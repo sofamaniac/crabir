@@ -8,102 +8,181 @@ import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:provider/provider.dart';
 
-class FeedView extends StatefulWidget {
+class FeedView extends StatelessWidget {
   const FeedView({super.key, required this.feed, required this.initialSort});
   final Feed feed;
   final Sort initialSort;
 
   @override
-  State<StatefulWidget> createState() => _FeedViewState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) =>
+          FeedStateProvider(state: FeedState(feed: feed, sort: initialSort)),
+      child: const FeedViewBody(),
+    );
+  }
 }
 
-class _FeedViewState extends State<FeedView>
+class FeedStateProvider extends ChangeNotifier {
+  bool done = false;
+  final FeedState state;
+
+  FeedStateProvider({required this.state});
+
+  int get length => state.length;
+
+  Post? nth({required int n}) => state.nth(n: n);
+
+  Future<void> next() async {
+    if (done) return;
+
+    final newDone = await state.next();
+    done = newDone;
+
+    notifyListeners();
+  }
+
+  String get title => state.title;
+  String get sortString => state.sortString;
+
+  set sort(Sort sort) {
+    state.sort = sort;
+    notifyListeners();
+  }
+
+  set feed(Feed feed) {
+    state.feed = feed;
+    notifyListeners();
+  }
+
+  void reset() {
+    state.refresh();
+    done = false;
+    notifyListeners();
+  }
+}
+
+class FeedViewBody extends StatefulWidget {
+  const FeedViewBody({super.key});
+
+  @override
+  State<FeedViewBody> createState() => _FeedViewBodyState();
+}
+
+class _FeedViewBodyState extends State<FeedViewBody>
     with AutomaticKeepAliveClientMixin {
-  final List<Post> _posts = [];
   bool _isLoading = false;
-  bool _done = false;
-  late FeedWrapper _feedwrapper;
-  late Sort _sort;
-  UserAccount? _associatedAccount;
+  Future<void>? _nextFuture;
+  String _error = "";
+  UserAccount? account;
 
-  _FeedViewState();
-
-  // Ensure that the tab state is preserved
   @override
   bool get wantKeepAlive => true;
 
-  set sort(Sort sort) {
-    setState(() {
-      _sort = sort;
-      _feedwrapper = FeedWrapper(feed: widget.feed, sort: sort);
-      _posts.clear();
-    });
-  }
-
-  Sort get sort {
-    return _sort;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _sort = widget.initialSort;
-    _feedwrapper = FeedWrapper(feed: widget.feed, sort: sort);
-    // Preload first item
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadNext();
-    });
-  }
-
-  Future<void> _loadNext() async {
-    if (_isLoading || _done) return;
-    setState(() => _isLoading = true);
-
-    try {
-      final post = await _feedwrapper.next();
-      if (post != null) {
-        setState(() => _posts.add(post));
-      } else {
-        setState(() => _done = true);
-      }
-    } catch (e) {
-      print("Error loading post: $e");
-      setState(() => _done = true);
-    } finally {
-      setState(() => _isLoading = false);
+  void _triggerLoadNext(FeedStateProvider state) {
+    if (!_isLoading && !state.done && _nextFuture == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _isLoading = true;
+        _error = "";
+        _nextFuture = state.next().catchError((error) {
+          _error = "$error";
+        }).whenComplete(() {
+          setState(() {
+            _isLoading = false;
+            _nextFuture = null;
+          });
+        });
+      });
     }
+  }
+
+  void _triggerReset(FeedStateProvider state) {
+    _nextFuture?.ignore();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      state.reset();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final actualAccount = context
-        .select<DrawerModel, UserAccount?>((drawer) => drawer.currentAccount);
-    if (actualAccount != _associatedAccount) {
-      setState(() {
-        _posts.clear();
-        _associatedAccount = actualAccount;
-        _feedwrapper = FeedWrapper(feed: widget.feed, sort: sort);
-      });
-    }
     super.build(context);
+    final state = context.watch<FeedStateProvider>();
+    final drawerModel = context.watch<DrawerModel>();
+
+    if (drawerModel.currentAccount != account) {
+      _triggerReset(state);
+      account = drawerModel.currentAccount;
+    }
+
     return CustomScrollView(
       slivers: [
-        SliverAppBar(title: Text("${widget.feed}")),
+        FeedTopBar(),
         SliverList.builder(
-          itemCount: _posts.length + 1, // +1 for loader
+          itemCount: state.length + 1,
           itemBuilder: (context, index) {
-            if (index == _posts.length) {
-              // load more when reaching end
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                _loadNext();
-              });
-              return const Center(child: CircularProgressIndicator());
+            if (index == state.length) {
+              _triggerLoadNext(state);
+              if (_error.isNotEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text("Error: $_error",
+                      style: const TextStyle(color: Colors.red)),
+                );
+              }
+              return const Padding(
+                padding: EdgeInsets.all(16),
+                child: Center(child: CircularProgressIndicator()),
+              );
             }
-            final post = _posts[index];
-            return RedditPostCard(post: post);
+
+            final post = state.nth(n: index);
+            return post != null
+                ? RedditPostCard(post: post)
+                : Text("${state.done}, ${state.length}");
           },
         ),
       ],
+    );
+  }
+}
+
+class FeedTopBar extends StatelessWidget {
+  const FeedTopBar({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<FeedStateProvider>().state;
+    final title = state.title;
+    final sort = state.sortString;
+
+    return SliverAppBar(
+      title: Column(
+        children: [
+          // TODO styling
+          Text(title),
+          Text(sort),
+        ],
+      ),
+      actions: [
+        IconButton(onPressed: () => (), icon: Icon(Icons.search)),
+        SortMenu(),
+      ],
+      floating: true,
+    );
+  }
+}
+
+class SortMenu extends StatelessWidget {
+  const SortMenu({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<FeedStateProvider>();
+    return PopupMenuButton(
+      itemBuilder: (context) => [
+        const PopupMenuItem(value: Sort.best(), child: Text("Best")),
+        const PopupMenuItem(value: Sort.hot(), child: Text("Hot")),
+        const PopupMenuItem(value: Sort.rising(), child: Text("Rising")),
+      ],
+      onSelected: (sort) => state.sort = sort,
     );
   }
 }

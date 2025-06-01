@@ -8,13 +8,13 @@ import '../../../lib.dart';
 import 'flair.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `try_from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `try_from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner< Subreddit>>
 abstract class Subreddit implements RustOpaqueInterface {
   bool get acceptFollowers;
 
-  BigInt get accountsActive;
+  BigInt? get accountsActive;
 
   bool get accountsActiveIsFuzzed;
 
@@ -120,7 +120,7 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   String get name;
 
-  String get notificationLevel;
+  String? get notificationLevel;
 
   bool get originalContentTagEnabled;
 
@@ -200,7 +200,7 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   set acceptFollowers(bool acceptFollowers);
 
-  set accountsActive(BigInt accountsActive);
+  set accountsActive(BigInt? accountsActive);
 
   set accountsActiveIsFuzzed(bool accountsActiveIsFuzzed);
 
@@ -307,7 +307,7 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   set name(String name);
 
-  set notificationLevel(String notificationLevel);
+  set notificationLevel(String? notificationLevel);
 
   set originalContentTagEnabled(bool originalContentTagEnabled);
 
@@ -409,4 +409,13 @@ class CommentContributionSettings {
       other is CommentContributionSettings &&
           runtimeType == other.runtimeType &&
           allowedMediaTypes == other.allowedMediaTypes;
+}
+
+enum NotificationLevel {
+  unknown,
+  low,
+  ;
+
+  static Future<NotificationLevel> default_() =>
+      RustLib.instance.api.redditApiModelSubredditNotificationLevelDefault();
 }

@@ -42,29 +42,20 @@ class MyApp extends StatelessWidget {
                 Tab(icon: Icon(Icons.person))
               ],
             ),
-            body: const TabBarView(
+            body: TabBarView(
               physics: NeverScrollableScrollPhysics(),
               children: [
-                FeedView(
-                  feed: Feed.home(),
-                  initialSort: Sort.best(),
-                ),
-                FeedView(
-                  feed: Feed.subreddit("awwnime"),
-                  initialSort: Sort.best(),
-                ),
-                FeedView(
-                  feed: Feed.subreddit("unixporn"),
-                  initialSort: Sort.best(),
-                ),
-                FeedView(
-                  feed: Feed.subreddit("rust"),
-                  initialSort: Sort.best(),
-                ),
-                FeedView(
-                  feed: Feed.subreddit("cableporn"),
-                  initialSort: Sort.best(),
-                ),
+                // feedView(
+                //     context,
+                //     FeedState(
+                //       feed: Feed.home(),
+                //       sort: Sort.best(),
+                //     )),
+                FeedView(feed: Feed.home(), initialSort: Sort.best()),
+                FeedView(feed: Feed.home(), initialSort: Sort.best()),
+                FeedView(feed: Feed.home(), initialSort: Sort.best()),
+                FeedView(feed: Feed.home(), initialSort: Sort.best()),
+                FeedView(feed: Feed.home(), initialSort: Sort.best()),
               ],
             ),
           ),

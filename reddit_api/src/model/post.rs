@@ -1,5 +1,5 @@
 pub use chrono::{DateTime, Local, Utc};
-use std::time::Duration;
+use std::{backtrace::Backtrace, time::Duration};
 
 use crate::error::Error;
 use crate::model::flair::Flair;
@@ -243,7 +243,9 @@ impl TryFrom<Thing> for Post {
     fn try_from(value: Thing) -> Result<Self, Self::Error> {
         match value {
             Thing::Post(post) => Ok(post),
-            _ => Err(Error::InvalidThing),
+            _ => Err(Error::InvalidThing {
+                backtrace: Backtrace::capture(),
+            }),
         }
     }
 }
@@ -326,12 +328,12 @@ pub struct Gildings {}
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Preview {
-    pub images: Vec<Image>,
+    pub images: Vec<RedditImage>,
     pub enabled: bool,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Image {
+pub struct RedditImage {
     pub source: ImageBase,
     pub resolutions: Vec<ImageBase>,
     pub variants: Variants,

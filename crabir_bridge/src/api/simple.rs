@@ -1,18 +1,18 @@
+use flutter_rust_bridge::JoinHandle;
+use futures::channel::mpsc::{self, Receiver};
 // Needs to be pub for the bridge
 pub use futures::lock::Mutex;
+use futures::SinkExt;
 pub use reddit_api::client::Client;
 use reddit_api::model::feed::{Stream, StreamExt};
 use reddit_api::model::post::{Kind, Thumbnail};
-//use reddit_api::model::Timeframe;
-use std::sync::Arc;
 use std::sync::LazyLock;
+use std::time;
 
 pub use reddit_api::error::Error;
 use reddit_api::model::feed::Feed;
 use reddit_api::model::post::Post;
-use reddit_api::model::Sort;
-
-//pub use reddit_api::{Fullname, Saveable, Votable};
+use reddit_api::model::{Sort, Timeframe};
 
 pub static CLIENT: LazyLock<reddit_api::client::Client> =
     LazyLock::new(reddit_api::client::Client::new_anonymous);
@@ -28,47 +28,172 @@ impl RedditAPI {
     }
 }
 
-// #[flutter_rust_bridge::frb(mirror(Feed))]
-// pub enum _Feed {
-//     Home,
-//     All,
-//     Popular,
-//     Subreddit(String),
-// }
+pub type PostStream = Box<dyn Stream<Item = Result<Post, Error>> + Send + Sync + Unpin>;
 
-// #[flutter_rust_bridge::frb(mirror(Sort))]
-// pub enum _Sort {
-//     Best,
-//     Hot,
-//     Top(Timeframe),
-//     Rising,
-//     New(Timeframe),
-//     Controversial(Timeframe),
-// }
-
-pub type FeedStream = Box<dyn Stream<Item = Result<Post, Error>> + Send + Sync + Unpin>;
-
-#[flutter_rust_bridge::frb(opaque)]
-pub struct FeedWrapper {
-    pub stream: Arc<Mutex<FeedStream>>,
+pub struct FeedState {
+    feed: Feed,
+    sort: Sort,
+    posts: Vec<Post>,
+    done: bool,
+    loading: bool,
+    bg_task: Option<JoinHandle<()>>,
+    rx: Receiver<Result<Post, Error>>,
 }
 
-impl FeedWrapper {
+impl std::fmt::Debug for FeedState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("FeedState")
+            //.field("stream", &self.stream)
+            .field("feed", &self.feed)
+            .field("sort", &self.sort)
+            .field("posts", &self.posts)
+            .field("loading", &self.loading)
+            .field("done", &self.loading)
+            //.field("base_state", &self.base_state)
+            .finish()
+    }
+}
+
+impl FeedState {
     #[flutter_rust_bridge::frb(sync)]
     pub fn new(feed: Feed, sort: Sort) -> Self {
-        let stream = CLIENT.feed(feed, sort);
-        let stream: FeedStream = Box::new(stream);
-        let stream = Arc::new(Mutex::new(stream));
-        FeedWrapper { stream }
+        let (_, rx) = mpsc::channel(10);
+        //frb::spawn requires to be in an async function
+        Self {
+            feed,
+            sort,
+            posts: Vec::new(),
+            done: false,
+            loading: false,
+            bg_task: None,
+            rx,
+        }
     }
-    pub async fn next(&mut self) -> Result<Option<Post>, Error> {
-        self.stream
-            .clone()
-            .lock_owned()
-            .await
-            .next()
-            .await
-            .transpose()
+
+    async fn new_bg_task(&mut self) {
+        if let Some(bg_task) = self.bg_task.as_ref() {
+            bg_task.abort();
+        }
+        let (mut tx, rx) = mpsc::channel(10);
+        self.rx = rx;
+        let feed_clone = self.feed.clone();
+        let sort_clone = self.sort;
+        self.bg_task = Some(flutter_rust_bridge::spawn(async move {
+            let mut stream = CLIENT.feed(feed_clone, sort_clone);
+            while let Some(post) = stream.next().await {
+                if tx.send(post).await.is_err() {
+                    break;
+                }
+            }
+        }));
+    }
+
+    #[flutter_rust_bridge::frb]
+    pub async fn refresh(&mut self) {
+        self.new_bg_task().await;
+        self.posts.clear();
+    }
+
+    /// Returns true if there is no more posts to load
+    //#[flutter_rust_bridge::frb(ui_mutation)]
+    #[flutter_rust_bridge::frb]
+    pub async fn next(&mut self) -> Result<bool, Error> {
+        if self.bg_task.is_none() {
+            self.new_bg_task().await;
+        }
+        if let Some(message) = self.rx.next().await {
+            let post = message?;
+            self.posts.push(post);
+            Ok(false)
+        } else {
+            Ok(true)
+        }
+    }
+
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn nth(&self, n: u32) -> Option<Post> {
+        self.posts.get(n as usize).cloned()
+    }
+
+    #[flutter_rust_bridge::frb(sync, getter)]
+    pub fn get_length(&self) -> u32 {
+        self.posts.len() as u32
+    }
+
+    // frb will automatically strip the prefix from setters and getters.
+    #[flutter_rust_bridge::frb(setter)]
+    pub async fn set_feed(&mut self, feed: Feed) {
+        if feed != self.feed {
+            self.feed = feed;
+            self.refresh().await;
+        }
+    }
+
+    #[flutter_rust_bridge::frb(sync, getter)]
+    pub fn get_feed(&self) -> Feed {
+        self.feed.clone()
+    }
+
+    #[flutter_rust_bridge::frb(sync, getter)]
+    pub fn get_sort(&self) -> Sort {
+        self.sort
+    }
+    #[flutter_rust_bridge::frb(setter)]
+    pub async fn set_sort(&mut self, sort: Sort) {
+        if sort != self.sort {
+            self.sort = sort;
+            self.refresh().await;
+        }
+    }
+
+    #[flutter_rust_bridge::frb(sync, getter)]
+    pub fn get_done(&self) -> bool {
+        self.done
+    }
+    #[flutter_rust_bridge::frb(sync, getter)]
+    pub fn get_loading(&self) -> bool {
+        self.loading
+    }
+
+    #[flutter_rust_bridge::frb(sync, getter)]
+    pub fn get_title(&self) -> String {
+        match &self.feed {
+            Feed::Home => "Home".to_owned(),
+            Feed::Subreddit(subreddit) => subreddit.clone(),
+            Feed::All => "r/all".to_owned(),
+            Feed::Popular => "r/popular".to_owned(),
+        }
+    }
+
+    #[flutter_rust_bridge::frb(sync, getter)]
+    pub fn get_sort_string(&self) -> String {
+        let start = match self.sort {
+            Sort::Best => "Best",
+            Sort::Hot => "Hot",
+            Sort::Rising => "Rising",
+            Sort::New(_) => "New",
+            Sort::Top(_) => "Top",
+            Sort::Controversial(_) => "Controversial",
+        };
+        let end = match self.sort {
+            Sort::New(timeframe) | Sort::Top(timeframe) | Sort::Controversial(timeframe) => {
+                Some(match timeframe {
+                    Timeframe::All => "all time",
+                    Timeframe::Year => "year",
+                    Timeframe::Month => "month",
+                    Timeframe::Week => "week",
+                    Timeframe::Day => "day",
+                    Timeframe::Hour => "hour",
+                })
+            }
+            _ => None,
+        };
+
+        if let Some(end) = end {
+            format!("{start} {end}")
+        } else {
+            start.to_owned()
+        }
     }
 }
 
@@ -82,6 +207,7 @@ impl Post {
 
 #[flutter_rust_bridge::frb(init)]
 pub fn init_app() {
+    std::env::set_var("RUST_BACKTRACE", "1");
     // Default utilities - feel free to customize
     flutter_rust_bridge::setup_default_user_utils();
     setup_the_logger();
@@ -90,6 +216,6 @@ pub fn init_app() {
 fn setup_the_logger() {
     #[cfg(target_os = "android")]
     android_logger::init_once(
-        android_logger::Config::default().with_max_level(log::LevelFilter::Trace),
+        android_logger::Config::default().with_max_level(log::LevelFilter::Debug),
     );
 }

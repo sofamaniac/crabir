@@ -10,21 +10,38 @@ import '../third_party/reddit_api/model/feed.dart';
 import '../third_party/reddit_api/model/post.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `setup_the_logger`
+// These functions are ignored because they are not marked as `pub`: `new_bg_task`, `setup_the_logger`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Mutex < FeedStream > >>>
-abstract class ArcMutexFeedStream implements RustOpaqueInterface {}
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FeedState>>
+abstract class FeedState implements RustOpaqueInterface {
+  bool get done;
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FeedWrapper>>
-abstract class FeedWrapper implements RustOpaqueInterface {
-  ArcMutexFeedStream get stream;
+  Feed get feed;
 
-  set stream(ArcMutexFeedStream stream);
+  int get length;
 
-  factory FeedWrapper({required Feed feed, required Sort sort}) =>
-      RustLib.instance.api.crateApiSimpleFeedWrapperNew(feed: feed, sort: sort);
+  bool get loading;
 
-  Future<Post?> next();
+  Sort get sort;
+
+  String get sortString;
+
+  String get title;
+
+  factory FeedState({required Feed feed, required Sort sort}) =>
+      RustLib.instance.api.crateApiSimpleFeedStateNew(feed: feed, sort: sort);
+
+  /// Returns true if there is no more posts to load
+  Future<bool> next();
+
+  Post? nth({required int n});
+
+  Future<void> refresh();
+
+  set feed(Feed feed);
+
+  set sort(Sort sort);
 }
 
 class RedditAPI {

@@ -1,3 +1,5 @@
+use std::backtrace::Backtrace;
+
 use serde::{Deserialize, Serialize};
 
 use crate::error::Error;
@@ -47,7 +49,9 @@ impl TryFrom<Thing> for Multi {
     fn try_from(value: Thing) -> Result<Self, Self::Error> {
         match value {
             Thing::Multi(multi) => Ok(multi),
-            _ => Err(Error::InvalidThing),
+            _ => Err(Error::InvalidThing {
+                backtrace: Backtrace::capture(),
+            }),
         }
     }
 }

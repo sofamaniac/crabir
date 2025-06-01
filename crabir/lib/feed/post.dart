@@ -1,103 +1,193 @@
+import 'package:crabir/feed/feed.dart';
 import 'package:crabir/src/rust/api/simple.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/material.dart' as widgets show Image;
 import 'package:flutter/services.dart';
 
-class PostView extends StatelessWidget {
-  const PostView({super.key, required this.post});
+final horizontalPadding = 16.0;
+
+class _PostTitle extends StatelessWidget {
   final Post post;
+
+  const _PostTitle({super.key, required this.post});
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [Text(post.title), Divider()]);
-  }
-}
-
-class PostHeader extends StatelessWidget {
-  const PostHeader({
-    super.key,
-    required this.post,
-    this.onSubredditTap,
-    this.onUserTap,
-  });
-  final Post post;
-  final void Function(SubredditInfo subreddit)? onSubredditTap;
-  final void Function(AuthorInfo? username)? onUserTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final labelStyle = Theme.of(context).textTheme.labelSmall;
-    return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8),
-        child: Row(
-          children: [
-            InkWell(
-              onTap: () => onSubredditTap?.call(post.subreddit),
-              child: Text(
-                'r/${post.subreddit.subreddit}',
-                style: labelStyle?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 3,
+          child: Text(
+            post.title,
+            textAlign: TextAlign.start,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: AspectRatio(
+            aspectRatio: 1.0,
+            child: ClipRect(
+              child:
+                  widgets.Image.network(post.thumbnail!.url, fit: BoxFit.cover),
             ),
-            const Text(' • '),
-            InkWell(
-              onTap: () => onUserTap?.call(post.author),
-              child: Text(
-                'u/${post.author?.username ?? "[deleted]"}',
-                style: labelStyle?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            ),
-          ],
-        ));
-  }
-}
-
-class PostBottowRow extends StatelessWidget {
-  final Post post;
-  const PostBottowRow({super.key, required this.post});
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8),
-        child: Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_upward),
-              tooltip: 'Upvote',
-              onPressed: () {},
-            ),
-            const SizedBox(width: 16),
-            IconButton(
-              icon: const Icon(Icons.comment),
-              tooltip: 'Comments',
-              onPressed: () {},
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.share),
-              tooltip: 'Share',
-              onPressed: () {},
-            ),
-          ],
-        ));
+          ),
+        ),
+      ],
+    );
   }
 }
 
 class RedditPostCard extends StatelessWidget {
   final Post post;
-  final void Function(String subreddit)? onSubredditTap;
-  final void Function(String username)? onUserTap;
 
   const RedditPostCard({
     super.key,
     required this.post,
-    this.onSubredditTap,
-    this.onUserTap,
   });
+
+  Widget header(BuildContext context) {
+    final labelStyle = Theme.of(context).textTheme.labelSmall;
+    final subreddit = post.subreddit.subreddit;
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+      child: Row(
+        children: [
+          InkWell(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => FeedView(
+                  feed: Feed.subreddit(subreddit),
+                  initialSort: Sort.best(),
+                ),
+              ),
+            ),
+            child: Text(
+              'r/$subreddit',
+              style: labelStyle?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+          const Text(' • '),
+          InkWell(
+            onTap: () => (),
+            child: Text(
+              'u/${post.author?.username ?? "[deleted]"}',
+              style: labelStyle?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget footer(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.thumb_up),
+            tooltip: 'Upvote',
+            onPressed: () async {
+              await RedditAPI.client().vote(
+                  thing: post.name,
+                  direction: (post.likes ?? false)
+                      ? VoteDirection.up
+                      : VoteDirection.neutral);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.thumb_down),
+            tooltip: 'Downvote',
+            onPressed: () async {
+              await RedditAPI.client().vote(
+                  thing: post.name,
+                  direction: !(post.likes ?? false)
+                      ? VoteDirection.down
+                      : VoteDirection.neutral);
+            },
+          ),
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.bookmark_outlined),
+            tooltip: "Save",
+          ),
+          IconButton(
+            icon: const Icon(Icons.comment),
+            tooltip: 'Comments',
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.exit_to_app),
+            tooltip: 'Open in',
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            tooltip: 'Share',
+            onPressed: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool showThumbnail() {
+    if (post.thumbnail == null) {
+      return false;
+    } else {
+      return switch (post.kind) {
+        Kind.link || Kind.unknown => true,
+        _ => false,
+      };
+    }
+  }
+
+  Widget title(BuildContext context) {
+    if (showThumbnail()) {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: _PostTitle(post: post),
+        ),
+      );
+    } else {
+      return Padding(
+        padding: EdgeInsetsDirectional.symmetric(horizontal: horizontalPadding),
+        child: Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: Text(
+            post.title,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget content(BuildContext context) {
+    return switch (post.kind) {
+      Kind.selftext => Text("selftext"),
+      Kind.meta => Text("meta"),
+      Kind.video => Text("video"),
+      Kind.gallery => Text("gallery"),
+      Kind.image => ImageContent(post: post),
+      Kind.link => Text("link"),
+      Kind.unknown => Text("unknown"),
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,38 +199,17 @@ class RedditPostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            PostHeader(post: post),
+            header(context),
             const SizedBox(height: 8),
-            Text(
-              post.title,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            title(context),
             const SizedBox(height: 12),
-            PostContent(post: post),
+            content(context),
             const SizedBox(height: 12),
-            PostBottowRow(post: post),
+            footer(context),
           ],
         ),
       ),
     );
-  }
-}
-
-class PostContent extends StatelessWidget {
-  final Post post;
-  const PostContent({super.key, required this.post});
-
-  @override
-  Widget build(BuildContext context) {
-    return switch (post.kind) {
-      Kind.selftext => Text("selftext"),
-      Kind.meta => Text("meta"),
-      Kind.video => Text("video"),
-      Kind.gallery => Text("gallery"),
-      Kind.image => ImageContent(post: post),
-      Kind.link => Text("link"),
-      Kind.unknown => Text("unknown"),
-    };
   }
 }
 
@@ -150,34 +219,21 @@ class ImageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8),
-          child: Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: Text(
-                post.title,
-                style: Theme.of(context).textTheme.titleMedium,
-                textAlign: TextAlign.start,
-              ))),
-      imageView(context)
-    ]);
-  }
-
-  Widget imageView(BuildContext context) {
     final image = post.preview!.images[0].source;
     return InkWell(
-        onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => FullscreenImageViewer(image: image))),
-        child: AspectRatio(
-            aspectRatio: image.width.toDouble() / image.height.toDouble(),
-            child: widgets.Image.network(image.url,
-                //width: image.width.toDouble(),
-                width: double.infinity,
-                //height: image.height.toDouble(),
-                fit: BoxFit.fitWidth)));
+      onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => FullscreenImageViewer(image: image))),
+      child: AspectRatio(
+        aspectRatio: image.width.toDouble() / image.height.toDouble(),
+        child: widgets.Image.network(image.url,
+            //width: image.width.toDouble(),
+            width: double.infinity,
+            //height: image.height.toDouble(),
+            fit: BoxFit.fitWidth),
+      ),
+    );
   }
 }
 

@@ -31,13 +31,13 @@ where
     }
 }
 
-// pub fn response_or_default<'de, D, T>(d: D) -> Result<Option<T>, D::Error>
-// where
-//     D: Deserializer<'de>,
-//     T: Deserialize<'de> + Default,
-// {
-//     Ok(response_or_none(d)?.unwrap_or_default())
-// }
+pub fn response_or_default<'de, D, T>(d: D) -> Result<T, D::Error>
+where
+    D: Deserializer<'de>,
+    T: Deserialize<'de> + Default,
+{
+    Ok(response_or_none(d)?.unwrap_or_default())
+}
 
 pub fn author_option<'de, D>(d: D) -> Result<Option<AuthorInfo>, D::Error>
 where

@@ -8,6 +8,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
 class DrawerModel extends ChangeNotifier {
@@ -24,13 +25,14 @@ class DrawerModel extends ChangeNotifier {
   List<Subreddit> _subscriptions = [];
   List<Subreddit> get subscriptions => _subscriptions;
 
+  Logger log = Logger("DrawerModel");
+
   Future selectAccount(int index) async {
     // TODO persist to storage
     if (index < _accounts.length && index != _currentAccount) {
       _currentAccount = index;
       if (_accounts[index].id != UserAccount.anonymous().id) {
         await RedditAPI.client().authenticate(
-          accessToken: _accounts[index].accessToken!,
           refreshToken: _accounts[index].refreshToken!,
         );
         await _loadSubreddits();
@@ -68,10 +70,16 @@ class DrawerModel extends ChangeNotifier {
   }
 
   Future _loadSubreddits() async {
+    if (currentAccount == UserAccount.anonymous() || currentAccount == null) {
+      return;
+    }
+    log.info("Requesting subscriptions for ${currentAccount?.username}");
     try {
       _subscriptions = await RedditAPI.client().subsriptions();
+      _subscriptions.sort((a, b) =>
+          a.displayName.toLowerCase().compareTo(b.displayName.toLowerCase()));
     } catch (err) {
-      print("err while loading subreddits $err");
+      log.severe("Error while loading subscriptions: $err");
       _subscriptions = [];
     }
   }
@@ -177,23 +185,46 @@ class DrawerFeedSelection extends StatelessWidget {
           ...userOptions.map((option) => Text(option)),
           Divider(),
           ...subscriptions.map((sub) => Text(sub)),
-          ...state.subscriptions.map(
-            (sub) => InkWell(
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => FeedView(
-                    feed: Feed.subreddit(sub.name),
-                    initialSort: Sort.best(),
+          Column(
+            spacing: 8.0,
+            children: [
+              ...state.subscriptions.map(
+                (sub) => InkWell(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => FeedView(
+                        feed: Feed.subreddit(sub.displayName),
+                        initialSort: Sort.best(),
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    spacing: 8.0,
+                    children: [
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundImage: NetworkImage(
+                          sub.iconImg,
+                          // width: 32,
+                          // height: 32,
+                        ),
+                      ),
+                      Text(sub.displayNamePrefixed,
+                          style: Theme.of(context).textTheme.bodyMedium)
+                    ],
                   ),
                 ),
               ),
-              child: Row(children: [
-                Image.network(sub.iconImg),
-                Text(sub.displayNamePrefixed)
-              ]),
-            ),
-          )
+            ],
+          ),
+          Divider(),
+          InkWell(
+              onTap: () => showLicensePage(context: context),
+              child: Row(spacing: 8.0, children: [
+                Icon(Icons.info_outline),
+                Text("Licenses", style: Theme.of(context).textTheme.bodyMedium)
+              ]))
         ]));
   }
 }

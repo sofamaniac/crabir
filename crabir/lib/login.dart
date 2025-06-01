@@ -111,7 +111,8 @@ class AccountDatabase {
 
   Future<int> insertAccount(UserAccount account) async {
     final db = await database;
-    return await db.insert("accounts", account.toMap());
+    return await db.insert("accounts", account.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<UserAccount>> getAccounts() async {
@@ -152,13 +153,15 @@ Future<bool> loginToReddit() async {
   // Extract the code from the callback URL
   final code = result.queryParameters['code'];
 
+  final header =
+      'Basic ${base64Encode(utf8.encode('$clientId:'))}'; // No client secret for installed apps
+  print("HEADER $header");
   // Exchange the code for an access token
   final tokenResponse = await http.post(
     Uri.https(baseUri, tokenEndpoint),
     headers: {
       'Authorization':
           'Basic ${base64Encode(utf8.encode('$clientId:'))}', // No client secret for installed apps
-      'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: {
       'grant_type': 'authorization_code',
@@ -172,8 +175,8 @@ Future<bool> loginToReddit() async {
   final tokenData = json.decode(tokenResponse.body);
   final accessToken = tokenData["access_token"];
   final refreshToken = tokenData["refresh_token"];
-  await RedditAPI.client()
-      .authenticate(accessToken: accessToken, refreshToken: refreshToken);
+  print("REFRESH TOKEN $refreshToken");
+  await RedditAPI.client().authenticate(refreshToken: refreshToken);
   final UserInfo userInfo = await RedditAPI.client().loggedUserInfo();
   await AccountDatabase().insertAccount(
       UserAccount.fromUserInfo(userInfo, accessToken, refreshToken));

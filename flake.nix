@@ -12,13 +12,13 @@
     flake-utils.lib.eachSystem [ "x86_64-linux" ] (
       system:
       let
+        overlays = [(import rust-overlay)];
         pkgs = import nixpkgs {
-          inherit system;
+          inherit system overlays;
           config.allowUnfree = true;
           android_sdk.accept_license = true;
-          # overlays = [rust-overlay.overlays.default];
         };
-        # rust-toolchain = pkgs.rust-bin.fromRustupToolchainFile ./toolchain.toml;
+        #rust-toolchain = rust-bin.selectLatestNightlyWith (toolchain: toolchain.default);
         buildToolsVer = "35.0.1";
         androidEnv = pkgs.androidenv.override { licenseAccepted = true; };
         androidComposition = androidEnv.composeAndroidPackages {
@@ -68,15 +68,15 @@
               gradle
               jdk17
 
-              #rust-bin.stable.latest.default # Stable rust, default profile. If not sure, always choose this.
-              # rust-toolchain
+              (rust-bin.fromRustupToolchainFile ./toolchain.toml)
               rustup
-              cargo
-              rust-analyzer
             ];
 
             # See https://github.com/fzyzcjy/flutter_rust_bridge/issues/2527
-            LD_LIBRARY_PATH = "/home/sofamaniac/Nextcloud/programmation/boostrs/lib/:$LD_LIBRARY_PATH";
+            LD_LIBRARY_PATH = "/home/sofamaniac/Nextcloud/programmation/crabir/crabir/lib/:$LD_LIBRARY_PATH";
+
+            # To fix std completion
+            RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
 
             shellHook = ''
               if [ -z "$PUB_CACHE" ]; then

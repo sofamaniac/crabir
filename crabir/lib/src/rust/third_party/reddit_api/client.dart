@@ -10,17 +10,22 @@ import 'model/subreddit.dart';
 import 'model/user.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`
-// These functions have error during generation (see debug logs or enable `stop_on_error: true` for more details): `feed`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `SaveFeed`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fetch_next`, `fmt`, `fmt`
+// These functions have error during generation (see debug logs or enable `stop_on_error: true` for more details): `feed`, `saved`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Client>>
 abstract class Client implements RustOpaqueInterface {
   /// Authenticate the current client
-  Future<void> authenticate(
-      {required String accessToken, required String refreshToken});
+  Future<void> authenticate({required String refreshToken});
 
   static Future<Client> default_() =>
       RustLib.instance.api.redditApiClientClientDefault();
+
+  /// Create a new client that is authenticated
+  static Future<Client> fromRefreshToken({required String refreshToken}) =>
+      RustLib.instance.api
+          .redditApiClientClientFromRefreshToken(refreshToken: refreshToken);
 
   /// Get the info of the current user.
   /// # Errors
@@ -35,12 +40,6 @@ abstract class Client implements RustOpaqueInterface {
   /// Create a new client for a logged out user
   static Future<Client> newAnonymous() =>
       RustLib.instance.api.redditApiClientClientNewAnonymous();
-
-  /// Create a new client that is authenticated
-  static Future<Client> newUser(
-          {required String accessToken, required String refreshToken}) =>
-      RustLib.instance.api.redditApiClientClientNewUser(
-          accessToken: accessToken, refreshToken: refreshToken);
 
   /// Save a saveable item (i.e. a [`Post`] or a [`Comment`]).
   /// # Errors

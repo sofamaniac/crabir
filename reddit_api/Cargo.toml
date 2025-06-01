@@ -11,11 +11,17 @@ csscolorparser = { version = "0.7.0", features = ["serde"] }
 flutter_rust_bridge = "2.10.0"
 futures = "0.3.31"
 log = "0.4.27"
-reqwest = { version = "0.12.15", features = ["json", "rustls-tls", "http2"], default-features = false }
+reqwest = { version = "0.12.15", features = [
+  "json",
+  "rustls-tls",
+  "http2",
+], default-features = false }
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 serde_with = { version = "3.12.0", features = ["chrono_0_4"] }
 thiserror = "2.0.12"
+# tracing = "0.1.41"
 
 [dev-dependencies]
-tokio = {version = "1.45.0", features = ["full"]}
+tokio = { version = "1.45.0", features = ["full"] }
+env_logger = "0.11.8"

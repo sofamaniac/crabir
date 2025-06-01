@@ -1,3 +1,5 @@
+use std::backtrace::{self, Backtrace};
+
 use multi::Multi;
 pub use post::Post;
 use reqwest::Url;
@@ -51,7 +53,9 @@ impl TryFrom<Thing> for Listing {
     fn try_from(value: Thing) -> Result<Self, Self::Error> {
         match value {
             Thing::Listing(listing) => Ok(listing),
-            _ => Err(Error::InvalidThing),
+            _ => Err(Error::InvalidThing {
+                backtrace: Backtrace::capture(),
+            }),
         }
     }
 }

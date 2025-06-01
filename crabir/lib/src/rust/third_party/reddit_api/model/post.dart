@@ -522,37 +522,6 @@ class Gildings {
       other is Gildings && runtimeType == other.runtimeType;
 }
 
-class Image {
-  final ImageBase source;
-  final List<ImageBase> resolutions;
-  final Variants variants;
-  final String id;
-
-  const Image({
-    required this.source,
-    required this.resolutions,
-    required this.variants,
-    required this.id,
-  });
-
-  static Future<Image> default_() =>
-      RustLib.instance.api.redditApiModelPostImageDefault();
-
-  @override
-  int get hashCode =>
-      source.hashCode ^ resolutions.hashCode ^ variants.hashCode ^ id.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Image &&
-          runtimeType == other.runtimeType &&
-          source == other.source &&
-          resolutions == other.resolutions &&
-          variants == other.variants &&
-          id == other.id;
-}
-
 class ImageBase {
   final String url;
   final PlatformInt64 width;
@@ -623,7 +592,7 @@ class MediaEmbed {
 }
 
 class Preview {
-  final List<Image> images;
+  final List<RedditImage> images;
   final bool enabled;
 
   const Preview({
@@ -644,6 +613,37 @@ class Preview {
           runtimeType == other.runtimeType &&
           images == other.images &&
           enabled == other.enabled;
+}
+
+class RedditImage {
+  final ImageBase source;
+  final List<ImageBase> resolutions;
+  final Variants variants;
+  final String id;
+
+  const RedditImage({
+    required this.source,
+    required this.resolutions,
+    required this.variants,
+    required this.id,
+  });
+
+  static Future<RedditImage> default_() =>
+      RustLib.instance.api.redditApiModelPostRedditImageDefault();
+
+  @override
+  int get hashCode =>
+      source.hashCode ^ resolutions.hashCode ^ variants.hashCode ^ id.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RedditImage &&
+          runtimeType == other.runtimeType &&
+          source == other.source &&
+          resolutions == other.resolutions &&
+          variants == other.variants &&
+          id == other.id;
 }
 
 class SecureMediaEmbed {

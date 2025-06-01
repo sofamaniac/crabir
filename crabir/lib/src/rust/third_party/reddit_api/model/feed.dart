@@ -4,12 +4,22 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../../frb_generated.dart';
+import '../client.dart';
+import '../model.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'feed.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `eq`, `fmt`, `poll_next`
-// These functions are ignored (category: IgnoreBecauseNotAllowedOwner): `new`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `eq`, `fetch_next`, `fmt`
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FeedStream>>
+abstract class FeedStream implements RustOpaqueInterface {
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<FeedStream> newInstance(
+          {required Client client, required Feed feed, required Sort sort}) =>
+      RustLib.instance.api.redditApiModelFeedFeedStreamNew(
+          client: client, feed: feed, sort: sort);
+}
 
 @freezed
 sealed class Feed with _$Feed {

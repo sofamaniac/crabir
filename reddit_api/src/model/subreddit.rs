@@ -1,3 +1,6 @@
+use std::backtrace::Backtrace;
+
+use crate::utils::response_or_default;
 use crate::{error::Error, model::flair::Flair};
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
@@ -42,14 +45,12 @@ pub struct Subreddit {
 
     #[serde(rename = "primary_color")]
     pub primary_color: String,
-    #[serde(rename = "active_user_count")]
-    #[serde_as(deserialize_as = "DefaultOnNull")]
+    #[serde(rename = "active_user_count", deserialize_with = "response_or_default")]
     pub active_user_count: u64,
     #[serde(rename = "display_name_prefixed")]
     pub display_name_prefixed: String,
-    #[serde(rename = "accounts_active")]
-    #[serde_as(deserialize_as = "DefaultOnNull")]
-    pub accounts_active: u64,
+    #[serde(rename = "accounts_active", deserialize_with = "response_or_default")]
+    pub accounts_active: Option<u64>,
     #[serde(rename = "public_traffic")]
     pub public_traffic: bool,
     pub subscribers: i64,
@@ -109,7 +110,7 @@ pub struct Subreddit {
     pub submission_type: String,
     #[serde(rename = "user_is_subscriber")]
     pub user_is_subscriber: bool,
-    #[serde(rename = "allowed_media_in_comments")]
+    #[serde(rename = "allowed_media_in_comments", default)]
     pub allowed_media_in_comments: Vec<String>,
     #[serde(rename = "allow_videogifs")]
     pub allow_videogifs: bool,
@@ -127,8 +128,8 @@ pub struct Subreddit {
     pub allow_videos: bool,
     #[serde(rename = "is_crosspostable_subreddit")]
     pub is_crosspostable_subreddit: Option<bool>,
-    #[serde(rename = "notification_level")]
-    pub notification_level: String,
+    #[serde(rename = "notification_level", default)]
+    pub notification_level: Option<String>,
     #[serde(rename = "should_show_media_in_comments_setting")]
     pub should_show_media_in_comments_setting: bool,
     #[serde(rename = "can_assign_link_flair")]
@@ -198,7 +199,9 @@ impl TryFrom<Thing> for Subreddit {
     fn try_from(value: Thing) -> Result<Self, Self::Error> {
         match value {
             Thing::Subreddit(subreddit) => Ok(subreddit),
-            _ => Err(Error::InvalidThing),
+            _ => Err(Error::InvalidThing {
+                backtrace: Backtrace::capture(),
+            }),
         }
     }
 }
@@ -206,7 +209,18 @@ impl TryFrom<Thing> for Subreddit {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CommentContributionSettings {
-    #[serde(rename = "allowed_media_types")]
-    #[serde(default)]
+    #[serde(
+        rename = "allowed_media_types",
+        deserialize_with = "response_or_default",
+        default
+    )]
     pub allowed_media_types: Vec<String>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum NotificationLevel {
+    #[default]
+    Unknown,
+    Low,
 }

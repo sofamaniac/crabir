@@ -1,19 +1,17 @@
+use crate::listing_stream::{ListingStream, Wrapper};
 use crate::model::Fullname;
 use crate::model::feed::Feed;
 use crate::{model::feed::FeedStream, result::Result};
+use std::backtrace::Backtrace;
+use std::collections::HashMap;
 use std::sync::Arc;
 
-use base64::{
-    Engine,
-    prelude::{BASE64_STANDARD, BASE64_URL_SAFE_NO_PAD},
-};
+use base64::Engine;
+use base64::prelude::BASE64_URL_SAFE_NO_PAD;
 use chrono::{DateTime, Utc};
 use futures::{Stream, lock::Mutex};
-use log::*;
-use reqwest::{
-    Request, RequestBuilder,
-    header::{self, HeaderMap, HeaderValue},
-};
+use log::{debug, error, info};
+use reqwest::{Request, RequestBuilder};
 
 pub use reqwest::{IntoUrl, Url};
 use serde::{
@@ -26,12 +24,12 @@ use crate::{
     model::{Listing, Sort, Thing, post::Post, user::UserInfo},
 };
 
-const USER_AGENT: &str = "com.sofamaniac.reboost";
+const USER_AGENT: &str = "com.sofamaniac.crabir";
 const CLIENT_ID: &str = "w0DROpe2H7uv2inVTvSfZw";
 
 #[derive(Clone, Debug)]
 pub struct Client {
-    client: Arc<Mutex<reqwest::Client>>,
+    http: reqwest::Client,
     refresh_token: Arc<Mutex<Option<String>>>,
     current_access_token: Arc<Mutex<Option<String>>>,
 }
@@ -70,46 +68,29 @@ pub const SCOPES: [&str; 19] = [
     "wikiread",
 ];
 
-/// Basic auth string
-fn bearer_token() -> String {
-    let token = BASE64_STANDARD.encode(format!("{CLIENT_ID}:"));
-    format!("Basic {token}")
-}
-
 impl Client {
-    fn new_reqwest_client(token: Option<&str>) -> reqwest::Client {
-        let mut headers = HeaderMap::new();
-        let bearer_token = match token {
-            None => bearer_token(),
-            Some(token) => format!("Bearer {token}"),
-        };
-        debug!("{bearer_token}");
-        headers.insert(
-            header::AUTHORIZATION,
-            HeaderValue::from_str(&bearer_token).unwrap(),
-        );
+    fn new_reqwest_client() -> reqwest::Client {
         reqwest::Client::builder()
             .user_agent(USER_AGENT)
-            .default_headers(headers)
             .build()
-            .unwrap()
+            .expect("Building reqwest client should not fail")
     }
     /// Create a new client for a logged out user
     #[must_use]
     pub fn new_anonymous() -> Self {
         Self {
-            client: Arc::new(Mutex::new(Self::new_reqwest_client(None))),
+            http: Self::new_reqwest_client(),
             refresh_token: Arc::new(Mutex::new(None)),
             current_access_token: Arc::new(Mutex::new(None)),
         }
     }
     /// Create a new client that is authenticated
     #[must_use]
-    pub fn new_user(access_token: String, refresh_token: String) -> Self {
+    pub fn from_refresh_token(refresh_token: String) -> Self {
         Self {
-            client: Arc::new(Mutex::new(Self::new_reqwest_client(Some(&access_token)))),
+            http: Self::new_reqwest_client(),
             refresh_token: Arc::new(Mutex::new(Some(refresh_token))),
-            current_access_token: Arc::new(Mutex::new(Some(access_token))),
+            current_access_token: Arc::new(Mutex::new(Some(String::new()))),
         }
     }
 
@@ -124,10 +105,9 @@ impl Client {
     }
 
     /// Authenticate the current client
-    pub async fn authenticate(&self, access_token: String, refresh_token: String) {
-        *self.current_access_token.lock().await = Some(access_token.clone());
-        *self.client.lock().await = Self::new_reqwest_client(Some(&access_token));
+    pub async fn authenticate(&self, refresh_token: String) {
         *self.refresh_token.lock().await = Some(refresh_token);
+        *self.current_access_token.lock().await = Some(String::new());
     }
 }
 
@@ -179,47 +159,65 @@ impl Pager {
 }
 
 async fn parse_response<T: DeserializeOwned>(response: reqwest::Response) -> Result<T> {
-    let text = response.text().await?;
-    match serde_json::from_str(&text) {
-        Ok(json) => Ok(json),
-        Err(e) => Err(Error::Parsing(serde_json::Error::custom(format!(
-            "serde_json error {e}. Failed to parse this post: {text}"
-        )))),
+    let response = response.error_for_status();
+    match response {
+        Ok(response) => {
+            let text = response.text().await?;
+            match serde_json::from_str(&text) {
+                Ok(json) => Ok(json),
+                Err(e) => Err(Error::Parsing {
+                    source: serde_json::Error::custom(format!(
+                        "serde_json error {e}. Failed to parse this post: {text}"
+                    )),
+                    backtrace: Backtrace::capture(),
+                }),
+            }
+        }
+        Err(error) => {
+            error!("{error}");
+            Err(Error::Reqwest {
+                source: error,
+                backtrace: Backtrace::capture(),
+            })
+        }
     }
 }
 
 impl Client {
-    async fn get(&self, url: impl IntoUrl) -> RequestBuilder {
-        self.client
-            .lock()
-            .await
-            .get(url)
-            .query(&[("raw_json", "1")])
+    fn get(&self, url: impl IntoUrl) -> RequestBuilder {
+        self.http.get(url).query(&[("raw_json", "1")])
     }
-    async fn post(&self, url: impl IntoUrl) -> RequestBuilder {
-        self.client.lock().await.post(url)
+    fn post(&self, url: impl IntoUrl) -> RequestBuilder {
+        self.http.post(url)
     }
 
     /// Check if token has expired
-    /// # Errors
-    /// Returns an error if the token is not in proper base64 or if it does not contain the `exp`
-    /// field.
-    async fn is_access_token_valid(&self) -> Result<bool> {
+    async fn is_access_token_valid(&self) -> bool {
         #[derive(Deserialize)]
         struct Claims {
             exp: f64,
         }
         if let Some(token) = &*self.current_access_token.lock().await {
             let parts: Vec<&str> = token.splitn(3, '.').collect();
-            let payload_bytes = BASE64_URL_SAFE_NO_PAD.decode(parts[1])?;
-            let claims: Claims = serde_json::from_slice(&payload_bytes)?;
-            #[allow(clippy::cast_possible_truncation)]
-            let date = DateTime::from_timestamp_millis((claims.exp * 1000.0) as i64).unwrap();
-            debug!("Current token is valid until ${date}");
-            Ok(date >= Utc::now())
+            // The token is not valid
+            if parts.len() < 3 {
+                return false;
+            }
+            if let Ok(Ok(claims)) = BASE64_URL_SAFE_NO_PAD
+                .decode(parts[1])
+                .map(|bytes| serde_json::from_slice::<Claims>(&bytes))
+            {
+                #[allow(clippy::cast_possible_truncation)]
+                let date = DateTime::from_timestamp_millis((claims.exp * 1000.0) as i64)
+                    .expect("Converting timestamp should not fail.");
+                debug!("Current token is valid until ${date}");
+                date >= Utc::now()
+            } else {
+                false
+            }
         } else {
             debug!("Access token is not set");
-            Ok(true)
+            true
         }
     }
 
@@ -230,45 +228,51 @@ impl Client {
             access_token: String,
         }
         info!("[CLIENT] Refreshing token");
-        let refresh_token = self.refresh_token.lock().await;
-        if refresh_token.is_none() {
-            return Ok(());
-        }
-        let refresh_token = refresh_token.clone().unwrap();
-        let url = Url::parse("https://reddit.com/").expect("Should not panic.");
+        let refresh_token = match &*self.refresh_token.lock().await {
+            None => return Ok(()),
+            Some(token) => token.clone(),
+        };
+        let url = Url::parse("https://www.reddit.com/").expect("Should not panic.");
         let url = url.join("api/v1/access_token").expect("Should not fail.");
-        let request = self.post(url).await;
-        // When refreshing the token we must use the same authorization header as during the
-        // initial negociation.
-        let request = request.header(
-            header::AUTHORIZATION,
-            HeaderValue::from_str(&bearer_token()).unwrap(),
-        );
-        let body = format!("grant_type=refresh_token&refresh_token={refresh_token}");
-        let request = request.body(body).build().unwrap();
+        let mut body = HashMap::new();
+        body.insert("grant_type", "refresh_token");
+        body.insert("refresh_token", &refresh_token);
+
+        let request = self
+            .http
+            .post(url)
+            .basic_auth::<&str, &str>(CLIENT_ID, None)
+            .form(&body)
+            .build()
+            .expect("Building request should not fail");
         debug!("{request:#?}");
-        let response = self.client.lock().await.execute(request).await?;
-        //let response: Response = response.json().await?;
-        let text = response.text().await.unwrap();
-        debug!("{text}");
-        let response: Response = serde_json::from_str(&text)?;
-        self.authenticate(response.access_token, refresh_token)
-            .await;
+        let response = self.http.execute(request).await?;
+        let response: Response = parse_response(response).await?;
+        *self.current_access_token.lock().await = Some(response.access_token);
         info!("[CLIENT] Token has been refreshed.");
         Ok(())
     }
 
-    async fn execute(&self, request: Request) -> Result<reqwest::Response> {
-        debug!("Executing {request:?}");
-        if !self.is_access_token_valid().await? {
+    async fn execute(&self, request: RequestBuilder) -> Result<reqwest::Response> {
+        if !self.is_access_token_valid().await {
             self.refresh_token().await?;
         }
-        self.client
-            .lock()
-            .await
-            .execute(request)
-            .await
-            .map_err(std::convert::Into::into)
+        let request = if self.is_access_token_valid().await {
+            if let Some(access_token) = &*self.current_access_token.lock().await {
+                request.bearer_auth(access_token)
+            } else {
+                request.basic_auth::<&str, &str>(CLIENT_ID, None)
+            }
+        } else {
+            request
+        };
+        debug!("Executing {request:#?}");
+        let res = self
+            .http
+            .execute(request.build().expect("Building request should not fail"))
+            .await?;
+        debug!("Done with request.");
+        res.error_for_status().map_err(Into::into)
     }
 
     pub(crate) async fn feed_request(
@@ -288,12 +292,14 @@ impl Client {
         };
         let url = sort.add_to_url(&url);
         let url = pager.add_to_url(url);
-        let request = self.get(url).await;
-        let posts = self.execute(request.build().unwrap()).await?;
+        let request = self.get(url);
+        let posts = self.execute(request).await?;
         let json = parse_response(posts).await?;
         match json {
             Thing::Listing(listing) => Ok(listing),
-            _ => Err(Error::InvalidThing),
+            _ => Err(Error::InvalidThing {
+                backtrace: Backtrace::capture(),
+            }),
         }
     }
 
@@ -303,8 +309,8 @@ impl Client {
     pub async fn logged_user_info(&self) -> Result<UserInfo> {
         let base_url = self.base_url().await;
         let url = base_url.join("api/v1/me.json").expect("Should not fail");
-        let request = self.get(url).await;
-        let response = self.execute(request.build().unwrap()).await?;
+        let request = self.get(url);
+        let response = self.execute(request).await?;
         let json = parse_response(response).await?;
         Ok(json)
     }
@@ -312,7 +318,7 @@ impl Client {
     /// Get a stream of posts for the specified feed with the specified sort.
     /// Yield an error when the request to reddit API failed.
     pub fn feed(&self, feed: Feed, sort: Sort) -> impl Stream<Item = Result<Post>> + Send + Sync {
-        FeedStream::new(self, feed, sort)
+        Wrapper::new(FeedStream::new(self.clone(), feed, sort))
     }
 
     /// Get one page of a listing.
@@ -321,11 +327,7 @@ impl Client {
         url: &Url,
         pager: &Pager,
     ) -> Result<(Vec<T>, Pager)> {
-        let url = pager.add_to_url(url.clone());
-        let request = self.get(url).await;
-        let response = self.execute(request.build().unwrap()).await?;
-        let thing: Thing = parse_response(response).await?;
-        let listing: Listing = thing.try_into()?;
+        let listing = self.paged_listing(url, pager).await?;
         let mut pager = Pager::default();
         pager.after(listing.after);
         let things = listing
@@ -336,16 +338,25 @@ impl Client {
         Ok((things, pager))
     }
 
+    async fn paged_listing(&self, url: &Url, pager: &Pager) -> Result<Listing> {
+        let url = pager.add_to_url(url.clone());
+        let request = self.get(url);
+        let response = self.execute(request).await?;
+        let thing: Thing = parse_response(response).await?;
+        thing.try_into()
+    }
+
     /// Try to collect everything from a paged request. Will continue until there is no
     /// more item to collect.
     async fn collect_paged<T: TryFrom<Thing>>(&self, url: &Url) -> Result<Vec<T>> {
-        let mut things = Vec::new();
-        let pager = Pager::default();
+        let (mut things, pager) = self.paged_request(url, &Pager::default()).await?;
         loop {
             let (mut page_things, pager) = self.paged_request(url, &pager).await?;
             things.append(&mut page_things);
-            if pager.after.is_none() {
-                break;
+            match pager.after {
+                Some(s) if s.is_empty() => break,
+                None => break,
+                _ => (),
             }
         }
         Ok(things)
@@ -388,11 +399,9 @@ impl Client {
             .await
             .join("api/vote")
             .expect("Should not fail.");
-        let request = self.post(url).await;
+        let request = self.post(url);
         let request = request.query(&[("id", thing.as_ref()), ("dir", &format!("{dir}"))]);
-        let _ = self
-            .execute(request.build().expect("Should not fail."))
-            .await?;
+        let _ = self.execute(request).await?;
         Ok(())
     }
 
@@ -405,11 +414,9 @@ impl Client {
             .await
             .join("api/save")
             .expect("Should not fail.");
-        let request = self.post(url).await;
+        let request = self.post(url);
         let request = request.query(&[("id", &thing)]);
-        let _ = self
-            .execute(request.build().expect("Should not fail."))
-            .await?;
+        let _ = self.execute(request).await?;
         Ok(())
     }
 
@@ -422,11 +429,46 @@ impl Client {
             .await
             .join("api/unsave")
             .expect("Should not fail.");
-        let request = self.post(url).await;
+        let request = self.post(url);
         let request = request.query(&[("id", &thing)]);
-        let _ = self
-            .execute(request.build().expect("Should not fail."))
-            .await?;
+        let _ = self.execute(request).await?;
         Ok(())
+    }
+
+    /// Get saved items ( both [`Post`] and [`Comment`] ) for the specified user.
+    /// # Errors
+    /// Fails if api request fails.
+    pub fn saved(&self, username: String) -> impl Stream<Item = Result<Thing>> + Send + Sync {
+        Wrapper::new(SaveFeed {
+            client: self.clone(),
+            username,
+        })
+    }
+}
+
+struct SaveFeed {
+    client: Client,
+    username: String,
+}
+
+impl ListingStream for SaveFeed {
+    type Output = Thing;
+
+    fn fetch_next(
+        &self,
+        pager: &Pager,
+    ) -> std::pin::Pin<Box<dyn Future<Output = Result<Listing>> + Send + Sync>> {
+        let client = self.client.clone();
+        let pager = pager.clone();
+        let username = self.username.clone();
+        let fut = async move {
+            let url = client
+                .base_url()
+                .await
+                .join(&format!("user/{username}/saved.json"))
+                .expect("Should not fail.");
+            client.paged_listing(&url, &pager).await
+        };
+        Box::pin(fut)
     }
 }
