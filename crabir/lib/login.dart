@@ -155,13 +155,11 @@ Future<bool> loginToReddit() async {
 
   final header =
       'Basic ${base64Encode(utf8.encode('$clientId:'))}'; // No client secret for installed apps
-  print("HEADER $header");
   // Exchange the code for an access token
   final tokenResponse = await http.post(
     Uri.https(baseUri, tokenEndpoint),
     headers: {
-      'Authorization':
-          'Basic ${base64Encode(utf8.encode('$clientId:'))}', // No client secret for installed apps
+      'Authorization': header, // No client secret for installed apps
     },
     body: {
       'grant_type': 'authorization_code',
@@ -175,7 +173,6 @@ Future<bool> loginToReddit() async {
   final tokenData = json.decode(tokenResponse.body);
   final accessToken = tokenData["access_token"];
   final refreshToken = tokenData["refresh_token"];
-  print("REFRESH TOKEN $refreshToken");
   await RedditAPI.client().authenticate(refreshToken: refreshToken);
   final UserInfo userInfo = await RedditAPI.client().loggedUserInfo();
   await AccountDatabase().insertAccount(

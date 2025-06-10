@@ -1,7 +1,11 @@
 use std::backtrace::Backtrace;
+use std::borrow::Cow;
+use std::collections::HashMap;
 
-use crate::utils::response_or_default;
+use crate::utils::{response_or_default, response_or_none_string};
 use crate::{error::Error, model::flair::Flair};
+use log::debug;
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
 use serde_with::with_prefix;
@@ -39,9 +43,9 @@ pub struct Subreddit {
     pub allow_galleries: bool,
 
     #[serde(rename = "icon_size")]
-    pub icon_size: Option<[usize; 2]>,
-    #[serde(rename = "icon_img")]
-    pub icon_img: String,
+    icon_size: Option<[usize; 2]>,
+    #[serde(rename = "icon_img", deserialize_with = "response_or_none_string")]
+    icon_img: Option<String>,
 
     #[serde(rename = "primary_color")]
     pub primary_color: String,
@@ -72,8 +76,11 @@ pub struct Subreddit {
     pub allow_predictions: bool,
     #[serde(rename = "user_has_favorited")]
     pub user_has_favorited: bool,
-    #[serde(rename = "community_icon")]
-    pub community_icon: String,
+    #[serde(
+        rename = "community_icon",
+        deserialize_with = "response_or_none_string"
+    )]
+    community_icon: Option<String>,
     #[serde(rename = "banner_background_image")]
     pub banner_background_image: String,
     #[serde(rename = "original_content_tag_enabled")]
@@ -191,6 +198,40 @@ pub struct Subreddit {
     pub user_is_contributor: bool,
     #[serde(rename = "allow_predictions_tournament")]
     pub allow_predictions_tournament: bool,
+}
+
+pub struct Icon {
+    pub url: String,
+    pub width: usize,
+    pub height: usize,
+}
+
+impl Subreddit {
+    #[must_use]
+    /// flutter_rust_bridge:getter,sync
+    pub fn icon(&self) -> Option<Icon> {
+        if let Some(url) = &self.icon_img {
+            assert!(self.icon_size.is_some());
+            Some(Icon {
+                url: url.to_owned(),
+                width: self.icon_size?[0],
+                height: self.icon_size?[1],
+            })
+        } else if let Some(url) = &self.community_icon {
+            let url = Url::parse(url).ok()?;
+            let params: HashMap<Cow<str>, Cow<str>> = url.query_pairs().collect();
+            let width: usize = params.get("width")?.parse().ok()?;
+            let height: usize = width;
+
+            Some(Icon {
+                url: url.to_string(),
+                width,
+                height,
+            })
+        } else {
+            None
+        }
+    }
 }
 
 impl TryFrom<Thing> for Subreddit {

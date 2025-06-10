@@ -1,19 +1,22 @@
 import 'package:crabir/feed/feed.dart';
+import 'package:crabir/feed/gif.dart';
+import 'package:crabir/feed/image.dart';
+import 'package:crabir/feed/video.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
-import 'package:flutter/material.dart' hide Image;
-import 'package:flutter/material.dart' as widgets show Image;
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 final horizontalPadding = 16.0;
 
 class _PostTitle extends StatelessWidget {
   final Post post;
 
-  const _PostTitle({super.key, required this.post});
+  const _PostTitle({required this.post});
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +36,7 @@ class _PostTitle extends StatelessWidget {
           child: AspectRatio(
             aspectRatio: 1.0,
             child: ClipRect(
-              child:
-                  widgets.Image.network(post.thumbnail!.url, fit: BoxFit.cover),
+              child: Image.network(post.thumbnail!.url, fit: BoxFit.cover),
             ),
           ),
         ),
@@ -43,111 +45,147 @@ class _PostTitle extends StatelessWidget {
   }
 }
 
-class RedditPostCard extends StatelessWidget {
+class RedditPostCard extends StatefulWidget {
   final Post post;
 
-  const RedditPostCard({
-    super.key,
-    required this.post,
-  });
+  final Future<void> Function(VoteDirection) onLike;
+  final Future<void> Function(bool) onSave;
+
+  const RedditPostCard(
+      {super.key,
+      required this.post,
+      required this.onLike,
+      required this.onSave});
+  @override
+  State<StatefulWidget> createState() => _RedditPostCardState();
+}
+
+class _RedditPostCardState extends State<RedditPostCard> {
+  late bool? likes;
+  late bool saved;
+
+  _RedditPostCardState();
+
+  @override
+  void initState() {
+    super.initState();
+    likes = widget.post.likes;
+    saved = widget.post.saved;
+  }
+
+  Widget _wrap(Widget widget) {
+    return Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: widget);
+  }
 
   Widget header(BuildContext context) {
     final labelStyle = Theme.of(context).textTheme.labelSmall;
-    final subreddit = post.subreddit.subreddit;
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-      child: Row(
-        children: [
-          InkWell(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => FeedView(
-                  feed: Feed.subreddit(subreddit),
-                  initialSort: Sort.best(),
-                ),
-              ),
-            ),
-            child: Text(
-              'r/$subreddit',
-              style: labelStyle?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
+    final subreddit = widget.post.subreddit.subreddit;
+    return Row(
+      children: [
+        InkWell(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => FeedView(
+                feed: Feed.subreddit(subreddit),
+                initialSort: Sort.best(),
               ),
             ),
           ),
-          const Text(' • '),
-          InkWell(
-            onTap: () => (),
-            child: Text(
-              'u/${post.author?.username ?? "[deleted]"}',
-              style: labelStyle?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-              ),
+          child: Text(
+            'r/$subreddit',
+            style: labelStyle?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
-        ],
-      ),
+        ),
+        const Text(' • '),
+        InkWell(
+          onTap: () => (),
+          child: Text(
+            'u/${widget.post.author?.username ?? "[deleted]"}',
+            style: labelStyle?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Widget footer(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.thumb_up),
-            tooltip: 'Upvote',
-            onPressed: () async {
-              await RedditAPI.client().vote(
-                  thing: post.name,
-                  direction: (post.likes ?? false)
-                      ? VoteDirection.up
-                      : VoteDirection.neutral);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.thumb_down),
-            tooltip: 'Downvote',
-            onPressed: () async {
-              await RedditAPI.client().vote(
-                  thing: post.name,
-                  direction: !(post.likes ?? false)
-                      ? VoteDirection.down
-                      : VoteDirection.neutral);
-            },
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.bookmark_outlined),
-            tooltip: "Save",
-          ),
-          IconButton(
-            icon: const Icon(Icons.comment),
-            tooltip: 'Comments',
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.exit_to_app),
-            tooltip: 'Open in',
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.share),
-            tooltip: 'Share',
-            onPressed: () {},
-          ),
-        ],
-      ),
+    final likeColor = Theme.of(context).colorScheme.primary;
+    final dislikeColor = Theme.of(context).colorScheme.secondary;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          icon: Icon(Icons.thumb_up, color: (likes == true) ? likeColor : null),
+          tooltip: 'Upvote',
+          onPressed: () async {
+            await widget.onLike(
+              !(likes == true) ? VoteDirection.up : VoteDirection.neutral,
+            );
+            setState(() {
+              if (likes == true) {
+                likes = null;
+              } else {
+                likes = true;
+              }
+            });
+          },
+        ),
+        IconButton(
+          icon: Icon(Icons.thumb_down,
+              color: (likes == false) ? dislikeColor : null),
+          tooltip: 'Downvote',
+          onPressed: () async {
+            await widget.onLike(
+              !(likes == false) ? VoteDirection.down : VoteDirection.neutral,
+            );
+            setState(() {
+              if (likes == false) {
+                likes = null;
+              } else {
+                likes = false;
+              }
+            });
+          },
+        ),
+        IconButton(
+          onPressed: () async {
+            await widget.onSave(!saved);
+            saved = !saved;
+          },
+          icon: const Icon(Icons.bookmark_outlined),
+          tooltip: "Save",
+        ),
+        IconButton(
+          icon: const Icon(Icons.comment),
+          tooltip: 'Comments',
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: const Icon(Icons.exit_to_app),
+          tooltip: 'Open in',
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: const Icon(Icons.share),
+          tooltip: 'Share',
+          onPressed: () {
+            debugPost(post: widget.post);
+          },
+        ),
+      ],
     );
   }
 
   bool showThumbnail() {
-    if (post.thumbnail == null) {
+    if (widget.post.thumbnail == null) {
       return false;
     } else {
-      return switch (post.kind) {
+      return switch (widget.post.kind) {
         Kind.link || Kind.unknown => true,
         _ => false,
       };
@@ -156,58 +194,71 @@ class RedditPostCard extends StatelessWidget {
 
   Widget title(BuildContext context) {
     if (showThumbnail()) {
-      return Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: _PostTitle(post: post),
-        ),
-      );
+      return _PostTitle(post: widget.post);
     } else {
-      return Padding(
-        padding: EdgeInsetsDirectional.symmetric(horizontal: horizontalPadding),
-        child: Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: Text(
-            post.title,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+      return Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: Text(
+          widget.post.title,
+          style: Theme.of(context).textTheme.titleMedium,
         ),
       );
     }
   }
 
+  Widget _contentWrap(Widget widget) {
+    return switch (this.widget.post.kind) {
+      Kind.image || Kind.gallery || Kind.video || Kind.selftext => widget,
+      _ => _wrap(widget),
+    };
+  }
+
   Widget content(BuildContext context) {
-    return switch (post.kind) {
-      Kind.selftext => Text("selftext"),
+    final fontSize = Theme.of(context).textTheme.bodyMedium?.fontSize ?? 15;
+    final widget = switch (this.widget.post.kind) {
+      Kind.selftext => HtmlWithConditionalFade(
+          htmlContent: this.widget.post.selftextHtml ?? "",
+          maxLines: 5,
+          backgroundColor: Colors.black,
+          fontSize: fontSize,
+        ),
       Kind.meta => Text("meta"),
-      Kind.video => Text("video"),
+      Kind.video => VideoContent(post: this.widget.post),
       Kind.gallery => Text("gallery"),
-      Kind.image => ImageContent(post: post),
-      Kind.link => Text("link"),
+      Kind.image => switch (this.widget.post.url.endsWith(".gif")) {
+          false => ImageContent(
+              post: this.widget.post,
+              fullscreen: (context, post) =>
+                  FullscreenImageViewer(imageUrl: post.url),
+            ),
+          true => ImageContent(
+              post: this.widget.post,
+              fullscreen: (context, post) => GifContentFullscreen(post: post),
+            ),
+        },
+      Kind.link => Container(),
       Kind.unknown => Text("unknown"),
     };
+
+    return _contentWrap(widget);
   }
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+      margin: const EdgeInsets.symmetric(vertical: 4),
       elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            header(context),
-            const SizedBox(height: 8),
-            title(context),
-            const SizedBox(height: 12),
-            content(context),
-            const SizedBox(height: 12),
-            footer(context),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _wrap(header(context)),
+          _wrap(const SizedBox(height: 8)),
+          _wrap(title(context)),
+          _wrap(const SizedBox(height: 12)),
+          content(context),
+          _wrap(const SizedBox(height: 12)),
+          _wrap(footer(context)),
+        ],
       ),
     );
   }
@@ -215,31 +266,63 @@ class RedditPostCard extends StatelessWidget {
 
 class ImageContent extends StatelessWidget {
   final Post post;
-  const ImageContent({super.key, required this.post});
+  final Widget Function(BuildContext, Post)? fullscreen;
+  const ImageContent({super.key, required this.post, this.fullscreen});
+
+  Widget thumbnail(
+      BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+    final thumbnail = post.thumbnail;
+    if (thumbnail == null) {
+      return child;
+    } else if (loadingProgress != null) {
+      return Image.network(
+        thumbnail.url,
+        width: double.infinity,
+        fit: BoxFit.fitWidth,
+      );
+    } else {
+      return child;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    // If the post is an image, the url should point to the image.
+    final imageUrl = post.url;
+    // We look into the previews to get the source size
+    // It does not need to match exactly as it is used to
+    // prevent posts from jumping around when loading the image.
     final image = post.preview!.images[0].source;
+
+    late final Future? Function() onTap;
+    if (fullscreen != null) {
+      onTap = () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => fullscreen!(context, post),
+            ),
+          );
+    } else {
+      onTap = () {
+        return;
+      };
+    }
+
     return InkWell(
-      onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => FullscreenImageViewer(image: image))),
-      child: AspectRatio(
-        aspectRatio: image.width.toDouble() / image.height.toDouble(),
-        child: widgets.Image.network(image.url,
-            //width: image.width.toDouble(),
-            width: double.infinity,
-            //height: image.height.toDouble(),
-            fit: BoxFit.fitWidth),
+      onTap: onTap,
+      child: ImageThumbnail(
+        url: imageUrl,
+        width: image.width.toDouble(),
+        height: image.height.toDouble(),
+        thumbnailUrl: post.thumbnail?.url,
       ),
     );
   }
 }
 
 class FullscreenImageViewer extends StatefulWidget {
-  final ImageBase image;
-  const FullscreenImageViewer({super.key, required this.image});
+  final String imageUrl;
+  const FullscreenImageViewer({super.key, required this.imageUrl});
 
   @override
   State<FullscreenImageViewer> createState() => _FullscreenImageViewerState();
@@ -278,10 +361,6 @@ class _FullscreenImageViewerState extends State<FullscreenImageViewer>
       expectedZoom = 1.0;
     }
 
-    setState(() {
-      _dismissable = expectedZoom == 1.0;
-    });
-
     if (expectedZoom > currentScale) {
       // Calculate the transformation
       final focalPoint = details.localPosition;
@@ -309,6 +388,13 @@ class _FullscreenImageViewerState extends State<FullscreenImageViewer>
     _animationController.addListener(() {
       _transformationController.value = _animation!.value;
     });
+    _transformationController.addListener(() {
+      // The image is dismissalbe only if it is not zoomed in
+      setState(() {
+        _dismissable =
+            _transformationController.value.getMaxScaleOnAxis() == 1.0;
+      });
+    });
   }
 
   @override
@@ -329,8 +415,8 @@ class _FullscreenImageViewerState extends State<FullscreenImageViewer>
             minScale: 1.0,
             maxScale: 5.0,
             child: Center(
-              child: widgets.Image.network(
-                widget.image.url,
+              child: Image.network(
+                widget.imageUrl,
                 fit: BoxFit.contain,
               ),
             ),
@@ -357,6 +443,163 @@ class _FullscreenImageViewerState extends State<FullscreenImageViewer>
           onDoubleTap: () {},
           child: _content(),
         ),
+      ),
+    );
+  }
+}
+
+class FadingHtml extends StatelessWidget {
+  final String htmlContent;
+  final int maxLines;
+
+  const FadingHtml({
+    super.key,
+    required this.htmlContent,
+    this.maxLines = 10,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (htmlContent.isEmpty) {
+      return Container();
+    }
+    final fontSize = Theme.of(context).textTheme.bodyMedium?.fontSize ?? 15;
+    final backgroundColor = Theme.of(context).colorScheme.surface;
+    // return ConstrainedBox(
+    //   constraints: BoxConstraints(
+    //     // Approx size for `maxLines`
+    //     maxHeight: maxLines * fontSize * 3 / 2,
+    //   ),
+    //   child: ClipRect(
+    //     child: Html(
+    //       data: htmlContent,
+    //       shrinkWrap: true,
+    //     ),
+    //   ),
+    // );
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+          maxHeight: maxLines * fontSize * 2,
+          maxWidth: MediaQuery.of(context).size.width),
+      child: Stack(
+        fit: StackFit.expand,
+        clipBehavior: Clip.antiAlias,
+        children: [
+          Positioned.fill(
+            top: 0,
+            child: Html(data: htmlContent),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 40, // Height of the fade effect
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    backgroundColor, // Match your background color
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class HtmlWithConditionalFade extends StatefulWidget {
+  final String htmlContent;
+  final int maxLines;
+  final double fontSize;
+  final Color backgroundColor;
+
+  const HtmlWithConditionalFade({
+    super.key,
+    required this.htmlContent,
+    required this.maxLines,
+    required this.fontSize,
+    required this.backgroundColor,
+  });
+
+  @override
+  State<HtmlWithConditionalFade> createState() =>
+      _HtmlWithConditionalFadeState();
+}
+
+class _HtmlWithConditionalFadeState extends State<HtmlWithConditionalFade> {
+  final GlobalKey _key = GlobalKey();
+  bool _overflowing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Wait for first layout to check overflow
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkOverflow());
+  }
+
+  void _checkOverflow() {
+    final context = _key.currentContext;
+    if (context == null) return;
+    final renderBox = context.findRenderObject() as RenderBox;
+    final contentHeight = renderBox.size.height;
+
+    final maxHeight = widget.maxLines * widget.fontSize * 2;
+
+    if (mounted) {
+      setState(() {
+        _overflowing = contentHeight > maxHeight;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final maxHeight = widget.maxLines * widget.fontSize * 2;
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: maxHeight,
+        maxWidth: MediaQuery.of(context).size.width,
+      ),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              child: Html(
+                key: _key,
+                data: widget.htmlContent,
+              ),
+            ),
+          ),
+          if (_overflowing)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: IgnorePointer(
+                child: Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        widget.backgroundColor,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

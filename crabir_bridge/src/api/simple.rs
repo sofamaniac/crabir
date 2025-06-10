@@ -3,9 +3,12 @@ use futures::channel::mpsc::{self, Receiver};
 // Needs to be pub for the bridge
 pub use futures::lock::Mutex;
 use futures::SinkExt;
+use log::debug;
 pub use reddit_api::client::Client;
+use reddit_api::client::VoteDirection;
 use reddit_api::model::feed::{Stream, StreamExt};
 use reddit_api::model::post::{Kind, Thumbnail};
+use reddit_api::model::subreddit::{Icon, Subreddit};
 use std::sync::LazyLock;
 use std::time;
 
@@ -95,7 +98,6 @@ impl FeedState {
     }
 
     /// Returns true if there is no more posts to load
-    //#[flutter_rust_bridge::frb(ui_mutation)]
     #[flutter_rust_bridge::frb]
     pub async fn next(&mut self) -> Result<bool, Error> {
         if self.bg_task.is_none() {
@@ -113,6 +115,32 @@ impl FeedState {
     #[flutter_rust_bridge::frb(sync)]
     pub fn nth(&self, n: u32) -> Option<Post> {
         self.posts.get(n as usize).cloned()
+    }
+
+    /// Vote on a post
+    #[flutter_rust_bridge::frb]
+    pub async fn vote(&mut self, index: u32, direction: VoteDirection) -> Result<(), Error> {
+        let index = index as usize;
+        if let Some(post) = self.posts.get_mut(index) {
+            CLIENT.vote(&post.name, direction).await?;
+            post.likes = direction.into();
+        }
+        Ok(())
+    }
+
+    /// Save / unsave a post
+    #[flutter_rust_bridge::frb]
+    pub async fn save(&mut self, index: u32, save: bool) -> Result<(), Error> {
+        let index = index as usize;
+        if let Some(post) = self.posts.get_mut(index) {
+            if save {
+                CLIENT.save(&post.name).await?;
+            } else {
+                CLIENT.unsave(&post.name).await?;
+            }
+            post.saved = save;
+        }
+        Ok(())
     }
 
     #[flutter_rust_bridge::frb(sync, getter)]
@@ -203,6 +231,11 @@ impl Post {
     pub fn kind(&self) -> Kind {}
     #[flutter_rust_bridge::frb(sync, getter)]
     pub fn thumbnail(&self) -> Option<Thumbnail> {}
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn debug_post(post: &Post) {
+    debug!("{post:#?}");
 }
 
 #[flutter_rust_bridge::frb(init)]

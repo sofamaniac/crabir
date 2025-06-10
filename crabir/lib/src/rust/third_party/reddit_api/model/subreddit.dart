@@ -4,7 +4,6 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../../frb_generated.dart';
-import '../../../lib.dart';
 import 'flair.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
@@ -64,8 +63,6 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   PlatformInt64 get commentScoreHideMins;
 
-  String get communityIcon;
-
   bool get communityReviewed;
 
   double get created;
@@ -97,10 +94,6 @@ abstract class Subreddit implements RustOpaqueInterface {
   String get headerTitle;
 
   bool get hideAds;
-
-  String get iconImg;
-
-  UsizeArray2? get iconSize;
 
   String get id;
 
@@ -251,8 +244,6 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   set commentScoreHideMins(PlatformInt64 commentScoreHideMins);
 
-  set communityIcon(String communityIcon);
-
   set communityReviewed(bool communityReviewed);
 
   set created(double created);
@@ -284,10 +275,6 @@ abstract class Subreddit implements RustOpaqueInterface {
   set headerTitle(String headerTitle);
 
   set hideAds(bool hideAds);
-
-  set iconImg(String iconImg);
-
-  set iconSize(UsizeArray2? iconSize);
 
   set id(String id);
 
@@ -388,6 +375,9 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   static Future<Subreddit> default_() =>
       RustLib.instance.api.redditApiModelSubredditSubredditDefault();
+
+  /// flutter_rust_bridge:getter,sync
+  Icon? get icon;
 }
 
 class CommentContributionSettings {
@@ -409,6 +399,30 @@ class CommentContributionSettings {
       other is CommentContributionSettings &&
           runtimeType == other.runtimeType &&
           allowedMediaTypes == other.allowedMediaTypes;
+}
+
+class Icon {
+  final String url;
+  final BigInt width;
+  final BigInt height;
+
+  const Icon({
+    required this.url,
+    required this.width,
+    required this.height,
+  });
+
+  @override
+  int get hashCode => url.hashCode ^ width.hashCode ^ height.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Icon &&
+          runtimeType == other.runtimeType &&
+          url == other.url &&
+          width == other.width &&
+          height == other.height;
 }
 
 enum NotificationLevel {

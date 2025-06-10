@@ -13,7 +13,7 @@ flutter_rust_bridge = { version = "=2.10.0", features = ["chrono"] }
 futures = "0.3.31"
 log = "0.4.27"
 reddit_api = { path = "../reddit_api" }
-tokio = { version = "1.45.1", features = ["full"] }
+tokio = { version = "1.45.1", default-features = true }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

@@ -13,6 +13,9 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 // These functions are ignored because they are not marked as `pub`: `new_bg_task`, `setup_the_logger`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`
 
+void debugPost({required Post post}) =>
+    RustLib.instance.api.crateApiSimpleDebugPost(post: post);
+
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FeedState>>
 abstract class FeedState implements RustOpaqueInterface {
   bool get done;
@@ -39,9 +42,15 @@ abstract class FeedState implements RustOpaqueInterface {
 
   Future<void> refresh();
 
+  /// Save / unsave a post
+  Future<void> save({required int index, required bool save});
+
   set feed(Feed feed);
 
   set sort(Sort sort);
+
+  /// Vote on a post
+  Future<void> vote({required int index, required VoteDirection direction});
 }
 
 class RedditAPI {

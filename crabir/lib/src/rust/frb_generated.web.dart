@@ -10,7 +10,6 @@ import 'api/simple.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
-import 'lib.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 import 'third_party/reddit_api/client.dart';
 import 'third_party/reddit_api/model.dart';
@@ -50,12 +49,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_ListingPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing;
 
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_MediaPtr => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia;
-
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_OembedPtr => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed;
-
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_PagerPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager;
 
@@ -64,14 +57,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_PostIdPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID;
-
-  CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_RedditVideoPtr => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo;
-
-  CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_SecureMediaPtr => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia;
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_SubredditPtr =>
       wire.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit;
@@ -126,16 +111,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           dynamic raw);
 
   @protected
-  Media
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          dynamic raw);
-
-  @protected
-  Oembed
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-          dynamic raw);
-
-  @protected
   Pager
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager(
           dynamic raw);
@@ -148,16 +123,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   PostId
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
-          dynamic raw);
-
-  @protected
-  RedditVideo
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-          dynamic raw);
-
-  @protected
-  SecureMedia
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
           dynamic raw);
 
   @protected
@@ -197,11 +162,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Listing
       dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
-          dynamic raw);
-
-  @protected
-  Oembed
-      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
           dynamic raw);
 
   @protected
@@ -245,13 +205,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           dynamic raw);
 
   @protected
-  Listing
-      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
+  Fullname
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
           dynamic raw);
 
   @protected
-  Oembed
-      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
+  Listing
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
           dynamic raw);
 
   @protected
@@ -323,16 +283,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           dynamic raw);
 
   @protected
-  Media
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          dynamic raw);
-
-  @protected
-  Oembed
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-          dynamic raw);
-
-  @protected
   Pager
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager(
           dynamic raw);
@@ -345,16 +295,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   PostId
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
-          dynamic raw);
-
-  @protected
-  RedditVideo
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-          dynamic raw);
-
-  @protected
-  SecureMedia
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
           dynamic raw);
 
   @protected
@@ -388,18 +328,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           dynamic raw);
 
   @protected
-  Media
-      dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          dynamic raw);
-
-  @protected
   Post
       dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
-          dynamic raw);
-
-  @protected
-  SecureMedia
-      dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
           dynamic raw);
 
   @protected
@@ -421,13 +351,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
 
   @protected
+  Icon dco_decode_box_autoadd_icon(dynamic raw);
+
+  @protected
+  Media dco_decode_box_autoadd_media(dynamic raw);
+
+  @protected
   MediaEmbed dco_decode_box_autoadd_media_embed(dynamic raw);
 
   @protected
   Multi dco_decode_box_autoadd_multi(dynamic raw);
 
   @protected
+  Oembed dco_decode_box_autoadd_oembed(dynamic raw);
+
+  @protected
   Preview dco_decode_box_autoadd_preview(dynamic raw);
+
+  @protected
+  RedditVideo dco_decode_box_autoadd_reddit_video(dynamic raw);
 
   @protected
   SecureMediaEmbed dco_decode_box_autoadd_secure_media_embed(dynamic raw);
@@ -473,6 +415,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
+  Icon dco_decode_icon(dynamic raw);
+
+  @protected
   ImageBase dco_decode_image_base(dynamic raw);
 
   @protected
@@ -505,9 +450,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
-  Uint64List dco_decode_list_prim_usize_strict(dynamic raw);
-
-  @protected
   List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
 
   @protected
@@ -520,6 +462,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Thing> dco_decode_list_thing(dynamic raw);
 
   @protected
+  Media dco_decode_media(dynamic raw);
+
+  @protected
   MediaEmbed dco_decode_media_embed(dynamic raw);
 
   @protected
@@ -527,6 +472,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   NotificationLevel dco_decode_notification_level(dynamic raw);
+
+  @protected
+  Oembed dco_decode_oembed(dynamic raw);
 
   @protected
   String? dco_decode_opt_String(dynamic raw);
@@ -537,18 +485,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           dynamic raw);
 
   @protected
-  Media?
-      dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          dynamic raw);
-
-  @protected
   Post?
       dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
-          dynamic raw);
-
-  @protected
-  SecureMedia?
-      dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
           dynamic raw);
 
   @protected
@@ -565,6 +503,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
+
+  @protected
+  Icon? dco_decode_opt_box_autoadd_icon(dynamic raw);
+
+  @protected
+  Media? dco_decode_opt_box_autoadd_media(dynamic raw);
 
   @protected
   MediaEmbed? dco_decode_opt_box_autoadd_media_embed(dynamic raw);
@@ -585,9 +529,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Int64List? dco_decode_opt_list_prim_i_64_strict(dynamic raw);
 
   @protected
-  UsizeArray2? dco_decode_opt_usize_array_2(dynamic raw);
-
-  @protected
   Preferences dco_decode_preferences(dynamic raw);
 
   @protected
@@ -601,6 +542,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RedditImage dco_decode_reddit_image(dynamic raw);
+
+  @protected
+  RedditVideo dco_decode_reddit_video(dynamic raw);
 
   @protected
   SecureMediaEmbed dco_decode_secure_media_embed(dynamic raw);
@@ -619,6 +563,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Thumbnail dco_decode_thumbnail(dynamic raw);
+
+  @protected
+  ThumbnailOption dco_decode_thumbnail_option(dynamic raw);
+
+  @protected
+  ThumbnailURL dco_decode_thumbnail_url(dynamic raw);
 
   @protected
   Timeframe dco_decode_timeframe(dynamic raw);
@@ -646,9 +596,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BigInt dco_decode_usize(dynamic raw);
-
-  @protected
-  UsizeArray2 dco_decode_usize_array_2(dynamic raw);
 
   @protected
   Variants dco_decode_variants(dynamic raw);
@@ -695,16 +642,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
-  Media
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          SseDeserializer deserializer);
-
-  @protected
-  Oembed
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-          SseDeserializer deserializer);
-
-  @protected
   Pager
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager(
           SseDeserializer deserializer);
@@ -717,16 +654,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   PostId
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
-          SseDeserializer deserializer);
-
-  @protected
-  RedditVideo
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-          SseDeserializer deserializer);
-
-  @protected
-  SecureMedia
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
           SseDeserializer deserializer);
 
   @protected
@@ -766,11 +693,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Listing
       sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
-          SseDeserializer deserializer);
-
-  @protected
-  Oembed
-      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
           SseDeserializer deserializer);
 
   @protected
@@ -814,13 +736,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
-  Listing
-      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
+  Fullname
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
           SseDeserializer deserializer);
 
   @protected
-  Oembed
-      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
+  Listing
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
           SseDeserializer deserializer);
 
   @protected
@@ -893,16 +815,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
-  Media
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          SseDeserializer deserializer);
-
-  @protected
-  Oembed
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-          SseDeserializer deserializer);
-
-  @protected
   Pager
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager(
           SseDeserializer deserializer);
@@ -915,16 +827,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   PostId
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
-          SseDeserializer deserializer);
-
-  @protected
-  RedditVideo
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-          SseDeserializer deserializer);
-
-  @protected
-  SecureMedia
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
           SseDeserializer deserializer);
 
   @protected
@@ -958,18 +860,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
-  Media
-      sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          SseDeserializer deserializer);
-
-  @protected
   Post
       sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
-          SseDeserializer deserializer);
-
-  @protected
-  SecureMedia
-      sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
           SseDeserializer deserializer);
 
   @protected
@@ -991,13 +883,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
 
   @protected
+  Icon sse_decode_box_autoadd_icon(SseDeserializer deserializer);
+
+  @protected
+  Media sse_decode_box_autoadd_media(SseDeserializer deserializer);
+
+  @protected
   MediaEmbed sse_decode_box_autoadd_media_embed(SseDeserializer deserializer);
 
   @protected
   Multi sse_decode_box_autoadd_multi(SseDeserializer deserializer);
 
   @protected
+  Oembed sse_decode_box_autoadd_oembed(SseDeserializer deserializer);
+
+  @protected
   Preview sse_decode_box_autoadd_preview(SseDeserializer deserializer);
+
+  @protected
+  RedditVideo sse_decode_box_autoadd_reddit_video(SseDeserializer deserializer);
 
   @protected
   SecureMediaEmbed sse_decode_box_autoadd_secure_media_embed(
@@ -1044,6 +948,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
   @protected
+  Icon sse_decode_icon(SseDeserializer deserializer);
+
+  @protected
   ImageBase sse_decode_image_base(SseDeserializer deserializer);
 
   @protected
@@ -1077,9 +984,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
-  Uint64List sse_decode_list_prim_usize_strict(SseDeserializer deserializer);
-
-  @protected
   List<(String, String)> sse_decode_list_record_string_string(
       SseDeserializer deserializer);
 
@@ -1094,6 +998,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Thing> sse_decode_list_thing(SseDeserializer deserializer);
 
   @protected
+  Media sse_decode_media(SseDeserializer deserializer);
+
+  @protected
   MediaEmbed sse_decode_media_embed(SseDeserializer deserializer);
 
   @protected
@@ -1101,6 +1008,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   NotificationLevel sse_decode_notification_level(SseDeserializer deserializer);
+
+  @protected
+  Oembed sse_decode_oembed(SseDeserializer deserializer);
 
   @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
@@ -1111,18 +1021,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
-  Media?
-      sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          SseDeserializer deserializer);
-
-  @protected
   Post?
       sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
-          SseDeserializer deserializer);
-
-  @protected
-  SecureMedia?
-      sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
           SseDeserializer deserializer);
 
   @protected
@@ -1139,6 +1039,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
+
+  @protected
+  Icon? sse_decode_opt_box_autoadd_icon(SseDeserializer deserializer);
+
+  @protected
+  Media? sse_decode_opt_box_autoadd_media(SseDeserializer deserializer);
 
   @protected
   MediaEmbed? sse_decode_opt_box_autoadd_media_embed(
@@ -1161,9 +1067,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Int64List? sse_decode_opt_list_prim_i_64_strict(SseDeserializer deserializer);
 
   @protected
-  UsizeArray2? sse_decode_opt_usize_array_2(SseDeserializer deserializer);
-
-  @protected
   Preferences sse_decode_preferences(SseDeserializer deserializer);
 
   @protected
@@ -1178,6 +1081,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RedditImage sse_decode_reddit_image(SseDeserializer deserializer);
+
+  @protected
+  RedditVideo sse_decode_reddit_video(SseDeserializer deserializer);
 
   @protected
   SecureMediaEmbed sse_decode_secure_media_embed(SseDeserializer deserializer);
@@ -1196,6 +1102,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Thumbnail sse_decode_thumbnail(SseDeserializer deserializer);
+
+  @protected
+  ThumbnailOption sse_decode_thumbnail_option(SseDeserializer deserializer);
+
+  @protected
+  ThumbnailURL sse_decode_thumbnail_url(SseDeserializer deserializer);
 
   @protected
   Timeframe sse_decode_timeframe(SseDeserializer deserializer);
@@ -1223,9 +1135,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BigInt sse_decode_usize(SseDeserializer deserializer);
-
-  @protected
-  UsizeArray2 sse_decode_usize_array_2(SseDeserializer deserializer);
 
   @protected
   Variants sse_decode_variants(SseDeserializer deserializer);
@@ -1274,16 +1183,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          Media self, SseSerializer serializer);
-
-  @protected
-  void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-          Oembed self, SseSerializer serializer);
-
-  @protected
-  void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager(
           Pager self, SseSerializer serializer);
 
@@ -1296,16 +1195,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
           PostId self, SseSerializer serializer);
-
-  @protected
-  void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-          RedditVideo self, SseSerializer serializer);
-
-  @protected
-  void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
-          SecureMedia self, SseSerializer serializer);
 
   @protected
   void
@@ -1349,11 +1238,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
-      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-          Oembed self, SseSerializer serializer);
-
-  @protected
-  void
       sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager(
           Pager self, SseSerializer serializer);
 
@@ -1394,13 +1278,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
-      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
-          Listing self, SseSerializer serializer);
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+          Fullname self, SseSerializer serializer);
 
   @protected
   void
-      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-          Oembed self, SseSerializer serializer);
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
+          Listing self, SseSerializer serializer);
 
   @protected
   void
@@ -1474,16 +1358,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          Media self, SseSerializer serializer);
-
-  @protected
-  void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-          Oembed self, SseSerializer serializer);
-
-  @protected
-  void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager(
           Pager self, SseSerializer serializer);
 
@@ -1496,16 +1370,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
           PostId self, SseSerializer serializer);
-
-  @protected
-  void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-          RedditVideo self, SseSerializer serializer);
-
-  @protected
-  void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
-          SecureMedia self, SseSerializer serializer);
 
   @protected
   void
@@ -1540,18 +1404,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
-      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          Media self, SseSerializer serializer);
-
-  @protected
-  void
       sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
           Post self, SseSerializer serializer);
-
-  @protected
-  void
-      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
-          SecureMedia self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
@@ -1573,6 +1427,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       PlatformInt64 self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_icon(Icon self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_media(Media self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_media_embed(
       MediaEmbed self, SseSerializer serializer);
 
@@ -1580,7 +1440,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_multi(Multi self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_oembed(Oembed self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_preview(Preview self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_reddit_video(
+      RedditVideo self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_secure_media_embed(
@@ -1628,6 +1495,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
+  void sse_encode_icon(Icon self, SseSerializer serializer);
+
+  @protected
   void sse_encode_image_base(ImageBase self, SseSerializer serializer);
 
   @protected
@@ -1664,10 +1534,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       Uint8List self, SseSerializer serializer);
 
   @protected
-  void sse_encode_list_prim_usize_strict(
-      Uint64List self, SseSerializer serializer);
-
-  @protected
   void sse_encode_list_record_string_string(
       List<(String, String)> self, SseSerializer serializer);
 
@@ -1683,6 +1549,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_list_thing(List<Thing> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_media(Media self, SseSerializer serializer);
+
+  @protected
   void sse_encode_media_embed(MediaEmbed self, SseSerializer serializer);
 
   @protected
@@ -1691,6 +1560,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_notification_level(
       NotificationLevel self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_oembed(Oembed self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
@@ -1702,18 +1574,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
-      sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          Media? self, SseSerializer serializer);
-
-  @protected
-  void
       sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
           Post? self, SseSerializer serializer);
-
-  @protected
-  void
-      sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
-          SecureMedia? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
@@ -1731,6 +1593,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_i_64(
       PlatformInt64? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_icon(Icon? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_media(Media? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_media_embed(
@@ -1756,10 +1624,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       Int64List? self, SseSerializer serializer);
 
   @protected
-  void sse_encode_opt_usize_array_2(
-      UsizeArray2? self, SseSerializer serializer);
-
-  @protected
   void sse_encode_preferences(Preferences self, SseSerializer serializer);
 
   @protected
@@ -1774,6 +1638,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_reddit_image(RedditImage self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_reddit_video(RedditVideo self, SseSerializer serializer);
 
   @protected
   void sse_encode_secure_media_embed(
@@ -1793,6 +1660,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_thumbnail(Thumbnail self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_thumbnail_option(
+      ThumbnailOption self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_thumbnail_url(ThumbnailURL self, SseSerializer serializer);
 
   @protected
   void sse_encode_timeframe(Timeframe self, SseSerializer serializer);
@@ -1820,9 +1694,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_usize_array_2(UsizeArray2 self, SseSerializer serializer);
 
   @protected
   void sse_encode_variants(Variants self, SseSerializer serializer);
@@ -1920,30 +1791,6 @@ class RustLibWire implements BaseWire {
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
               ptr);
 
-  void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          int ptr) =>
-      wasmModule
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-              ptr);
-
-  void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          int ptr) =>
-      wasmModule
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-              ptr);
-
-  void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-          int ptr) =>
-      wasmModule
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-              ptr);
-
-  void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-          int ptr) =>
-      wasmModule
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-              ptr);
-
   void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager(
           int ptr) =>
       wasmModule
@@ -1978,30 +1825,6 @@ class RustLibWire implements BaseWire {
           int ptr) =>
       wasmModule
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
-              ptr);
-
-  void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-          int ptr) =>
-      wasmModule
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-              ptr);
-
-  void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-          int ptr) =>
-      wasmModule
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-              ptr);
-
-  void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
-          int ptr) =>
-      wasmModule
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
-              ptr);
-
-  void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
-          int ptr) =>
-      wasmModule
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
               ptr);
 
   void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
@@ -2116,22 +1939,6 @@ extension type RustLibWasmModule._(JSObject _) implements JSObject {
           int ptr);
 
   external void
-      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          int ptr);
-
-  external void
-      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-          int ptr);
-
-  external void
-      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-          int ptr);
-
-  external void
-      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-          int ptr);
-
-  external void
       rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager(
           int ptr);
 
@@ -2153,22 +1960,6 @@ extension type RustLibWasmModule._(JSObject _) implements JSObject {
 
   external void
       rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
-          int ptr);
-
-  external void
-      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-          int ptr);
-
-  external void
-      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-          int ptr);
-
-  external void
-      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
-          int ptr);
-
-  external void
-      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
           int ptr);
 
   external void

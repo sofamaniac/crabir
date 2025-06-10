@@ -70,6 +70,10 @@
 
               (rust-bin.fromRustupToolchainFile ./toolchain.toml)
               rustup
+
+              gtk3
+              graphite2
+              pkg-config
             ];
 
             # See https://github.com/fzyzcjy/flutter_rust_bridge/issues/2527

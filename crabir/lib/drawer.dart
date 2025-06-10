@@ -1,124 +1,86 @@
-import 'dart:math';
-
+import 'package:collection/collection.dart';
+import 'package:crabir/accounts_manager.dart';
 import 'package:crabir/feed/feed.dart';
 import 'package:crabir/login.dart';
-import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-class DrawerModel extends ChangeNotifier {
-  List<UserAccount> _accounts = [];
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
-  int? _currentAccount;
+// Taken from https://stackoverflow.com/a/50081214
+extension HexColor on Color {
+  /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
+  static Color fromHex(String hexString) {
+    if (hexString.isEmpty) {
+      return Colors.black;
+    }
+    final buffer = StringBuffer();
+    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    try {
+      return Color(int.parse(buffer.toString(), radix: 16));
+    } catch (e) {
+      print("Invalid Color $hexString.");
+      return Color(0x00000000);
+    }
+  }
+
+  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
+  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+      '${(255 * a).toInt().toRadixString(16).padLeft(2, '0')}'
+      '${(255 * r).toInt().toRadixString(16).padLeft(2, '0')}'
+      '${(255 * g).toInt().toRadixString(16).padLeft(2, '0')}'
+      '${(255 * b).toInt().toRadixString(16).padLeft(2, '0')}';
+}
+
+class DrawerState extends State<AppDrawer> {
   bool _isSelectingAccount = false;
 
   bool get isSelectingAccount => _isSelectingAccount;
-  UserAccount? get currentAccount =>
-      _currentAccount != null ? _accounts[_currentAccount!] : null;
-
-  List<Subreddit> _subscriptions = [];
-  List<Subreddit> get subscriptions => _subscriptions;
 
   Logger log = Logger("DrawerModel");
 
-  Future selectAccount(int index) async {
-    // TODO persist to storage
-    if (index < _accounts.length && index != _currentAccount) {
-      _currentAccount = index;
-      if (_accounts[index].id != UserAccount.anonymous().id) {
-        await RedditAPI.client().authenticate(
-          refreshToken: _accounts[index].refreshToken!,
-        );
-        await _loadSubreddits();
-      }
-      notifyListeners();
-    }
-  }
+  DrawerState();
 
   void changeMode({bool? isSelectingAccount}) {
-    _isSelectingAccount = isSelectingAccount ?? !_isSelectingAccount;
-    notifyListeners();
-  }
-
-  UnmodifiableListView<UserAccount> get accounts =>
-      UnmodifiableListView(_accounts);
-
-  DrawerModel();
-
-  /// load all accounts and select the last one added
-  Future loadAccounts() {
-    _isLoading = true;
-    notifyListeners();
-
-    return AccountDatabase().getAccounts().then((accounts) {
-      _accounts = accounts;
-      _accounts.add(UserAccount.anonymous());
-      _isLoading = false;
-      // Select last added account and if there is none the anonymous account will be at index 0
-      // TODO load from shared_preferences
-      selectAccount(max(0, _accounts.length - 2));
-    }).catchError((err) {
-      _isLoading = false;
-      notifyListeners();
+    setState(() {
+      _isSelectingAccount = isSelectingAccount ?? !_isSelectingAccount;
     });
   }
 
-  Future _loadSubreddits() async {
-    if (currentAccount == UserAccount.anonymous() || currentAccount == null) {
-      return;
-    }
-    log.info("Requesting subscriptions for ${currentAccount?.username}");
-    try {
-      _subscriptions = await RedditAPI.client().subsriptions();
-      _subscriptions.sort((a, b) =>
-          a.displayName.toLowerCase().compareTo(b.displayName.toLowerCase()));
-    } catch (err) {
-      log.severe("Error while loading subscriptions: $err");
-      _subscriptions = [];
-    }
-  }
-}
-
-class AppDrawer extends StatelessWidget {
-  const AppDrawer({super.key});
-
   Widget currentAccountView(BuildContext context) {
-    final state = context.watch<DrawerModel>();
     final icon =
-        state.isSelectingAccount ? Icons.arrow_drop_up : Icons.arrow_drop_down;
-    return Column(children: [
-      Row(children: [
-        state.isLoading
-            ? const CircularProgressIndicator()
-            : state.currentAccount!.build(context),
-        IconButton(onPressed: () => state.changeMode(), icon: Icon(icon))
-      ]),
-      Divider()
-    ]);
+        isSelectingAccount ? Icons.arrow_drop_up : Icons.arrow_drop_down;
+    final state = context.watch<AccountsManager>();
+    return DrawerHeader(
+      child: Row(
+        children: [
+          state.currentUser?.build(context) ??
+              const CircularProgressIndicator(),
+          IconButton(onPressed: () => changeMode(), icon: Icon(icon))
+        ],
+      ),
+    );
   }
 
   Widget accountSelector(BuildContext context) {
-    final state = context.watch<DrawerModel>();
-
-    if (state.isLoading) {
+    final state = context.watch<AccountsManager>();
+    if (state.currentUser == null) {
       return const CircularProgressIndicator();
     }
     return Expanded(
       child: ListView(
         children: [
           ...state.accounts.mapIndexed((index, account) => InkWell(
-              onTap: () => state.selectAccount(index),
+              onTap: () async {
+                state.selectAccount(index);
+              },
               child: account.build(context))),
           InkWell(
             onTap: () async {
               if (await loginToReddit()) {
-                await state.loadAccounts();
+                await state.init();
               }
             },
             child: Text("Add an account"),
@@ -134,15 +96,14 @@ class AppDrawer extends StatelessWidget {
       child: Drawer(
         child: Padding(
           padding: EdgeInsetsDirectional.symmetric(horizontal: 8.0),
-          child: Consumer<DrawerModel>(
-            builder: (context, accounts, child) {
-              return Column(mainAxisSize: MainAxisSize.min, children: [
-                currentAccountView(context),
-                accounts.isSelectingAccount
-                    ? accountSelector(context)
-                    : DrawerFeedSelection().build(context)
-              ]);
-            },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              currentAccountView(context),
+              isSelectingAccount
+                  ? accountSelector(context)
+                  : DrawerFeedSelection()
+            ],
           ),
         ),
       ),
@@ -150,71 +111,92 @@ class AppDrawer extends StatelessWidget {
   }
 }
 
-class DrawerFeedSelection extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
+  const AppDrawer({super.key});
+  @override
+  State<StatefulWidget> createState() => DrawerState();
+}
+
+class DrawerFeedSelection extends StatefulWidget {
+  const DrawerFeedSelection({super.key});
+
+  @override
+  State<StatefulWidget> createState() => DrawerFeedSelectionState();
+}
+
+class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
   final List<String> feeds = ["Home", "Popular", "All", "Saved", "History"];
   final List<String> userOptions = ["Profile", "Inbox", "Moderation"];
-  final List<String> subscriptions = [
-    "Home",
-    "Popular",
-    "All",
-    "Saved",
-    "History",
+  final log = Logger("DrawerFeedSelection");
+  bool _isInit = false;
+  UserAccount? account;
+  final List<Feed> baseSubscriptions = [
+    Feed.home(),
+    Feed.popular(),
+    Feed.all()
+    //"Saved",
+    //"History",
   ];
 
-  DrawerFeedSelection({super.key});
-
-  Widget listView(List<String> elements, BuildContext context) {
-    return Flexible(
-        fit: FlexFit.loose,
-        child: ListView.builder(
-            itemCount: elements.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Text(elements[index]);
-            }));
-    //return Column(children: elements.map((e) => Text(e)).toList());
-  }
+  DrawerFeedSelectionState();
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<DrawerModel>();
+    final state = context.watch<AccountsManager>();
+    if (account != state.currentUser) {
+      _isInit = false;
+      account = state.currentUser;
+    }
     return Flexible(
-        fit: FlexFit.loose,
-        child: ListView(children: [
+      fit: FlexFit.loose,
+      child: ListView(
+        children: [
           ...feeds.map((feed) => Text(feed)),
           Divider(),
           ...userOptions.map((option) => Text(option)),
           Divider(),
-          ...subscriptions.map((sub) => Text(sub)),
           Column(
             spacing: 8.0,
             children: [
-              ...state.subscriptions.map(
-                (sub) => InkWell(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => FeedView(
-                        feed: Feed.subreddit(sub.displayName),
-                        initialSort: Sort.best(),
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    spacing: 8.0,
-                    children: [
-                      CircleAvatar(
-                        radius: 16,
-                        backgroundImage: NetworkImage(
-                          sub.iconImg,
-                          // width: 32,
-                          // height: 32,
+              ...state.subreddits.map(
+                (sub) {
+                  final icon = sub.icon;
+                  late final CircleAvatar iconWidget;
+                  if (icon?.url.toString() != null) {
+                    iconWidget = CircleAvatar(
+                      radius: 16,
+                      foregroundImage: NetworkImage(icon!.url.toString()),
+                      backgroundColor: Colors.transparent,
+                    );
+                  } else {
+                    final keyColor = sub.keyColor;
+                    final color = keyColor.isEmpty ? keyColor : "#000000";
+                    iconWidget = CircleAvatar(
+                      radius: 16,
+                      backgroundColor: HexColor.fromHex(color),
+                      child: Text("r/"),
+                    );
+                  }
+                  return InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FeedView(
+                          feed: Feed.subreddit(sub.displayName),
+                          initialSort: Sort.best(),
                         ),
                       ),
-                      Text(sub.displayNamePrefixed,
-                          style: Theme.of(context).textTheme.bodyMedium)
-                    ],
-                  ),
-                ),
+                    ),
+                    child: Row(
+                      spacing: 8.0,
+                      children: [
+                        iconWidget,
+                        Text(sub.displayNamePrefixed,
+                            style: Theme.of(context).textTheme.bodyMedium)
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -225,6 +207,8 @@ class DrawerFeedSelection extends StatelessWidget {
                 Icon(Icons.info_outline),
                 Text("Licenses", style: Theme.of(context).textTheme.bodyMedium)
               ]))
-        ]));
+        ],
+      ),
+    );
   }
 }

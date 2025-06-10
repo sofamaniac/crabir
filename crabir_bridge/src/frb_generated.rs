@@ -44,7 +44,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.10.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1733747484;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 649119475;
 
 // Section: executor
 
@@ -966,17 +966,25 @@ fn wire__reddit_api__client__Client_save_impl(
             let api_that = <RustOpaqueMoi<
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Client>,
             >>::sse_decode(&mut deserializer);
-            let api_thing = <Fullname>::sse_decode(&mut deserializer);
+            let api_thing = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Fullname>,
+            >>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
                         let mut api_that_guard = None;
+                        let mut api_thing_guard = None;
                         let decode_indices_ =
                             flutter_rust_bridge::for_generated::lockable_compute_decode_order(
-                                vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                                    &api_that, 0, false,
-                                )],
+                                vec![
+                                    flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                        &api_that, 0, false,
+                                    ),
+                                    flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                        &api_thing, 1, false,
+                                    ),
+                                ],
                             );
                         for i in decode_indices_ {
                             match i {
@@ -984,12 +992,18 @@ fn wire__reddit_api__client__Client_save_impl(
                                     api_that_guard =
                                         Some(api_that.lockable_decode_async_ref().await)
                                 }
+                                1 => {
+                                    api_thing_guard =
+                                        Some(api_thing.lockable_decode_async_ref().await)
+                                }
                                 _ => unreachable!(),
                             }
                         }
                         let api_that_guard = api_that_guard.unwrap();
+                        let api_thing_guard = api_thing_guard.unwrap();
                         let output_ok =
-                            reddit_api::client::Client::save(&*api_that_guard, api_thing).await?;
+                            reddit_api::client::Client::save(&*api_that_guard, &*api_thing_guard)
+                                .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1079,17 +1093,25 @@ fn wire__reddit_api__client__Client_unsave_impl(
             let api_that = <RustOpaqueMoi<
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Client>,
             >>::sse_decode(&mut deserializer);
-            let api_thing = <Fullname>::sse_decode(&mut deserializer);
+            let api_thing = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Fullname>,
+            >>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
                         let mut api_that_guard = None;
+                        let mut api_thing_guard = None;
                         let decode_indices_ =
                             flutter_rust_bridge::for_generated::lockable_compute_decode_order(
-                                vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                                    &api_that, 0, false,
-                                )],
+                                vec![
+                                    flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                        &api_that, 0, false,
+                                    ),
+                                    flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                        &api_thing, 1, false,
+                                    ),
+                                ],
                             );
                         for i in decode_indices_ {
                             match i {
@@ -1097,12 +1119,18 @@ fn wire__reddit_api__client__Client_unsave_impl(
                                     api_that_guard =
                                         Some(api_that.lockable_decode_async_ref().await)
                                 }
+                                1 => {
+                                    api_thing_guard =
+                                        Some(api_thing.lockable_decode_async_ref().await)
+                                }
                                 _ => unreachable!(),
                             }
                         }
                         let api_that_guard = api_that_guard.unwrap();
+                        let api_thing_guard = api_thing_guard.unwrap();
                         let output_ok =
-                            reddit_api::client::Client::unsave(&*api_that_guard, api_thing).await?;
+                            reddit_api::client::Client::unsave(&*api_that_guard, &*api_thing_guard)
+                                .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1136,18 +1164,26 @@ fn wire__reddit_api__client__Client_vote_impl(
             let api_that = <RustOpaqueMoi<
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Client>,
             >>::sse_decode(&mut deserializer);
-            let api_thing = <Fullname>::sse_decode(&mut deserializer);
+            let api_thing = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Fullname>,
+            >>::sse_decode(&mut deserializer);
             let api_direction = <reddit_api::client::VoteDirection>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
                         let mut api_that_guard = None;
+                        let mut api_thing_guard = None;
                         let decode_indices_ =
                             flutter_rust_bridge::for_generated::lockable_compute_decode_order(
-                                vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                                    &api_that, 0, false,
-                                )],
+                                vec![
+                                    flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                        &api_that, 0, false,
+                                    ),
+                                    flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                        &api_thing, 1, false,
+                                    ),
+                                ],
                             );
                         for i in decode_indices_ {
                             match i {
@@ -1155,13 +1191,18 @@ fn wire__reddit_api__client__Client_vote_impl(
                                     api_that_guard =
                                         Some(api_that.lockable_decode_async_ref().await)
                                 }
+                                1 => {
+                                    api_thing_guard =
+                                        Some(api_thing.lockable_decode_async_ref().await)
+                                }
                                 _ => unreachable!(),
                             }
                         }
                         let api_that_guard = api_that_guard.unwrap();
+                        let api_thing_guard = api_thing_guard.unwrap();
                         let output_ok = reddit_api::client::Client::vote(
                             &*api_that_guard,
-                            api_thing,
+                            &*api_thing_guard,
                             api_direction,
                         )
                         .await?;
@@ -1701,6 +1742,68 @@ fn wire__crate__api__simple__FeedState_refresh_impl(
         },
     )
 }
+fn wire__crate__api__simple__FeedState_save_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "FeedState_save",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FeedState>,
+            >>::sse_decode(&mut deserializer);
+            let api_index = <u32>::sse_decode(&mut deserializer);
+            let api_save = <bool>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                    (move || async move {
+                        let mut api_that_guard = None;
+                        let decode_indices_ =
+                            flutter_rust_bridge::for_generated::lockable_compute_decode_order(
+                                vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                    &api_that, 0, true,
+                                )],
+                            );
+                        for i in decode_indices_ {
+                            match i {
+                                0 => {
+                                    api_that_guard =
+                                        Some(api_that.lockable_decode_async_ref_mut().await)
+                                }
+                                _ => unreachable!(),
+                            }
+                        }
+                        let mut api_that_guard = api_that_guard.unwrap();
+                        let output_ok = crate::api::simple::FeedState::save(
+                            &mut *api_that_guard,
+                            api_index,
+                            api_save,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__simple__FeedState_set_feed_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1811,6 +1914,68 @@ fn wire__crate__api__simple__FeedState_set_sort_impl(
                             crate::api::simple::FeedState::set_sort(&mut *api_that_guard, api_sort)
                                 .await;
                         })?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__simple__FeedState_vote_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "FeedState_vote",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FeedState>,
+            >>::sse_decode(&mut deserializer);
+            let api_index = <u32>::sse_decode(&mut deserializer);
+            let api_direction = <reddit_api::client::VoteDirection>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                    (move || async move {
+                        let mut api_that_guard = None;
+                        let decode_indices_ =
+                            flutter_rust_bridge::for_generated::lockable_compute_decode_order(
+                                vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                    &api_that, 0, true,
+                                )],
+                            );
+                        for i in decode_indices_ {
+                            match i {
+                                0 => {
+                                    api_that_guard =
+                                        Some(api_that.lockable_decode_async_ref_mut().await)
+                                }
+                                _ => unreachable!(),
+                            }
+                        }
+                        let mut api_that_guard = api_that_guard.unwrap();
+                        let output_ok = crate::api::simple::FeedState::vote(
+                            &mut *api_that_guard,
+                            api_index,
+                            api_direction,
+                        )
+                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -3015,1009 +3180,6 @@ fn wire__reddit_api__model__Listing_default_impl(
             move |context| {
                 transform_result_sse::<_, ()>((move || {
                     let output_ok = Result::<_, ()>::Ok(reddit_api::model::Listing::default())?;
-                    Ok(output_ok)
-                })())
-            }
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_get_author_name_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_get_author_name",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.author_name.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_get_author_url_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_get_author_url",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.author_url.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_get_height_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_get_height",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.height.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_get_html_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_get_html",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.html.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_get_provider_name_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_get_provider_name",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.provider_name.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_get_provider_url_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_get_provider_url",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.provider_url.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_get_title_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_get_title",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.title.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_get_type_field_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_get_type_field",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.type_field.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_get_version_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_get_version",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.version.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_get_width_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_get_width",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.width.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_set_author_name_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_set_author_name",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            let api_author_name = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.author_name = api_author_name;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_set_author_url_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_set_author_url",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            let api_author_url = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.author_url = api_author_url;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_set_height_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_set_height",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            let api_height = <i64>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.height = api_height;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_set_html_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_set_html",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            let api_html = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.html = api_html;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_set_provider_name_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_set_provider_name",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            let api_provider_name = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.provider_name = api_provider_name;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_set_provider_url_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_set_provider_url",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            let api_provider_url = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.provider_url = api_provider_url;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_set_title_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_set_title",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            let api_title = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.title = api_title;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_set_type_field_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_set_type_field",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            let api_type_field = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.type_field = api_type_field;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_set_version_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_set_version",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            let api_version = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.version = api_version;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_auto_accessor_set_width_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_auto_accessor_set_width",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-            >>::sse_decode(&mut deserializer);
-            let api_width = <i64>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.width = api_width;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__Oembed_default_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Oembed_default",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, ()>((move || {
-                    let output_ok =
-                        Result::<_, ()>::Ok(reddit_api::model::post::Oembed::default())?;
                     Ok(output_ok)
                 })())
             }
@@ -10216,7 +9378,7 @@ fn wire__reddit_api__model__post__Post_auto_accessor_set_media_impl(
             let api_that = <RustOpaqueMoi<
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Post>,
             >>::sse_decode(&mut deserializer);
-            let api_media = <Option<Media>>::sse_decode(&mut deserializer);
+            let api_media = <Option<reddit_api::model::post::Media>>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let mut api_that_guard = None;
@@ -11544,7 +10706,8 @@ fn wire__reddit_api__model__post__Post_auto_accessor_set_secure_media_impl(
             let api_that = <RustOpaqueMoi<
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Post>,
             >>::sse_decode(&mut deserializer);
-            let api_secure_media = <Option<SecureMedia>>::sse_decode(&mut deserializer);
+            let api_secure_media =
+                <Option<reddit_api::model::post::Media>>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let mut api_that_guard = None;
@@ -12716,39 +11879,6 @@ fn wire__reddit_api__model__post__Post_thumbnail_impl(
                 ))?;
                 Ok(output_ok)
             })())
-        },
-    )
-}
-fn wire__reddit_api__model__post__RedditVideo_default_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "RedditVideo_default",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, ()>((move || {
-                    let output_ok =
-                        Result::<_, ()>::Ok(reddit_api::model::post::RedditVideo::default())?;
-                    Ok(output_ok)
-                })())
-            }
         },
     )
 }
@@ -14509,52 +13639,6 @@ fn wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_comment_score
         },
     )
 }
-fn wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_community_icon_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Subreddit_auto_accessor_get_community_icon",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Subreddit>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.community_icon.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
 fn wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_community_reviewed_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -15287,98 +14371,6 @@ fn wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_hide_ads_impl
                 }
                 let api_that_guard = api_that_guard.unwrap();
                 let output_ok = Result::<_, ()>::Ok(api_that_guard.hide_ads.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_icon_img_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Subreddit_auto_accessor_get_icon_img",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Subreddit>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.icon_img.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_icon_size_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Subreddit_auto_accessor_get_icon_size",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Subreddit>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.icon_size.clone())?;
                 Ok(output_ok)
             })())
         },
@@ -18932,57 +17924,6 @@ fn wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_comment_score
         },
     )
 }
-fn wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_community_icon_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Subreddit_auto_accessor_set_community_icon",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Subreddit>,
-            >>::sse_decode(&mut deserializer);
-            let api_community_icon = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.community_icon = api_community_icon;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
 fn wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_community_reviewed_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -19793,108 +18734,6 @@ fn wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_hide_ads_impl
                 let output_ok = Result::<_, ()>::Ok({
                     {
                         api_that_guard.hide_ads = api_hide_ads;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_icon_img_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Subreddit_auto_accessor_set_icon_img",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Subreddit>,
-            >>::sse_decode(&mut deserializer);
-            let api_icon_img = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.icon_img = api_icon_img;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_icon_size_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Subreddit_auto_accessor_set_icon_size",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Subreddit>,
-            >>::sse_decode(&mut deserializer);
-            let api_icon_size = <Option<[usize; 2]>>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.icon_size = api_icon_size;
                     };
                 })?;
                 Ok(output_ok)
@@ -22386,6 +21225,54 @@ fn wire__reddit_api__model__subreddit__Subreddit_default_impl(
         },
     )
 }
+fn wire__reddit_api__model__subreddit__Subreddit_icon_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "Subreddit_icon",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Subreddit>,
+            >>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, ()>((move || {
+                let mut api_that_guard = None;
+                let decode_indices_ =
+                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
+                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                            &api_that, 0, false,
+                        ),
+                    ]);
+                for i in decode_indices_ {
+                    match i {
+                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                        _ => unreachable!(),
+                    }
+                }
+                let api_that_guard = api_that_guard.unwrap();
+                let output_ok = Result::<_, ()>::Ok(
+                    reddit_api::model::subreddit::Subreddit::icon(&*api_that_guard),
+                )?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__reddit_api__model__subreddit__comment_contribution_settings_default_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -22417,6 +21304,54 @@ fn wire__reddit_api__model__subreddit__comment_contribution_settings_default_imp
                     Ok(output_ok)
                 })())
             }
+        },
+    )
+}
+fn wire__crate__api__simple__debug_post_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "debug_post",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_post = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Post>,
+            >>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, ()>((move || {
+                let mut api_post_guard = None;
+                let decode_indices_ =
+                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
+                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                            &api_post, 0, false,
+                        ),
+                    ]);
+                for i in decode_indices_ {
+                    match i {
+                        0 => api_post_guard = Some(api_post.lockable_decode_sync_ref()),
+                        _ => unreachable!(),
+                    }
+                }
+                let api_post_guard = api_post_guard.unwrap();
+                let output_ok = Result::<_, ()>::Ok({
+                    crate::api::simple::debug_post(&*api_post_guard);
+                })?;
+                Ok(output_ok)
+            })())
         },
     )
 }
@@ -22718,6 +21653,39 @@ fn wire__reddit_api__model__subreddit__notification_level_default_impl(
         },
     )
 }
+fn wire__reddit_api__model__post__oembed_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "oembed_default",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok =
+                        Result::<_, ()>::Ok(reddit_api::model::post::Oembed::default())?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__reddit_api__model__user__preferences_default_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -22840,6 +21808,39 @@ fn wire__reddit_api__model__post__reddit_image_default_impl(
                 transform_result_sse::<_, ()>((move || {
                     let output_ok =
                         Result::<_, ()>::Ok(reddit_api::model::post::RedditImage::default())?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__reddit_api__model__post__reddit_video_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "reddit_video_default",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok =
+                        Result::<_, ()>::Ok(reddit_api::model::post::RedditVideo::default())?;
                     Ok(output_ok)
                 })())
             }
@@ -22992,6 +21993,72 @@ fn wire__reddit_api__model__multi__subreddit_name_default_impl(
                 transform_result_sse::<_, ()>((move || {
                     let output_ok =
                         Result::<_, ()>::Ok(reddit_api::model::multi::SubredditName::default())?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__reddit_api__model__post__thumbnail_option_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "thumbnail_option_default",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok =
+                        Result::<_, ()>::Ok(reddit_api::model::post::ThumbnailOption::default())?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__reddit_api__model__post__thumbnail_url_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "thumbnail_url_default",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok =
+                        Result::<_, ()>::Ok(reddit_api::model::post::ThumbnailURL::default())?;
                     Ok(output_ok)
                 })())
             }
@@ -23182,10 +22249,25 @@ const _: fn() = || {
         let Gildings = None::<reddit_api::model::post::Gildings>.unwrap();
     }
     {
+        let Icon = None::<reddit_api::model::subreddit::Icon>.unwrap();
+        let _: String = Icon.url;
+        let _: usize = Icon.width;
+        let _: usize = Icon.height;
+    }
+    {
         let ImageBase = None::<reddit_api::model::post::ImageBase>.unwrap();
         let _: String = ImageBase.url;
         let _: i64 = ImageBase.width;
         let _: i64 = ImageBase.height;
+    }
+    match None::<reddit_api::model::post::Media>.unwrap() {
+        reddit_api::model::post::Media::RedditVideo(field0) => {
+            let _: reddit_api::model::post::RedditVideo = field0;
+        }
+        reddit_api::model::post::Media::Oembed { oembed, type_field } => {
+            let _: reddit_api::model::post::Oembed = oembed;
+            let _: String = type_field;
+        }
     }
     {
         let MediaEmbed = None::<reddit_api::model::post::MediaEmbed>.unwrap();
@@ -23217,6 +22299,20 @@ const _: fn() = || {
         let _: bool = Multi.is_favorited;
     }
     {
+        let Oembed = None::<reddit_api::model::post::Oembed>.unwrap();
+        let _: String = Oembed.provider_url;
+        let _: String = Oembed.title;
+        let _: String = Oembed.html;
+        let _: i64 = Oembed.height;
+        let _: i64 = Oembed.width;
+        let _: String = Oembed.version;
+        let _: String = Oembed.author_name;
+        let _: String = Oembed.provider_name;
+        let _: String = Oembed.type_field;
+        let _: String = Oembed.author_url;
+        let _: reddit_api::model::post::ThumbnailOption = Oembed.thumbnail;
+    }
+    {
         let Preferences = None::<reddit_api::model::user::Preferences>.unwrap();
         let _: bool = Preferences.pref_autoplay;
         let _: bool = Preferences.pref_video_autoplay;
@@ -23240,6 +22336,20 @@ const _: fn() = || {
         let _: Vec<reddit_api::model::post::ImageBase> = RedditImage.resolutions;
         let _: reddit_api::model::post::Variants = RedditImage.variants;
         let _: String = RedditImage.id;
+    }
+    {
+        let RedditVideo = None::<reddit_api::model::post::RedditVideo>.unwrap();
+        let _: u64 = RedditVideo.bitrate_kbps;
+        let _: u64 = RedditVideo.width;
+        let _: u64 = RedditVideo.height;
+        let _: bool = RedditVideo.has_audio;
+        let _: bool = RedditVideo.is_gif;
+        let _: String = RedditVideo.fallback_url;
+        let _: String = RedditVideo.scrubber_media_url;
+        let _: String = RedditVideo.dash_url;
+        let _: String = RedditVideo.hls_url;
+        let _: u64 = RedditVideo.duration;
+        let _: String = RedditVideo.transcoding_status;
     }
     {
         let SecureMediaEmbed = None::<reddit_api::model::post::SecureMediaEmbed>.unwrap();
@@ -23298,6 +22408,18 @@ const _: fn() = || {
         let _: String = Thumbnail.url;
         let _: u64 = Thumbnail.height;
         let _: u64 = Thumbnail.width;
+    }
+    {
+        let ThumbnailOption = None::<reddit_api::model::post::ThumbnailOption>.unwrap();
+        let _: Option<String> = ThumbnailOption.url;
+        let _: Option<u64> = ThumbnailOption.height;
+        let _: Option<u64> = ThumbnailOption.width;
+    }
+    {
+        let ThumbnailURL = None::<reddit_api::model::post::ThumbnailURL>.unwrap();
+        let _: Option<String> = ThumbnailURL.url;
+        let _: Option<u64> = ThumbnailURL.height;
+        let _: Option<u64> = ThumbnailURL.width;
     }
     {
         let User = None::<reddit_api::model::user::User>.unwrap();
@@ -23429,12 +22551,6 @@ flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
     flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Listing>
 );
 flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Media>
-);
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>
-);
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
     flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Pager>
 );
 flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
@@ -23442,12 +22558,6 @@ flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
 );
 flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
     flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PostID>
-);
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RedditVideo>
-);
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SecureMedia>
 );
 flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
     flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Subreddit>
@@ -23542,26 +22652,6 @@ impl SseDecode for Listing {
     }
 }
 
-impl SseDecode for Media {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <RustOpaqueMoi<
-            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Media>,
-        >>::sse_decode(deserializer);
-        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
-    }
-}
-
-impl SseDecode for Oembed {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <RustOpaqueMoi<
-            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>,
-        >>::sse_decode(deserializer);
-        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
-    }
-}
-
 impl SseDecode for Pager {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -23587,26 +22677,6 @@ impl SseDecode for PostID {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <RustOpaqueMoi<
             flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PostID>,
-        >>::sse_decode(deserializer);
-        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
-    }
-}
-
-impl SseDecode for RedditVideo {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <RustOpaqueMoi<
-            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RedditVideo>,
-        >>::sse_decode(deserializer);
-        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
-    }
-}
-
-impl SseDecode for SecureMedia {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <RustOpaqueMoi<
-            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SecureMedia>,
         >>::sse_decode(deserializer);
         return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
     }
@@ -23750,22 +22820,6 @@ impl SseDecode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpa
     }
 }
 
-impl SseDecode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Media>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
-    }
-}
-
-impl SseDecode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
-    }
-}
-
 impl SseDecode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Pager>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -23783,26 +22837,6 @@ impl SseDecode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpa
 }
 
 impl SseDecode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PostID>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
-    }
-}
-
-impl SseDecode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RedditVideo>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
-    }
-}
-
-impl SseDecode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SecureMedia>>
-{
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <usize>::sse_decode(deserializer);
@@ -24002,6 +23036,20 @@ impl SseDecode for i64 {
     }
 }
 
+impl SseDecode for reddit_api::model::subreddit::Icon {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_url = <String>::sse_decode(deserializer);
+        let mut var_width = <usize>::sse_decode(deserializer);
+        let mut var_height = <usize>::sse_decode(deserializer);
+        return reddit_api::model::subreddit::Icon {
+            url: var_url,
+            width: var_width,
+            height: var_height,
+        };
+    }
+}
+
 impl SseDecode for reddit_api::model::post::ImageBase {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -24133,18 +23181,6 @@ impl SseDecode for Vec<u8> {
     }
 }
 
-impl SseDecode for Vec<usize> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
-        let mut ans_ = vec![];
-        for idx_ in 0..len_ {
-            ans_.push(<usize>::sse_decode(deserializer));
-        }
-        return ans_;
-    }
-}
-
 impl SseDecode for Vec<(String, String)> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -24194,6 +23230,31 @@ impl SseDecode for Vec<reddit_api::model::Thing> {
             ans_.push(<reddit_api::model::Thing>::sse_decode(deserializer));
         }
         return ans_;
+    }
+}
+
+impl SseDecode for reddit_api::model::post::Media {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_field0 =
+                    <reddit_api::model::post::RedditVideo>::sse_decode(deserializer);
+                return reddit_api::model::post::Media::RedditVideo(var_field0);
+            }
+            1 => {
+                let mut var_oembed = <reddit_api::model::post::Oembed>::sse_decode(deserializer);
+                let mut var_typeField = <String>::sse_decode(deserializer);
+                return reddit_api::model::post::Media::Oembed {
+                    oembed: var_oembed,
+                    type_field: var_typeField,
+                };
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 
@@ -24272,6 +23333,37 @@ impl SseDecode for reddit_api::model::subreddit::NotificationLevel {
     }
 }
 
+impl SseDecode for reddit_api::model::post::Oembed {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_providerUrl = <String>::sse_decode(deserializer);
+        let mut var_title = <String>::sse_decode(deserializer);
+        let mut var_html = <String>::sse_decode(deserializer);
+        let mut var_height = <i64>::sse_decode(deserializer);
+        let mut var_width = <i64>::sse_decode(deserializer);
+        let mut var_version = <String>::sse_decode(deserializer);
+        let mut var_authorName = <String>::sse_decode(deserializer);
+        let mut var_providerName = <String>::sse_decode(deserializer);
+        let mut var_typeField = <String>::sse_decode(deserializer);
+        let mut var_authorUrl = <String>::sse_decode(deserializer);
+        let mut var_thumbnail =
+            <reddit_api::model::post::ThumbnailOption>::sse_decode(deserializer);
+        return reddit_api::model::post::Oembed {
+            provider_url: var_providerUrl,
+            title: var_title,
+            html: var_html,
+            height: var_height,
+            width: var_width,
+            version: var_version,
+            author_name: var_authorName,
+            provider_name: var_providerName,
+            type_field: var_typeField,
+            author_url: var_authorUrl,
+            thumbnail: var_thumbnail,
+        };
+    }
+}
+
 impl SseDecode for Option<String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -24294,33 +23386,11 @@ impl SseDecode for Option<AuthorInfo> {
     }
 }
 
-impl SseDecode for Option<Media> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        if (<bool>::sse_decode(deserializer)) {
-            return Some(<Media>::sse_decode(deserializer));
-        } else {
-            return None;
-        }
-    }
-}
-
 impl SseDecode for Option<Post> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         if (<bool>::sse_decode(deserializer)) {
             return Some(<Post>::sse_decode(deserializer));
-        } else {
-            return None;
-        }
-    }
-}
-
-impl SseDecode for Option<SecureMedia> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        if (<bool>::sse_decode(deserializer)) {
-            return Some(<SecureMedia>::sse_decode(deserializer));
         } else {
             return None;
         }
@@ -24376,6 +23446,30 @@ impl SseDecode for Option<i64> {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         if (<bool>::sse_decode(deserializer)) {
             return Some(<i64>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<reddit_api::model::subreddit::Icon> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<reddit_api::model::subreddit::Icon>::sse_decode(
+                deserializer,
+            ));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<reddit_api::model::post::Media> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<reddit_api::model::post::Media>::sse_decode(deserializer));
         } else {
             return None;
         }
@@ -24454,17 +23548,6 @@ impl SseDecode for Option<Vec<i64>> {
     }
 }
 
-impl SseDecode for Option<[usize; 2]> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        if (<bool>::sse_decode(deserializer)) {
-            return Some(<[usize; 2]>::sse_decode(deserializer));
-        } else {
-            return None;
-        }
-    }
-}
-
 impl SseDecode for reddit_api::model::user::Preferences {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -24534,6 +23617,36 @@ impl SseDecode for reddit_api::model::post::RedditImage {
             resolutions: var_resolutions,
             variants: var_variants,
             id: var_id,
+        };
+    }
+}
+
+impl SseDecode for reddit_api::model::post::RedditVideo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_bitrateKbps = <u64>::sse_decode(deserializer);
+        let mut var_width = <u64>::sse_decode(deserializer);
+        let mut var_height = <u64>::sse_decode(deserializer);
+        let mut var_hasAudio = <bool>::sse_decode(deserializer);
+        let mut var_isGif = <bool>::sse_decode(deserializer);
+        let mut var_fallbackUrl = <String>::sse_decode(deserializer);
+        let mut var_scrubberMediaUrl = <String>::sse_decode(deserializer);
+        let mut var_dashUrl = <String>::sse_decode(deserializer);
+        let mut var_hlsUrl = <String>::sse_decode(deserializer);
+        let mut var_duration = <u64>::sse_decode(deserializer);
+        let mut var_transcodingStatus = <String>::sse_decode(deserializer);
+        return reddit_api::model::post::RedditVideo {
+            bitrate_kbps: var_bitrateKbps,
+            width: var_width,
+            height: var_height,
+            has_audio: var_hasAudio,
+            is_gif: var_isGif,
+            fallback_url: var_fallbackUrl,
+            scrubber_media_url: var_scrubberMediaUrl,
+            dash_url: var_dashUrl,
+            hls_url: var_hlsUrl,
+            duration: var_duration,
+            transcoding_status: var_transcodingStatus,
         };
     }
 }
@@ -24659,6 +23772,34 @@ impl SseDecode for reddit_api::model::post::Thumbnail {
         let mut var_height = <u64>::sse_decode(deserializer);
         let mut var_width = <u64>::sse_decode(deserializer);
         return reddit_api::model::post::Thumbnail {
+            url: var_url,
+            height: var_height,
+            width: var_width,
+        };
+    }
+}
+
+impl SseDecode for reddit_api::model::post::ThumbnailOption {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_url = <Option<String>>::sse_decode(deserializer);
+        let mut var_height = <Option<u64>>::sse_decode(deserializer);
+        let mut var_width = <Option<u64>>::sse_decode(deserializer);
+        return reddit_api::model::post::ThumbnailOption {
+            url: var_url,
+            height: var_height,
+            width: var_width,
+        };
+    }
+}
+
+impl SseDecode for reddit_api::model::post::ThumbnailURL {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_url = <Option<String>>::sse_decode(deserializer);
+        let mut var_height = <Option<u64>>::sse_decode(deserializer);
+        let mut var_width = <Option<u64>>::sse_decode(deserializer);
+        return reddit_api::model::post::ThumbnailURL {
             url: var_url,
             height: var_height,
             width: var_width,
@@ -24923,14 +24064,6 @@ impl SseDecode for usize {
     }
 }
 
-impl SseDecode for [usize; 2] {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <Vec<usize>>::sse_decode(deserializer);
-        return flutter_rust_bridge::for_generated::from_vec_to_array(inner);
-    }
-}
-
 impl SseDecode for reddit_api::model::post::Variants {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -24990,123 +24123,139 @@ fn pde_ffi_dispatcher_primary_impl(
         23 => wire__reddit_api__client__Client_vote_impl(port, ptr, rust_vec_len, data_len),
         32 => wire__crate__api__simple__FeedState_next_impl(port, ptr, rust_vec_len, data_len),
         34 => wire__crate__api__simple__FeedState_refresh_impl(port, ptr, rust_vec_len, data_len),
-        35 => wire__crate__api__simple__FeedState_set_feed_impl(port, ptr, rust_vec_len, data_len),
-        36 => wire__crate__api__simple__FeedState_set_sort_impl(port, ptr, rust_vec_len, data_len),
-        37 => wire__reddit_api__model__feed__FeedStream_new_impl(port, ptr, rust_vec_len, data_len),
-        50 => wire__reddit_api__model__flair__Flair_default_impl(port, ptr, rust_vec_len, data_len),
-        51 => wire__reddit_api__model__Fullname_default_impl(port, ptr, rust_vec_len, data_len),
-        62 => wire__reddit_api__model__Listing_default_impl(port, ptr, rust_vec_len, data_len),
-        83 => wire__reddit_api__model__post__Oembed_default_impl(port, ptr, rust_vec_len, data_len),
-        84 => wire__reddit_api__client__Pager_add_to_url_impl(port, ptr, rust_vec_len, data_len),
-        85 => wire__reddit_api__client__Pager_after_impl(port, ptr, rust_vec_len, data_len),
-        86 => wire__reddit_api__client__Pager_before_impl(port, ptr, rust_vec_len, data_len),
-        87 => wire__reddit_api__client__Pager_default_impl(port, ptr, rust_vec_len, data_len),
-        88 => wire__reddit_api__model__post__PostId_default_impl(port, ptr, rust_vec_len, data_len),
-        261 => wire__reddit_api__model__post__Post_default_impl(port, ptr, rust_vec_len, data_len),
-        264 => wire__reddit_api__model__post__RedditVideo_default_impl(
+        35 => wire__crate__api__simple__FeedState_save_impl(port, ptr, rust_vec_len, data_len),
+        36 => wire__crate__api__simple__FeedState_set_feed_impl(port, ptr, rust_vec_len, data_len),
+        37 => wire__crate__api__simple__FeedState_set_sort_impl(port, ptr, rust_vec_len, data_len),
+        38 => wire__crate__api__simple__FeedState_vote_impl(port, ptr, rust_vec_len, data_len),
+        39 => wire__reddit_api__model__feed__FeedStream_new_impl(port, ptr, rust_vec_len, data_len),
+        52 => wire__reddit_api__model__flair__Flair_default_impl(port, ptr, rust_vec_len, data_len),
+        53 => wire__reddit_api__model__Fullname_default_impl(port, ptr, rust_vec_len, data_len),
+        64 => wire__reddit_api__model__Listing_default_impl(port, ptr, rust_vec_len, data_len),
+        65 => wire__reddit_api__client__Pager_add_to_url_impl(port, ptr, rust_vec_len, data_len),
+        66 => wire__reddit_api__client__Pager_after_impl(port, ptr, rust_vec_len, data_len),
+        67 => wire__reddit_api__client__Pager_before_impl(port, ptr, rust_vec_len, data_len),
+        68 => wire__reddit_api__client__Pager_default_impl(port, ptr, rust_vec_len, data_len),
+        69 => wire__reddit_api__model__post__PostId_default_impl(port, ptr, rust_vec_len, data_len),
+        242 => wire__reddit_api__model__post__Post_default_impl(port, ptr, rust_vec_len, data_len),
+        245 => wire__reddit_api__model__post__SubredditId_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        265 => wire__reddit_api__model__post__SubredditId_default_impl(
+        256 => wire__reddit_api__model__post__SubredditInfo_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        276 => wire__reddit_api__model__post__SubredditInfo_default_impl(
+        437 => wire__reddit_api__model__subreddit__Subreddit_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        463 => wire__reddit_api__model__subreddit__Subreddit_default_impl(
+        439 => wire__reddit_api__model__subreddit__comment_contribution_settings_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        464 => wire__reddit_api__model__subreddit__comment_contribution_settings_default_impl(
+        441 => {
+            wire__reddit_api__model__user__features_default_impl(port, ptr, rust_vec_len, data_len)
+        }
+        442 => wire__reddit_api__model__feed__feed_default_impl(port, ptr, rust_vec_len, data_len),
+        443 => {
+            wire__reddit_api__model__post__gallery_default_impl(port, ptr, rust_vec_len, data_len)
+        }
+        444 => {
+            wire__reddit_api__model__post__gildings_default_impl(port, ptr, rust_vec_len, data_len)
+        }
+        445 => wire__reddit_api__model__post__image_base_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        446 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
+        447 => wire__reddit_api__model__post__media_embed_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        448 => {
+            wire__reddit_api__model__multi__multi_default_impl(port, ptr, rust_vec_len, data_len)
+        }
+        449 => wire__reddit_api__model__subreddit__notification_level_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        450 => {
+            wire__reddit_api__model__post__oembed_default_impl(port, ptr, rust_vec_len, data_len)
+        }
+        451 => wire__reddit_api__model__user__preferences_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        452 => {
+            wire__reddit_api__model__post__preview_default_impl(port, ptr, rust_vec_len, data_len)
+        }
+        454 => wire__reddit_api__model__post__reddit_image_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        455 => wire__reddit_api__model__post__reddit_video_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        456 => wire__reddit_api__model__post__secure_media_embed_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        457 => {
+            wire__reddit_api__model__user__snoovatar_default_impl(port, ptr, rust_vec_len, data_len)
+        }
+        458 => wire__reddit_api__model__sort_add_to_url_impl(port, ptr, rust_vec_len, data_len),
+        459 => wire__reddit_api__model__multi__subreddit_name_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        460 => wire__reddit_api__model__post__thumbnail_option_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        461 => wire__reddit_api__model__post__thumbnail_url_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        462 => wire__reddit_api__model__user__user_default_impl(port, ptr, rust_vec_len, data_len),
+        463 => {
+            wire__reddit_api__model__user__user_info_default_impl(port, ptr, rust_vec_len, data_len)
+        }
+        464 => wire__reddit_api__model__user__user_subreddit_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
         465 => {
-            wire__reddit_api__model__user__features_default_impl(port, ptr, rust_vec_len, data_len)
-        }
-        466 => wire__reddit_api__model__feed__feed_default_impl(port, ptr, rust_vec_len, data_len),
-        467 => {
-            wire__reddit_api__model__post__gallery_default_impl(port, ptr, rust_vec_len, data_len)
-        }
-        468 => {
-            wire__reddit_api__model__post__gildings_default_impl(port, ptr, rust_vec_len, data_len)
-        }
-        469 => wire__reddit_api__model__post__image_base_default_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        470 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
-        471 => wire__reddit_api__model__post__media_embed_default_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        472 => {
-            wire__reddit_api__model__multi__multi_default_impl(port, ptr, rust_vec_len, data_len)
-        }
-        473 => wire__reddit_api__model__subreddit__notification_level_default_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        474 => wire__reddit_api__model__user__preferences_default_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        475 => {
-            wire__reddit_api__model__post__preview_default_impl(port, ptr, rust_vec_len, data_len)
-        }
-        477 => wire__reddit_api__model__post__reddit_image_default_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        478 => wire__reddit_api__model__post__secure_media_embed_default_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        479 => {
-            wire__reddit_api__model__user__snoovatar_default_impl(port, ptr, rust_vec_len, data_len)
-        }
-        480 => wire__reddit_api__model__sort_add_to_url_impl(port, ptr, rust_vec_len, data_len),
-        481 => wire__reddit_api__model__multi__subreddit_name_default_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        482 => wire__reddit_api__model__user__user_default_impl(port, ptr, rust_vec_len, data_len),
-        483 => {
-            wire__reddit_api__model__user__user_info_default_impl(port, ptr, rust_vec_len, data_len)
-        }
-        484 => wire__reddit_api__model__user__user_subreddit_default_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        485 => {
             wire__reddit_api__model__post__variants_default_impl(port, ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -25142,419 +24291,395 @@ fn pde_ffi_dispatcher_sync_impl(
 30 => wire__crate__api__simple__FeedState_get_title_impl(ptr, rust_vec_len, data_len),
 31 => wire__crate__api__simple__FeedState_new_impl(ptr, rust_vec_len, data_len),
 33 => wire__crate__api__simple__FeedState_nth_impl(ptr, rust_vec_len, data_len),
-38 => wire__reddit_api__model__flair__Flair_auto_accessor_get_css_class_impl(ptr, rust_vec_len, data_len),
-39 => wire__reddit_api__model__flair__Flair_auto_accessor_get_flair_type_impl(ptr, rust_vec_len, data_len),
-40 => wire__reddit_api__model__flair__Flair_auto_accessor_get_position_impl(ptr, rust_vec_len, data_len),
-41 => wire__reddit_api__model__flair__Flair_auto_accessor_get_richtext_impl(ptr, rust_vec_len, data_len),
-42 => wire__reddit_api__model__flair__Flair_auto_accessor_get_template_id_impl(ptr, rust_vec_len, data_len),
-43 => wire__reddit_api__model__flair__Flair_auto_accessor_get_text_impl(ptr, rust_vec_len, data_len),
-44 => wire__reddit_api__model__flair__Flair_auto_accessor_set_css_class_impl(ptr, rust_vec_len, data_len),
-45 => wire__reddit_api__model__flair__Flair_auto_accessor_set_flair_type_impl(ptr, rust_vec_len, data_len),
-46 => wire__reddit_api__model__flair__Flair_auto_accessor_set_position_impl(ptr, rust_vec_len, data_len),
-47 => wire__reddit_api__model__flair__Flair_auto_accessor_set_richtext_impl(ptr, rust_vec_len, data_len),
-48 => wire__reddit_api__model__flair__Flair_auto_accessor_set_template_id_impl(ptr, rust_vec_len, data_len),
-49 => wire__reddit_api__model__flair__Flair_auto_accessor_set_text_impl(ptr, rust_vec_len, data_len),
-52 => wire__reddit_api__model__Listing_auto_accessor_get_after_impl(ptr, rust_vec_len, data_len),
-53 => wire__reddit_api__model__Listing_auto_accessor_get_before_impl(ptr, rust_vec_len, data_len),
-54 => wire__reddit_api__model__Listing_auto_accessor_get_children_impl(ptr, rust_vec_len, data_len),
-55 => wire__reddit_api__model__Listing_auto_accessor_get_dist_impl(ptr, rust_vec_len, data_len),
-56 => wire__reddit_api__model__Listing_auto_accessor_get_modhash_impl(ptr, rust_vec_len, data_len),
-57 => wire__reddit_api__model__Listing_auto_accessor_set_after_impl(ptr, rust_vec_len, data_len),
-58 => wire__reddit_api__model__Listing_auto_accessor_set_before_impl(ptr, rust_vec_len, data_len),
-59 => wire__reddit_api__model__Listing_auto_accessor_set_children_impl(ptr, rust_vec_len, data_len),
-60 => wire__reddit_api__model__Listing_auto_accessor_set_dist_impl(ptr, rust_vec_len, data_len),
-61 => wire__reddit_api__model__Listing_auto_accessor_set_modhash_impl(ptr, rust_vec_len, data_len),
-63 => wire__reddit_api__model__post__Oembed_auto_accessor_get_author_name_impl(ptr, rust_vec_len, data_len),
-64 => wire__reddit_api__model__post__Oembed_auto_accessor_get_author_url_impl(ptr, rust_vec_len, data_len),
-65 => wire__reddit_api__model__post__Oembed_auto_accessor_get_height_impl(ptr, rust_vec_len, data_len),
-66 => wire__reddit_api__model__post__Oembed_auto_accessor_get_html_impl(ptr, rust_vec_len, data_len),
-67 => wire__reddit_api__model__post__Oembed_auto_accessor_get_provider_name_impl(ptr, rust_vec_len, data_len),
-68 => wire__reddit_api__model__post__Oembed_auto_accessor_get_provider_url_impl(ptr, rust_vec_len, data_len),
-69 => wire__reddit_api__model__post__Oembed_auto_accessor_get_title_impl(ptr, rust_vec_len, data_len),
-70 => wire__reddit_api__model__post__Oembed_auto_accessor_get_type_field_impl(ptr, rust_vec_len, data_len),
-71 => wire__reddit_api__model__post__Oembed_auto_accessor_get_version_impl(ptr, rust_vec_len, data_len),
-72 => wire__reddit_api__model__post__Oembed_auto_accessor_get_width_impl(ptr, rust_vec_len, data_len),
-73 => wire__reddit_api__model__post__Oembed_auto_accessor_set_author_name_impl(ptr, rust_vec_len, data_len),
-74 => wire__reddit_api__model__post__Oembed_auto_accessor_set_author_url_impl(ptr, rust_vec_len, data_len),
-75 => wire__reddit_api__model__post__Oembed_auto_accessor_set_height_impl(ptr, rust_vec_len, data_len),
-76 => wire__reddit_api__model__post__Oembed_auto_accessor_set_html_impl(ptr, rust_vec_len, data_len),
-77 => wire__reddit_api__model__post__Oembed_auto_accessor_set_provider_name_impl(ptr, rust_vec_len, data_len),
-78 => wire__reddit_api__model__post__Oembed_auto_accessor_set_provider_url_impl(ptr, rust_vec_len, data_len),
-79 => wire__reddit_api__model__post__Oembed_auto_accessor_set_title_impl(ptr, rust_vec_len, data_len),
-80 => wire__reddit_api__model__post__Oembed_auto_accessor_set_type_field_impl(ptr, rust_vec_len, data_len),
-81 => wire__reddit_api__model__post__Oembed_auto_accessor_set_version_impl(ptr, rust_vec_len, data_len),
-82 => wire__reddit_api__model__post__Oembed_auto_accessor_set_width_impl(ptr, rust_vec_len, data_len),
-89 => wire__reddit_api__model__post__Post_auto_accessor_get_all_awardings_impl(ptr, rust_vec_len, data_len),
-90 => wire__reddit_api__model__post__Post_auto_accessor_get_allow_live_comments_impl(ptr, rust_vec_len, data_len),
-91 => wire__reddit_api__model__post__Post_auto_accessor_get_approved_at_utc_impl(ptr, rust_vec_len, data_len),
-92 => wire__reddit_api__model__post__Post_auto_accessor_get_approved_by_impl(ptr, rust_vec_len, data_len),
-93 => wire__reddit_api__model__post__Post_auto_accessor_get_archived_impl(ptr, rust_vec_len, data_len),
-94 => wire__reddit_api__model__post__Post_auto_accessor_get_author_impl(ptr, rust_vec_len, data_len),
-95 => wire__reddit_api__model__post__Post_auto_accessor_get_awarders_impl(ptr, rust_vec_len, data_len),
-96 => wire__reddit_api__model__post__Post_auto_accessor_get_banned_at_utc_impl(ptr, rust_vec_len, data_len),
-97 => wire__reddit_api__model__post__Post_auto_accessor_get_banned_by_impl(ptr, rust_vec_len, data_len),
-98 => wire__reddit_api__model__post__Post_auto_accessor_get_can_gild_impl(ptr, rust_vec_len, data_len),
-99 => wire__reddit_api__model__post__Post_auto_accessor_get_can_mod_post_impl(ptr, rust_vec_len, data_len),
-100 => wire__reddit_api__model__post__Post_auto_accessor_get_category_impl(ptr, rust_vec_len, data_len),
-101 => wire__reddit_api__model__post__Post_auto_accessor_get_clicked_impl(ptr, rust_vec_len, data_len),
-102 => wire__reddit_api__model__post__Post_auto_accessor_get_content_categories_impl(ptr, rust_vec_len, data_len),
-103 => wire__reddit_api__model__post__Post_auto_accessor_get_contest_mode_impl(ptr, rust_vec_len, data_len),
-104 => wire__reddit_api__model__post__Post_auto_accessor_get_created_impl(ptr, rust_vec_len, data_len),
-105 => wire__reddit_api__model__post__Post_auto_accessor_get_created_utc_impl(ptr, rust_vec_len, data_len),
-106 => wire__reddit_api__model__post__Post_auto_accessor_get_discussion_type_impl(ptr, rust_vec_len, data_len),
-107 => wire__reddit_api__model__post__Post_auto_accessor_get_distinguished_impl(ptr, rust_vec_len, data_len),
-108 => wire__reddit_api__model__post__Post_auto_accessor_get_domain_impl(ptr, rust_vec_len, data_len),
-109 => wire__reddit_api__model__post__Post_auto_accessor_get_downs_impl(ptr, rust_vec_len, data_len),
-110 => wire__reddit_api__model__post__Post_auto_accessor_get_edited_impl(ptr, rust_vec_len, data_len),
-111 => wire__reddit_api__model__post__Post_auto_accessor_get_gallery_impl(ptr, rust_vec_len, data_len),
-112 => wire__reddit_api__model__post__Post_auto_accessor_get_gilded_impl(ptr, rust_vec_len, data_len),
-113 => wire__reddit_api__model__post__Post_auto_accessor_get_gildings_impl(ptr, rust_vec_len, data_len),
-114 => wire__reddit_api__model__post__Post_auto_accessor_get_hidden_impl(ptr, rust_vec_len, data_len),
-115 => wire__reddit_api__model__post__Post_auto_accessor_get_hide_score_impl(ptr, rust_vec_len, data_len),
-116 => wire__reddit_api__model__post__Post_auto_accessor_get_id_impl(ptr, rust_vec_len, data_len),
-117 => wire__reddit_api__model__post__Post_auto_accessor_get_is_created_from_ads_ui_impl(ptr, rust_vec_len, data_len),
-118 => wire__reddit_api__model__post__Post_auto_accessor_get_is_crosspostable_impl(ptr, rust_vec_len, data_len),
-119 => wire__reddit_api__model__post__Post_auto_accessor_get_is_meta_impl(ptr, rust_vec_len, data_len),
-120 => wire__reddit_api__model__post__Post_auto_accessor_get_is_original_content_impl(ptr, rust_vec_len, data_len),
-121 => wire__reddit_api__model__post__Post_auto_accessor_get_is_reddit_media_domain_impl(ptr, rust_vec_len, data_len),
-122 => wire__reddit_api__model__post__Post_auto_accessor_get_is_robot_indexable_impl(ptr, rust_vec_len, data_len),
-123 => wire__reddit_api__model__post__Post_auto_accessor_get_is_self_impl(ptr, rust_vec_len, data_len),
-124 => wire__reddit_api__model__post__Post_auto_accessor_get_is_video_impl(ptr, rust_vec_len, data_len),
-125 => wire__reddit_api__model__post__Post_auto_accessor_get_likes_impl(ptr, rust_vec_len, data_len),
-126 => wire__reddit_api__model__post__Post_auto_accessor_get_link_flair_impl(ptr, rust_vec_len, data_len),
-127 => wire__reddit_api__model__post__Post_auto_accessor_get_locked_impl(ptr, rust_vec_len, data_len),
-128 => wire__reddit_api__model__post__Post_auto_accessor_get_media_impl(ptr, rust_vec_len, data_len),
-129 => wire__reddit_api__model__post__Post_auto_accessor_get_media_embed_impl(ptr, rust_vec_len, data_len),
-130 => wire__reddit_api__model__post__Post_auto_accessor_get_media_only_impl(ptr, rust_vec_len, data_len),
-131 => wire__reddit_api__model__post__Post_auto_accessor_get_mod_note_impl(ptr, rust_vec_len, data_len),
-132 => wire__reddit_api__model__post__Post_auto_accessor_get_mod_reason_by_impl(ptr, rust_vec_len, data_len),
-133 => wire__reddit_api__model__post__Post_auto_accessor_get_mod_reason_title_impl(ptr, rust_vec_len, data_len),
-134 => wire__reddit_api__model__post__Post_auto_accessor_get_mod_reports_impl(ptr, rust_vec_len, data_len),
-135 => wire__reddit_api__model__post__Post_auto_accessor_get_name_impl(ptr, rust_vec_len, data_len),
-136 => wire__reddit_api__model__post__Post_auto_accessor_get_no_follow_impl(ptr, rust_vec_len, data_len),
-137 => wire__reddit_api__model__post__Post_auto_accessor_get_num_comments_impl(ptr, rust_vec_len, data_len),
-138 => wire__reddit_api__model__post__Post_auto_accessor_get_num_crossposts_impl(ptr, rust_vec_len, data_len),
-139 => wire__reddit_api__model__post__Post_auto_accessor_get_num_duplicates_impl(ptr, rust_vec_len, data_len),
-140 => wire__reddit_api__model__post__Post_auto_accessor_get_num_reports_impl(ptr, rust_vec_len, data_len),
-141 => wire__reddit_api__model__post__Post_auto_accessor_get_over_18_impl(ptr, rust_vec_len, data_len),
-142 => wire__reddit_api__model__post__Post_auto_accessor_get_permalink_impl(ptr, rust_vec_len, data_len),
-143 => wire__reddit_api__model__post__Post_auto_accessor_get_pinned_impl(ptr, rust_vec_len, data_len),
-144 => wire__reddit_api__model__post__Post_auto_accessor_get_post_hint_impl(ptr, rust_vec_len, data_len),
-145 => wire__reddit_api__model__post__Post_auto_accessor_get_preview_impl(ptr, rust_vec_len, data_len),
-146 => wire__reddit_api__model__post__Post_auto_accessor_get_pwls_impl(ptr, rust_vec_len, data_len),
-147 => wire__reddit_api__model__post__Post_auto_accessor_get_quarantine_impl(ptr, rust_vec_len, data_len),
-148 => wire__reddit_api__model__post__Post_auto_accessor_get_removal_reason_impl(ptr, rust_vec_len, data_len),
-149 => wire__reddit_api__model__post__Post_auto_accessor_get_removed_by_impl(ptr, rust_vec_len, data_len),
-150 => wire__reddit_api__model__post__Post_auto_accessor_get_removed_by_category_impl(ptr, rust_vec_len, data_len),
-151 => wire__reddit_api__model__post__Post_auto_accessor_get_report_reasons_impl(ptr, rust_vec_len, data_len),
-152 => wire__reddit_api__model__post__Post_auto_accessor_get_saved_impl(ptr, rust_vec_len, data_len),
-153 => wire__reddit_api__model__post__Post_auto_accessor_get_score_impl(ptr, rust_vec_len, data_len),
-154 => wire__reddit_api__model__post__Post_auto_accessor_get_secure_media_impl(ptr, rust_vec_len, data_len),
-155 => wire__reddit_api__model__post__Post_auto_accessor_get_secure_media_embed_impl(ptr, rust_vec_len, data_len),
-156 => wire__reddit_api__model__post__Post_auto_accessor_get_selftext_impl(ptr, rust_vec_len, data_len),
-157 => wire__reddit_api__model__post__Post_auto_accessor_get_selftext_html_impl(ptr, rust_vec_len, data_len),
-158 => wire__reddit_api__model__post__Post_auto_accessor_get_send_replies_impl(ptr, rust_vec_len, data_len),
-159 => wire__reddit_api__model__post__Post_auto_accessor_get_spoiler_impl(ptr, rust_vec_len, data_len),
-160 => wire__reddit_api__model__post__Post_auto_accessor_get_stickied_impl(ptr, rust_vec_len, data_len),
-161 => wire__reddit_api__model__post__Post_auto_accessor_get_subreddit_impl(ptr, rust_vec_len, data_len),
-162 => wire__reddit_api__model__post__Post_auto_accessor_get_suggested_sort_impl(ptr, rust_vec_len, data_len),
-163 => wire__reddit_api__model__post__Post_auto_accessor_get_title_impl(ptr, rust_vec_len, data_len),
-164 => wire__reddit_api__model__post__Post_auto_accessor_get_top_awarded_type_impl(ptr, rust_vec_len, data_len),
-165 => wire__reddit_api__model__post__Post_auto_accessor_get_total_awards_received_impl(ptr, rust_vec_len, data_len),
-166 => wire__reddit_api__model__post__Post_auto_accessor_get_treatment_tags_impl(ptr, rust_vec_len, data_len),
-167 => wire__reddit_api__model__post__Post_auto_accessor_get_ups_impl(ptr, rust_vec_len, data_len),
-168 => wire__reddit_api__model__post__Post_auto_accessor_get_upvote_ratio_impl(ptr, rust_vec_len, data_len),
-169 => wire__reddit_api__model__post__Post_auto_accessor_get_url_impl(ptr, rust_vec_len, data_len),
-170 => wire__reddit_api__model__post__Post_auto_accessor_get_url_overridden_by_dest_impl(ptr, rust_vec_len, data_len),
-171 => wire__reddit_api__model__post__Post_auto_accessor_get_user_reports_impl(ptr, rust_vec_len, data_len),
-172 => wire__reddit_api__model__post__Post_auto_accessor_get_view_count_impl(ptr, rust_vec_len, data_len),
-173 => wire__reddit_api__model__post__Post_auto_accessor_get_visited_impl(ptr, rust_vec_len, data_len),
-174 => wire__reddit_api__model__post__Post_auto_accessor_get_wls_impl(ptr, rust_vec_len, data_len),
-175 => wire__reddit_api__model__post__Post_auto_accessor_set_all_awardings_impl(ptr, rust_vec_len, data_len),
-176 => wire__reddit_api__model__post__Post_auto_accessor_set_allow_live_comments_impl(ptr, rust_vec_len, data_len),
-177 => wire__reddit_api__model__post__Post_auto_accessor_set_approved_at_utc_impl(ptr, rust_vec_len, data_len),
-178 => wire__reddit_api__model__post__Post_auto_accessor_set_approved_by_impl(ptr, rust_vec_len, data_len),
-179 => wire__reddit_api__model__post__Post_auto_accessor_set_archived_impl(ptr, rust_vec_len, data_len),
-180 => wire__reddit_api__model__post__Post_auto_accessor_set_author_impl(ptr, rust_vec_len, data_len),
-181 => wire__reddit_api__model__post__Post_auto_accessor_set_awarders_impl(ptr, rust_vec_len, data_len),
-182 => wire__reddit_api__model__post__Post_auto_accessor_set_banned_at_utc_impl(ptr, rust_vec_len, data_len),
-183 => wire__reddit_api__model__post__Post_auto_accessor_set_banned_by_impl(ptr, rust_vec_len, data_len),
-184 => wire__reddit_api__model__post__Post_auto_accessor_set_can_gild_impl(ptr, rust_vec_len, data_len),
-185 => wire__reddit_api__model__post__Post_auto_accessor_set_can_mod_post_impl(ptr, rust_vec_len, data_len),
-186 => wire__reddit_api__model__post__Post_auto_accessor_set_category_impl(ptr, rust_vec_len, data_len),
-187 => wire__reddit_api__model__post__Post_auto_accessor_set_clicked_impl(ptr, rust_vec_len, data_len),
-188 => wire__reddit_api__model__post__Post_auto_accessor_set_content_categories_impl(ptr, rust_vec_len, data_len),
-189 => wire__reddit_api__model__post__Post_auto_accessor_set_contest_mode_impl(ptr, rust_vec_len, data_len),
-190 => wire__reddit_api__model__post__Post_auto_accessor_set_created_impl(ptr, rust_vec_len, data_len),
-191 => wire__reddit_api__model__post__Post_auto_accessor_set_created_utc_impl(ptr, rust_vec_len, data_len),
-192 => wire__reddit_api__model__post__Post_auto_accessor_set_discussion_type_impl(ptr, rust_vec_len, data_len),
-193 => wire__reddit_api__model__post__Post_auto_accessor_set_distinguished_impl(ptr, rust_vec_len, data_len),
-194 => wire__reddit_api__model__post__Post_auto_accessor_set_domain_impl(ptr, rust_vec_len, data_len),
-195 => wire__reddit_api__model__post__Post_auto_accessor_set_downs_impl(ptr, rust_vec_len, data_len),
-196 => wire__reddit_api__model__post__Post_auto_accessor_set_edited_impl(ptr, rust_vec_len, data_len),
-197 => wire__reddit_api__model__post__Post_auto_accessor_set_gallery_impl(ptr, rust_vec_len, data_len),
-198 => wire__reddit_api__model__post__Post_auto_accessor_set_gilded_impl(ptr, rust_vec_len, data_len),
-199 => wire__reddit_api__model__post__Post_auto_accessor_set_gildings_impl(ptr, rust_vec_len, data_len),
-200 => wire__reddit_api__model__post__Post_auto_accessor_set_hidden_impl(ptr, rust_vec_len, data_len),
-201 => wire__reddit_api__model__post__Post_auto_accessor_set_hide_score_impl(ptr, rust_vec_len, data_len),
-202 => wire__reddit_api__model__post__Post_auto_accessor_set_id_impl(ptr, rust_vec_len, data_len),
-203 => wire__reddit_api__model__post__Post_auto_accessor_set_is_created_from_ads_ui_impl(ptr, rust_vec_len, data_len),
-204 => wire__reddit_api__model__post__Post_auto_accessor_set_is_crosspostable_impl(ptr, rust_vec_len, data_len),
-205 => wire__reddit_api__model__post__Post_auto_accessor_set_is_meta_impl(ptr, rust_vec_len, data_len),
-206 => wire__reddit_api__model__post__Post_auto_accessor_set_is_original_content_impl(ptr, rust_vec_len, data_len),
-207 => wire__reddit_api__model__post__Post_auto_accessor_set_is_reddit_media_domain_impl(ptr, rust_vec_len, data_len),
-208 => wire__reddit_api__model__post__Post_auto_accessor_set_is_robot_indexable_impl(ptr, rust_vec_len, data_len),
-209 => wire__reddit_api__model__post__Post_auto_accessor_set_is_self_impl(ptr, rust_vec_len, data_len),
-210 => wire__reddit_api__model__post__Post_auto_accessor_set_is_video_impl(ptr, rust_vec_len, data_len),
-211 => wire__reddit_api__model__post__Post_auto_accessor_set_likes_impl(ptr, rust_vec_len, data_len),
-212 => wire__reddit_api__model__post__Post_auto_accessor_set_link_flair_impl(ptr, rust_vec_len, data_len),
-213 => wire__reddit_api__model__post__Post_auto_accessor_set_locked_impl(ptr, rust_vec_len, data_len),
-214 => wire__reddit_api__model__post__Post_auto_accessor_set_media_impl(ptr, rust_vec_len, data_len),
-215 => wire__reddit_api__model__post__Post_auto_accessor_set_media_embed_impl(ptr, rust_vec_len, data_len),
-216 => wire__reddit_api__model__post__Post_auto_accessor_set_media_only_impl(ptr, rust_vec_len, data_len),
-217 => wire__reddit_api__model__post__Post_auto_accessor_set_mod_note_impl(ptr, rust_vec_len, data_len),
-218 => wire__reddit_api__model__post__Post_auto_accessor_set_mod_reason_by_impl(ptr, rust_vec_len, data_len),
-219 => wire__reddit_api__model__post__Post_auto_accessor_set_mod_reason_title_impl(ptr, rust_vec_len, data_len),
-220 => wire__reddit_api__model__post__Post_auto_accessor_set_mod_reports_impl(ptr, rust_vec_len, data_len),
-221 => wire__reddit_api__model__post__Post_auto_accessor_set_name_impl(ptr, rust_vec_len, data_len),
-222 => wire__reddit_api__model__post__Post_auto_accessor_set_no_follow_impl(ptr, rust_vec_len, data_len),
-223 => wire__reddit_api__model__post__Post_auto_accessor_set_num_comments_impl(ptr, rust_vec_len, data_len),
-224 => wire__reddit_api__model__post__Post_auto_accessor_set_num_crossposts_impl(ptr, rust_vec_len, data_len),
-225 => wire__reddit_api__model__post__Post_auto_accessor_set_num_duplicates_impl(ptr, rust_vec_len, data_len),
-226 => wire__reddit_api__model__post__Post_auto_accessor_set_num_reports_impl(ptr, rust_vec_len, data_len),
-227 => wire__reddit_api__model__post__Post_auto_accessor_set_over_18_impl(ptr, rust_vec_len, data_len),
-228 => wire__reddit_api__model__post__Post_auto_accessor_set_permalink_impl(ptr, rust_vec_len, data_len),
-229 => wire__reddit_api__model__post__Post_auto_accessor_set_pinned_impl(ptr, rust_vec_len, data_len),
-230 => wire__reddit_api__model__post__Post_auto_accessor_set_post_hint_impl(ptr, rust_vec_len, data_len),
-231 => wire__reddit_api__model__post__Post_auto_accessor_set_preview_impl(ptr, rust_vec_len, data_len),
-232 => wire__reddit_api__model__post__Post_auto_accessor_set_pwls_impl(ptr, rust_vec_len, data_len),
-233 => wire__reddit_api__model__post__Post_auto_accessor_set_quarantine_impl(ptr, rust_vec_len, data_len),
-234 => wire__reddit_api__model__post__Post_auto_accessor_set_removal_reason_impl(ptr, rust_vec_len, data_len),
-235 => wire__reddit_api__model__post__Post_auto_accessor_set_removed_by_impl(ptr, rust_vec_len, data_len),
-236 => wire__reddit_api__model__post__Post_auto_accessor_set_removed_by_category_impl(ptr, rust_vec_len, data_len),
-237 => wire__reddit_api__model__post__Post_auto_accessor_set_report_reasons_impl(ptr, rust_vec_len, data_len),
-238 => wire__reddit_api__model__post__Post_auto_accessor_set_saved_impl(ptr, rust_vec_len, data_len),
-239 => wire__reddit_api__model__post__Post_auto_accessor_set_score_impl(ptr, rust_vec_len, data_len),
-240 => wire__reddit_api__model__post__Post_auto_accessor_set_secure_media_impl(ptr, rust_vec_len, data_len),
-241 => wire__reddit_api__model__post__Post_auto_accessor_set_secure_media_embed_impl(ptr, rust_vec_len, data_len),
-242 => wire__reddit_api__model__post__Post_auto_accessor_set_selftext_impl(ptr, rust_vec_len, data_len),
-243 => wire__reddit_api__model__post__Post_auto_accessor_set_selftext_html_impl(ptr, rust_vec_len, data_len),
-244 => wire__reddit_api__model__post__Post_auto_accessor_set_send_replies_impl(ptr, rust_vec_len, data_len),
-245 => wire__reddit_api__model__post__Post_auto_accessor_set_spoiler_impl(ptr, rust_vec_len, data_len),
-246 => wire__reddit_api__model__post__Post_auto_accessor_set_stickied_impl(ptr, rust_vec_len, data_len),
-247 => wire__reddit_api__model__post__Post_auto_accessor_set_subreddit_impl(ptr, rust_vec_len, data_len),
-248 => wire__reddit_api__model__post__Post_auto_accessor_set_suggested_sort_impl(ptr, rust_vec_len, data_len),
-249 => wire__reddit_api__model__post__Post_auto_accessor_set_title_impl(ptr, rust_vec_len, data_len),
-250 => wire__reddit_api__model__post__Post_auto_accessor_set_top_awarded_type_impl(ptr, rust_vec_len, data_len),
-251 => wire__reddit_api__model__post__Post_auto_accessor_set_total_awards_received_impl(ptr, rust_vec_len, data_len),
-252 => wire__reddit_api__model__post__Post_auto_accessor_set_treatment_tags_impl(ptr, rust_vec_len, data_len),
-253 => wire__reddit_api__model__post__Post_auto_accessor_set_ups_impl(ptr, rust_vec_len, data_len),
-254 => wire__reddit_api__model__post__Post_auto_accessor_set_upvote_ratio_impl(ptr, rust_vec_len, data_len),
-255 => wire__reddit_api__model__post__Post_auto_accessor_set_url_impl(ptr, rust_vec_len, data_len),
-256 => wire__reddit_api__model__post__Post_auto_accessor_set_url_overridden_by_dest_impl(ptr, rust_vec_len, data_len),
-257 => wire__reddit_api__model__post__Post_auto_accessor_set_user_reports_impl(ptr, rust_vec_len, data_len),
-258 => wire__reddit_api__model__post__Post_auto_accessor_set_view_count_impl(ptr, rust_vec_len, data_len),
-259 => wire__reddit_api__model__post__Post_auto_accessor_set_visited_impl(ptr, rust_vec_len, data_len),
-260 => wire__reddit_api__model__post__Post_auto_accessor_set_wls_impl(ptr, rust_vec_len, data_len),
-262 => wire__reddit_api__model__post__Post_kind_impl(ptr, rust_vec_len, data_len),
-263 => wire__reddit_api__model__post__Post_thumbnail_impl(ptr, rust_vec_len, data_len),
-266 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_get_subreddit_impl(ptr, rust_vec_len, data_len),
-267 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_get_subreddit_id_impl(ptr, rust_vec_len, data_len),
-268 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_get_subreddit_name_prefixed_impl(ptr, rust_vec_len, data_len),
-269 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_get_subreddit_type_impl(ptr, rust_vec_len, data_len),
-270 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_get_subscribers_impl(ptr, rust_vec_len, data_len),
-271 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_set_subreddit_impl(ptr, rust_vec_len, data_len),
-272 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_set_subreddit_id_impl(ptr, rust_vec_len, data_len),
-273 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_set_subreddit_name_prefixed_impl(ptr, rust_vec_len, data_len),
-274 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_set_subreddit_type_impl(ptr, rust_vec_len, data_len),
-275 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_set_subscribers_impl(ptr, rust_vec_len, data_len),
-277 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_accept_followers_impl(ptr, rust_vec_len, data_len),
-278 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_accounts_active_impl(ptr, rust_vec_len, data_len),
-279 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_accounts_active_is_fuzzed_impl(ptr, rust_vec_len, data_len),
-280 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_active_user_count_impl(ptr, rust_vec_len, data_len),
-281 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_advertiser_category_impl(ptr, rust_vec_len, data_len),
-282 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_all_original_content_impl(ptr, rust_vec_len, data_len),
-283 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_discovery_impl(ptr, rust_vec_len, data_len),
-284 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_galleries_impl(ptr, rust_vec_len, data_len),
-285 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_images_impl(ptr, rust_vec_len, data_len),
-286 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_polls_impl(ptr, rust_vec_len, data_len),
-287 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_prediction_contributors_impl(ptr, rust_vec_len, data_len),
-288 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_predictions_impl(ptr, rust_vec_len, data_len),
-289 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_predictions_tournament_impl(ptr, rust_vec_len, data_len),
-290 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_talks_impl(ptr, rust_vec_len, data_len),
-291 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_videogifs_impl(ptr, rust_vec_len, data_len),
-292 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_videos_impl(ptr, rust_vec_len, data_len),
-293 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allowed_media_in_comments_impl(ptr, rust_vec_len, data_len),
-294 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_banner_background_color_impl(ptr, rust_vec_len, data_len),
-295 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_banner_background_image_impl(ptr, rust_vec_len, data_len),
-296 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_banner_img_impl(ptr, rust_vec_len, data_len),
-297 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_banner_size_impl(ptr, rust_vec_len, data_len),
-298 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_can_assign_link_flair_impl(ptr, rust_vec_len, data_len),
-299 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_can_assign_user_flair_impl(ptr, rust_vec_len, data_len),
-300 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_collapse_deleted_comments_impl(ptr, rust_vec_len, data_len),
-301 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_comment_contribution_settings_impl(ptr, rust_vec_len, data_len),
-302 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_comment_score_hide_mins_impl(ptr, rust_vec_len, data_len),
-303 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_community_icon_impl(ptr, rust_vec_len, data_len),
-304 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_community_reviewed_impl(ptr, rust_vec_len, data_len),
-305 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_created_impl(ptr, rust_vec_len, data_len),
-306 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_created_utc_impl(ptr, rust_vec_len, data_len),
-307 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_description_impl(ptr, rust_vec_len, data_len),
-308 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_description_html_impl(ptr, rust_vec_len, data_len),
-309 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_disable_contributor_requests_impl(ptr, rust_vec_len, data_len),
-310 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_display_name_impl(ptr, rust_vec_len, data_len),
-311 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_display_name_prefixed_impl(ptr, rust_vec_len, data_len),
-312 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_emojis_custom_size_impl(ptr, rust_vec_len, data_len),
-313 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_emojis_enabled_impl(ptr, rust_vec_len, data_len),
-314 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_free_form_reports_impl(ptr, rust_vec_len, data_len),
-315 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_has_menu_widget_impl(ptr, rust_vec_len, data_len),
-316 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_header_img_impl(ptr, rust_vec_len, data_len),
-317 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_header_size_impl(ptr, rust_vec_len, data_len),
-318 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_header_title_impl(ptr, rust_vec_len, data_len),
-319 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_hide_ads_impl(ptr, rust_vec_len, data_len),
-320 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_icon_img_impl(ptr, rust_vec_len, data_len),
-321 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_icon_size_impl(ptr, rust_vec_len, data_len),
-322 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_id_impl(ptr, rust_vec_len, data_len),
-323 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_is_crosspostable_subreddit_impl(ptr, rust_vec_len, data_len),
-324 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_is_enrolled_in_new_modmail_impl(ptr, rust_vec_len, data_len),
-325 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_key_color_impl(ptr, rust_vec_len, data_len),
-326 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_lang_impl(ptr, rust_vec_len, data_len),
-327 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_link_flair_enabled_impl(ptr, rust_vec_len, data_len),
-328 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_link_flair_position_impl(ptr, rust_vec_len, data_len),
-329 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_mobile_banner_image_impl(ptr, rust_vec_len, data_len),
-330 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_name_impl(ptr, rust_vec_len, data_len),
-331 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_notification_level_impl(ptr, rust_vec_len, data_len),
-332 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_original_content_tag_enabled_impl(ptr, rust_vec_len, data_len),
-333 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_over18_impl(ptr, rust_vec_len, data_len),
-334 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_prediction_leaderboard_entry_type_impl(ptr, rust_vec_len, data_len),
-335 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_primary_color_impl(ptr, rust_vec_len, data_len),
-336 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_public_description_impl(ptr, rust_vec_len, data_len),
-337 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_public_description_html_impl(ptr, rust_vec_len, data_len),
-338 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_public_traffic_impl(ptr, rust_vec_len, data_len),
-339 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_quarantine_impl(ptr, rust_vec_len, data_len),
-340 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_restrict_commenting_impl(ptr, rust_vec_len, data_len),
-341 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_restrict_posting_impl(ptr, rust_vec_len, data_len),
-342 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_should_archive_posts_impl(ptr, rust_vec_len, data_len),
-343 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_should_show_media_in_comments_setting_impl(ptr, rust_vec_len, data_len),
-344 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_show_media_impl(ptr, rust_vec_len, data_len),
-345 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_show_media_preview_impl(ptr, rust_vec_len, data_len),
-346 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_spoilers_enabled_impl(ptr, rust_vec_len, data_len),
-347 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_submission_type_impl(ptr, rust_vec_len, data_len),
-348 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_submit_link_label_impl(ptr, rust_vec_len, data_len),
-349 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_submit_text_impl(ptr, rust_vec_len, data_len),
-350 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_submit_text_html_impl(ptr, rust_vec_len, data_len),
-351 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_submit_text_label_impl(ptr, rust_vec_len, data_len),
-352 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_subreddit_type_impl(ptr, rust_vec_len, data_len),
-353 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_subscribers_impl(ptr, rust_vec_len, data_len),
-354 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_suggested_comment_sort_impl(ptr, rust_vec_len, data_len),
-355 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_title_impl(ptr, rust_vec_len, data_len),
-356 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_url_impl(ptr, rust_vec_len, data_len),
-357 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_can_flair_in_sr_impl(ptr, rust_vec_len, data_len),
-358 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_flair_impl(ptr, rust_vec_len, data_len),
-359 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_flair_enabled_in_sr_impl(ptr, rust_vec_len, data_len),
-360 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_has_favorited_impl(ptr, rust_vec_len, data_len),
-361 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_is_banned_impl(ptr, rust_vec_len, data_len),
-362 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_is_contributor_impl(ptr, rust_vec_len, data_len),
-363 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_is_moderator_impl(ptr, rust_vec_len, data_len),
-364 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_is_muted_impl(ptr, rust_vec_len, data_len),
-365 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_is_subscriber_impl(ptr, rust_vec_len, data_len),
-366 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_sr_flair_enabled_impl(ptr, rust_vec_len, data_len),
-367 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_sr_theme_enabled_impl(ptr, rust_vec_len, data_len),
-368 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_wiki_enabled_impl(ptr, rust_vec_len, data_len),
-369 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_wls_impl(ptr, rust_vec_len, data_len),
-370 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_accept_followers_impl(ptr, rust_vec_len, data_len),
-371 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_accounts_active_impl(ptr, rust_vec_len, data_len),
-372 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_accounts_active_is_fuzzed_impl(ptr, rust_vec_len, data_len),
-373 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_active_user_count_impl(ptr, rust_vec_len, data_len),
-374 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_advertiser_category_impl(ptr, rust_vec_len, data_len),
-375 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_all_original_content_impl(ptr, rust_vec_len, data_len),
-376 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_discovery_impl(ptr, rust_vec_len, data_len),
-377 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_galleries_impl(ptr, rust_vec_len, data_len),
-378 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_images_impl(ptr, rust_vec_len, data_len),
-379 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_polls_impl(ptr, rust_vec_len, data_len),
-380 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_prediction_contributors_impl(ptr, rust_vec_len, data_len),
-381 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_predictions_impl(ptr, rust_vec_len, data_len),
-382 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_predictions_tournament_impl(ptr, rust_vec_len, data_len),
-383 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_talks_impl(ptr, rust_vec_len, data_len),
-384 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_videogifs_impl(ptr, rust_vec_len, data_len),
-385 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_videos_impl(ptr, rust_vec_len, data_len),
-386 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allowed_media_in_comments_impl(ptr, rust_vec_len, data_len),
-387 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_banner_background_color_impl(ptr, rust_vec_len, data_len),
-388 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_banner_background_image_impl(ptr, rust_vec_len, data_len),
-389 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_banner_img_impl(ptr, rust_vec_len, data_len),
-390 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_banner_size_impl(ptr, rust_vec_len, data_len),
-391 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_can_assign_link_flair_impl(ptr, rust_vec_len, data_len),
-392 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_can_assign_user_flair_impl(ptr, rust_vec_len, data_len),
-393 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_collapse_deleted_comments_impl(ptr, rust_vec_len, data_len),
-394 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_comment_contribution_settings_impl(ptr, rust_vec_len, data_len),
-395 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_comment_score_hide_mins_impl(ptr, rust_vec_len, data_len),
-396 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_community_icon_impl(ptr, rust_vec_len, data_len),
-397 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_community_reviewed_impl(ptr, rust_vec_len, data_len),
-398 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_created_impl(ptr, rust_vec_len, data_len),
-399 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_created_utc_impl(ptr, rust_vec_len, data_len),
-400 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_description_impl(ptr, rust_vec_len, data_len),
-401 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_description_html_impl(ptr, rust_vec_len, data_len),
-402 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_disable_contributor_requests_impl(ptr, rust_vec_len, data_len),
-403 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_display_name_impl(ptr, rust_vec_len, data_len),
-404 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_display_name_prefixed_impl(ptr, rust_vec_len, data_len),
-405 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_emojis_custom_size_impl(ptr, rust_vec_len, data_len),
-406 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_emojis_enabled_impl(ptr, rust_vec_len, data_len),
-407 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_free_form_reports_impl(ptr, rust_vec_len, data_len),
-408 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_has_menu_widget_impl(ptr, rust_vec_len, data_len),
-409 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_header_img_impl(ptr, rust_vec_len, data_len),
-410 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_header_size_impl(ptr, rust_vec_len, data_len),
-411 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_header_title_impl(ptr, rust_vec_len, data_len),
-412 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_hide_ads_impl(ptr, rust_vec_len, data_len),
-413 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_icon_img_impl(ptr, rust_vec_len, data_len),
-414 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_icon_size_impl(ptr, rust_vec_len, data_len),
-415 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_id_impl(ptr, rust_vec_len, data_len),
-416 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_is_crosspostable_subreddit_impl(ptr, rust_vec_len, data_len),
-417 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_is_enrolled_in_new_modmail_impl(ptr, rust_vec_len, data_len),
-418 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_key_color_impl(ptr, rust_vec_len, data_len),
-419 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_lang_impl(ptr, rust_vec_len, data_len),
-420 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_link_flair_enabled_impl(ptr, rust_vec_len, data_len),
-421 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_link_flair_position_impl(ptr, rust_vec_len, data_len),
-422 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_mobile_banner_image_impl(ptr, rust_vec_len, data_len),
-423 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_name_impl(ptr, rust_vec_len, data_len),
-424 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_notification_level_impl(ptr, rust_vec_len, data_len),
-425 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_original_content_tag_enabled_impl(ptr, rust_vec_len, data_len),
-426 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_over18_impl(ptr, rust_vec_len, data_len),
-427 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_prediction_leaderboard_entry_type_impl(ptr, rust_vec_len, data_len),
-428 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_primary_color_impl(ptr, rust_vec_len, data_len),
-429 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_public_description_impl(ptr, rust_vec_len, data_len),
-430 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_public_description_html_impl(ptr, rust_vec_len, data_len),
-431 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_public_traffic_impl(ptr, rust_vec_len, data_len),
-432 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_quarantine_impl(ptr, rust_vec_len, data_len),
-433 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_restrict_commenting_impl(ptr, rust_vec_len, data_len),
-434 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_restrict_posting_impl(ptr, rust_vec_len, data_len),
-435 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_should_archive_posts_impl(ptr, rust_vec_len, data_len),
-436 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_should_show_media_in_comments_setting_impl(ptr, rust_vec_len, data_len),
-437 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_show_media_impl(ptr, rust_vec_len, data_len),
-438 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_show_media_preview_impl(ptr, rust_vec_len, data_len),
-439 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_spoilers_enabled_impl(ptr, rust_vec_len, data_len),
-440 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_submission_type_impl(ptr, rust_vec_len, data_len),
-441 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_submit_link_label_impl(ptr, rust_vec_len, data_len),
-442 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_submit_text_impl(ptr, rust_vec_len, data_len),
-443 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_submit_text_html_impl(ptr, rust_vec_len, data_len),
-444 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_submit_text_label_impl(ptr, rust_vec_len, data_len),
-445 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_subreddit_type_impl(ptr, rust_vec_len, data_len),
-446 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_subscribers_impl(ptr, rust_vec_len, data_len),
-447 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_suggested_comment_sort_impl(ptr, rust_vec_len, data_len),
-448 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_title_impl(ptr, rust_vec_len, data_len),
-449 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_url_impl(ptr, rust_vec_len, data_len),
-450 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_can_flair_in_sr_impl(ptr, rust_vec_len, data_len),
-451 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_flair_impl(ptr, rust_vec_len, data_len),
-452 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_flair_enabled_in_sr_impl(ptr, rust_vec_len, data_len),
-453 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_has_favorited_impl(ptr, rust_vec_len, data_len),
-454 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_is_banned_impl(ptr, rust_vec_len, data_len),
-455 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_is_contributor_impl(ptr, rust_vec_len, data_len),
-456 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_is_moderator_impl(ptr, rust_vec_len, data_len),
-457 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_is_muted_impl(ptr, rust_vec_len, data_len),
-458 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_is_subscriber_impl(ptr, rust_vec_len, data_len),
-459 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_sr_flair_enabled_impl(ptr, rust_vec_len, data_len),
-460 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_sr_theme_enabled_impl(ptr, rust_vec_len, data_len),
-461 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_wiki_enabled_impl(ptr, rust_vec_len, data_len),
-462 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_wls_impl(ptr, rust_vec_len, data_len),
-476 => wire__crate__api__simple__reddit_api_client_impl(ptr, rust_vec_len, data_len),
+40 => wire__reddit_api__model__flair__Flair_auto_accessor_get_css_class_impl(ptr, rust_vec_len, data_len),
+41 => wire__reddit_api__model__flair__Flair_auto_accessor_get_flair_type_impl(ptr, rust_vec_len, data_len),
+42 => wire__reddit_api__model__flair__Flair_auto_accessor_get_position_impl(ptr, rust_vec_len, data_len),
+43 => wire__reddit_api__model__flair__Flair_auto_accessor_get_richtext_impl(ptr, rust_vec_len, data_len),
+44 => wire__reddit_api__model__flair__Flair_auto_accessor_get_template_id_impl(ptr, rust_vec_len, data_len),
+45 => wire__reddit_api__model__flair__Flair_auto_accessor_get_text_impl(ptr, rust_vec_len, data_len),
+46 => wire__reddit_api__model__flair__Flair_auto_accessor_set_css_class_impl(ptr, rust_vec_len, data_len),
+47 => wire__reddit_api__model__flair__Flair_auto_accessor_set_flair_type_impl(ptr, rust_vec_len, data_len),
+48 => wire__reddit_api__model__flair__Flair_auto_accessor_set_position_impl(ptr, rust_vec_len, data_len),
+49 => wire__reddit_api__model__flair__Flair_auto_accessor_set_richtext_impl(ptr, rust_vec_len, data_len),
+50 => wire__reddit_api__model__flair__Flair_auto_accessor_set_template_id_impl(ptr, rust_vec_len, data_len),
+51 => wire__reddit_api__model__flair__Flair_auto_accessor_set_text_impl(ptr, rust_vec_len, data_len),
+54 => wire__reddit_api__model__Listing_auto_accessor_get_after_impl(ptr, rust_vec_len, data_len),
+55 => wire__reddit_api__model__Listing_auto_accessor_get_before_impl(ptr, rust_vec_len, data_len),
+56 => wire__reddit_api__model__Listing_auto_accessor_get_children_impl(ptr, rust_vec_len, data_len),
+57 => wire__reddit_api__model__Listing_auto_accessor_get_dist_impl(ptr, rust_vec_len, data_len),
+58 => wire__reddit_api__model__Listing_auto_accessor_get_modhash_impl(ptr, rust_vec_len, data_len),
+59 => wire__reddit_api__model__Listing_auto_accessor_set_after_impl(ptr, rust_vec_len, data_len),
+60 => wire__reddit_api__model__Listing_auto_accessor_set_before_impl(ptr, rust_vec_len, data_len),
+61 => wire__reddit_api__model__Listing_auto_accessor_set_children_impl(ptr, rust_vec_len, data_len),
+62 => wire__reddit_api__model__Listing_auto_accessor_set_dist_impl(ptr, rust_vec_len, data_len),
+63 => wire__reddit_api__model__Listing_auto_accessor_set_modhash_impl(ptr, rust_vec_len, data_len),
+70 => wire__reddit_api__model__post__Post_auto_accessor_get_all_awardings_impl(ptr, rust_vec_len, data_len),
+71 => wire__reddit_api__model__post__Post_auto_accessor_get_allow_live_comments_impl(ptr, rust_vec_len, data_len),
+72 => wire__reddit_api__model__post__Post_auto_accessor_get_approved_at_utc_impl(ptr, rust_vec_len, data_len),
+73 => wire__reddit_api__model__post__Post_auto_accessor_get_approved_by_impl(ptr, rust_vec_len, data_len),
+74 => wire__reddit_api__model__post__Post_auto_accessor_get_archived_impl(ptr, rust_vec_len, data_len),
+75 => wire__reddit_api__model__post__Post_auto_accessor_get_author_impl(ptr, rust_vec_len, data_len),
+76 => wire__reddit_api__model__post__Post_auto_accessor_get_awarders_impl(ptr, rust_vec_len, data_len),
+77 => wire__reddit_api__model__post__Post_auto_accessor_get_banned_at_utc_impl(ptr, rust_vec_len, data_len),
+78 => wire__reddit_api__model__post__Post_auto_accessor_get_banned_by_impl(ptr, rust_vec_len, data_len),
+79 => wire__reddit_api__model__post__Post_auto_accessor_get_can_gild_impl(ptr, rust_vec_len, data_len),
+80 => wire__reddit_api__model__post__Post_auto_accessor_get_can_mod_post_impl(ptr, rust_vec_len, data_len),
+81 => wire__reddit_api__model__post__Post_auto_accessor_get_category_impl(ptr, rust_vec_len, data_len),
+82 => wire__reddit_api__model__post__Post_auto_accessor_get_clicked_impl(ptr, rust_vec_len, data_len),
+83 => wire__reddit_api__model__post__Post_auto_accessor_get_content_categories_impl(ptr, rust_vec_len, data_len),
+84 => wire__reddit_api__model__post__Post_auto_accessor_get_contest_mode_impl(ptr, rust_vec_len, data_len),
+85 => wire__reddit_api__model__post__Post_auto_accessor_get_created_impl(ptr, rust_vec_len, data_len),
+86 => wire__reddit_api__model__post__Post_auto_accessor_get_created_utc_impl(ptr, rust_vec_len, data_len),
+87 => wire__reddit_api__model__post__Post_auto_accessor_get_discussion_type_impl(ptr, rust_vec_len, data_len),
+88 => wire__reddit_api__model__post__Post_auto_accessor_get_distinguished_impl(ptr, rust_vec_len, data_len),
+89 => wire__reddit_api__model__post__Post_auto_accessor_get_domain_impl(ptr, rust_vec_len, data_len),
+90 => wire__reddit_api__model__post__Post_auto_accessor_get_downs_impl(ptr, rust_vec_len, data_len),
+91 => wire__reddit_api__model__post__Post_auto_accessor_get_edited_impl(ptr, rust_vec_len, data_len),
+92 => wire__reddit_api__model__post__Post_auto_accessor_get_gallery_impl(ptr, rust_vec_len, data_len),
+93 => wire__reddit_api__model__post__Post_auto_accessor_get_gilded_impl(ptr, rust_vec_len, data_len),
+94 => wire__reddit_api__model__post__Post_auto_accessor_get_gildings_impl(ptr, rust_vec_len, data_len),
+95 => wire__reddit_api__model__post__Post_auto_accessor_get_hidden_impl(ptr, rust_vec_len, data_len),
+96 => wire__reddit_api__model__post__Post_auto_accessor_get_hide_score_impl(ptr, rust_vec_len, data_len),
+97 => wire__reddit_api__model__post__Post_auto_accessor_get_id_impl(ptr, rust_vec_len, data_len),
+98 => wire__reddit_api__model__post__Post_auto_accessor_get_is_created_from_ads_ui_impl(ptr, rust_vec_len, data_len),
+99 => wire__reddit_api__model__post__Post_auto_accessor_get_is_crosspostable_impl(ptr, rust_vec_len, data_len),
+100 => wire__reddit_api__model__post__Post_auto_accessor_get_is_meta_impl(ptr, rust_vec_len, data_len),
+101 => wire__reddit_api__model__post__Post_auto_accessor_get_is_original_content_impl(ptr, rust_vec_len, data_len),
+102 => wire__reddit_api__model__post__Post_auto_accessor_get_is_reddit_media_domain_impl(ptr, rust_vec_len, data_len),
+103 => wire__reddit_api__model__post__Post_auto_accessor_get_is_robot_indexable_impl(ptr, rust_vec_len, data_len),
+104 => wire__reddit_api__model__post__Post_auto_accessor_get_is_self_impl(ptr, rust_vec_len, data_len),
+105 => wire__reddit_api__model__post__Post_auto_accessor_get_is_video_impl(ptr, rust_vec_len, data_len),
+106 => wire__reddit_api__model__post__Post_auto_accessor_get_likes_impl(ptr, rust_vec_len, data_len),
+107 => wire__reddit_api__model__post__Post_auto_accessor_get_link_flair_impl(ptr, rust_vec_len, data_len),
+108 => wire__reddit_api__model__post__Post_auto_accessor_get_locked_impl(ptr, rust_vec_len, data_len),
+109 => wire__reddit_api__model__post__Post_auto_accessor_get_media_impl(ptr, rust_vec_len, data_len),
+110 => wire__reddit_api__model__post__Post_auto_accessor_get_media_embed_impl(ptr, rust_vec_len, data_len),
+111 => wire__reddit_api__model__post__Post_auto_accessor_get_media_only_impl(ptr, rust_vec_len, data_len),
+112 => wire__reddit_api__model__post__Post_auto_accessor_get_mod_note_impl(ptr, rust_vec_len, data_len),
+113 => wire__reddit_api__model__post__Post_auto_accessor_get_mod_reason_by_impl(ptr, rust_vec_len, data_len),
+114 => wire__reddit_api__model__post__Post_auto_accessor_get_mod_reason_title_impl(ptr, rust_vec_len, data_len),
+115 => wire__reddit_api__model__post__Post_auto_accessor_get_mod_reports_impl(ptr, rust_vec_len, data_len),
+116 => wire__reddit_api__model__post__Post_auto_accessor_get_name_impl(ptr, rust_vec_len, data_len),
+117 => wire__reddit_api__model__post__Post_auto_accessor_get_no_follow_impl(ptr, rust_vec_len, data_len),
+118 => wire__reddit_api__model__post__Post_auto_accessor_get_num_comments_impl(ptr, rust_vec_len, data_len),
+119 => wire__reddit_api__model__post__Post_auto_accessor_get_num_crossposts_impl(ptr, rust_vec_len, data_len),
+120 => wire__reddit_api__model__post__Post_auto_accessor_get_num_duplicates_impl(ptr, rust_vec_len, data_len),
+121 => wire__reddit_api__model__post__Post_auto_accessor_get_num_reports_impl(ptr, rust_vec_len, data_len),
+122 => wire__reddit_api__model__post__Post_auto_accessor_get_over_18_impl(ptr, rust_vec_len, data_len),
+123 => wire__reddit_api__model__post__Post_auto_accessor_get_permalink_impl(ptr, rust_vec_len, data_len),
+124 => wire__reddit_api__model__post__Post_auto_accessor_get_pinned_impl(ptr, rust_vec_len, data_len),
+125 => wire__reddit_api__model__post__Post_auto_accessor_get_post_hint_impl(ptr, rust_vec_len, data_len),
+126 => wire__reddit_api__model__post__Post_auto_accessor_get_preview_impl(ptr, rust_vec_len, data_len),
+127 => wire__reddit_api__model__post__Post_auto_accessor_get_pwls_impl(ptr, rust_vec_len, data_len),
+128 => wire__reddit_api__model__post__Post_auto_accessor_get_quarantine_impl(ptr, rust_vec_len, data_len),
+129 => wire__reddit_api__model__post__Post_auto_accessor_get_removal_reason_impl(ptr, rust_vec_len, data_len),
+130 => wire__reddit_api__model__post__Post_auto_accessor_get_removed_by_impl(ptr, rust_vec_len, data_len),
+131 => wire__reddit_api__model__post__Post_auto_accessor_get_removed_by_category_impl(ptr, rust_vec_len, data_len),
+132 => wire__reddit_api__model__post__Post_auto_accessor_get_report_reasons_impl(ptr, rust_vec_len, data_len),
+133 => wire__reddit_api__model__post__Post_auto_accessor_get_saved_impl(ptr, rust_vec_len, data_len),
+134 => wire__reddit_api__model__post__Post_auto_accessor_get_score_impl(ptr, rust_vec_len, data_len),
+135 => wire__reddit_api__model__post__Post_auto_accessor_get_secure_media_impl(ptr, rust_vec_len, data_len),
+136 => wire__reddit_api__model__post__Post_auto_accessor_get_secure_media_embed_impl(ptr, rust_vec_len, data_len),
+137 => wire__reddit_api__model__post__Post_auto_accessor_get_selftext_impl(ptr, rust_vec_len, data_len),
+138 => wire__reddit_api__model__post__Post_auto_accessor_get_selftext_html_impl(ptr, rust_vec_len, data_len),
+139 => wire__reddit_api__model__post__Post_auto_accessor_get_send_replies_impl(ptr, rust_vec_len, data_len),
+140 => wire__reddit_api__model__post__Post_auto_accessor_get_spoiler_impl(ptr, rust_vec_len, data_len),
+141 => wire__reddit_api__model__post__Post_auto_accessor_get_stickied_impl(ptr, rust_vec_len, data_len),
+142 => wire__reddit_api__model__post__Post_auto_accessor_get_subreddit_impl(ptr, rust_vec_len, data_len),
+143 => wire__reddit_api__model__post__Post_auto_accessor_get_suggested_sort_impl(ptr, rust_vec_len, data_len),
+144 => wire__reddit_api__model__post__Post_auto_accessor_get_title_impl(ptr, rust_vec_len, data_len),
+145 => wire__reddit_api__model__post__Post_auto_accessor_get_top_awarded_type_impl(ptr, rust_vec_len, data_len),
+146 => wire__reddit_api__model__post__Post_auto_accessor_get_total_awards_received_impl(ptr, rust_vec_len, data_len),
+147 => wire__reddit_api__model__post__Post_auto_accessor_get_treatment_tags_impl(ptr, rust_vec_len, data_len),
+148 => wire__reddit_api__model__post__Post_auto_accessor_get_ups_impl(ptr, rust_vec_len, data_len),
+149 => wire__reddit_api__model__post__Post_auto_accessor_get_upvote_ratio_impl(ptr, rust_vec_len, data_len),
+150 => wire__reddit_api__model__post__Post_auto_accessor_get_url_impl(ptr, rust_vec_len, data_len),
+151 => wire__reddit_api__model__post__Post_auto_accessor_get_url_overridden_by_dest_impl(ptr, rust_vec_len, data_len),
+152 => wire__reddit_api__model__post__Post_auto_accessor_get_user_reports_impl(ptr, rust_vec_len, data_len),
+153 => wire__reddit_api__model__post__Post_auto_accessor_get_view_count_impl(ptr, rust_vec_len, data_len),
+154 => wire__reddit_api__model__post__Post_auto_accessor_get_visited_impl(ptr, rust_vec_len, data_len),
+155 => wire__reddit_api__model__post__Post_auto_accessor_get_wls_impl(ptr, rust_vec_len, data_len),
+156 => wire__reddit_api__model__post__Post_auto_accessor_set_all_awardings_impl(ptr, rust_vec_len, data_len),
+157 => wire__reddit_api__model__post__Post_auto_accessor_set_allow_live_comments_impl(ptr, rust_vec_len, data_len),
+158 => wire__reddit_api__model__post__Post_auto_accessor_set_approved_at_utc_impl(ptr, rust_vec_len, data_len),
+159 => wire__reddit_api__model__post__Post_auto_accessor_set_approved_by_impl(ptr, rust_vec_len, data_len),
+160 => wire__reddit_api__model__post__Post_auto_accessor_set_archived_impl(ptr, rust_vec_len, data_len),
+161 => wire__reddit_api__model__post__Post_auto_accessor_set_author_impl(ptr, rust_vec_len, data_len),
+162 => wire__reddit_api__model__post__Post_auto_accessor_set_awarders_impl(ptr, rust_vec_len, data_len),
+163 => wire__reddit_api__model__post__Post_auto_accessor_set_banned_at_utc_impl(ptr, rust_vec_len, data_len),
+164 => wire__reddit_api__model__post__Post_auto_accessor_set_banned_by_impl(ptr, rust_vec_len, data_len),
+165 => wire__reddit_api__model__post__Post_auto_accessor_set_can_gild_impl(ptr, rust_vec_len, data_len),
+166 => wire__reddit_api__model__post__Post_auto_accessor_set_can_mod_post_impl(ptr, rust_vec_len, data_len),
+167 => wire__reddit_api__model__post__Post_auto_accessor_set_category_impl(ptr, rust_vec_len, data_len),
+168 => wire__reddit_api__model__post__Post_auto_accessor_set_clicked_impl(ptr, rust_vec_len, data_len),
+169 => wire__reddit_api__model__post__Post_auto_accessor_set_content_categories_impl(ptr, rust_vec_len, data_len),
+170 => wire__reddit_api__model__post__Post_auto_accessor_set_contest_mode_impl(ptr, rust_vec_len, data_len),
+171 => wire__reddit_api__model__post__Post_auto_accessor_set_created_impl(ptr, rust_vec_len, data_len),
+172 => wire__reddit_api__model__post__Post_auto_accessor_set_created_utc_impl(ptr, rust_vec_len, data_len),
+173 => wire__reddit_api__model__post__Post_auto_accessor_set_discussion_type_impl(ptr, rust_vec_len, data_len),
+174 => wire__reddit_api__model__post__Post_auto_accessor_set_distinguished_impl(ptr, rust_vec_len, data_len),
+175 => wire__reddit_api__model__post__Post_auto_accessor_set_domain_impl(ptr, rust_vec_len, data_len),
+176 => wire__reddit_api__model__post__Post_auto_accessor_set_downs_impl(ptr, rust_vec_len, data_len),
+177 => wire__reddit_api__model__post__Post_auto_accessor_set_edited_impl(ptr, rust_vec_len, data_len),
+178 => wire__reddit_api__model__post__Post_auto_accessor_set_gallery_impl(ptr, rust_vec_len, data_len),
+179 => wire__reddit_api__model__post__Post_auto_accessor_set_gilded_impl(ptr, rust_vec_len, data_len),
+180 => wire__reddit_api__model__post__Post_auto_accessor_set_gildings_impl(ptr, rust_vec_len, data_len),
+181 => wire__reddit_api__model__post__Post_auto_accessor_set_hidden_impl(ptr, rust_vec_len, data_len),
+182 => wire__reddit_api__model__post__Post_auto_accessor_set_hide_score_impl(ptr, rust_vec_len, data_len),
+183 => wire__reddit_api__model__post__Post_auto_accessor_set_id_impl(ptr, rust_vec_len, data_len),
+184 => wire__reddit_api__model__post__Post_auto_accessor_set_is_created_from_ads_ui_impl(ptr, rust_vec_len, data_len),
+185 => wire__reddit_api__model__post__Post_auto_accessor_set_is_crosspostable_impl(ptr, rust_vec_len, data_len),
+186 => wire__reddit_api__model__post__Post_auto_accessor_set_is_meta_impl(ptr, rust_vec_len, data_len),
+187 => wire__reddit_api__model__post__Post_auto_accessor_set_is_original_content_impl(ptr, rust_vec_len, data_len),
+188 => wire__reddit_api__model__post__Post_auto_accessor_set_is_reddit_media_domain_impl(ptr, rust_vec_len, data_len),
+189 => wire__reddit_api__model__post__Post_auto_accessor_set_is_robot_indexable_impl(ptr, rust_vec_len, data_len),
+190 => wire__reddit_api__model__post__Post_auto_accessor_set_is_self_impl(ptr, rust_vec_len, data_len),
+191 => wire__reddit_api__model__post__Post_auto_accessor_set_is_video_impl(ptr, rust_vec_len, data_len),
+192 => wire__reddit_api__model__post__Post_auto_accessor_set_likes_impl(ptr, rust_vec_len, data_len),
+193 => wire__reddit_api__model__post__Post_auto_accessor_set_link_flair_impl(ptr, rust_vec_len, data_len),
+194 => wire__reddit_api__model__post__Post_auto_accessor_set_locked_impl(ptr, rust_vec_len, data_len),
+195 => wire__reddit_api__model__post__Post_auto_accessor_set_media_impl(ptr, rust_vec_len, data_len),
+196 => wire__reddit_api__model__post__Post_auto_accessor_set_media_embed_impl(ptr, rust_vec_len, data_len),
+197 => wire__reddit_api__model__post__Post_auto_accessor_set_media_only_impl(ptr, rust_vec_len, data_len),
+198 => wire__reddit_api__model__post__Post_auto_accessor_set_mod_note_impl(ptr, rust_vec_len, data_len),
+199 => wire__reddit_api__model__post__Post_auto_accessor_set_mod_reason_by_impl(ptr, rust_vec_len, data_len),
+200 => wire__reddit_api__model__post__Post_auto_accessor_set_mod_reason_title_impl(ptr, rust_vec_len, data_len),
+201 => wire__reddit_api__model__post__Post_auto_accessor_set_mod_reports_impl(ptr, rust_vec_len, data_len),
+202 => wire__reddit_api__model__post__Post_auto_accessor_set_name_impl(ptr, rust_vec_len, data_len),
+203 => wire__reddit_api__model__post__Post_auto_accessor_set_no_follow_impl(ptr, rust_vec_len, data_len),
+204 => wire__reddit_api__model__post__Post_auto_accessor_set_num_comments_impl(ptr, rust_vec_len, data_len),
+205 => wire__reddit_api__model__post__Post_auto_accessor_set_num_crossposts_impl(ptr, rust_vec_len, data_len),
+206 => wire__reddit_api__model__post__Post_auto_accessor_set_num_duplicates_impl(ptr, rust_vec_len, data_len),
+207 => wire__reddit_api__model__post__Post_auto_accessor_set_num_reports_impl(ptr, rust_vec_len, data_len),
+208 => wire__reddit_api__model__post__Post_auto_accessor_set_over_18_impl(ptr, rust_vec_len, data_len),
+209 => wire__reddit_api__model__post__Post_auto_accessor_set_permalink_impl(ptr, rust_vec_len, data_len),
+210 => wire__reddit_api__model__post__Post_auto_accessor_set_pinned_impl(ptr, rust_vec_len, data_len),
+211 => wire__reddit_api__model__post__Post_auto_accessor_set_post_hint_impl(ptr, rust_vec_len, data_len),
+212 => wire__reddit_api__model__post__Post_auto_accessor_set_preview_impl(ptr, rust_vec_len, data_len),
+213 => wire__reddit_api__model__post__Post_auto_accessor_set_pwls_impl(ptr, rust_vec_len, data_len),
+214 => wire__reddit_api__model__post__Post_auto_accessor_set_quarantine_impl(ptr, rust_vec_len, data_len),
+215 => wire__reddit_api__model__post__Post_auto_accessor_set_removal_reason_impl(ptr, rust_vec_len, data_len),
+216 => wire__reddit_api__model__post__Post_auto_accessor_set_removed_by_impl(ptr, rust_vec_len, data_len),
+217 => wire__reddit_api__model__post__Post_auto_accessor_set_removed_by_category_impl(ptr, rust_vec_len, data_len),
+218 => wire__reddit_api__model__post__Post_auto_accessor_set_report_reasons_impl(ptr, rust_vec_len, data_len),
+219 => wire__reddit_api__model__post__Post_auto_accessor_set_saved_impl(ptr, rust_vec_len, data_len),
+220 => wire__reddit_api__model__post__Post_auto_accessor_set_score_impl(ptr, rust_vec_len, data_len),
+221 => wire__reddit_api__model__post__Post_auto_accessor_set_secure_media_impl(ptr, rust_vec_len, data_len),
+222 => wire__reddit_api__model__post__Post_auto_accessor_set_secure_media_embed_impl(ptr, rust_vec_len, data_len),
+223 => wire__reddit_api__model__post__Post_auto_accessor_set_selftext_impl(ptr, rust_vec_len, data_len),
+224 => wire__reddit_api__model__post__Post_auto_accessor_set_selftext_html_impl(ptr, rust_vec_len, data_len),
+225 => wire__reddit_api__model__post__Post_auto_accessor_set_send_replies_impl(ptr, rust_vec_len, data_len),
+226 => wire__reddit_api__model__post__Post_auto_accessor_set_spoiler_impl(ptr, rust_vec_len, data_len),
+227 => wire__reddit_api__model__post__Post_auto_accessor_set_stickied_impl(ptr, rust_vec_len, data_len),
+228 => wire__reddit_api__model__post__Post_auto_accessor_set_subreddit_impl(ptr, rust_vec_len, data_len),
+229 => wire__reddit_api__model__post__Post_auto_accessor_set_suggested_sort_impl(ptr, rust_vec_len, data_len),
+230 => wire__reddit_api__model__post__Post_auto_accessor_set_title_impl(ptr, rust_vec_len, data_len),
+231 => wire__reddit_api__model__post__Post_auto_accessor_set_top_awarded_type_impl(ptr, rust_vec_len, data_len),
+232 => wire__reddit_api__model__post__Post_auto_accessor_set_total_awards_received_impl(ptr, rust_vec_len, data_len),
+233 => wire__reddit_api__model__post__Post_auto_accessor_set_treatment_tags_impl(ptr, rust_vec_len, data_len),
+234 => wire__reddit_api__model__post__Post_auto_accessor_set_ups_impl(ptr, rust_vec_len, data_len),
+235 => wire__reddit_api__model__post__Post_auto_accessor_set_upvote_ratio_impl(ptr, rust_vec_len, data_len),
+236 => wire__reddit_api__model__post__Post_auto_accessor_set_url_impl(ptr, rust_vec_len, data_len),
+237 => wire__reddit_api__model__post__Post_auto_accessor_set_url_overridden_by_dest_impl(ptr, rust_vec_len, data_len),
+238 => wire__reddit_api__model__post__Post_auto_accessor_set_user_reports_impl(ptr, rust_vec_len, data_len),
+239 => wire__reddit_api__model__post__Post_auto_accessor_set_view_count_impl(ptr, rust_vec_len, data_len),
+240 => wire__reddit_api__model__post__Post_auto_accessor_set_visited_impl(ptr, rust_vec_len, data_len),
+241 => wire__reddit_api__model__post__Post_auto_accessor_set_wls_impl(ptr, rust_vec_len, data_len),
+243 => wire__reddit_api__model__post__Post_kind_impl(ptr, rust_vec_len, data_len),
+244 => wire__reddit_api__model__post__Post_thumbnail_impl(ptr, rust_vec_len, data_len),
+246 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_get_subreddit_impl(ptr, rust_vec_len, data_len),
+247 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_get_subreddit_id_impl(ptr, rust_vec_len, data_len),
+248 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_get_subreddit_name_prefixed_impl(ptr, rust_vec_len, data_len),
+249 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_get_subreddit_type_impl(ptr, rust_vec_len, data_len),
+250 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_get_subscribers_impl(ptr, rust_vec_len, data_len),
+251 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_set_subreddit_impl(ptr, rust_vec_len, data_len),
+252 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_set_subreddit_id_impl(ptr, rust_vec_len, data_len),
+253 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_set_subreddit_name_prefixed_impl(ptr, rust_vec_len, data_len),
+254 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_set_subreddit_type_impl(ptr, rust_vec_len, data_len),
+255 => wire__reddit_api__model__post__SubredditInfo_auto_accessor_set_subscribers_impl(ptr, rust_vec_len, data_len),
+257 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_accept_followers_impl(ptr, rust_vec_len, data_len),
+258 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_accounts_active_impl(ptr, rust_vec_len, data_len),
+259 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_accounts_active_is_fuzzed_impl(ptr, rust_vec_len, data_len),
+260 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_active_user_count_impl(ptr, rust_vec_len, data_len),
+261 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_advertiser_category_impl(ptr, rust_vec_len, data_len),
+262 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_all_original_content_impl(ptr, rust_vec_len, data_len),
+263 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_discovery_impl(ptr, rust_vec_len, data_len),
+264 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_galleries_impl(ptr, rust_vec_len, data_len),
+265 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_images_impl(ptr, rust_vec_len, data_len),
+266 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_polls_impl(ptr, rust_vec_len, data_len),
+267 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_prediction_contributors_impl(ptr, rust_vec_len, data_len),
+268 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_predictions_impl(ptr, rust_vec_len, data_len),
+269 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_predictions_tournament_impl(ptr, rust_vec_len, data_len),
+270 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_talks_impl(ptr, rust_vec_len, data_len),
+271 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_videogifs_impl(ptr, rust_vec_len, data_len),
+272 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allow_videos_impl(ptr, rust_vec_len, data_len),
+273 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_allowed_media_in_comments_impl(ptr, rust_vec_len, data_len),
+274 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_banner_background_color_impl(ptr, rust_vec_len, data_len),
+275 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_banner_background_image_impl(ptr, rust_vec_len, data_len),
+276 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_banner_img_impl(ptr, rust_vec_len, data_len),
+277 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_banner_size_impl(ptr, rust_vec_len, data_len),
+278 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_can_assign_link_flair_impl(ptr, rust_vec_len, data_len),
+279 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_can_assign_user_flair_impl(ptr, rust_vec_len, data_len),
+280 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_collapse_deleted_comments_impl(ptr, rust_vec_len, data_len),
+281 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_comment_contribution_settings_impl(ptr, rust_vec_len, data_len),
+282 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_comment_score_hide_mins_impl(ptr, rust_vec_len, data_len),
+283 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_community_reviewed_impl(ptr, rust_vec_len, data_len),
+284 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_created_impl(ptr, rust_vec_len, data_len),
+285 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_created_utc_impl(ptr, rust_vec_len, data_len),
+286 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_description_impl(ptr, rust_vec_len, data_len),
+287 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_description_html_impl(ptr, rust_vec_len, data_len),
+288 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_disable_contributor_requests_impl(ptr, rust_vec_len, data_len),
+289 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_display_name_impl(ptr, rust_vec_len, data_len),
+290 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_display_name_prefixed_impl(ptr, rust_vec_len, data_len),
+291 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_emojis_custom_size_impl(ptr, rust_vec_len, data_len),
+292 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_emojis_enabled_impl(ptr, rust_vec_len, data_len),
+293 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_free_form_reports_impl(ptr, rust_vec_len, data_len),
+294 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_has_menu_widget_impl(ptr, rust_vec_len, data_len),
+295 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_header_img_impl(ptr, rust_vec_len, data_len),
+296 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_header_size_impl(ptr, rust_vec_len, data_len),
+297 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_header_title_impl(ptr, rust_vec_len, data_len),
+298 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_hide_ads_impl(ptr, rust_vec_len, data_len),
+299 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_id_impl(ptr, rust_vec_len, data_len),
+300 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_is_crosspostable_subreddit_impl(ptr, rust_vec_len, data_len),
+301 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_is_enrolled_in_new_modmail_impl(ptr, rust_vec_len, data_len),
+302 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_key_color_impl(ptr, rust_vec_len, data_len),
+303 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_lang_impl(ptr, rust_vec_len, data_len),
+304 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_link_flair_enabled_impl(ptr, rust_vec_len, data_len),
+305 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_link_flair_position_impl(ptr, rust_vec_len, data_len),
+306 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_mobile_banner_image_impl(ptr, rust_vec_len, data_len),
+307 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_name_impl(ptr, rust_vec_len, data_len),
+308 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_notification_level_impl(ptr, rust_vec_len, data_len),
+309 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_original_content_tag_enabled_impl(ptr, rust_vec_len, data_len),
+310 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_over18_impl(ptr, rust_vec_len, data_len),
+311 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_prediction_leaderboard_entry_type_impl(ptr, rust_vec_len, data_len),
+312 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_primary_color_impl(ptr, rust_vec_len, data_len),
+313 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_public_description_impl(ptr, rust_vec_len, data_len),
+314 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_public_description_html_impl(ptr, rust_vec_len, data_len),
+315 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_public_traffic_impl(ptr, rust_vec_len, data_len),
+316 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_quarantine_impl(ptr, rust_vec_len, data_len),
+317 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_restrict_commenting_impl(ptr, rust_vec_len, data_len),
+318 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_restrict_posting_impl(ptr, rust_vec_len, data_len),
+319 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_should_archive_posts_impl(ptr, rust_vec_len, data_len),
+320 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_should_show_media_in_comments_setting_impl(ptr, rust_vec_len, data_len),
+321 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_show_media_impl(ptr, rust_vec_len, data_len),
+322 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_show_media_preview_impl(ptr, rust_vec_len, data_len),
+323 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_spoilers_enabled_impl(ptr, rust_vec_len, data_len),
+324 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_submission_type_impl(ptr, rust_vec_len, data_len),
+325 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_submit_link_label_impl(ptr, rust_vec_len, data_len),
+326 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_submit_text_impl(ptr, rust_vec_len, data_len),
+327 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_submit_text_html_impl(ptr, rust_vec_len, data_len),
+328 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_submit_text_label_impl(ptr, rust_vec_len, data_len),
+329 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_subreddit_type_impl(ptr, rust_vec_len, data_len),
+330 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_subscribers_impl(ptr, rust_vec_len, data_len),
+331 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_suggested_comment_sort_impl(ptr, rust_vec_len, data_len),
+332 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_title_impl(ptr, rust_vec_len, data_len),
+333 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_url_impl(ptr, rust_vec_len, data_len),
+334 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_can_flair_in_sr_impl(ptr, rust_vec_len, data_len),
+335 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_flair_impl(ptr, rust_vec_len, data_len),
+336 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_flair_enabled_in_sr_impl(ptr, rust_vec_len, data_len),
+337 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_has_favorited_impl(ptr, rust_vec_len, data_len),
+338 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_is_banned_impl(ptr, rust_vec_len, data_len),
+339 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_is_contributor_impl(ptr, rust_vec_len, data_len),
+340 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_is_moderator_impl(ptr, rust_vec_len, data_len),
+341 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_is_muted_impl(ptr, rust_vec_len, data_len),
+342 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_is_subscriber_impl(ptr, rust_vec_len, data_len),
+343 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_sr_flair_enabled_impl(ptr, rust_vec_len, data_len),
+344 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_user_sr_theme_enabled_impl(ptr, rust_vec_len, data_len),
+345 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_wiki_enabled_impl(ptr, rust_vec_len, data_len),
+346 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_get_wls_impl(ptr, rust_vec_len, data_len),
+347 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_accept_followers_impl(ptr, rust_vec_len, data_len),
+348 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_accounts_active_impl(ptr, rust_vec_len, data_len),
+349 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_accounts_active_is_fuzzed_impl(ptr, rust_vec_len, data_len),
+350 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_active_user_count_impl(ptr, rust_vec_len, data_len),
+351 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_advertiser_category_impl(ptr, rust_vec_len, data_len),
+352 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_all_original_content_impl(ptr, rust_vec_len, data_len),
+353 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_discovery_impl(ptr, rust_vec_len, data_len),
+354 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_galleries_impl(ptr, rust_vec_len, data_len),
+355 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_images_impl(ptr, rust_vec_len, data_len),
+356 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_polls_impl(ptr, rust_vec_len, data_len),
+357 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_prediction_contributors_impl(ptr, rust_vec_len, data_len),
+358 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_predictions_impl(ptr, rust_vec_len, data_len),
+359 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_predictions_tournament_impl(ptr, rust_vec_len, data_len),
+360 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_talks_impl(ptr, rust_vec_len, data_len),
+361 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_videogifs_impl(ptr, rust_vec_len, data_len),
+362 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allow_videos_impl(ptr, rust_vec_len, data_len),
+363 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_allowed_media_in_comments_impl(ptr, rust_vec_len, data_len),
+364 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_banner_background_color_impl(ptr, rust_vec_len, data_len),
+365 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_banner_background_image_impl(ptr, rust_vec_len, data_len),
+366 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_banner_img_impl(ptr, rust_vec_len, data_len),
+367 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_banner_size_impl(ptr, rust_vec_len, data_len),
+368 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_can_assign_link_flair_impl(ptr, rust_vec_len, data_len),
+369 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_can_assign_user_flair_impl(ptr, rust_vec_len, data_len),
+370 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_collapse_deleted_comments_impl(ptr, rust_vec_len, data_len),
+371 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_comment_contribution_settings_impl(ptr, rust_vec_len, data_len),
+372 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_comment_score_hide_mins_impl(ptr, rust_vec_len, data_len),
+373 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_community_reviewed_impl(ptr, rust_vec_len, data_len),
+374 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_created_impl(ptr, rust_vec_len, data_len),
+375 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_created_utc_impl(ptr, rust_vec_len, data_len),
+376 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_description_impl(ptr, rust_vec_len, data_len),
+377 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_description_html_impl(ptr, rust_vec_len, data_len),
+378 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_disable_contributor_requests_impl(ptr, rust_vec_len, data_len),
+379 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_display_name_impl(ptr, rust_vec_len, data_len),
+380 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_display_name_prefixed_impl(ptr, rust_vec_len, data_len),
+381 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_emojis_custom_size_impl(ptr, rust_vec_len, data_len),
+382 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_emojis_enabled_impl(ptr, rust_vec_len, data_len),
+383 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_free_form_reports_impl(ptr, rust_vec_len, data_len),
+384 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_has_menu_widget_impl(ptr, rust_vec_len, data_len),
+385 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_header_img_impl(ptr, rust_vec_len, data_len),
+386 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_header_size_impl(ptr, rust_vec_len, data_len),
+387 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_header_title_impl(ptr, rust_vec_len, data_len),
+388 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_hide_ads_impl(ptr, rust_vec_len, data_len),
+389 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_id_impl(ptr, rust_vec_len, data_len),
+390 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_is_crosspostable_subreddit_impl(ptr, rust_vec_len, data_len),
+391 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_is_enrolled_in_new_modmail_impl(ptr, rust_vec_len, data_len),
+392 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_key_color_impl(ptr, rust_vec_len, data_len),
+393 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_lang_impl(ptr, rust_vec_len, data_len),
+394 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_link_flair_enabled_impl(ptr, rust_vec_len, data_len),
+395 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_link_flair_position_impl(ptr, rust_vec_len, data_len),
+396 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_mobile_banner_image_impl(ptr, rust_vec_len, data_len),
+397 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_name_impl(ptr, rust_vec_len, data_len),
+398 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_notification_level_impl(ptr, rust_vec_len, data_len),
+399 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_original_content_tag_enabled_impl(ptr, rust_vec_len, data_len),
+400 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_over18_impl(ptr, rust_vec_len, data_len),
+401 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_prediction_leaderboard_entry_type_impl(ptr, rust_vec_len, data_len),
+402 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_primary_color_impl(ptr, rust_vec_len, data_len),
+403 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_public_description_impl(ptr, rust_vec_len, data_len),
+404 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_public_description_html_impl(ptr, rust_vec_len, data_len),
+405 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_public_traffic_impl(ptr, rust_vec_len, data_len),
+406 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_quarantine_impl(ptr, rust_vec_len, data_len),
+407 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_restrict_commenting_impl(ptr, rust_vec_len, data_len),
+408 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_restrict_posting_impl(ptr, rust_vec_len, data_len),
+409 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_should_archive_posts_impl(ptr, rust_vec_len, data_len),
+410 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_should_show_media_in_comments_setting_impl(ptr, rust_vec_len, data_len),
+411 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_show_media_impl(ptr, rust_vec_len, data_len),
+412 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_show_media_preview_impl(ptr, rust_vec_len, data_len),
+413 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_spoilers_enabled_impl(ptr, rust_vec_len, data_len),
+414 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_submission_type_impl(ptr, rust_vec_len, data_len),
+415 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_submit_link_label_impl(ptr, rust_vec_len, data_len),
+416 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_submit_text_impl(ptr, rust_vec_len, data_len),
+417 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_submit_text_html_impl(ptr, rust_vec_len, data_len),
+418 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_submit_text_label_impl(ptr, rust_vec_len, data_len),
+419 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_subreddit_type_impl(ptr, rust_vec_len, data_len),
+420 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_subscribers_impl(ptr, rust_vec_len, data_len),
+421 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_suggested_comment_sort_impl(ptr, rust_vec_len, data_len),
+422 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_title_impl(ptr, rust_vec_len, data_len),
+423 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_url_impl(ptr, rust_vec_len, data_len),
+424 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_can_flair_in_sr_impl(ptr, rust_vec_len, data_len),
+425 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_flair_impl(ptr, rust_vec_len, data_len),
+426 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_flair_enabled_in_sr_impl(ptr, rust_vec_len, data_len),
+427 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_has_favorited_impl(ptr, rust_vec_len, data_len),
+428 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_is_banned_impl(ptr, rust_vec_len, data_len),
+429 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_is_contributor_impl(ptr, rust_vec_len, data_len),
+430 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_is_moderator_impl(ptr, rust_vec_len, data_len),
+431 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_is_muted_impl(ptr, rust_vec_len, data_len),
+432 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_is_subscriber_impl(ptr, rust_vec_len, data_len),
+433 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_sr_flair_enabled_impl(ptr, rust_vec_len, data_len),
+434 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_user_sr_theme_enabled_impl(ptr, rust_vec_len, data_len),
+435 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_wiki_enabled_impl(ptr, rust_vec_len, data_len),
+436 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_wls_impl(ptr, rust_vec_len, data_len),
+438 => wire__reddit_api__model__subreddit__Subreddit_icon_impl(ptr, rust_vec_len, data_len),
+440 => wire__crate__api__simple__debug_post_impl(ptr, rust_vec_len, data_len),
+453 => wire__crate__api__simple__reddit_api_client_impl(ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }
@@ -25667,36 +24792,6 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<Listing>> for Listing {
 }
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<Media> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
-            .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<Media> {}
-
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<Media>> for Media {
-    fn into_into_dart(self) -> FrbWrapper<Media> {
-        self.into()
-    }
-}
-
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<Oembed> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
-            .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<Oembed> {}
-
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<Oembed>> for Oembed {
-    fn into_into_dart(self) -> FrbWrapper<Oembed> {
-        self.into()
-    }
-}
-
-// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<Pager> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
@@ -25737,36 +24832,6 @@ impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<
 
 impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<PostID>> for PostID {
     fn into_into_dart(self) -> FrbWrapper<PostID> {
-        self.into()
-    }
-}
-
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<RedditVideo> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
-            .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<RedditVideo> {}
-
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<RedditVideo>> for RedditVideo {
-    fn into_into_dart(self) -> FrbWrapper<RedditVideo> {
-        self.into()
-    }
-}
-
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<SecureMedia> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
-            .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<SecureMedia> {}
-
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<SecureMedia>> for SecureMedia {
-    fn into_into_dart(self) -> FrbWrapper<SecureMedia> {
         self.into()
     }
 }
@@ -25984,6 +25049,28 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::post::Gildi
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::subreddit::Icon> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.0.url.into_into_dart().into_dart(),
+            self.0.width.into_into_dart().into_dart(),
+            self.0.height.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for FrbWrapper<reddit_api::model::subreddit::Icon>
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::subreddit::Icon>>
+    for reddit_api::model::subreddit::Icon
+{
+    fn into_into_dart(self) -> FrbWrapper<reddit_api::model::subreddit::Icon> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::post::ImageBase> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -26028,6 +25115,36 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::post::Kind>
     for reddit_api::model::post::Kind
 {
     fn into_into_dart(self) -> FrbWrapper<reddit_api::model::post::Kind> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::post::Media> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            reddit_api::model::post::Media::RedditVideo(field0) => {
+                [0.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            reddit_api::model::post::Media::Oembed { oembed, type_field } => [
+                1.into_dart(),
+                oembed.into_into_dart().into_dart(),
+                type_field.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for FrbWrapper<reddit_api::model::post::Media>
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::post::Media>>
+    for reddit_api::model::post::Media
+{
+    fn into_into_dart(self) -> FrbWrapper<reddit_api::model::post::Media> {
         self.into()
     }
 }
@@ -26110,6 +25227,36 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::subreddit::
     for reddit_api::model::subreddit::NotificationLevel
 {
     fn into_into_dart(self) -> FrbWrapper<reddit_api::model::subreddit::NotificationLevel> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::post::Oembed> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.0.provider_url.into_into_dart().into_dart(),
+            self.0.title.into_into_dart().into_dart(),
+            self.0.html.into_into_dart().into_dart(),
+            self.0.height.into_into_dart().into_dart(),
+            self.0.width.into_into_dart().into_dart(),
+            self.0.version.into_into_dart().into_dart(),
+            self.0.author_name.into_into_dart().into_dart(),
+            self.0.provider_name.into_into_dart().into_dart(),
+            self.0.type_field.into_into_dart().into_dart(),
+            self.0.author_url.into_into_dart().into_dart(),
+            self.0.thumbnail.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for FrbWrapper<reddit_api::model::post::Oembed>
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::post::Oembed>>
+    for reddit_api::model::post::Oembed
+{
+    fn into_into_dart(self) -> FrbWrapper<reddit_api::model::post::Oembed> {
         self.into()
     }
 }
@@ -26200,6 +25347,36 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::post::Reddi
     for reddit_api::model::post::RedditImage
 {
     fn into_into_dart(self) -> FrbWrapper<reddit_api::model::post::RedditImage> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::post::RedditVideo> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.0.bitrate_kbps.into_into_dart().into_dart(),
+            self.0.width.into_into_dart().into_dart(),
+            self.0.height.into_into_dart().into_dart(),
+            self.0.has_audio.into_into_dart().into_dart(),
+            self.0.is_gif.into_into_dart().into_dart(),
+            self.0.fallback_url.into_into_dart().into_dart(),
+            self.0.scrubber_media_url.into_into_dart().into_dart(),
+            self.0.dash_url.into_into_dart().into_dart(),
+            self.0.hls_url.into_into_dart().into_dart(),
+            self.0.duration.into_into_dart().into_dart(),
+            self.0.transcoding_status.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for FrbWrapper<reddit_api::model::post::RedditVideo>
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::post::RedditVideo>>
+    for reddit_api::model::post::RedditVideo
+{
+    fn into_into_dart(self) -> FrbWrapper<reddit_api::model::post::RedditVideo> {
         self.into()
     }
 }
@@ -26357,6 +25534,50 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::post::Thumb
     for reddit_api::model::post::Thumbnail
 {
     fn into_into_dart(self) -> FrbWrapper<reddit_api::model::post::Thumbnail> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::post::ThumbnailOption> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.0.url.into_into_dart().into_dart(),
+            self.0.height.into_into_dart().into_dart(),
+            self.0.width.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for FrbWrapper<reddit_api::model::post::ThumbnailOption>
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::post::ThumbnailOption>>
+    for reddit_api::model::post::ThumbnailOption
+{
+    fn into_into_dart(self) -> FrbWrapper<reddit_api::model::post::ThumbnailOption> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::post::ThumbnailURL> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.0.url.into_into_dart().into_dart(),
+            self.0.height.into_into_dart().into_dart(),
+            self.0.width.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for FrbWrapper<reddit_api::model::post::ThumbnailURL>
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::post::ThumbnailURL>>
+    for reddit_api::model::post::ThumbnailURL
+{
+    fn into_into_dart(self) -> FrbWrapper<reddit_api::model::post::ThumbnailURL> {
         self.into()
     }
 }
@@ -26645,23 +25866,6 @@ impl SseEncode for Listing {
     }
 }
 
-impl SseEncode for Media {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Media>>>::sse_encode(
-            flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self),
-            serializer,
-        );
-    }
-}
-
-impl SseEncode for Oembed {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
-    }
-}
-
 impl SseEncode for Pager {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -26686,20 +25890,6 @@ impl SseEncode for PostID {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PostID>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
-    }
-}
-
-impl SseEncode for RedditVideo {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RedditVideo>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
-    }
-}
-
-impl SseEncode for SecureMedia {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SecureMedia>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
     }
 }
 
@@ -26826,24 +26016,6 @@ impl SseEncode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpa
     }
 }
 
-impl SseEncode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Media>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
-    }
-}
-
-impl SseEncode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
-    }
-}
-
 impl SseEncode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Pager>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -26863,28 +26035,6 @@ impl SseEncode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpa
 }
 
 impl SseEncode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PostID>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
-    }
-}
-
-impl SseEncode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RedditVideo>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
-    }
-}
-
-impl SseEncode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SecureMedia>>
-{
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         let (ptr, size) = self.sse_encode_raw();
@@ -27055,6 +26205,15 @@ impl SseEncode for i64 {
     }
 }
 
+impl SseEncode for reddit_api::model::subreddit::Icon {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.url, serializer);
+        <usize>::sse_encode(self.width, serializer);
+        <usize>::sse_encode(self.height, serializer);
+    }
+}
+
 impl SseEncode for reddit_api::model::post::ImageBase {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -27165,16 +26324,6 @@ impl SseEncode for Vec<u8> {
     }
 }
 
-impl SseEncode for Vec<usize> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <usize>::sse_encode(item, serializer);
-        }
-    }
-}
-
 impl SseEncode for Vec<(String, String)> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -27211,6 +26360,26 @@ impl SseEncode for Vec<reddit_api::model::Thing> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <reddit_api::model::Thing>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for reddit_api::model::post::Media {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            reddit_api::model::post::Media::RedditVideo(field0) => {
+                <i32>::sse_encode(0, serializer);
+                <reddit_api::model::post::RedditVideo>::sse_encode(field0, serializer);
+            }
+            reddit_api::model::post::Media::Oembed { oembed, type_field } => {
+                <i32>::sse_encode(1, serializer);
+                <reddit_api::model::post::Oembed>::sse_encode(oembed, serializer);
+                <String>::sse_encode(type_field, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
         }
     }
 }
@@ -27266,6 +26435,23 @@ impl SseEncode for reddit_api::model::subreddit::NotificationLevel {
     }
 }
 
+impl SseEncode for reddit_api::model::post::Oembed {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.provider_url, serializer);
+        <String>::sse_encode(self.title, serializer);
+        <String>::sse_encode(self.html, serializer);
+        <i64>::sse_encode(self.height, serializer);
+        <i64>::sse_encode(self.width, serializer);
+        <String>::sse_encode(self.version, serializer);
+        <String>::sse_encode(self.author_name, serializer);
+        <String>::sse_encode(self.provider_name, serializer);
+        <String>::sse_encode(self.type_field, serializer);
+        <String>::sse_encode(self.author_url, serializer);
+        <reddit_api::model::post::ThumbnailOption>::sse_encode(self.thumbnail, serializer);
+    }
+}
+
 impl SseEncode for Option<String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -27286,32 +26472,12 @@ impl SseEncode for Option<AuthorInfo> {
     }
 }
 
-impl SseEncode for Option<Media> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.is_some(), serializer);
-        if let Some(value) = self {
-            <Media>::sse_encode(value, serializer);
-        }
-    }
-}
-
 impl SseEncode for Option<Post> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <Post>::sse_encode(value, serializer);
-        }
-    }
-}
-
-impl SseEncode for Option<SecureMedia> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.is_some(), serializer);
-        if let Some(value) = self {
-            <SecureMedia>::sse_encode(value, serializer);
         }
     }
 }
@@ -27362,6 +26528,26 @@ impl SseEncode for Option<i64> {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <i64>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<reddit_api::model::subreddit::Icon> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <reddit_api::model::subreddit::Icon>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<reddit_api::model::post::Media> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <reddit_api::model::post::Media>::sse_encode(value, serializer);
         }
     }
 }
@@ -27426,16 +26612,6 @@ impl SseEncode for Option<Vec<i64>> {
     }
 }
 
-impl SseEncode for Option<[usize; 2]> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.is_some(), serializer);
-        if let Some(value) = self {
-            <[usize; 2]>::sse_encode(value, serializer);
-        }
-    }
-}
-
 impl SseEncode for reddit_api::model::user::Preferences {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -27480,6 +26656,23 @@ impl SseEncode for reddit_api::model::post::RedditImage {
         <Vec<reddit_api::model::post::ImageBase>>::sse_encode(self.resolutions, serializer);
         <reddit_api::model::post::Variants>::sse_encode(self.variants, serializer);
         <String>::sse_encode(self.id, serializer);
+    }
+}
+
+impl SseEncode for reddit_api::model::post::RedditVideo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u64>::sse_encode(self.bitrate_kbps, serializer);
+        <u64>::sse_encode(self.width, serializer);
+        <u64>::sse_encode(self.height, serializer);
+        <bool>::sse_encode(self.has_audio, serializer);
+        <bool>::sse_encode(self.is_gif, serializer);
+        <String>::sse_encode(self.fallback_url, serializer);
+        <String>::sse_encode(self.scrubber_media_url, serializer);
+        <String>::sse_encode(self.dash_url, serializer);
+        <String>::sse_encode(self.hls_url, serializer);
+        <u64>::sse_encode(self.duration, serializer);
+        <String>::sse_encode(self.transcoding_status, serializer);
     }
 }
 
@@ -27588,6 +26781,24 @@ impl SseEncode for reddit_api::model::post::Thumbnail {
         <String>::sse_encode(self.url, serializer);
         <u64>::sse_encode(self.height, serializer);
         <u64>::sse_encode(self.width, serializer);
+    }
+}
+
+impl SseEncode for reddit_api::model::post::ThumbnailOption {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Option<String>>::sse_encode(self.url, serializer);
+        <Option<u64>>::sse_encode(self.height, serializer);
+        <Option<u64>>::sse_encode(self.width, serializer);
+    }
+}
+
+impl SseEncode for reddit_api::model::post::ThumbnailURL {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Option<String>>::sse_encode(self.url, serializer);
+        <Option<u64>>::sse_encode(self.height, serializer);
+        <Option<u64>>::sse_encode(self.width, serializer);
     }
 }
 
@@ -27757,19 +26968,6 @@ impl SseEncode for usize {
     }
 }
 
-impl SseEncode for [usize; 2] {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<usize>>::sse_encode(
-            {
-                let boxed: Box<[_]> = Box::new(self);
-                boxed.into_vec()
-            },
-            serializer,
-        );
-    }
-}
-
 impl SseEncode for reddit_api::model::post::Variants {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
@@ -27916,34 +27114,6 @@ mod io {
     }
 
     #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_crabir_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Media>>::increment_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_crabir_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Media>>::decrement_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_crabir_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>>::increment_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_crabir_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>>::decrement_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
     pub extern "C" fn frbgen_crabir_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager(
         ptr: *const std::ffi::c_void,
     ) {
@@ -27983,34 +27153,6 @@ mod io {
         ptr: *const std::ffi::c_void,
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PostID>>::decrement_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_crabir_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RedditVideo>>::increment_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_crabir_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RedditVideo>>::decrement_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_crabir_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SecureMedia>>::increment_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_crabir_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SecureMedia>>::decrement_strong_count(ptr as _);
     }
 
     #[unsafe(no_mangle)]
@@ -28199,34 +27341,6 @@ mod web {
     }
 
     #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Media>>::increment_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMedia(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Media>>::decrement_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>>::increment_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerOembed(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>>::decrement_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
     pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager(
         ptr: *const std::ffi::c_void,
     ) {
@@ -28266,34 +27380,6 @@ mod web {
         ptr: *const std::ffi::c_void,
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PostID>>::decrement_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RedditVideo>>::increment_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRedditVideo(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RedditVideo>>::decrement_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SecureMedia>>::increment_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSecureMedia(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SecureMedia>>::decrement_strong_count(ptr as _);
     }
 
     #[wasm_bindgen]

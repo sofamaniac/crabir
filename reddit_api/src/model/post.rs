@@ -123,7 +123,7 @@ pub struct Post {
     #[serde(deserialize_with = "utils::response_or_none")]
     pub media_embed: Option<MediaEmbed>,
     #[serde(deserialize_with = "utils::response_or_none")]
-    pub secure_media: Option<SecureMedia>,
+    pub secure_media: Option<Media>,
     #[serde(deserialize_with = "utils::response_or_none")]
     pub secure_media_embed: Option<SecureMediaEmbed>,
     pub gallery: Option<Gallery>,
@@ -265,7 +265,7 @@ pub struct Thumbnail {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-struct ThumbnailOption {
+pub struct ThumbnailOption {
     #[serde(rename = "thumbnail")]
     pub url: Option<String>,
     #[serde(rename = "thumbnail_height")]
@@ -276,7 +276,7 @@ struct ThumbnailOption {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(remote = "ThumbnailOption")]
-struct ThumbnailURL {
+pub struct ThumbnailURL {
     #[serde(rename = "thumbnail_url")]
     pub url: Option<String>,
     #[serde(rename = "thumbnail_height")]
@@ -287,6 +287,7 @@ struct ThumbnailURL {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 #[serde(untagged)]
+/// flutter_rust_bridge:non_opaque
 pub enum SecureMedia {
     RedditVideo(RedditVideo),
     Oembed {
@@ -298,20 +299,21 @@ pub enum SecureMedia {
 
 #[serde_as]
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+/// flutter_rust_bridge:non_opaque
 pub struct RedditVideo {
-    bitrate_kbps: u64,
-    width: u64,
-    height: u64,
-    has_audio: bool,
-    is_gif: bool,
-    fallback_url: String,
-    scrubber_media_url: String,
-    dash_url: String,
-    hls_url: String,
+    pub bitrate_kbps: u64,
+    pub width: u64,
+    pub height: u64,
+    pub has_audio: bool,
+    pub is_gif: bool,
+    pub fallback_url: String,
+    pub scrubber_media_url: String,
+    pub dash_url: String,
+    pub hls_url: String,
     /// Duration in seconds
-    #[serde_as(as = "DurationSeconds<u64>")]
-    duration: Duration,
-    transcoding_status: String,
+    //#[serde_as(as = "DurationSeconds<u64>")]
+    pub duration: u64,
+    pub transcoding_status: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -348,12 +350,16 @@ pub struct ImageBase {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Variants {}
+pub struct Variants {
+    // TODO:
+}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
-#[serde(untagged)]
+/// flutter_rust_bridge:non_opaque
 pub enum Media {
+    #[serde(rename = "reddit_video")]
     RedditVideo(RedditVideo),
+    #[serde(rename = "oembed")]
     Oembed {
         oembed: Oembed,
         #[serde(rename = "type")]
@@ -362,6 +368,7 @@ pub enum Media {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+/// flutter_rust_bridge:non_opaque
 pub struct Oembed {
     pub provider_url: String,
     pub title: String,
@@ -375,7 +382,7 @@ pub struct Oembed {
     pub type_field: String,
     pub author_url: String,
     #[serde(flatten, with = "ThumbnailURL")]
-    thumbnail: ThumbnailOption,
+    pub thumbnail: ThumbnailOption,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

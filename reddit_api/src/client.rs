@@ -11,7 +11,7 @@ use base64::prelude::BASE64_URL_SAFE_NO_PAD;
 use chrono::{DateTime, Utc};
 use futures::{Stream, lock::Mutex};
 use log::{debug, error, info};
-use reqwest::{Request, RequestBuilder};
+use reqwest::RequestBuilder;
 
 pub use reqwest::{IntoUrl, Url};
 use serde::{
@@ -40,10 +40,21 @@ impl Default for Client {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VoteDirection {
     Up,
     Down,
     Neutral,
+}
+
+impl From<VoteDirection> for Option<bool> {
+    fn from(value: VoteDirection) -> Self {
+        match value {
+            VoteDirection::Up => Some(true),
+            VoteDirection::Down => Some(false),
+            VoteDirection::Neutral => None,
+        }
+    }
 }
 
 pub const SCOPES: [&str; 19] = [
@@ -387,7 +398,7 @@ impl Client {
     /// Vote on a votable item (i.e. a [`Post`] or a [`Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
-    pub async fn vote(&self, thing: Fullname, direction: VoteDirection) -> Result<()> {
+    pub async fn vote(&self, thing: &Fullname, direction: VoteDirection) -> Result<()> {
         let dir = match direction {
             VoteDirection::Up => 1,
             VoteDirection::Down => -1,
@@ -408,7 +419,7 @@ impl Client {
     /// Save a saveable item (i.e. a [`Post`] or a [`Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
-    pub async fn save(&self, thing: Fullname) -> Result<()> {
+    pub async fn save(&self, thing: &Fullname) -> Result<()> {
         let url = self
             .base_url()
             .await
@@ -423,7 +434,7 @@ impl Client {
     /// Unsave a saveable item (i.e. a [`Post`] or a [`Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
-    pub async fn unsave(&self, thing: Fullname) -> Result<()> {
+    pub async fn unsave(&self, thing: &Fullname) -> Result<()> {
         let url = self
             .base_url()
             .await

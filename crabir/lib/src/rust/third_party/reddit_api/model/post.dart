@@ -7,10 +7,11 @@ import '../../../frb_generated.dart';
 import '../model.dart';
 import 'flair.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
+part 'post.freezed.dart';
 
-// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `ThumbnailOption`, `ThumbnailURL`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `SecureMedia`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `try_from`
-// These functions are ignored (category: IgnoreBecauseOwnerTyShouldIgnore): `default`, `default`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<AuthorInfo>>
 abstract class AuthorInfo implements RustOpaqueInterface {
@@ -40,55 +41,6 @@ abstract class AuthorInfo implements RustOpaqueInterface {
 
   static Future<AuthorInfo> default_() =>
       RustLib.instance.api.redditApiModelPostAuthorInfoDefault();
-}
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Media>>
-abstract class Media implements RustOpaqueInterface {}
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Oembed>>
-abstract class Oembed implements RustOpaqueInterface {
-  String get authorName;
-
-  String get authorUrl;
-
-  PlatformInt64 get height;
-
-  String get html;
-
-  String get providerName;
-
-  String get providerUrl;
-
-  String get title;
-
-  String get typeField;
-
-  String get version;
-
-  PlatformInt64 get width;
-
-  set authorName(String authorName);
-
-  set authorUrl(String authorUrl);
-
-  set height(PlatformInt64 height);
-
-  set html(String html);
-
-  set providerName(String providerName);
-
-  set providerUrl(String providerUrl);
-
-  set title(String title);
-
-  set typeField(String typeField);
-
-  set version(String version);
-
-  set width(PlatformInt64 width);
-
-  static Future<Oembed> default_() =>
-      RustLib.instance.api.redditApiModelPostOembedDefault();
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Post>>
@@ -223,7 +175,7 @@ abstract class Post implements RustOpaqueInterface {
 
   PlatformInt64 get score;
 
-  SecureMedia? get secureMedia;
+  Media? get secureMedia;
 
   SecureMediaEmbed? get secureMediaEmbed;
 
@@ -395,7 +347,7 @@ abstract class Post implements RustOpaqueInterface {
 
   set score(PlatformInt64 score);
 
-  set secureMedia(SecureMedia? secureMedia);
+  set secureMedia(Media? secureMedia);
 
   set secureMediaEmbed(SecureMediaEmbed? secureMediaEmbed);
 
@@ -450,15 +402,6 @@ abstract class PostId implements RustOpaqueInterface {
   static Future<PostId> default_() =>
       RustLib.instance.api.redditApiModelPostPostIdDefault();
 }
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RedditVideo>>
-abstract class RedditVideo implements RustOpaqueInterface {
-  static Future<RedditVideo> default_() =>
-      RustLib.instance.api.redditApiModelPostRedditVideoDefault();
-}
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SecureMedia>>
-abstract class SecureMedia implements RustOpaqueInterface {}
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SubredditID>>
 abstract class SubredditId implements RustOpaqueInterface {
@@ -560,6 +503,19 @@ enum Kind {
   ;
 }
 
+@freezed
+sealed class Media with _$Media {
+  const Media._();
+
+  const factory Media.redditVideo(
+    RedditVideo field0,
+  ) = Media_RedditVideo;
+  const factory Media.oembed({
+    required Oembed oembed,
+    required String typeField,
+  }) = Media_Oembed;
+}
+
 class MediaEmbed {
   final String content;
   final PlatformInt64 width;
@@ -589,6 +545,69 @@ class MediaEmbed {
           width == other.width &&
           scrolling == other.scrolling &&
           height == other.height;
+}
+
+/// flutter_rust_bridge:non_opaque
+class Oembed {
+  final String providerUrl;
+  final String title;
+  final String html;
+  final PlatformInt64 height;
+  final PlatformInt64 width;
+  final String version;
+  final String authorName;
+  final String providerName;
+  final String typeField;
+  final String authorUrl;
+  final ThumbnailOption thumbnail;
+
+  const Oembed({
+    required this.providerUrl,
+    required this.title,
+    required this.html,
+    required this.height,
+    required this.width,
+    required this.version,
+    required this.authorName,
+    required this.providerName,
+    required this.typeField,
+    required this.authorUrl,
+    required this.thumbnail,
+  });
+
+  static Future<Oembed> default_() =>
+      RustLib.instance.api.redditApiModelPostOembedDefault();
+
+  @override
+  int get hashCode =>
+      providerUrl.hashCode ^
+      title.hashCode ^
+      html.hashCode ^
+      height.hashCode ^
+      width.hashCode ^
+      version.hashCode ^
+      authorName.hashCode ^
+      providerName.hashCode ^
+      typeField.hashCode ^
+      authorUrl.hashCode ^
+      thumbnail.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Oembed &&
+          runtimeType == other.runtimeType &&
+          providerUrl == other.providerUrl &&
+          title == other.title &&
+          html == other.html &&
+          height == other.height &&
+          width == other.width &&
+          version == other.version &&
+          authorName == other.authorName &&
+          providerName == other.providerName &&
+          typeField == other.typeField &&
+          authorUrl == other.authorUrl &&
+          thumbnail == other.thumbnail;
 }
 
 class Preview {
@@ -644,6 +663,71 @@ class RedditImage {
           resolutions == other.resolutions &&
           variants == other.variants &&
           id == other.id;
+}
+
+/// flutter_rust_bridge:non_opaque
+class RedditVideo {
+  final BigInt bitrateKbps;
+  final BigInt width;
+  final BigInt height;
+  final bool hasAudio;
+  final bool isGif;
+  final String fallbackUrl;
+  final String scrubberMediaUrl;
+  final String dashUrl;
+  final String hlsUrl;
+
+  /// Duration in seconds
+  final BigInt duration;
+  final String transcodingStatus;
+
+  const RedditVideo({
+    required this.bitrateKbps,
+    required this.width,
+    required this.height,
+    required this.hasAudio,
+    required this.isGif,
+    required this.fallbackUrl,
+    required this.scrubberMediaUrl,
+    required this.dashUrl,
+    required this.hlsUrl,
+    required this.duration,
+    required this.transcodingStatus,
+  });
+
+  static Future<RedditVideo> default_() =>
+      RustLib.instance.api.redditApiModelPostRedditVideoDefault();
+
+  @override
+  int get hashCode =>
+      bitrateKbps.hashCode ^
+      width.hashCode ^
+      height.hashCode ^
+      hasAudio.hashCode ^
+      isGif.hashCode ^
+      fallbackUrl.hashCode ^
+      scrubberMediaUrl.hashCode ^
+      dashUrl.hashCode ^
+      hlsUrl.hashCode ^
+      duration.hashCode ^
+      transcodingStatus.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RedditVideo &&
+          runtimeType == other.runtimeType &&
+          bitrateKbps == other.bitrateKbps &&
+          width == other.width &&
+          height == other.height &&
+          hasAudio == other.hasAudio &&
+          isGif == other.isGif &&
+          fallbackUrl == other.fallbackUrl &&
+          scrubberMediaUrl == other.scrubberMediaUrl &&
+          dashUrl == other.dashUrl &&
+          hlsUrl == other.hlsUrl &&
+          duration == other.duration &&
+          transcodingStatus == other.transcodingStatus;
 }
 
 class SecureMediaEmbed {
@@ -702,6 +786,60 @@ class Thumbnail {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Thumbnail &&
+          runtimeType == other.runtimeType &&
+          url == other.url &&
+          height == other.height &&
+          width == other.width;
+}
+
+class ThumbnailOption {
+  final String? url;
+  final BigInt? height;
+  final BigInt? width;
+
+  const ThumbnailOption({
+    this.url,
+    this.height,
+    this.width,
+  });
+
+  static Future<ThumbnailOption> default_() =>
+      RustLib.instance.api.redditApiModelPostThumbnailOptionDefault();
+
+  @override
+  int get hashCode => url.hashCode ^ height.hashCode ^ width.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ThumbnailOption &&
+          runtimeType == other.runtimeType &&
+          url == other.url &&
+          height == other.height &&
+          width == other.width;
+}
+
+class ThumbnailURL {
+  final String? url;
+  final BigInt? height;
+  final BigInt? width;
+
+  const ThumbnailURL({
+    this.url,
+    this.height,
+    this.width,
+  });
+
+  static Future<ThumbnailURL> default_() =>
+      RustLib.instance.api.redditApiModelPostThumbnailUrlDefault();
+
+  @override
+  int get hashCode => url.hashCode ^ height.hashCode ^ width.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ThumbnailURL &&
           runtimeType == other.runtimeType &&
           url == other.url &&
           height == other.height &&
