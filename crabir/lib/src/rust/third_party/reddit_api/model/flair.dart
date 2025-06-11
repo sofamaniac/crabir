@@ -5,35 +5,70 @@
 
 import '../../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
+part 'flair.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `eq`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Flair>>
-abstract class Flair implements RustOpaqueInterface {
-  String? get cssClass;
+class Flair {
+  final String? cssClass;
+  final List<Richtext> richtext;
+  final String? backgroundColor;
+  final String? textColor;
+  final String? text;
+  final String? flairType;
+  final String? templateId;
+  final String? position;
 
-  String? get flairType;
-
-  String? get position;
-
-  List<Map<String, String>> get richtext;
-
-  String? get templateId;
-
-  String? get text;
-
-  set cssClass(String? cssClass);
-
-  set flairType(String? flairType);
-
-  set position(String? position);
-
-  set richtext(List<Map<String, String>> richtext);
-
-  set templateId(String? templateId);
-
-  set text(String? text);
+  const Flair({
+    this.cssClass,
+    required this.richtext,
+    this.backgroundColor,
+    this.textColor,
+    this.text,
+    this.flairType,
+    this.templateId,
+    this.position,
+  });
 
   static Future<Flair> default_() =>
       RustLib.instance.api.redditApiModelFlairFlairDefault();
+
+  @override
+  int get hashCode =>
+      cssClass.hashCode ^
+      richtext.hashCode ^
+      backgroundColor.hashCode ^
+      textColor.hashCode ^
+      text.hashCode ^
+      flairType.hashCode ^
+      templateId.hashCode ^
+      position.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Flair &&
+          runtimeType == other.runtimeType &&
+          cssClass == other.cssClass &&
+          richtext == other.richtext &&
+          backgroundColor == other.backgroundColor &&
+          textColor == other.textColor &&
+          text == other.text &&
+          flairType == other.flairType &&
+          templateId == other.templateId &&
+          position == other.position;
+}
+
+@freezed
+sealed class Richtext with _$Richtext {
+  const Richtext._();
+
+  const factory Richtext.text({
+    required String t,
+  }) = Richtext_Text;
+  const factory Richtext.emoji({
+    required String a,
+    required String u,
+  }) = Richtext_Emoji;
 }

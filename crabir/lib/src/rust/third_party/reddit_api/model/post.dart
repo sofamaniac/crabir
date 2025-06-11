@@ -13,36 +13,6 @@ part 'post.freezed.dart';
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `SecureMedia`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `try_from`
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<AuthorInfo>>
-abstract class AuthorInfo implements RustOpaqueInterface {
-  Flair get flair;
-
-  String get fullname;
-
-  bool get isBlocked;
-
-  bool get patreonFlair;
-
-  bool get premium;
-
-  String get username;
-
-  set flair(Flair flair);
-
-  set fullname(String fullname);
-
-  set isBlocked(bool isBlocked);
-
-  set patreonFlair(bool patreonFlair);
-
-  set premium(bool premium);
-
-  set username(String username);
-
-  static Future<AuthorInfo> default_() =>
-      RustLib.instance.api.redditApiModelPostAuthorInfoDefault();
-}
-
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Post>>
 abstract class Post implements RustOpaqueInterface {
   List<String?> get allAwardings;
@@ -433,6 +403,48 @@ abstract class SubredditInfo implements RustOpaqueInterface {
 
   static Future<SubredditInfo> default_() =>
       RustLib.instance.api.redditApiModelPostSubredditInfoDefault();
+}
+
+class AuthorInfo {
+  final String username;
+  final bool premium;
+  final Flair flair;
+  final String fullname;
+  final bool isBlocked;
+  final bool patreonFlair;
+
+  const AuthorInfo({
+    required this.username,
+    required this.premium,
+    required this.flair,
+    required this.fullname,
+    required this.isBlocked,
+    required this.patreonFlair,
+  });
+
+  static Future<AuthorInfo> default_() =>
+      RustLib.instance.api.redditApiModelPostAuthorInfoDefault();
+
+  @override
+  int get hashCode =>
+      username.hashCode ^
+      premium.hashCode ^
+      flair.hashCode ^
+      fullname.hashCode ^
+      isBlocked.hashCode ^
+      patreonFlair.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AuthorInfo &&
+          runtimeType == other.runtimeType &&
+          username == other.username &&
+          premium == other.premium &&
+          flair == other.flair &&
+          fullname == other.fullname &&
+          isBlocked == other.isBlocked &&
+          patreonFlair == other.patreonFlair;
 }
 
 class Gallery {

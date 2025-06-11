@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:crabir/drawer.dart';
 import 'package:crabir/feed/feed.dart';
 import 'package:crabir/feed/gif.dart';
 import 'package:crabir/feed/image.dart';
@@ -6,10 +9,12 @@ import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:logging/logging.dart';
 
 final horizontalPadding = 16.0;
 
@@ -42,6 +47,85 @@ class _PostTitle extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _PostFlair extends StatelessWidget {
+  final Post post;
+  final Logger log = Logger("PostFlair");
+  _PostFlair({required this.post});
+
+  Widget richtext(BuildContext context, Richtext richtext,
+      Color backgroundColor, Color textColor) {
+    return switch (richtext) {
+      Richtext_Text(t: var text) => RichText(
+          text: WidgetSpan(
+            child: Container(
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(8),
+                ),
+              ),
+              padding: EdgeInsetsDirectional.symmetric(horizontal: 4),
+              child: Text(
+                text,
+                semanticsLabel: "flair",
+                style: TextStyle(
+                  color: textColor,
+                  //backgroundColor: backgroundColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            style: TextStyle(
+              color: textColor,
+              backgroundColor: backgroundColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      Richtext_Emoji(a: var text, u: var url) => Image.network(
+          url,
+          semanticLabel: text,
+        )
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final flair = post.linkFlair;
+    return Row(
+      children: flair.richtext
+          .map(
+            (e) => richtext(
+              context,
+              e,
+              stringToColor(flair.backgroundColor ?? "gray"),
+              stringToColor(flair.textColor ?? "black"),
+            ),
+          )
+          .toList(),
+    );
+  }
+}
+
+Color stringToColor(String s) {
+  final log = Logger("stringToColor");
+  if (s.startsWith("#")) {
+    return HexColor.fromHex(s);
+  } else {
+    return switch (s) {
+      "black" => Colors.black,
+      "transparent" => Colors.transparent,
+      "light" => Colors.white,
+      "dark" => Colors.black,
+      "gray" => Colors.grey,
+      _ => () {
+          log.info("Unknown color $s");
+          return Colors.grey;
+        }()
+    };
   }
 }
 
@@ -250,13 +334,13 @@ class _RedditPostCardState extends State<RedditPostCard> {
       elevation: 1,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        spacing: 8,
         children: [
           _wrap(header(context)),
-          _wrap(const SizedBox(height: 8)),
           _wrap(title(context)),
-          _wrap(const SizedBox(height: 12)),
+          _wrap(_PostFlair(post: widget.post)),
           content(context),
-          _wrap(const SizedBox(height: 12)),
           _wrap(footer(context)),
         ],
       ),
@@ -535,6 +619,7 @@ class HtmlWithConditionalFade extends StatefulWidget {
 class _HtmlWithConditionalFadeState extends State<HtmlWithConditionalFade> {
   final GlobalKey _key = GlobalKey();
   bool _overflowing = false;
+  double _contentHeight = 0;
 
   @override
   void initState() {
@@ -554,13 +639,38 @@ class _HtmlWithConditionalFadeState extends State<HtmlWithConditionalFade> {
     if (mounted) {
       setState(() {
         _overflowing = contentHeight > maxHeight;
+        _contentHeight = contentHeight;
       });
     }
   }
 
+  Widget gradient() {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: IgnorePointer(
+        child: Container(
+          height: 40,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.transparent,
+                widget.backgroundColor,
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final maxHeight = widget.maxLines * widget.fontSize * 2;
+    final maxHeight =
+        min(_contentHeight, widget.maxLines * widget.fontSize * 2);
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -578,27 +688,7 @@ class _HtmlWithConditionalFadeState extends State<HtmlWithConditionalFade> {
               ),
             ),
           ),
-          if (_overflowing)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: IgnorePointer(
-                child: Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        widget.backgroundColor,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+          if (_overflowing) gradient(),
         ],
       ),
     );
