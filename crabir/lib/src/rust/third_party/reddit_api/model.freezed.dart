@@ -992,37 +992,46 @@ mixin _$Thing {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Listing field0) listing,
-    required TResult Function() comment,
+    required TResult Function(Comment field0) comment,
     required TResult Function(User field0) user,
     required TResult Function(Post field0) post,
     required TResult Function() message,
     required TResult Function(Subreddit field0) subreddit,
     required TResult Function() award,
     required TResult Function(Multi field0) multi,
+    required TResult Function(
+            String id, String name, int count, int depth, List<String> children)
+        more,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(Listing field0)? listing,
-    TResult? Function()? comment,
+    TResult? Function(Comment field0)? comment,
     TResult? Function(User field0)? user,
     TResult? Function(Post field0)? post,
     TResult? Function()? message,
     TResult? Function(Subreddit field0)? subreddit,
     TResult? Function()? award,
     TResult? Function(Multi field0)? multi,
+    TResult? Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(Listing field0)? listing,
-    TResult Function()? comment,
+    TResult Function(Comment field0)? comment,
     TResult Function(User field0)? user,
     TResult Function(Post field0)? post,
     TResult Function()? message,
     TResult Function(Subreddit field0)? subreddit,
     TResult Function()? award,
     TResult Function(Multi field0)? multi,
+    TResult Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -1036,6 +1045,7 @@ mixin _$Thing {
     required TResult Function(Thing_Subreddit value) subreddit,
     required TResult Function(Thing_Award value) award,
     required TResult Function(Thing_Multi value) multi,
+    required TResult Function(Thing_More value) more,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -1048,6 +1058,7 @@ mixin _$Thing {
     TResult? Function(Thing_Subreddit value)? subreddit,
     TResult? Function(Thing_Award value)? award,
     TResult? Function(Thing_Multi value)? multi,
+    TResult? Function(Thing_More value)? more,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -1060,6 +1071,7 @@ mixin _$Thing {
     TResult Function(Thing_Subreddit value)? subreddit,
     TResult Function(Thing_Award value)? award,
     TResult Function(Thing_Multi value)? multi,
+    TResult Function(Thing_More value)? more,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -1154,13 +1166,16 @@ class _$Thing_ListingImpl extends Thing_Listing {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Listing field0) listing,
-    required TResult Function() comment,
+    required TResult Function(Comment field0) comment,
     required TResult Function(User field0) user,
     required TResult Function(Post field0) post,
     required TResult Function() message,
     required TResult Function(Subreddit field0) subreddit,
     required TResult Function() award,
     required TResult Function(Multi field0) multi,
+    required TResult Function(
+            String id, String name, int count, int depth, List<String> children)
+        more,
   }) {
     return listing(field0);
   }
@@ -1169,13 +1184,16 @@ class _$Thing_ListingImpl extends Thing_Listing {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(Listing field0)? listing,
-    TResult? Function()? comment,
+    TResult? Function(Comment field0)? comment,
     TResult? Function(User field0)? user,
     TResult? Function(Post field0)? post,
     TResult? Function()? message,
     TResult? Function(Subreddit field0)? subreddit,
     TResult? Function()? award,
     TResult? Function(Multi field0)? multi,
+    TResult? Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
   }) {
     return listing?.call(field0);
   }
@@ -1184,13 +1202,16 @@ class _$Thing_ListingImpl extends Thing_Listing {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(Listing field0)? listing,
-    TResult Function()? comment,
+    TResult Function(Comment field0)? comment,
     TResult Function(User field0)? user,
     TResult Function(Post field0)? post,
     TResult Function()? message,
     TResult Function(Subreddit field0)? subreddit,
     TResult Function()? award,
     TResult Function(Multi field0)? multi,
+    TResult Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
     required TResult orElse(),
   }) {
     if (listing != null) {
@@ -1210,6 +1231,7 @@ class _$Thing_ListingImpl extends Thing_Listing {
     required TResult Function(Thing_Subreddit value) subreddit,
     required TResult Function(Thing_Award value) award,
     required TResult Function(Thing_Multi value) multi,
+    required TResult Function(Thing_More value) more,
   }) {
     return listing(this);
   }
@@ -1225,6 +1247,7 @@ class _$Thing_ListingImpl extends Thing_Listing {
     TResult? Function(Thing_Subreddit value)? subreddit,
     TResult? Function(Thing_Award value)? award,
     TResult? Function(Thing_Multi value)? multi,
+    TResult? Function(Thing_More value)? more,
   }) {
     return listing?.call(this);
   }
@@ -1240,6 +1263,7 @@ class _$Thing_ListingImpl extends Thing_Listing {
     TResult Function(Thing_Subreddit value)? subreddit,
     TResult Function(Thing_Award value)? award,
     TResult Function(Thing_Multi value)? multi,
+    TResult Function(Thing_More value)? more,
     required TResult orElse(),
   }) {
     if (listing != null) {
@@ -1267,6 +1291,8 @@ abstract class _$$Thing_CommentImplCopyWith<$Res> {
   factory _$$Thing_CommentImplCopyWith(
           _$Thing_CommentImpl value, $Res Function(_$Thing_CommentImpl) then) =
       __$$Thing_CommentImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({Comment field0});
 }
 
 /// @nodoc
@@ -1279,72 +1305,106 @@ class __$$Thing_CommentImplCopyWithImpl<$Res>
 
   /// Create a copy of Thing
   /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? field0 = null,
+  }) {
+    return _then(_$Thing_CommentImpl(
+      null == field0
+          ? _value.field0
+          : field0 // ignore: cast_nullable_to_non_nullable
+              as Comment,
+    ));
+  }
 }
 
 /// @nodoc
 
 class _$Thing_CommentImpl extends Thing_Comment {
-  const _$Thing_CommentImpl() : super._();
+  const _$Thing_CommentImpl(this.field0) : super._();
+
+  @override
+  final Comment field0;
 
   @override
   String toString() {
-    return 'Thing.comment()';
+    return 'Thing.comment(field0: $field0)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$Thing_CommentImpl);
+        (other.runtimeType == runtimeType &&
+            other is _$Thing_CommentImpl &&
+            (identical(other.field0, field0) || other.field0 == field0));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, field0);
+
+  /// Create a copy of Thing
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$Thing_CommentImplCopyWith<_$Thing_CommentImpl> get copyWith =>
+      __$$Thing_CommentImplCopyWithImpl<_$Thing_CommentImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Listing field0) listing,
-    required TResult Function() comment,
+    required TResult Function(Comment field0) comment,
     required TResult Function(User field0) user,
     required TResult Function(Post field0) post,
     required TResult Function() message,
     required TResult Function(Subreddit field0) subreddit,
     required TResult Function() award,
     required TResult Function(Multi field0) multi,
+    required TResult Function(
+            String id, String name, int count, int depth, List<String> children)
+        more,
   }) {
-    return comment();
+    return comment(field0);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(Listing field0)? listing,
-    TResult? Function()? comment,
+    TResult? Function(Comment field0)? comment,
     TResult? Function(User field0)? user,
     TResult? Function(Post field0)? post,
     TResult? Function()? message,
     TResult? Function(Subreddit field0)? subreddit,
     TResult? Function()? award,
     TResult? Function(Multi field0)? multi,
+    TResult? Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
   }) {
-    return comment?.call();
+    return comment?.call(field0);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(Listing field0)? listing,
-    TResult Function()? comment,
+    TResult Function(Comment field0)? comment,
     TResult Function(User field0)? user,
     TResult Function(Post field0)? post,
     TResult Function()? message,
     TResult Function(Subreddit field0)? subreddit,
     TResult Function()? award,
     TResult Function(Multi field0)? multi,
+    TResult Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
     required TResult orElse(),
   }) {
     if (comment != null) {
-      return comment();
+      return comment(field0);
     }
     return orElse();
   }
@@ -1360,6 +1420,7 @@ class _$Thing_CommentImpl extends Thing_Comment {
     required TResult Function(Thing_Subreddit value) subreddit,
     required TResult Function(Thing_Award value) award,
     required TResult Function(Thing_Multi value) multi,
+    required TResult Function(Thing_More value) more,
   }) {
     return comment(this);
   }
@@ -1375,6 +1436,7 @@ class _$Thing_CommentImpl extends Thing_Comment {
     TResult? Function(Thing_Subreddit value)? subreddit,
     TResult? Function(Thing_Award value)? award,
     TResult? Function(Thing_Multi value)? multi,
+    TResult? Function(Thing_More value)? more,
   }) {
     return comment?.call(this);
   }
@@ -1390,6 +1452,7 @@ class _$Thing_CommentImpl extends Thing_Comment {
     TResult Function(Thing_Subreddit value)? subreddit,
     TResult Function(Thing_Award value)? award,
     TResult Function(Thing_Multi value)? multi,
+    TResult Function(Thing_More value)? more,
     required TResult orElse(),
   }) {
     if (comment != null) {
@@ -1400,8 +1463,16 @@ class _$Thing_CommentImpl extends Thing_Comment {
 }
 
 abstract class Thing_Comment extends Thing {
-  const factory Thing_Comment() = _$Thing_CommentImpl;
+  const factory Thing_Comment(final Comment field0) = _$Thing_CommentImpl;
   const Thing_Comment._() : super._();
+
+  Comment get field0;
+
+  /// Create a copy of Thing
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$Thing_CommentImplCopyWith<_$Thing_CommentImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -1473,13 +1544,16 @@ class _$Thing_UserImpl extends Thing_User {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Listing field0) listing,
-    required TResult Function() comment,
+    required TResult Function(Comment field0) comment,
     required TResult Function(User field0) user,
     required TResult Function(Post field0) post,
     required TResult Function() message,
     required TResult Function(Subreddit field0) subreddit,
     required TResult Function() award,
     required TResult Function(Multi field0) multi,
+    required TResult Function(
+            String id, String name, int count, int depth, List<String> children)
+        more,
   }) {
     return user(field0);
   }
@@ -1488,13 +1562,16 @@ class _$Thing_UserImpl extends Thing_User {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(Listing field0)? listing,
-    TResult? Function()? comment,
+    TResult? Function(Comment field0)? comment,
     TResult? Function(User field0)? user,
     TResult? Function(Post field0)? post,
     TResult? Function()? message,
     TResult? Function(Subreddit field0)? subreddit,
     TResult? Function()? award,
     TResult? Function(Multi field0)? multi,
+    TResult? Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
   }) {
     return user?.call(field0);
   }
@@ -1503,13 +1580,16 @@ class _$Thing_UserImpl extends Thing_User {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(Listing field0)? listing,
-    TResult Function()? comment,
+    TResult Function(Comment field0)? comment,
     TResult Function(User field0)? user,
     TResult Function(Post field0)? post,
     TResult Function()? message,
     TResult Function(Subreddit field0)? subreddit,
     TResult Function()? award,
     TResult Function(Multi field0)? multi,
+    TResult Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
     required TResult orElse(),
   }) {
     if (user != null) {
@@ -1529,6 +1609,7 @@ class _$Thing_UserImpl extends Thing_User {
     required TResult Function(Thing_Subreddit value) subreddit,
     required TResult Function(Thing_Award value) award,
     required TResult Function(Thing_Multi value) multi,
+    required TResult Function(Thing_More value) more,
   }) {
     return user(this);
   }
@@ -1544,6 +1625,7 @@ class _$Thing_UserImpl extends Thing_User {
     TResult? Function(Thing_Subreddit value)? subreddit,
     TResult? Function(Thing_Award value)? award,
     TResult? Function(Thing_Multi value)? multi,
+    TResult? Function(Thing_More value)? more,
   }) {
     return user?.call(this);
   }
@@ -1559,6 +1641,7 @@ class _$Thing_UserImpl extends Thing_User {
     TResult Function(Thing_Subreddit value)? subreddit,
     TResult Function(Thing_Award value)? award,
     TResult Function(Thing_Multi value)? multi,
+    TResult Function(Thing_More value)? more,
     required TResult orElse(),
   }) {
     if (user != null) {
@@ -1650,13 +1733,16 @@ class _$Thing_PostImpl extends Thing_Post {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Listing field0) listing,
-    required TResult Function() comment,
+    required TResult Function(Comment field0) comment,
     required TResult Function(User field0) user,
     required TResult Function(Post field0) post,
     required TResult Function() message,
     required TResult Function(Subreddit field0) subreddit,
     required TResult Function() award,
     required TResult Function(Multi field0) multi,
+    required TResult Function(
+            String id, String name, int count, int depth, List<String> children)
+        more,
   }) {
     return post(field0);
   }
@@ -1665,13 +1751,16 @@ class _$Thing_PostImpl extends Thing_Post {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(Listing field0)? listing,
-    TResult? Function()? comment,
+    TResult? Function(Comment field0)? comment,
     TResult? Function(User field0)? user,
     TResult? Function(Post field0)? post,
     TResult? Function()? message,
     TResult? Function(Subreddit field0)? subreddit,
     TResult? Function()? award,
     TResult? Function(Multi field0)? multi,
+    TResult? Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
   }) {
     return post?.call(field0);
   }
@@ -1680,13 +1769,16 @@ class _$Thing_PostImpl extends Thing_Post {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(Listing field0)? listing,
-    TResult Function()? comment,
+    TResult Function(Comment field0)? comment,
     TResult Function(User field0)? user,
     TResult Function(Post field0)? post,
     TResult Function()? message,
     TResult Function(Subreddit field0)? subreddit,
     TResult Function()? award,
     TResult Function(Multi field0)? multi,
+    TResult Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
     required TResult orElse(),
   }) {
     if (post != null) {
@@ -1706,6 +1798,7 @@ class _$Thing_PostImpl extends Thing_Post {
     required TResult Function(Thing_Subreddit value) subreddit,
     required TResult Function(Thing_Award value) award,
     required TResult Function(Thing_Multi value) multi,
+    required TResult Function(Thing_More value) more,
   }) {
     return post(this);
   }
@@ -1721,6 +1814,7 @@ class _$Thing_PostImpl extends Thing_Post {
     TResult? Function(Thing_Subreddit value)? subreddit,
     TResult? Function(Thing_Award value)? award,
     TResult? Function(Thing_Multi value)? multi,
+    TResult? Function(Thing_More value)? more,
   }) {
     return post?.call(this);
   }
@@ -1736,6 +1830,7 @@ class _$Thing_PostImpl extends Thing_Post {
     TResult Function(Thing_Subreddit value)? subreddit,
     TResult Function(Thing_Award value)? award,
     TResult Function(Thing_Multi value)? multi,
+    TResult Function(Thing_More value)? more,
     required TResult orElse(),
   }) {
     if (post != null) {
@@ -1800,13 +1895,16 @@ class _$Thing_MessageImpl extends Thing_Message {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Listing field0) listing,
-    required TResult Function() comment,
+    required TResult Function(Comment field0) comment,
     required TResult Function(User field0) user,
     required TResult Function(Post field0) post,
     required TResult Function() message,
     required TResult Function(Subreddit field0) subreddit,
     required TResult Function() award,
     required TResult Function(Multi field0) multi,
+    required TResult Function(
+            String id, String name, int count, int depth, List<String> children)
+        more,
   }) {
     return message();
   }
@@ -1815,13 +1913,16 @@ class _$Thing_MessageImpl extends Thing_Message {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(Listing field0)? listing,
-    TResult? Function()? comment,
+    TResult? Function(Comment field0)? comment,
     TResult? Function(User field0)? user,
     TResult? Function(Post field0)? post,
     TResult? Function()? message,
     TResult? Function(Subreddit field0)? subreddit,
     TResult? Function()? award,
     TResult? Function(Multi field0)? multi,
+    TResult? Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
   }) {
     return message?.call();
   }
@@ -1830,13 +1931,16 @@ class _$Thing_MessageImpl extends Thing_Message {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(Listing field0)? listing,
-    TResult Function()? comment,
+    TResult Function(Comment field0)? comment,
     TResult Function(User field0)? user,
     TResult Function(Post field0)? post,
     TResult Function()? message,
     TResult Function(Subreddit field0)? subreddit,
     TResult Function()? award,
     TResult Function(Multi field0)? multi,
+    TResult Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
     required TResult orElse(),
   }) {
     if (message != null) {
@@ -1856,6 +1960,7 @@ class _$Thing_MessageImpl extends Thing_Message {
     required TResult Function(Thing_Subreddit value) subreddit,
     required TResult Function(Thing_Award value) award,
     required TResult Function(Thing_Multi value) multi,
+    required TResult Function(Thing_More value) more,
   }) {
     return message(this);
   }
@@ -1871,6 +1976,7 @@ class _$Thing_MessageImpl extends Thing_Message {
     TResult? Function(Thing_Subreddit value)? subreddit,
     TResult? Function(Thing_Award value)? award,
     TResult? Function(Thing_Multi value)? multi,
+    TResult? Function(Thing_More value)? more,
   }) {
     return message?.call(this);
   }
@@ -1886,6 +1992,7 @@ class _$Thing_MessageImpl extends Thing_Message {
     TResult Function(Thing_Subreddit value)? subreddit,
     TResult Function(Thing_Award value)? award,
     TResult Function(Thing_Multi value)? multi,
+    TResult Function(Thing_More value)? more,
     required TResult orElse(),
   }) {
     if (message != null) {
@@ -1970,13 +2077,16 @@ class _$Thing_SubredditImpl extends Thing_Subreddit {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Listing field0) listing,
-    required TResult Function() comment,
+    required TResult Function(Comment field0) comment,
     required TResult Function(User field0) user,
     required TResult Function(Post field0) post,
     required TResult Function() message,
     required TResult Function(Subreddit field0) subreddit,
     required TResult Function() award,
     required TResult Function(Multi field0) multi,
+    required TResult Function(
+            String id, String name, int count, int depth, List<String> children)
+        more,
   }) {
     return subreddit(field0);
   }
@@ -1985,13 +2095,16 @@ class _$Thing_SubredditImpl extends Thing_Subreddit {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(Listing field0)? listing,
-    TResult? Function()? comment,
+    TResult? Function(Comment field0)? comment,
     TResult? Function(User field0)? user,
     TResult? Function(Post field0)? post,
     TResult? Function()? message,
     TResult? Function(Subreddit field0)? subreddit,
     TResult? Function()? award,
     TResult? Function(Multi field0)? multi,
+    TResult? Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
   }) {
     return subreddit?.call(field0);
   }
@@ -2000,13 +2113,16 @@ class _$Thing_SubredditImpl extends Thing_Subreddit {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(Listing field0)? listing,
-    TResult Function()? comment,
+    TResult Function(Comment field0)? comment,
     TResult Function(User field0)? user,
     TResult Function(Post field0)? post,
     TResult Function()? message,
     TResult Function(Subreddit field0)? subreddit,
     TResult Function()? award,
     TResult Function(Multi field0)? multi,
+    TResult Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
     required TResult orElse(),
   }) {
     if (subreddit != null) {
@@ -2026,6 +2142,7 @@ class _$Thing_SubredditImpl extends Thing_Subreddit {
     required TResult Function(Thing_Subreddit value) subreddit,
     required TResult Function(Thing_Award value) award,
     required TResult Function(Thing_Multi value) multi,
+    required TResult Function(Thing_More value) more,
   }) {
     return subreddit(this);
   }
@@ -2041,6 +2158,7 @@ class _$Thing_SubredditImpl extends Thing_Subreddit {
     TResult? Function(Thing_Subreddit value)? subreddit,
     TResult? Function(Thing_Award value)? award,
     TResult? Function(Thing_Multi value)? multi,
+    TResult? Function(Thing_More value)? more,
   }) {
     return subreddit?.call(this);
   }
@@ -2056,6 +2174,7 @@ class _$Thing_SubredditImpl extends Thing_Subreddit {
     TResult Function(Thing_Subreddit value)? subreddit,
     TResult Function(Thing_Award value)? award,
     TResult Function(Thing_Multi value)? multi,
+    TResult Function(Thing_More value)? more,
     required TResult orElse(),
   }) {
     if (subreddit != null) {
@@ -2120,13 +2239,16 @@ class _$Thing_AwardImpl extends Thing_Award {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Listing field0) listing,
-    required TResult Function() comment,
+    required TResult Function(Comment field0) comment,
     required TResult Function(User field0) user,
     required TResult Function(Post field0) post,
     required TResult Function() message,
     required TResult Function(Subreddit field0) subreddit,
     required TResult Function() award,
     required TResult Function(Multi field0) multi,
+    required TResult Function(
+            String id, String name, int count, int depth, List<String> children)
+        more,
   }) {
     return award();
   }
@@ -2135,13 +2257,16 @@ class _$Thing_AwardImpl extends Thing_Award {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(Listing field0)? listing,
-    TResult? Function()? comment,
+    TResult? Function(Comment field0)? comment,
     TResult? Function(User field0)? user,
     TResult? Function(Post field0)? post,
     TResult? Function()? message,
     TResult? Function(Subreddit field0)? subreddit,
     TResult? Function()? award,
     TResult? Function(Multi field0)? multi,
+    TResult? Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
   }) {
     return award?.call();
   }
@@ -2150,13 +2275,16 @@ class _$Thing_AwardImpl extends Thing_Award {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(Listing field0)? listing,
-    TResult Function()? comment,
+    TResult Function(Comment field0)? comment,
     TResult Function(User field0)? user,
     TResult Function(Post field0)? post,
     TResult Function()? message,
     TResult Function(Subreddit field0)? subreddit,
     TResult Function()? award,
     TResult Function(Multi field0)? multi,
+    TResult Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
     required TResult orElse(),
   }) {
     if (award != null) {
@@ -2176,6 +2304,7 @@ class _$Thing_AwardImpl extends Thing_Award {
     required TResult Function(Thing_Subreddit value) subreddit,
     required TResult Function(Thing_Award value) award,
     required TResult Function(Thing_Multi value) multi,
+    required TResult Function(Thing_More value) more,
   }) {
     return award(this);
   }
@@ -2191,6 +2320,7 @@ class _$Thing_AwardImpl extends Thing_Award {
     TResult? Function(Thing_Subreddit value)? subreddit,
     TResult? Function(Thing_Award value)? award,
     TResult? Function(Thing_Multi value)? multi,
+    TResult? Function(Thing_More value)? more,
   }) {
     return award?.call(this);
   }
@@ -2206,6 +2336,7 @@ class _$Thing_AwardImpl extends Thing_Award {
     TResult Function(Thing_Subreddit value)? subreddit,
     TResult Function(Thing_Award value)? award,
     TResult Function(Thing_Multi value)? multi,
+    TResult Function(Thing_More value)? more,
     required TResult orElse(),
   }) {
     if (award != null) {
@@ -2289,13 +2420,16 @@ class _$Thing_MultiImpl extends Thing_Multi {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Listing field0) listing,
-    required TResult Function() comment,
+    required TResult Function(Comment field0) comment,
     required TResult Function(User field0) user,
     required TResult Function(Post field0) post,
     required TResult Function() message,
     required TResult Function(Subreddit field0) subreddit,
     required TResult Function() award,
     required TResult Function(Multi field0) multi,
+    required TResult Function(
+            String id, String name, int count, int depth, List<String> children)
+        more,
   }) {
     return multi(field0);
   }
@@ -2304,13 +2438,16 @@ class _$Thing_MultiImpl extends Thing_Multi {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(Listing field0)? listing,
-    TResult? Function()? comment,
+    TResult? Function(Comment field0)? comment,
     TResult? Function(User field0)? user,
     TResult? Function(Post field0)? post,
     TResult? Function()? message,
     TResult? Function(Subreddit field0)? subreddit,
     TResult? Function()? award,
     TResult? Function(Multi field0)? multi,
+    TResult? Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
   }) {
     return multi?.call(field0);
   }
@@ -2319,13 +2456,16 @@ class _$Thing_MultiImpl extends Thing_Multi {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(Listing field0)? listing,
-    TResult Function()? comment,
+    TResult Function(Comment field0)? comment,
     TResult Function(User field0)? user,
     TResult Function(Post field0)? post,
     TResult Function()? message,
     TResult Function(Subreddit field0)? subreddit,
     TResult Function()? award,
     TResult Function(Multi field0)? multi,
+    TResult Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
     required TResult orElse(),
   }) {
     if (multi != null) {
@@ -2345,6 +2485,7 @@ class _$Thing_MultiImpl extends Thing_Multi {
     required TResult Function(Thing_Subreddit value) subreddit,
     required TResult Function(Thing_Award value) award,
     required TResult Function(Thing_Multi value) multi,
+    required TResult Function(Thing_More value) more,
   }) {
     return multi(this);
   }
@@ -2360,6 +2501,7 @@ class _$Thing_MultiImpl extends Thing_Multi {
     TResult? Function(Thing_Subreddit value)? subreddit,
     TResult? Function(Thing_Award value)? award,
     TResult? Function(Thing_Multi value)? multi,
+    TResult? Function(Thing_More value)? more,
   }) {
     return multi?.call(this);
   }
@@ -2375,6 +2517,7 @@ class _$Thing_MultiImpl extends Thing_Multi {
     TResult Function(Thing_Subreddit value)? subreddit,
     TResult Function(Thing_Award value)? award,
     TResult Function(Thing_Multi value)? multi,
+    TResult Function(Thing_More value)? more,
     required TResult orElse(),
   }) {
     if (multi != null) {
@@ -2394,5 +2537,249 @@ abstract class Thing_Multi extends Thing {
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$Thing_MultiImplCopyWith<_$Thing_MultiImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$Thing_MoreImplCopyWith<$Res> {
+  factory _$$Thing_MoreImplCopyWith(
+          _$Thing_MoreImpl value, $Res Function(_$Thing_MoreImpl) then) =
+      __$$Thing_MoreImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call(
+      {String id, String name, int count, int depth, List<String> children});
+}
+
+/// @nodoc
+class __$$Thing_MoreImplCopyWithImpl<$Res>
+    extends _$ThingCopyWithImpl<$Res, _$Thing_MoreImpl>
+    implements _$$Thing_MoreImplCopyWith<$Res> {
+  __$$Thing_MoreImplCopyWithImpl(
+      _$Thing_MoreImpl _value, $Res Function(_$Thing_MoreImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of Thing
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? count = null,
+    Object? depth = null,
+    Object? children = null,
+  }) {
+    return _then(_$Thing_MoreImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      count: null == count
+          ? _value.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
+      depth: null == depth
+          ? _value.depth
+          : depth // ignore: cast_nullable_to_non_nullable
+              as int,
+      children: null == children
+          ? _value._children
+          : children // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$Thing_MoreImpl extends Thing_More {
+  const _$Thing_MoreImpl(
+      {required this.id,
+      required this.name,
+      required this.count,
+      required this.depth,
+      required final List<String> children})
+      : _children = children,
+        super._();
+
+  @override
+  final String id;
+  @override
+  final String name;
+  @override
+  final int count;
+  @override
+  final int depth;
+  final List<String> _children;
+  @override
+  List<String> get children {
+    if (_children is EqualUnmodifiableListView) return _children;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_children);
+  }
+
+  @override
+  String toString() {
+    return 'Thing.more(id: $id, name: $name, count: $count, depth: $depth, children: $children)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$Thing_MoreImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.count, count) || other.count == count) &&
+            (identical(other.depth, depth) || other.depth == depth) &&
+            const DeepCollectionEquality().equals(other._children, _children));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, id, name, count, depth,
+      const DeepCollectionEquality().hash(_children));
+
+  /// Create a copy of Thing
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$Thing_MoreImplCopyWith<_$Thing_MoreImpl> get copyWith =>
+      __$$Thing_MoreImplCopyWithImpl<_$Thing_MoreImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(Listing field0) listing,
+    required TResult Function(Comment field0) comment,
+    required TResult Function(User field0) user,
+    required TResult Function(Post field0) post,
+    required TResult Function() message,
+    required TResult Function(Subreddit field0) subreddit,
+    required TResult Function() award,
+    required TResult Function(Multi field0) multi,
+    required TResult Function(
+            String id, String name, int count, int depth, List<String> children)
+        more,
+  }) {
+    return more(id, name, count, depth, children);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(Listing field0)? listing,
+    TResult? Function(Comment field0)? comment,
+    TResult? Function(User field0)? user,
+    TResult? Function(Post field0)? post,
+    TResult? Function()? message,
+    TResult? Function(Subreddit field0)? subreddit,
+    TResult? Function()? award,
+    TResult? Function(Multi field0)? multi,
+    TResult? Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
+  }) {
+    return more?.call(id, name, count, depth, children);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(Listing field0)? listing,
+    TResult Function(Comment field0)? comment,
+    TResult Function(User field0)? user,
+    TResult Function(Post field0)? post,
+    TResult Function()? message,
+    TResult Function(Subreddit field0)? subreddit,
+    TResult Function()? award,
+    TResult Function(Multi field0)? multi,
+    TResult Function(String id, String name, int count, int depth,
+            List<String> children)?
+        more,
+    required TResult orElse(),
+  }) {
+    if (more != null) {
+      return more(id, name, count, depth, children);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(Thing_Listing value) listing,
+    required TResult Function(Thing_Comment value) comment,
+    required TResult Function(Thing_User value) user,
+    required TResult Function(Thing_Post value) post,
+    required TResult Function(Thing_Message value) message,
+    required TResult Function(Thing_Subreddit value) subreddit,
+    required TResult Function(Thing_Award value) award,
+    required TResult Function(Thing_Multi value) multi,
+    required TResult Function(Thing_More value) more,
+  }) {
+    return more(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Thing_Listing value)? listing,
+    TResult? Function(Thing_Comment value)? comment,
+    TResult? Function(Thing_User value)? user,
+    TResult? Function(Thing_Post value)? post,
+    TResult? Function(Thing_Message value)? message,
+    TResult? Function(Thing_Subreddit value)? subreddit,
+    TResult? Function(Thing_Award value)? award,
+    TResult? Function(Thing_Multi value)? multi,
+    TResult? Function(Thing_More value)? more,
+  }) {
+    return more?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(Thing_Listing value)? listing,
+    TResult Function(Thing_Comment value)? comment,
+    TResult Function(Thing_User value)? user,
+    TResult Function(Thing_Post value)? post,
+    TResult Function(Thing_Message value)? message,
+    TResult Function(Thing_Subreddit value)? subreddit,
+    TResult Function(Thing_Award value)? award,
+    TResult Function(Thing_Multi value)? multi,
+    TResult Function(Thing_More value)? more,
+    required TResult orElse(),
+  }) {
+    if (more != null) {
+      return more(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class Thing_More extends Thing {
+  const factory Thing_More(
+      {required final String id,
+      required final String name,
+      required final int count,
+      required final int depth,
+      required final List<String> children}) = _$Thing_MoreImpl;
+  const Thing_More._() : super._();
+
+  String get id;
+  String get name;
+  int get count;
+  int get depth;
+  List<String> get children;
+
+  /// Create a copy of Thing
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$Thing_MoreImplCopyWith<_$Thing_MoreImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

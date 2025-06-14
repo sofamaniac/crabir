@@ -1,5 +1,6 @@
 use crate::listing_stream::{ListingStream, Wrapper};
 use crate::model::Fullname;
+use crate::model::comment::Comment;
 use crate::model::feed::Feed;
 use crate::{model::feed::FeedStream, result::Result};
 use std::backtrace::Backtrace;
@@ -454,6 +455,23 @@ impl Client {
             client: self.clone(),
             username,
         })
+    }
+
+    /// Returns the comments for the post at the given permalink. Each element in the vec is either
+    /// a [`Thing::Comment`] or a [`Thing::More`].
+    /// # Errors
+    /// Fails if the request fails or the parsing of the response fails.
+    pub async fn comments(&self, permalink: String) -> Result<Vec<Thing>> {
+        let url = self
+            .base_url()
+            .await
+            .join(&format!("{permalink}.json"))
+            .expect("Should not fail.");
+        let request = self.get(url);
+        let result = self.execute(request).await?;
+        let result: [Listing; 2] = parse_response(result).await?;
+        let [_, result] = result;
+        Ok(result.children)
     }
 }
 

@@ -14,6 +14,27 @@ use super::Thing;
 
 with_prefix!(prefix_user_flair "user_flair_");
 
+/// Subreddit's ID, is of the form `t5_xxx`
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SubredditID(String);
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SubredditInfo {
+    /// The subreddit's name (e.g. "awww")
+    #[serde(rename = "subreddit")]
+    pub subreddit: String,
+    #[serde(rename = "subreddit_type")]
+    pub subreddit_type: String,
+    #[serde(rename = "subreddit_id")]
+    pub subreddit_id: SubredditID,
+    /// The subreddit's name prefixed with "r/"
+    #[serde(rename = "subreddit_name_prefixed")]
+    pub subreddit_name_prefixed: String,
+    /// The number of subscribers of the subreddit
+    #[serde(rename = "subreddit_subscribers")]
+    pub subscribers: u64,
+}
+
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[serde_as]

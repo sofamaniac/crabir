@@ -5,6 +5,7 @@
 
 import '../../frb_generated.dart';
 import 'client.dart';
+import 'model/comment.dart';
 import 'model/multi.dart';
 import 'model/post.dart';
 import 'model/subreddit.dart';
@@ -13,7 +14,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'model.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `as_ref`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `cmp`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `partial_cmp`, `try_from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `as_ref`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `cmp`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `partial_cmp`, `try_from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Fullname>>
 abstract class Fullname implements RustOpaqueInterface {
@@ -29,7 +30,7 @@ abstract class Listing implements RustOpaqueInterface {
 
   List<Thing> get children;
 
-  BigInt get dist;
+  BigInt? get dist;
 
   String? get modhash;
 
@@ -39,7 +40,7 @@ abstract class Listing implements RustOpaqueInterface {
 
   set children(List<Thing> children);
 
-  set dist(BigInt dist);
+  set dist(BigInt? dist);
 
   set modhash(String? modhash);
 
@@ -75,7 +76,9 @@ sealed class Thing with _$Thing {
   const factory Thing.listing(
     Listing field0,
   ) = Thing_Listing;
-  const factory Thing.comment() = Thing_Comment;
+  const factory Thing.comment(
+    Comment field0,
+  ) = Thing_Comment;
   const factory Thing.user(
     User field0,
   ) = Thing_User;
@@ -90,6 +93,15 @@ sealed class Thing with _$Thing {
   const factory Thing.multi(
     Multi field0,
   ) = Thing_Multi;
+
+  /// How to load more comment in a given thread
+  const factory Thing.more({
+    required String id,
+    required String name,
+    required int count,
+    required int depth,
+    required List<String> children,
+  }) = Thing_More;
 }
 
 enum Timeframe {

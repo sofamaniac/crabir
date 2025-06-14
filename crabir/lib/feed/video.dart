@@ -46,6 +46,7 @@ class _VideoContentState extends State<VideoContent> {
       videoPlayerController: _controller,
       autoPlay: true,
       looping: true,
+      aspectRatio: width / height,
     );
   }
 

@@ -1,5 +1,6 @@
 use std::backtrace::{self, Backtrace};
 
+use comment::Comment;
 use multi::Multi;
 pub use post::Post;
 use reqwest::Url;
@@ -9,8 +10,11 @@ use user::User;
 
 use crate::error::Error;
 
+pub mod author;
+pub mod comment;
 pub mod feed;
 pub mod flair;
+pub mod gallery;
 pub mod multi;
 pub mod post;
 pub mod subreddit;
@@ -25,14 +29,15 @@ impl AsRef<str> for Fullname {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag = "kind", content = "data")]
 #[allow(clippy::large_enum_variant)]
+/// flutter_rust_bridge:non_opaque
 pub enum Thing {
     #[serde(rename = "Listing")]
     Listing(Listing),
     #[serde(rename = "t1")]
-    Comment,
+    Comment(Comment),
     #[serde(rename = "t2")]
     User(User),
     #[serde(rename = "t3")]
@@ -45,6 +50,15 @@ pub enum Thing {
     Award,
     #[serde(rename = "LabeledMulti")]
     Multi(Multi),
+    /// How to load more comment in a given thread
+    #[serde(rename = "more")]
+    More {
+        id: String,
+        name: String,
+        count: u32,
+        depth: u32,
+        children: Vec<String>,
+    },
 }
 
 impl TryFrom<Thing> for Listing {
@@ -60,14 +74,15 @@ impl TryFrom<Thing> for Listing {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
 pub struct Listing {
     pub after: Option<String>,
     pub before: Option<String>,
-    pub dist: u64,
+    pub dist: Option<u64>,
     /// Is null when querying oauth.reddit.com
     pub modhash: Option<String>,
     geofilter: Option<String>,
+    #[serde(default)]
     pub children: Vec<Thing>,
 }
 

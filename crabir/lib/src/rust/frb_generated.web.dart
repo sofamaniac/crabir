@@ -13,8 +13,11 @@ import 'frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 import 'third_party/reddit_api/client.dart';
 import 'third_party/reddit_api/model.dart';
+import 'third_party/reddit_api/model/author.dart';
+import 'third_party/reddit_api/model/comment.dart';
 import 'third_party/reddit_api/model/feed.dart';
 import 'third_party/reddit_api/model/flair.dart';
+import 'third_party/reddit_api/model/gallery.dart';
 import 'third_party/reddit_api/model/multi.dart';
 import 'third_party/reddit_api/model/post.dart';
 import 'third_party/reddit_api/model/subreddit.dart';
@@ -31,6 +34,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_ClientPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient;
 
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_CommentPtr => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment;
+
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_FeedStatePtr =>
       wire.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState;
 
@@ -39,6 +45,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_FullnamePtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_GalleryPtr => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery;
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_ListingPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing;
@@ -75,6 +84,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           dynamic raw);
 
   @protected
+  Comment
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+          dynamic raw);
+
+  @protected
   FeedState
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
           dynamic raw);
@@ -87,6 +101,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Fullname
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+          dynamic raw);
+
+  @protected
+  Gallery
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
           dynamic raw);
 
   @protected
@@ -129,6 +148,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
+  Comment
+      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+          dynamic raw);
+
+  @protected
   FeedState
       dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
           dynamic raw);
@@ -161,6 +185,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Client
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+          dynamic raw);
+
+  @protected
+  Comment
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
           dynamic raw);
 
   @protected
@@ -214,6 +243,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           dynamic raw);
 
   @protected
+  Comment
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+          dynamic raw);
+
+  @protected
   FeedState
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
           dynamic raw);
@@ -226,6 +260,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Fullname
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+          dynamic raw);
+
+  @protected
+  Gallery
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
           dynamic raw);
 
   @protected
@@ -277,6 +316,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool dco_decode_bool(dynamic raw);
 
   @protected
+  Gallery
+      dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          dynamic raw);
+
+  @protected
   Post
       dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
           dynamic raw);
@@ -295,9 +339,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Feed dco_decode_box_autoadd_feed(dynamic raw);
-
-  @protected
-  Gallery dco_decode_box_autoadd_gallery(dynamic raw);
 
   @protected
   PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
@@ -339,6 +380,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   User dco_decode_box_autoadd_user(dynamic raw);
 
   @protected
+  VariantInner dco_decode_box_autoadd_variant_inner(dynamic raw);
+
+  @protected
   CommentContributionSettings dco_decode_comment_contribution_settings(
       dynamic raw);
 
@@ -356,9 +400,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Flair dco_decode_flair(dynamic raw);
-
-  @protected
-  Gallery dco_decode_gallery(dynamic raw);
 
   @protected
   Gildings dco_decode_gildings(dynamic raw);
@@ -432,6 +473,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String? dco_decode_opt_String(dynamic raw);
 
   @protected
+  Gallery?
+      dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          dynamic raw);
+
+  @protected
   Post?
       dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
           dynamic raw);
@@ -447,9 +493,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   double? dco_decode_opt_box_autoadd_f_64(dynamic raw);
-
-  @protected
-  Gallery? dco_decode_opt_box_autoadd_gallery(dynamic raw);
 
   @protected
   PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
@@ -474,6 +517,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw);
+
+  @protected
+  VariantInner? dco_decode_opt_box_autoadd_variant_inner(dynamic raw);
 
   @protected
   Int64List? dco_decode_opt_list_prim_i_64_strict(dynamic raw);
@@ -548,6 +594,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt dco_decode_usize(dynamic raw);
 
   @protected
+  VariantInner dco_decode_variant_inner(dynamic raw);
+
+  @protected
   Variants dco_decode_variants(dynamic raw);
 
   @protected
@@ -559,6 +608,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Client
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+          SseDeserializer deserializer);
+
+  @protected
+  Comment
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
           SseDeserializer deserializer);
 
   @protected
@@ -574,6 +628,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Fullname
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+          SseDeserializer deserializer);
+
+  @protected
+  Gallery
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
           SseDeserializer deserializer);
 
   @protected
@@ -616,6 +675,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  Comment
+      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+          SseDeserializer deserializer);
+
+  @protected
   FeedState
       sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
           SseDeserializer deserializer);
@@ -648,6 +712,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Client
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+          SseDeserializer deserializer);
+
+  @protected
+  Comment
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
           SseDeserializer deserializer);
 
   @protected
@@ -701,6 +770,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
+  Comment
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+          SseDeserializer deserializer);
+
+  @protected
   FeedState
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
           SseDeserializer deserializer);
@@ -713,6 +787,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Fullname
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+          SseDeserializer deserializer);
+
+  @protected
+  Gallery
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
           SseDeserializer deserializer);
 
   @protected
@@ -764,6 +843,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
+  Gallery
+      sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          SseDeserializer deserializer);
+
+  @protected
   Post
       sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
           SseDeserializer deserializer);
@@ -782,9 +866,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Feed sse_decode_box_autoadd_feed(SseDeserializer deserializer);
-
-  @protected
-  Gallery sse_decode_box_autoadd_gallery(SseDeserializer deserializer);
 
   @protected
   PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
@@ -827,6 +908,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   User sse_decode_box_autoadd_user(SseDeserializer deserializer);
 
   @protected
+  VariantInner sse_decode_box_autoadd_variant_inner(
+      SseDeserializer deserializer);
+
+  @protected
   CommentContributionSettings sse_decode_comment_contribution_settings(
       SseDeserializer deserializer);
 
@@ -844,9 +929,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Flair sse_decode_flair(SseDeserializer deserializer);
-
-  @protected
-  Gallery sse_decode_gallery(SseDeserializer deserializer);
 
   @protected
   Gildings sse_decode_gildings(SseDeserializer deserializer);
@@ -921,6 +1003,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String? sse_decode_opt_String(SseDeserializer deserializer);
 
   @protected
+  Gallery?
+      sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          SseDeserializer deserializer);
+
+  @protected
   Post?
       sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
           SseDeserializer deserializer);
@@ -937,9 +1024,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer);
-
-  @protected
-  Gallery? sse_decode_opt_box_autoadd_gallery(SseDeserializer deserializer);
 
   @protected
   PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
@@ -966,6 +1050,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer);
+
+  @protected
+  VariantInner? sse_decode_opt_box_autoadd_variant_inner(
+      SseDeserializer deserializer);
 
   @protected
   Int64List? sse_decode_opt_list_prim_i_64_strict(SseDeserializer deserializer);
@@ -1040,6 +1128,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt sse_decode_usize(SseDeserializer deserializer);
 
   @protected
+  VariantInner sse_decode_variant_inner(SseDeserializer deserializer);
+
+  @protected
   Variants sse_decode_variants(SseDeserializer deserializer);
 
   @protected
@@ -1056,6 +1147,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+          Comment self, SseSerializer serializer);
+
+  @protected
+  void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
           FeedState self, SseSerializer serializer);
 
@@ -1068,6 +1164,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
           Fullname self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          Gallery self, SseSerializer serializer);
 
   @protected
   void
@@ -1111,6 +1212,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
+      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+          Comment self, SseSerializer serializer);
+
+  @protected
+  void
       sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
           FeedState self, SseSerializer serializer);
 
@@ -1143,6 +1249,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
           Client self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+          Comment self, SseSerializer serializer);
 
   @protected
   void
@@ -1197,6 +1308,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+          Comment self, SseSerializer serializer);
+
+  @protected
+  void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
           FeedState self, SseSerializer serializer);
 
@@ -1209,6 +1325,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
           Fullname self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          Gallery self, SseSerializer serializer);
 
   @protected
   void
@@ -1261,6 +1382,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
+      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          Gallery self, SseSerializer serializer);
+
+  @protected
+  void
       sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
           Post self, SseSerializer serializer);
 
@@ -1279,9 +1405,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_box_autoadd_feed(Feed self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_box_autoadd_gallery(Gallery self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_i_64(
@@ -1328,6 +1451,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_user(User self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_variant_inner(
+      VariantInner self, SseSerializer serializer);
+
+  @protected
   void sse_encode_comment_contribution_settings(
       CommentContributionSettings self, SseSerializer serializer);
 
@@ -1345,9 +1472,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_flair(Flair self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_gallery(Gallery self, SseSerializer serializer);
 
   @protected
   void sse_encode_gildings(Gildings self, SseSerializer serializer);
@@ -1428,6 +1552,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
+      sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          Gallery? self, SseSerializer serializer);
+
+  @protected
+  void
       sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
           Post? self, SseSerializer serializer);
 
@@ -1443,10 +1572,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_gallery(
-      Gallery? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_i_64(
@@ -1476,6 +1601,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_variant_inner(
+      VariantInner? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_list_prim_i_64_strict(
@@ -1553,6 +1682,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_usize(BigInt self, SseSerializer serializer);
 
   @protected
+  void sse_encode_variant_inner(VariantInner self, SseSerializer serializer);
+
+  @protected
   void sse_encode_variants(Variants self, SseSerializer serializer);
 
   @protected
@@ -1574,6 +1706,18 @@ class RustLibWire implements BaseWire {
           int ptr) =>
       wasmModule
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+              ptr);
+
+  void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+          int ptr) =>
+      wasmModule
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+              ptr);
+
+  void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+          int ptr) =>
+      wasmModule
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
               ptr);
 
   void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
@@ -1610,6 +1754,18 @@ class RustLibWire implements BaseWire {
           int ptr) =>
       wasmModule
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+              ptr);
+
+  void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          int ptr) =>
+      wasmModule
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+              ptr);
+
+  void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          int ptr) =>
+      wasmModule
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
               ptr);
 
   void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
@@ -1724,6 +1880,14 @@ extension type RustLibWasmModule._(JSObject _) implements JSObject {
           int ptr);
 
   external void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+          int ptr);
+
+  external void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+          int ptr);
+
+  external void
       rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
           int ptr);
 
@@ -1745,6 +1909,14 @@ extension type RustLibWasmModule._(JSObject _) implements JSObject {
 
   external void
       rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+          int ptr);
+
+  external void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          int ptr);
+
+  external void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
           int ptr);
 
   external void

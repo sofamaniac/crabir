@@ -1,17 +1,18 @@
 pub use chrono::{DateTime, Local, Utc};
-use std::{backtrace::Backtrace, time::Duration};
+use std::backtrace::Backtrace;
 
 use crate::error::Error;
+use crate::model::author;
+use crate::model::author::AuthorInfo;
 use crate::model::flair::Flair;
 use crate::utils;
 use serde::{Deserialize, Serialize};
-use serde_with::{DurationSeconds, serde_as, with_prefix};
+use serde_with::{serde_as, with_prefix};
 
-use super::{Fullname, Thing};
+use super::{Fullname, Thing, gallery::Gallery, subreddit::SubredditInfo};
 
 with_prefix!(prefix_link_flair "link_flair_");
 with_prefix!(prefix_flair "flair_");
-with_prefix!(prefix_author_flair "author_flair_");
 
 pub enum Kind {
     Selftext,
@@ -21,44 +22,6 @@ pub enum Kind {
     Gallery,
     Link,
     Unknown,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde_as]
-pub struct AuthorInfo {
-    #[serde(rename = "author")]
-    pub username: String,
-    #[serde(rename = "author_premium", default)]
-    pub premium: bool,
-    #[serde(flatten, with = "prefix_author_flair")]
-    pub flair: Flair,
-    #[serde(rename = "author_fullname", default)]
-    pub fullname: String,
-    #[serde(rename = "author_is_blocked")]
-    pub is_blocked: bool,
-    #[serde(rename = "author_patreon_flair", default)]
-    pub patreon_flair: bool,
-}
-
-/// Subreddit's ID, is of the form `t5_xxx`
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SubredditID(String);
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SubredditInfo {
-    /// The subreddit's name (e.g. "awww")
-    #[serde(rename = "subreddit")]
-    pub subreddit: String,
-    #[serde(rename = "subreddit_type")]
-    pub subreddit_type: String,
-    #[serde(rename = "subreddit_id")]
-    pub subreddit_id: SubredditID,
-    /// The subreddit's name prefixed with "r/"
-    #[serde(rename = "subreddit_name_prefixed")]
-    pub subreddit_name_prefixed: String,
-    /// The number of subscribers of the subreddit
-    #[serde(rename = "subreddit_subscribers")]
-    pub subscribers: u64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -109,8 +72,8 @@ pub struct Post {
 
     #[serde(
         flatten,
-        serialize_with = "utils::serialize_author_option",
-        deserialize_with = "utils::author_option"
+        serialize_with = "author::serialize_author_option",
+        deserialize_with = "author::author_option"
     )]
     pub author: Option<AuthorInfo>,
 
@@ -126,6 +89,7 @@ pub struct Post {
     pub secure_media: Option<Media>,
     #[serde(deserialize_with = "utils::response_or_none")]
     pub secure_media_embed: Option<SecureMediaEmbed>,
+    #[serde(flatten)]
     pub gallery: Option<Gallery>,
 
     // Moderation
@@ -335,6 +299,7 @@ pub struct Preview {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+/// flutter_rust_bridge:non_opaque
 pub struct RedditImage {
     pub source: ImageBase,
     pub resolutions: Vec<ImageBase>,
@@ -350,8 +315,19 @@ pub struct ImageBase {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+/// flutter_rust_bridge:non_opaque
 pub struct Variants {
-    // TODO:
+    pub gif: Option<VariantInner>,
+    pub mp4: Option<VariantInner>,
+    pub obfuscated: Option<VariantInner>,
+    pub nsfw: Option<VariantInner>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+/// flutter_rust_bridge:non_opaque
+pub struct VariantInner {
+    pub source: ImageBase,
+    pub resolutions: Vec<ImageBase>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
@@ -384,6 +360,3 @@ pub struct Oembed {
     #[serde(flatten, with = "ThumbnailURL")]
     pub thumbnail: ThumbnailOption,
 }
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Gallery {}

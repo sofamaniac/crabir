@@ -5,7 +5,9 @@
 
 import '../../frb_generated.dart';
 import 'model.dart';
+import 'model/comment.dart';
 import 'model/multi.dart';
+import 'model/post.dart';
 import 'model/subreddit.dart';
 import 'model/user.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -18,6 +20,12 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 abstract class Client implements RustOpaqueInterface {
   /// Authenticate the current client
   Future<void> authenticate({required String refreshToken});
+
+  /// Returns the comments for the post at the given permalink. Each element in the vec is either
+  /// a [`Thing::Comment`] or a [`Thing::More`].
+  /// # Errors
+  /// Fails if the request fails or the parsing of the response fails.
+  Future<List<Thing>> comments({required String permalink});
 
   static Future<Client> default_() =>
       RustLib.instance.api.redditApiClientClientDefault();

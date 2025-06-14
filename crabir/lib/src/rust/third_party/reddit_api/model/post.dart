@@ -5,13 +5,16 @@
 
 import '../../../frb_generated.dart';
 import '../model.dart';
+import 'author.dart';
 import 'flair.dart';
+import 'gallery.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
+import 'subreddit.dart';
 part 'post.freezed.dart';
 
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `SecureMedia`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `try_from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `try_from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Post>>
 abstract class Post implements RustOpaqueInterface {
@@ -373,95 +376,6 @@ abstract class PostId implements RustOpaqueInterface {
       RustLib.instance.api.redditApiModelPostPostIdDefault();
 }
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SubredditID>>
-abstract class SubredditId implements RustOpaqueInterface {
-  static Future<SubredditId> default_() =>
-      RustLib.instance.api.redditApiModelPostSubredditIdDefault();
-}
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SubredditInfo>>
-abstract class SubredditInfo implements RustOpaqueInterface {
-  String get subreddit;
-
-  SubredditId get subredditId;
-
-  String get subredditNamePrefixed;
-
-  String get subredditType;
-
-  BigInt get subscribers;
-
-  set subreddit(String subreddit);
-
-  set subredditId(SubredditId subredditId);
-
-  set subredditNamePrefixed(String subredditNamePrefixed);
-
-  set subredditType(String subredditType);
-
-  set subscribers(BigInt subscribers);
-
-  static Future<SubredditInfo> default_() =>
-      RustLib.instance.api.redditApiModelPostSubredditInfoDefault();
-}
-
-class AuthorInfo {
-  final String username;
-  final bool premium;
-  final Flair flair;
-  final String fullname;
-  final bool isBlocked;
-  final bool patreonFlair;
-
-  const AuthorInfo({
-    required this.username,
-    required this.premium,
-    required this.flair,
-    required this.fullname,
-    required this.isBlocked,
-    required this.patreonFlair,
-  });
-
-  static Future<AuthorInfo> default_() =>
-      RustLib.instance.api.redditApiModelPostAuthorInfoDefault();
-
-  @override
-  int get hashCode =>
-      username.hashCode ^
-      premium.hashCode ^
-      flair.hashCode ^
-      fullname.hashCode ^
-      isBlocked.hashCode ^
-      patreonFlair.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AuthorInfo &&
-          runtimeType == other.runtimeType &&
-          username == other.username &&
-          premium == other.premium &&
-          flair == other.flair &&
-          fullname == other.fullname &&
-          isBlocked == other.isBlocked &&
-          patreonFlair == other.patreonFlair;
-}
-
-class Gallery {
-  const Gallery();
-
-  static Future<Gallery> default_() =>
-      RustLib.instance.api.redditApiModelPostGalleryDefault();
-
-  @override
-  int get hashCode => 0;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Gallery && runtimeType == other.runtimeType;
-}
-
 class Gildings {
   const Gildings();
 
@@ -646,6 +560,7 @@ class Preview {
           enabled == other.enabled;
 }
 
+/// flutter_rust_bridge:non_opaque
 class RedditImage {
   final ImageBase source;
   final List<ImageBase> resolutions;
@@ -858,17 +773,59 @@ class ThumbnailURL {
           width == other.width;
 }
 
+/// flutter_rust_bridge:non_opaque
+class VariantInner {
+  final ImageBase source;
+  final List<ImageBase> resolutions;
+
+  const VariantInner({
+    required this.source,
+    required this.resolutions,
+  });
+
+  static Future<VariantInner> default_() =>
+      RustLib.instance.api.redditApiModelPostVariantInnerDefault();
+
+  @override
+  int get hashCode => source.hashCode ^ resolutions.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is VariantInner &&
+          runtimeType == other.runtimeType &&
+          source == other.source &&
+          resolutions == other.resolutions;
+}
+
+/// flutter_rust_bridge:non_opaque
 class Variants {
-  const Variants();
+  final VariantInner? gif;
+  final VariantInner? mp4;
+  final VariantInner? obfuscated;
+  final VariantInner? nsfw;
+
+  const Variants({
+    this.gif,
+    this.mp4,
+    this.obfuscated,
+    this.nsfw,
+  });
 
   static Future<Variants> default_() =>
       RustLib.instance.api.redditApiModelPostVariantsDefault();
 
   @override
-  int get hashCode => 0;
+  int get hashCode =>
+      gif.hashCode ^ mp4.hashCode ^ obfuscated.hashCode ^ nsfw.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Variants && runtimeType == other.runtimeType;
+      other is Variants &&
+          runtimeType == other.runtimeType &&
+          gif == other.gif &&
+          mp4 == other.mp4 &&
+          obfuscated == other.obfuscated &&
+          nsfw == other.nsfw;
 }

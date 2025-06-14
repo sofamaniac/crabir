@@ -4,19 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import 'frb_generated.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-class UsizeArray2 extends NonGrowableListView<BigInt> {
-  static const arraySize = 2;
-
-  @internal
-  Uint64List get inner => _inner;
-  final Uint64List _inner;
-
-  UsizeArray2(this._inner)
-      : assert(_inner.length == arraySize),
-        super(_inner);
-
-  UsizeArray2.init() : this(Uint64List(arraySize));
-}
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Value>>
+abstract class Value implements RustOpaqueInterface {}

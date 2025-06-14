@@ -4,6 +4,7 @@ import 'package:crabir/login.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
+import 'package:crabir/thread/thread.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -134,11 +135,18 @@ class _FeedViewBodyState extends State<FeedViewBody>
     }
     final post = state.nth(n: index);
     return post != null
-        ? RedditPostCard(
-            post: post,
-            onLike: (direction) => state.vote(index, direction),
-            onSave: (save) => state.save(index, save),
-          )
+        ? InkWell(
+            onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Thread(post: post),
+                  ),
+                ),
+            child: RedditPostCard(
+              post: post,
+              onLike: (direction) => state.vote(index, direction),
+              onSave: (save) => state.save(index, save),
+            ))
         : Text("${state.done}, ${state.length}");
   }
 
@@ -156,6 +164,10 @@ class _FeedViewBodyState extends State<FeedViewBody>
     if (appState.currentUser != account) {
       _triggerReset(state);
       account = appState.currentUser;
+    }
+
+    if (account == null) {
+      return Center(child: CircularProgressIndicator());
     }
     return NestedScrollView(
       headerSliverBuilder: (context, _) => [FeedTopBar()],

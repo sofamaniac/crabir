@@ -21,7 +21,35 @@ final horizontalPadding = 16.0;
 class _PostTitle extends StatelessWidget {
   final Post post;
 
-  const _PostTitle({required this.post});
+  final bool showThumbnail;
+  final bool showFlair;
+
+  const _PostTitle(
+      {required this.post, this.showThumbnail = false, this.showFlair = true});
+
+  Widget thumbnail() {
+    return Expanded(
+      flex: 1,
+      child: AspectRatio(
+        aspectRatio: 1.0,
+        child: ClipRect(
+          child: Image.network(post.thumbnail!.url, fit: BoxFit.cover),
+        ),
+      ),
+    );
+  }
+
+  Widget title(BuildContext context) {
+    final title = Text(
+      post.title,
+      textAlign: TextAlign.start,
+      style: Theme.of(context).textTheme.titleMedium,
+    );
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      title,
+      _PostFlair(post: post),
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,21 +58,46 @@ class _PostTitle extends StatelessWidget {
       children: [
         Expanded(
           flex: 3,
-          child: Text(
-            post.title,
-            textAlign: TextAlign.start,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          child: title(context),
         ),
-        Expanded(
-          flex: 1,
-          child: AspectRatio(
-            aspectRatio: 1.0,
-            child: ClipRect(
-              child: Image.network(post.thumbnail!.url, fit: BoxFit.cover),
-            ),
-          ),
+        if (showThumbnail) thumbnail(),
+      ],
+    );
+  }
+}
+
+class BorderedText extends StatelessWidget {
+  final String text;
+  final Color borderColor;
+  final TextStyle? style;
+  final String? semanticLabel;
+
+  const BorderedText(
+      {super.key,
+      required this.text,
+      required this.borderColor,
+      this.style,
+      this.semanticLabel});
+
+  @override
+  Widget build(BuildContext context) {
+    final borderStyle = (style ?? TextStyle()).copyWith(
+      foreground: Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..color = borderColor,
+    );
+    return Stack(
+      children: [
+        Text(
+          text,
+          style: borderStyle,
         ),
+        Text(
+          text,
+          style: style,
+          semanticsLabel: semanticLabel,
+        )
       ],
     );
   }
@@ -55,39 +108,79 @@ class _PostFlair extends StatelessWidget {
   final Logger log = Logger("PostFlair");
   _PostFlair({required this.post});
 
-  Widget richtext(BuildContext context, Richtext richtext,
+  /// Compute the luminance of a color according to https://www.w3.org/WAI/WCAG22/Techniques/general/G18.html
+  double _luminance(Color c) {
+    final r = _linearize(c.r);
+    final g = _linearize(c.g);
+    final b = _linearize(c.b);
+
+    return r * 0.2126 + g * 0.7152 + b * 0.0722;
+  }
+
+  double _linearize(double sRGB) {
+    if (sRGB < 0.04045) {
+      return sRGB / 12.92;
+    } else {
+      return pow((sRGB + 0.055) / 1.055, 2.4) as double;
+    }
+  }
+
+  /// Compute the contrast between two colors according to https://www.w3.org/WAI/WCAG22/Techniques/general/G18.html
+  double _colorRatio(Color c1, Color c2) {
+    final r1 = _luminance(c1);
+    final r2 = _luminance(c2);
+
+    final rMin = min(r1, r2);
+    final rMax = min(r1, r2);
+
+    return (rMax + 0.05) / (rMin + 0.05);
+  }
+
+  /// Add a border around the text if the contrast between `backdgoundColor` and the `textColor`
+  /// is not high enough
+  Widget coloredText(BuildContext context, String text, Color backgroundColor,
+      Color textColor) {
+    final textStyle = Theme.of(context)
+        .textTheme
+        .labelSmall
+        ?.copyWith(backgroundColor: backgroundColor, color: textColor);
+    if (_colorRatio(textColor, backgroundColor) > 4.5) {
+      return Text(
+        text,
+        style: textStyle,
+        semanticsLabel: "flair",
+      );
+    } else {
+      return BorderedText(
+        text: text,
+        borderColor: Colors.black,
+        style: textStyle,
+        semanticLabel: "flair",
+      );
+    }
+  }
+
+  InlineSpan richtext(BuildContext context, Richtext richtext,
       Color backgroundColor, Color textColor) {
+    final fontSize = Theme.of(context).textTheme.labelSmall?.fontSize ?? 15;
+    final height = Theme.of(context).textTheme.labelSmall?.height ?? 1;
+    final imageHeight = height * fontSize;
     return switch (richtext) {
-      Richtext_Text(t: var text) => RichText(
-          text: WidgetSpan(
-            child: Container(
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(8),
-                ),
-              ),
-              padding: EdgeInsetsDirectional.symmetric(horizontal: 4),
-              child: Text(
-                text,
-                semanticsLabel: "flair",
-                style: TextStyle(
-                  color: textColor,
-                  //backgroundColor: backgroundColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            style: TextStyle(
-              color: textColor,
-              backgroundColor: backgroundColor,
-              fontWeight: FontWeight.bold,
-            ),
+      Richtext_Text(t: var text) => WidgetSpan(
+          child: coloredText(context, text, backgroundColor, textColor),
+          style: TextStyle(
+            color: textColor,
+            backgroundColor: backgroundColor,
+            fontWeight: FontWeight.bold,
           ),
         ),
-      Richtext_Emoji(a: var text, u: var url) => Image.network(
-          url,
-          semanticLabel: text,
+      Richtext_Emoji(a: var text, u: var url) => WidgetSpan(
+          child: Image.network(url, semanticLabel: text, height: imageHeight),
+          style: TextStyle(
+            color: textColor,
+            backgroundColor: backgroundColor,
+            fontWeight: FontWeight.bold,
+          ),
         )
     };
   }
@@ -95,17 +188,30 @@ class _PostFlair extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final flair = post.linkFlair;
-    return Row(
-      children: flair.richtext
-          .map(
-            (e) => richtext(
-              context,
-              e,
-              stringToColor(flair.backgroundColor ?? "gray"),
-              stringToColor(flair.textColor ?? "black"),
-            ),
-          )
-          .toList(),
+    if (flair.richtext.isEmpty) {
+      return Container();
+    }
+    final backgroundColor = stringToColor(flair.backgroundColor ?? "gray");
+    return Container(
+      padding: EdgeInsetsDirectional.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(2),
+      ),
+      child: RichText(
+        text: TextSpan(
+          children: flair.richtext
+              .map(
+                (e) => richtext(
+                  context,
+                  e,
+                  backgroundColor,
+                  stringToColor(flair.textColor ?? "black"),
+                ),
+              )
+              .toList(),
+        ),
+      ),
     );
   }
 }
@@ -132,14 +238,15 @@ Color stringToColor(String s) {
 class RedditPostCard extends StatefulWidget {
   final Post post;
 
-  final Future<void> Function(VoteDirection) onLike;
-  final Future<void> Function(bool) onSave;
+  final Future<void> Function(bool)? onSave;
+  final Future<void> Function(VoteDirection)? onLike;
 
-  const RedditPostCard(
-      {super.key,
-      required this.post,
-      required this.onLike,
-      required this.onSave});
+  const RedditPostCard({
+    super.key,
+    required this.post,
+    this.onLike,
+    this.onSave,
+  });
   @override
   State<StatefulWidget> createState() => _RedditPostCardState();
 }
@@ -207,7 +314,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
           icon: Icon(Icons.thumb_up, color: (likes == true) ? likeColor : null),
           tooltip: 'Upvote',
           onPressed: () async {
-            await widget.onLike(
+            await widget.onLike?.call(
               !(likes == true) ? VoteDirection.up : VoteDirection.neutral,
             );
             setState(() {
@@ -224,7 +331,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
               color: (likes == false) ? dislikeColor : null),
           tooltip: 'Downvote',
           onPressed: () async {
-            await widget.onLike(
+            await widget.onLike?.call(
               !(likes == false) ? VoteDirection.down : VoteDirection.neutral,
             );
             setState(() {
@@ -238,7 +345,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
         ),
         IconButton(
           onPressed: () async {
-            await widget.onSave(!saved);
+            await widget.onSave?.call(!saved);
             saved = !saved;
           },
           icon: const Icon(Icons.bookmark_outlined),
@@ -277,17 +384,10 @@ class _RedditPostCardState extends State<RedditPostCard> {
   }
 
   Widget title(BuildContext context) {
-    if (showThumbnail()) {
-      return _PostTitle(post: widget.post);
-    } else {
-      return Align(
-        alignment: AlignmentDirectional.centerStart,
-        child: Text(
-          widget.post.title,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      );
-    }
+    return _PostTitle(
+      post: widget.post,
+      showThumbnail: showThumbnail(),
+    );
   }
 
   Widget _contentWrap(Widget widget) {
@@ -299,12 +399,14 @@ class _RedditPostCardState extends State<RedditPostCard> {
 
   Widget content(BuildContext context) {
     final fontSize = Theme.of(context).textTheme.bodyMedium?.fontSize ?? 15;
+    final height = Theme.of(context).textTheme.bodyMedium?.height ?? 1;
     final widget = switch (this.widget.post.kind) {
       Kind.selftext => HtmlWithConditionalFade(
           htmlContent: this.widget.post.selftextHtml ?? "",
           maxLines: 5,
           backgroundColor: Colors.black,
           fontSize: fontSize,
+          height: height,
         ),
       Kind.meta => Text("meta"),
       Kind.video => VideoContent(post: this.widget.post),
@@ -315,9 +417,8 @@ class _RedditPostCardState extends State<RedditPostCard> {
               fullscreen: (context, post) =>
                   FullscreenImageViewer(imageUrl: post.url),
             ),
-          true => ImageContent(
+          true => GifContent(
               post: this.widget.post,
-              fullscreen: (context, post) => GifContentFullscreen(post: post),
             ),
         },
       Kind.link => Container(),
@@ -339,7 +440,6 @@ class _RedditPostCardState extends State<RedditPostCard> {
         children: [
           _wrap(header(context)),
           _wrap(title(context)),
-          _wrap(_PostFlair(post: widget.post)),
           content(context),
           _wrap(footer(context)),
         ],
@@ -532,76 +632,12 @@ class _FullscreenImageViewerState extends State<FullscreenImageViewer>
   }
 }
 
-class FadingHtml extends StatelessWidget {
-  final String htmlContent;
-  final int maxLines;
-
-  const FadingHtml({
-    super.key,
-    required this.htmlContent,
-    this.maxLines = 10,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (htmlContent.isEmpty) {
-      return Container();
-    }
-    final fontSize = Theme.of(context).textTheme.bodyMedium?.fontSize ?? 15;
-    final backgroundColor = Theme.of(context).colorScheme.surface;
-    // return ConstrainedBox(
-    //   constraints: BoxConstraints(
-    //     // Approx size for `maxLines`
-    //     maxHeight: maxLines * fontSize * 3 / 2,
-    //   ),
-    //   child: ClipRect(
-    //     child: Html(
-    //       data: htmlContent,
-    //       shrinkWrap: true,
-    //     ),
-    //   ),
-    // );
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-          maxHeight: maxLines * fontSize * 2,
-          maxWidth: MediaQuery.of(context).size.width),
-      child: Stack(
-        fit: StackFit.expand,
-        clipBehavior: Clip.antiAlias,
-        children: [
-          Positioned.fill(
-            top: 0,
-            child: Html(data: htmlContent),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 40, // Height of the fade effect
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    backgroundColor, // Match your background color
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class HtmlWithConditionalFade extends StatefulWidget {
   final String htmlContent;
   final int maxLines;
   final double fontSize;
   final Color backgroundColor;
+  final double height;
 
   const HtmlWithConditionalFade({
     super.key,
@@ -609,6 +645,7 @@ class HtmlWithConditionalFade extends StatefulWidget {
     required this.maxLines,
     required this.fontSize,
     required this.backgroundColor,
+    required this.height,
   });
 
   @override
@@ -634,7 +671,7 @@ class _HtmlWithConditionalFadeState extends State<HtmlWithConditionalFade> {
     final renderBox = context.findRenderObject() as RenderBox;
     final contentHeight = renderBox.size.height;
 
-    final maxHeight = widget.maxLines * widget.fontSize * 2;
+    final maxHeight = widget.maxLines * widget.fontSize * widget.height;
 
     if (mounted) {
       setState(() {
@@ -658,7 +695,7 @@ class _HtmlWithConditionalFadeState extends State<HtmlWithConditionalFade> {
               end: Alignment.bottomCenter,
               colors: [
                 Colors.transparent,
-                widget.backgroundColor,
+                Theme.of(context).scaffoldBackgroundColor.withAlpha(127),
               ],
             ),
           ),
@@ -670,7 +707,7 @@ class _HtmlWithConditionalFadeState extends State<HtmlWithConditionalFade> {
   @override
   Widget build(BuildContext context) {
     final maxHeight =
-        min(_contentHeight, widget.maxLines * widget.fontSize * 2);
+        min(_contentHeight, widget.maxLines * widget.fontSize * widget.height);
 
     return ConstrainedBox(
       constraints: BoxConstraints(

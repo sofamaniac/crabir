@@ -7,9 +7,9 @@ import '../../../frb_generated.dart';
 import 'flair.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `try_from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `try_from`
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner< Subreddit>>
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Subreddit>>
 abstract class Subreddit implements RustOpaqueInterface {
   bool get acceptFollowers;
 
@@ -378,6 +378,38 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   /// flutter_rust_bridge:getter,sync
   Icon? get icon;
+}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SubredditID>>
+abstract class SubredditId implements RustOpaqueInterface {
+  static Future<SubredditId> default_() =>
+      RustLib.instance.api.redditApiModelSubredditSubredditIdDefault();
+}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SubredditInfo>>
+abstract class SubredditInfo implements RustOpaqueInterface {
+  String get subreddit;
+
+  SubredditId get subredditId;
+
+  String get subredditNamePrefixed;
+
+  String get subredditType;
+
+  BigInt get subscribers;
+
+  set subreddit(String subreddit);
+
+  set subredditId(SubredditId subredditId);
+
+  set subredditNamePrefixed(String subredditNamePrefixed);
+
+  set subredditType(String subredditType);
+
+  set subscribers(BigInt subscribers);
+
+  static Future<SubredditInfo> default_() =>
+      RustLib.instance.api.redditApiModelSubredditSubredditInfoDefault();
 }
 
 class CommentContributionSettings {
