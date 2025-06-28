@@ -461,6 +461,7 @@ impl Client {
     /// a [`Thing::Comment`] or a [`Thing::More`].
     /// # Errors
     /// Fails if the request fails or the parsing of the response fails.
+    // TODO: sort
     pub async fn comments(&self, permalink: String) -> Result<Vec<Thing>> {
         let url = self
             .base_url()
@@ -469,9 +470,50 @@ impl Client {
             .expect("Should not fail.");
         let request = self.get(url);
         let result = self.execute(request).await?;
-        let result: [Listing; 2] = parse_response(result).await?;
-        let [_, result] = result;
-        Ok(result.children)
+        let result: [Thing; 2] = parse_response(result).await?;
+        if let [_, Thing::Listing(comments)] = result {
+            Ok(comments.children)
+        } else {
+            Err(Error::InvalidThing {
+                backtrace: Backtrace::capture(),
+            })
+        }
+    }
+
+    // TODO: sort
+    pub async fn load_more_comments(
+        &self,
+        parent_id: Fullname,
+        children: Vec<String>,
+    ) -> Result<Vec<Thing>> {
+        let url = self
+            .base_url()
+            .await
+            .join("api/morechildren.json")
+            .expect("Should not fail.");
+        let request = self.get(url).query(&[
+            ("api_type", "json"),
+            ("children", &children.join(",")),
+            ("link_id", parent_id.as_ref()),
+            ("sort", "confidence"),
+        ]);
+        #[derive(Deserialize)]
+        struct Response {
+            json: Json,
+        }
+        #[derive(Deserialize)]
+        struct Json {
+            errors: Vec<String>,
+            #[serde(default)]
+            data: Data,
+        }
+        #[derive(Deserialize, Default)]
+        struct Data {
+            things: Vec<Thing>,
+        }
+        let result = self.execute(request).await?;
+        let result: Response = parse_response(result).await?;
+        Ok(result.json.data.things)
     }
 }
 

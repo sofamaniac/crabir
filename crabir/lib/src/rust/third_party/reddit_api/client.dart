@@ -35,6 +35,9 @@ abstract class Client implements RustOpaqueInterface {
       RustLib.instance.api
           .redditApiClientClientFromRefreshToken(refreshToken: refreshToken);
 
+  Future<List<Thing>> loadMoreComments(
+      {required Fullname parentId, required List<String> children});
+
   /// Get the info of the current user.
   /// # Errors
   /// Returns an error if the http client fails or if the parsing of the response fails.

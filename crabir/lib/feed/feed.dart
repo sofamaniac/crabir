@@ -135,18 +135,17 @@ class _FeedViewBodyState extends State<FeedViewBody>
     }
     final post = state.nth(n: index);
     return post != null
-        ? InkWell(
+        ? RedditPostCard(
+            post: post,
+            onLike: (direction) => state.vote(index, direction),
+            onSave: (save) => state.save(index, save),
             onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Thread(post: post),
-                  ),
-                ),
-            child: RedditPostCard(
-              post: post,
-              onLike: (direction) => state.vote(index, direction),
-              onSave: (save) => state.save(index, save),
-            ))
+              context,
+              MaterialPageRoute(
+                builder: (context) => Thread(post: post),
+              ),
+            ),
+          )
         : Text("${state.done}, ${state.length}");
   }
 

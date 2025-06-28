@@ -82,7 +82,6 @@ pub struct Listing {
     /// Is null when querying oauth.reddit.com
     pub modhash: Option<String>,
     geofilter: Option<String>,
-    #[serde(default)]
     pub children: Vec<Thing>,
 }
 

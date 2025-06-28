@@ -7,7 +7,11 @@ import '../../../frb_generated.dart';
 import '../model.dart';
 import 'author.dart';
 import 'flair.dart';
+import 'multi.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'post.dart';
+import 'subreddit.dart';
+import 'user.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `eq`, `fmt`
 
@@ -37,7 +41,7 @@ abstract class Comment implements RustOpaqueInterface {
 
   PlatformInt64 get downs;
 
-  bool get edited;
+  double? get edited;
 
   PlatformInt64 get gilded;
 
@@ -51,15 +55,13 @@ abstract class Comment implements RustOpaqueInterface {
 
   bool get locked;
 
-  String get name;
+  Fullname get name;
 
   bool get noFollow;
 
   String get parentId;
 
   String get permalink;
-
-  Listing get replies;
 
   bool get saved;
 
@@ -105,7 +107,7 @@ abstract class Comment implements RustOpaqueInterface {
 
   set downs(PlatformInt64 downs);
 
-  set edited(bool edited);
+  set edited(double? edited);
 
   set gilded(PlatformInt64 gilded);
 
@@ -119,15 +121,13 @@ abstract class Comment implements RustOpaqueInterface {
 
   set locked(bool locked);
 
-  set name(String name);
+  set name(Fullname name);
 
   set noFollow(bool noFollow);
 
   set parentId(String parentId);
 
   set permalink(String permalink);
-
-  set replies(Listing replies);
 
   set saved(bool saved);
 
@@ -151,4 +151,7 @@ abstract class Comment implements RustOpaqueInterface {
 
   static Future<Comment> default_() =>
       RustLib.instance.api.redditApiModelCommentCommentDefault();
+
+  /// flutter_rust_bridge:getter,sync
+  List<Thing> get replies;
 }

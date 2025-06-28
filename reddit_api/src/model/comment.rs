@@ -1,9 +1,12 @@
 use serde::Deserialize;
 use serde::Serialize;
 
+use super::Fullname;
 use super::Listing;
+use super::Thing;
 use super::author;
 use super::author::AuthorInfo;
+use crate::utils;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Comment {
@@ -12,7 +15,6 @@ pub struct Comment {
     pub subreddit_name_prefixed: String,
     pub subreddit_type: String,
     pub subreddit: String,
-    // AUTHOR
     #[serde(
         flatten,
         serialize_with = "author::serialize_author_option",
@@ -23,7 +25,9 @@ pub struct Comment {
     pub saved: bool,
     pub likes: Option<bool>,
     pub id: String,
-    pub replies: Listing,
+    #[serde(deserialize_with = "utils::response_or_none")]
+    /// Should be a listing if present
+    replies: Option<Box<Thing>>,
 
     // pub approved_at_utc: Value,
     // pub comment_type: Value,
@@ -48,9 +52,10 @@ pub struct Comment {
     // pub all_awardings: Vec<Value>,
     pub collapsed: bool,
     pub body: String,
-    pub edited: bool,
+    #[serde(deserialize_with = "utils::response_or_none")]
+    pub edited: Option<f64>,
     // pub top_awarded_type: Value,
-    pub name: String,
+    pub name: Fullname,
     pub is_submitter: bool,
     pub downs: i64,
     pub body_html: String,
@@ -75,6 +80,19 @@ pub struct Comment {
     // pub mod_reports: Vec<Value>,
     // pub num_reports: Value,
     pub ups: i64,
+}
+
+impl Comment {
+    /// flutter_rust_bridge:getter,sync
+    pub fn replies(&self) -> Vec<Thing> {
+        match &self.replies {
+            Some(listing) => match &**listing {
+                Thing::Listing(listing) => listing.children.clone(),
+                _ => Vec::new(),
+            },
+            None => Vec::new(),
+        }
+    }
 }
 
 // #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

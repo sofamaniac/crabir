@@ -1,20 +1,17 @@
-import 'dart:math';
-
-import 'package:crabir/drawer.dart';
 import 'package:crabir/feed/feed.dart';
 import 'package:crabir/feed/gif.dart';
+import 'package:crabir/feed/html_with_fade.dart';
 import 'package:crabir/feed/image.dart';
 import 'package:crabir/feed/video.dart';
+import 'package:crabir/flair.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
+import 'package:crabir/thread/thread.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:logging/logging.dart';
 
 final horizontalPadding = 16.0;
 
@@ -47,7 +44,14 @@ class _PostTitle extends StatelessWidget {
     );
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       title,
-      _PostFlair(post: post),
+      FlairView(flair: post.linkFlair),
+      Row(
+        children: [
+          Text("${post.ups}"),
+          Text(" "),
+          Text("${post.numComments} comments")
+        ],
+      )
     ]);
   }
 
@@ -66,186 +70,21 @@ class _PostTitle extends StatelessWidget {
   }
 }
 
-class BorderedText extends StatelessWidget {
-  final String text;
-  final Color borderColor;
-  final TextStyle? style;
-  final String? semanticLabel;
-
-  const BorderedText(
-      {super.key,
-      required this.text,
-      required this.borderColor,
-      this.style,
-      this.semanticLabel});
-
-  @override
-  Widget build(BuildContext context) {
-    final borderStyle = (style ?? TextStyle()).copyWith(
-      foreground: Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1
-        ..color = borderColor,
-    );
-    return Stack(
-      children: [
-        Text(
-          text,
-          style: borderStyle,
-        ),
-        Text(
-          text,
-          style: style,
-          semanticsLabel: semanticLabel,
-        )
-      ],
-    );
-  }
-}
-
-class _PostFlair extends StatelessWidget {
-  final Post post;
-  final Logger log = Logger("PostFlair");
-  _PostFlair({required this.post});
-
-  /// Compute the luminance of a color according to https://www.w3.org/WAI/WCAG22/Techniques/general/G18.html
-  double _luminance(Color c) {
-    final r = _linearize(c.r);
-    final g = _linearize(c.g);
-    final b = _linearize(c.b);
-
-    return r * 0.2126 + g * 0.7152 + b * 0.0722;
-  }
-
-  double _linearize(double sRGB) {
-    if (sRGB < 0.04045) {
-      return sRGB / 12.92;
-    } else {
-      return pow((sRGB + 0.055) / 1.055, 2.4) as double;
-    }
-  }
-
-  /// Compute the contrast between two colors according to https://www.w3.org/WAI/WCAG22/Techniques/general/G18.html
-  double _colorRatio(Color c1, Color c2) {
-    final r1 = _luminance(c1);
-    final r2 = _luminance(c2);
-
-    final rMin = min(r1, r2);
-    final rMax = min(r1, r2);
-
-    return (rMax + 0.05) / (rMin + 0.05);
-  }
-
-  /// Add a border around the text if the contrast between `backdgoundColor` and the `textColor`
-  /// is not high enough
-  Widget coloredText(BuildContext context, String text, Color backgroundColor,
-      Color textColor) {
-    final textStyle = Theme.of(context)
-        .textTheme
-        .labelSmall
-        ?.copyWith(backgroundColor: backgroundColor, color: textColor);
-    if (_colorRatio(textColor, backgroundColor) > 4.5) {
-      return Text(
-        text,
-        style: textStyle,
-        semanticsLabel: "flair",
-      );
-    } else {
-      return BorderedText(
-        text: text,
-        borderColor: Colors.black,
-        style: textStyle,
-        semanticLabel: "flair",
-      );
-    }
-  }
-
-  InlineSpan richtext(BuildContext context, Richtext richtext,
-      Color backgroundColor, Color textColor) {
-    final fontSize = Theme.of(context).textTheme.labelSmall?.fontSize ?? 15;
-    final height = Theme.of(context).textTheme.labelSmall?.height ?? 1;
-    final imageHeight = height * fontSize;
-    return switch (richtext) {
-      Richtext_Text(t: var text) => WidgetSpan(
-          child: coloredText(context, text, backgroundColor, textColor),
-          style: TextStyle(
-            color: textColor,
-            backgroundColor: backgroundColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      Richtext_Emoji(a: var text, u: var url) => WidgetSpan(
-          child: Image.network(url, semanticLabel: text, height: imageHeight),
-          style: TextStyle(
-            color: textColor,
-            backgroundColor: backgroundColor,
-            fontWeight: FontWeight.bold,
-          ),
-        )
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final flair = post.linkFlair;
-    if (flair.richtext.isEmpty) {
-      return Container();
-    }
-    final backgroundColor = stringToColor(flair.backgroundColor ?? "gray");
-    return Container(
-      padding: EdgeInsetsDirectional.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(2),
-      ),
-      child: RichText(
-        text: TextSpan(
-          children: flair.richtext
-              .map(
-                (e) => richtext(
-                  context,
-                  e,
-                  backgroundColor,
-                  stringToColor(flair.textColor ?? "black"),
-                ),
-              )
-              .toList(),
-        ),
-      ),
-    );
-  }
-}
-
-Color stringToColor(String s) {
-  final log = Logger("stringToColor");
-  if (s.startsWith("#")) {
-    return HexColor.fromHex(s);
-  } else {
-    return switch (s) {
-      "black" => Colors.black,
-      "transparent" => Colors.transparent,
-      "light" => Colors.white,
-      "dark" => Colors.black,
-      "gray" => Colors.grey,
-      _ => () {
-          log.info("Unknown color $s");
-          return Colors.grey;
-        }()
-    };
-  }
-}
-
 class RedditPostCard extends StatefulWidget {
   final Post post;
 
   final Future<void> Function(bool)? onSave;
   final Future<void> Function(VoteDirection)? onLike;
+  final VoidCallback? onTap;
+  final int maxLines;
 
   const RedditPostCard({
     super.key,
     required this.post,
     this.onLike,
     this.onSave,
+    this.onTap,
+    this.maxLines = 5,
   });
   @override
   State<StatefulWidget> createState() => _RedditPostCardState();
@@ -403,7 +242,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
     final widget = switch (this.widget.post.kind) {
       Kind.selftext => HtmlWithConditionalFade(
           htmlContent: this.widget.post.selftextHtml ?? "",
-          maxLines: 5,
+          maxLines: this.widget.maxLines,
           backgroundColor: Colors.black,
           fontSize: fontSize,
           height: height,
@@ -430,304 +269,21 @@ class _RedditPostCardState extends State<RedditPostCard> {
 
   @override
   Widget build(BuildContext context) {
+    final contentWidget = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      spacing: 8,
+      children: [
+        _wrap(header(context)),
+        _wrap(title(context)),
+        content(context),
+        _wrap(footer(context)),
+      ],
+    );
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
       elevation: 1,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        spacing: 8,
-        children: [
-          _wrap(header(context)),
-          _wrap(title(context)),
-          content(context),
-          _wrap(footer(context)),
-        ],
-      ),
-    );
-  }
-}
-
-class ImageContent extends StatelessWidget {
-  final Post post;
-  final Widget Function(BuildContext, Post)? fullscreen;
-  const ImageContent({super.key, required this.post, this.fullscreen});
-
-  Widget thumbnail(
-      BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-    final thumbnail = post.thumbnail;
-    if (thumbnail == null) {
-      return child;
-    } else if (loadingProgress != null) {
-      return Image.network(
-        thumbnail.url,
-        width: double.infinity,
-        fit: BoxFit.fitWidth,
-      );
-    } else {
-      return child;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // If the post is an image, the url should point to the image.
-    final imageUrl = post.url;
-    // We look into the previews to get the source size
-    // It does not need to match exactly as it is used to
-    // prevent posts from jumping around when loading the image.
-    final image = post.preview!.images[0].source;
-
-    late final Future? Function() onTap;
-    if (fullscreen != null) {
-      onTap = () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => fullscreen!(context, post),
-            ),
-          );
-    } else {
-      onTap = () {
-        return;
-      };
-    }
-
-    return InkWell(
-      onTap: onTap,
-      child: ImageThumbnail(
-        url: imageUrl,
-        width: image.width.toDouble(),
-        height: image.height.toDouble(),
-        thumbnailUrl: post.thumbnail?.url,
-      ),
-    );
-  }
-}
-
-class FullscreenImageViewer extends StatefulWidget {
-  final String imageUrl;
-  const FullscreenImageViewer({super.key, required this.imageUrl});
-
-  @override
-  State<FullscreenImageViewer> createState() => _FullscreenImageViewerState();
-}
-
-class _FullscreenImageViewerState extends State<FullscreenImageViewer>
-    with SingleTickerProviderStateMixin {
-  final _transformationController = TransformationController();
-  late AnimationController _animationController;
-  Animation<Matrix4>? _animation;
-  bool _dismissable = true;
-
-  // Set to flutter's default value
-  SystemUiMode _systemUiMode = SystemUiMode.edgeToEdge;
-
-  void _onSingleTap() {
-    if (_systemUiMode == SystemUiMode.edgeToEdge) {
-      setState(() => _systemUiMode = SystemUiMode.leanBack);
-    } else {
-      setState(() => _systemUiMode = SystemUiMode.edgeToEdge);
-    }
-    SystemChrome.setEnabledSystemUIMode(_systemUiMode);
-  }
-
-  void _onDoubleTap(TapDownDetails details) {
-    final currentScale = _transformationController.value.getMaxScaleOnAxis();
-    var expectedZoom = 1.0;
-    var transform = Matrix4.identity();
-    if (currentScale < 1.0) {
-      expectedZoom = 1.0;
-    } else if (currentScale < 2.5) {
-      expectedZoom = 2.5;
-    } else if (currentScale < 5.0) {
-      expectedZoom = 5.0;
-    } else {
-      expectedZoom = 1.0;
-    }
-
-    if (expectedZoom > currentScale) {
-      // Calculate the transformation
-      final focalPoint = details.localPosition;
-      transform = transform
-        ..translate(-focalPoint.dx * (expectedZoom - 1),
-            -focalPoint.dy * (expectedZoom - 1))
-        ..scale(expectedZoom);
-    }
-
-    _animation =
-        Matrix4Tween(begin: _transformationController.value, end: transform)
-            .animate(CurvedAnimation(
-                parent: _animationController, curve: Curves.easeOut));
-
-    _animationController.forward(from: 0);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 200),
-    );
-    _animationController.addListener(() {
-      _transformationController.value = _animation!.value;
-    });
-    _transformationController.addListener(() {
-      // The image is dismissalbe only if it is not zoomed in
-      setState(() {
-        _dismissable =
-            _transformationController.value.getMaxScaleOnAxis() == 1.0;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _transformationController.dispose();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    super.dispose();
-  }
-
-  Widget _content() {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: InteractiveViewer(
-            transformationController: _transformationController,
-            panEnabled: true,
-            minScale: 1.0,
-            maxScale: 5.0,
-            child: Center(
-              child: Image.network(
-                widget.imageUrl,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.black,
-      body: Dismissible(
-        key: Key("FullscreenImageViewer"),
-        direction:
-            _dismissable ? DismissDirection.vertical : DismissDirection.none,
-        onDismissed: (_) => Navigator.pop(context),
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: _onSingleTap,
-          onDoubleTapDown: _onDoubleTap,
-          onDoubleTap: () {},
-          child: _content(),
-        ),
-      ),
-    );
-  }
-}
-
-class HtmlWithConditionalFade extends StatefulWidget {
-  final String htmlContent;
-  final int maxLines;
-  final double fontSize;
-  final Color backgroundColor;
-  final double height;
-
-  const HtmlWithConditionalFade({
-    super.key,
-    required this.htmlContent,
-    required this.maxLines,
-    required this.fontSize,
-    required this.backgroundColor,
-    required this.height,
-  });
-
-  @override
-  State<HtmlWithConditionalFade> createState() =>
-      _HtmlWithConditionalFadeState();
-}
-
-class _HtmlWithConditionalFadeState extends State<HtmlWithConditionalFade> {
-  final GlobalKey _key = GlobalKey();
-  bool _overflowing = false;
-  double _contentHeight = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    // Wait for first layout to check overflow
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkOverflow());
-  }
-
-  void _checkOverflow() {
-    final context = _key.currentContext;
-    if (context == null) return;
-    final renderBox = context.findRenderObject() as RenderBox;
-    final contentHeight = renderBox.size.height;
-
-    final maxHeight = widget.maxLines * widget.fontSize * widget.height;
-
-    if (mounted) {
-      setState(() {
-        _overflowing = contentHeight > maxHeight;
-        _contentHeight = contentHeight;
-      });
-    }
-  }
-
-  Widget gradient() {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: IgnorePointer(
-        child: Container(
-          height: 40,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                Theme.of(context).scaffoldBackgroundColor.withAlpha(127),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final maxHeight =
-        min(_contentHeight, widget.maxLines * widget.fontSize * widget.height);
-
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: maxHeight,
-        maxWidth: MediaQuery.of(context).size.width,
-      ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: SingleChildScrollView(
-              physics: const NeverScrollableScrollPhysics(),
-              child: Html(
-                key: _key,
-                data: widget.htmlContent,
-              ),
-            ),
-          ),
-          if (_overflowing) gradient(),
-        ],
-      ),
+      child: InkWell(onTap: widget.onTap, child: contentWidget),
     );
   }
 }
