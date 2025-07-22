@@ -91,8 +91,9 @@ class AccountsManager extends ChangeNotifier {
     log.info("Requesting subscriptions for ${currentUser!.username}");
     try {
       _subreddits = await RedditAPI.client().subsriptions();
-      _subreddits.sort((a, b) =>
-          a.displayName.toLowerCase().compareTo(b.displayName.toLowerCase()));
+      _subreddits.sort((a, b) => a.other.displayName
+          .toLowerCase()
+          .compareTo(b.other.displayName.toLowerCase()));
       notifyListeners();
     } catch (err) {
       log.severe("Error while loading subscriptions: $err");

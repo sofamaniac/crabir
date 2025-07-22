@@ -4,21 +4,28 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../../frb_generated.dart';
+import '../../../lib.dart';
 import '../client.dart';
 import '../model.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'feed.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `eq`, `fetch_next`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `to_stream`
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Box < FeedStream >>>
+abstract class BoxFeedStream implements RustOpaqueInterface {}
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FeedStream>>
 abstract class FeedStream implements RustOpaqueInterface {
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
-  static Future<FeedStream> newInstance(
-          {required Client client, required Feed feed, required Sort sort}) =>
+  static Future<BoxFeedStream> newInstance(
+          {required Client client,
+          required Feed feed,
+          required FeedSort sort,
+          required Url baseUrl}) =>
       RustLib.instance.api.redditApiModelFeedFeedStreamNew(
-          client: client, feed: feed, sort: sort);
+          client: client, feed: feed, sort: sort, baseUrl: baseUrl);
 }
 
 @freezed
@@ -41,4 +48,25 @@ sealed class Feed with _$Feed {
 
   static Future<Feed> default_() =>
       RustLib.instance.api.redditApiModelFeedFeedDefault();
+}
+
+@freezed
+sealed class FeedSort with _$FeedSort {
+  const FeedSort._();
+
+  const factory FeedSort.best() = FeedSort_Best;
+  const factory FeedSort.hot() = FeedSort_Hot;
+  const factory FeedSort.new_(
+    Timeframe field0,
+  ) = FeedSort_New;
+  const factory FeedSort.top(
+    Timeframe field0,
+  ) = FeedSort_Top;
+  const factory FeedSort.rising() = FeedSort_Rising;
+  const factory FeedSort.controversial(
+    Timeframe field0,
+  ) = FeedSort_Controversial;
+
+  Future<Url> addToUrl({required Url url}) => RustLib.instance.api
+      .redditApiModelFeedFeedSortAddToUrl(that: this, url: url);
 }

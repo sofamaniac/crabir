@@ -74,10 +74,16 @@
               gtk3
               graphite2
               pkg-config
+
+              # For building on Linux
+              ninja
+              webkitgtk_4_1
             ];
 
             # See https://github.com/fzyzcjy/flutter_rust_bridge/issues/2527
-            LD_LIBRARY_PATH = "/home/sofamaniac/Nextcloud/programmation/crabir/crabir/lib/:$LD_LIBRARY_PATH";
+            # LD_LIBRARY_PATH = "/home/sofamaniac/Nextcloud/programmation/crabir/crabir/lib/:$LD_LIBRARY_PATH";
+            #LD_LIBRARY_PATH="/home/sofamaniac/Nextcloud/programmation/crabir/crabir/build/linux/x64/debug/bundle/lib:/home/sofamaniac/Nextcloud/programmation/crabir/crabir/build/linux/x64/release/bundle/lib:$LD_LIBRARY_PATH";
+            LD_LIBRARY_PATH="build/linux/x64/debug/plugins/crabir_bridge:$LD_LIBRARY_PATH";
 
             # To fix std completion
             RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";

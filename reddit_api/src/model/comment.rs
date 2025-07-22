@@ -1,12 +1,28 @@
+use std::backtrace::Backtrace;
+
 use serde::Deserialize;
 use serde::Serialize;
+use serde_json::Value;
 
 use super::Fullname;
-use super::Listing;
 use super::Thing;
 use super::author;
 use super::author::AuthorInfo;
+use crate::error::Error;
 use crate::utils;
+
+impl TryFrom<Thing> for Comment {
+    type Error = Error;
+
+    fn try_from(value: Thing) -> Result<Self, Self::Error> {
+        match value {
+            Thing::Comment(comment) => Ok(comment),
+            _ => Err(Error::InvalidThing {
+                backtrace: Backtrace::capture(),
+            }),
+        }
+    }
+}
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Comment {
@@ -27,18 +43,21 @@ pub struct Comment {
     pub id: String,
     #[serde(deserialize_with = "utils::response_or_none")]
     /// Should be a listing if present
-    replies: Option<Box<Thing>>,
+    /// Because they can be deeply nested we use a `Value` that is
+    /// deserialize only when needed and only one level at a time.
+    //replies: Option<Box<Value>>,
+    replies: Option<Value>,
 
     // pub approved_at_utc: Value,
     // pub comment_type: Value,
     // pub awarders: Vec<Value>,
     // pub mod_reason_by: Value,
     // pub banned_by: Value,
-    // pub total_awards_received: i64,
+    // pub total_awards_received: u32,
     // pub user_reports: Vec<Value>,
     // pub banned_at_utc: Value,
     // pub mod_reason_title: Value,
-    pub gilded: i64,
+    pub gilded: u32,
     pub archived: bool,
     // pub collapsed_reason_code: Value,
     pub no_follow: bool,
@@ -46,7 +65,7 @@ pub struct Comment {
     pub created_utc: f64,
     pub send_replies: bool,
     pub parent_id: String,
-    pub score: i64,
+    pub score: u32,
     // pub approved_by: Value,
     // pub mod_note: Value,
     // pub all_awardings: Vec<Value>,
@@ -57,7 +76,7 @@ pub struct Comment {
     // pub top_awarded_type: Value,
     pub name: Fullname,
     pub is_submitter: bool,
-    pub downs: i64,
+    pub downs: u32,
     pub body_html: String,
     // pub removal_reason: Value,
     // pub collapsed_reason: Value,
@@ -74,23 +93,59 @@ pub struct Comment {
     pub created: f64,
     // pub treatment_tags: Vec<Value>,
     pub link_id: String,
-    pub controversiality: i64,
-    pub depth: i64,
+    pub controversiality: u32,
+    // Depth is absent when requesting the user's overview.
+    #[serde(default)]
+    pub depth: u32,
     // pub collapsed_because_crowd_control: Value,
     // pub mod_reports: Vec<Value>,
     // pub num_reports: Value,
-    pub ups: i64,
+    pub ups: u32,
 }
 
 impl Comment {
     /// flutter_rust_bridge:getter,sync
     pub fn replies(&self) -> Vec<Thing> {
+        // match &self.replies {
+        //     Some(listing) => match &**listing {
+        //         Thing::Listing(listing) => listing.children.clone(),
+        //         _ => Vec::new(),
+        //     },
+        //     None => Vec::new(),
+        // }
         match &self.replies {
-            Some(listing) => match &**listing {
-                Thing::Listing(listing) => listing.children.clone(),
+            Some(value) => match serde_json::from_value(value.clone()) {
+                Ok(Thing::Listing(listing)) => listing.children.clone(),
                 _ => Vec::new(),
             },
             None => Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CommentSort {
+    Confidence,
+    Top,
+    New,
+    Controversial,
+    Old,
+    Random,
+    QA,
+    Live,
+}
+
+impl CommentSort {
+    pub(crate) fn to_url(&self) -> &'static str {
+        match self {
+            Self::Confidence => "confidence",
+            Self::Top => "top",
+            Self::New => "new",
+            Self::Controversial => "controversial",
+            Self::Old => "old",
+            Self::Random => "random",
+            Self::QA => "qa",
+            Self::Live => "live",
         }
     }
 }

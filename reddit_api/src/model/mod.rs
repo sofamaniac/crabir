@@ -1,4 +1,4 @@
-use std::backtrace::{self, Backtrace};
+use std::backtrace::Backtrace;
 
 use comment::Comment;
 use multi::Multi;
@@ -6,7 +6,7 @@ pub use post::Post;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 use subreddit::Subreddit;
-use user::User;
+use user::model::User;
 
 use crate::error::Error;
 
@@ -21,6 +21,8 @@ pub mod subreddit;
 pub mod user;
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+/// Represent the kind and the ID of a thing.
+/// For example a post has a fullname of the form "t3_xxxx".
 pub struct Fullname(String);
 
 impl AsRef<str> for Fullname {
@@ -53,12 +55,49 @@ pub enum Thing {
     /// How to load more comment in a given thread
     #[serde(rename = "more")]
     More {
+        /// Has the same id as its first children
+        /// If there is no children is "_".
         id: String,
-        name: String,
+        /// Name of the first children. If there is none is "t1__".
+        name: Fullname,
         count: u32,
         depth: u32,
         children: Vec<String>,
     },
+}
+
+impl Thing {
+    /// flutter_rust_bridge:getter,sync
+    pub fn name(&self) -> Option<Fullname> {
+        match self {
+            Thing::Listing(_) => None,
+            Thing::Comment(comment) => Some(comment.name.clone()),
+            Thing::User(user) => Some(user.name()),
+            Thing::Post(post) => Some(post.name.clone()),
+            Thing::Message => todo!(),
+            Thing::Subreddit(subreddit) => Some(subreddit.other.name.clone()),
+            Thing::Award => None,
+            Thing::Multi(multi) => Some(multi.name.clone()),
+            Thing::More { .. } => None,
+        }
+    }
+
+    pub(crate) fn likes(&mut self, direction: crate::client::VoteDirection) {
+        let likes: Option<bool> = direction.into();
+        match self {
+            Thing::Comment(comment) => comment.likes = likes,
+            Thing::Post(post) => post.likes = likes,
+            _ => (),
+        }
+    }
+
+    pub(crate) fn save(&mut self, save: bool) {
+        match self {
+            Thing::Comment(comment) => comment.saved = save,
+            Thing::Post(post) => post.saved = save,
+            _ => (),
+        }
+    }
 }
 
 impl TryFrom<Thing> for Listing {
@@ -78,10 +117,11 @@ impl TryFrom<Thing> for Listing {
 pub struct Listing {
     pub after: Option<String>,
     pub before: Option<String>,
-    pub dist: Option<u64>,
+    pub dist: Option<u32>,
     /// Is null when querying oauth.reddit.com
     pub modhash: Option<String>,
     geofilter: Option<String>,
+    #[serde(default)]
     pub children: Vec<Thing>,
 }
 
@@ -105,40 +145,5 @@ impl Timeframe {
             Self::Year => "year",
             Self::All => "all",
         }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
-/// flutter_rust_bridge:non_opaque
-pub enum Sort {
-    Best,
-    Hot,
-    New(Timeframe),
-    Top(Timeframe),
-    Rising,
-    Controversial(Timeframe),
-}
-
-impl Sort {
-    #[must_use]
-    pub fn add_to_url(&self, url: &Url) -> Url {
-        let sort = match &self {
-            Self::Best => "best.json",
-            Self::Hot => "hot.json",
-            Self::Rising => "rising.json",
-            Self::Top(_) => "top.json",
-            Self::New(_) => "new.json",
-            Self::Controversial(_) => "controversial.json",
-        };
-        let mut url = url.join(sort).expect("Should not fail.");
-        match &self {
-            Self::Top(timeframe) | Self::New(timeframe) | Self::Controversial(timeframe) => {
-                let _ = url
-                    .query_pairs_mut()
-                    .append_pair("t", timeframe.as_query_param());
-            }
-            _ => (),
-        }
-        url
     }
 }

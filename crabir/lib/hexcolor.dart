@@ -13,7 +13,6 @@ extension HexColor on Color {
     try {
       return Color(int.parse(buffer.toString(), radix: 16));
     } catch (e) {
-      print("Invalid Color $hexString.");
       return Color(0x00000000);
     }
   }

@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,466 +10,149 @@ part of 'feed.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$Feed {
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() home,
-    required TResult Function() all,
-    required TResult Function() popular,
-    required TResult Function(String field0) subreddit,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? home,
-    TResult? Function()? all,
-    TResult? Function()? popular,
-    TResult? Function(String field0)? subreddit,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? home,
-    TResult Function()? all,
-    TResult Function()? popular,
-    TResult Function(String field0)? subreddit,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(Feed_Home value) home,
-    required TResult Function(Feed_All value) all,
-    required TResult Function(Feed_Popular value) popular,
-    required TResult Function(Feed_Subreddit value) subreddit,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(Feed_Home value)? home,
-    TResult? Function(Feed_All value)? all,
-    TResult? Function(Feed_Popular value)? popular,
-    TResult? Function(Feed_Subreddit value)? subreddit,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(Feed_Home value)? home,
-    TResult Function(Feed_All value)? all,
-    TResult Function(Feed_Popular value)? popular,
-    TResult Function(Feed_Subreddit value)? subreddit,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is Feed);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'Feed()';
+  }
 }
 
 /// @nodoc
-abstract class $FeedCopyWith<$Res> {
-  factory $FeedCopyWith(Feed value, $Res Function(Feed) then) =
-      _$FeedCopyWithImpl<$Res, Feed>;
-}
-
-/// @nodoc
-class _$FeedCopyWithImpl<$Res, $Val extends Feed>
-    implements $FeedCopyWith<$Res> {
-  _$FeedCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of Feed
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-abstract class _$$Feed_HomeImplCopyWith<$Res> {
-  factory _$$Feed_HomeImplCopyWith(
-          _$Feed_HomeImpl value, $Res Function(_$Feed_HomeImpl) then) =
-      __$$Feed_HomeImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$Feed_HomeImplCopyWithImpl<$Res>
-    extends _$FeedCopyWithImpl<$Res, _$Feed_HomeImpl>
-    implements _$$Feed_HomeImplCopyWith<$Res> {
-  __$$Feed_HomeImplCopyWithImpl(
-      _$Feed_HomeImpl _value, $Res Function(_$Feed_HomeImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of Feed
-  /// with the given fields replaced by the non-null parameter values.
+class $FeedCopyWith<$Res> {
+  $FeedCopyWith(Feed _, $Res Function(Feed) __);
 }
 
 /// @nodoc
 
-class _$Feed_HomeImpl extends Feed_Home {
-  const _$Feed_HomeImpl() : super._();
+class Feed_Home extends Feed {
+  const Feed_Home() : super._();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is Feed_Home);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
     return 'Feed.home()';
   }
+}
+
+/// @nodoc
+
+class Feed_All extends Feed {
+  const Feed_All() : super._();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$Feed_HomeImpl);
+        (other.runtimeType == runtimeType && other is Feed_All);
   }
 
   @override
   int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() home,
-    required TResult Function() all,
-    required TResult Function() popular,
-    required TResult Function(String field0) subreddit,
-  }) {
-    return home();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? home,
-    TResult? Function()? all,
-    TResult? Function()? popular,
-    TResult? Function(String field0)? subreddit,
-  }) {
-    return home?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? home,
-    TResult Function()? all,
-    TResult Function()? popular,
-    TResult Function(String field0)? subreddit,
-    required TResult orElse(),
-  }) {
-    if (home != null) {
-      return home();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(Feed_Home value) home,
-    required TResult Function(Feed_All value) all,
-    required TResult Function(Feed_Popular value) popular,
-    required TResult Function(Feed_Subreddit value) subreddit,
-  }) {
-    return home(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(Feed_Home value)? home,
-    TResult? Function(Feed_All value)? all,
-    TResult? Function(Feed_Popular value)? popular,
-    TResult? Function(Feed_Subreddit value)? subreddit,
-  }) {
-    return home?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(Feed_Home value)? home,
-    TResult Function(Feed_All value)? all,
-    TResult Function(Feed_Popular value)? popular,
-    TResult Function(Feed_Subreddit value)? subreddit,
-    required TResult orElse(),
-  }) {
-    if (home != null) {
-      return home(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class Feed_Home extends Feed {
-  const factory Feed_Home() = _$Feed_HomeImpl;
-  const Feed_Home._() : super._();
-}
-
-/// @nodoc
-abstract class _$$Feed_AllImplCopyWith<$Res> {
-  factory _$$Feed_AllImplCopyWith(
-          _$Feed_AllImpl value, $Res Function(_$Feed_AllImpl) then) =
-      __$$Feed_AllImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$Feed_AllImplCopyWithImpl<$Res>
-    extends _$FeedCopyWithImpl<$Res, _$Feed_AllImpl>
-    implements _$$Feed_AllImplCopyWith<$Res> {
-  __$$Feed_AllImplCopyWithImpl(
-      _$Feed_AllImpl _value, $Res Function(_$Feed_AllImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of Feed
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$Feed_AllImpl extends Feed_All {
-  const _$Feed_AllImpl() : super._();
 
   @override
   String toString() {
     return 'Feed.all()';
   }
+}
+
+/// @nodoc
+
+class Feed_Popular extends Feed {
+  const Feed_Popular() : super._();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$Feed_AllImpl);
+        (other.runtimeType == runtimeType && other is Feed_Popular);
   }
 
   @override
   int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() home,
-    required TResult Function() all,
-    required TResult Function() popular,
-    required TResult Function(String field0) subreddit,
-  }) {
-    return all();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? home,
-    TResult? Function()? all,
-    TResult? Function()? popular,
-    TResult? Function(String field0)? subreddit,
-  }) {
-    return all?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? home,
-    TResult Function()? all,
-    TResult Function()? popular,
-    TResult Function(String field0)? subreddit,
-    required TResult orElse(),
-  }) {
-    if (all != null) {
-      return all();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(Feed_Home value) home,
-    required TResult Function(Feed_All value) all,
-    required TResult Function(Feed_Popular value) popular,
-    required TResult Function(Feed_Subreddit value) subreddit,
-  }) {
-    return all(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(Feed_Home value)? home,
-    TResult? Function(Feed_All value)? all,
-    TResult? Function(Feed_Popular value)? popular,
-    TResult? Function(Feed_Subreddit value)? subreddit,
-  }) {
-    return all?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(Feed_Home value)? home,
-    TResult Function(Feed_All value)? all,
-    TResult Function(Feed_Popular value)? popular,
-    TResult Function(Feed_Subreddit value)? subreddit,
-    required TResult orElse(),
-  }) {
-    if (all != null) {
-      return all(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class Feed_All extends Feed {
-  const factory Feed_All() = _$Feed_AllImpl;
-  const Feed_All._() : super._();
-}
-
-/// @nodoc
-abstract class _$$Feed_PopularImplCopyWith<$Res> {
-  factory _$$Feed_PopularImplCopyWith(
-          _$Feed_PopularImpl value, $Res Function(_$Feed_PopularImpl) then) =
-      __$$Feed_PopularImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$Feed_PopularImplCopyWithImpl<$Res>
-    extends _$FeedCopyWithImpl<$Res, _$Feed_PopularImpl>
-    implements _$$Feed_PopularImplCopyWith<$Res> {
-  __$$Feed_PopularImplCopyWithImpl(
-      _$Feed_PopularImpl _value, $Res Function(_$Feed_PopularImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of Feed
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$Feed_PopularImpl extends Feed_Popular {
-  const _$Feed_PopularImpl() : super._();
 
   @override
   String toString() {
     return 'Feed.popular()';
   }
+}
+
+/// @nodoc
+
+class Feed_Subreddit extends Feed {
+  const Feed_Subreddit(this.field0) : super._();
+
+  final String field0;
+
+  /// Create a copy of Feed
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $Feed_SubredditCopyWith<Feed_Subreddit> get copyWith =>
+      _$Feed_SubredditCopyWithImpl<Feed_Subreddit>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$Feed_PopularImpl);
+        (other.runtimeType == runtimeType &&
+            other is Feed_Subreddit &&
+            (identical(other.field0, field0) || other.field0 == field0));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, field0);
 
   @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() home,
-    required TResult Function() all,
-    required TResult Function() popular,
-    required TResult Function(String field0) subreddit,
-  }) {
-    return popular();
+  String toString() {
+    return 'Feed.subreddit(field0: $field0)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? home,
-    TResult? Function()? all,
-    TResult? Function()? popular,
-    TResult? Function(String field0)? subreddit,
-  }) {
-    return popular?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? home,
-    TResult Function()? all,
-    TResult Function()? popular,
-    TResult Function(String field0)? subreddit,
-    required TResult orElse(),
-  }) {
-    if (popular != null) {
-      return popular();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(Feed_Home value) home,
-    required TResult Function(Feed_All value) all,
-    required TResult Function(Feed_Popular value) popular,
-    required TResult Function(Feed_Subreddit value) subreddit,
-  }) {
-    return popular(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(Feed_Home value)? home,
-    TResult? Function(Feed_All value)? all,
-    TResult? Function(Feed_Popular value)? popular,
-    TResult? Function(Feed_Subreddit value)? subreddit,
-  }) {
-    return popular?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(Feed_Home value)? home,
-    TResult Function(Feed_All value)? all,
-    TResult Function(Feed_Popular value)? popular,
-    TResult Function(Feed_Subreddit value)? subreddit,
-    required TResult orElse(),
-  }) {
-    if (popular != null) {
-      return popular(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class Feed_Popular extends Feed {
-  const factory Feed_Popular() = _$Feed_PopularImpl;
-  const Feed_Popular._() : super._();
 }
 
 /// @nodoc
-abstract class _$$Feed_SubredditImplCopyWith<$Res> {
-  factory _$$Feed_SubredditImplCopyWith(_$Feed_SubredditImpl value,
-          $Res Function(_$Feed_SubredditImpl) then) =
-      __$$Feed_SubredditImplCopyWithImpl<$Res>;
+abstract mixin class $Feed_SubredditCopyWith<$Res>
+    implements $FeedCopyWith<$Res> {
+  factory $Feed_SubredditCopyWith(
+          Feed_Subreddit value, $Res Function(Feed_Subreddit) _then) =
+      _$Feed_SubredditCopyWithImpl;
   @useResult
   $Res call({String field0});
 }
 
 /// @nodoc
-class __$$Feed_SubredditImplCopyWithImpl<$Res>
-    extends _$FeedCopyWithImpl<$Res, _$Feed_SubredditImpl>
-    implements _$$Feed_SubredditImplCopyWith<$Res> {
-  __$$Feed_SubredditImplCopyWithImpl(
-      _$Feed_SubredditImpl _value, $Res Function(_$Feed_SubredditImpl) _then)
-      : super(_value, _then);
+class _$Feed_SubredditCopyWithImpl<$Res>
+    implements $Feed_SubredditCopyWith<$Res> {
+  _$Feed_SubredditCopyWithImpl(this._self, this._then);
+
+  final Feed_Subreddit _self;
+  final $Res Function(Feed_Subreddit) _then;
 
   /// Create a copy of Feed
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
   $Res call({
     Object? field0 = null,
   }) {
-    return _then(_$Feed_SubredditImpl(
+    return _then(Feed_Subreddit(
       null == field0
-          ? _value.field0
+          ? _self.field0
           : field0 // ignore: cast_nullable_to_non_nullable
               as String,
     ));
@@ -476,122 +160,276 @@ class __$$Feed_SubredditImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
-class _$Feed_SubredditImpl extends Feed_Subreddit {
-  const _$Feed_SubredditImpl(this.field0) : super._();
+mixin _$FeedSort {
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is FeedSort);
+  }
 
   @override
-  final String field0;
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
-    return 'Feed.subreddit(field0: $field0)';
+    return 'FeedSort()';
   }
+}
+
+/// @nodoc
+class $FeedSortCopyWith<$Res> {
+  $FeedSortCopyWith(FeedSort _, $Res Function(FeedSort) __);
+}
+
+/// @nodoc
+
+class FeedSort_Best extends FeedSort {
+  const FeedSort_Best() : super._();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is FeedSort_Best);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'FeedSort.best()';
+  }
+}
+
+/// @nodoc
+
+class FeedSort_Hot extends FeedSort {
+  const FeedSort_Hot() : super._();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is FeedSort_Hot);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'FeedSort.hot()';
+  }
+}
+
+/// @nodoc
+
+class FeedSort_New extends FeedSort {
+  const FeedSort_New(this.field0) : super._();
+
+  final Timeframe field0;
+
+  /// Create a copy of FeedSort
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $FeedSort_NewCopyWith<FeedSort_New> get copyWith =>
+      _$FeedSort_NewCopyWithImpl<FeedSort_New>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$Feed_SubredditImpl &&
+            other is FeedSort_New &&
             (identical(other.field0, field0) || other.field0 == field0));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 
-  /// Create a copy of Feed
+  @override
+  String toString() {
+    return 'FeedSort.new_(field0: $field0)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $FeedSort_NewCopyWith<$Res>
+    implements $FeedSortCopyWith<$Res> {
+  factory $FeedSort_NewCopyWith(
+          FeedSort_New value, $Res Function(FeedSort_New) _then) =
+      _$FeedSort_NewCopyWithImpl;
+  @useResult
+  $Res call({Timeframe field0});
+}
+
+/// @nodoc
+class _$FeedSort_NewCopyWithImpl<$Res> implements $FeedSort_NewCopyWith<$Res> {
+  _$FeedSort_NewCopyWithImpl(this._self, this._then);
+
+  final FeedSort_New _self;
+  final $Res Function(FeedSort_New) _then;
+
+  /// Create a copy of FeedSort
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? field0 = null,
+  }) {
+    return _then(FeedSort_New(
+      null == field0
+          ? _self.field0
+          : field0 // ignore: cast_nullable_to_non_nullable
+              as Timeframe,
+    ));
+  }
+}
+
+/// @nodoc
+
+class FeedSort_Top extends FeedSort {
+  const FeedSort_Top(this.field0) : super._();
+
+  final Timeframe field0;
+
+  /// Create a copy of FeedSort
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
   @pragma('vm:prefer-inline')
-  _$$Feed_SubredditImplCopyWith<_$Feed_SubredditImpl> get copyWith =>
-      __$$Feed_SubredditImplCopyWithImpl<_$Feed_SubredditImpl>(
+  $FeedSort_TopCopyWith<FeedSort_Top> get copyWith =>
+      _$FeedSort_TopCopyWithImpl<FeedSort_Top>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is FeedSort_Top &&
+            (identical(other.field0, field0) || other.field0 == field0));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, field0);
+
+  @override
+  String toString() {
+    return 'FeedSort.top(field0: $field0)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $FeedSort_TopCopyWith<$Res>
+    implements $FeedSortCopyWith<$Res> {
+  factory $FeedSort_TopCopyWith(
+          FeedSort_Top value, $Res Function(FeedSort_Top) _then) =
+      _$FeedSort_TopCopyWithImpl;
+  @useResult
+  $Res call({Timeframe field0});
+}
+
+/// @nodoc
+class _$FeedSort_TopCopyWithImpl<$Res> implements $FeedSort_TopCopyWith<$Res> {
+  _$FeedSort_TopCopyWithImpl(this._self, this._then);
+
+  final FeedSort_Top _self;
+  final $Res Function(FeedSort_Top) _then;
+
+  /// Create a copy of FeedSort
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? field0 = null,
+  }) {
+    return _then(FeedSort_Top(
+      null == field0
+          ? _self.field0
+          : field0 // ignore: cast_nullable_to_non_nullable
+              as Timeframe,
+    ));
+  }
+}
+
+/// @nodoc
+
+class FeedSort_Rising extends FeedSort {
+  const FeedSort_Rising() : super._();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is FeedSort_Rising);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'FeedSort.rising()';
+  }
+}
+
+/// @nodoc
+
+class FeedSort_Controversial extends FeedSort {
+  const FeedSort_Controversial(this.field0) : super._();
+
+  final Timeframe field0;
+
+  /// Create a copy of FeedSort
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $FeedSort_ControversialCopyWith<FeedSort_Controversial> get copyWith =>
+      _$FeedSort_ControversialCopyWithImpl<FeedSort_Controversial>(
           this, _$identity);
 
   @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() home,
-    required TResult Function() all,
-    required TResult Function() popular,
-    required TResult Function(String field0) subreddit,
-  }) {
-    return subreddit(field0);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is FeedSort_Controversial &&
+            (identical(other.field0, field0) || other.field0 == field0));
   }
 
   @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? home,
-    TResult? Function()? all,
-    TResult? Function()? popular,
-    TResult? Function(String field0)? subreddit,
-  }) {
-    return subreddit?.call(field0);
-  }
+  int get hashCode => Object.hash(runtimeType, field0);
 
   @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? home,
-    TResult Function()? all,
-    TResult Function()? popular,
-    TResult Function(String field0)? subreddit,
-    required TResult orElse(),
-  }) {
-    if (subreddit != null) {
-      return subreddit(field0);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(Feed_Home value) home,
-    required TResult Function(Feed_All value) all,
-    required TResult Function(Feed_Popular value) popular,
-    required TResult Function(Feed_Subreddit value) subreddit,
-  }) {
-    return subreddit(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(Feed_Home value)? home,
-    TResult? Function(Feed_All value)? all,
-    TResult? Function(Feed_Popular value)? popular,
-    TResult? Function(Feed_Subreddit value)? subreddit,
-  }) {
-    return subreddit?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(Feed_Home value)? home,
-    TResult Function(Feed_All value)? all,
-    TResult Function(Feed_Popular value)? popular,
-    TResult Function(Feed_Subreddit value)? subreddit,
-    required TResult orElse(),
-  }) {
-    if (subreddit != null) {
-      return subreddit(this);
-    }
-    return orElse();
+  String toString() {
+    return 'FeedSort.controversial(field0: $field0)';
   }
 }
 
-abstract class Feed_Subreddit extends Feed {
-  const factory Feed_Subreddit(final String field0) = _$Feed_SubredditImpl;
-  const Feed_Subreddit._() : super._();
+/// @nodoc
+abstract mixin class $FeedSort_ControversialCopyWith<$Res>
+    implements $FeedSortCopyWith<$Res> {
+  factory $FeedSort_ControversialCopyWith(FeedSort_Controversial value,
+          $Res Function(FeedSort_Controversial) _then) =
+      _$FeedSort_ControversialCopyWithImpl;
+  @useResult
+  $Res call({Timeframe field0});
+}
 
-  String get field0;
+/// @nodoc
+class _$FeedSort_ControversialCopyWithImpl<$Res>
+    implements $FeedSort_ControversialCopyWith<$Res> {
+  _$FeedSort_ControversialCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of Feed
+  final FeedSort_Controversial _self;
+  final $Res Function(FeedSort_Controversial) _then;
+
+  /// Create a copy of FeedSort
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$Feed_SubredditImplCopyWith<_$Feed_SubredditImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? field0 = null,
+  }) {
+    return _then(FeedSort_Controversial(
+      null == field0
+          ? _self.field0
+          : field0 // ignore: cast_nullable_to_non_nullable
+              as Timeframe,
+    ));
+  }
 }
+
+// dart format on

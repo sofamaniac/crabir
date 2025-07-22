@@ -1,3 +1,5 @@
 rust_input: crate::api,reddit_api
 rust_root: ../crabir_bridge/
 dart_output: lib/src/rust
+enable_lifetime: true
+stop_on_error: true

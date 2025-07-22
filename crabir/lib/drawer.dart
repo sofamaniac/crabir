@@ -1,13 +1,13 @@
 import 'package:collection/collection.dart';
+import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/accounts_manager.dart';
 import 'package:crabir/feed/feed.dart';
-import 'package:crabir/hexcolor.dart';
 import 'package:crabir/login.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
+import 'package:crabir/subreddit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
-import 'package:provider/provider.dart';
 
 class DrawerState extends State<AppDrawer> {
   bool _isSelectingAccount = false;
@@ -27,21 +27,22 @@ class DrawerState extends State<AppDrawer> {
   Widget currentAccountView(BuildContext context) {
     final icon =
         isSelectingAccount ? Icons.arrow_drop_up : Icons.arrow_drop_down;
-    final state = context.watch<AccountsManager>();
-    return DrawerHeader(
-      child: Row(
-        children: [
-          state.currentUser?.build(context) ??
-              const CircularProgressIndicator(),
-          IconButton(onPressed: () => changeMode(), icon: Icon(icon))
-        ],
+    return BlocBuilder<AccountsBloc, AccountState>(
+      builder: (context, account) => DrawerHeader(
+        child: Row(
+          children: [
+            account.account?.build(context) ??
+                const CircularProgressIndicator(),
+            IconButton(onPressed: () => changeMode(), icon: Icon(icon))
+          ],
+        ),
       ),
     );
   }
 
   Widget accountSelector(BuildContext context) {
-    final state = context.watch<AccountsManager>();
-    if (state.currentUser == null) {
+    final state = context.watch<AccountsBloc>();
+    if (state.selectedAccount == null) {
       return const CircularProgressIndicator();
     }
     return Expanded(
@@ -49,13 +50,13 @@ class DrawerState extends State<AppDrawer> {
         children: [
           ...state.accounts.mapIndexed((index, account) => InkWell(
               onTap: () async {
-                state.selectAccount(index);
+                state.add(SelectAccount(index: index));
               },
               child: account.build(context))),
           InkWell(
             onTap: () async {
               if (await loginToReddit()) {
-                await state.init();
+                state.add(Initialize());
               }
             },
             child: Text("Add an account"),
@@ -103,7 +104,6 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
   final List<String> feeds = ["Home", "Popular", "All", "Saved", "History"];
   final List<String> userOptions = ["Profile", "Inbox", "Moderation"];
   final log = Logger("DrawerFeedSelection");
-  bool _isInit = false;
   UserAccount? account;
   final List<Feed> baseSubscriptions = [
     Feed.home(),
@@ -117,73 +117,70 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<AccountsManager>();
-    if (account != state.currentUser) {
-      _isInit = false;
-      account = state.currentUser;
-    }
-    return Flexible(
-      fit: FlexFit.loose,
-      child: ListView(
-        children: [
-          ...feeds.map((feed) => Text(feed)),
-          Divider(),
-          ...userOptions.map((option) => Text(option)),
-          Divider(),
-          Column(
-            spacing: 8.0,
-            children: [
-              ...state.subreddits.map(
-                (sub) {
-                  final icon = sub.icon;
-                  late final CircleAvatar iconWidget;
-                  if (icon?.url.toString() != null) {
-                    iconWidget = CircleAvatar(
-                      radius: 16,
-                      foregroundImage: NetworkImage(icon!.url.toString()),
-                      backgroundColor: Colors.transparent,
-                    );
-                  } else {
-                    final keyColor = sub.keyColor;
-                    final color = keyColor.isEmpty ? keyColor : "#000000";
-                    iconWidget = CircleAvatar(
-                      radius: 16,
-                      backgroundColor: HexColor.fromHex(color),
-                      child: Text("r/"),
-                    );
-                  }
-                  return InkWell(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => FeedView(
-                          feed: Feed.subreddit(sub.displayName),
-                          initialSort: Sort.best(),
-                        ),
-                      ),
+    final state = context.read<AccountsBloc>();
+    return BlocBuilder<AccountsBloc, AccountState>(
+      builder: (context, account) {
+        if (account.status == AccountStatus.uninit) {
+          state.add(Initialize());
+        } else if (account.status == AccountStatus.unloaded) {
+          state.add(LoadSubscriptions());
+        } else if (account.status == AccountStatus.loaded) {
+          return Flexible(
+            fit: FlexFit.loose,
+            child: ListView(
+              children: [
+                ...feeds.map((feed) => Text(feed)),
+                Divider(),
+                ...userOptions.map((option) => Text(option)),
+                Divider(),
+                Column(
+                  spacing: 8.0,
+                  children: [
+                    ...account.subscriptions.map(
+                      (sub) {
+                        return InkWell(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => FeedView(
+                                feed: Feed.subreddit(sub.other.displayName),
+                                initialSort: FeedSort.best(),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            spacing: 8.0,
+                            children: [
+                              SubredditIcon(icon: sub.icon, radius: 16),
+                              Text(
+                                sub.other.displayNamePrefixed,
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              )
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                    child: Row(
-                      spacing: 8.0,
-                      children: [
-                        iconWidget,
-                        Text(sub.displayNamePrefixed,
-                            style: Theme.of(context).textTheme.bodyMedium)
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-          Divider(),
-          InkWell(
-              onTap: () => showLicensePage(context: context),
-              child: Row(spacing: 8.0, children: [
-                Icon(Icons.info_outline),
-                Text("Licenses", style: Theme.of(context).textTheme.bodyMedium)
-              ]))
-        ],
-      ),
+                  ],
+                ),
+                Divider(),
+                InkWell(
+                  onTap: () => showLicensePage(context: context),
+                  child: Row(
+                    spacing: 8.0,
+                    children: [
+                      Icon(Icons.info_outline),
+                      Text("Licenses",
+                          style: Theme.of(context).textTheme.bodyMedium)
+                    ],
+                  ),
+                )
+              ],
+            ),
+          );
+        }
+        return Container();
+      },
     );
   }
 }

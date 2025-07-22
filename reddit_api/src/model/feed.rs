@@ -1,13 +1,13 @@
-use std::task::Poll;
-use std::{collections::VecDeque, pin::Pin};
+use std::pin::Pin;
 
 use crate::client::{Client, Pager};
-use crate::listing_stream::ListingStream;
 use crate::result::Result;
-use futures::FutureExt;
+use crate::streamable::stream::IntoStreamPrivate;
 pub use futures::{Stream, StreamExt};
+use reqwest::Url;
+use serde::{Deserialize, Serialize};
 
-use super::{Listing, Post, Sort, Thing};
+use super::{Listing, Post, Thing, Timeframe};
 
 /// All the kind of available feeds on reddit
 #[derive(Debug, Default, PartialEq, Eq, Clone)]
@@ -24,30 +24,80 @@ pub enum Feed {
     Subreddit(String),
 }
 
-pub struct FeedStream {
-    client: Client,
-    feed: Feed,
-    sort: Sort,
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
+/// flutter_rust_bridge:non_opaque
+pub enum FeedSort {
+    Best,
+    Hot,
+    New(Timeframe),
+    Top(Timeframe),
+    Rising,
+    Controversial(Timeframe),
 }
 
-impl FeedStream {
+impl FeedSort {
     #[must_use]
-    pub fn new(client: Client, feed: Feed, sort: Sort) -> FeedStream {
-        Self { client, feed, sort }
+    pub fn add_to_url(&self, url: &Url) -> Url {
+        let sort = match &self {
+            Self::Best => "best.json",
+            Self::Hot => "hot.json",
+            Self::Rising => "rising.json",
+            Self::Top(_) => "top.json",
+            Self::New(_) => "new.json",
+            Self::Controversial(_) => "controversial.json",
+        };
+        let mut url = url.join(sort).expect("Should not fail.");
+        match &self {
+            Self::Top(timeframe) | Self::New(timeframe) | Self::Controversial(timeframe) => {
+                let _ = url
+                    .query_pairs_mut()
+                    .append_pair("t", timeframe.as_query_param());
+            }
+            _ => (),
+        }
+        url
     }
 }
 
-impl ListingStream for FeedStream {
-    type Output = Post;
+pub struct FeedStream {
+    client: Client,
+    feed: Feed,
+    sort: FeedSort,
+    base_url: Url,
+}
 
-    fn fetch_next(
-        &self,
-        pager: &Pager,
-    ) -> Pin<Box<dyn Future<Output = Result<Listing>> + Send + Sync>> {
-        let client = self.client.clone();
-        let feed = self.feed.clone();
-        let sort = self.sort.clone();
-        let pager = pager.clone();
-        Box::pin(async move { client.feed_request(&feed, &sort, &pager).await })
+impl FeedStream {
+    pub fn new(client: Client, feed: Feed, sort: FeedSort, base_url: Url) -> Box<Self> {
+        Box::new(Self {
+            client,
+            feed,
+            sort,
+            base_url,
+        })
+    }
+
+    fn to_url(&self) -> Url {
+        let base_url = self.base_url.clone();
+        let url = match &self.feed {
+            Feed::Home => base_url.clone(),
+            Feed::All => base_url.join("r/all/").expect("Should not fail."),
+            Feed::Popular => base_url.join("r/popular/").expect("Should not fail."),
+            Feed::Subreddit(subreddit) => base_url
+                .join(&format!("r/{subreddit}/"))
+                .expect("Should not fail"),
+        };
+        let url = &self.sort.add_to_url(&url);
+        url.clone()
+    }
+}
+
+impl IntoStreamPrivate for FeedStream {
+    type Output = Thing;
+
+    fn to_stream(&self) -> futures::stream::BoxStream<'static, Result<Self::Output>> {
+        self.client
+            .clone()
+            .stream_vec(self.to_url(), None, &[("sr_detail", "true")])
+            .boxed()
     }
 }

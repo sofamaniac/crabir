@@ -58,13 +58,13 @@ abstract class Post implements RustOpaqueInterface {
 
   String get domain;
 
-  PlatformInt64 get downs;
+  int get downs;
 
   double? get edited;
 
   Gallery? get gallery;
 
-  PlatformInt64 get gilded;
+  int get gilded;
 
   Gildings get gildings;
 
@@ -114,13 +114,13 @@ abstract class Post implements RustOpaqueInterface {
 
   bool get noFollow;
 
-  PlatformInt64 get numComments;
+  int get numComments;
 
-  PlatformInt64? get numCrossposts;
+  int? get numCrossposts;
 
-  BigInt? get numDuplicates;
+  int? get numDuplicates;
 
-  String? get numReports;
+  int? get numReports;
 
   bool get over18;
 
@@ -132,7 +132,7 @@ abstract class Post implements RustOpaqueInterface {
 
   Preview? get preview;
 
-  PlatformInt64? get pwls;
+  int? get pwls;
 
   bool get quarantine;
 
@@ -142,11 +142,11 @@ abstract class Post implements RustOpaqueInterface {
 
   String? get removedByCategory;
 
-  String? get reportReasons;
+  List<String> get reportReasons;
 
   bool get saved;
 
-  PlatformInt64 get score;
+  int get score;
 
   Media? get secureMedia;
 
@@ -170,11 +170,11 @@ abstract class Post implements RustOpaqueInterface {
 
   String? get topAwardedType;
 
-  PlatformInt64? get totalAwardsReceived;
+  int? get totalAwardsReceived;
 
   List<String?> get treatmentTags;
 
-  PlatformInt64 get ups;
+  int get ups;
 
   double get upvoteRatio;
 
@@ -188,7 +188,7 @@ abstract class Post implements RustOpaqueInterface {
 
   bool get visited;
 
-  PlatformInt64? get wls;
+  int? get wls;
 
   set allAwardings(List<String?> allAwardings);
 
@@ -230,13 +230,13 @@ abstract class Post implements RustOpaqueInterface {
 
   set domain(String domain);
 
-  set downs(PlatformInt64 downs);
+  set downs(int downs);
 
   set edited(double? edited);
 
   set gallery(Gallery? gallery);
 
-  set gilded(PlatformInt64 gilded);
+  set gilded(int gilded);
 
   set gildings(Gildings gildings);
 
@@ -286,13 +286,13 @@ abstract class Post implements RustOpaqueInterface {
 
   set noFollow(bool noFollow);
 
-  set numComments(PlatformInt64 numComments);
+  set numComments(int numComments);
 
-  set numCrossposts(PlatformInt64? numCrossposts);
+  set numCrossposts(int? numCrossposts);
 
-  set numDuplicates(BigInt? numDuplicates);
+  set numDuplicates(int? numDuplicates);
 
-  set numReports(String? numReports);
+  set numReports(int? numReports);
 
   set over18(bool over18);
 
@@ -304,7 +304,7 @@ abstract class Post implements RustOpaqueInterface {
 
   set preview(Preview? preview);
 
-  set pwls(PlatformInt64? pwls);
+  set pwls(int? pwls);
 
   set quarantine(bool quarantine);
 
@@ -314,11 +314,11 @@ abstract class Post implements RustOpaqueInterface {
 
   set removedByCategory(String? removedByCategory);
 
-  set reportReasons(String? reportReasons);
+  set reportReasons(List<String> reportReasons);
 
   set saved(bool saved);
 
-  set score(PlatformInt64 score);
+  set score(int score);
 
   set secureMedia(Media? secureMedia);
 
@@ -342,11 +342,11 @@ abstract class Post implements RustOpaqueInterface {
 
   set topAwardedType(String? topAwardedType);
 
-  set totalAwardsReceived(PlatformInt64? totalAwardsReceived);
+  set totalAwardsReceived(int? totalAwardsReceived);
 
   set treatmentTags(List<String?> treatmentTags);
 
-  set ups(PlatformInt64 ups);
+  set ups(int ups);
 
   set upvoteRatio(double upvoteRatio);
 
@@ -360,7 +360,7 @@ abstract class Post implements RustOpaqueInterface {
 
   set visited(bool visited);
 
-  set wls(PlatformInt64? wls);
+  set wls(int? wls);
 
   static Future<Post> default_() =>
       RustLib.instance.api.redditApiModelPostPostDefault();
@@ -393,8 +393,8 @@ class Gildings {
 
 class ImageBase {
   final String url;
-  final PlatformInt64 width;
-  final PlatformInt64 height;
+  final int width;
+  final int height;
 
   const ImageBase({
     required this.url,
@@ -444,9 +444,9 @@ sealed class Media with _$Media {
 
 class MediaEmbed {
   final String content;
-  final PlatformInt64 width;
+  final int width;
   final bool scrolling;
-  final PlatformInt64 height;
+  final int height;
 
   const MediaEmbed({
     required this.content,
@@ -478,8 +478,8 @@ class Oembed {
   final String providerUrl;
   final String title;
   final String html;
-  final PlatformInt64 height;
-  final PlatformInt64 width;
+  final int height;
+  final int width;
   final String version;
   final String authorName;
   final String providerName;
@@ -594,9 +594,9 @@ class RedditImage {
 
 /// flutter_rust_bridge:non_opaque
 class RedditVideo {
-  final BigInt bitrateKbps;
-  final BigInt width;
-  final BigInt height;
+  final int bitrateKbps;
+  final int width;
+  final int height;
   final bool hasAudio;
   final bool isGif;
   final String fallbackUrl;
@@ -605,7 +605,7 @@ class RedditVideo {
   final String hlsUrl;
 
   /// Duration in seconds
-  final BigInt duration;
+  final int duration;
   final String transcodingStatus;
 
   const RedditVideo({
@@ -659,10 +659,10 @@ class RedditVideo {
 
 class SecureMediaEmbed {
   final String content;
-  final PlatformInt64 width;
+  final int width;
   final bool scrolling;
   final String mediaDomainUrl;
-  final PlatformInt64 height;
+  final int height;
 
   const SecureMediaEmbed({
     required this.content,
@@ -697,8 +697,8 @@ class SecureMediaEmbed {
 
 class Thumbnail {
   final String url;
-  final BigInt height;
-  final BigInt width;
+  final int height;
+  final int width;
 
   const Thumbnail({
     required this.url,
@@ -721,8 +721,8 @@ class Thumbnail {
 
 class ThumbnailOption {
   final String? url;
-  final BigInt? height;
-  final BigInt? width;
+  final int? height;
+  final int? width;
 
   const ThumbnailOption({
     this.url,
@@ -748,8 +748,8 @@ class ThumbnailOption {
 
 class ThumbnailURL {
   final String? url;
-  final BigInt? height;
-  final BigInt? width;
+  final int? height;
+  final int? width;
 
   const ThumbnailURL({
     this.url,

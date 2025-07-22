@@ -1,13 +1,13 @@
-import 'package:crabir/accounts_manager.dart';
+import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/drawer.dart';
 import 'package:crabir/login.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
+import 'package:crabir/user.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/frb_generated.dart';
 import 'package:crabir/feed/feed.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
-import 'package:provider/provider.dart';
 
 Future<void> main() async {
   await RustLib.init();
@@ -44,15 +44,8 @@ class Crabir extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) {
-          final accountManager = AccountsManager();
-          WidgetsBinding.instance
-              .addPostFrameCallback((_) => accountManager.init());
-          return accountManager;
-        }),
-      ],
+    return BlocProvider(
+      create: (context) => AccountsBloc(),
       child: MaterialApp(
         themeMode: ThemeMode.system,
         theme: ThemeData.light(useMaterial3: true),
@@ -73,11 +66,11 @@ class Crabir extends StatelessWidget {
             body: TabBarView(
               physics: NeverScrollableScrollPhysics(),
               children: [
-                FeedView(feed: Feed.home(), initialSort: Sort.best()),
-                FeedView(feed: Feed.home(), initialSort: Sort.best()),
-                FeedView(feed: Feed.home(), initialSort: Sort.best()),
-                FeedView(feed: Feed.home(), initialSort: Sort.best()),
-                FeedView(feed: Feed.home(), initialSort: Sort.best()),
+                FeedView(feed: Feed.home(), initialSort: FeedSort.best()),
+                FeedView(feed: Feed.home(), initialSort: FeedSort.best()),
+                FeedView(feed: Feed.home(), initialSort: FeedSort.best()),
+                FeedView(feed: Feed.home(), initialSort: FeedSort.best()),
+                CurrentUserView(),
               ],
             ),
           ),

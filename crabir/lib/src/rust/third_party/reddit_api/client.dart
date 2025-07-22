@@ -4,17 +4,18 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import '../../lib.dart';
 import 'model.dart';
 import 'model/comment.dart';
+import 'model/feed.dart';
 import 'model/multi.dart';
 import 'model/post.dart';
 import 'model/subreddit.dart';
-import 'model/user.dart';
+import 'model/user/model.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'streamable.dart';
 
-// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `SaveFeed`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `eq`, `fetch_next`, `fmt`, `fmt`, `fmt`, `from`
-// These functions have error during generation (see debug logs or enable `stop_on_error: true` for more details): `feed`, `saved`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Client>>
 abstract class Client implements RustOpaqueInterface {
@@ -25,10 +26,13 @@ abstract class Client implements RustOpaqueInterface {
   /// a [`Thing::Comment`] or a [`Thing::More`].
   /// # Errors
   /// Fails if the request fails or the parsing of the response fails.
-  Future<List<Thing>> comments({required String permalink});
+  Future<List<Thing>> comments({required String permalink, CommentSort? sort});
 
   static Future<Client> default_() =>
       RustLib.instance.api.redditApiClientClientDefault();
+
+  /// flutter_rust_bridge:sync
+  Streamable feedStream({required Feed feed, required FeedSort sort});
 
   /// Create a new client that is authenticated
   static Future<Client> fromRefreshToken({required String refreshToken}) =>
@@ -36,7 +40,9 @@ abstract class Client implements RustOpaqueInterface {
           .redditApiClientClientFromRefreshToken(refreshToken: refreshToken);
 
   Future<List<Thing>> loadMoreComments(
-      {required Fullname parentId, required List<String> children});
+      {required Fullname parentId,
+      required List<String> children,
+      CommentSort? sort});
 
   /// Get the info of the current user.
   /// # Errors
@@ -52,12 +58,15 @@ abstract class Client implements RustOpaqueInterface {
   static Future<Client> newAnonymous() =>
       RustLib.instance.api.redditApiClientClientNewAnonymous();
 
+  /// Create a new access token for a logged out user
+  Future<void> newLoggedOutUserToken();
+
   /// Save a saveable item (i.e. a [`Post`] or a [`Comment`]).
   /// # Errors
   /// Returns an error if the request failed.
   Future<void> save({required Fullname thing});
 
-  /// Get the list of subreddits the current user is subscribed to.
+  /// Get the list of all subreddits the current user is subscribed to.
   /// # Errors
   /// Returns an error if the http client fails or if the parsing of the response fails.
   Future<List<Subreddit>> subsriptions();
@@ -66,6 +75,36 @@ abstract class Client implements RustOpaqueInterface {
   /// # Errors
   /// Returns an error if the request failed.
   Future<void> unsave({required Fullname thing});
+
+  /// flutter_rust_bridge:sync
+  Streamable userComments(
+      {required String username, required UserStreamSort sort});
+
+  /// flutter_rust_bridge:sync
+  Streamable userDownvoted({required String username});
+
+  /// flutter_rust_bridge:sync
+  Streamable userGilded({required String username});
+
+  /// flutter_rust_bridge:sync
+  Streamable userHidden({required String username});
+
+  /// flutter_rust_bridge:sync
+  Streamable userOverview(
+      {required String username, required UserStreamSort sort});
+
+  /// Get saved items ( both [`Post`] and [`Comment`] ) for the specified user.
+  /// # Errors
+  /// Fails if api request fails.
+  /// flutter_rust_bridge:sync
+  Streamable userSaved({required String username});
+
+  /// flutter_rust_bridge:sync
+  Streamable userSubmitted(
+      {required String username, required UserStreamSort sort});
+
+  /// flutter_rust_bridge:sync
+  Streamable userUpvoted({required String username});
 
   /// Vote on a votable item (i.e. a [`Post`] or a [`Comment`]).
   /// # Errors
@@ -85,9 +124,6 @@ abstract class Pager implements RustOpaqueInterface {
   static Future<Pager> default_() =>
       RustLib.instance.api.redditApiClientPagerDefault();
 }
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Url>>
-abstract class Url implements RustOpaqueInterface {}
 
 enum VoteDirection {
   up,

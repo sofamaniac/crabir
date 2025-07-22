@@ -4,102 +4,91 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../../frb_generated.dart';
+import '../model.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `try_from`
 
-class Multi {
-  final bool canEdit;
-  final String displayName;
-  final String name;
-  final String descriptionHtml;
-  final PlatformInt64 numSubscribers;
-  final String? copiedFrom;
-  final String iconUrl;
-  final List<SubredditName> subreddits;
-  final double createdUtc;
-  final String visibility;
-  final double created;
-  final bool over18;
-  final String path;
-  final String owner;
-  final String? keyColor;
-  final bool isSubscriber;
-  final String ownerId;
-  final String descriptionMd;
-  final bool isFavorited;
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Multi>>
+abstract class Multi implements RustOpaqueInterface {
+  bool get canEdit;
 
-  const Multi({
-    required this.canEdit,
-    required this.displayName,
-    required this.name,
-    required this.descriptionHtml,
-    required this.numSubscribers,
-    this.copiedFrom,
-    required this.iconUrl,
-    required this.subreddits,
-    required this.createdUtc,
-    required this.visibility,
-    required this.created,
-    required this.over18,
-    required this.path,
-    required this.owner,
-    this.keyColor,
-    required this.isSubscriber,
-    required this.ownerId,
-    required this.descriptionMd,
-    required this.isFavorited,
-  });
+  String? get copiedFrom;
+
+  double get created;
+
+  double get createdUtc;
+
+  String get descriptionHtml;
+
+  String get descriptionMd;
+
+  String get displayName;
+
+  String get iconUrl;
+
+  bool get isFavorited;
+
+  bool get isSubscriber;
+
+  String? get keyColor;
+
+  Fullname get name;
+
+  PlatformInt64 get numSubscribers;
+
+  bool get over18;
+
+  String get owner;
+
+  String get ownerId;
+
+  String get path;
+
+  List<SubredditName> get subreddits;
+
+  String get visibility;
+
+  set canEdit(bool canEdit);
+
+  set copiedFrom(String? copiedFrom);
+
+  set created(double created);
+
+  set createdUtc(double createdUtc);
+
+  set descriptionHtml(String descriptionHtml);
+
+  set descriptionMd(String descriptionMd);
+
+  set displayName(String displayName);
+
+  set iconUrl(String iconUrl);
+
+  set isFavorited(bool isFavorited);
+
+  set isSubscriber(bool isSubscriber);
+
+  set keyColor(String? keyColor);
+
+  set name(Fullname name);
+
+  set numSubscribers(PlatformInt64 numSubscribers);
+
+  set over18(bool over18);
+
+  set owner(String owner);
+
+  set ownerId(String ownerId);
+
+  set path(String path);
+
+  set subreddits(List<SubredditName> subreddits);
+
+  set visibility(String visibility);
 
   static Future<Multi> default_() =>
       RustLib.instance.api.redditApiModelMultiMultiDefault();
-
-  @override
-  int get hashCode =>
-      canEdit.hashCode ^
-      displayName.hashCode ^
-      name.hashCode ^
-      descriptionHtml.hashCode ^
-      numSubscribers.hashCode ^
-      copiedFrom.hashCode ^
-      iconUrl.hashCode ^
-      subreddits.hashCode ^
-      createdUtc.hashCode ^
-      visibility.hashCode ^
-      created.hashCode ^
-      over18.hashCode ^
-      path.hashCode ^
-      owner.hashCode ^
-      keyColor.hashCode ^
-      isSubscriber.hashCode ^
-      ownerId.hashCode ^
-      descriptionMd.hashCode ^
-      isFavorited.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Multi &&
-          runtimeType == other.runtimeType &&
-          canEdit == other.canEdit &&
-          displayName == other.displayName &&
-          name == other.name &&
-          descriptionHtml == other.descriptionHtml &&
-          numSubscribers == other.numSubscribers &&
-          copiedFrom == other.copiedFrom &&
-          iconUrl == other.iconUrl &&
-          subreddits == other.subreddits &&
-          createdUtc == other.createdUtc &&
-          visibility == other.visibility &&
-          created == other.created &&
-          over18 == other.over18 &&
-          path == other.path &&
-          owner == other.owner &&
-          keyColor == other.keyColor &&
-          isSubscriber == other.isSubscriber &&
-          ownerId == other.ownerId &&
-          descriptionMd == other.descriptionMd &&
-          isFavorited == other.isFavorited;
 }
 
 class SubredditName {

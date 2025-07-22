@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:crabir/src/rust/api/simple.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/user.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/user/model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:path/path.dart';

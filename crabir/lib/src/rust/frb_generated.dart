@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'frb_generated.dart';
 import 'frb_generated.io.dart'
     if (dart.library.js_interop) 'frb_generated.web.dart';
+import 'lib.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'third_party/reddit_api/client.dart';
 import 'third_party/reddit_api/model.dart';
@@ -20,7 +21,8 @@ import 'third_party/reddit_api/model/gallery.dart';
 import 'third_party/reddit_api/model/multi.dart';
 import 'third_party/reddit_api/model/post.dart';
 import 'third_party/reddit_api/model/subreddit.dart';
-import 'third_party/reddit_api/model/user.dart';
+import 'third_party/reddit_api/model/user/model.dart';
+import 'third_party/reddit_api/streamable.dart';
 
 /// Main entrypoint of the Rust API
 class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
@@ -79,7 +81,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.10.0';
 
   @override
-  int get rustContentHash => -711605960;
+  int get rustContentHash => 1624966378;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -94,9 +96,12 @@ abstract class RustLibApi extends BaseApi {
       {required Client that, required String refreshToken});
 
   Future<List<Thing>> redditApiClientClientComments(
-      {required Client that, required String permalink});
+      {required Client that, required String permalink, CommentSort? sort});
 
   Future<Client> redditApiClientClientDefault();
+
+  Streamable redditApiClientClientFeedStream(
+      {required Client that, required Feed feed, required FeedSort sort});
 
   Future<Client> redditApiClientClientFromRefreshToken(
       {required String refreshToken});
@@ -104,13 +109,17 @@ abstract class RustLibApi extends BaseApi {
   Future<List<Thing>> redditApiClientClientLoadMoreComments(
       {required Client that,
       required Fullname parentId,
-      required List<String> children});
+      required List<String> children,
+      CommentSort? sort});
 
   Future<UserInfo> redditApiClientClientLoggedUserInfo({required Client that});
 
   Future<List<Multi>> redditApiClientClientMultis({required Client that});
 
   Future<Client> redditApiClientClientNewAnonymous();
+
+  Future<void> redditApiClientClientNewLoggedOutUserToken(
+      {required Client that});
 
   Future<void> redditApiClientClientSave(
       {required Client that, required Fullname thing});
@@ -120,6 +129,36 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> redditApiClientClientUnsave(
       {required Client that, required Fullname thing});
+
+  Streamable redditApiClientClientUserComments(
+      {required Client that,
+      required String username,
+      required UserStreamSort sort});
+
+  Streamable redditApiClientClientUserDownvoted(
+      {required Client that, required String username});
+
+  Streamable redditApiClientClientUserGilded(
+      {required Client that, required String username});
+
+  Streamable redditApiClientClientUserHidden(
+      {required Client that, required String username});
+
+  Streamable redditApiClientClientUserOverview(
+      {required Client that,
+      required String username,
+      required UserStreamSort sort});
+
+  Streamable redditApiClientClientUserSaved(
+      {required Client that, required String username});
+
+  Streamable redditApiClientClientUserSubmitted(
+      {required Client that,
+      required String username,
+      required UserStreamSort sort});
+
+  Streamable redditApiClientClientUserUpvoted(
+      {required Client that, required String username});
 
   Future<void> redditApiClientClientVote(
       {required Client that,
@@ -147,7 +186,7 @@ abstract class RustLibApi extends BaseApi {
   bool redditApiModelCommentCommentAutoAccessorGetCollapsed(
       {required Comment that});
 
-  PlatformInt64 redditApiModelCommentCommentAutoAccessorGetControversiality(
+  int redditApiModelCommentCommentAutoAccessorGetControversiality(
       {required Comment that});
 
   double redditApiModelCommentCommentAutoAccessorGetCreated(
@@ -156,16 +195,14 @@ abstract class RustLibApi extends BaseApi {
   double redditApiModelCommentCommentAutoAccessorGetCreatedUtc(
       {required Comment that});
 
-  PlatformInt64 redditApiModelCommentCommentAutoAccessorGetDepth(
-      {required Comment that});
+  int redditApiModelCommentCommentAutoAccessorGetDepth({required Comment that});
 
-  PlatformInt64 redditApiModelCommentCommentAutoAccessorGetDowns(
-      {required Comment that});
+  int redditApiModelCommentCommentAutoAccessorGetDowns({required Comment that});
 
   double? redditApiModelCommentCommentAutoAccessorGetEdited(
       {required Comment that});
 
-  PlatformInt64 redditApiModelCommentCommentAutoAccessorGetGilded(
+  int redditApiModelCommentCommentAutoAccessorGetGilded(
       {required Comment that});
 
   String redditApiModelCommentCommentAutoAccessorGetId({required Comment that});
@@ -197,8 +234,7 @@ abstract class RustLibApi extends BaseApi {
   bool redditApiModelCommentCommentAutoAccessorGetSaved(
       {required Comment that});
 
-  PlatformInt64 redditApiModelCommentCommentAutoAccessorGetScore(
-      {required Comment that});
+  int redditApiModelCommentCommentAutoAccessorGetScore({required Comment that});
 
   bool redditApiModelCommentCommentAutoAccessorGetScoreHidden(
       {required Comment that});
@@ -221,8 +257,7 @@ abstract class RustLibApi extends BaseApi {
   String redditApiModelCommentCommentAutoAccessorGetSubredditType(
       {required Comment that});
 
-  PlatformInt64 redditApiModelCommentCommentAutoAccessorGetUps(
-      {required Comment that});
+  int redditApiModelCommentCommentAutoAccessorGetUps({required Comment that});
 
   void redditApiModelCommentCommentAutoAccessorSetArchived(
       {required Comment that, required bool archived});
@@ -246,7 +281,7 @@ abstract class RustLibApi extends BaseApi {
       {required Comment that, required bool collapsed});
 
   void redditApiModelCommentCommentAutoAccessorSetControversiality(
-      {required Comment that, required PlatformInt64 controversiality});
+      {required Comment that, required int controversiality});
 
   void redditApiModelCommentCommentAutoAccessorSetCreated(
       {required Comment that, required double created});
@@ -255,16 +290,16 @@ abstract class RustLibApi extends BaseApi {
       {required Comment that, required double createdUtc});
 
   void redditApiModelCommentCommentAutoAccessorSetDepth(
-      {required Comment that, required PlatformInt64 depth});
+      {required Comment that, required int depth});
 
   void redditApiModelCommentCommentAutoAccessorSetDowns(
-      {required Comment that, required PlatformInt64 downs});
+      {required Comment that, required int downs});
 
   void redditApiModelCommentCommentAutoAccessorSetEdited(
       {required Comment that, double? edited});
 
   void redditApiModelCommentCommentAutoAccessorSetGilded(
-      {required Comment that, required PlatformInt64 gilded});
+      {required Comment that, required int gilded});
 
   void redditApiModelCommentCommentAutoAccessorSetId(
       {required Comment that, required String id});
@@ -297,7 +332,7 @@ abstract class RustLibApi extends BaseApi {
       {required Comment that, required bool saved});
 
   void redditApiModelCommentCommentAutoAccessorSetScore(
-      {required Comment that, required PlatformInt64 score});
+      {required Comment that, required int score});
 
   void redditApiModelCommentCommentAutoAccessorSetScoreHidden(
       {required Comment that, required bool scoreHidden});
@@ -321,53 +356,271 @@ abstract class RustLibApi extends BaseApi {
       {required Comment that, required String subredditType});
 
   void redditApiModelCommentCommentAutoAccessorSetUps(
-      {required Comment that, required PlatformInt64 ups});
+      {required Comment that, required int ups});
 
   Future<Comment> redditApiModelCommentCommentDefault();
 
   List<Thing> redditApiModelCommentCommentReplies({required Comment that});
 
-  bool crateApiSimpleFeedStateGetDone({required FeedState that});
+  bool redditApiModelSubredditCommonAutoAccessorGetAcceptFollowers(
+      {required Common that});
 
-  Feed crateApiSimpleFeedStateGetFeed({required FeedState that});
+  List<String>
+      redditApiModelSubredditCommonAutoAccessorGetAllowedMediaInComments(
+          {required Common that});
 
-  int crateApiSimpleFeedStateGetLength({required FeedState that});
+  String redditApiModelSubredditCommonAutoAccessorGetBannerImg(
+      {required Common that});
 
-  bool crateApiSimpleFeedStateGetLoading({required FeedState that});
+  Int64List? redditApiModelSubredditCommonAutoAccessorGetBannerSize(
+      {required Common that});
 
-  Sort crateApiSimpleFeedStateGetSort({required FeedState that});
+  double redditApiModelSubredditCommonAutoAccessorGetCreated(
+      {required Common that});
 
-  String crateApiSimpleFeedStateGetSortString({required FeedState that});
+  double redditApiModelSubredditCommonAutoAccessorGetCreatedUtc(
+      {required Common that});
 
-  String crateApiSimpleFeedStateGetTitle({required FeedState that});
+  bool redditApiModelSubredditCommonAutoAccessorGetDisableContributorRequests(
+      {required Common that});
 
-  FeedState crateApiSimpleFeedStateNew(
-      {required Feed feed, required Sort sort});
+  String redditApiModelSubredditCommonAutoAccessorGetDisplayName(
+      {required Common that});
 
-  Future<bool> crateApiSimpleFeedStateNext({required FeedState that});
+  String redditApiModelSubredditCommonAutoAccessorGetDisplayNamePrefixed(
+      {required Common that});
 
-  Post? crateApiSimpleFeedStateNth({required FeedState that, required int n});
+  bool redditApiModelSubredditCommonAutoAccessorGetFreeFormReports(
+      {required Common that});
 
-  Future<void> crateApiSimpleFeedStateRefresh({required FeedState that});
+  String? redditApiModelSubredditCommonAutoAccessorGetHeaderImg(
+      {required Common that});
 
-  Future<void> crateApiSimpleFeedStateSave(
-      {required FeedState that, required int index, required bool save});
+  Int64List? redditApiModelSubredditCommonAutoAccessorGetHeaderSize(
+      {required Common that});
 
-  Future<void> crateApiSimpleFeedStateSetFeed(
-      {required FeedState that, required Feed feed});
+  String redditApiModelSubredditCommonAutoAccessorGetKeyColor(
+      {required Common that});
 
-  Future<void> crateApiSimpleFeedStateSetSort(
-      {required FeedState that, required Sort sort});
+  bool redditApiModelSubredditCommonAutoAccessorGetLinkFlairEnabled(
+      {required Common that});
 
-  Future<void> crateApiSimpleFeedStateVote(
-      {required FeedState that,
-      required int index,
-      required VoteDirection direction});
+  String redditApiModelSubredditCommonAutoAccessorGetLinkFlairPosition(
+      {required Common that});
 
-  Future<FeedStream> redditApiModelFeedFeedStreamNew(
-      {required Client client, required Feed feed, required Sort sort});
+  Fullname redditApiModelSubredditCommonAutoAccessorGetName(
+      {required Common that});
+
+  String redditApiModelSubredditCommonAutoAccessorGetPrimaryColor(
+      {required Common that});
+
+  String redditApiModelSubredditCommonAutoAccessorGetPublicDescription(
+      {required Common that});
+
+  bool redditApiModelSubredditCommonAutoAccessorGetQuarantine(
+      {required Common that});
+
+  bool redditApiModelSubredditCommonAutoAccessorGetRestrictCommenting(
+      {required Common that});
+
+  bool redditApiModelSubredditCommonAutoAccessorGetRestrictPosting(
+      {required Common that});
+
+  bool redditApiModelSubredditCommonAutoAccessorGetShowMedia(
+      {required Common that});
+
+  String redditApiModelSubredditCommonAutoAccessorGetSubmitLinkLabel(
+      {required Common that});
+
+  String redditApiModelSubredditCommonAutoAccessorGetSubmitTextLabel(
+      {required Common that});
+
+  String redditApiModelSubredditCommonAutoAccessorGetSubredditType(
+      {required Common that});
+
+  PlatformInt64 redditApiModelSubredditCommonAutoAccessorGetSubscribers(
+      {required Common that});
+
+  String redditApiModelSubredditCommonAutoAccessorGetTitle(
+      {required Common that});
+
+  String redditApiModelSubredditCommonAutoAccessorGetUrl(
+      {required Common that});
+
+  bool redditApiModelSubredditCommonAutoAccessorGetUserIsBanned(
+      {required Common that});
+
+  bool redditApiModelSubredditCommonAutoAccessorGetUserIsContributor(
+      {required Common that});
+
+  bool redditApiModelSubredditCommonAutoAccessorGetUserIsModerator(
+      {required Common that});
+
+  bool redditApiModelSubredditCommonAutoAccessorGetUserIsMuted(
+      {required Common that});
+
+  bool redditApiModelSubredditCommonAutoAccessorGetUserIsSubscriber(
+      {required Common that});
+
+  void redditApiModelSubredditCommonAutoAccessorSetAcceptFollowers(
+      {required Common that, required bool acceptFollowers});
+
+  void redditApiModelSubredditCommonAutoAccessorSetAllowedMediaInComments(
+      {required Common that, required List<String> allowedMediaInComments});
+
+  void redditApiModelSubredditCommonAutoAccessorSetBannerImg(
+      {required Common that, required String bannerImg});
+
+  void redditApiModelSubredditCommonAutoAccessorSetBannerSize(
+      {required Common that, Int64List? bannerSize});
+
+  void redditApiModelSubredditCommonAutoAccessorSetCreated(
+      {required Common that, required double created});
+
+  void redditApiModelSubredditCommonAutoAccessorSetCreatedUtc(
+      {required Common that, required double createdUtc});
+
+  void redditApiModelSubredditCommonAutoAccessorSetDisableContributorRequests(
+      {required Common that, required bool disableContributorRequests});
+
+  void redditApiModelSubredditCommonAutoAccessorSetDisplayName(
+      {required Common that, required String displayName});
+
+  void redditApiModelSubredditCommonAutoAccessorSetDisplayNamePrefixed(
+      {required Common that, required String displayNamePrefixed});
+
+  void redditApiModelSubredditCommonAutoAccessorSetFreeFormReports(
+      {required Common that, required bool freeFormReports});
+
+  void redditApiModelSubredditCommonAutoAccessorSetHeaderImg(
+      {required Common that, String? headerImg});
+
+  void redditApiModelSubredditCommonAutoAccessorSetHeaderSize(
+      {required Common that, Int64List? headerSize});
+
+  void redditApiModelSubredditCommonAutoAccessorSetKeyColor(
+      {required Common that, required String keyColor});
+
+  void redditApiModelSubredditCommonAutoAccessorSetLinkFlairEnabled(
+      {required Common that, required bool linkFlairEnabled});
+
+  void redditApiModelSubredditCommonAutoAccessorSetLinkFlairPosition(
+      {required Common that, required String linkFlairPosition});
+
+  void redditApiModelSubredditCommonAutoAccessorSetName(
+      {required Common that, required Fullname name});
+
+  void redditApiModelSubredditCommonAutoAccessorSetPrimaryColor(
+      {required Common that, required String primaryColor});
+
+  void redditApiModelSubredditCommonAutoAccessorSetPublicDescription(
+      {required Common that, required String publicDescription});
+
+  void redditApiModelSubredditCommonAutoAccessorSetQuarantine(
+      {required Common that, required bool quarantine});
+
+  void redditApiModelSubredditCommonAutoAccessorSetRestrictCommenting(
+      {required Common that, required bool restrictCommenting});
+
+  void redditApiModelSubredditCommonAutoAccessorSetRestrictPosting(
+      {required Common that, required bool restrictPosting});
+
+  void redditApiModelSubredditCommonAutoAccessorSetShowMedia(
+      {required Common that, required bool showMedia});
+
+  void redditApiModelSubredditCommonAutoAccessorSetSubmitLinkLabel(
+      {required Common that, required String submitLinkLabel});
+
+  void redditApiModelSubredditCommonAutoAccessorSetSubmitTextLabel(
+      {required Common that, required String submitTextLabel});
+
+  void redditApiModelSubredditCommonAutoAccessorSetSubredditType(
+      {required Common that, required String subredditType});
+
+  void redditApiModelSubredditCommonAutoAccessorSetSubscribers(
+      {required Common that, required PlatformInt64 subscribers});
+
+  void redditApiModelSubredditCommonAutoAccessorSetTitle(
+      {required Common that, required String title});
+
+  void redditApiModelSubredditCommonAutoAccessorSetUrl(
+      {required Common that, required String url});
+
+  void redditApiModelSubredditCommonAutoAccessorSetUserIsBanned(
+      {required Common that, required bool userIsBanned});
+
+  void redditApiModelSubredditCommonAutoAccessorSetUserIsContributor(
+      {required Common that, required bool userIsContributor});
+
+  void redditApiModelSubredditCommonAutoAccessorSetUserIsModerator(
+      {required Common that, required bool userIsModerator});
+
+  void redditApiModelSubredditCommonAutoAccessorSetUserIsMuted(
+      {required Common that, required bool userIsMuted});
+
+  void redditApiModelSubredditCommonAutoAccessorSetUserIsSubscriber(
+      {required Common that, required bool userIsSubscriber});
+
+  Future<Common> redditApiModelSubredditCommonDefault();
+
+  SubredditIcon redditApiModelSubredditCommonIcon({required Common that});
+
+  bool redditApiModelSubredditDetailsAutoAccessorGetDefaultSet(
+      {required Details that});
+
+  String redditApiModelSubredditDetailsAutoAccessorGetDescription(
+      {required Details that});
+
+  String redditApiModelSubredditDetailsAutoAccessorGetIconColor(
+      {required Details that});
+
+  Common redditApiModelSubredditDetailsAutoAccessorGetOther(
+      {required Details that});
+
+  bool redditApiModelSubredditDetailsAutoAccessorGetOver18(
+      {required Details that});
+
+  List<String> redditApiModelSubredditDetailsAutoAccessorGetPreviousNames(
+      {required Details that});
+
+  void redditApiModelSubredditDetailsAutoAccessorSetDefaultSet(
+      {required Details that, required bool defaultSet});
+
+  void redditApiModelSubredditDetailsAutoAccessorSetDescription(
+      {required Details that, required String description});
+
+  void redditApiModelSubredditDetailsAutoAccessorSetIconColor(
+      {required Details that, required String iconColor});
+
+  void redditApiModelSubredditDetailsAutoAccessorSetOther(
+      {required Details that, required Common other});
+
+  void redditApiModelSubredditDetailsAutoAccessorSetOver18(
+      {required Details that, required bool over18});
+
+  void redditApiModelSubredditDetailsAutoAccessorSetPreviousNames(
+      {required Details that, required List<String> previousNames});
+
+  Future<Details> redditApiModelSubredditDetailsDefault();
+
+  SubredditIcon redditApiModelSubredditDetailsIcon({required Details that});
+
+  Future<BoxFeedStream> redditApiModelFeedFeedStreamNew(
+      {required Client client,
+      required Feed feed,
+      required FeedSort sort,
+      required Url baseUrl});
 
   Future<Fullname> redditApiModelFullnameDefault();
+
+  Future<GalleryData> redditApiModelGalleryGalleryDataDefault();
+
+  Future<Gallery> redditApiModelGalleryGalleryDefault();
+
+  ImageBase redditApiModelGalleryGalleryGet(
+      {required Gallery that, required int index});
+
+  int redditApiModelGalleryGalleryGetLength({required Gallery that});
 
   String? redditApiModelListingAutoAccessorGetAfter({required Listing that});
 
@@ -376,7 +629,7 @@ abstract class RustLibApi extends BaseApi {
   List<Thing> redditApiModelListingAutoAccessorGetChildren(
       {required Listing that});
 
-  BigInt? redditApiModelListingAutoAccessorGetDist({required Listing that});
+  int? redditApiModelListingAutoAccessorGetDist({required Listing that});
 
   String? redditApiModelListingAutoAccessorGetModhash({required Listing that});
 
@@ -390,12 +643,120 @@ abstract class RustLibApi extends BaseApi {
       {required Listing that, required List<Thing> children});
 
   void redditApiModelListingAutoAccessorSetDist(
-      {required Listing that, BigInt? dist});
+      {required Listing that, int? dist});
 
   void redditApiModelListingAutoAccessorSetModhash(
       {required Listing that, String? modhash});
 
   Future<Listing> redditApiModelListingDefault();
+
+  bool redditApiModelMultiMultiAutoAccessorGetCanEdit({required Multi that});
+
+  String? redditApiModelMultiMultiAutoAccessorGetCopiedFrom(
+      {required Multi that});
+
+  double redditApiModelMultiMultiAutoAccessorGetCreated({required Multi that});
+
+  double redditApiModelMultiMultiAutoAccessorGetCreatedUtc(
+      {required Multi that});
+
+  String redditApiModelMultiMultiAutoAccessorGetDescriptionHtml(
+      {required Multi that});
+
+  String redditApiModelMultiMultiAutoAccessorGetDescriptionMd(
+      {required Multi that});
+
+  String redditApiModelMultiMultiAutoAccessorGetDisplayName(
+      {required Multi that});
+
+  String redditApiModelMultiMultiAutoAccessorGetIconUrl({required Multi that});
+
+  bool redditApiModelMultiMultiAutoAccessorGetIsFavorited(
+      {required Multi that});
+
+  bool redditApiModelMultiMultiAutoAccessorGetIsSubscriber(
+      {required Multi that});
+
+  String? redditApiModelMultiMultiAutoAccessorGetKeyColor(
+      {required Multi that});
+
+  Fullname redditApiModelMultiMultiAutoAccessorGetName({required Multi that});
+
+  PlatformInt64 redditApiModelMultiMultiAutoAccessorGetNumSubscribers(
+      {required Multi that});
+
+  bool redditApiModelMultiMultiAutoAccessorGetOver18({required Multi that});
+
+  String redditApiModelMultiMultiAutoAccessorGetOwner({required Multi that});
+
+  String redditApiModelMultiMultiAutoAccessorGetOwnerId({required Multi that});
+
+  String redditApiModelMultiMultiAutoAccessorGetPath({required Multi that});
+
+  List<SubredditName> redditApiModelMultiMultiAutoAccessorGetSubreddits(
+      {required Multi that});
+
+  String redditApiModelMultiMultiAutoAccessorGetVisibility(
+      {required Multi that});
+
+  void redditApiModelMultiMultiAutoAccessorSetCanEdit(
+      {required Multi that, required bool canEdit});
+
+  void redditApiModelMultiMultiAutoAccessorSetCopiedFrom(
+      {required Multi that, String? copiedFrom});
+
+  void redditApiModelMultiMultiAutoAccessorSetCreated(
+      {required Multi that, required double created});
+
+  void redditApiModelMultiMultiAutoAccessorSetCreatedUtc(
+      {required Multi that, required double createdUtc});
+
+  void redditApiModelMultiMultiAutoAccessorSetDescriptionHtml(
+      {required Multi that, required String descriptionHtml});
+
+  void redditApiModelMultiMultiAutoAccessorSetDescriptionMd(
+      {required Multi that, required String descriptionMd});
+
+  void redditApiModelMultiMultiAutoAccessorSetDisplayName(
+      {required Multi that, required String displayName});
+
+  void redditApiModelMultiMultiAutoAccessorSetIconUrl(
+      {required Multi that, required String iconUrl});
+
+  void redditApiModelMultiMultiAutoAccessorSetIsFavorited(
+      {required Multi that, required bool isFavorited});
+
+  void redditApiModelMultiMultiAutoAccessorSetIsSubscriber(
+      {required Multi that, required bool isSubscriber});
+
+  void redditApiModelMultiMultiAutoAccessorSetKeyColor(
+      {required Multi that, String? keyColor});
+
+  void redditApiModelMultiMultiAutoAccessorSetName(
+      {required Multi that, required Fullname name});
+
+  void redditApiModelMultiMultiAutoAccessorSetNumSubscribers(
+      {required Multi that, required PlatformInt64 numSubscribers});
+
+  void redditApiModelMultiMultiAutoAccessorSetOver18(
+      {required Multi that, required bool over18});
+
+  void redditApiModelMultiMultiAutoAccessorSetOwner(
+      {required Multi that, required String owner});
+
+  void redditApiModelMultiMultiAutoAccessorSetOwnerId(
+      {required Multi that, required String ownerId});
+
+  void redditApiModelMultiMultiAutoAccessorSetPath(
+      {required Multi that, required String path});
+
+  void redditApiModelMultiMultiAutoAccessorSetSubreddits(
+      {required Multi that, required List<SubredditName> subreddits});
+
+  void redditApiModelMultiMultiAutoAccessorSetVisibility(
+      {required Multi that, required String visibility});
+
+  Future<Multi> redditApiModelMultiMultiDefault();
 
   Future<Url> redditApiClientPagerAddToUrl(
       {required Pager that, required Url url});
@@ -458,15 +819,13 @@ abstract class RustLibApi extends BaseApi {
 
   String redditApiModelPostPostAutoAccessorGetDomain({required Post that});
 
-  PlatformInt64 redditApiModelPostPostAutoAccessorGetDowns(
-      {required Post that});
+  int redditApiModelPostPostAutoAccessorGetDowns({required Post that});
 
   double? redditApiModelPostPostAutoAccessorGetEdited({required Post that});
 
   Gallery? redditApiModelPostPostAutoAccessorGetGallery({required Post that});
 
-  PlatformInt64 redditApiModelPostPostAutoAccessorGetGilded(
-      {required Post that});
+  int redditApiModelPostPostAutoAccessorGetGilded({required Post that});
 
   Gildings redditApiModelPostPostAutoAccessorGetGildings({required Post that});
 
@@ -525,16 +884,13 @@ abstract class RustLibApi extends BaseApi {
 
   bool redditApiModelPostPostAutoAccessorGetNoFollow({required Post that});
 
-  PlatformInt64 redditApiModelPostPostAutoAccessorGetNumComments(
-      {required Post that});
+  int redditApiModelPostPostAutoAccessorGetNumComments({required Post that});
 
-  PlatformInt64? redditApiModelPostPostAutoAccessorGetNumCrossposts(
-      {required Post that});
+  int? redditApiModelPostPostAutoAccessorGetNumCrossposts({required Post that});
 
-  BigInt? redditApiModelPostPostAutoAccessorGetNumDuplicates(
-      {required Post that});
+  int? redditApiModelPostPostAutoAccessorGetNumDuplicates({required Post that});
 
-  String? redditApiModelPostPostAutoAccessorGetNumReports({required Post that});
+  int? redditApiModelPostPostAutoAccessorGetNumReports({required Post that});
 
   bool redditApiModelPostPostAutoAccessorGetOver18({required Post that});
 
@@ -546,8 +902,7 @@ abstract class RustLibApi extends BaseApi {
 
   Preview? redditApiModelPostPostAutoAccessorGetPreview({required Post that});
 
-  PlatformInt64? redditApiModelPostPostAutoAccessorGetPwls(
-      {required Post that});
+  int? redditApiModelPostPostAutoAccessorGetPwls({required Post that});
 
   bool redditApiModelPostPostAutoAccessorGetQuarantine({required Post that});
 
@@ -559,13 +914,12 @@ abstract class RustLibApi extends BaseApi {
   String? redditApiModelPostPostAutoAccessorGetRemovedByCategory(
       {required Post that});
 
-  String? redditApiModelPostPostAutoAccessorGetReportReasons(
+  List<String> redditApiModelPostPostAutoAccessorGetReportReasons(
       {required Post that});
 
   bool redditApiModelPostPostAutoAccessorGetSaved({required Post that});
 
-  PlatformInt64 redditApiModelPostPostAutoAccessorGetScore(
-      {required Post that});
+  int redditApiModelPostPostAutoAccessorGetScore({required Post that});
 
   Media? redditApiModelPostPostAutoAccessorGetSecureMedia({required Post that});
 
@@ -594,13 +948,13 @@ abstract class RustLibApi extends BaseApi {
   String? redditApiModelPostPostAutoAccessorGetTopAwardedType(
       {required Post that});
 
-  PlatformInt64? redditApiModelPostPostAutoAccessorGetTotalAwardsReceived(
+  int? redditApiModelPostPostAutoAccessorGetTotalAwardsReceived(
       {required Post that});
 
   List<String?> redditApiModelPostPostAutoAccessorGetTreatmentTags(
       {required Post that});
 
-  PlatformInt64 redditApiModelPostPostAutoAccessorGetUps({required Post that});
+  int redditApiModelPostPostAutoAccessorGetUps({required Post that});
 
   double redditApiModelPostPostAutoAccessorGetUpvoteRatio({required Post that});
 
@@ -616,7 +970,7 @@ abstract class RustLibApi extends BaseApi {
 
   bool redditApiModelPostPostAutoAccessorGetVisited({required Post that});
 
-  PlatformInt64? redditApiModelPostPostAutoAccessorGetWls({required Post that});
+  int? redditApiModelPostPostAutoAccessorGetWls({required Post that});
 
   void redditApiModelPostPostAutoAccessorSetAllAwardings(
       {required Post that, required List<String?> allAwardings});
@@ -679,7 +1033,7 @@ abstract class RustLibApi extends BaseApi {
       {required Post that, required String domain});
 
   void redditApiModelPostPostAutoAccessorSetDowns(
-      {required Post that, required PlatformInt64 downs});
+      {required Post that, required int downs});
 
   void redditApiModelPostPostAutoAccessorSetEdited(
       {required Post that, double? edited});
@@ -688,7 +1042,7 @@ abstract class RustLibApi extends BaseApi {
       {required Post that, Gallery? gallery});
 
   void redditApiModelPostPostAutoAccessorSetGilded(
-      {required Post that, required PlatformInt64 gilded});
+      {required Post that, required int gilded});
 
   void redditApiModelPostPostAutoAccessorSetGildings(
       {required Post that, required Gildings gildings});
@@ -763,16 +1117,16 @@ abstract class RustLibApi extends BaseApi {
       {required Post that, required bool noFollow});
 
   void redditApiModelPostPostAutoAccessorSetNumComments(
-      {required Post that, required PlatformInt64 numComments});
+      {required Post that, required int numComments});
 
   void redditApiModelPostPostAutoAccessorSetNumCrossposts(
-      {required Post that, PlatformInt64? numCrossposts});
+      {required Post that, int? numCrossposts});
 
   void redditApiModelPostPostAutoAccessorSetNumDuplicates(
-      {required Post that, BigInt? numDuplicates});
+      {required Post that, int? numDuplicates});
 
   void redditApiModelPostPostAutoAccessorSetNumReports(
-      {required Post that, String? numReports});
+      {required Post that, int? numReports});
 
   void redditApiModelPostPostAutoAccessorSetOver18(
       {required Post that, required bool over18});
@@ -790,7 +1144,7 @@ abstract class RustLibApi extends BaseApi {
       {required Post that, Preview? preview});
 
   void redditApiModelPostPostAutoAccessorSetPwls(
-      {required Post that, PlatformInt64? pwls});
+      {required Post that, int? pwls});
 
   void redditApiModelPostPostAutoAccessorSetQuarantine(
       {required Post that, required bool quarantine});
@@ -805,13 +1159,13 @@ abstract class RustLibApi extends BaseApi {
       {required Post that, String? removedByCategory});
 
   void redditApiModelPostPostAutoAccessorSetReportReasons(
-      {required Post that, String? reportReasons});
+      {required Post that, required List<String> reportReasons});
 
   void redditApiModelPostPostAutoAccessorSetSaved(
       {required Post that, required bool saved});
 
   void redditApiModelPostPostAutoAccessorSetScore(
-      {required Post that, required PlatformInt64 score});
+      {required Post that, required int score});
 
   void redditApiModelPostPostAutoAccessorSetSecureMedia(
       {required Post that, Media? secureMedia});
@@ -847,13 +1201,13 @@ abstract class RustLibApi extends BaseApi {
       {required Post that, String? topAwardedType});
 
   void redditApiModelPostPostAutoAccessorSetTotalAwardsReceived(
-      {required Post that, PlatformInt64? totalAwardsReceived});
+      {required Post that, int? totalAwardsReceived});
 
   void redditApiModelPostPostAutoAccessorSetTreatmentTags(
       {required Post that, required List<String?> treatmentTags});
 
   void redditApiModelPostPostAutoAccessorSetUps(
-      {required Post that, required PlatformInt64 ups});
+      {required Post that, required int ups});
 
   void redditApiModelPostPostAutoAccessorSetUpvoteRatio(
       {required Post that, required double upvoteRatio});
@@ -873,8 +1227,7 @@ abstract class RustLibApi extends BaseApi {
   void redditApiModelPostPostAutoAccessorSetVisited(
       {required Post that, required bool visited});
 
-  void redditApiModelPostPostAutoAccessorSetWls(
-      {required Post that, PlatformInt64? wls});
+  void redditApiModelPostPostAutoAccessorSetWls({required Post that, int? wls});
 
   Future<Post> redditApiModelPostPostDefault();
 
@@ -882,7 +1235,35 @@ abstract class RustLibApi extends BaseApi {
 
   Thumbnail? redditApiModelPostPostThumbnail({required Post that});
 
+  Future<List<Thing>> redditApiStreamableStreamableGetAll(
+      {required Streamable that});
+
+  Future<int> redditApiStreamableStreamableGetLength(
+      {required Streamable that});
+
+  Future<bool> redditApiStreamableStreamableNext({required Streamable that});
+
+  Future<Thing?> redditApiStreamableStreamableNth(
+      {required Streamable that, required int n});
+
+  Future<void> redditApiStreamableStreamableRefresh({required Streamable that});
+
+  Future<void> redditApiStreamableStreamableSave(
+      {required Streamable that,
+      required Fullname name,
+      required bool save,
+      required Client client});
+
+  Future<void> redditApiStreamableStreamableVote(
+      {required Streamable that,
+      required Fullname name,
+      required VoteDirection direction,
+      required Client client});
+
   Future<SubredditId> redditApiModelSubredditSubredditIdDefault();
+
+  Details? redditApiModelSubredditSubredditInfoAutoAccessorGetDetails(
+      {required SubredditInfo that});
 
   String redditApiModelSubredditSubredditInfoAutoAccessorGetSubreddit(
       {required SubredditInfo that});
@@ -894,11 +1275,11 @@ abstract class RustLibApi extends BaseApi {
       redditApiModelSubredditSubredditInfoAutoAccessorGetSubredditNamePrefixed(
           {required SubredditInfo that});
 
-  String redditApiModelSubredditSubredditInfoAutoAccessorGetSubredditType(
+  int redditApiModelSubredditSubredditInfoAutoAccessorGetSubscribers(
       {required SubredditInfo that});
 
-  BigInt redditApiModelSubredditSubredditInfoAutoAccessorGetSubscribers(
-      {required SubredditInfo that});
+  void redditApiModelSubredditSubredditInfoAutoAccessorSetDetails(
+      {required SubredditInfo that, Details? details});
 
   void redditApiModelSubredditSubredditInfoAutoAccessorSetSubreddit(
       {required SubredditInfo that, required String subreddit});
@@ -909,24 +1290,18 @@ abstract class RustLibApi extends BaseApi {
   void redditApiModelSubredditSubredditInfoAutoAccessorSetSubredditNamePrefixed(
       {required SubredditInfo that, required String subredditNamePrefixed});
 
-  void redditApiModelSubredditSubredditInfoAutoAccessorSetSubredditType(
-      {required SubredditInfo that, required String subredditType});
-
   void redditApiModelSubredditSubredditInfoAutoAccessorSetSubscribers(
-      {required SubredditInfo that, required BigInt subscribers});
+      {required SubredditInfo that, required int subscribers});
 
   Future<SubredditInfo> redditApiModelSubredditSubredditInfoDefault();
 
-  bool redditApiModelSubredditSubredditAutoAccessorGetAcceptFollowers(
-      {required Subreddit that});
-
-  BigInt? redditApiModelSubredditSubredditAutoAccessorGetAccountsActive(
+  int? redditApiModelSubredditSubredditAutoAccessorGetAccountsActive(
       {required Subreddit that});
 
   bool redditApiModelSubredditSubredditAutoAccessorGetAccountsActiveIsFuzzed(
       {required Subreddit that});
 
-  BigInt redditApiModelSubredditSubredditAutoAccessorGetActiveUserCount(
+  int redditApiModelSubredditSubredditAutoAccessorGetActiveUserCount(
       {required Subreddit that});
 
   String redditApiModelSubredditSubredditAutoAccessorGetAdvertiserCategory(
@@ -967,20 +1342,10 @@ abstract class RustLibApi extends BaseApi {
   bool redditApiModelSubredditSubredditAutoAccessorGetAllowVideos(
       {required Subreddit that});
 
-  List<String>
-      redditApiModelSubredditSubredditAutoAccessorGetAllowedMediaInComments(
-          {required Subreddit that});
-
   String redditApiModelSubredditSubredditAutoAccessorGetBannerBackgroundColor(
       {required Subreddit that});
 
   String redditApiModelSubredditSubredditAutoAccessorGetBannerBackgroundImage(
-      {required Subreddit that});
-
-  String redditApiModelSubredditSubredditAutoAccessorGetBannerImg(
-      {required Subreddit that});
-
-  Int64List? redditApiModelSubredditSubredditAutoAccessorGetBannerSize(
       {required Subreddit that});
 
   bool redditApiModelSubredditSubredditAutoAccessorGetCanAssignLinkFlair(
@@ -1003,26 +1368,10 @@ abstract class RustLibApi extends BaseApi {
   bool redditApiModelSubredditSubredditAutoAccessorGetCommunityReviewed(
       {required Subreddit that});
 
-  double redditApiModelSubredditSubredditAutoAccessorGetCreated(
-      {required Subreddit that});
-
-  double redditApiModelSubredditSubredditAutoAccessorGetCreatedUtc(
-      {required Subreddit that});
-
   String redditApiModelSubredditSubredditAutoAccessorGetDescription(
       {required Subreddit that});
 
   String? redditApiModelSubredditSubredditAutoAccessorGetDescriptionHtml(
-      {required Subreddit that});
-
-  bool
-      redditApiModelSubredditSubredditAutoAccessorGetDisableContributorRequests(
-          {required Subreddit that});
-
-  String redditApiModelSubredditSubredditAutoAccessorGetDisplayName(
-      {required Subreddit that});
-
-  String redditApiModelSubredditSubredditAutoAccessorGetDisplayNamePrefixed(
       {required Subreddit that});
 
   Int64List? redditApiModelSubredditSubredditAutoAccessorGetEmojisCustomSize(
@@ -1031,16 +1380,7 @@ abstract class RustLibApi extends BaseApi {
   bool redditApiModelSubredditSubredditAutoAccessorGetEmojisEnabled(
       {required Subreddit that});
 
-  bool redditApiModelSubredditSubredditAutoAccessorGetFreeFormReports(
-      {required Subreddit that});
-
   bool redditApiModelSubredditSubredditAutoAccessorGetHasMenuWidget(
-      {required Subreddit that});
-
-  String? redditApiModelSubredditSubredditAutoAccessorGetHeaderImg(
-      {required Subreddit that});
-
-  Int64List? redditApiModelSubredditSubredditAutoAccessorGetHeaderSize(
       {required Subreddit that});
 
   String redditApiModelSubredditSubredditAutoAccessorGetHeaderTitle(
@@ -1058,28 +1398,19 @@ abstract class RustLibApi extends BaseApi {
   bool? redditApiModelSubredditSubredditAutoAccessorGetIsEnrolledInNewModmail(
       {required Subreddit that});
 
-  String redditApiModelSubredditSubredditAutoAccessorGetKeyColor(
-      {required Subreddit that});
-
   String redditApiModelSubredditSubredditAutoAccessorGetLang(
       {required Subreddit that});
 
-  bool redditApiModelSubredditSubredditAutoAccessorGetLinkFlairEnabled(
-      {required Subreddit that});
-
-  String redditApiModelSubredditSubredditAutoAccessorGetLinkFlairPosition(
-      {required Subreddit that});
-
   String redditApiModelSubredditSubredditAutoAccessorGetMobileBannerImage(
-      {required Subreddit that});
-
-  String redditApiModelSubredditSubredditAutoAccessorGetName(
       {required Subreddit that});
 
   String? redditApiModelSubredditSubredditAutoAccessorGetNotificationLevel(
       {required Subreddit that});
 
   bool redditApiModelSubredditSubredditAutoAccessorGetOriginalContentTagEnabled(
+      {required Subreddit that});
+
+  Common redditApiModelSubredditSubredditAutoAccessorGetOther(
       {required Subreddit that});
 
   bool redditApiModelSubredditSubredditAutoAccessorGetOver18(
@@ -1089,25 +1420,10 @@ abstract class RustLibApi extends BaseApi {
       redditApiModelSubredditSubredditAutoAccessorGetPredictionLeaderboardEntryType(
           {required Subreddit that});
 
-  String redditApiModelSubredditSubredditAutoAccessorGetPrimaryColor(
-      {required Subreddit that});
-
-  String redditApiModelSubredditSubredditAutoAccessorGetPublicDescription(
-      {required Subreddit that});
-
   String? redditApiModelSubredditSubredditAutoAccessorGetPublicDescriptionHtml(
       {required Subreddit that});
 
   bool redditApiModelSubredditSubredditAutoAccessorGetPublicTraffic(
-      {required Subreddit that});
-
-  bool redditApiModelSubredditSubredditAutoAccessorGetQuarantine(
-      {required Subreddit that});
-
-  bool redditApiModelSubredditSubredditAutoAccessorGetRestrictCommenting(
-      {required Subreddit that});
-
-  bool redditApiModelSubredditSubredditAutoAccessorGetRestrictPosting(
       {required Subreddit that});
 
   bool redditApiModelSubredditSubredditAutoAccessorGetShouldArchivePosts(
@@ -1116,9 +1432,6 @@ abstract class RustLibApi extends BaseApi {
   bool
       redditApiModelSubredditSubredditAutoAccessorGetShouldShowMediaInCommentsSetting(
           {required Subreddit that});
-
-  bool redditApiModelSubredditSubredditAutoAccessorGetShowMedia(
-      {required Subreddit that});
 
   bool redditApiModelSubredditSubredditAutoAccessorGetShowMediaPreview(
       {required Subreddit that});
@@ -1129,31 +1442,13 @@ abstract class RustLibApi extends BaseApi {
   String redditApiModelSubredditSubredditAutoAccessorGetSubmissionType(
       {required Subreddit that});
 
-  String redditApiModelSubredditSubredditAutoAccessorGetSubmitLinkLabel(
-      {required Subreddit that});
-
   String redditApiModelSubredditSubredditAutoAccessorGetSubmitText(
       {required Subreddit that});
 
   String? redditApiModelSubredditSubredditAutoAccessorGetSubmitTextHtml(
       {required Subreddit that});
 
-  String redditApiModelSubredditSubredditAutoAccessorGetSubmitTextLabel(
-      {required Subreddit that});
-
-  String redditApiModelSubredditSubredditAutoAccessorGetSubredditType(
-      {required Subreddit that});
-
-  PlatformInt64 redditApiModelSubredditSubredditAutoAccessorGetSubscribers(
-      {required Subreddit that});
-
   String? redditApiModelSubredditSubredditAutoAccessorGetSuggestedCommentSort(
-      {required Subreddit that});
-
-  String redditApiModelSubredditSubredditAutoAccessorGetTitle(
-      {required Subreddit that});
-
-  String redditApiModelSubredditSubredditAutoAccessorGetUrl(
       {required Subreddit that});
 
   bool? redditApiModelSubredditSubredditAutoAccessorGetUserCanFlairInSr(
@@ -1168,21 +1463,6 @@ abstract class RustLibApi extends BaseApi {
   bool redditApiModelSubredditSubredditAutoAccessorGetUserHasFavorited(
       {required Subreddit that});
 
-  bool redditApiModelSubredditSubredditAutoAccessorGetUserIsBanned(
-      {required Subreddit that});
-
-  bool redditApiModelSubredditSubredditAutoAccessorGetUserIsContributor(
-      {required Subreddit that});
-
-  bool redditApiModelSubredditSubredditAutoAccessorGetUserIsModerator(
-      {required Subreddit that});
-
-  bool redditApiModelSubredditSubredditAutoAccessorGetUserIsMuted(
-      {required Subreddit that});
-
-  bool redditApiModelSubredditSubredditAutoAccessorGetUserIsSubscriber(
-      {required Subreddit that});
-
   bool? redditApiModelSubredditSubredditAutoAccessorGetUserSrFlairEnabled(
       {required Subreddit that});
 
@@ -1192,20 +1472,17 @@ abstract class RustLibApi extends BaseApi {
   bool? redditApiModelSubredditSubredditAutoAccessorGetWikiEnabled(
       {required Subreddit that});
 
-  BigInt? redditApiModelSubredditSubredditAutoAccessorGetWls(
+  int? redditApiModelSubredditSubredditAutoAccessorGetWls(
       {required Subreddit that});
 
-  void redditApiModelSubredditSubredditAutoAccessorSetAcceptFollowers(
-      {required Subreddit that, required bool acceptFollowers});
-
   void redditApiModelSubredditSubredditAutoAccessorSetAccountsActive(
-      {required Subreddit that, BigInt? accountsActive});
+      {required Subreddit that, int? accountsActive});
 
   void redditApiModelSubredditSubredditAutoAccessorSetAccountsActiveIsFuzzed(
       {required Subreddit that, required bool accountsActiveIsFuzzed});
 
   void redditApiModelSubredditSubredditAutoAccessorSetActiveUserCount(
-      {required Subreddit that, required BigInt activeUserCount});
+      {required Subreddit that, required int activeUserCount});
 
   void redditApiModelSubredditSubredditAutoAccessorSetAdvertiserCategory(
       {required Subreddit that, required String advertiserCategory});
@@ -1245,20 +1522,11 @@ abstract class RustLibApi extends BaseApi {
   void redditApiModelSubredditSubredditAutoAccessorSetAllowVideos(
       {required Subreddit that, required bool allowVideos});
 
-  void redditApiModelSubredditSubredditAutoAccessorSetAllowedMediaInComments(
-      {required Subreddit that, required List<String> allowedMediaInComments});
-
   void redditApiModelSubredditSubredditAutoAccessorSetBannerBackgroundColor(
       {required Subreddit that, required String bannerBackgroundColor});
 
   void redditApiModelSubredditSubredditAutoAccessorSetBannerBackgroundImage(
       {required Subreddit that, required String bannerBackgroundImage});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetBannerImg(
-      {required Subreddit that, required String bannerImg});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetBannerSize(
-      {required Subreddit that, Int64List? bannerSize});
 
   void redditApiModelSubredditSubredditAutoAccessorSetCanAssignLinkFlair(
       {required Subreddit that, required bool canAssignLinkFlair});
@@ -1280,27 +1548,11 @@ abstract class RustLibApi extends BaseApi {
   void redditApiModelSubredditSubredditAutoAccessorSetCommunityReviewed(
       {required Subreddit that, required bool communityReviewed});
 
-  void redditApiModelSubredditSubredditAutoAccessorSetCreated(
-      {required Subreddit that, required double created});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetCreatedUtc(
-      {required Subreddit that, required double createdUtc});
-
   void redditApiModelSubredditSubredditAutoAccessorSetDescription(
       {required Subreddit that, required String description});
 
   void redditApiModelSubredditSubredditAutoAccessorSetDescriptionHtml(
       {required Subreddit that, String? descriptionHtml});
-
-  void
-      redditApiModelSubredditSubredditAutoAccessorSetDisableContributorRequests(
-          {required Subreddit that, required bool disableContributorRequests});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetDisplayName(
-      {required Subreddit that, required String displayName});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetDisplayNamePrefixed(
-      {required Subreddit that, required String displayNamePrefixed});
 
   void redditApiModelSubredditSubredditAutoAccessorSetEmojisCustomSize(
       {required Subreddit that, Int64List? emojisCustomSize});
@@ -1308,17 +1560,8 @@ abstract class RustLibApi extends BaseApi {
   void redditApiModelSubredditSubredditAutoAccessorSetEmojisEnabled(
       {required Subreddit that, required bool emojisEnabled});
 
-  void redditApiModelSubredditSubredditAutoAccessorSetFreeFormReports(
-      {required Subreddit that, required bool freeFormReports});
-
   void redditApiModelSubredditSubredditAutoAccessorSetHasMenuWidget(
       {required Subreddit that, required bool hasMenuWidget});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetHeaderImg(
-      {required Subreddit that, String? headerImg});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetHeaderSize(
-      {required Subreddit that, Int64List? headerSize});
 
   void redditApiModelSubredditSubredditAutoAccessorSetHeaderTitle(
       {required Subreddit that, required String headerTitle});
@@ -1335,29 +1578,20 @@ abstract class RustLibApi extends BaseApi {
   void redditApiModelSubredditSubredditAutoAccessorSetIsEnrolledInNewModmail(
       {required Subreddit that, bool? isEnrolledInNewModmail});
 
-  void redditApiModelSubredditSubredditAutoAccessorSetKeyColor(
-      {required Subreddit that, required String keyColor});
-
   void redditApiModelSubredditSubredditAutoAccessorSetLang(
       {required Subreddit that, required String lang});
 
-  void redditApiModelSubredditSubredditAutoAccessorSetLinkFlairEnabled(
-      {required Subreddit that, required bool linkFlairEnabled});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetLinkFlairPosition(
-      {required Subreddit that, required String linkFlairPosition});
-
   void redditApiModelSubredditSubredditAutoAccessorSetMobileBannerImage(
       {required Subreddit that, required String mobileBannerImage});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetName(
-      {required Subreddit that, required String name});
 
   void redditApiModelSubredditSubredditAutoAccessorSetNotificationLevel(
       {required Subreddit that, String? notificationLevel});
 
   void redditApiModelSubredditSubredditAutoAccessorSetOriginalContentTagEnabled(
       {required Subreddit that, required bool originalContentTagEnabled});
+
+  void redditApiModelSubredditSubredditAutoAccessorSetOther(
+      {required Subreddit that, required Common other});
 
   void redditApiModelSubredditSubredditAutoAccessorSetOver18(
       {required Subreddit that, required bool over18});
@@ -1367,26 +1601,11 @@ abstract class RustLibApi extends BaseApi {
           {required Subreddit that,
           required PlatformInt64 predictionLeaderboardEntryType});
 
-  void redditApiModelSubredditSubredditAutoAccessorSetPrimaryColor(
-      {required Subreddit that, required String primaryColor});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetPublicDescription(
-      {required Subreddit that, required String publicDescription});
-
   void redditApiModelSubredditSubredditAutoAccessorSetPublicDescriptionHtml(
       {required Subreddit that, String? publicDescriptionHtml});
 
   void redditApiModelSubredditSubredditAutoAccessorSetPublicTraffic(
       {required Subreddit that, required bool publicTraffic});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetQuarantine(
-      {required Subreddit that, required bool quarantine});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetRestrictCommenting(
-      {required Subreddit that, required bool restrictCommenting});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetRestrictPosting(
-      {required Subreddit that, required bool restrictPosting});
 
   void redditApiModelSubredditSubredditAutoAccessorSetShouldArchivePosts(
       {required Subreddit that, required bool shouldArchivePosts});
@@ -1395,9 +1614,6 @@ abstract class RustLibApi extends BaseApi {
       redditApiModelSubredditSubredditAutoAccessorSetShouldShowMediaInCommentsSetting(
           {required Subreddit that,
           required bool shouldShowMediaInCommentsSetting});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetShowMedia(
-      {required Subreddit that, required bool showMedia});
 
   void redditApiModelSubredditSubredditAutoAccessorSetShowMediaPreview(
       {required Subreddit that, required bool showMediaPreview});
@@ -1408,32 +1624,14 @@ abstract class RustLibApi extends BaseApi {
   void redditApiModelSubredditSubredditAutoAccessorSetSubmissionType(
       {required Subreddit that, required String submissionType});
 
-  void redditApiModelSubredditSubredditAutoAccessorSetSubmitLinkLabel(
-      {required Subreddit that, required String submitLinkLabel});
-
   void redditApiModelSubredditSubredditAutoAccessorSetSubmitText(
       {required Subreddit that, required String submitText});
 
   void redditApiModelSubredditSubredditAutoAccessorSetSubmitTextHtml(
       {required Subreddit that, String? submitTextHtml});
 
-  void redditApiModelSubredditSubredditAutoAccessorSetSubmitTextLabel(
-      {required Subreddit that, required String submitTextLabel});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetSubredditType(
-      {required Subreddit that, required String subredditType});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetSubscribers(
-      {required Subreddit that, required PlatformInt64 subscribers});
-
   void redditApiModelSubredditSubredditAutoAccessorSetSuggestedCommentSort(
       {required Subreddit that, String? suggestedCommentSort});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetTitle(
-      {required Subreddit that, required String title});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetUrl(
-      {required Subreddit that, required String url});
 
   void redditApiModelSubredditSubredditAutoAccessorSetUserCanFlairInSr(
       {required Subreddit that, bool? userCanFlairInSr});
@@ -1447,21 +1645,6 @@ abstract class RustLibApi extends BaseApi {
   void redditApiModelSubredditSubredditAutoAccessorSetUserHasFavorited(
       {required Subreddit that, required bool userHasFavorited});
 
-  void redditApiModelSubredditSubredditAutoAccessorSetUserIsBanned(
-      {required Subreddit that, required bool userIsBanned});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetUserIsContributor(
-      {required Subreddit that, required bool userIsContributor});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetUserIsModerator(
-      {required Subreddit that, required bool userIsModerator});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetUserIsMuted(
-      {required Subreddit that, required bool userIsMuted});
-
-  void redditApiModelSubredditSubredditAutoAccessorSetUserIsSubscriber(
-      {required Subreddit that, required bool userIsSubscriber});
-
   void redditApiModelSubredditSubredditAutoAccessorSetUserSrFlairEnabled(
       {required Subreddit that, bool? userSrFlairEnabled});
 
@@ -1472,22 +1655,27 @@ abstract class RustLibApi extends BaseApi {
       {required Subreddit that, bool? wikiEnabled});
 
   void redditApiModelSubredditSubredditAutoAccessorSetWls(
-      {required Subreddit that, BigInt? wls});
+      {required Subreddit that, int? wls});
 
   Future<Subreddit> redditApiModelSubredditSubredditDefault();
 
-  Icon? redditApiModelSubredditSubredditIcon({required Subreddit that});
+  SubredditIcon redditApiModelSubredditSubredditIcon({required Subreddit that});
 
   Future<AuthorInfo> redditApiModelAuthorAuthorInfoDefault();
 
   Future<CommentContributionSettings>
       redditApiModelSubredditCommentContributionSettingsDefault();
 
+  void crateApiSimpleDebugComment({required Comment comment});
+
   void crateApiSimpleDebugPost({required Post post});
 
-  Future<Features> redditApiModelUserFeaturesDefault();
+  Future<Features> redditApiModelUserModelFeaturesDefault();
 
   Future<Feed> redditApiModelFeedFeedDefault();
+
+  Future<Url> redditApiModelFeedFeedSortAddToUrl(
+      {required FeedSort that, required Url url});
 
   Future<Flair> redditApiModelFlairFlairDefault();
 
@@ -1499,13 +1687,11 @@ abstract class RustLibApi extends BaseApi {
 
   Future<MediaEmbed> redditApiModelPostMediaEmbedDefault();
 
-  Future<Multi> redditApiModelMultiMultiDefault();
-
   Future<NotificationLevel> redditApiModelSubredditNotificationLevelDefault();
 
   Future<Oembed> redditApiModelPostOembedDefault();
 
-  Future<Preferences> redditApiModelUserPreferencesDefault();
+  Future<Preferences> redditApiModelUserModelPreferencesDefault();
 
   Future<Preview> redditApiModelPostPreviewDefault();
 
@@ -1517,26 +1703,34 @@ abstract class RustLibApi extends BaseApi {
 
   Future<SecureMediaEmbed> redditApiModelPostSecureMediaEmbedDefault();
 
-  Future<Snoovatar> redditApiModelUserSnoovatarDefault();
-
-  Future<Url> redditApiModelSortAddToUrl(
-      {required Sort that, required Url url});
+  Future<Snoovatar> redditApiModelUserModelSnoovatarDefault();
 
   Future<SubredditName> redditApiModelMultiSubredditNameDefault();
+
+  Fullname? redditApiModelThingName({required Thing that});
 
   Future<ThumbnailOption> redditApiModelPostThumbnailOptionDefault();
 
   Future<ThumbnailURL> redditApiModelPostThumbnailUrlDefault();
 
-  Future<User> redditApiModelUserUserDefault();
+  Future<User> redditApiModelUserModelUserDefault();
 
-  Future<UserInfo> redditApiModelUserUserInfoDefault();
+  Future<UserInfo> redditApiModelUserModelUserInfoDefault();
 
-  Future<UserSubreddit> redditApiModelUserUserSubredditDefault();
+  Future<UserSubreddit> redditApiModelUserModelUserSubredditDefault();
 
   Future<VariantInner> redditApiModelPostVariantInnerDefault();
 
   Future<Variants> redditApiModelPostVariantsDefault();
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_BoxFeedStream;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_BoxFeedStream;
+
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_BoxFeedStreamPtr;
 
   RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Client;
 
@@ -1550,13 +1744,17 @@ abstract class RustLibApi extends BaseApi {
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_CommentPtr;
 
-  RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_FeedState;
+  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Common;
 
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_FeedState;
+  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Common;
 
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_FeedStatePtr;
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_CommonPtr;
+
+  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Details;
+
+  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Details;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_DetailsPtr;
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_FeedStream;
@@ -1580,11 +1778,25 @@ abstract class RustLibApi extends BaseApi {
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_GalleryPtr;
 
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_GalleryData;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_GalleryData;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_GalleryDataPtr;
+
   RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Listing;
 
   RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Listing;
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_ListingPtr;
+
+  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Multi;
+
+  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Multi;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_MultiPtr;
 
   RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Pager;
 
@@ -1603,6 +1815,14 @@ abstract class RustLibApi extends BaseApi {
   RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_PostId;
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_PostIdPtr;
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_Streamable;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_Streamable;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_StreamablePtr;
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_Subreddit;
@@ -1674,13 +1894,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<List<Thing>> redditApiClientClientComments(
-      {required Client that, required String permalink}) {
+      {required Client that, required String permalink, CommentSort? sort}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
             that, serializer);
         sse_encode_String(permalink, serializer);
+        sse_encode_opt_box_autoadd_comment_sort(sort, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 2, port: port_);
       },
@@ -1689,7 +1910,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta: kRedditApiClientClientCommentsConstMeta,
-      argValues: [that, permalink],
+      argValues: [that, permalink, sort],
       apiImpl: this,
     ));
   }
@@ -1697,7 +1918,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kRedditApiClientClientCommentsConstMeta =>
       const TaskConstMeta(
         debugName: "Client_comments",
-        argNames: ["that", "permalink"],
+        argNames: ["that", "permalink", "sort"],
       );
 
   @override
@@ -1726,6 +1947,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Streamable redditApiClientClientFeedStream(
+      {required Client that, required Feed feed, required FeedSort sort}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+            that, serializer);
+        sse_encode_box_autoadd_feed(feed, serializer);
+        sse_encode_box_autoadd_feed_sort(sort, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiClientClientFeedStreamConstMeta,
+      argValues: [that, feed, sort],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiClientClientFeedStreamConstMeta =>
+      const TaskConstMeta(
+        debugName: "Client_feed_stream",
+        argNames: ["that", "feed", "sort"],
+      );
+
+  @override
   Future<Client> redditApiClientClientFromRefreshToken(
       {required String refreshToken}) {
     return handler.executeNormal(NormalTask(
@@ -1733,7 +1983,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(refreshToken, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 4, port: port_);
+            funcId: 5, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -1756,7 +2006,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<List<Thing>> redditApiClientClientLoadMoreComments(
       {required Client that,
       required Fullname parentId,
-      required List<String> children}) {
+      required List<String> children,
+      CommentSort? sort}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -1765,15 +2016,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
             parentId, serializer);
         sse_encode_list_String(children, serializer);
+        sse_encode_opt_box_autoadd_comment_sort(sort, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 5, port: port_);
+            funcId: 6, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_thing,
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta: kRedditApiClientClientLoadMoreCommentsConstMeta,
-      argValues: [that, parentId, children],
+      argValues: [that, parentId, children, sort],
       apiImpl: this,
     ));
   }
@@ -1781,7 +2033,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kRedditApiClientClientLoadMoreCommentsConstMeta =>
       const TaskConstMeta(
         debugName: "Client_load_more_comments",
-        argNames: ["that", "parentId", "children"],
+        argNames: ["that", "parentId", "children", "sort"],
       );
 
   @override
@@ -1792,7 +2044,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
             that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 6, port: port_);
+            funcId: 7, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_user_info,
@@ -1818,10 +2070,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
             that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 7, port: port_);
+            funcId: 8, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_list_multi,
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti,
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta: kRedditApiClientClientMultisConstMeta,
@@ -1842,7 +2095,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 8, port: port_);
+            funcId: 9, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -1862,6 +2115,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<void> redditApiClientClientNewLoggedOutUserToken(
+      {required Client that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+            that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 10, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kRedditApiClientClientNewLoggedOutUserTokenConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiClientClientNewLoggedOutUserTokenConstMeta =>
+      const TaskConstMeta(
+        debugName: "Client_new_logged_out_user_token",
+        argNames: ["that"],
+      );
+
+  @override
   Future<void> redditApiClientClientSave(
       {required Client that, required Fullname thing}) {
     return handler.executeNormal(NormalTask(
@@ -1872,7 +2152,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
             thing, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 9, port: port_);
+            funcId: 11, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1898,7 +2178,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
             that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 10, port: port_);
+            funcId: 12, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -1928,7 +2208,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
             thing, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 11, port: port_);
+            funcId: 13, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1947,6 +2227,239 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Streamable redditApiClientClientUserComments(
+      {required Client that,
+      required String username,
+      required UserStreamSort sort}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+            that, serializer);
+        sse_encode_String(username, serializer);
+        sse_encode_box_autoadd_user_stream_sort(sort, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiClientClientUserCommentsConstMeta,
+      argValues: [that, username, sort],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiClientClientUserCommentsConstMeta =>
+      const TaskConstMeta(
+        debugName: "Client_user_comments",
+        argNames: ["that", "username", "sort"],
+      );
+
+  @override
+  Streamable redditApiClientClientUserDownvoted(
+      {required Client that, required String username}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+            that, serializer);
+        sse_encode_String(username, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiClientClientUserDownvotedConstMeta,
+      argValues: [that, username],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiClientClientUserDownvotedConstMeta =>
+      const TaskConstMeta(
+        debugName: "Client_user_downvoted",
+        argNames: ["that", "username"],
+      );
+
+  @override
+  Streamable redditApiClientClientUserGilded(
+      {required Client that, required String username}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+            that, serializer);
+        sse_encode_String(username, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiClientClientUserGildedConstMeta,
+      argValues: [that, username],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiClientClientUserGildedConstMeta =>
+      const TaskConstMeta(
+        debugName: "Client_user_gilded",
+        argNames: ["that", "username"],
+      );
+
+  @override
+  Streamable redditApiClientClientUserHidden(
+      {required Client that, required String username}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+            that, serializer);
+        sse_encode_String(username, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiClientClientUserHiddenConstMeta,
+      argValues: [that, username],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiClientClientUserHiddenConstMeta =>
+      const TaskConstMeta(
+        debugName: "Client_user_hidden",
+        argNames: ["that", "username"],
+      );
+
+  @override
+  Streamable redditApiClientClientUserOverview(
+      {required Client that,
+      required String username,
+      required UserStreamSort sort}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+            that, serializer);
+        sse_encode_String(username, serializer);
+        sse_encode_box_autoadd_user_stream_sort(sort, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiClientClientUserOverviewConstMeta,
+      argValues: [that, username, sort],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiClientClientUserOverviewConstMeta =>
+      const TaskConstMeta(
+        debugName: "Client_user_overview",
+        argNames: ["that", "username", "sort"],
+      );
+
+  @override
+  Streamable redditApiClientClientUserSaved(
+      {required Client that, required String username}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+            that, serializer);
+        sse_encode_String(username, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiClientClientUserSavedConstMeta,
+      argValues: [that, username],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiClientClientUserSavedConstMeta =>
+      const TaskConstMeta(
+        debugName: "Client_user_saved",
+        argNames: ["that", "username"],
+      );
+
+  @override
+  Streamable redditApiClientClientUserSubmitted(
+      {required Client that,
+      required String username,
+      required UserStreamSort sort}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+            that, serializer);
+        sse_encode_String(username, serializer);
+        sse_encode_box_autoadd_user_stream_sort(sort, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiClientClientUserSubmittedConstMeta,
+      argValues: [that, username, sort],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiClientClientUserSubmittedConstMeta =>
+      const TaskConstMeta(
+        debugName: "Client_user_submitted",
+        argNames: ["that", "username", "sort"],
+      );
+
+  @override
+  Streamable redditApiClientClientUserUpvoted(
+      {required Client that, required String username}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+            that, serializer);
+        sse_encode_String(username, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiClientClientUserUpvotedConstMeta,
+      argValues: [that, username],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiClientClientUserUpvotedConstMeta =>
+      const TaskConstMeta(
+        debugName: "Client_user_upvoted",
+        argNames: ["that", "username"],
+      );
+
+  @override
   Future<void> redditApiClientClientVote(
       {required Client that,
       required Fullname thing,
@@ -1960,7 +2473,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             thing, serializer);
         sse_encode_vote_direction(direction, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 12, port: port_);
+            funcId: 22, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1985,7 +2498,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -2012,7 +2525,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_author_info,
@@ -2039,7 +2552,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2065,7 +2578,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2092,7 +2605,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -2119,7 +2632,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -2147,7 +2660,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -2167,17 +2680,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  PlatformInt64 redditApiModelCommentCommentAutoAccessorGetControversiality(
+  int redditApiModelCommentCommentAutoAccessorGetControversiality(
       {required Comment that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
+        decodeSuccessData: sse_decode_u_32,
         decodeErrorData: null,
       ),
       constMeta:
@@ -2202,7 +2715,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_f_64,
@@ -2229,7 +2742,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 32)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_f_64,
@@ -2250,17 +2763,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  PlatformInt64 redditApiModelCommentCommentAutoAccessorGetDepth(
+  int redditApiModelCommentCommentAutoAccessorGetDepth(
       {required Comment that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 33)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
+        decodeSuccessData: sse_decode_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelCommentCommentAutoAccessorGetDepthConstMeta,
@@ -2277,17 +2790,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  PlatformInt64 redditApiModelCommentCommentAutoAccessorGetDowns(
+  int redditApiModelCommentCommentAutoAccessorGetDowns(
       {required Comment that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 34)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
+        decodeSuccessData: sse_decode_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelCommentCommentAutoAccessorGetDownsConstMeta,
@@ -2311,7 +2824,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 35)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_f_64,
@@ -2331,17 +2844,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  PlatformInt64 redditApiModelCommentCommentAutoAccessorGetGilded(
+  int redditApiModelCommentCommentAutoAccessorGetGilded(
       {required Comment that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 36)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
+        decodeSuccessData: sse_decode_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelCommentCommentAutoAccessorGetGildedConstMeta,
@@ -2365,7 +2878,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 37)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2391,7 +2904,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 38)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -2419,7 +2932,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_bool,
@@ -2446,7 +2959,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 40)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2473,7 +2986,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 41)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -2500,7 +3013,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 32)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 42)!;
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -2527,7 +3040,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 33)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 43)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -2554,7 +3067,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 34)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 44)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2581,7 +3094,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 35)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2608,7 +3121,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 36)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 46)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -2628,17 +3141,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  PlatformInt64 redditApiModelCommentCommentAutoAccessorGetScore(
+  int redditApiModelCommentCommentAutoAccessorGetScore(
       {required Comment that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 37)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 47)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
+        decodeSuccessData: sse_decode_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelCommentCommentAutoAccessorGetScoreConstMeta,
@@ -2662,7 +3175,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 38)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 48)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -2690,7 +3203,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 49)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -2718,7 +3231,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 40)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 50)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -2745,7 +3258,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 41)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 51)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2772,7 +3285,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 42)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 52)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2800,7 +3313,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 43)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 53)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2828,7 +3341,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 44)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 54)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2849,17 +3362,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  PlatformInt64 redditApiModelCommentCommentAutoAccessorGetUps(
-      {required Comment that}) {
+  int redditApiModelCommentCommentAutoAccessorGetUps({required Comment that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 55)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
+        decodeSuccessData: sse_decode_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelCommentCommentAutoAccessorGetUpsConstMeta,
@@ -2883,7 +3395,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_bool(archived, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 46)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 56)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -2911,7 +3423,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_opt_box_autoadd_author_info(author, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 47)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 57)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -2939,7 +3451,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_String(body, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 48)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 58)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -2966,7 +3478,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_String(bodyHtml, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 49)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -2994,7 +3506,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_bool(canGild, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 50)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 60)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3022,7 +3534,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_bool(canModPost, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 51)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 61)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3051,7 +3563,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_bool(collapsed, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 52)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 62)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3072,14 +3584,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelCommentCommentAutoAccessorSetControversiality(
-      {required Comment that, required PlatformInt64 controversiality}) {
+      {required Comment that, required int controversiality}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        sse_encode_i_64(controversiality, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 53)!;
+        sse_encode_u_32(controversiality, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 63)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3108,7 +3620,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_f_64(created, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 54)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 64)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3136,7 +3648,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_f_64(createdUtc, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 55)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 65)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3158,14 +3670,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelCommentCommentAutoAccessorSetDepth(
-      {required Comment that, required PlatformInt64 depth}) {
+      {required Comment that, required int depth}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        sse_encode_i_64(depth, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 56)!;
+        sse_encode_u_32(depth, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 66)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3186,14 +3698,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelCommentCommentAutoAccessorSetDowns(
-      {required Comment that, required PlatformInt64 downs}) {
+      {required Comment that, required int downs}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        sse_encode_i_64(downs, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 57)!;
+        sse_encode_u_32(downs, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 67)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3221,7 +3733,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_opt_box_autoadd_f_64(edited, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 58)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 68)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3242,14 +3754,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelCommentCommentAutoAccessorSetGilded(
-      {required Comment that, required PlatformInt64 gilded}) {
+      {required Comment that, required int gilded}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        sse_encode_i_64(gilded, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59)!;
+        sse_encode_u_32(gilded, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 69)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3277,7 +3789,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_String(id, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 60)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 70)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3304,7 +3816,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_bool(isSubmitter, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 61)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 71)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3333,7 +3845,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_opt_box_autoadd_bool(likes, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 62)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 72)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3361,7 +3873,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_String(linkId, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 63)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 73)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3389,7 +3901,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_bool(locked, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 64)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 74)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3418,7 +3930,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
             name, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 65)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 75)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3445,7 +3957,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_bool(noFollow, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 66)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 76)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3473,7 +3985,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_String(parentId, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 67)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 77)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3501,7 +4013,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_String(permalink, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 68)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 78)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3529,7 +4041,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_bool(saved, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 69)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 79)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3550,14 +4062,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelCommentCommentAutoAccessorSetScore(
-      {required Comment that, required PlatformInt64 score}) {
+      {required Comment that, required int score}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        sse_encode_i_64(score, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 70)!;
+        sse_encode_u_32(score, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 80)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3585,7 +4097,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_bool(scoreHidden, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 71)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 81)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3614,7 +4126,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_bool(sendReplies, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 72)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 82)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3643,7 +4155,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_bool(stickied, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 73)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 83)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3671,7 +4183,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_String(subreddit, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 74)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 84)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3699,7 +4211,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_String(subredditId, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 75)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 85)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3728,7 +4240,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_String(subredditNamePrefixed, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 76)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 86)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3757,7 +4269,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
         sse_encode_String(subredditType, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 77)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 87)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3779,14 +4291,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelCommentCommentAutoAccessorSetUps(
-      {required Comment that, required PlatformInt64 ups}) {
+      {required Comment that, required int ups}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        sse_encode_i_64(ups, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 78)!;
+        sse_encode_u_32(ups, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 88)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3810,7 +4322,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 79, port: port_);
+            funcId: 89, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -3836,7 +4348,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 80)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 90)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_thing,
@@ -3855,420 +4367,2342 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  bool crateApiSimpleFeedStateGetDone({required FeedState that}) {
+  bool redditApiModelSubredditCommonAutoAccessorGetAcceptFollowers(
+      {required Common that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 81)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 91)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleFeedStateGetDoneConstMeta,
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetAcceptFollowersConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleFeedStateGetDoneConstMeta =>
-      const TaskConstMeta(
-        debugName: "FeedState_get_done(dart_style=done)",
-        argNames: ["that"],
-      );
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetAcceptFollowersConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_accept_followers",
+            argNames: ["that"],
+          );
 
   @override
-  Feed crateApiSimpleFeedStateGetFeed({required FeedState that}) {
+  List<String>
+      redditApiModelSubredditCommonAutoAccessorGetAllowedMediaInComments(
+          {required Common that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 82)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 92)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_feed,
+        decodeSuccessData: sse_decode_list_String,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleFeedStateGetFeedConstMeta,
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetAllowedMediaInCommentsConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleFeedStateGetFeedConstMeta =>
-      const TaskConstMeta(
-        debugName: "FeedState_get_feed(dart_style=feed)",
-        argNames: ["that"],
-      );
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetAllowedMediaInCommentsConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_allowed_media_in_comments",
+            argNames: ["that"],
+          );
 
   @override
-  int crateApiSimpleFeedStateGetLength({required FeedState that}) {
+  String redditApiModelSubredditCommonAutoAccessorGetBannerImg(
+      {required Common that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 83)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_u_32,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiSimpleFeedStateGetLengthConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiSimpleFeedStateGetLengthConstMeta =>
-      const TaskConstMeta(
-        debugName: "FeedState_get_length(dart_style=length)",
-        argNames: ["that"],
-      );
-
-  @override
-  bool crateApiSimpleFeedStateGetLoading({required FeedState that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 84)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiSimpleFeedStateGetLoadingConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiSimpleFeedStateGetLoadingConstMeta =>
-      const TaskConstMeta(
-        debugName: "FeedState_get_loading(dart_style=loading)",
-        argNames: ["that"],
-      );
-
-  @override
-  Sort crateApiSimpleFeedStateGetSort({required FeedState that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 85)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_sort,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiSimpleFeedStateGetSortConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiSimpleFeedStateGetSortConstMeta =>
-      const TaskConstMeta(
-        debugName: "FeedState_get_sort(dart_style=sort)",
-        argNames: ["that"],
-      );
-
-  @override
-  String crateApiSimpleFeedStateGetSortString({required FeedState that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 86)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 93)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleFeedStateGetSortStringConstMeta,
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetBannerImgConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleFeedStateGetSortStringConstMeta =>
-      const TaskConstMeta(
-        debugName: "FeedState_get_sort_string(dart_style=sort_string)",
-        argNames: ["that"],
-      );
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetBannerImgConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_banner_img",
+            argNames: ["that"],
+          );
 
   @override
-  String crateApiSimpleFeedStateGetTitle({required FeedState that}) {
+  Int64List? redditApiModelSubredditCommonAutoAccessorGetBannerSize(
+      {required Common that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 87)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 94)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_list_prim_i_64_strict,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetBannerSizeConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetBannerSizeConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_banner_size",
+            argNames: ["that"],
+          );
+
+  @override
+  double redditApiModelSubredditCommonAutoAccessorGetCreated(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 95)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_f_64,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditCommonAutoAccessorGetCreatedConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetCreatedConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_created",
+            argNames: ["that"],
+          );
+
+  @override
+  double redditApiModelSubredditCommonAutoAccessorGetCreatedUtc(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 96)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_f_64,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetCreatedUtcConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetCreatedUtcConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_created_utc",
+            argNames: ["that"],
+          );
+
+  @override
+  bool redditApiModelSubredditCommonAutoAccessorGetDisableContributorRequests(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 97)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetDisableContributorRequestsConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetDisableContributorRequestsConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_disable_contributor_requests",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelSubredditCommonAutoAccessorGetDisplayName(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 98)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleFeedStateGetTitleConstMeta,
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetDisplayNameConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleFeedStateGetTitleConstMeta =>
-      const TaskConstMeta(
-        debugName: "FeedState_get_title(dart_style=title)",
-        argNames: ["that"],
-      );
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetDisplayNameConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_display_name",
+            argNames: ["that"],
+          );
 
   @override
-  FeedState crateApiSimpleFeedStateNew(
-      {required Feed feed, required Sort sort}) {
+  String redditApiModelSubredditCommonAutoAccessorGetDisplayNamePrefixed(
+      {required Common that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_feed(feed, serializer);
-        sse_encode_box_autoadd_sort(sort, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 88)!;
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 99)!;
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState,
+        decodeSuccessData: sse_decode_String,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleFeedStateNewConstMeta,
-      argValues: [feed, sort],
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetDisplayNamePrefixedConstMeta,
+      argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleFeedStateNewConstMeta => const TaskConstMeta(
-        debugName: "FeedState_new",
-        argNames: ["feed", "sort"],
-      );
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetDisplayNamePrefixedConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_display_name_prefixed",
+            argNames: ["that"],
+          );
 
   @override
-  Future<bool> crateApiSimpleFeedStateNext({required FeedState that}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
+  bool redditApiModelSubredditCommonAutoAccessorGetFreeFormReports(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
             that, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 89, port: port_);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 100)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
-        decodeErrorData: sse_decode_AnyhowException,
+        decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleFeedStateNextConstMeta,
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetFreeFormReportsConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleFeedStateNextConstMeta =>
-      const TaskConstMeta(
-        debugName: "FeedState_next",
-        argNames: ["that"],
-      );
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetFreeFormReportsConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_free_form_reports",
+            argNames: ["that"],
+          );
 
   @override
-  Post? crateApiSimpleFeedStateNth({required FeedState that, required int n}) {
+  String? redditApiModelSubredditCommonAutoAccessorGetHeaderImg(
+      {required Common that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
             that, serializer);
-        sse_encode_u_32(n, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 90)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 101)!;
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost,
+        decodeSuccessData: sse_decode_opt_String,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleFeedStateNthConstMeta,
-      argValues: [that, n],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiSimpleFeedStateNthConstMeta => const TaskConstMeta(
-        debugName: "FeedState_nth",
-        argNames: ["that", "n"],
-      );
-
-  @override
-  Future<void> crateApiSimpleFeedStateRefresh({required FeedState that}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
-            that, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 91, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiSimpleFeedStateRefreshConstMeta,
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetHeaderImgConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleFeedStateRefreshConstMeta =>
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetHeaderImgConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_header_img",
+            argNames: ["that"],
+          );
+
+  @override
+  Int64List? redditApiModelSubredditCommonAutoAccessorGetHeaderSize(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 102)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_list_prim_i_64_strict,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetHeaderSizeConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetHeaderSizeConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_header_size",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelSubredditCommonAutoAccessorGetKeyColor(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 103)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditCommonAutoAccessorGetKeyColorConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetKeyColorConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_key_color",
+            argNames: ["that"],
+          );
+
+  @override
+  bool redditApiModelSubredditCommonAutoAccessorGetLinkFlairEnabled(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 104)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetLinkFlairEnabledConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetLinkFlairEnabledConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_link_flair_enabled",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelSubredditCommonAutoAccessorGetLinkFlairPosition(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 105)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetLinkFlairPositionConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetLinkFlairPositionConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_link_flair_position",
+            argNames: ["that"],
+          );
+
+  @override
+  Fullname redditApiModelSubredditCommonAutoAccessorGetName(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 106)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditCommonAutoAccessorGetNameConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetNameConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_name",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelSubredditCommonAutoAccessorGetPrimaryColor(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 107)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetPrimaryColorConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetPrimaryColorConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_primary_color",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelSubredditCommonAutoAccessorGetPublicDescription(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 108)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetPublicDescriptionConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetPublicDescriptionConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_public_description",
+            argNames: ["that"],
+          );
+
+  @override
+  bool redditApiModelSubredditCommonAutoAccessorGetQuarantine(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 109)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetQuarantineConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetQuarantineConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_quarantine",
+            argNames: ["that"],
+          );
+
+  @override
+  bool redditApiModelSubredditCommonAutoAccessorGetRestrictCommenting(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 110)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetRestrictCommentingConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetRestrictCommentingConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_restrict_commenting",
+            argNames: ["that"],
+          );
+
+  @override
+  bool redditApiModelSubredditCommonAutoAccessorGetRestrictPosting(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 111)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetRestrictPostingConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetRestrictPostingConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_restrict_posting",
+            argNames: ["that"],
+          );
+
+  @override
+  bool redditApiModelSubredditCommonAutoAccessorGetShowMedia(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 112)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetShowMediaConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetShowMediaConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_show_media",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelSubredditCommonAutoAccessorGetSubmitLinkLabel(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 113)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetSubmitLinkLabelConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetSubmitLinkLabelConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_submit_link_label",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelSubredditCommonAutoAccessorGetSubmitTextLabel(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 114)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetSubmitTextLabelConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetSubmitTextLabelConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_submit_text_label",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelSubredditCommonAutoAccessorGetSubredditType(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 115)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetSubredditTypeConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetSubredditTypeConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_subreddit_type",
+            argNames: ["that"],
+          );
+
+  @override
+  PlatformInt64 redditApiModelSubredditCommonAutoAccessorGetSubscribers(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 116)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_i_64,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetSubscribersConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetSubscribersConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_subscribers",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelSubredditCommonAutoAccessorGetTitle(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 117)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditCommonAutoAccessorGetTitleConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetTitleConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_title",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelSubredditCommonAutoAccessorGetUrl(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 118)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditCommonAutoAccessorGetUrlConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelSubredditCommonAutoAccessorGetUrlConstMeta =>
       const TaskConstMeta(
-        debugName: "FeedState_refresh",
+        debugName: "Common_auto_accessor_get_url",
         argNames: ["that"],
       );
 
   @override
-  Future<void> crateApiSimpleFeedStateSave(
-      {required FeedState that, required int index, required bool save}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
+  bool redditApiModelSubredditCommonAutoAccessorGetUserIsBanned(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
             that, serializer);
-        sse_encode_u_32(index, serializer);
-        sse_encode_bool(save, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 92, port: port_);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 119)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleFeedStateSaveConstMeta,
-      argValues: [that, index, save],
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetUserIsBannedConstMeta,
+      argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleFeedStateSaveConstMeta =>
-      const TaskConstMeta(
-        debugName: "FeedState_save",
-        argNames: ["that", "index", "save"],
-      );
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetUserIsBannedConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_user_is_banned",
+            argNames: ["that"],
+          );
 
   @override
-  Future<void> crateApiSimpleFeedStateSetFeed(
-      {required FeedState that, required Feed feed}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
+  bool redditApiModelSubredditCommonAutoAccessorGetUserIsContributor(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
             that, serializer);
-        sse_encode_box_autoadd_feed(feed, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 93, port: port_);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 120)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetUserIsContributorConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetUserIsContributorConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_user_is_contributor",
+            argNames: ["that"],
+          );
+
+  @override
+  bool redditApiModelSubredditCommonAutoAccessorGetUserIsModerator(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 121)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetUserIsModeratorConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetUserIsModeratorConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_user_is_moderator",
+            argNames: ["that"],
+          );
+
+  @override
+  bool redditApiModelSubredditCommonAutoAccessorGetUserIsMuted(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 122)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetUserIsMutedConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetUserIsMutedConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_user_is_muted",
+            argNames: ["that"],
+          );
+
+  @override
+  bool redditApiModelSubredditCommonAutoAccessorGetUserIsSubscriber(
+      {required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 123)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorGetUserIsSubscriberConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorGetUserIsSubscriberConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_get_user_is_subscriber",
+            argNames: ["that"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetAcceptFollowers(
+      {required Common that, required bool acceptFollowers}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_bool(acceptFollowers, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 124)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleFeedStateSetFeedConstMeta,
-      argValues: [that, feed],
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetAcceptFollowersConstMeta,
+      argValues: [that, acceptFollowers],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleFeedStateSetFeedConstMeta =>
-      const TaskConstMeta(
-        debugName: "FeedState_set_feed(dart_style=feed)",
-        argNames: ["that", "feed"],
-      );
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetAcceptFollowersConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_accept_followers",
+            argNames: ["that", "acceptFollowers"],
+          );
 
   @override
-  Future<void> crateApiSimpleFeedStateSetSort(
-      {required FeedState that, required Sort sort}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
+  void redditApiModelSubredditCommonAutoAccessorSetAllowedMediaInComments(
+      {required Common that, required List<String> allowedMediaInComments}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
             that, serializer);
-        sse_encode_box_autoadd_sort(sort, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 94, port: port_);
+        sse_encode_list_String(allowedMediaInComments, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 125)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleFeedStateSetSortConstMeta,
-      argValues: [that, sort],
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetAllowedMediaInCommentsConstMeta,
+      argValues: [that, allowedMediaInComments],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleFeedStateSetSortConstMeta =>
-      const TaskConstMeta(
-        debugName: "FeedState_set_sort(dart_style=sort)",
-        argNames: ["that", "sort"],
-      );
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetAllowedMediaInCommentsConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_allowed_media_in_comments",
+            argNames: ["that", "allowedMediaInComments"],
+          );
 
   @override
-  Future<void> crateApiSimpleFeedStateVote(
-      {required FeedState that,
-      required int index,
-      required VoteDirection direction}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
+  void redditApiModelSubredditCommonAutoAccessorSetBannerImg(
+      {required Common that, required String bannerImg}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
             that, serializer);
-        sse_encode_u_32(index, serializer);
-        sse_encode_vote_direction(direction, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 95, port: port_);
+        sse_encode_String(bannerImg, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 126)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
+        decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleFeedStateVoteConstMeta,
-      argValues: [that, index, direction],
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetBannerImgConstMeta,
+      argValues: [that, bannerImg],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleFeedStateVoteConstMeta =>
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetBannerImgConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_banner_img",
+            argNames: ["that", "bannerImg"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetBannerSize(
+      {required Common that, Int64List? bannerSize}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_opt_list_prim_i_64_strict(bannerSize, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 127)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetBannerSizeConstMeta,
+      argValues: [that, bannerSize],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetBannerSizeConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_banner_size",
+            argNames: ["that", "bannerSize"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetCreated(
+      {required Common that, required double created}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_f_64(created, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 128)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditCommonAutoAccessorSetCreatedConstMeta,
+      argValues: [that, created],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetCreatedConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_created",
+            argNames: ["that", "created"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetCreatedUtc(
+      {required Common that, required double createdUtc}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_f_64(createdUtc, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 129)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetCreatedUtcConstMeta,
+      argValues: [that, createdUtc],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetCreatedUtcConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_created_utc",
+            argNames: ["that", "createdUtc"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetDisableContributorRequests(
+      {required Common that, required bool disableContributorRequests}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_bool(disableContributorRequests, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 130)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetDisableContributorRequestsConstMeta,
+      argValues: [that, disableContributorRequests],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetDisableContributorRequestsConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_disable_contributor_requests",
+            argNames: ["that", "disableContributorRequests"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetDisplayName(
+      {required Common that, required String displayName}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_String(displayName, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 131)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetDisplayNameConstMeta,
+      argValues: [that, displayName],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetDisplayNameConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_display_name",
+            argNames: ["that", "displayName"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetDisplayNamePrefixed(
+      {required Common that, required String displayNamePrefixed}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_String(displayNamePrefixed, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 132)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetDisplayNamePrefixedConstMeta,
+      argValues: [that, displayNamePrefixed],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetDisplayNamePrefixedConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_display_name_prefixed",
+            argNames: ["that", "displayNamePrefixed"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetFreeFormReports(
+      {required Common that, required bool freeFormReports}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_bool(freeFormReports, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 133)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetFreeFormReportsConstMeta,
+      argValues: [that, freeFormReports],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetFreeFormReportsConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_free_form_reports",
+            argNames: ["that", "freeFormReports"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetHeaderImg(
+      {required Common that, String? headerImg}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_opt_String(headerImg, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 134)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetHeaderImgConstMeta,
+      argValues: [that, headerImg],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetHeaderImgConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_header_img",
+            argNames: ["that", "headerImg"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetHeaderSize(
+      {required Common that, Int64List? headerSize}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_opt_list_prim_i_64_strict(headerSize, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 135)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetHeaderSizeConstMeta,
+      argValues: [that, headerSize],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetHeaderSizeConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_header_size",
+            argNames: ["that", "headerSize"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetKeyColor(
+      {required Common that, required String keyColor}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_String(keyColor, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 136)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditCommonAutoAccessorSetKeyColorConstMeta,
+      argValues: [that, keyColor],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetKeyColorConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_key_color",
+            argNames: ["that", "keyColor"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetLinkFlairEnabled(
+      {required Common that, required bool linkFlairEnabled}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_bool(linkFlairEnabled, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 137)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetLinkFlairEnabledConstMeta,
+      argValues: [that, linkFlairEnabled],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetLinkFlairEnabledConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_link_flair_enabled",
+            argNames: ["that", "linkFlairEnabled"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetLinkFlairPosition(
+      {required Common that, required String linkFlairPosition}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_String(linkFlairPosition, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 138)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetLinkFlairPositionConstMeta,
+      argValues: [that, linkFlairPosition],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetLinkFlairPositionConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_link_flair_position",
+            argNames: ["that", "linkFlairPosition"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetName(
+      {required Common that, required Fullname name}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+            name, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 139)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditCommonAutoAccessorSetNameConstMeta,
+      argValues: [that, name],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetNameConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_name",
+            argNames: ["that", "name"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetPrimaryColor(
+      {required Common that, required String primaryColor}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_String(primaryColor, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 140)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetPrimaryColorConstMeta,
+      argValues: [that, primaryColor],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetPrimaryColorConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_primary_color",
+            argNames: ["that", "primaryColor"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetPublicDescription(
+      {required Common that, required String publicDescription}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_String(publicDescription, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 141)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetPublicDescriptionConstMeta,
+      argValues: [that, publicDescription],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetPublicDescriptionConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_public_description",
+            argNames: ["that", "publicDescription"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetQuarantine(
+      {required Common that, required bool quarantine}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_bool(quarantine, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 142)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetQuarantineConstMeta,
+      argValues: [that, quarantine],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetQuarantineConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_quarantine",
+            argNames: ["that", "quarantine"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetRestrictCommenting(
+      {required Common that, required bool restrictCommenting}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_bool(restrictCommenting, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 143)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetRestrictCommentingConstMeta,
+      argValues: [that, restrictCommenting],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetRestrictCommentingConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_restrict_commenting",
+            argNames: ["that", "restrictCommenting"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetRestrictPosting(
+      {required Common that, required bool restrictPosting}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_bool(restrictPosting, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 144)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetRestrictPostingConstMeta,
+      argValues: [that, restrictPosting],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetRestrictPostingConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_restrict_posting",
+            argNames: ["that", "restrictPosting"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetShowMedia(
+      {required Common that, required bool showMedia}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_bool(showMedia, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 145)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetShowMediaConstMeta,
+      argValues: [that, showMedia],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetShowMediaConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_show_media",
+            argNames: ["that", "showMedia"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetSubmitLinkLabel(
+      {required Common that, required String submitLinkLabel}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_String(submitLinkLabel, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 146)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetSubmitLinkLabelConstMeta,
+      argValues: [that, submitLinkLabel],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetSubmitLinkLabelConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_submit_link_label",
+            argNames: ["that", "submitLinkLabel"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetSubmitTextLabel(
+      {required Common that, required String submitTextLabel}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_String(submitTextLabel, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 147)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetSubmitTextLabelConstMeta,
+      argValues: [that, submitTextLabel],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetSubmitTextLabelConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_submit_text_label",
+            argNames: ["that", "submitTextLabel"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetSubredditType(
+      {required Common that, required String subredditType}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_String(subredditType, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 148)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetSubredditTypeConstMeta,
+      argValues: [that, subredditType],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetSubredditTypeConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_subreddit_type",
+            argNames: ["that", "subredditType"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetSubscribers(
+      {required Common that, required PlatformInt64 subscribers}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_i_64(subscribers, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 149)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetSubscribersConstMeta,
+      argValues: [that, subscribers],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetSubscribersConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_subscribers",
+            argNames: ["that", "subscribers"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetTitle(
+      {required Common that, required String title}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_String(title, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 150)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditCommonAutoAccessorSetTitleConstMeta,
+      argValues: [that, title],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetTitleConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_title",
+            argNames: ["that", "title"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetUrl(
+      {required Common that, required String url}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_String(url, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 151)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditCommonAutoAccessorSetUrlConstMeta,
+      argValues: [that, url],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelSubredditCommonAutoAccessorSetUrlConstMeta =>
       const TaskConstMeta(
-        debugName: "FeedState_vote",
-        argNames: ["that", "index", "direction"],
+        debugName: "Common_auto_accessor_set_url",
+        argNames: ["that", "url"],
       );
 
   @override
-  Future<FeedStream> redditApiModelFeedFeedStreamNew(
-      {required Client client, required Feed feed, required Sort sort}) {
+  void redditApiModelSubredditCommonAutoAccessorSetUserIsBanned(
+      {required Common that, required bool userIsBanned}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_bool(userIsBanned, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 152)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetUserIsBannedConstMeta,
+      argValues: [that, userIsBanned],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetUserIsBannedConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_user_is_banned",
+            argNames: ["that", "userIsBanned"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetUserIsContributor(
+      {required Common that, required bool userIsContributor}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_bool(userIsContributor, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 153)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetUserIsContributorConstMeta,
+      argValues: [that, userIsContributor],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetUserIsContributorConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_user_is_contributor",
+            argNames: ["that", "userIsContributor"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetUserIsModerator(
+      {required Common that, required bool userIsModerator}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_bool(userIsModerator, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 154)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetUserIsModeratorConstMeta,
+      argValues: [that, userIsModerator],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetUserIsModeratorConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_user_is_moderator",
+            argNames: ["that", "userIsModerator"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetUserIsMuted(
+      {required Common that, required bool userIsMuted}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_bool(userIsMuted, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 155)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetUserIsMutedConstMeta,
+      argValues: [that, userIsMuted],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetUserIsMutedConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_user_is_muted",
+            argNames: ["that", "userIsMuted"],
+          );
+
+  @override
+  void redditApiModelSubredditCommonAutoAccessorSetUserIsSubscriber(
+      {required Common that, required bool userIsSubscriber}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        sse_encode_bool(userIsSubscriber, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 156)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditCommonAutoAccessorSetUserIsSubscriberConstMeta,
+      argValues: [that, userIsSubscriber],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditCommonAutoAccessorSetUserIsSubscriberConstMeta =>
+          const TaskConstMeta(
+            debugName: "Common_auto_accessor_set_user_is_subscriber",
+            argNames: ["that", "userIsSubscriber"],
+          );
+
+  @override
+  Future<Common> redditApiModelSubredditCommonDefault() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 157, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditCommonDefaultConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelSubredditCommonDefaultConstMeta =>
+      const TaskConstMeta(
+        debugName: "Common_default",
+        argNames: [],
+      );
+
+  @override
+  SubredditIcon redditApiModelSubredditCommonIcon({required Common that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 158)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_subreddit_icon,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditCommonIconConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelSubredditCommonIconConstMeta =>
+      const TaskConstMeta(
+        debugName: "Common_icon",
+        argNames: ["that"],
+      );
+
+  @override
+  bool redditApiModelSubredditDetailsAutoAccessorGetDefaultSet(
+      {required Details that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 159)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditDetailsAutoAccessorGetDefaultSetConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditDetailsAutoAccessorGetDefaultSetConstMeta =>
+          const TaskConstMeta(
+            debugName: "Details_auto_accessor_get_default_set",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelSubredditDetailsAutoAccessorGetDescription(
+      {required Details that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 160)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditDetailsAutoAccessorGetDescriptionConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditDetailsAutoAccessorGetDescriptionConstMeta =>
+          const TaskConstMeta(
+            debugName: "Details_auto_accessor_get_description",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelSubredditDetailsAutoAccessorGetIconColor(
+      {required Details that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 161)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditDetailsAutoAccessorGetIconColorConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditDetailsAutoAccessorGetIconColorConstMeta =>
+          const TaskConstMeta(
+            debugName: "Details_auto_accessor_get_icon_color",
+            argNames: ["that"],
+          );
+
+  @override
+  Common redditApiModelSubredditDetailsAutoAccessorGetOther(
+      {required Details that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 162)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditDetailsAutoAccessorGetOtherConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditDetailsAutoAccessorGetOtherConstMeta =>
+          const TaskConstMeta(
+            debugName: "Details_auto_accessor_get_other",
+            argNames: ["that"],
+          );
+
+  @override
+  bool redditApiModelSubredditDetailsAutoAccessorGetOver18(
+      {required Details that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 163)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditDetailsAutoAccessorGetOver18ConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditDetailsAutoAccessorGetOver18ConstMeta =>
+          const TaskConstMeta(
+            debugName: "Details_auto_accessor_get_over_18",
+            argNames: ["that"],
+          );
+
+  @override
+  List<String> redditApiModelSubredditDetailsAutoAccessorGetPreviousNames(
+      {required Details that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 164)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_String,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditDetailsAutoAccessorGetPreviousNamesConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditDetailsAutoAccessorGetPreviousNamesConstMeta =>
+          const TaskConstMeta(
+            debugName: "Details_auto_accessor_get_previous_names",
+            argNames: ["that"],
+          );
+
+  @override
+  void redditApiModelSubredditDetailsAutoAccessorSetDefaultSet(
+      {required Details that, required bool defaultSet}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            that, serializer);
+        sse_encode_bool(defaultSet, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 165)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditDetailsAutoAccessorSetDefaultSetConstMeta,
+      argValues: [that, defaultSet],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditDetailsAutoAccessorSetDefaultSetConstMeta =>
+          const TaskConstMeta(
+            debugName: "Details_auto_accessor_set_default_set",
+            argNames: ["that", "defaultSet"],
+          );
+
+  @override
+  void redditApiModelSubredditDetailsAutoAccessorSetDescription(
+      {required Details that, required String description}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            that, serializer);
+        sse_encode_String(description, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 166)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditDetailsAutoAccessorSetDescriptionConstMeta,
+      argValues: [that, description],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditDetailsAutoAccessorSetDescriptionConstMeta =>
+          const TaskConstMeta(
+            debugName: "Details_auto_accessor_set_description",
+            argNames: ["that", "description"],
+          );
+
+  @override
+  void redditApiModelSubredditDetailsAutoAccessorSetIconColor(
+      {required Details that, required String iconColor}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            that, serializer);
+        sse_encode_String(iconColor, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 167)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditDetailsAutoAccessorSetIconColorConstMeta,
+      argValues: [that, iconColor],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditDetailsAutoAccessorSetIconColorConstMeta =>
+          const TaskConstMeta(
+            debugName: "Details_auto_accessor_set_icon_color",
+            argNames: ["that", "iconColor"],
+          );
+
+  @override
+  void redditApiModelSubredditDetailsAutoAccessorSetOther(
+      {required Details that, required Common other}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            that, serializer);
+        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            other, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 168)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditDetailsAutoAccessorSetOtherConstMeta,
+      argValues: [that, other],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditDetailsAutoAccessorSetOtherConstMeta =>
+          const TaskConstMeta(
+            debugName: "Details_auto_accessor_set_other",
+            argNames: ["that", "other"],
+          );
+
+  @override
+  void redditApiModelSubredditDetailsAutoAccessorSetOver18(
+      {required Details that, required bool over18}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            that, serializer);
+        sse_encode_bool(over18, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 169)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditDetailsAutoAccessorSetOver18ConstMeta,
+      argValues: [that, over18],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditDetailsAutoAccessorSetOver18ConstMeta =>
+          const TaskConstMeta(
+            debugName: "Details_auto_accessor_set_over_18",
+            argNames: ["that", "over18"],
+          );
+
+  @override
+  void redditApiModelSubredditDetailsAutoAccessorSetPreviousNames(
+      {required Details that, required List<String> previousNames}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            that, serializer);
+        sse_encode_list_String(previousNames, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 170)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditDetailsAutoAccessorSetPreviousNamesConstMeta,
+      argValues: [that, previousNames],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditDetailsAutoAccessorSetPreviousNamesConstMeta =>
+          const TaskConstMeta(
+            debugName: "Details_auto_accessor_set_previous_names",
+            argNames: ["that", "previousNames"],
+          );
+
+  @override
+  Future<Details> redditApiModelSubredditDetailsDefault() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 171, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditDetailsDefaultConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelSubredditDetailsDefaultConstMeta =>
+      const TaskConstMeta(
+        debugName: "Details_default",
+        argNames: [],
+      );
+
+  @override
+  SubredditIcon redditApiModelSubredditDetailsIcon({required Details that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 172)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_subreddit_icon,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditDetailsIconConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelSubredditDetailsIconConstMeta =>
+      const TaskConstMeta(
+        debugName: "Details_icon",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<BoxFeedStream> redditApiModelFeedFeedStreamNew(
+      {required Client client,
+      required Feed feed,
+      required FeedSort sort,
+      required Url baseUrl}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
             client, serializer);
         sse_encode_box_autoadd_feed(feed, serializer);
-        sse_encode_box_autoadd_sort(sort, serializer);
+        sse_encode_box_autoadd_feed_sort(sort, serializer);
+        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUrl(
+            baseUrl, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 96, port: port_);
+            funcId: 173, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedStream,
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxFeedStream,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelFeedFeedStreamNewConstMeta,
-      argValues: [client, feed, sort],
+      argValues: [client, feed, sort, baseUrl],
       apiImpl: this,
     ));
   }
@@ -4276,7 +6710,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kRedditApiModelFeedFeedStreamNewConstMeta =>
       const TaskConstMeta(
         debugName: "FeedStream_new",
-        argNames: ["client", "feed", "sort"],
+        argNames: ["client", "feed", "sort", "baseUrl"],
       );
 
   @override
@@ -4285,7 +6719,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 97, port: port_);
+            funcId: 174, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -4305,13 +6739,115 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<GalleryData> redditApiModelGalleryGalleryDataDefault() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 175, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGalleryData,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelGalleryGalleryDataDefaultConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelGalleryGalleryDataDefaultConstMeta =>
+      const TaskConstMeta(
+        debugName: "GalleryData_default",
+        argNames: [],
+      );
+
+  @override
+  Future<Gallery> redditApiModelGalleryGalleryDefault() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 176, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelGalleryGalleryDefaultConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelGalleryGalleryDefaultConstMeta =>
+      const TaskConstMeta(
+        debugName: "Gallery_default",
+        argNames: [],
+      );
+
+  @override
+  ImageBase redditApiModelGalleryGalleryGet(
+      {required Gallery that, required int index}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+            that, serializer);
+        sse_encode_u_32(index, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 177)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_image_base,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelGalleryGalleryGetConstMeta,
+      argValues: [that, index],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelGalleryGalleryGetConstMeta =>
+      const TaskConstMeta(
+        debugName: "Gallery_get",
+        argNames: ["that", "index"],
+      );
+
+  @override
+  int redditApiModelGalleryGalleryGetLength({required Gallery that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 178)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_32,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelGalleryGalleryGetLengthConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelGalleryGalleryGetLengthConstMeta =>
+      const TaskConstMeta(
+        debugName: "Gallery_get_length(dart_style=length)",
+        argNames: ["that"],
+      );
+
+  @override
   String? redditApiModelListingAutoAccessorGetAfter({required Listing that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 98)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 179)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -4336,7 +6872,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 99)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 180)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -4362,7 +6898,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 100)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 181)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_thing,
@@ -4381,16 +6917,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  BigInt? redditApiModelListingAutoAccessorGetDist({required Listing that}) {
+  int? redditApiModelListingAutoAccessorGetDist({required Listing that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 101)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 182)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_box_autoadd_u_64,
+        decodeSuccessData: sse_decode_opt_box_autoadd_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelListingAutoAccessorGetDistConstMeta,
@@ -4412,7 +6948,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 102)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 183)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -4439,7 +6975,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
             that, serializer);
         sse_encode_opt_String(after, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 103)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 184)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4466,7 +7002,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
             that, serializer);
         sse_encode_opt_String(before, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 104)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 185)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4493,7 +7029,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
             that, serializer);
         sse_encode_list_thing(children, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 105)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 186)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4513,14 +7049,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelListingAutoAccessorSetDist(
-      {required Listing that, BigInt? dist}) {
+      {required Listing that, int? dist}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
             that, serializer);
-        sse_encode_opt_box_autoadd_u_64(dist, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 106)!;
+        sse_encode_opt_box_autoadd_u_32(dist, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 187)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4547,7 +7083,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
             that, serializer);
         sse_encode_opt_String(modhash, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 107)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 188)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4571,7 +7107,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 108, port: port_);
+            funcId: 189, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -4591,6 +7127,1056 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  bool redditApiModelMultiMultiAutoAccessorGetCanEdit({required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 190)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetCanEditConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorGetCanEditConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_get_can_edit",
+        argNames: ["that"],
+      );
+
+  @override
+  String? redditApiModelMultiMultiAutoAccessorGetCopiedFrom(
+      {required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 191)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetCopiedFromConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorGetCopiedFromConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_get_copied_from",
+            argNames: ["that"],
+          );
+
+  @override
+  double redditApiModelMultiMultiAutoAccessorGetCreated({required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 192)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_f_64,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetCreatedConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorGetCreatedConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_get_created",
+        argNames: ["that"],
+      );
+
+  @override
+  double redditApiModelMultiMultiAutoAccessorGetCreatedUtc(
+      {required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 193)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_f_64,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetCreatedUtcConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorGetCreatedUtcConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_get_created_utc",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelMultiMultiAutoAccessorGetDescriptionHtml(
+      {required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 194)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelMultiMultiAutoAccessorGetDescriptionHtmlConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorGetDescriptionHtmlConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_get_description_html",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelMultiMultiAutoAccessorGetDescriptionMd(
+      {required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 195)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetDescriptionMdConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorGetDescriptionMdConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_get_description_md",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelMultiMultiAutoAccessorGetDisplayName(
+      {required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 196)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetDisplayNameConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorGetDisplayNameConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_get_display_name",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelMultiMultiAutoAccessorGetIconUrl({required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 197)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetIconUrlConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorGetIconUrlConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_get_icon_url",
+        argNames: ["that"],
+      );
+
+  @override
+  bool redditApiModelMultiMultiAutoAccessorGetIsFavorited(
+      {required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 198)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetIsFavoritedConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorGetIsFavoritedConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_get_is_favorited",
+            argNames: ["that"],
+          );
+
+  @override
+  bool redditApiModelMultiMultiAutoAccessorGetIsSubscriber(
+      {required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 199)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetIsSubscriberConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorGetIsSubscriberConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_get_is_subscriber",
+            argNames: ["that"],
+          );
+
+  @override
+  String? redditApiModelMultiMultiAutoAccessorGetKeyColor(
+      {required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 200)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetKeyColorConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorGetKeyColorConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_get_key_color",
+        argNames: ["that"],
+      );
+
+  @override
+  Fullname redditApiModelMultiMultiAutoAccessorGetName({required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 201)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetNameConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorGetNameConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_get_name",
+        argNames: ["that"],
+      );
+
+  @override
+  PlatformInt64 redditApiModelMultiMultiAutoAccessorGetNumSubscribers(
+      {required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 202)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_i_64,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelMultiMultiAutoAccessorGetNumSubscribersConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorGetNumSubscribersConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_get_num_subscribers",
+            argNames: ["that"],
+          );
+
+  @override
+  bool redditApiModelMultiMultiAutoAccessorGetOver18({required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 203)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetOver18ConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorGetOver18ConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_get_over_18",
+        argNames: ["that"],
+      );
+
+  @override
+  String redditApiModelMultiMultiAutoAccessorGetOwner({required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 204)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetOwnerConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorGetOwnerConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_get_owner",
+        argNames: ["that"],
+      );
+
+  @override
+  String redditApiModelMultiMultiAutoAccessorGetOwnerId({required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 205)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetOwnerIdConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorGetOwnerIdConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_get_owner_id",
+        argNames: ["that"],
+      );
+
+  @override
+  String redditApiModelMultiMultiAutoAccessorGetPath({required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 206)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetPathConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorGetPathConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_get_path",
+        argNames: ["that"],
+      );
+
+  @override
+  List<SubredditName> redditApiModelMultiMultiAutoAccessorGetSubreddits(
+      {required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 207)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_subreddit_name,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetSubredditsConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorGetSubredditsConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_get_subreddits",
+            argNames: ["that"],
+          );
+
+  @override
+  String redditApiModelMultiMultiAutoAccessorGetVisibility(
+      {required Multi that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 208)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorGetVisibilityConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorGetVisibilityConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_get_visibility",
+            argNames: ["that"],
+          );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetCanEdit(
+      {required Multi that, required bool canEdit}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_bool(canEdit, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 209)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetCanEditConstMeta,
+      argValues: [that, canEdit],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorSetCanEditConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_set_can_edit",
+        argNames: ["that", "canEdit"],
+      );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetCopiedFrom(
+      {required Multi that, String? copiedFrom}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_opt_String(copiedFrom, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 210)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetCopiedFromConstMeta,
+      argValues: [that, copiedFrom],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorSetCopiedFromConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_set_copied_from",
+            argNames: ["that", "copiedFrom"],
+          );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetCreated(
+      {required Multi that, required double created}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_f_64(created, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 211)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetCreatedConstMeta,
+      argValues: [that, created],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorSetCreatedConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_set_created",
+        argNames: ["that", "created"],
+      );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetCreatedUtc(
+      {required Multi that, required double createdUtc}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_f_64(createdUtc, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 212)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetCreatedUtcConstMeta,
+      argValues: [that, createdUtc],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorSetCreatedUtcConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_set_created_utc",
+            argNames: ["that", "createdUtc"],
+          );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetDescriptionHtml(
+      {required Multi that, required String descriptionHtml}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_String(descriptionHtml, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 213)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelMultiMultiAutoAccessorSetDescriptionHtmlConstMeta,
+      argValues: [that, descriptionHtml],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorSetDescriptionHtmlConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_set_description_html",
+            argNames: ["that", "descriptionHtml"],
+          );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetDescriptionMd(
+      {required Multi that, required String descriptionMd}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_String(descriptionMd, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 214)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetDescriptionMdConstMeta,
+      argValues: [that, descriptionMd],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorSetDescriptionMdConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_set_description_md",
+            argNames: ["that", "descriptionMd"],
+          );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetDisplayName(
+      {required Multi that, required String displayName}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_String(displayName, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 215)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetDisplayNameConstMeta,
+      argValues: [that, displayName],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorSetDisplayNameConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_set_display_name",
+            argNames: ["that", "displayName"],
+          );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetIconUrl(
+      {required Multi that, required String iconUrl}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_String(iconUrl, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 216)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetIconUrlConstMeta,
+      argValues: [that, iconUrl],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorSetIconUrlConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_set_icon_url",
+        argNames: ["that", "iconUrl"],
+      );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetIsFavorited(
+      {required Multi that, required bool isFavorited}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_bool(isFavorited, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 217)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetIsFavoritedConstMeta,
+      argValues: [that, isFavorited],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorSetIsFavoritedConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_set_is_favorited",
+            argNames: ["that", "isFavorited"],
+          );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetIsSubscriber(
+      {required Multi that, required bool isSubscriber}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_bool(isSubscriber, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 218)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetIsSubscriberConstMeta,
+      argValues: [that, isSubscriber],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorSetIsSubscriberConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_set_is_subscriber",
+            argNames: ["that", "isSubscriber"],
+          );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetKeyColor(
+      {required Multi that, String? keyColor}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_opt_String(keyColor, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 219)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetKeyColorConstMeta,
+      argValues: [that, keyColor],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorSetKeyColorConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_set_key_color",
+        argNames: ["that", "keyColor"],
+      );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetName(
+      {required Multi that, required Fullname name}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+            name, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 220)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetNameConstMeta,
+      argValues: [that, name],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorSetNameConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_set_name",
+        argNames: ["that", "name"],
+      );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetNumSubscribers(
+      {required Multi that, required PlatformInt64 numSubscribers}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_i_64(numSubscribers, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 221)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelMultiMultiAutoAccessorSetNumSubscribersConstMeta,
+      argValues: [that, numSubscribers],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorSetNumSubscribersConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_set_num_subscribers",
+            argNames: ["that", "numSubscribers"],
+          );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetOver18(
+      {required Multi that, required bool over18}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_bool(over18, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 222)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetOver18ConstMeta,
+      argValues: [that, over18],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorSetOver18ConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_set_over_18",
+        argNames: ["that", "over18"],
+      );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetOwner(
+      {required Multi that, required String owner}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_String(owner, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 223)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetOwnerConstMeta,
+      argValues: [that, owner],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorSetOwnerConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_set_owner",
+        argNames: ["that", "owner"],
+      );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetOwnerId(
+      {required Multi that, required String ownerId}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_String(ownerId, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 224)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetOwnerIdConstMeta,
+      argValues: [that, ownerId],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorSetOwnerIdConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_set_owner_id",
+        argNames: ["that", "ownerId"],
+      );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetPath(
+      {required Multi that, required String path}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_String(path, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 225)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetPathConstMeta,
+      argValues: [that, path],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiAutoAccessorSetPathConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_auto_accessor_set_path",
+        argNames: ["that", "path"],
+      );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetSubreddits(
+      {required Multi that, required List<SubredditName> subreddits}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_list_subreddit_name(subreddits, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 226)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetSubredditsConstMeta,
+      argValues: [that, subreddits],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorSetSubredditsConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_set_subreddits",
+            argNames: ["that", "subreddits"],
+          );
+
+  @override
+  void redditApiModelMultiMultiAutoAccessorSetVisibility(
+      {required Multi that, required String visibility}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            that, serializer);
+        sse_encode_String(visibility, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 227)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiAutoAccessorSetVisibilityConstMeta,
+      argValues: [that, visibility],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelMultiMultiAutoAccessorSetVisibilityConstMeta =>
+          const TaskConstMeta(
+            debugName: "Multi_auto_accessor_set_visibility",
+            argNames: ["that", "visibility"],
+          );
+
+  @override
+  Future<Multi> redditApiModelMultiMultiDefault() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 228, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelMultiMultiDefaultConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelMultiMultiDefaultConstMeta =>
+      const TaskConstMeta(
+        debugName: "Multi_default",
+        argNames: [],
+      );
+
+  @override
   Future<Url> redditApiClientPagerAddToUrl(
       {required Pager that, required Url url}) {
     return handler.executeNormal(NormalTask(
@@ -4601,7 +8187,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUrl(
             url, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 109, port: port_);
+            funcId: 229, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -4629,7 +8215,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_opt_String(after, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 110, port: port_);
+            funcId: 230, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4656,7 +8242,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_opt_String(before, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 111, port: port_);
+            funcId: 231, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4679,7 +8265,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 112, port: port_);
+            funcId: 232, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -4704,7 +8290,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 113, port: port_);
+            funcId: 233, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -4731,7 +8317,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 114)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 234)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_opt_String,
@@ -4758,7 +8344,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 115)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 235)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -4786,10 +8372,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 116)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 236)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_box_autoadd_f_32,
+        decodeSuccessData: sse_decode_opt_box_autoadd_f_64,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetApprovedAtUtcConstMeta,
@@ -4813,7 +8399,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 117)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 237)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -4838,7 +8424,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 118)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 238)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -4864,7 +8450,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 119)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 239)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_author_info,
@@ -4890,7 +8476,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 120)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 240)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_opt_String,
@@ -4916,10 +8502,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 121)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 241)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_box_autoadd_f_32,
+        decodeSuccessData: sse_decode_opt_box_autoadd_f_64,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetBannedAtUtcConstMeta,
@@ -4942,7 +8528,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 122)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 242)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -4967,7 +8553,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 123)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 243)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -4992,7 +8578,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 124)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 244)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5017,7 +8603,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 125)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 245)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -5042,7 +8628,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 126)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 246)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5068,7 +8654,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 127)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 247)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_String,
@@ -5095,7 +8681,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 128)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 248)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5121,7 +8707,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 129)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 249)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_Chrono_Local,
@@ -5147,7 +8733,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 130)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 250)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_Chrono_Utc,
@@ -5173,7 +8759,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 131)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 251)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -5200,7 +8786,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 132)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 252)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -5226,7 +8812,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 133)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 253)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -5245,17 +8831,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  PlatformInt64 redditApiModelPostPostAutoAccessorGetDowns(
-      {required Post that}) {
+  int redditApiModelPostPostAutoAccessorGetDowns({required Post that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 134)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 254)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
+        decodeSuccessData: sse_decode_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetDownsConstMeta,
@@ -5277,7 +8862,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 135)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 255)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_f_64,
@@ -5302,7 +8887,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 136)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 256)!;
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -5322,17 +8907,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  PlatformInt64 redditApiModelPostPostAutoAccessorGetGilded(
-      {required Post that}) {
+  int redditApiModelPostPostAutoAccessorGetGilded({required Post that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 137)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 257)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
+        decodeSuccessData: sse_decode_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetGildedConstMeta,
@@ -5354,7 +8938,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 138)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 258)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_gildings,
@@ -5379,7 +8963,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 139)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 259)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5404,7 +8988,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 140)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 260)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5429,7 +9013,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 141)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 261)!;
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -5456,7 +9040,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 142)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 262)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5484,7 +9068,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 143)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 263)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5510,7 +9094,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 144)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 264)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5536,7 +9120,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 145)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 265)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5564,7 +9148,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 146)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 266)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5592,7 +9176,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 147)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 267)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5619,7 +9203,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 148)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 268)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5644,7 +9228,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 149)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 269)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5669,7 +9253,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 150)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 270)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_bool,
@@ -5694,7 +9278,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 151)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 271)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_flair,
@@ -5719,7 +9303,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 152)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 272)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5744,7 +9328,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 153)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 273)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_media,
@@ -5770,7 +9354,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 154)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 274)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_media_embed,
@@ -5795,7 +9379,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 155)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 275)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5820,7 +9404,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 156)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 276)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -5846,7 +9430,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 157)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 277)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -5873,7 +9457,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 158)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 278)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -5900,7 +9484,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 159)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 279)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_opt_String,
@@ -5925,7 +9509,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 160)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 280)!;
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -5951,7 +9535,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 161)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 281)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -5970,17 +9554,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  PlatformInt64 redditApiModelPostPostAutoAccessorGetNumComments(
-      {required Post that}) {
+  int redditApiModelPostPostAutoAccessorGetNumComments({required Post that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 162)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 282)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
+        decodeSuccessData: sse_decode_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetNumCommentsConstMeta,
@@ -5997,17 +9580,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  PlatformInt64? redditApiModelPostPostAutoAccessorGetNumCrossposts(
+  int? redditApiModelPostPostAutoAccessorGetNumCrossposts(
       {required Post that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 163)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 283)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_box_autoadd_i_64,
+        decodeSuccessData: sse_decode_opt_box_autoadd_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetNumCrosspostsConstMeta,
@@ -6024,17 +9607,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  BigInt? redditApiModelPostPostAutoAccessorGetNumDuplicates(
+  int? redditApiModelPostPostAutoAccessorGetNumDuplicates(
       {required Post that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 164)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 284)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_box_autoadd_u_64,
+        decodeSuccessData: sse_decode_opt_box_autoadd_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetNumDuplicatesConstMeta,
@@ -6051,17 +9634,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  String? redditApiModelPostPostAutoAccessorGetNumReports(
-      {required Post that}) {
+  int? redditApiModelPostPostAutoAccessorGetNumReports({required Post that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 165)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 285)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_String,
+        decodeSuccessData: sse_decode_opt_box_autoadd_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetNumReportsConstMeta,
@@ -6083,7 +9665,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 166)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 286)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -6108,7 +9690,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 167)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 287)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -6133,7 +9715,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 168)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 288)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -6158,7 +9740,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 169)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 289)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -6183,7 +9765,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 170)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 290)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_preview,
@@ -6202,17 +9784,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  PlatformInt64? redditApiModelPostPostAutoAccessorGetPwls(
-      {required Post that}) {
+  int? redditApiModelPostPostAutoAccessorGetPwls({required Post that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 171)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 291)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_box_autoadd_i_64,
+        decodeSuccessData: sse_decode_opt_box_autoadd_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetPwlsConstMeta,
@@ -6234,7 +9815,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 172)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 292)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -6260,7 +9841,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 173)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 293)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -6286,7 +9867,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 174)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 294)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -6312,7 +9893,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 175)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 295)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -6333,17 +9914,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  String? redditApiModelPostPostAutoAccessorGetReportReasons(
+  List<String> redditApiModelPostPostAutoAccessorGetReportReasons(
       {required Post that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 176)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 296)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_String,
+        decodeSuccessData: sse_decode_list_String,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetReportReasonsConstMeta,
@@ -6366,7 +9947,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 177)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 297)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -6385,17 +9966,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  PlatformInt64 redditApiModelPostPostAutoAccessorGetScore(
-      {required Post that}) {
+  int redditApiModelPostPostAutoAccessorGetScore({required Post that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 178)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 298)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
+        decodeSuccessData: sse_decode_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetScoreConstMeta,
@@ -6418,7 +9998,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 179)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 299)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_media,
@@ -6445,7 +10025,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 180)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 300)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_secure_media_embed,
@@ -6472,7 +10052,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 181)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 301)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -6498,7 +10078,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 182)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 302)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -6524,7 +10104,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 183)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 303)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -6550,7 +10130,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 184)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 304)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -6575,7 +10155,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 185)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 305)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -6601,7 +10181,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 186)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 306)!;
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -6628,7 +10208,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 187)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 307)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -6654,7 +10234,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 188)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 308)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -6680,7 +10260,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 189)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 309)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -6700,17 +10280,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  PlatformInt64? redditApiModelPostPostAutoAccessorGetTotalAwardsReceived(
+  int? redditApiModelPostPostAutoAccessorGetTotalAwardsReceived(
       {required Post that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 190)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 310)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_box_autoadd_i_64,
+        decodeSuccessData: sse_decode_opt_box_autoadd_u_32,
         decodeErrorData: null,
       ),
       constMeta:
@@ -6735,7 +10315,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 191)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 311)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_opt_String,
@@ -6755,16 +10335,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  PlatformInt64 redditApiModelPostPostAutoAccessorGetUps({required Post that}) {
+  int redditApiModelPostPostAutoAccessorGetUps({required Post that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 192)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 312)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
+        decodeSuccessData: sse_decode_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetUpsConstMeta,
@@ -6787,7 +10367,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 193)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 313)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_f_64,
@@ -6813,7 +10393,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 194)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 314)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -6839,7 +10419,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 195)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 315)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -6867,7 +10447,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 196)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 316)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_opt_String,
@@ -6893,7 +10473,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 197)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 317)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -6918,7 +10498,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 198)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 318)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -6937,17 +10517,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  PlatformInt64? redditApiModelPostPostAutoAccessorGetWls(
-      {required Post that}) {
+  int? redditApiModelPostPostAutoAccessorGetWls({required Post that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 199)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 319)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_box_autoadd_i_64,
+        decodeSuccessData: sse_decode_opt_box_autoadd_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetWlsConstMeta,
@@ -6971,7 +10550,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_list_opt_String(allAwardings, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 200)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 320)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -6999,7 +10578,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(allowLiveComments, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 201)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 321)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7027,8 +10606,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_opt_box_autoadd_f_32(approvedAtUtc, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 202)!;
+        sse_encode_opt_box_autoadd_f_64(approvedAtUtc, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 322)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7056,7 +10635,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(approvedBy, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 203)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 323)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7083,7 +10662,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(archived, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 204)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 324)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7110,7 +10689,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_box_autoadd_author_info(author, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 205)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 325)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7137,7 +10716,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_list_opt_String(awarders, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 206)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 326)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7163,8 +10742,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_opt_box_autoadd_f_32(bannedAtUtc, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 207)!;
+        sse_encode_opt_box_autoadd_f_64(bannedAtUtc, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 327)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7192,7 +10771,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(bannedBy, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 208)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 328)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7219,7 +10798,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(canGild, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 209)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 329)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7246,7 +10825,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(canModPost, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 210)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 330)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7273,7 +10852,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(category, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 211)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 331)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7300,7 +10879,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(clicked, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 212)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 332)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7327,7 +10906,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_list_String(contentCategories, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 213)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 333)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7356,7 +10935,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(contestMode, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 214)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 334)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7384,7 +10963,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_Chrono_Local(created, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 215)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 335)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7411,7 +10990,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_Chrono_Utc(createdUtc, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 216)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 336)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7438,7 +11017,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(discussionType, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 217)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 337)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7466,7 +11045,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(distinguished, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 218)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 338)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7494,7 +11073,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_String(domain, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 219)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 339)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7514,14 +11093,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelPostPostAutoAccessorSetDowns(
-      {required Post that, required PlatformInt64 downs}) {
+      {required Post that, required int downs}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_i_64(downs, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 220)!;
+        sse_encode_u_32(downs, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 340)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7548,7 +11127,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_box_autoadd_f_64(edited, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 221)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 341)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7576,7 +11155,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
             gallery, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 222)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 342)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7596,14 +11175,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelPostPostAutoAccessorSetGilded(
-      {required Post that, required PlatformInt64 gilded}) {
+      {required Post that, required int gilded}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_i_64(gilded, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 223)!;
+        sse_encode_u_32(gilded, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 343)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7630,7 +11209,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_gildings(gildings, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 224)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 344)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7657,7 +11236,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(hidden, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 225)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 345)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7684,7 +11263,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(hideScore, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 226)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 346)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7712,7 +11291,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
             id, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 227)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 347)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7739,7 +11318,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(isCreatedFromAdsUi, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 228)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 348)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7768,7 +11347,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(isCrosspostable, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 229)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 349)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7796,7 +11375,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(isMeta, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 230)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 350)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7823,7 +11402,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(isOriginalContent, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 231)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 351)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7852,7 +11431,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(isRedditMediaDomain, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 232)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 352)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7881,7 +11460,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(isRobotIndexable, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 233)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 353)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7910,7 +11489,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(isSelf, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 234)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 354)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7937,7 +11516,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(isVideo, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 235)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 355)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7964,7 +11543,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_box_autoadd_bool(likes, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 236)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 356)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -7991,7 +11570,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_flair(linkFlair, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 237)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 357)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8018,7 +11597,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(locked, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 238)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 358)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8045,7 +11624,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_box_autoadd_media(media, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 239)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 359)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8072,7 +11651,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_box_autoadd_media_embed(mediaEmbed, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 240)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 360)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8099,7 +11678,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(mediaOnly, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 241)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 361)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8126,7 +11705,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(modNote, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 242)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 362)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8153,7 +11732,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(modReasonBy, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 243)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 363)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8181,7 +11760,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(modReasonTitle, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 244)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 364)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8209,7 +11788,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_list_opt_String(modReports, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 245)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 365)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8237,7 +11816,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
             name, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 246)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 366)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8264,7 +11843,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(noFollow, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 247)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 367)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8284,14 +11863,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelPostPostAutoAccessorSetNumComments(
-      {required Post that, required PlatformInt64 numComments}) {
+      {required Post that, required int numComments}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_i_64(numComments, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 248)!;
+        sse_encode_u_32(numComments, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 368)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8312,14 +11891,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelPostPostAutoAccessorSetNumCrossposts(
-      {required Post that, PlatformInt64? numCrossposts}) {
+      {required Post that, int? numCrossposts}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_opt_box_autoadd_i_64(numCrossposts, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 249)!;
+        sse_encode_opt_box_autoadd_u_32(numCrossposts, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 369)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8340,14 +11919,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelPostPostAutoAccessorSetNumDuplicates(
-      {required Post that, BigInt? numDuplicates}) {
+      {required Post that, int? numDuplicates}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_opt_box_autoadd_u_64(numDuplicates, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 250)!;
+        sse_encode_opt_box_autoadd_u_32(numDuplicates, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 370)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8368,14 +11947,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelPostPostAutoAccessorSetNumReports(
-      {required Post that, String? numReports}) {
+      {required Post that, int? numReports}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_opt_String(numReports, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 251)!;
+        sse_encode_opt_box_autoadd_u_32(numReports, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 371)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8402,7 +11981,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(over18, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 252)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 372)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8429,7 +12008,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_String(permalink, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 253)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 373)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8456,7 +12035,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(pinned, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 254)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 374)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8483,7 +12062,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(postHint, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 255)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 375)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8510,7 +12089,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_box_autoadd_preview(preview, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 256)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 376)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8530,14 +12109,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelPostPostAutoAccessorSetPwls(
-      {required Post that, PlatformInt64? pwls}) {
+      {required Post that, int? pwls}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_opt_box_autoadd_i_64(pwls, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 257)!;
+        sse_encode_opt_box_autoadd_u_32(pwls, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 377)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8564,7 +12143,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(quarantine, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 258)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 378)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8591,7 +12170,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(removalReason, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 259)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 379)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8619,7 +12198,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(removedBy, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 260)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 380)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8646,7 +12225,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(removedByCategory, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 261)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 381)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8668,14 +12247,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelPostPostAutoAccessorSetReportReasons(
-      {required Post that, String? reportReasons}) {
+      {required Post that, required List<String> reportReasons}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_opt_String(reportReasons, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 262)!;
+        sse_encode_list_String(reportReasons, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 382)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8703,7 +12282,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(saved, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 263)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 383)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8723,14 +12302,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelPostPostAutoAccessorSetScore(
-      {required Post that, required PlatformInt64 score}) {
+      {required Post that, required int score}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_i_64(score, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 264)!;
+        sse_encode_u_32(score, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 384)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8757,7 +12336,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_box_autoadd_media(secureMedia, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 265)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 385)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8786,7 +12365,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_opt_box_autoadd_secure_media_embed(
             secureMediaEmbed, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 266)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 386)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8815,7 +12394,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(selftext, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 267)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 387)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8842,7 +12421,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(selftextHtml, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 268)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 388)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8870,7 +12449,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(sendReplies, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 269)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 389)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8898,7 +12477,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(spoiler, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 270)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 390)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8925,7 +12504,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(stickied, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 271)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 391)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8953,7 +12532,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
             subreddit, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 272)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 392)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -8980,7 +12559,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(suggestedSort, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 273)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 393)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9008,7 +12587,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_String(title, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 274)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 394)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9035,7 +12614,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(topAwardedType, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 275)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 395)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9056,14 +12635,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelPostPostAutoAccessorSetTotalAwardsReceived(
-      {required Post that, PlatformInt64? totalAwardsReceived}) {
+      {required Post that, int? totalAwardsReceived}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_opt_box_autoadd_i_64(totalAwardsReceived, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 276)!;
+        sse_encode_opt_box_autoadd_u_32(totalAwardsReceived, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 396)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9092,7 +12671,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_list_opt_String(treatmentTags, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 277)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 397)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9113,14 +12692,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelPostPostAutoAccessorSetUps(
-      {required Post that, required PlatformInt64 ups}) {
+      {required Post that, required int ups}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_i_64(ups, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 278)!;
+        sse_encode_u_32(ups, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 398)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9147,7 +12726,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_f_64(upvoteRatio, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 279)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 399)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9175,7 +12754,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_String(url, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 280)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 400)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9202,7 +12781,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(urlOverriddenByDest, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 281)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 401)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9231,7 +12810,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_list_opt_String(userReports, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 282)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 402)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9259,7 +12838,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_opt_String(viewCount, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 283)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 403)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9286,7 +12865,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
         sse_encode_bool(visited, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 284)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 404)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9306,14 +12885,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelPostPostAutoAccessorSetWls(
-      {required Post that, PlatformInt64? wls}) {
+      {required Post that, int? wls}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_opt_box_autoadd_i_64(wls, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 285)!;
+        sse_encode_opt_box_autoadd_u_32(wls, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 405)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9337,7 +12916,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 286, port: port_);
+            funcId: 406, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -9363,7 +12942,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 287)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 407)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_kind,
@@ -9387,7 +12966,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 288)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 408)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_thumbnail,
@@ -9406,12 +12985,217 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<List<Thing>> redditApiStreamableStreamableGetAll(
+      {required Streamable that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+            that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 409, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_thing,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiStreamableStreamableGetAllConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiStreamableStreamableGetAllConstMeta =>
+      const TaskConstMeta(
+        debugName: "Streamable_get_all",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<int> redditApiStreamableStreamableGetLength(
+      {required Streamable that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+            that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 410, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_32,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiStreamableStreamableGetLengthConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiStreamableStreamableGetLengthConstMeta =>
+      const TaskConstMeta(
+        debugName: "Streamable_get_length(dart_style=length)",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<bool> redditApiStreamableStreamableNext({required Streamable that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+            that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 411, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kRedditApiStreamableStreamableNextConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiStreamableStreamableNextConstMeta =>
+      const TaskConstMeta(
+        debugName: "Streamable_next",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<Thing?> redditApiStreamableStreamableNth(
+      {required Streamable that, required int n}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+            that, serializer);
+        sse_encode_u_32(n, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 412, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_box_autoadd_thing,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiStreamableStreamableNthConstMeta,
+      argValues: [that, n],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiStreamableStreamableNthConstMeta =>
+      const TaskConstMeta(
+        debugName: "Streamable_nth",
+        argNames: ["that", "n"],
+      );
+
+  @override
+  Future<void> redditApiStreamableStreamableRefresh(
+      {required Streamable that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+            that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 413, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiStreamableStreamableRefreshConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiStreamableStreamableRefreshConstMeta =>
+      const TaskConstMeta(
+        debugName: "Streamable_refresh",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<void> redditApiStreamableStreamableSave(
+      {required Streamable that,
+      required Fullname name,
+      required bool save,
+      required Client client}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+            that, serializer);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+            name, serializer);
+        sse_encode_bool(save, serializer);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+            client, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 414, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kRedditApiStreamableStreamableSaveConstMeta,
+      argValues: [that, name, save, client],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiStreamableStreamableSaveConstMeta =>
+      const TaskConstMeta(
+        debugName: "Streamable_save",
+        argNames: ["that", "name", "save", "client"],
+      );
+
+  @override
+  Future<void> redditApiStreamableStreamableVote(
+      {required Streamable that,
+      required Fullname name,
+      required VoteDirection direction,
+      required Client client}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+            that, serializer);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+            name, serializer);
+        sse_encode_vote_direction(direction, serializer);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
+            client, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 415, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kRedditApiStreamableStreamableVoteConstMeta,
+      argValues: [that, name, direction, client],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiStreamableStreamableVoteConstMeta =>
+      const TaskConstMeta(
+        debugName: "Streamable_vote",
+        argNames: ["that", "name", "direction", "client"],
+      );
+
+  @override
   Future<SubredditId> redditApiModelSubredditSubredditIdDefault() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 289, port: port_);
+            funcId: 416, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -9431,6 +13215,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Details? redditApiModelSubredditSubredditInfoAutoAccessorGetDetails(
+      {required SubredditInfo that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 417)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditSubredditInfoAutoAccessorGetDetailsConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditSubredditInfoAutoAccessorGetDetailsConstMeta =>
+          const TaskConstMeta(
+            debugName: "SubredditInfo_auto_accessor_get_details",
+            argNames: ["that"],
+          );
+
+  @override
   String redditApiModelSubredditSubredditInfoAutoAccessorGetSubreddit(
       {required SubredditInfo that}) {
     return handler.executeSync(SyncTask(
@@ -9438,7 +13251,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 290)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 418)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -9466,7 +13279,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 291)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 419)!;
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -9496,7 +13309,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 292)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 420)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -9518,45 +13331,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  String redditApiModelSubredditSubredditInfoAutoAccessorGetSubredditType(
+  int redditApiModelSubredditSubredditInfoAutoAccessorGetSubscribers(
       {required SubredditInfo that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 293)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 421)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditInfoAutoAccessorGetSubredditTypeConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditInfoAutoAccessorGetSubredditTypeConstMeta =>
-          const TaskConstMeta(
-            debugName: "SubredditInfo_auto_accessor_get_subreddit_type",
-            argNames: ["that"],
-          );
-
-  @override
-  BigInt redditApiModelSubredditSubredditInfoAutoAccessorGetSubscribers(
-      {required SubredditInfo that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 294)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_u_64,
+        decodeSuccessData: sse_decode_u_32,
         decodeErrorData: null,
       ),
       constMeta:
@@ -9574,6 +13359,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
+  void redditApiModelSubredditSubredditInfoAutoAccessorSetDetails(
+      {required SubredditInfo that, Details? details}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
+            that, serializer);
+        sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            details, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 422)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kRedditApiModelSubredditSubredditInfoAutoAccessorSetDetailsConstMeta,
+      argValues: [that, details],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditSubredditInfoAutoAccessorSetDetailsConstMeta =>
+          const TaskConstMeta(
+            debugName: "SubredditInfo_auto_accessor_set_details",
+            argNames: ["that", "details"],
+          );
+
+  @override
   void redditApiModelSubredditSubredditInfoAutoAccessorSetSubreddit(
       {required SubredditInfo that, required String subreddit}) {
     return handler.executeSync(SyncTask(
@@ -9582,7 +13397,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
             that, serializer);
         sse_encode_String(subreddit, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 295)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 423)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9612,7 +13427,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditID(
             subredditId, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 296)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 424)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9641,7 +13456,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
             that, serializer);
         sse_encode_String(subredditNamePrefixed, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 297)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 425)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9663,44 +13478,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditInfoAutoAccessorSetSubredditType(
-      {required SubredditInfo that, required String subredditType}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
-            that, serializer);
-        sse_encode_String(subredditType, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 298)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditInfoAutoAccessorSetSubredditTypeConstMeta,
-      argValues: [that, subredditType],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditInfoAutoAccessorSetSubredditTypeConstMeta =>
-          const TaskConstMeta(
-            debugName: "SubredditInfo_auto_accessor_set_subreddit_type",
-            argNames: ["that", "subredditType"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditInfoAutoAccessorSetSubscribers(
-      {required SubredditInfo that, required BigInt subscribers}) {
+      {required SubredditInfo that, required int subscribers}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
             that, serializer);
-        sse_encode_u_64(subscribers, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 299)!;
+        sse_encode_u_32(subscribers, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 426)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -9726,7 +13512,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 300, port: port_);
+            funcId: 427, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -9746,45 +13532,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  bool redditApiModelSubredditSubredditAutoAccessorGetAcceptFollowers(
+  int? redditApiModelSubredditSubredditAutoAccessorGetAccountsActive(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 301)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 428)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetAcceptFollowersConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetAcceptFollowersConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_accept_followers",
-            argNames: ["that"],
-          );
-
-  @override
-  BigInt? redditApiModelSubredditSubredditAutoAccessorGetAccountsActive(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 302)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_box_autoadd_u_64,
+        decodeSuccessData: sse_decode_opt_box_autoadd_u_32,
         decodeErrorData: null,
       ),
       constMeta:
@@ -9809,7 +13567,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 303)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 429)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -9830,17 +13588,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  BigInt redditApiModelSubredditSubredditAutoAccessorGetActiveUserCount(
+  int redditApiModelSubredditSubredditAutoAccessorGetActiveUserCount(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 304)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 430)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_u_64,
+        decodeSuccessData: sse_decode_u_32,
         decodeErrorData: null,
       ),
       constMeta:
@@ -9865,7 +13623,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 305)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 431)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -9893,7 +13651,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 306)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 432)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -9921,7 +13679,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 307)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 433)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -9949,7 +13707,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 308)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 434)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -9977,7 +13735,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 309)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 435)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10005,7 +13763,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 310)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 436)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10034,7 +13792,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 311)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 437)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10063,7 +13821,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 312)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 438)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10092,7 +13850,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 313)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 439)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10121,7 +13879,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 314)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 440)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10149,7 +13907,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 315)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 441)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10177,7 +13935,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 316)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 442)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10198,35 +13956,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  List<String>
-      redditApiModelSubredditSubredditAutoAccessorGetAllowedMediaInComments(
-          {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 317)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_list_String,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetAllowedMediaInCommentsConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetAllowedMediaInCommentsConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_allowed_media_in_comments",
-            argNames: ["that"],
-          );
-
-  @override
   String redditApiModelSubredditSubredditAutoAccessorGetBannerBackgroundColor(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -10234,7 +13963,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 318)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 443)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -10262,7 +13991,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 319)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 444)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -10283,62 +14012,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  String redditApiModelSubredditSubredditAutoAccessorGetBannerImg(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 320)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetBannerImgConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetBannerImgConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_banner_img",
-            argNames: ["that"],
-          );
-
-  @override
-  Int64List? redditApiModelSubredditSubredditAutoAccessorGetBannerSize(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 321)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_list_prim_i_64_strict,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetBannerSizeConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetBannerSizeConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_banner_size",
-            argNames: ["that"],
-          );
-
-  @override
   bool redditApiModelSubredditSubredditAutoAccessorGetCanAssignLinkFlair(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -10346,7 +14019,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 322)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 445)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10374,7 +14047,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 323)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 446)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10402,7 +14075,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 324)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 447)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10431,7 +14104,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 325)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 448)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_comment_contribution_settings,
@@ -10461,7 +14134,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 326)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 449)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_i_64,
@@ -10489,7 +14162,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 327)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 450)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10510,62 +14183,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  double redditApiModelSubredditSubredditAutoAccessorGetCreated(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 328)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_f_64,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetCreatedConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetCreatedConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_created",
-            argNames: ["that"],
-          );
-
-  @override
-  double redditApiModelSubredditSubredditAutoAccessorGetCreatedUtc(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 329)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_f_64,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetCreatedUtcConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetCreatedUtcConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_created_utc",
-            argNames: ["that"],
-          );
-
-  @override
   String redditApiModelSubredditSubredditAutoAccessorGetDescription(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -10573,7 +14190,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 330)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 451)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -10601,7 +14218,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 331)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 452)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -10622,92 +14239,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  bool
-      redditApiModelSubredditSubredditAutoAccessorGetDisableContributorRequests(
-          {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 332)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetDisableContributorRequestsConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetDisableContributorRequestsConstMeta =>
-          const TaskConstMeta(
-            debugName:
-                "Subreddit_auto_accessor_get_disable_contributor_requests",
-            argNames: ["that"],
-          );
-
-  @override
-  String redditApiModelSubredditSubredditAutoAccessorGetDisplayName(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 333)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetDisplayNameConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetDisplayNameConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_display_name",
-            argNames: ["that"],
-          );
-
-  @override
-  String redditApiModelSubredditSubredditAutoAccessorGetDisplayNamePrefixed(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 334)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetDisplayNamePrefixedConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetDisplayNamePrefixedConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_display_name_prefixed",
-            argNames: ["that"],
-          );
-
-  @override
   Int64List? redditApiModelSubredditSubredditAutoAccessorGetEmojisCustomSize(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -10715,7 +14246,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 335)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 453)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_list_prim_i_64_strict,
@@ -10743,7 +14274,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 336)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 454)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10764,34 +14295,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  bool redditApiModelSubredditSubredditAutoAccessorGetFreeFormReports(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 337)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetFreeFormReportsConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetFreeFormReportsConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_free_form_reports",
-            argNames: ["that"],
-          );
-
-  @override
   bool redditApiModelSubredditSubredditAutoAccessorGetHasMenuWidget(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -10799,7 +14302,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 338)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 455)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10820,62 +14323,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  String? redditApiModelSubredditSubredditAutoAccessorGetHeaderImg(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 339)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_String,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetHeaderImgConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetHeaderImgConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_header_img",
-            argNames: ["that"],
-          );
-
-  @override
-  Int64List? redditApiModelSubredditSubredditAutoAccessorGetHeaderSize(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 340)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_list_prim_i_64_strict,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetHeaderSizeConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetHeaderSizeConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_header_size",
-            argNames: ["that"],
-          );
-
-  @override
   String redditApiModelSubredditSubredditAutoAccessorGetHeaderTitle(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -10883,7 +14330,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 341)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 456)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -10911,7 +14358,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 342)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 457)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -10939,7 +14386,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 343)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 458)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -10966,7 +14413,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 344)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 459)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_bool,
@@ -10994,7 +14441,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 345)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 460)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_bool,
@@ -11015,34 +14462,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  String redditApiModelSubredditSubredditAutoAccessorGetKeyColor(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 346)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetKeyColorConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetKeyColorConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_key_color",
-            argNames: ["that"],
-          );
-
-  @override
   String redditApiModelSubredditSubredditAutoAccessorGetLang(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -11050,7 +14469,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 347)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 461)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -11070,62 +14489,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  bool redditApiModelSubredditSubredditAutoAccessorGetLinkFlairEnabled(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 348)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetLinkFlairEnabledConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetLinkFlairEnabledConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_link_flair_enabled",
-            argNames: ["that"],
-          );
-
-  @override
-  String redditApiModelSubredditSubredditAutoAccessorGetLinkFlairPosition(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 349)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetLinkFlairPositionConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetLinkFlairPositionConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_link_flair_position",
-            argNames: ["that"],
-          );
-
-  @override
   String redditApiModelSubredditSubredditAutoAccessorGetMobileBannerImage(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -11133,7 +14496,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 350)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 462)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -11154,33 +14517,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  String redditApiModelSubredditSubredditAutoAccessorGetName(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 351)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kRedditApiModelSubredditSubredditAutoAccessorGetNameConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetNameConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_name",
-            argNames: ["that"],
-          );
-
-  @override
   String? redditApiModelSubredditSubredditAutoAccessorGetNotificationLevel(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -11188,7 +14524,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 352)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 463)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -11216,7 +14552,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 353)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 464)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -11238,6 +14574,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
+  Common redditApiModelSubredditSubredditAutoAccessorGetOther(
+      {required Subreddit that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 465)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditSubredditAutoAccessorGetOtherConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditSubredditAutoAccessorGetOtherConstMeta =>
+          const TaskConstMeta(
+            debugName: "Subreddit_auto_accessor_get_other",
+            argNames: ["that"],
+          );
+
+  @override
   bool redditApiModelSubredditSubredditAutoAccessorGetOver18(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -11245,7 +14609,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 354)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 466)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -11274,7 +14638,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 355)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 467)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_i_64,
@@ -11296,62 +14660,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  String redditApiModelSubredditSubredditAutoAccessorGetPrimaryColor(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 356)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetPrimaryColorConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetPrimaryColorConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_primary_color",
-            argNames: ["that"],
-          );
-
-  @override
-  String redditApiModelSubredditSubredditAutoAccessorGetPublicDescription(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 357)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetPublicDescriptionConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetPublicDescriptionConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_public_description",
-            argNames: ["that"],
-          );
-
-  @override
   String? redditApiModelSubredditSubredditAutoAccessorGetPublicDescriptionHtml(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -11359,7 +14667,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 358)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 468)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -11387,7 +14695,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 359)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 469)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -11408,90 +14716,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  bool redditApiModelSubredditSubredditAutoAccessorGetQuarantine(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 360)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetQuarantineConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetQuarantineConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_quarantine",
-            argNames: ["that"],
-          );
-
-  @override
-  bool redditApiModelSubredditSubredditAutoAccessorGetRestrictCommenting(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 361)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetRestrictCommentingConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetRestrictCommentingConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_restrict_commenting",
-            argNames: ["that"],
-          );
-
-  @override
-  bool redditApiModelSubredditSubredditAutoAccessorGetRestrictPosting(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 362)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetRestrictPostingConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetRestrictPostingConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_restrict_posting",
-            argNames: ["that"],
-          );
-
-  @override
   bool redditApiModelSubredditSubredditAutoAccessorGetShouldArchivePosts(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -11499,7 +14723,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 363)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 470)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -11528,7 +14752,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 364)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 471)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -11550,34 +14774,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  bool redditApiModelSubredditSubredditAutoAccessorGetShowMedia(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 365)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetShowMediaConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetShowMediaConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_show_media",
-            argNames: ["that"],
-          );
-
-  @override
   bool redditApiModelSubredditSubredditAutoAccessorGetShowMediaPreview(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -11585,7 +14781,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 366)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 472)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -11613,7 +14809,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 367)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 473)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -11641,7 +14837,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 368)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 474)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -11662,34 +14858,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  String redditApiModelSubredditSubredditAutoAccessorGetSubmitLinkLabel(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 369)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetSubmitLinkLabelConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetSubmitLinkLabelConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_submit_link_label",
-            argNames: ["that"],
-          );
-
-  @override
   String redditApiModelSubredditSubredditAutoAccessorGetSubmitText(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -11697,7 +14865,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 370)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 475)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -11725,7 +14893,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 371)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 476)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -11746,90 +14914,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  String redditApiModelSubredditSubredditAutoAccessorGetSubmitTextLabel(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 372)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetSubmitTextLabelConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetSubmitTextLabelConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_submit_text_label",
-            argNames: ["that"],
-          );
-
-  @override
-  String redditApiModelSubredditSubredditAutoAccessorGetSubredditType(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 373)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetSubredditTypeConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetSubredditTypeConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_subreddit_type",
-            argNames: ["that"],
-          );
-
-  @override
-  PlatformInt64 redditApiModelSubredditSubredditAutoAccessorGetSubscribers(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 374)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetSubscribersConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetSubscribersConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_subscribers",
-            argNames: ["that"],
-          );
-
-  @override
   String? redditApiModelSubredditSubredditAutoAccessorGetSuggestedCommentSort(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -11837,7 +14921,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 375)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 477)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -11858,60 +14942,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  String redditApiModelSubredditSubredditAutoAccessorGetTitle(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 376)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kRedditApiModelSubredditSubredditAutoAccessorGetTitleConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetTitleConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_title",
-            argNames: ["that"],
-          );
-
-  @override
-  String redditApiModelSubredditSubredditAutoAccessorGetUrl(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 377)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kRedditApiModelSubredditSubredditAutoAccessorGetUrlConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetUrlConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_url",
-            argNames: ["that"],
-          );
-
-  @override
   bool? redditApiModelSubredditSubredditAutoAccessorGetUserCanFlairInSr(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -11919,7 +14949,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 378)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 478)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_bool,
@@ -11947,7 +14977,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 379)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 479)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_flair,
@@ -11975,7 +15005,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 380)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 480)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -12003,7 +15033,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 381)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 481)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -12024,146 +15054,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  bool redditApiModelSubredditSubredditAutoAccessorGetUserIsBanned(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 382)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetUserIsBannedConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetUserIsBannedConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_user_is_banned",
-            argNames: ["that"],
-          );
-
-  @override
-  bool redditApiModelSubredditSubredditAutoAccessorGetUserIsContributor(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 383)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetUserIsContributorConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetUserIsContributorConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_user_is_contributor",
-            argNames: ["that"],
-          );
-
-  @override
-  bool redditApiModelSubredditSubredditAutoAccessorGetUserIsModerator(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 384)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetUserIsModeratorConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetUserIsModeratorConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_user_is_moderator",
-            argNames: ["that"],
-          );
-
-  @override
-  bool redditApiModelSubredditSubredditAutoAccessorGetUserIsMuted(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 385)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetUserIsMutedConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetUserIsMutedConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_user_is_muted",
-            argNames: ["that"],
-          );
-
-  @override
-  bool redditApiModelSubredditSubredditAutoAccessorGetUserIsSubscriber(
-      {required Subreddit that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 386)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorGetUserIsSubscriberConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorGetUserIsSubscriberConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_get_user_is_subscriber",
-            argNames: ["that"],
-          );
-
-  @override
   bool? redditApiModelSubredditSubredditAutoAccessorGetUserSrFlairEnabled(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
@@ -12171,7 +15061,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 387)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 482)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_bool,
@@ -12199,7 +15089,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 388)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 483)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -12227,7 +15117,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 389)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 484)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_bool,
@@ -12248,17 +15138,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  BigInt? redditApiModelSubredditSubredditAutoAccessorGetWls(
+  int? redditApiModelSubredditSubredditAutoAccessorGetWls(
       {required Subreddit that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 390)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 485)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_box_autoadd_u_64,
+        decodeSuccessData: sse_decode_opt_box_autoadd_u_32,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelSubredditSubredditAutoAccessorGetWlsConstMeta,
@@ -12275,44 +15165,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetAcceptFollowers(
-      {required Subreddit that, required bool acceptFollowers}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_bool(acceptFollowers, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 391)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetAcceptFollowersConstMeta,
-      argValues: [that, acceptFollowers],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetAcceptFollowersConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_accept_followers",
-            argNames: ["that", "acceptFollowers"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetAccountsActive(
-      {required Subreddit that, BigInt? accountsActive}) {
+      {required Subreddit that, int? accountsActive}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        sse_encode_opt_box_autoadd_u_64(accountsActive, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 392)!;
+        sse_encode_opt_box_autoadd_u_32(accountsActive, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 486)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12341,7 +15202,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(accountsActiveIsFuzzed, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 393)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 487)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12363,14 +15224,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelSubredditSubredditAutoAccessorSetActiveUserCount(
-      {required Subreddit that, required BigInt activeUserCount}) {
+      {required Subreddit that, required int activeUserCount}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        sse_encode_u_64(activeUserCount, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 394)!;
+        sse_encode_u_32(activeUserCount, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 488)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12399,7 +15260,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_String(advertiserCategory, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 395)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 489)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12428,7 +15289,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(allOriginalContent, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 396)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 490)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12457,7 +15318,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(allowDiscovery, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 397)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 491)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12486,7 +15347,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(allowGalleries, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 398)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 492)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12515,7 +15376,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(allowImages, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 399)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 493)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12544,7 +15405,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(allowPolls, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 400)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 494)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12575,7 +15436,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(allowPredictionContributors, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 401)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 495)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12605,7 +15466,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(allowPredictions, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 402)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 496)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12635,7 +15496,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(allowPredictionsTournament, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 403)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 497)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12665,7 +15526,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(allowTalks, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 404)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 498)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12694,7 +15555,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(allowVideogifs, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 405)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 499)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12723,7 +15584,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(allowVideos, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 406)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 500)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12744,35 +15605,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetAllowedMediaInComments(
-      {required Subreddit that, required List<String> allowedMediaInComments}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_list_String(allowedMediaInComments, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 407)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetAllowedMediaInCommentsConstMeta,
-      argValues: [that, allowedMediaInComments],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetAllowedMediaInCommentsConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_allowed_media_in_comments",
-            argNames: ["that", "allowedMediaInComments"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetBannerBackgroundColor(
       {required Subreddit that, required String bannerBackgroundColor}) {
     return handler.executeSync(SyncTask(
@@ -12781,7 +15613,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_String(bannerBackgroundColor, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 408)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 501)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12810,7 +15642,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_String(bannerBackgroundImage, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 409)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 502)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12831,64 +15663,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetBannerImg(
-      {required Subreddit that, required String bannerImg}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_String(bannerImg, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 410)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetBannerImgConstMeta,
-      argValues: [that, bannerImg],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetBannerImgConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_banner_img",
-            argNames: ["that", "bannerImg"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetBannerSize(
-      {required Subreddit that, Int64List? bannerSize}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_opt_list_prim_i_64_strict(bannerSize, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 411)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetBannerSizeConstMeta,
-      argValues: [that, bannerSize],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetBannerSizeConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_banner_size",
-            argNames: ["that", "bannerSize"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetCanAssignLinkFlair(
       {required Subreddit that, required bool canAssignLinkFlair}) {
     return handler.executeSync(SyncTask(
@@ -12897,7 +15671,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(canAssignLinkFlair, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 412)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 503)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12926,7 +15700,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(canAssignUserFlair, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 413)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 504)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12955,7 +15729,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(collapseDeletedComments, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 414)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 505)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -12987,7 +15761,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_comment_contribution_settings(
             commentContributionSettings, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 415)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 506)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13017,7 +15791,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_i_64(commentScoreHideMins, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 416)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 507)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13046,7 +15820,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(communityReviewed, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 417)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 508)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13067,64 +15841,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetCreated(
-      {required Subreddit that, required double created}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_f_64(created, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 418)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetCreatedConstMeta,
-      argValues: [that, created],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetCreatedConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_created",
-            argNames: ["that", "created"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetCreatedUtc(
-      {required Subreddit that, required double createdUtc}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_f_64(createdUtc, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 419)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetCreatedUtcConstMeta,
-      argValues: [that, createdUtc],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetCreatedUtcConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_created_utc",
-            argNames: ["that", "createdUtc"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetDescription(
       {required Subreddit that, required String description}) {
     return handler.executeSync(SyncTask(
@@ -13133,7 +15849,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_String(description, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 420)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 509)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13162,7 +15878,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_opt_String(descriptionHtml, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 421)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 510)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13183,95 +15899,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void
-      redditApiModelSubredditSubredditAutoAccessorSetDisableContributorRequests(
-          {required Subreddit that, required bool disableContributorRequests}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_bool(disableContributorRequests, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 422)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetDisableContributorRequestsConstMeta,
-      argValues: [that, disableContributorRequests],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetDisableContributorRequestsConstMeta =>
-          const TaskConstMeta(
-            debugName:
-                "Subreddit_auto_accessor_set_disable_contributor_requests",
-            argNames: ["that", "disableContributorRequests"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetDisplayName(
-      {required Subreddit that, required String displayName}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_String(displayName, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 423)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetDisplayNameConstMeta,
-      argValues: [that, displayName],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetDisplayNameConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_display_name",
-            argNames: ["that", "displayName"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetDisplayNamePrefixed(
-      {required Subreddit that, required String displayNamePrefixed}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_String(displayNamePrefixed, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 424)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetDisplayNamePrefixedConstMeta,
-      argValues: [that, displayNamePrefixed],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetDisplayNamePrefixedConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_display_name_prefixed",
-            argNames: ["that", "displayNamePrefixed"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetEmojisCustomSize(
       {required Subreddit that, Int64List? emojisCustomSize}) {
     return handler.executeSync(SyncTask(
@@ -13280,7 +15907,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_opt_list_prim_i_64_strict(emojisCustomSize, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 425)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 511)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13309,7 +15936,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(emojisEnabled, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 426)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 512)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13330,35 +15957,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetFreeFormReports(
-      {required Subreddit that, required bool freeFormReports}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_bool(freeFormReports, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 427)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetFreeFormReportsConstMeta,
-      argValues: [that, freeFormReports],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetFreeFormReportsConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_free_form_reports",
-            argNames: ["that", "freeFormReports"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetHasMenuWidget(
       {required Subreddit that, required bool hasMenuWidget}) {
     return handler.executeSync(SyncTask(
@@ -13367,7 +15965,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(hasMenuWidget, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 428)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 513)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13388,64 +15986,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetHeaderImg(
-      {required Subreddit that, String? headerImg}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_opt_String(headerImg, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 429)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetHeaderImgConstMeta,
-      argValues: [that, headerImg],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetHeaderImgConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_header_img",
-            argNames: ["that", "headerImg"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetHeaderSize(
-      {required Subreddit that, Int64List? headerSize}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_opt_list_prim_i_64_strict(headerSize, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 430)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetHeaderSizeConstMeta,
-      argValues: [that, headerSize],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetHeaderSizeConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_header_size",
-            argNames: ["that", "headerSize"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetHeaderTitle(
       {required Subreddit that, required String headerTitle}) {
     return handler.executeSync(SyncTask(
@@ -13454,7 +15994,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_String(headerTitle, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 431)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 514)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13483,7 +16023,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(hideAds, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 432)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 515)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13512,7 +16052,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_String(id, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 433)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 516)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13540,7 +16080,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_opt_box_autoadd_bool(isCrosspostableSubreddit, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 434)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 517)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13569,7 +16109,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_opt_box_autoadd_bool(isEnrolledInNewModmail, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 435)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 518)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13590,35 +16130,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetKeyColor(
-      {required Subreddit that, required String keyColor}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_String(keyColor, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 436)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetKeyColorConstMeta,
-      argValues: [that, keyColor],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetKeyColorConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_key_color",
-            argNames: ["that", "keyColor"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetLang(
       {required Subreddit that, required String lang}) {
     return handler.executeSync(SyncTask(
@@ -13627,7 +16138,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_String(lang, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 437)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 519)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13647,64 +16158,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetLinkFlairEnabled(
-      {required Subreddit that, required bool linkFlairEnabled}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_bool(linkFlairEnabled, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 438)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetLinkFlairEnabledConstMeta,
-      argValues: [that, linkFlairEnabled],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetLinkFlairEnabledConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_link_flair_enabled",
-            argNames: ["that", "linkFlairEnabled"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetLinkFlairPosition(
-      {required Subreddit that, required String linkFlairPosition}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_String(linkFlairPosition, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 439)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetLinkFlairPositionConstMeta,
-      argValues: [that, linkFlairPosition],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetLinkFlairPositionConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_link_flair_position",
-            argNames: ["that", "linkFlairPosition"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetMobileBannerImage(
       {required Subreddit that, required String mobileBannerImage}) {
     return handler.executeSync(SyncTask(
@@ -13713,7 +16166,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_String(mobileBannerImage, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 440)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 520)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13734,34 +16187,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetName(
-      {required Subreddit that, required String name}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_String(name, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 441)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta: kRedditApiModelSubredditSubredditAutoAccessorSetNameConstMeta,
-      argValues: [that, name],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetNameConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_name",
-            argNames: ["that", "name"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetNotificationLevel(
       {required Subreddit that, String? notificationLevel}) {
     return handler.executeSync(SyncTask(
@@ -13770,7 +16195,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_opt_String(notificationLevel, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 442)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 521)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13799,7 +16224,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(originalContentTagEnabled, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 443)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 522)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13821,6 +16246,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
+  void redditApiModelSubredditSubredditAutoAccessorSetOther(
+      {required Subreddit that, required Common other}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
+            that, serializer);
+        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+            other, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 523)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelSubredditSubredditAutoAccessorSetOtherConstMeta,
+      argValues: [that, other],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kRedditApiModelSubredditSubredditAutoAccessorSetOtherConstMeta =>
+          const TaskConstMeta(
+            debugName: "Subreddit_auto_accessor_set_other",
+            argNames: ["that", "other"],
+          );
+
+  @override
   void redditApiModelSubredditSubredditAutoAccessorSetOver18(
       {required Subreddit that, required bool over18}) {
     return handler.executeSync(SyncTask(
@@ -13829,7 +16283,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(over18, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 444)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 524)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13860,7 +16314,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_i_64(predictionLeaderboardEntryType, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 445)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 525)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13882,64 +16336,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetPrimaryColor(
-      {required Subreddit that, required String primaryColor}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_String(primaryColor, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 446)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetPrimaryColorConstMeta,
-      argValues: [that, primaryColor],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetPrimaryColorConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_primary_color",
-            argNames: ["that", "primaryColor"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetPublicDescription(
-      {required Subreddit that, required String publicDescription}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_String(publicDescription, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 447)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetPublicDescriptionConstMeta,
-      argValues: [that, publicDescription],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetPublicDescriptionConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_public_description",
-            argNames: ["that", "publicDescription"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetPublicDescriptionHtml(
       {required Subreddit that, String? publicDescriptionHtml}) {
     return handler.executeSync(SyncTask(
@@ -13948,7 +16344,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_opt_String(publicDescriptionHtml, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 448)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 526)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13977,7 +16373,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(publicTraffic, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 449)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 527)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -13998,93 +16394,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetQuarantine(
-      {required Subreddit that, required bool quarantine}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_bool(quarantine, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 450)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetQuarantineConstMeta,
-      argValues: [that, quarantine],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetQuarantineConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_quarantine",
-            argNames: ["that", "quarantine"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetRestrictCommenting(
-      {required Subreddit that, required bool restrictCommenting}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_bool(restrictCommenting, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 451)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetRestrictCommentingConstMeta,
-      argValues: [that, restrictCommenting],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetRestrictCommentingConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_restrict_commenting",
-            argNames: ["that", "restrictCommenting"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetRestrictPosting(
-      {required Subreddit that, required bool restrictPosting}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_bool(restrictPosting, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 452)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetRestrictPostingConstMeta,
-      argValues: [that, restrictPosting],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetRestrictPostingConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_restrict_posting",
-            argNames: ["that", "restrictPosting"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetShouldArchivePosts(
       {required Subreddit that, required bool shouldArchivePosts}) {
     return handler.executeSync(SyncTask(
@@ -14093,7 +16402,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(shouldArchivePosts, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 453)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 528)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14124,7 +16433,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(shouldShowMediaInCommentsSetting, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 454)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 529)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14146,35 +16455,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetShowMedia(
-      {required Subreddit that, required bool showMedia}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_bool(showMedia, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 455)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetShowMediaConstMeta,
-      argValues: [that, showMedia],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetShowMediaConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_show_media",
-            argNames: ["that", "showMedia"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetShowMediaPreview(
       {required Subreddit that, required bool showMediaPreview}) {
     return handler.executeSync(SyncTask(
@@ -14183,7 +16463,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(showMediaPreview, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 456)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 530)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14212,7 +16492,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(spoilersEnabled, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 457)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 531)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14241,7 +16521,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_String(submissionType, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 458)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 532)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14262,35 +16542,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetSubmitLinkLabel(
-      {required Subreddit that, required String submitLinkLabel}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_String(submitLinkLabel, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 459)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetSubmitLinkLabelConstMeta,
-      argValues: [that, submitLinkLabel],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetSubmitLinkLabelConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_submit_link_label",
-            argNames: ["that", "submitLinkLabel"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetSubmitText(
       {required Subreddit that, required String submitText}) {
     return handler.executeSync(SyncTask(
@@ -14299,7 +16550,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_String(submitText, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 460)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 533)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14328,7 +16579,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_opt_String(submitTextHtml, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 461)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 534)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14349,93 +16600,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetSubmitTextLabel(
-      {required Subreddit that, required String submitTextLabel}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_String(submitTextLabel, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 462)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetSubmitTextLabelConstMeta,
-      argValues: [that, submitTextLabel],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetSubmitTextLabelConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_submit_text_label",
-            argNames: ["that", "submitTextLabel"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetSubredditType(
-      {required Subreddit that, required String subredditType}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_String(subredditType, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 463)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetSubredditTypeConstMeta,
-      argValues: [that, subredditType],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetSubredditTypeConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_subreddit_type",
-            argNames: ["that", "subredditType"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetSubscribers(
-      {required Subreddit that, required PlatformInt64 subscribers}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_i_64(subscribers, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 464)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetSubscribersConstMeta,
-      argValues: [that, subscribers],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetSubscribersConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_subscribers",
-            argNames: ["that", "subscribers"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetSuggestedCommentSort(
       {required Subreddit that, String? suggestedCommentSort}) {
     return handler.executeSync(SyncTask(
@@ -14444,7 +16608,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_opt_String(suggestedCommentSort, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 465)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 535)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14465,62 +16629,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetTitle(
-      {required Subreddit that, required String title}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_String(title, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 466)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta: kRedditApiModelSubredditSubredditAutoAccessorSetTitleConstMeta,
-      argValues: [that, title],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetTitleConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_title",
-            argNames: ["that", "title"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetUrl(
-      {required Subreddit that, required String url}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_String(url, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 467)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta: kRedditApiModelSubredditSubredditAutoAccessorSetUrlConstMeta,
-      argValues: [that, url],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetUrlConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_url",
-            argNames: ["that", "url"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetUserCanFlairInSr(
       {required Subreddit that, bool? userCanFlairInSr}) {
     return handler.executeSync(SyncTask(
@@ -14529,7 +16637,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_opt_box_autoadd_bool(userCanFlairInSr, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 468)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 536)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14558,7 +16666,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_flair(userFlair, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 469)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 537)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14587,7 +16695,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(userFlairEnabledInSr, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 470)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 538)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14616,7 +16724,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(userHasFavorited, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 471)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 539)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14637,151 +16745,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void redditApiModelSubredditSubredditAutoAccessorSetUserIsBanned(
-      {required Subreddit that, required bool userIsBanned}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_bool(userIsBanned, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 472)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetUserIsBannedConstMeta,
-      argValues: [that, userIsBanned],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetUserIsBannedConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_user_is_banned",
-            argNames: ["that", "userIsBanned"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetUserIsContributor(
-      {required Subreddit that, required bool userIsContributor}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_bool(userIsContributor, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 473)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetUserIsContributorConstMeta,
-      argValues: [that, userIsContributor],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetUserIsContributorConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_user_is_contributor",
-            argNames: ["that", "userIsContributor"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetUserIsModerator(
-      {required Subreddit that, required bool userIsModerator}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_bool(userIsModerator, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 474)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetUserIsModeratorConstMeta,
-      argValues: [that, userIsModerator],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetUserIsModeratorConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_user_is_moderator",
-            argNames: ["that", "userIsModerator"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetUserIsMuted(
-      {required Subreddit that, required bool userIsMuted}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_bool(userIsMuted, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 475)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetUserIsMutedConstMeta,
-      argValues: [that, userIsMuted],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetUserIsMutedConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_user_is_muted",
-            argNames: ["that", "userIsMuted"],
-          );
-
-  @override
-  void redditApiModelSubredditSubredditAutoAccessorSetUserIsSubscriber(
-      {required Subreddit that, required bool userIsSubscriber}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
-            that, serializer);
-        sse_encode_bool(userIsSubscriber, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 476)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kRedditApiModelSubredditSubredditAutoAccessorSetUserIsSubscriberConstMeta,
-      argValues: [that, userIsSubscriber],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kRedditApiModelSubredditSubredditAutoAccessorSetUserIsSubscriberConstMeta =>
-          const TaskConstMeta(
-            debugName: "Subreddit_auto_accessor_set_user_is_subscriber",
-            argNames: ["that", "userIsSubscriber"],
-          );
-
-  @override
   void redditApiModelSubredditSubredditAutoAccessorSetUserSrFlairEnabled(
       {required Subreddit that, bool? userSrFlairEnabled}) {
     return handler.executeSync(SyncTask(
@@ -14790,7 +16753,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_opt_box_autoadd_bool(userSrFlairEnabled, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 477)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 540)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14819,7 +16782,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_bool(userSrThemeEnabled, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 478)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 541)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14848,7 +16811,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
         sse_encode_opt_box_autoadd_bool(wikiEnabled, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 479)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 542)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14870,14 +16833,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelSubredditSubredditAutoAccessorSetWls(
-      {required Subreddit that, BigInt? wls}) {
+      {required Subreddit that, int? wls}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        sse_encode_opt_box_autoadd_u_64(wls, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 480)!;
+        sse_encode_opt_box_autoadd_u_32(wls, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 543)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -14902,7 +16865,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 481, port: port_);
+            funcId: 544, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -14922,16 +16885,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Icon? redditApiModelSubredditSubredditIcon({required Subreddit that}) {
+  SubredditIcon redditApiModelSubredditSubredditIcon(
+      {required Subreddit that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubreddit(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 482)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 545)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_box_autoadd_icon,
+        decodeSuccessData: sse_decode_subreddit_icon,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelSubredditSubredditIconConstMeta,
@@ -14952,7 +16916,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 483, port: port_);
+            funcId: 546, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_author_info,
@@ -14977,7 +16941,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 484, port: port_);
+            funcId: 547, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_comment_contribution_settings,
@@ -14998,13 +16962,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
+  void crateApiSimpleDebugComment({required Comment comment}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
+            comment, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 548)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiSimpleDebugCommentConstMeta,
+      argValues: [comment],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSimpleDebugCommentConstMeta => const TaskConstMeta(
+        debugName: "debug_comment",
+        argNames: ["comment"],
+      );
+
+  @override
   void crateApiSimpleDebugPost({required Post post}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             post, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 485)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 549)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -15022,24 +17010,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Features> redditApiModelUserFeaturesDefault() {
+  Future<Features> redditApiModelUserModelFeaturesDefault() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 486, port: port_);
+            funcId: 550, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_features,
         decodeErrorData: null,
       ),
-      constMeta: kRedditApiModelUserFeaturesDefaultConstMeta,
+      constMeta: kRedditApiModelUserModelFeaturesDefaultConstMeta,
       argValues: [],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kRedditApiModelUserFeaturesDefaultConstMeta =>
+  TaskConstMeta get kRedditApiModelUserModelFeaturesDefaultConstMeta =>
       const TaskConstMeta(
         debugName: "features_default",
         argNames: [],
@@ -15051,7 +17039,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 487, port: port_);
+            funcId: 551, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_feed,
@@ -15070,12 +17058,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<Url> redditApiModelFeedFeedSortAddToUrl(
+      {required FeedSort that, required Url url}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_feed_sort(that, serializer);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUrl(
+            url, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 552, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUrl,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelFeedFeedSortAddToUrlConstMeta,
+      argValues: [that, url],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelFeedFeedSortAddToUrlConstMeta =>
+      const TaskConstMeta(
+        debugName: "feed_sort_add_to_url",
+        argNames: ["that", "url"],
+      );
+
+  @override
   Future<Flair> redditApiModelFlairFlairDefault() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 488, port: port_);
+            funcId: 553, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_flair,
@@ -15099,7 +17116,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 489, port: port_);
+            funcId: 554, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_gildings,
@@ -15123,7 +17140,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 490, port: port_);
+            funcId: 555, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_image_base,
@@ -15147,7 +17164,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 491, port: port_);
+            funcId: 556, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -15170,7 +17187,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 492, port: port_);
+            funcId: 557, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_media_embed,
@@ -15189,36 +17206,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Multi> redditApiModelMultiMultiDefault() {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 493, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_multi,
-        decodeErrorData: null,
-      ),
-      constMeta: kRedditApiModelMultiMultiDefaultConstMeta,
-      argValues: [],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kRedditApiModelMultiMultiDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "multi_default",
-        argNames: [],
-      );
-
-  @override
   Future<NotificationLevel> redditApiModelSubredditNotificationLevelDefault() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 494, port: port_);
+            funcId: 558, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_notification_level,
@@ -15242,7 +17235,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 495, port: port_);
+            funcId: 559, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_oembed,
@@ -15261,24 +17254,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Preferences> redditApiModelUserPreferencesDefault() {
+  Future<Preferences> redditApiModelUserModelPreferencesDefault() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 496, port: port_);
+            funcId: 560, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_preferences,
         decodeErrorData: null,
       ),
-      constMeta: kRedditApiModelUserPreferencesDefaultConstMeta,
+      constMeta: kRedditApiModelUserModelPreferencesDefaultConstMeta,
       argValues: [],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kRedditApiModelUserPreferencesDefaultConstMeta =>
+  TaskConstMeta get kRedditApiModelUserModelPreferencesDefaultConstMeta =>
       const TaskConstMeta(
         debugName: "preferences_default",
         argNames: [],
@@ -15290,7 +17283,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 497, port: port_);
+            funcId: 561, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_preview,
@@ -15313,7 +17306,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 498)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 562)!;
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -15338,7 +17331,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 499, port: port_);
+            funcId: 563, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_reddit_image,
@@ -15362,7 +17355,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 500, port: port_);
+            funcId: 564, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_reddit_video,
@@ -15386,7 +17379,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 501, port: port_);
+            funcId: 565, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_secure_media_embed,
@@ -15405,55 +17398,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Snoovatar> redditApiModelUserSnoovatarDefault() {
+  Future<Snoovatar> redditApiModelUserModelSnoovatarDefault() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 502, port: port_);
+            funcId: 566, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_snoovatar,
         decodeErrorData: null,
       ),
-      constMeta: kRedditApiModelUserSnoovatarDefaultConstMeta,
+      constMeta: kRedditApiModelUserModelSnoovatarDefaultConstMeta,
       argValues: [],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kRedditApiModelUserSnoovatarDefaultConstMeta =>
+  TaskConstMeta get kRedditApiModelUserModelSnoovatarDefaultConstMeta =>
       const TaskConstMeta(
         debugName: "snoovatar_default",
         argNames: [],
-      );
-
-  @override
-  Future<Url> redditApiModelSortAddToUrl(
-      {required Sort that, required Url url}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_sort(that, serializer);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUrl(
-            url, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 503, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUrl,
-        decodeErrorData: null,
-      ),
-      constMeta: kRedditApiModelSortAddToUrlConstMeta,
-      argValues: [that, url],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kRedditApiModelSortAddToUrlConstMeta => const TaskConstMeta(
-        debugName: "sort_add_to_url",
-        argNames: ["that", "url"],
       );
 
   @override
@@ -15462,7 +17427,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 504, port: port_);
+            funcId: 567, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_subreddit_name,
@@ -15481,12 +17446,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Fullname? redditApiModelThingName({required Thing that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_thing(that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 568)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname,
+        decodeErrorData: null,
+      ),
+      constMeta: kRedditApiModelThingNameConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kRedditApiModelThingNameConstMeta => const TaskConstMeta(
+        debugName: "thing_name",
+        argNames: ["that"],
+      );
+
+  @override
   Future<ThumbnailOption> redditApiModelPostThumbnailOptionDefault() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 505, port: port_);
+            funcId: 569, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_thumbnail_option,
@@ -15510,7 +17499,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 506, port: port_);
+            funcId: 570, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_thumbnail_url,
@@ -15529,72 +17518,72 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<User> redditApiModelUserUserDefault() {
+  Future<User> redditApiModelUserModelUserDefault() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 507, port: port_);
+            funcId: 571, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_user,
         decodeErrorData: null,
       ),
-      constMeta: kRedditApiModelUserUserDefaultConstMeta,
+      constMeta: kRedditApiModelUserModelUserDefaultConstMeta,
       argValues: [],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kRedditApiModelUserUserDefaultConstMeta =>
+  TaskConstMeta get kRedditApiModelUserModelUserDefaultConstMeta =>
       const TaskConstMeta(
         debugName: "user_default",
         argNames: [],
       );
 
   @override
-  Future<UserInfo> redditApiModelUserUserInfoDefault() {
+  Future<UserInfo> redditApiModelUserModelUserInfoDefault() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 508, port: port_);
+            funcId: 572, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_user_info,
         decodeErrorData: null,
       ),
-      constMeta: kRedditApiModelUserUserInfoDefaultConstMeta,
+      constMeta: kRedditApiModelUserModelUserInfoDefaultConstMeta,
       argValues: [],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kRedditApiModelUserUserInfoDefaultConstMeta =>
+  TaskConstMeta get kRedditApiModelUserModelUserInfoDefaultConstMeta =>
       const TaskConstMeta(
         debugName: "user_info_default",
         argNames: [],
       );
 
   @override
-  Future<UserSubreddit> redditApiModelUserUserSubredditDefault() {
+  Future<UserSubreddit> redditApiModelUserModelUserSubredditDefault() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 509, port: port_);
+            funcId: 573, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_user_subreddit,
         decodeErrorData: null,
       ),
-      constMeta: kRedditApiModelUserUserSubredditDefaultConstMeta,
+      constMeta: kRedditApiModelUserModelUserSubredditDefaultConstMeta,
       argValues: [],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kRedditApiModelUserUserSubredditDefaultConstMeta =>
+  TaskConstMeta get kRedditApiModelUserModelUserSubredditDefaultConstMeta =>
       const TaskConstMeta(
         debugName: "user_subreddit_default",
         argNames: [],
@@ -15606,7 +17595,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 510, port: port_);
+            funcId: 574, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_variant_inner,
@@ -15630,7 +17619,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 511, port: port_);
+            funcId: 575, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_variants,
@@ -15649,6 +17638,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_BoxFeedStream => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxFeedStream;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_BoxFeedStream => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxFeedStream;
+
+  RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_Client => wire
           .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient;
 
@@ -15665,12 +17662,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment;
 
   RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_FeedState => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState;
+      get rust_arc_increment_strong_count_Common => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon;
 
   RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_FeedState => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState;
+      get rust_arc_decrement_strong_count_Common => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon;
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_Details => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_Details => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails;
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_FeedStream => wire
@@ -15697,12 +17702,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery;
 
   RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_GalleryData => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGalleryData;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_GalleryData => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGalleryData;
+
+  RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_Listing => wire
           .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing;
 
   RustArcDecrementStrongCountFnType
       get rust_arc_decrement_strong_count_Listing => wire
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing;
+
+  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Multi =>
+      wire.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti;
+
+  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Multi =>
+      wire.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti;
 
   RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Pager =>
       wire.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager;
@@ -15723,6 +17742,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   RustArcDecrementStrongCountFnType
       get rust_arc_decrement_strong_count_PostId => wire
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID;
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_Streamable => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_Streamable => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable;
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_Subreddit => wire
@@ -15761,6 +17788,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BoxFeedStream
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxFeedStream(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return BoxFeedStreamImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
   Client
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
           dynamic raw) {
@@ -15777,11 +17812,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  FeedState
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+  Common
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return FeedStateImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return CommonImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Details
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return DetailsImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -15809,11 +17852,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  GalleryData
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGalleryData(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return GalleryDataImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
   Listing
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ListingImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Multi
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return MultiImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -15838,6 +17897,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return PostIdImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Streamable
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return StreamableImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -15880,11 +17947,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  FeedState
-      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+  Common
+      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return FeedStateImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return CommonImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Details
+      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return DetailsImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -15893,6 +17968,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ListingImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Multi
+      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return MultiImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -15909,6 +17992,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return PostImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Streamable
+      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return StreamableImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -15944,11 +18035,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  FeedState
-      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+  Common
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return FeedStateImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return CommonImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Details
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return DetailsImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -15960,11 +18059,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Gallery
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return GalleryImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
   Listing
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ListingImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Multi
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return MultiImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -15981,6 +18096,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return PostImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Streamable
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return StreamableImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -16019,6 +18142,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BoxFeedStream
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxFeedStream(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return BoxFeedStreamImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
   Client
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
           dynamic raw) {
@@ -16035,11 +18166,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  FeedState
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+  Common
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return FeedStateImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return CommonImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Details
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return DetailsImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -16067,11 +18206,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  GalleryData
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGalleryData(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return GalleryDataImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
   Listing
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ListingImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Multi
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return MultiImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -16096,6 +18251,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return PostIdImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Streamable
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return StreamableImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -16158,20 +18321,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Details
+      dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+        raw);
+  }
+
+  @protected
+  Fullname
+      dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+        raw);
+  }
+
+  @protected
   Gallery
       dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
-        raw);
-  }
-
-  @protected
-  Post
-      dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
         raw);
   }
 
@@ -16185,6 +18357,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   bool dco_decode_box_autoadd_bool(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as bool;
+  }
+
+  @protected
+  CommentSort dco_decode_box_autoadd_comment_sort(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_comment_sort(raw);
   }
 
   @protected
@@ -16206,9 +18384,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw) {
+  FeedSort dco_decode_box_autoadd_feed_sort(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_i_64(raw);
+    return dco_decode_feed_sort(raw);
   }
 
   @protected
@@ -16227,12 +18405,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   MediaEmbed dco_decode_box_autoadd_media_embed(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_media_embed(raw);
-  }
-
-  @protected
-  Multi dco_decode_box_autoadd_multi(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_multi(raw);
   }
 
   @protected
@@ -16260,9 +18432,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Sort dco_decode_box_autoadd_sort(dynamic raw) {
+  Thing dco_decode_box_autoadd_thing(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_sort(raw);
+    return dco_decode_thing(raw);
   }
 
   @protected
@@ -16272,15 +18444,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  BigInt dco_decode_box_autoadd_u_64(dynamic raw) {
+  int dco_decode_box_autoadd_u_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_u_64(raw);
+    return raw as int;
   }
 
   @protected
   User dco_decode_box_autoadd_user(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_user(raw);
+  }
+
+  @protected
+  UserStreamSort dco_decode_box_autoadd_user_stream_sort(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_user_stream_sort(raw);
   }
 
   @protected
@@ -16299,6 +18477,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return CommentContributionSettings(
       allowedMediaTypes: dco_decode_list_String(arr[0]),
     );
+  }
+
+  @protected
+  CommentSort dco_decode_comment_sort(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return CommentSort.values[raw as int];
   }
 
   @protected
@@ -16369,6 +18553,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  FeedSort dco_decode_feed_sort(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return FeedSort_Best();
+      case 1:
+        return FeedSort_Hot();
+      case 2:
+        return FeedSort_New(
+          dco_decode_timeframe(raw[1]),
+        );
+      case 3:
+        return FeedSort_Top(
+          dco_decode_timeframe(raw[1]),
+        );
+      case 4:
+        return FeedSort_Rising();
+      case 5:
+        return FeedSort_Controversial(
+          dco_decode_timeframe(raw[1]),
+        );
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
   Flair dco_decode_flair(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -16428,8 +18639,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return ImageBase(
       url: dco_decode_String(arr[0]),
-      width: dco_decode_i_64(arr[1]),
-      height: dco_decode_i_64(arr[2]),
+      width: dco_decode_u_32(arr[1]),
+      height: dco_decode_u_32(arr[2]),
     );
   }
 
@@ -16437,6 +18648,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Kind dco_decode_kind(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return Kind.values[raw as int];
+  }
+
+  @protected
+  List<Multi>
+      dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(
+            dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti)
+        .toList();
   }
 
   @protected
@@ -16460,12 +18682,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<ImageBase> dco_decode_list_image_base(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_image_base).toList();
-  }
-
-  @protected
-  List<Multi> dco_decode_list_multi(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_multi).toList();
   }
 
   @protected
@@ -16536,38 +18752,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return MediaEmbed(
       content: dco_decode_String(arr[0]),
-      width: dco_decode_i_64(arr[1]),
+      width: dco_decode_u_32(arr[1]),
       scrolling: dco_decode_bool(arr[2]),
-      height: dco_decode_i_64(arr[3]),
-    );
-  }
-
-  @protected
-  Multi dco_decode_multi(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 19)
-      throw Exception('unexpected arr length: expect 19 but see ${arr.length}');
-    return Multi(
-      canEdit: dco_decode_bool(arr[0]),
-      displayName: dco_decode_String(arr[1]),
-      name: dco_decode_String(arr[2]),
-      descriptionHtml: dco_decode_String(arr[3]),
-      numSubscribers: dco_decode_i_64(arr[4]),
-      copiedFrom: dco_decode_opt_String(arr[5]),
-      iconUrl: dco_decode_String(arr[6]),
-      subreddits: dco_decode_list_subreddit_name(arr[7]),
-      createdUtc: dco_decode_f_64(arr[8]),
-      visibility: dco_decode_String(arr[9]),
-      created: dco_decode_f_64(arr[10]),
-      over18: dco_decode_bool(arr[11]),
-      path: dco_decode_String(arr[12]),
-      owner: dco_decode_String(arr[13]),
-      keyColor: dco_decode_opt_String(arr[14]),
-      isSubscriber: dco_decode_bool(arr[15]),
-      ownerId: dco_decode_String(arr[16]),
-      descriptionMd: dco_decode_String(arr[17]),
-      isFavorited: dco_decode_bool(arr[18]),
+      height: dco_decode_u_32(arr[3]),
     );
   }
 
@@ -16587,8 +18774,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       providerUrl: dco_decode_String(arr[0]),
       title: dco_decode_String(arr[1]),
       html: dco_decode_String(arr[2]),
-      height: dco_decode_i_64(arr[3]),
-      width: dco_decode_i_64(arr[4]),
+      height: dco_decode_u_32(arr[3]),
+      width: dco_decode_u_32(arr[4]),
       version: dco_decode_String(arr[5]),
       authorName: dco_decode_String(arr[6]),
       providerName: dco_decode_String(arr[7]),
@@ -16605,6 +18792,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Details?
+      dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+            raw);
+  }
+
+  @protected
+  Fullname?
+      dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+            raw);
+  }
+
+  @protected
   Gallery?
       dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
           dynamic raw) {
@@ -16612,17 +18821,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return raw == null
         ? null
         : dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
-            raw);
-  }
-
-  @protected
-  Post?
-      dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null
-        ? null
-        : dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             raw);
   }
 
@@ -16639,6 +18837,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CommentSort? dco_decode_opt_box_autoadd_comment_sort(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_comment_sort(raw);
+  }
+
+  @protected
   double? dco_decode_opt_box_autoadd_f_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_f_32(raw);
@@ -16648,18 +18852,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   double? dco_decode_opt_box_autoadd_f_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_f_64(raw);
-  }
-
-  @protected
-  PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_i_64(raw);
-  }
-
-  @protected
-  Icon? dco_decode_opt_box_autoadd_icon(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_icon(raw);
   }
 
   @protected
@@ -16687,15 +18879,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Thing? dco_decode_opt_box_autoadd_thing(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_thing(raw);
+  }
+
+  @protected
   Thumbnail? dco_decode_opt_box_autoadd_thumbnail(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_thumbnail(raw);
   }
 
   @protected
-  BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw) {
+  int? dco_decode_opt_box_autoadd_u_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_u_64(raw);
+    return raw == null ? null : dco_decode_box_autoadd_u_32(raw);
   }
 
   @protected
@@ -16772,16 +18970,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (arr.length != 11)
       throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
     return RedditVideo(
-      bitrateKbps: dco_decode_u_64(arr[0]),
-      width: dco_decode_u_64(arr[1]),
-      height: dco_decode_u_64(arr[2]),
+      bitrateKbps: dco_decode_u_32(arr[0]),
+      width: dco_decode_u_32(arr[1]),
+      height: dco_decode_u_32(arr[2]),
       hasAudio: dco_decode_bool(arr[3]),
       isGif: dco_decode_bool(arr[4]),
       fallbackUrl: dco_decode_String(arr[5]),
       scrubberMediaUrl: dco_decode_String(arr[6]),
       dashUrl: dco_decode_String(arr[7]),
       hlsUrl: dco_decode_String(arr[8]),
-      duration: dco_decode_u_64(arr[9]),
+      duration: dco_decode_u_32(arr[9]),
       transcodingStatus: dco_decode_String(arr[10]),
     );
   }
@@ -16812,10 +19010,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return SecureMediaEmbed(
       content: dco_decode_String(arr[0]),
-      width: dco_decode_i_64(arr[1]),
+      width: dco_decode_u_32(arr[1]),
       scrolling: dco_decode_bool(arr[2]),
       mediaDomainUrl: dco_decode_String(arr[3]),
-      height: dco_decode_i_64(arr[4]),
+      height: dco_decode_u_32(arr[4]),
     );
   }
 
@@ -16833,26 +19031,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Sort dco_decode_sort(dynamic raw) {
+  SubredditIcon dco_decode_subreddit_icon(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return Sort_Best();
+        return SubredditIcon_Image(
+          dco_decode_box_autoadd_icon(raw[1]),
+        );
       case 1:
-        return Sort_Hot();
-      case 2:
-        return Sort_New(
-          dco_decode_timeframe(raw[1]),
-        );
-      case 3:
-        return Sort_Top(
-          dco_decode_timeframe(raw[1]),
-        );
-      case 4:
-        return Sort_Rising();
-      case 5:
-        return Sort_Controversial(
-          dco_decode_timeframe(raw[1]),
+        return SubredditIcon_Color(
+          dco_decode_String(raw[1]),
         );
       default:
         throw Exception("unreachable");
@@ -16904,12 +19092,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         return Thing_Award();
       case 7:
         return Thing_Multi(
-          dco_decode_box_autoadd_multi(raw[1]),
+          dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+              raw[1]),
         );
       case 8:
         return Thing_More(
           id: dco_decode_String(raw[1]),
-          name: dco_decode_String(raw[2]),
+          name:
+              dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+                  raw[2]),
           count: dco_decode_u_32(raw[3]),
           depth: dco_decode_u_32(raw[4]),
           children: dco_decode_list_String(raw[5]),
@@ -16927,8 +19118,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return Thumbnail(
       url: dco_decode_String(arr[0]),
-      height: dco_decode_u_64(arr[1]),
-      width: dco_decode_u_64(arr[2]),
+      height: dco_decode_u_32(arr[1]),
+      width: dco_decode_u_32(arr[2]),
     );
   }
 
@@ -16940,8 +19131,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return ThumbnailOption(
       url: dco_decode_opt_String(arr[0]),
-      height: dco_decode_opt_box_autoadd_u_64(arr[1]),
-      width: dco_decode_opt_box_autoadd_u_64(arr[2]),
+      height: dco_decode_opt_box_autoadd_u_32(arr[1]),
+      width: dco_decode_opt_box_autoadd_u_32(arr[2]),
     );
   }
 
@@ -16953,8 +19144,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return ThumbnailURL(
       url: dco_decode_opt_String(arr[0]),
-      height: dco_decode_opt_box_autoadd_u_64(arr[1]),
-      width: dco_decode_opt_box_autoadd_u_64(arr[2]),
+      height: dco_decode_opt_box_autoadd_u_32(arr[1]),
+      width: dco_decode_opt_box_autoadd_u_32(arr[2]),
     );
   }
 
@@ -16968,12 +19159,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   int dco_decode_u_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
-  }
-
-  @protected
-  BigInt dco_decode_u_64(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dcoDecodeU64(raw);
   }
 
   @protected
@@ -17058,6 +19243,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       acceptChats: dco_decode_bool(arr[22]),
       acceptPms: dco_decode_bool(arr[23]),
     );
+  }
+
+  @protected
+  UserStreamSort dco_decode_user_stream_sort(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return UserStreamSort_Hot();
+      case 1:
+        return UserStreamSort_Top(
+          dco_decode_timeframe(raw[1]),
+        );
+      case 2:
+        return UserStreamSort_New();
+      case 3:
+        return UserStreamSort_Controversial(
+          dco_decode_timeframe(raw[1]),
+        );
+      default:
+        throw Exception("unreachable");
+    }
   }
 
   @protected
@@ -17156,6 +19362,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BoxFeedStream
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxFeedStream(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return BoxFeedStreamImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
   Client
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
           SseDeserializer deserializer) {
@@ -17174,11 +19389,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  FeedState
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+  Common
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return FeedStateImpl.frbInternalSseDecode(
+    return CommonImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Details
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return DetailsImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -17210,11 +19434,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  GalleryData
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGalleryData(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return GalleryDataImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
   Listing
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return ListingImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Multi
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return MultiImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -17242,6 +19484,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return PostIdImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Streamable
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return StreamableImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -17290,11 +19541,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  FeedState
-      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+  Common
+      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return FeedStateImpl.frbInternalSseDecode(
+    return CommonImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Details
+      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return DetailsImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -17304,6 +19564,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return ListingImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Multi
+      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return MultiImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -17322,6 +19591,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return PostImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Streamable
+      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return StreamableImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -17362,11 +19640,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  FeedState
-      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+  Common
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return FeedStateImpl.frbInternalSseDecode(
+    return CommonImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Details
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return DetailsImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -17380,11 +19667,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Gallery
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return GalleryImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
   Listing
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return ListingImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Multi
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return MultiImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -17403,6 +19708,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return PostImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Streamable
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return StreamableImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -17447,6 +19761,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BoxFeedStream
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxFeedStream(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return BoxFeedStreamImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
   Client
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
           SseDeserializer deserializer) {
@@ -17465,11 +19788,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  FeedState
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
+  Common
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return FeedStateImpl.frbInternalSseDecode(
+    return CommonImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Details
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return DetailsImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -17501,11 +19833,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  GalleryData
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGalleryData(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return GalleryDataImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
   Listing
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return ListingImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Multi
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return MultiImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -17533,6 +19883,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return PostIdImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Streamable
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return StreamableImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -17603,20 +19962,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Details
+      sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+        deserializer));
+  }
+
+  @protected
+  Fullname
+      sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+        deserializer));
+  }
+
+  @protected
   Gallery
       sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
-        deserializer));
-  }
-
-  @protected
-  Post
-      sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
         deserializer));
   }
 
@@ -17630,6 +19998,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   bool sse_decode_box_autoadd_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_bool(deserializer));
+  }
+
+  @protected
+  CommentSort sse_decode_box_autoadd_comment_sort(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_comment_sort(deserializer));
   }
 
   @protected
@@ -17651,9 +20026,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer) {
+  FeedSort sse_decode_box_autoadd_feed_sort(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_i_64(deserializer));
+    return (sse_decode_feed_sort(deserializer));
   }
 
   @protected
@@ -17672,12 +20047,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   MediaEmbed sse_decode_box_autoadd_media_embed(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_media_embed(deserializer));
-  }
-
-  @protected
-  Multi sse_decode_box_autoadd_multi(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_multi(deserializer));
   }
 
   @protected
@@ -17707,9 +20076,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Sort sse_decode_box_autoadd_sort(SseDeserializer deserializer) {
+  Thing sse_decode_box_autoadd_thing(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_sort(deserializer));
+    return (sse_decode_thing(deserializer));
   }
 
   @protected
@@ -17719,15 +20088,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer) {
+  int sse_decode_box_autoadd_u_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_u_64(deserializer));
+    return (sse_decode_u_32(deserializer));
   }
 
   @protected
   User sse_decode_box_autoadd_user(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_user(deserializer));
+  }
+
+  @protected
+  UserStreamSort sse_decode_box_autoadd_user_stream_sort(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_user_stream_sort(deserializer));
   }
 
   @protected
@@ -17744,6 +20120,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_allowedMediaTypes = sse_decode_list_String(deserializer);
     return CommentContributionSettings(
         allowedMediaTypes: var_allowedMediaTypes);
+  }
+
+  @protected
+  CommentSort sse_decode_comment_sort(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return CommentSort.values[inner];
   }
 
   @protected
@@ -17842,6 +20225,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  FeedSort sse_decode_feed_sort(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        return FeedSort_Best();
+      case 1:
+        return FeedSort_Hot();
+      case 2:
+        var var_field0 = sse_decode_timeframe(deserializer);
+        return FeedSort_New(var_field0);
+      case 3:
+        var var_field0 = sse_decode_timeframe(deserializer);
+        return FeedSort_Top(var_field0);
+      case 4:
+        return FeedSort_Rising();
+      case 5:
+        var var_field0 = sse_decode_timeframe(deserializer);
+        return FeedSort_Controversial(var_field0);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
   Flair sse_decode_flair(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_cssClass = sse_decode_opt_String(deserializer);
@@ -17894,8 +20303,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ImageBase sse_decode_image_base(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_url = sse_decode_String(deserializer);
-    var var_width = sse_decode_i_64(deserializer);
-    var var_height = sse_decode_i_64(deserializer);
+    var var_width = sse_decode_u_32(deserializer);
+    var var_height = sse_decode_u_32(deserializer);
     return ImageBase(url: var_url, width: var_width, height: var_height);
   }
 
@@ -17904,6 +20313,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return Kind.values[inner];
+  }
+
+  @protected
+  List<Multi>
+      sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Multi>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(
+          sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+              deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -17942,18 +20367,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <ImageBase>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_image_base(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<Multi> sse_decode_list_multi(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <Multi>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_multi(deserializer));
     }
     return ans_;
   }
@@ -18055,58 +20468,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   MediaEmbed sse_decode_media_embed(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_content = sse_decode_String(deserializer);
-    var var_width = sse_decode_i_64(deserializer);
+    var var_width = sse_decode_u_32(deserializer);
     var var_scrolling = sse_decode_bool(deserializer);
-    var var_height = sse_decode_i_64(deserializer);
+    var var_height = sse_decode_u_32(deserializer);
     return MediaEmbed(
         content: var_content,
         width: var_width,
         scrolling: var_scrolling,
         height: var_height);
-  }
-
-  @protected
-  Multi sse_decode_multi(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_canEdit = sse_decode_bool(deserializer);
-    var var_displayName = sse_decode_String(deserializer);
-    var var_name = sse_decode_String(deserializer);
-    var var_descriptionHtml = sse_decode_String(deserializer);
-    var var_numSubscribers = sse_decode_i_64(deserializer);
-    var var_copiedFrom = sse_decode_opt_String(deserializer);
-    var var_iconUrl = sse_decode_String(deserializer);
-    var var_subreddits = sse_decode_list_subreddit_name(deserializer);
-    var var_createdUtc = sse_decode_f_64(deserializer);
-    var var_visibility = sse_decode_String(deserializer);
-    var var_created = sse_decode_f_64(deserializer);
-    var var_over18 = sse_decode_bool(deserializer);
-    var var_path = sse_decode_String(deserializer);
-    var var_owner = sse_decode_String(deserializer);
-    var var_keyColor = sse_decode_opt_String(deserializer);
-    var var_isSubscriber = sse_decode_bool(deserializer);
-    var var_ownerId = sse_decode_String(deserializer);
-    var var_descriptionMd = sse_decode_String(deserializer);
-    var var_isFavorited = sse_decode_bool(deserializer);
-    return Multi(
-        canEdit: var_canEdit,
-        displayName: var_displayName,
-        name: var_name,
-        descriptionHtml: var_descriptionHtml,
-        numSubscribers: var_numSubscribers,
-        copiedFrom: var_copiedFrom,
-        iconUrl: var_iconUrl,
-        subreddits: var_subreddits,
-        createdUtc: var_createdUtc,
-        visibility: var_visibility,
-        created: var_created,
-        over18: var_over18,
-        path: var_path,
-        owner: var_owner,
-        keyColor: var_keyColor,
-        isSubscriber: var_isSubscriber,
-        ownerId: var_ownerId,
-        descriptionMd: var_descriptionMd,
-        isFavorited: var_isFavorited);
   }
 
   @protected
@@ -18123,8 +20492,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_providerUrl = sse_decode_String(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_html = sse_decode_String(deserializer);
-    var var_height = sse_decode_i_64(deserializer);
-    var var_width = sse_decode_i_64(deserializer);
+    var var_height = sse_decode_u_32(deserializer);
+    var var_width = sse_decode_u_32(deserializer);
     var var_version = sse_decode_String(deserializer);
     var var_authorName = sse_decode_String(deserializer);
     var var_providerName = sse_decode_String(deserializer);
@@ -18157,13 +20526,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Gallery?
-      sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+  Details?
+      sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+      return (sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
           deserializer));
     } else {
       return null;
@@ -18171,13 +20540,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Post?
-      sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
+  Fullname?
+      sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
+      return (sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+          deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  Gallery?
+      sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
           deserializer));
     } else {
       return null;
@@ -18208,6 +20591,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CommentSort? sse_decode_opt_box_autoadd_comment_sort(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_comment_sort(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   double? sse_decode_opt_box_autoadd_f_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -18224,28 +20619,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_f_64(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_i_64(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  Icon? sse_decode_opt_box_autoadd_icon(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_icon(deserializer));
     } else {
       return null;
     }
@@ -18298,6 +20671,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Thing? sse_decode_opt_box_autoadd_thing(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_thing(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   Thumbnail? sse_decode_opt_box_autoadd_thumbnail(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -18310,11 +20694,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer) {
+  int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_u_64(deserializer));
+      return (sse_decode_box_autoadd_u_32(deserializer));
     } else {
       return null;
     }
@@ -18401,16 +20785,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   RedditVideo sse_decode_reddit_video(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_bitrateKbps = sse_decode_u_64(deserializer);
-    var var_width = sse_decode_u_64(deserializer);
-    var var_height = sse_decode_u_64(deserializer);
+    var var_bitrateKbps = sse_decode_u_32(deserializer);
+    var var_width = sse_decode_u_32(deserializer);
+    var var_height = sse_decode_u_32(deserializer);
     var var_hasAudio = sse_decode_bool(deserializer);
     var var_isGif = sse_decode_bool(deserializer);
     var var_fallbackUrl = sse_decode_String(deserializer);
     var var_scrubberMediaUrl = sse_decode_String(deserializer);
     var var_dashUrl = sse_decode_String(deserializer);
     var var_hlsUrl = sse_decode_String(deserializer);
-    var var_duration = sse_decode_u_64(deserializer);
+    var var_duration = sse_decode_u_32(deserializer);
     var var_transcodingStatus = sse_decode_String(deserializer);
     return RedditVideo(
         bitrateKbps: var_bitrateKbps,
@@ -18448,10 +20832,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SecureMediaEmbed sse_decode_secure_media_embed(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_content = sse_decode_String(deserializer);
-    var var_width = sse_decode_i_64(deserializer);
+    var var_width = sse_decode_u_32(deserializer);
     var var_scrolling = sse_decode_bool(deserializer);
     var var_mediaDomainUrl = sse_decode_String(deserializer);
-    var var_height = sse_decode_i_64(deserializer);
+    var var_height = sse_decode_u_32(deserializer);
     return SecureMediaEmbed(
         content: var_content,
         width: var_width,
@@ -18473,26 +20857,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Sort sse_decode_sort(SseDeserializer deserializer) {
+  SubredditIcon sse_decode_subreddit_icon(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var tag_ = sse_decode_i_32(deserializer);
     switch (tag_) {
       case 0:
-        return Sort_Best();
+        var var_field0 = sse_decode_box_autoadd_icon(deserializer);
+        return SubredditIcon_Image(var_field0);
       case 1:
-        return Sort_Hot();
-      case 2:
-        var var_field0 = sse_decode_timeframe(deserializer);
-        return Sort_New(var_field0);
-      case 3:
-        var var_field0 = sse_decode_timeframe(deserializer);
-        return Sort_Top(var_field0);
-      case 4:
-        return Sort_Rising();
-      case 5:
-        var var_field0 = sse_decode_timeframe(deserializer);
-        return Sort_Controversial(var_field0);
+        var var_field0 = sse_decode_String(deserializer);
+        return SubredditIcon_Color(var_field0);
       default:
         throw UnimplementedError('');
     }
@@ -18539,11 +20914,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 6:
         return Thing_Award();
       case 7:
-        var var_field0 = sse_decode_box_autoadd_multi(deserializer);
+        var var_field0 =
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+                deserializer);
         return Thing_Multi(var_field0);
       case 8:
         var var_id = sse_decode_String(deserializer);
-        var var_name = sse_decode_String(deserializer);
+        var var_name =
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+                deserializer);
         var var_count = sse_decode_u_32(deserializer);
         var var_depth = sse_decode_u_32(deserializer);
         var var_children = sse_decode_list_String(deserializer);
@@ -18562,8 +20941,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Thumbnail sse_decode_thumbnail(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_url = sse_decode_String(deserializer);
-    var var_height = sse_decode_u_64(deserializer);
-    var var_width = sse_decode_u_64(deserializer);
+    var var_height = sse_decode_u_32(deserializer);
+    var var_width = sse_decode_u_32(deserializer);
     return Thumbnail(url: var_url, height: var_height, width: var_width);
   }
 
@@ -18571,8 +20950,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ThumbnailOption sse_decode_thumbnail_option(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_url = sse_decode_opt_String(deserializer);
-    var var_height = sse_decode_opt_box_autoadd_u_64(deserializer);
-    var var_width = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_height = sse_decode_opt_box_autoadd_u_32(deserializer);
+    var var_width = sse_decode_opt_box_autoadd_u_32(deserializer);
     return ThumbnailOption(url: var_url, height: var_height, width: var_width);
   }
 
@@ -18580,8 +20959,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ThumbnailURL sse_decode_thumbnail_url(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_url = sse_decode_opt_String(deserializer);
-    var var_height = sse_decode_opt_box_autoadd_u_64(deserializer);
-    var var_width = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_height = sse_decode_opt_box_autoadd_u_32(deserializer);
+    var var_width = sse_decode_opt_box_autoadd_u_32(deserializer);
     return ThumbnailURL(url: var_url, height: var_height, width: var_width);
   }
 
@@ -18596,12 +20975,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   int sse_decode_u_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint32();
-  }
-
-  @protected
-  BigInt sse_decode_u_64(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getBigUint64();
   }
 
   @protected
@@ -18733,6 +21106,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  UserStreamSort sse_decode_user_stream_sort(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        return UserStreamSort_Hot();
+      case 1:
+        var var_field0 = sse_decode_timeframe(deserializer);
+        return UserStreamSort_Top(var_field0);
+      case 2:
+        return UserStreamSort_New();
+      case 3:
+        var var_field0 = sse_decode_timeframe(deserializer);
+        return UserStreamSort_Controversial(var_field0);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
   UserSubreddit sse_decode_user_subreddit(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_defaultSet = sse_decode_bool(deserializer);
@@ -18859,6 +21253,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxFeedStream(
+          BoxFeedStream self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as BoxFeedStreamImpl).frbInternalSseEncode(move: true),
+        serializer);
+  }
+
+  @protected
+  void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
           Client self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -18877,11 +21281,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
-          FeedState self, SseSerializer serializer) {
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+          Common self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as FeedStateImpl).frbInternalSseEncode(move: true), serializer);
+        (self as CommonImpl).frbInternalSseEncode(move: true), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          Details self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as DetailsImpl).frbInternalSseEncode(move: true), serializer);
   }
 
   @protected
@@ -18913,11 +21326,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGalleryData(
+          GalleryData self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as GalleryDataImpl).frbInternalSseEncode(move: true), serializer);
+  }
+
+  @protected
+  void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
           Listing self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
         (self as ListingImpl).frbInternalSseEncode(move: true), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          Multi self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as MultiImpl).frbInternalSseEncode(move: true), serializer);
   }
 
   @protected
@@ -18945,6 +21376,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
         (self as PostIdImpl).frbInternalSseEncode(move: true), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+          Streamable self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as StreamableImpl).frbInternalSseEncode(move: true), serializer);
   }
 
   @protected
@@ -18995,11 +21435,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
-          FeedState self, SseSerializer serializer) {
+      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+          Common self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as FeedStateImpl).frbInternalSseEncode(move: false), serializer);
+        (self as CommonImpl).frbInternalSseEncode(move: false), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          Details self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as DetailsImpl).frbInternalSseEncode(move: false), serializer);
   }
 
   @protected
@@ -19009,6 +21458,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
         (self as ListingImpl).frbInternalSseEncode(move: false), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          Multi self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as MultiImpl).frbInternalSseEncode(move: false), serializer);
   }
 
   @protected
@@ -19027,6 +21485,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
         (self as PostImpl).frbInternalSseEncode(move: false), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+          Streamable self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as StreamableImpl).frbInternalSseEncode(move: false), serializer);
   }
 
   @protected
@@ -19068,11 +21535,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
-          FeedState self, SseSerializer serializer) {
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+          Common self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as FeedStateImpl).frbInternalSseEncode(move: false), serializer);
+        (self as CommonImpl).frbInternalSseEncode(move: false), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          Details self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as DetailsImpl).frbInternalSseEncode(move: false), serializer);
   }
 
   @protected
@@ -19086,11 +21562,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          Gallery self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as GalleryImpl).frbInternalSseEncode(move: false), serializer);
+  }
+
+  @protected
+  void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
           Listing self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
         (self as ListingImpl).frbInternalSseEncode(move: false), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          Multi self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as MultiImpl).frbInternalSseEncode(move: false), serializer);
   }
 
   @protected
@@ -19109,6 +21603,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
         (self as PostImpl).frbInternalSseEncode(move: false), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+          Streamable self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as StreamableImpl).frbInternalSseEncode(move: false), serializer);
   }
 
   @protected
@@ -19155,6 +21658,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxFeedStream(
+          BoxFeedStream self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as BoxFeedStreamImpl).frbInternalSseEncode(move: null),
+        serializer);
+  }
+
+  @protected
+  void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
           Client self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -19173,11 +21686,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFeedState(
-          FeedState self, SseSerializer serializer) {
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommon(
+          Common self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as FeedStateImpl).frbInternalSseEncode(move: null), serializer);
+        (self as CommonImpl).frbInternalSseEncode(move: null), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          Details self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as DetailsImpl).frbInternalSseEncode(move: null), serializer);
   }
 
   @protected
@@ -19209,11 +21731,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGalleryData(
+          GalleryData self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as GalleryDataImpl).frbInternalSseEncode(move: null), serializer);
+  }
+
+  @protected
+  void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerListing(
           Listing self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
         (self as ListingImpl).frbInternalSseEncode(move: null), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          Multi self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as MultiImpl).frbInternalSseEncode(move: null), serializer);
   }
 
   @protected
@@ -19241,6 +21781,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
         (self as PostIdImpl).frbInternalSseEncode(move: null), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
+          Streamable self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as StreamableImpl).frbInternalSseEncode(move: null), serializer);
   }
 
   @protected
@@ -19305,19 +21854,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
-          Gallery self, SseSerializer serializer) {
+      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          Details self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+    sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
         self, serializer);
   }
 
   @protected
   void
-      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
-          Post self, SseSerializer serializer) {
+      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+          Fullname self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
+    sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+        self, serializer);
+  }
+
+  @protected
+  void
+      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
+          Gallery self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
         self, serializer);
   }
 
@@ -19332,6 +21890,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_bool(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_comment_sort(
+      CommentSort self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_comment_sort(self, serializer);
   }
 
   @protected
@@ -19353,10 +21918,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_box_autoadd_i_64(
-      PlatformInt64 self, SseSerializer serializer) {
+  void sse_encode_box_autoadd_feed_sort(
+      FeedSort self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_64(self, serializer);
+    sse_encode_feed_sort(self, serializer);
   }
 
   @protected
@@ -19376,12 +21941,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       MediaEmbed self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_media_embed(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_multi(Multi self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_multi(self, serializer);
   }
 
   @protected
@@ -19411,9 +21970,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_box_autoadd_sort(Sort self, SseSerializer serializer) {
+  void sse_encode_box_autoadd_thing(Thing self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_sort(self, serializer);
+    sse_encode_thing(self, serializer);
   }
 
   @protected
@@ -19424,15 +21983,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer) {
+  void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_u_64(self, serializer);
+    sse_encode_u_32(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_user(User self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_user(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_user_stream_sort(
+      UserStreamSort self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_user_stream_sort(self, serializer);
   }
 
   @protected
@@ -19447,6 +22013,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       CommentContributionSettings self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_String(self.allowedMediaTypes, serializer);
+  }
+
+  @protected
+  void sse_encode_comment_sort(CommentSort self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -19510,6 +22082,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_feed_sort(FeedSort self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case FeedSort_Best():
+        sse_encode_i_32(0, serializer);
+      case FeedSort_Hot():
+        sse_encode_i_32(1, serializer);
+      case FeedSort_New(field0: final field0):
+        sse_encode_i_32(2, serializer);
+        sse_encode_timeframe(field0, serializer);
+      case FeedSort_Top(field0: final field0):
+        sse_encode_i_32(3, serializer);
+        sse_encode_timeframe(field0, serializer);
+      case FeedSort_Rising():
+        sse_encode_i_32(4, serializer);
+      case FeedSort_Controversial(field0: final field0):
+        sse_encode_i_32(5, serializer);
+        sse_encode_timeframe(field0, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_flair(Flair self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_opt_String(self.cssClass, serializer);
@@ -19551,14 +22145,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_image_base(ImageBase self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.url, serializer);
-    sse_encode_i_64(self.width, serializer);
-    sse_encode_i_64(self.height, serializer);
+    sse_encode_u_32(self.width, serializer);
+    sse_encode_u_32(self.height, serializer);
   }
 
   @protected
   void sse_encode_kind(Kind self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void
+      sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          List<Multi> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          item, serializer);
+    }
   }
 
   @protected
@@ -19589,15 +22195,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_image_base(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_multi(List<Multi> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_multi(item, serializer);
     }
   }
 
@@ -19683,33 +22280,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_media_embed(MediaEmbed self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.content, serializer);
-    sse_encode_i_64(self.width, serializer);
+    sse_encode_u_32(self.width, serializer);
     sse_encode_bool(self.scrolling, serializer);
-    sse_encode_i_64(self.height, serializer);
-  }
-
-  @protected
-  void sse_encode_multi(Multi self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_bool(self.canEdit, serializer);
-    sse_encode_String(self.displayName, serializer);
-    sse_encode_String(self.name, serializer);
-    sse_encode_String(self.descriptionHtml, serializer);
-    sse_encode_i_64(self.numSubscribers, serializer);
-    sse_encode_opt_String(self.copiedFrom, serializer);
-    sse_encode_String(self.iconUrl, serializer);
-    sse_encode_list_subreddit_name(self.subreddits, serializer);
-    sse_encode_f_64(self.createdUtc, serializer);
-    sse_encode_String(self.visibility, serializer);
-    sse_encode_f_64(self.created, serializer);
-    sse_encode_bool(self.over18, serializer);
-    sse_encode_String(self.path, serializer);
-    sse_encode_String(self.owner, serializer);
-    sse_encode_opt_String(self.keyColor, serializer);
-    sse_encode_bool(self.isSubscriber, serializer);
-    sse_encode_String(self.ownerId, serializer);
-    sse_encode_String(self.descriptionMd, serializer);
-    sse_encode_bool(self.isFavorited, serializer);
+    sse_encode_u_32(self.height, serializer);
   }
 
   @protected
@@ -19725,8 +22298,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.providerUrl, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_String(self.html, serializer);
-    sse_encode_i_64(self.height, serializer);
-    sse_encode_i_64(self.width, serializer);
+    sse_encode_u_32(self.height, serializer);
+    sse_encode_u_32(self.width, serializer);
     sse_encode_String(self.version, serializer);
     sse_encode_String(self.authorName, serializer);
     sse_encode_String(self.providerName, serializer);
@@ -19747,6 +22320,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
+      sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          Details? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDetails(
+          self, serializer);
+    }
+  }
+
+  @protected
+  void
+      sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+          Fullname? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+          self, serializer);
+    }
+  }
+
+  @protected
+  void
       sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
           Gallery? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -19754,19 +22353,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
-          self, serializer);
-    }
-  }
-
-  @protected
-  void
-      sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
-          Post? self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
           self, serializer);
     }
   }
@@ -19793,6 +22379,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_comment_sort(
+      CommentSort? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_comment_sort(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_f_32(double? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -19809,27 +22406,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_f_64(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_i_64(
-      PlatformInt64? self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_i_64(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_icon(Icon? self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_icon(self, serializer);
     }
   }
 
@@ -19877,6 +22453,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_thing(Thing? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_thing(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_thumbnail(
       Thumbnail? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -19888,12 +22474,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer) {
+  void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
     if (self != null) {
-      sse_encode_box_autoadd_u_64(self, serializer);
+      sse_encode_box_autoadd_u_32(self, serializer);
     }
   }
 
@@ -19958,16 +22544,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_reddit_video(RedditVideo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_u_64(self.bitrateKbps, serializer);
-    sse_encode_u_64(self.width, serializer);
-    sse_encode_u_64(self.height, serializer);
+    sse_encode_u_32(self.bitrateKbps, serializer);
+    sse_encode_u_32(self.width, serializer);
+    sse_encode_u_32(self.height, serializer);
     sse_encode_bool(self.hasAudio, serializer);
     sse_encode_bool(self.isGif, serializer);
     sse_encode_String(self.fallbackUrl, serializer);
     sse_encode_String(self.scrubberMediaUrl, serializer);
     sse_encode_String(self.dashUrl, serializer);
     sse_encode_String(self.hlsUrl, serializer);
-    sse_encode_u_64(self.duration, serializer);
+    sse_encode_u_32(self.duration, serializer);
     sse_encode_String(self.transcodingStatus, serializer);
   }
 
@@ -19990,10 +22576,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SecureMediaEmbed self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.content, serializer);
-    sse_encode_i_64(self.width, serializer);
+    sse_encode_u_32(self.width, serializer);
     sse_encode_bool(self.scrolling, serializer);
     sse_encode_String(self.mediaDomainUrl, serializer);
-    sse_encode_i_64(self.height, serializer);
+    sse_encode_u_32(self.height, serializer);
   }
 
   @protected
@@ -20005,24 +22591,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_sort(Sort self, SseSerializer serializer) {
+  void sse_encode_subreddit_icon(SubredditIcon self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
-      case Sort_Best():
+      case SubredditIcon_Image(field0: final field0):
         sse_encode_i_32(0, serializer);
-      case Sort_Hot():
+        sse_encode_box_autoadd_icon(field0, serializer);
+      case SubredditIcon_Color(field0: final field0):
         sse_encode_i_32(1, serializer);
-      case Sort_New(field0: final field0):
-        sse_encode_i_32(2, serializer);
-        sse_encode_timeframe(field0, serializer);
-      case Sort_Top(field0: final field0):
-        sse_encode_i_32(3, serializer);
-        sse_encode_timeframe(field0, serializer);
-      case Sort_Rising():
-        sse_encode_i_32(4, serializer);
-      case Sort_Controversial(field0: final field0):
-        sse_encode_i_32(5, serializer);
-        sse_encode_timeframe(field0, serializer);
+        sse_encode_String(field0, serializer);
     }
   }
 
@@ -20061,7 +22638,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(6, serializer);
       case Thing_Multi(field0: final field0):
         sse_encode_i_32(7, serializer);
-        sse_encode_box_autoadd_multi(field0, serializer);
+        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+            field0, serializer);
       case Thing_More(
           id: final id,
           name: final name,
@@ -20071,7 +22649,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         ):
         sse_encode_i_32(8, serializer);
         sse_encode_String(id, serializer);
-        sse_encode_String(name, serializer);
+        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFullname(
+            name, serializer);
         sse_encode_u_32(count, serializer);
         sse_encode_u_32(depth, serializer);
         sse_encode_list_String(children, serializer);
@@ -20082,8 +22661,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_thumbnail(Thumbnail self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.url, serializer);
-    sse_encode_u_64(self.height, serializer);
-    sse_encode_u_64(self.width, serializer);
+    sse_encode_u_32(self.height, serializer);
+    sse_encode_u_32(self.width, serializer);
   }
 
   @protected
@@ -20091,16 +22670,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       ThumbnailOption self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_opt_String(self.url, serializer);
-    sse_encode_opt_box_autoadd_u_64(self.height, serializer);
-    sse_encode_opt_box_autoadd_u_64(self.width, serializer);
+    sse_encode_opt_box_autoadd_u_32(self.height, serializer);
+    sse_encode_opt_box_autoadd_u_32(self.width, serializer);
   }
 
   @protected
   void sse_encode_thumbnail_url(ThumbnailURL self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_opt_String(self.url, serializer);
-    sse_encode_opt_box_autoadd_u_64(self.height, serializer);
-    sse_encode_opt_box_autoadd_u_64(self.width, serializer);
+    sse_encode_opt_box_autoadd_u_32(self.height, serializer);
+    sse_encode_opt_box_autoadd_u_32(self.width, serializer);
   }
 
   @protected
@@ -20113,12 +22692,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_u_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint32(self);
-  }
-
-  @protected
-  void sse_encode_u_64(BigInt self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putBigUint64(self);
   }
 
   @protected
@@ -20192,6 +22765,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.acceptFollowers, serializer);
     sse_encode_bool(self.acceptChats, serializer);
     sse_encode_bool(self.acceptPms, serializer);
+  }
+
+  @protected
+  void sse_encode_user_stream_sort(
+      UserStreamSort self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case UserStreamSort_Hot():
+        sse_encode_i_32(0, serializer);
+      case UserStreamSort_Top(field0: final field0):
+        sse_encode_i_32(1, serializer);
+        sse_encode_timeframe(field0, serializer);
+      case UserStreamSort_New():
+        sse_encode_i_32(2, serializer);
+      case UserStreamSort_Controversial(field0: final field0):
+        sse_encode_i_32(3, serializer);
+        sse_encode_timeframe(field0, serializer);
+    }
   }
 
   @protected
@@ -20269,6 +22860,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 }
 
 @sealed
+class BoxFeedStreamImpl extends RustOpaque implements BoxFeedStream {
+  // Not to be used by end users
+  BoxFeedStreamImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  BoxFeedStreamImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_BoxFeedStream,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_BoxFeedStream,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_BoxFeedStreamPtr,
+  );
+}
+
+@sealed
 class ClientImpl extends RustOpaque implements Client {
   // Not to be used by end users
   ClientImpl.frbInternalDcoDecode(List<dynamic> wire)
@@ -20296,14 +22907,22 @@ class ClientImpl extends RustOpaque implements Client {
   /// a [`Thing::Comment`] or a [`Thing::More`].
   /// # Errors
   /// Fails if the request fails or the parsing of the response fails.
-  Future<List<Thing>> comments({required String permalink}) =>
+  Future<List<Thing>> comments(
+          {required String permalink, CommentSort? sort}) =>
+      RustLib.instance.api.redditApiClientClientComments(
+          that: this, permalink: permalink, sort: sort);
+
+  /// flutter_rust_bridge:sync
+  Streamable feedStream({required Feed feed, required FeedSort sort}) =>
       RustLib.instance.api
-          .redditApiClientClientComments(that: this, permalink: permalink);
+          .redditApiClientClientFeedStream(that: this, feed: feed, sort: sort);
 
   Future<List<Thing>> loadMoreComments(
-          {required Fullname parentId, required List<String> children}) =>
+          {required Fullname parentId,
+          required List<String> children,
+          CommentSort? sort}) =>
       RustLib.instance.api.redditApiClientClientLoadMoreComments(
-          that: this, parentId: parentId, children: children);
+          that: this, parentId: parentId, children: children, sort: sort);
 
   /// Get the info of the current user.
   /// # Errors
@@ -20321,13 +22940,19 @@ class ClientImpl extends RustOpaque implements Client {
         that: this,
       );
 
+  /// Create a new access token for a logged out user
+  Future<void> newLoggedOutUserToken() =>
+      RustLib.instance.api.redditApiClientClientNewLoggedOutUserToken(
+        that: this,
+      );
+
   /// Save a saveable item (i.e. a [`Post`] or a [`Comment`]).
   /// # Errors
   /// Returns an error if the request failed.
   Future<void> save({required Fullname thing}) =>
       RustLib.instance.api.redditApiClientClientSave(that: this, thing: thing);
 
-  /// Get the list of subreddits the current user is subscribed to.
+  /// Get the list of all subreddits the current user is subscribed to.
   /// # Errors
   /// Returns an error if the http client fails or if the parsing of the response fails.
   Future<List<Subreddit>> subsriptions() =>
@@ -20340,6 +22965,47 @@ class ClientImpl extends RustOpaque implements Client {
   /// Returns an error if the request failed.
   Future<void> unsave({required Fullname thing}) => RustLib.instance.api
       .redditApiClientClientUnsave(that: this, thing: thing);
+
+  /// flutter_rust_bridge:sync
+  Streamable userComments(
+          {required String username, required UserStreamSort sort}) =>
+      RustLib.instance.api.redditApiClientClientUserComments(
+          that: this, username: username, sort: sort);
+
+  /// flutter_rust_bridge:sync
+  Streamable userDownvoted({required String username}) => RustLib.instance.api
+      .redditApiClientClientUserDownvoted(that: this, username: username);
+
+  /// flutter_rust_bridge:sync
+  Streamable userGilded({required String username}) => RustLib.instance.api
+      .redditApiClientClientUserGilded(that: this, username: username);
+
+  /// flutter_rust_bridge:sync
+  Streamable userHidden({required String username}) => RustLib.instance.api
+      .redditApiClientClientUserHidden(that: this, username: username);
+
+  /// flutter_rust_bridge:sync
+  Streamable userOverview(
+          {required String username, required UserStreamSort sort}) =>
+      RustLib.instance.api.redditApiClientClientUserOverview(
+          that: this, username: username, sort: sort);
+
+  /// Get saved items ( both [`Post`] and [`Comment`] ) for the specified user.
+  /// # Errors
+  /// Fails if api request fails.
+  /// flutter_rust_bridge:sync
+  Streamable userSaved({required String username}) => RustLib.instance.api
+      .redditApiClientClientUserSaved(that: this, username: username);
+
+  /// flutter_rust_bridge:sync
+  Streamable userSubmitted(
+          {required String username, required UserStreamSort sort}) =>
+      RustLib.instance.api.redditApiClientClientUserSubmitted(
+          that: this, username: username, sort: sort);
+
+  /// flutter_rust_bridge:sync
+  Streamable userUpvoted({required String username}) => RustLib.instance.api
+      .redditApiClientClientUserUpvoted(that: this, username: username);
 
   /// Vote on a votable item (i.e. a [`Post`] or a [`Comment`]).
   /// # Errors
@@ -20404,7 +23070,7 @@ class CommentImpl extends RustOpaque implements Comment {
         that: this,
       );
 
-  PlatformInt64 get controversiality => RustLib.instance.api
+  int get controversiality => RustLib.instance.api
           .redditApiModelCommentCommentAutoAccessorGetControversiality(
         that: this,
       );
@@ -20419,12 +23085,12 @@ class CommentImpl extends RustOpaque implements Comment {
         that: this,
       );
 
-  PlatformInt64 get depth =>
+  int get depth =>
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorGetDepth(
         that: this,
       );
 
-  PlatformInt64 get downs =>
+  int get downs =>
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorGetDowns(
         that: this,
       );
@@ -20434,7 +23100,7 @@ class CommentImpl extends RustOpaque implements Comment {
         that: this,
       );
 
-  PlatformInt64 get gilded =>
+  int get gilded =>
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorGetGilded(
         that: this,
       );
@@ -20489,7 +23155,7 @@ class CommentImpl extends RustOpaque implements Comment {
         that: this,
       );
 
-  PlatformInt64 get score =>
+  int get score =>
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorGetScore(
         that: this,
       );
@@ -20529,7 +23195,7 @@ class CommentImpl extends RustOpaque implements Comment {
         that: this,
       );
 
-  PlatformInt64 get ups =>
+  int get ups =>
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorGetUps(
         that: this,
       );
@@ -20561,7 +23227,7 @@ class CommentImpl extends RustOpaque implements Comment {
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorSetCollapsed(
           that: this, collapsed: collapsed);
 
-  set controversiality(PlatformInt64 controversiality) => RustLib.instance.api
+  set controversiality(int controversiality) => RustLib.instance.api
       .redditApiModelCommentCommentAutoAccessorSetControversiality(
           that: this, controversiality: controversiality);
 
@@ -20573,11 +23239,11 @@ class CommentImpl extends RustOpaque implements Comment {
       .redditApiModelCommentCommentAutoAccessorSetCreatedUtc(
           that: this, createdUtc: createdUtc);
 
-  set depth(PlatformInt64 depth) =>
+  set depth(int depth) =>
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorSetDepth(
           that: this, depth: depth);
 
-  set downs(PlatformInt64 downs) =>
+  set downs(int downs) =>
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorSetDowns(
           that: this, downs: downs);
 
@@ -20585,7 +23251,7 @@ class CommentImpl extends RustOpaque implements Comment {
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorSetEdited(
           that: this, edited: edited);
 
-  set gilded(PlatformInt64 gilded) =>
+  set gilded(int gilded) =>
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorSetGilded(
           that: this, gilded: gilded);
 
@@ -20627,7 +23293,7 @@ class CommentImpl extends RustOpaque implements Comment {
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorSetSaved(
           that: this, saved: saved);
 
-  set score(PlatformInt64 score) =>
+  set score(int score) =>
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorSetScore(
           that: this, score: score);
 
@@ -20660,7 +23326,7 @@ class CommentImpl extends RustOpaque implements Comment {
       .redditApiModelCommentCommentAutoAccessorSetSubredditType(
           that: this, subredditType: subredditType);
 
-  set ups(PlatformInt64 ups) => RustLib.instance.api
+  set ups(int ups) => RustLib.instance.api
       .redditApiModelCommentCommentAutoAccessorSetUps(that: this, ups: ups);
 
   /// flutter_rust_bridge:getter,sync
@@ -20671,80 +23337,406 @@ class CommentImpl extends RustOpaque implements Comment {
 }
 
 @sealed
-class FeedStateImpl extends RustOpaque implements FeedState {
+class CommonImpl extends RustOpaque implements Common {
   // Not to be used by end users
-  FeedStateImpl.frbInternalDcoDecode(List<dynamic> wire)
+  CommonImpl.frbInternalDcoDecode(List<dynamic> wire)
       : super.frbInternalDcoDecode(wire, _kStaticData);
 
   // Not to be used by end users
-  FeedStateImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+  CommonImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
       : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_FeedState,
+        RustLib.instance.api.rust_arc_increment_strong_count_Common,
     rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_FeedState,
+        RustLib.instance.api.rust_arc_decrement_strong_count_Common,
     rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_FeedStatePtr,
+        RustLib.instance.api.rust_arc_decrement_strong_count_CommonPtr,
   );
 
-  bool get done => RustLib.instance.api.crateApiSimpleFeedStateGetDone(
+  bool get acceptFollowers => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetAcceptFollowers(
         that: this,
       );
 
-  Feed get feed => RustLib.instance.api.crateApiSimpleFeedStateGetFeed(
+  List<String> get allowedMediaInComments => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetAllowedMediaInComments(
         that: this,
       );
 
-  int get length => RustLib.instance.api.crateApiSimpleFeedStateGetLength(
+  String get bannerImg => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetBannerImg(
         that: this,
       );
 
-  bool get loading => RustLib.instance.api.crateApiSimpleFeedStateGetLoading(
+  Int64List? get bannerSize => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetBannerSize(
         that: this,
       );
 
-  Sort get sort => RustLib.instance.api.crateApiSimpleFeedStateGetSort(
+  double get created =>
+      RustLib.instance.api.redditApiModelSubredditCommonAutoAccessorGetCreated(
         that: this,
       );
 
-  String get sortString =>
-      RustLib.instance.api.crateApiSimpleFeedStateGetSortString(
+  double get createdUtc => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetCreatedUtc(
         that: this,
       );
 
-  String get title => RustLib.instance.api.crateApiSimpleFeedStateGetTitle(
+  bool get disableContributorRequests => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetDisableContributorRequests(
         that: this,
       );
 
-  /// Returns true if there is no more posts to load
-  Future<bool> next() => RustLib.instance.api.crateApiSimpleFeedStateNext(
+  String get displayName => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetDisplayName(
         that: this,
       );
 
-  Post? nth({required int n}) =>
-      RustLib.instance.api.crateApiSimpleFeedStateNth(that: this, n: n);
-
-  Future<void> refresh() => RustLib.instance.api.crateApiSimpleFeedStateRefresh(
+  String get displayNamePrefixed => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetDisplayNamePrefixed(
         that: this,
       );
 
-  /// Save / unsave a post
-  Future<void> save({required int index, required bool save}) =>
+  bool get freeFormReports => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetFreeFormReports(
+        that: this,
+      );
+
+  String? get headerImg => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetHeaderImg(
+        that: this,
+      );
+
+  Int64List? get headerSize => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetHeaderSize(
+        that: this,
+      );
+
+  String get keyColor =>
+      RustLib.instance.api.redditApiModelSubredditCommonAutoAccessorGetKeyColor(
+        that: this,
+      );
+
+  bool get linkFlairEnabled => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetLinkFlairEnabled(
+        that: this,
+      );
+
+  String get linkFlairPosition => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetLinkFlairPosition(
+        that: this,
+      );
+
+  Fullname get name =>
+      RustLib.instance.api.redditApiModelSubredditCommonAutoAccessorGetName(
+        that: this,
+      );
+
+  String get primaryColor => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetPrimaryColor(
+        that: this,
+      );
+
+  String get publicDescription => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetPublicDescription(
+        that: this,
+      );
+
+  bool get quarantine => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetQuarantine(
+        that: this,
+      );
+
+  bool get restrictCommenting => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetRestrictCommenting(
+        that: this,
+      );
+
+  bool get restrictPosting => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetRestrictPosting(
+        that: this,
+      );
+
+  bool get showMedia => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetShowMedia(
+        that: this,
+      );
+
+  String get submitLinkLabel => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetSubmitLinkLabel(
+        that: this,
+      );
+
+  String get submitTextLabel => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetSubmitTextLabel(
+        that: this,
+      );
+
+  String get subredditType => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetSubredditType(
+        that: this,
+      );
+
+  PlatformInt64 get subscribers => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetSubscribers(
+        that: this,
+      );
+
+  String get title =>
+      RustLib.instance.api.redditApiModelSubredditCommonAutoAccessorGetTitle(
+        that: this,
+      );
+
+  String get url =>
+      RustLib.instance.api.redditApiModelSubredditCommonAutoAccessorGetUrl(
+        that: this,
+      );
+
+  bool get userIsBanned => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetUserIsBanned(
+        that: this,
+      );
+
+  bool get userIsContributor => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetUserIsContributor(
+        that: this,
+      );
+
+  bool get userIsModerator => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetUserIsModerator(
+        that: this,
+      );
+
+  bool get userIsMuted => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetUserIsMuted(
+        that: this,
+      );
+
+  bool get userIsSubscriber => RustLib.instance.api
+          .redditApiModelSubredditCommonAutoAccessorGetUserIsSubscriber(
+        that: this,
+      );
+
+  set acceptFollowers(bool acceptFollowers) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetAcceptFollowers(
+          that: this, acceptFollowers: acceptFollowers);
+
+  set allowedMediaInComments(List<String> allowedMediaInComments) =>
       RustLib.instance.api
-          .crateApiSimpleFeedStateSave(that: this, index: index, save: save);
+          .redditApiModelSubredditCommonAutoAccessorSetAllowedMediaInComments(
+              that: this, allowedMediaInComments: allowedMediaInComments);
 
-  set feed(Feed feed) => RustLib.instance.api
-      .crateApiSimpleFeedStateSetFeed(that: this, feed: feed);
+  set bannerImg(String bannerImg) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetBannerImg(
+          that: this, bannerImg: bannerImg);
 
-  set sort(Sort sort) => RustLib.instance.api
-      .crateApiSimpleFeedStateSetSort(that: this, sort: sort);
+  set bannerSize(Int64List? bannerSize) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetBannerSize(
+          that: this, bannerSize: bannerSize);
 
-  /// Vote on a post
-  Future<void> vote({required int index, required VoteDirection direction}) =>
-      RustLib.instance.api.crateApiSimpleFeedStateVote(
-          that: this, index: index, direction: direction);
+  set created(double created) =>
+      RustLib.instance.api.redditApiModelSubredditCommonAutoAccessorSetCreated(
+          that: this, created: created);
+
+  set createdUtc(double createdUtc) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetCreatedUtc(
+          that: this, createdUtc: createdUtc);
+
+  set disableContributorRequests(bool disableContributorRequests) => RustLib
+      .instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetDisableContributorRequests(
+          that: this, disableContributorRequests: disableContributorRequests);
+
+  set displayName(String displayName) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetDisplayName(
+          that: this, displayName: displayName);
+
+  set displayNamePrefixed(String displayNamePrefixed) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetDisplayNamePrefixed(
+          that: this, displayNamePrefixed: displayNamePrefixed);
+
+  set freeFormReports(bool freeFormReports) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetFreeFormReports(
+          that: this, freeFormReports: freeFormReports);
+
+  set headerImg(String? headerImg) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetHeaderImg(
+          that: this, headerImg: headerImg);
+
+  set headerSize(Int64List? headerSize) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetHeaderSize(
+          that: this, headerSize: headerSize);
+
+  set keyColor(String keyColor) =>
+      RustLib.instance.api.redditApiModelSubredditCommonAutoAccessorSetKeyColor(
+          that: this, keyColor: keyColor);
+
+  set linkFlairEnabled(bool linkFlairEnabled) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetLinkFlairEnabled(
+          that: this, linkFlairEnabled: linkFlairEnabled);
+
+  set linkFlairPosition(String linkFlairPosition) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetLinkFlairPosition(
+          that: this, linkFlairPosition: linkFlairPosition);
+
+  set name(Fullname name) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetName(that: this, name: name);
+
+  set primaryColor(String primaryColor) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetPrimaryColor(
+          that: this, primaryColor: primaryColor);
+
+  set publicDescription(String publicDescription) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetPublicDescription(
+          that: this, publicDescription: publicDescription);
+
+  set quarantine(bool quarantine) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetQuarantine(
+          that: this, quarantine: quarantine);
+
+  set restrictCommenting(bool restrictCommenting) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetRestrictCommenting(
+          that: this, restrictCommenting: restrictCommenting);
+
+  set restrictPosting(bool restrictPosting) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetRestrictPosting(
+          that: this, restrictPosting: restrictPosting);
+
+  set showMedia(bool showMedia) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetShowMedia(
+          that: this, showMedia: showMedia);
+
+  set submitLinkLabel(String submitLinkLabel) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetSubmitLinkLabel(
+          that: this, submitLinkLabel: submitLinkLabel);
+
+  set submitTextLabel(String submitTextLabel) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetSubmitTextLabel(
+          that: this, submitTextLabel: submitTextLabel);
+
+  set subredditType(String subredditType) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetSubredditType(
+          that: this, subredditType: subredditType);
+
+  set subscribers(PlatformInt64 subscribers) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetSubscribers(
+          that: this, subscribers: subscribers);
+
+  set title(String title) =>
+      RustLib.instance.api.redditApiModelSubredditCommonAutoAccessorSetTitle(
+          that: this, title: title);
+
+  set url(String url) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetUrl(that: this, url: url);
+
+  set userIsBanned(bool userIsBanned) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetUserIsBanned(
+          that: this, userIsBanned: userIsBanned);
+
+  set userIsContributor(bool userIsContributor) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetUserIsContributor(
+          that: this, userIsContributor: userIsContributor);
+
+  set userIsModerator(bool userIsModerator) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetUserIsModerator(
+          that: this, userIsModerator: userIsModerator);
+
+  set userIsMuted(bool userIsMuted) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetUserIsMuted(
+          that: this, userIsMuted: userIsMuted);
+
+  set userIsSubscriber(bool userIsSubscriber) => RustLib.instance.api
+      .redditApiModelSubredditCommonAutoAccessorSetUserIsSubscriber(
+          that: this, userIsSubscriber: userIsSubscriber);
+
+  /// flutter_rust_bridge:getter,sync
+  SubredditIcon get icon =>
+      RustLib.instance.api.redditApiModelSubredditCommonIcon(
+        that: this,
+      );
+}
+
+@sealed
+class DetailsImpl extends RustOpaque implements Details {
+  // Not to be used by end users
+  DetailsImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  DetailsImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_Details,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_Details,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_DetailsPtr,
+  );
+
+  bool get defaultSet => RustLib.instance.api
+          .redditApiModelSubredditDetailsAutoAccessorGetDefaultSet(
+        that: this,
+      );
+
+  String get description => RustLib.instance.api
+          .redditApiModelSubredditDetailsAutoAccessorGetDescription(
+        that: this,
+      );
+
+  String get iconColor => RustLib.instance.api
+          .redditApiModelSubredditDetailsAutoAccessorGetIconColor(
+        that: this,
+      );
+
+  Common get other =>
+      RustLib.instance.api.redditApiModelSubredditDetailsAutoAccessorGetOther(
+        that: this,
+      );
+
+  bool get over18 =>
+      RustLib.instance.api.redditApiModelSubredditDetailsAutoAccessorGetOver18(
+        that: this,
+      );
+
+  List<String> get previousNames => RustLib.instance.api
+          .redditApiModelSubredditDetailsAutoAccessorGetPreviousNames(
+        that: this,
+      );
+
+  set defaultSet(bool defaultSet) => RustLib.instance.api
+      .redditApiModelSubredditDetailsAutoAccessorSetDefaultSet(
+          that: this, defaultSet: defaultSet);
+
+  set description(String description) => RustLib.instance.api
+      .redditApiModelSubredditDetailsAutoAccessorSetDescription(
+          that: this, description: description);
+
+  set iconColor(String iconColor) => RustLib.instance.api
+      .redditApiModelSubredditDetailsAutoAccessorSetIconColor(
+          that: this, iconColor: iconColor);
+
+  set other(Common other) =>
+      RustLib.instance.api.redditApiModelSubredditDetailsAutoAccessorSetOther(
+          that: this, other: other);
+
+  set over18(bool over18) =>
+      RustLib.instance.api.redditApiModelSubredditDetailsAutoAccessorSetOver18(
+          that: this, over18: over18);
+
+  set previousNames(List<String> previousNames) => RustLib.instance.api
+      .redditApiModelSubredditDetailsAutoAccessorSetPreviousNames(
+          that: this, previousNames: previousNames);
+
+  /// flutter_rust_bridge:getter,sync
+  SubredditIcon get icon =>
+      RustLib.instance.api.redditApiModelSubredditDetailsIcon(
+        that: this,
+      );
 }
 
 @sealed
@@ -20788,6 +23780,26 @@ class FullnameImpl extends RustOpaque implements Fullname {
 }
 
 @sealed
+class GalleryDataImpl extends RustOpaque implements GalleryData {
+  // Not to be used by end users
+  GalleryDataImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  GalleryDataImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_GalleryData,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_GalleryData,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_GalleryDataPtr,
+  );
+}
+
+@sealed
 class GalleryImpl extends RustOpaque implements Gallery {
   // Not to be used by end users
   GalleryImpl.frbInternalDcoDecode(List<dynamic> wire)
@@ -20805,6 +23817,15 @@ class GalleryImpl extends RustOpaque implements Gallery {
     rustArcDecrementStrongCountPtr:
         RustLib.instance.api.rust_arc_decrement_strong_count_GalleryPtr,
   );
+
+  /// flutter_rust_bridge:sync
+  ImageBase get_({required int index}) => RustLib.instance.api
+      .redditApiModelGalleryGalleryGet(that: this, index: index);
+
+  /// flutter_rust_bridge:sync,getter
+  int get length => RustLib.instance.api.redditApiModelGalleryGalleryGetLength(
+        that: this,
+      );
 }
 
 @sealed
@@ -20841,7 +23862,7 @@ class ListingImpl extends RustOpaque implements Listing {
         that: this,
       );
 
-  BigInt? get dist =>
+  int? get dist =>
       RustLib.instance.api.redditApiModelListingAutoAccessorGetDist(
         that: this,
       );
@@ -20861,12 +23882,200 @@ class ListingImpl extends RustOpaque implements Listing {
       RustLib.instance.api.redditApiModelListingAutoAccessorSetChildren(
           that: this, children: children);
 
-  set dist(BigInt? dist) => RustLib.instance.api
+  set dist(int? dist) => RustLib.instance.api
       .redditApiModelListingAutoAccessorSetDist(that: this, dist: dist);
 
   set modhash(String? modhash) =>
       RustLib.instance.api.redditApiModelListingAutoAccessorSetModhash(
           that: this, modhash: modhash);
+}
+
+@sealed
+class MultiImpl extends RustOpaque implements Multi {
+  // Not to be used by end users
+  MultiImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  MultiImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_Multi,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_Multi,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_MultiPtr,
+  );
+
+  bool get canEdit =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetCanEdit(
+        that: this,
+      );
+
+  String? get copiedFrom =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetCopiedFrom(
+        that: this,
+      );
+
+  double get created =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetCreated(
+        that: this,
+      );
+
+  double get createdUtc =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetCreatedUtc(
+        that: this,
+      );
+
+  String get descriptionHtml => RustLib.instance.api
+          .redditApiModelMultiMultiAutoAccessorGetDescriptionHtml(
+        that: this,
+      );
+
+  String get descriptionMd =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetDescriptionMd(
+        that: this,
+      );
+
+  String get displayName =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetDisplayName(
+        that: this,
+      );
+
+  String get iconUrl =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetIconUrl(
+        that: this,
+      );
+
+  bool get isFavorited =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetIsFavorited(
+        that: this,
+      );
+
+  bool get isSubscriber =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetIsSubscriber(
+        that: this,
+      );
+
+  String? get keyColor =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetKeyColor(
+        that: this,
+      );
+
+  Fullname get name =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetName(
+        that: this,
+      );
+
+  PlatformInt64 get numSubscribers => RustLib.instance.api
+          .redditApiModelMultiMultiAutoAccessorGetNumSubscribers(
+        that: this,
+      );
+
+  bool get over18 =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetOver18(
+        that: this,
+      );
+
+  String get owner =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetOwner(
+        that: this,
+      );
+
+  String get ownerId =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetOwnerId(
+        that: this,
+      );
+
+  String get path =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetPath(
+        that: this,
+      );
+
+  List<SubredditName> get subreddits =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetSubreddits(
+        that: this,
+      );
+
+  String get visibility =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorGetVisibility(
+        that: this,
+      );
+
+  set canEdit(bool canEdit) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetCanEdit(
+          that: this, canEdit: canEdit);
+
+  set copiedFrom(String? copiedFrom) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetCopiedFrom(
+          that: this, copiedFrom: copiedFrom);
+
+  set created(double created) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetCreated(
+          that: this, created: created);
+
+  set createdUtc(double createdUtc) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetCreatedUtc(
+          that: this, createdUtc: createdUtc);
+
+  set descriptionHtml(String descriptionHtml) => RustLib.instance.api
+      .redditApiModelMultiMultiAutoAccessorSetDescriptionHtml(
+          that: this, descriptionHtml: descriptionHtml);
+
+  set descriptionMd(String descriptionMd) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetDescriptionMd(
+          that: this, descriptionMd: descriptionMd);
+
+  set displayName(String displayName) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetDisplayName(
+          that: this, displayName: displayName);
+
+  set iconUrl(String iconUrl) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetIconUrl(
+          that: this, iconUrl: iconUrl);
+
+  set isFavorited(bool isFavorited) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetIsFavorited(
+          that: this, isFavorited: isFavorited);
+
+  set isSubscriber(bool isSubscriber) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetIsSubscriber(
+          that: this, isSubscriber: isSubscriber);
+
+  set keyColor(String? keyColor) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetKeyColor(
+          that: this, keyColor: keyColor);
+
+  set name(Fullname name) => RustLib.instance.api
+      .redditApiModelMultiMultiAutoAccessorSetName(that: this, name: name);
+
+  set numSubscribers(PlatformInt64 numSubscribers) => RustLib.instance.api
+      .redditApiModelMultiMultiAutoAccessorSetNumSubscribers(
+          that: this, numSubscribers: numSubscribers);
+
+  set over18(bool over18) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetOver18(
+          that: this, over18: over18);
+
+  set owner(String owner) => RustLib.instance.api
+      .redditApiModelMultiMultiAutoAccessorSetOwner(that: this, owner: owner);
+
+  set ownerId(String ownerId) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetOwnerId(
+          that: this, ownerId: ownerId);
+
+  set path(String path) => RustLib.instance.api
+      .redditApiModelMultiMultiAutoAccessorSetPath(that: this, path: path);
+
+  set subreddits(List<SubredditName> subreddits) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetSubreddits(
+          that: this, subreddits: subreddits);
+
+  set visibility(String visibility) =>
+      RustLib.instance.api.redditApiModelMultiMultiAutoAccessorSetVisibility(
+          that: this, visibility: visibility);
 }
 
 @sealed
@@ -21037,7 +24246,7 @@ class PostImpl extends RustOpaque implements Post {
         that: this,
       );
 
-  PlatformInt64 get downs =>
+  int get downs =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorGetDowns(
         that: this,
       );
@@ -21052,7 +24261,7 @@ class PostImpl extends RustOpaque implements Post {
         that: this,
       );
 
-  PlatformInt64 get gilded =>
+  int get gilded =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorGetGilded(
         that: this,
       );
@@ -21176,22 +24385,22 @@ class PostImpl extends RustOpaque implements Post {
         that: this,
       );
 
-  PlatformInt64 get numComments =>
+  int get numComments =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorGetNumComments(
         that: this,
       );
 
-  PlatformInt64? get numCrossposts =>
+  int? get numCrossposts =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorGetNumCrossposts(
         that: this,
       );
 
-  BigInt? get numDuplicates =>
+  int? get numDuplicates =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorGetNumDuplicates(
         that: this,
       );
 
-  String? get numReports =>
+  int? get numReports =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorGetNumReports(
         that: this,
       );
@@ -21221,7 +24430,7 @@ class PostImpl extends RustOpaque implements Post {
         that: this,
       );
 
-  PlatformInt64? get pwls =>
+  int? get pwls =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorGetPwls(
         that: this,
       );
@@ -21246,7 +24455,7 @@ class PostImpl extends RustOpaque implements Post {
         that: this,
       );
 
-  String? get reportReasons =>
+  List<String> get reportReasons =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorGetReportReasons(
         that: this,
       );
@@ -21256,7 +24465,7 @@ class PostImpl extends RustOpaque implements Post {
         that: this,
       );
 
-  PlatformInt64 get score =>
+  int get score =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorGetScore(
         that: this,
       );
@@ -21316,7 +24525,7 @@ class PostImpl extends RustOpaque implements Post {
         that: this,
       );
 
-  PlatformInt64? get totalAwardsReceived => RustLib.instance.api
+  int? get totalAwardsReceived => RustLib.instance.api
           .redditApiModelPostPostAutoAccessorGetTotalAwardsReceived(
         that: this,
       );
@@ -21326,8 +24535,7 @@ class PostImpl extends RustOpaque implements Post {
         that: this,
       );
 
-  PlatformInt64 get ups =>
-      RustLib.instance.api.redditApiModelPostPostAutoAccessorGetUps(
+  int get ups => RustLib.instance.api.redditApiModelPostPostAutoAccessorGetUps(
         that: this,
       );
 
@@ -21361,8 +24569,7 @@ class PostImpl extends RustOpaque implements Post {
         that: this,
       );
 
-  PlatformInt64? get wls =>
-      RustLib.instance.api.redditApiModelPostPostAutoAccessorGetWls(
+  int? get wls => RustLib.instance.api.redditApiModelPostPostAutoAccessorGetWls(
         that: this,
       );
 
@@ -21444,7 +24651,7 @@ class PostImpl extends RustOpaque implements Post {
   set domain(String domain) => RustLib.instance.api
       .redditApiModelPostPostAutoAccessorSetDomain(that: this, domain: domain);
 
-  set downs(PlatformInt64 downs) => RustLib.instance.api
+  set downs(int downs) => RustLib.instance.api
       .redditApiModelPostPostAutoAccessorSetDowns(that: this, downs: downs);
 
   set edited(double? edited) => RustLib.instance.api
@@ -21454,7 +24661,7 @@ class PostImpl extends RustOpaque implements Post {
       RustLib.instance.api.redditApiModelPostPostAutoAccessorSetGallery(
           that: this, gallery: gallery);
 
-  set gilded(PlatformInt64 gilded) => RustLib.instance.api
+  set gilded(int gilded) => RustLib.instance.api
       .redditApiModelPostPostAutoAccessorSetGilded(that: this, gilded: gilded);
 
   set gildings(Gildings gildings) =>
@@ -21545,19 +24752,19 @@ class PostImpl extends RustOpaque implements Post {
       RustLib.instance.api.redditApiModelPostPostAutoAccessorSetNoFollow(
           that: this, noFollow: noFollow);
 
-  set numComments(PlatformInt64 numComments) =>
+  set numComments(int numComments) =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorSetNumComments(
           that: this, numComments: numComments);
 
-  set numCrossposts(PlatformInt64? numCrossposts) =>
+  set numCrossposts(int? numCrossposts) =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorSetNumCrossposts(
           that: this, numCrossposts: numCrossposts);
 
-  set numDuplicates(BigInt? numDuplicates) =>
+  set numDuplicates(int? numDuplicates) =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorSetNumDuplicates(
           that: this, numDuplicates: numDuplicates);
 
-  set numReports(String? numReports) =>
+  set numReports(int? numReports) =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorSetNumReports(
           that: this, numReports: numReports);
 
@@ -21579,7 +24786,7 @@ class PostImpl extends RustOpaque implements Post {
       RustLib.instance.api.redditApiModelPostPostAutoAccessorSetPreview(
           that: this, preview: preview);
 
-  set pwls(PlatformInt64? pwls) => RustLib.instance.api
+  set pwls(int? pwls) => RustLib.instance.api
       .redditApiModelPostPostAutoAccessorSetPwls(that: this, pwls: pwls);
 
   set quarantine(bool quarantine) =>
@@ -21598,14 +24805,14 @@ class PostImpl extends RustOpaque implements Post {
       .redditApiModelPostPostAutoAccessorSetRemovedByCategory(
           that: this, removedByCategory: removedByCategory);
 
-  set reportReasons(String? reportReasons) =>
+  set reportReasons(List<String> reportReasons) =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorSetReportReasons(
           that: this, reportReasons: reportReasons);
 
   set saved(bool saved) => RustLib.instance.api
       .redditApiModelPostPostAutoAccessorSetSaved(that: this, saved: saved);
 
-  set score(PlatformInt64 score) => RustLib.instance.api
+  set score(int score) => RustLib.instance.api
       .redditApiModelPostPostAutoAccessorSetScore(that: this, score: score);
 
   set secureMedia(Media? secureMedia) =>
@@ -21652,16 +24859,15 @@ class PostImpl extends RustOpaque implements Post {
       RustLib.instance.api.redditApiModelPostPostAutoAccessorSetTopAwardedType(
           that: this, topAwardedType: topAwardedType);
 
-  set totalAwardsReceived(PlatformInt64? totalAwardsReceived) =>
-      RustLib.instance.api
-          .redditApiModelPostPostAutoAccessorSetTotalAwardsReceived(
-              that: this, totalAwardsReceived: totalAwardsReceived);
+  set totalAwardsReceived(int? totalAwardsReceived) => RustLib.instance.api
+      .redditApiModelPostPostAutoAccessorSetTotalAwardsReceived(
+          that: this, totalAwardsReceived: totalAwardsReceived);
 
   set treatmentTags(List<String?> treatmentTags) =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorSetTreatmentTags(
           that: this, treatmentTags: treatmentTags);
 
-  set ups(PlatformInt64 ups) => RustLib.instance.api
+  set ups(int ups) => RustLib.instance.api
       .redditApiModelPostPostAutoAccessorSetUps(that: this, ups: ups);
 
   set upvoteRatio(double upvoteRatio) =>
@@ -21687,7 +24893,7 @@ class PostImpl extends RustOpaque implements Post {
       RustLib.instance.api.redditApiModelPostPostAutoAccessorSetVisited(
           that: this, visited: visited);
 
-  set wls(PlatformInt64? wls) => RustLib.instance.api
+  set wls(int? wls) => RustLib.instance.api
       .redditApiModelPostPostAutoAccessorSetWls(that: this, wls: wls);
 
   Kind get kind => RustLib.instance.api.redditApiModelPostPostKind(
@@ -21698,6 +24904,65 @@ class PostImpl extends RustOpaque implements Post {
       RustLib.instance.api.redditApiModelPostPostThumbnail(
         that: this,
       );
+}
+
+@sealed
+class StreamableImpl extends RustOpaque implements Streamable {
+  // Not to be used by end users
+  StreamableImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  StreamableImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_Streamable,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_Streamable,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_StreamablePtr,
+  );
+
+  Future<List<Thing>> getAll() =>
+      RustLib.instance.api.redditApiStreamableStreamableGetAll(
+        that: this,
+      );
+
+  /// flutter_rust_bridge:getter
+  Future<int> get length =>
+      RustLib.instance.api.redditApiStreamableStreamableGetLength(
+        that: this,
+      );
+
+  /// Returns true if there are still elements remaining.
+  /// flutter_rust_bridge:
+  Future<bool> next() => RustLib.instance.api.redditApiStreamableStreamableNext(
+        that: this,
+      );
+
+  Future<Thing?> nth({required int n}) =>
+      RustLib.instance.api.redditApiStreamableStreamableNth(that: this, n: n);
+
+  Future<void> refresh() =>
+      RustLib.instance.api.redditApiStreamableStreamableRefresh(
+        that: this,
+      );
+
+  Future<void> save(
+          {required Fullname name,
+          required bool save,
+          required Client client}) =>
+      RustLib.instance.api.redditApiStreamableStreamableSave(
+          that: this, name: name, save: save, client: client);
+
+  Future<void> vote(
+          {required Fullname name,
+          required VoteDirection direction,
+          required Client client}) =>
+      RustLib.instance.api.redditApiStreamableStreamableVote(
+          that: this, name: name, direction: direction, client: client);
 }
 
 @sealed
@@ -21739,12 +25004,7 @@ class SubredditImpl extends RustOpaque implements Subreddit {
         RustLib.instance.api.rust_arc_decrement_strong_count_SubredditPtr,
   );
 
-  bool get acceptFollowers => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetAcceptFollowers(
-        that: this,
-      );
-
-  BigInt? get accountsActive => RustLib.instance.api
+  int? get accountsActive => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetAccountsActive(
         that: this,
       );
@@ -21754,7 +25014,7 @@ class SubredditImpl extends RustOpaque implements Subreddit {
         that: this,
       );
 
-  BigInt get activeUserCount => RustLib.instance.api
+  int get activeUserCount => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetActiveUserCount(
         that: this,
       );
@@ -21819,11 +25079,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
         that: this,
       );
 
-  List<String> get allowedMediaInComments => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetAllowedMediaInComments(
-        that: this,
-      );
-
   String get bannerBackgroundColor => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetBannerBackgroundColor(
         that: this,
@@ -21831,16 +25086,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
 
   String get bannerBackgroundImage => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetBannerBackgroundImage(
-        that: this,
-      );
-
-  String get bannerImg => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetBannerImg(
-        that: this,
-      );
-
-  Int64List? get bannerSize => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetBannerSize(
         that: this,
       );
 
@@ -21875,16 +25120,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
         that: this,
       );
 
-  double get created => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetCreated(
-        that: this,
-      );
-
-  double get createdUtc => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetCreatedUtc(
-        that: this,
-      );
-
   String get description => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetDescription(
         that: this,
@@ -21892,21 +25127,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
 
   String? get descriptionHtml => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetDescriptionHtml(
-        that: this,
-      );
-
-  bool get disableContributorRequests => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetDisableContributorRequests(
-        that: this,
-      );
-
-  String get displayName => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetDisplayName(
-        that: this,
-      );
-
-  String get displayNamePrefixed => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetDisplayNamePrefixed(
         that: this,
       );
 
@@ -21920,23 +25140,8 @@ class SubredditImpl extends RustOpaque implements Subreddit {
         that: this,
       );
 
-  bool get freeFormReports => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetFreeFormReports(
-        that: this,
-      );
-
   bool get hasMenuWidget => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetHasMenuWidget(
-        that: this,
-      );
-
-  String? get headerImg => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetHeaderImg(
-        that: this,
-      );
-
-  Int64List? get headerSize => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetHeaderSize(
         that: this,
       );
 
@@ -21965,33 +25170,13 @@ class SubredditImpl extends RustOpaque implements Subreddit {
         that: this,
       );
 
-  String get keyColor => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetKeyColor(
-        that: this,
-      );
-
   String get lang =>
       RustLib.instance.api.redditApiModelSubredditSubredditAutoAccessorGetLang(
         that: this,
       );
 
-  bool get linkFlairEnabled => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetLinkFlairEnabled(
-        that: this,
-      );
-
-  String get linkFlairPosition => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetLinkFlairPosition(
-        that: this,
-      );
-
   String get mobileBannerImage => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetMobileBannerImage(
-        that: this,
-      );
-
-  String get name =>
-      RustLib.instance.api.redditApiModelSubredditSubredditAutoAccessorGetName(
         that: this,
       );
 
@@ -22005,6 +25190,11 @@ class SubredditImpl extends RustOpaque implements Subreddit {
         that: this,
       );
 
+  Common get other =>
+      RustLib.instance.api.redditApiModelSubredditSubredditAutoAccessorGetOther(
+        that: this,
+      );
+
   bool get over18 => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetOver18(
         that: this,
@@ -22012,16 +25202,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
 
   PlatformInt64 get predictionLeaderboardEntryType => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetPredictionLeaderboardEntryType(
-        that: this,
-      );
-
-  String get primaryColor => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetPrimaryColor(
-        that: this,
-      );
-
-  String get publicDescription => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetPublicDescription(
         that: this,
       );
 
@@ -22035,21 +25215,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
         that: this,
       );
 
-  bool get quarantine => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetQuarantine(
-        that: this,
-      );
-
-  bool get restrictCommenting => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetRestrictCommenting(
-        that: this,
-      );
-
-  bool get restrictPosting => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetRestrictPosting(
-        that: this,
-      );
-
   bool get shouldArchivePosts => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetShouldArchivePosts(
         that: this,
@@ -22057,11 +25222,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
 
   bool get shouldShowMediaInCommentsSetting => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetShouldShowMediaInCommentsSetting(
-        that: this,
-      );
-
-  bool get showMedia => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetShowMedia(
         that: this,
       );
 
@@ -22080,11 +25240,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
         that: this,
       );
 
-  String get submitLinkLabel => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetSubmitLinkLabel(
-        that: this,
-      );
-
   String get submitText => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetSubmitText(
         that: this,
@@ -22095,33 +25250,8 @@ class SubredditImpl extends RustOpaque implements Subreddit {
         that: this,
       );
 
-  String get submitTextLabel => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetSubmitTextLabel(
-        that: this,
-      );
-
-  String get subredditType => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetSubredditType(
-        that: this,
-      );
-
-  PlatformInt64 get subscribers => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetSubscribers(
-        that: this,
-      );
-
   String? get suggestedCommentSort => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetSuggestedCommentSort(
-        that: this,
-      );
-
-  String get title =>
-      RustLib.instance.api.redditApiModelSubredditSubredditAutoAccessorGetTitle(
-        that: this,
-      );
-
-  String get url =>
-      RustLib.instance.api.redditApiModelSubredditSubredditAutoAccessorGetUrl(
         that: this,
       );
 
@@ -22145,31 +25275,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
         that: this,
       );
 
-  bool get userIsBanned => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetUserIsBanned(
-        that: this,
-      );
-
-  bool get userIsContributor => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetUserIsContributor(
-        that: this,
-      );
-
-  bool get userIsModerator => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetUserIsModerator(
-        that: this,
-      );
-
-  bool get userIsMuted => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetUserIsMuted(
-        that: this,
-      );
-
-  bool get userIsSubscriber => RustLib.instance.api
-          .redditApiModelSubredditSubredditAutoAccessorGetUserIsSubscriber(
-        that: this,
-      );
-
   bool? get userSrFlairEnabled => RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorGetUserSrFlairEnabled(
         that: this,
@@ -22185,16 +25290,12 @@ class SubredditImpl extends RustOpaque implements Subreddit {
         that: this,
       );
 
-  BigInt? get wls =>
+  int? get wls =>
       RustLib.instance.api.redditApiModelSubredditSubredditAutoAccessorGetWls(
         that: this,
       );
 
-  set acceptFollowers(bool acceptFollowers) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetAcceptFollowers(
-          that: this, acceptFollowers: acceptFollowers);
-
-  set accountsActive(BigInt? accountsActive) => RustLib.instance.api
+  set accountsActive(int? accountsActive) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetAccountsActive(
           that: this, accountsActive: accountsActive);
 
@@ -22203,7 +25304,7 @@ class SubredditImpl extends RustOpaque implements Subreddit {
       .redditApiModelSubredditSubredditAutoAccessorSetAccountsActiveIsFuzzed(
           that: this, accountsActiveIsFuzzed: accountsActiveIsFuzzed);
 
-  set activeUserCount(BigInt activeUserCount) => RustLib.instance.api
+  set activeUserCount(int activeUserCount) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetActiveUserCount(
           that: this, activeUserCount: activeUserCount);
 
@@ -22257,11 +25358,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
       .redditApiModelSubredditSubredditAutoAccessorSetAllowVideos(
           that: this, allowVideos: allowVideos);
 
-  set allowedMediaInComments(List<String> allowedMediaInComments) => RustLib
-      .instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetAllowedMediaInComments(
-          that: this, allowedMediaInComments: allowedMediaInComments);
-
   set bannerBackgroundColor(String bannerBackgroundColor) =>
       RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorSetBannerBackgroundColor(
@@ -22271,14 +25367,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
       RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorSetBannerBackgroundImage(
               that: this, bannerBackgroundImage: bannerBackgroundImage);
-
-  set bannerImg(String bannerImg) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetBannerImg(
-          that: this, bannerImg: bannerImg);
-
-  set bannerSize(Int64List? bannerSize) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetBannerSize(
-          that: this, bannerSize: bannerSize);
 
   set canAssignLinkFlair(bool canAssignLinkFlair) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetCanAssignLinkFlair(
@@ -22309,14 +25397,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
       .redditApiModelSubredditSubredditAutoAccessorSetCommunityReviewed(
           that: this, communityReviewed: communityReviewed);
 
-  set created(double created) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetCreated(
-          that: this, created: created);
-
-  set createdUtc(double createdUtc) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetCreatedUtc(
-          that: this, createdUtc: createdUtc);
-
   set description(String description) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetDescription(
           that: this, description: description);
@@ -22324,19 +25404,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
   set descriptionHtml(String? descriptionHtml) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetDescriptionHtml(
           that: this, descriptionHtml: descriptionHtml);
-
-  set disableContributorRequests(bool disableContributorRequests) => RustLib
-      .instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetDisableContributorRequests(
-          that: this, disableContributorRequests: disableContributorRequests);
-
-  set displayName(String displayName) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetDisplayName(
-          that: this, displayName: displayName);
-
-  set displayNamePrefixed(String displayNamePrefixed) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetDisplayNamePrefixed(
-          that: this, displayNamePrefixed: displayNamePrefixed);
 
   set emojisCustomSize(Int64List? emojisCustomSize) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetEmojisCustomSize(
@@ -22346,21 +25413,9 @@ class SubredditImpl extends RustOpaque implements Subreddit {
       .redditApiModelSubredditSubredditAutoAccessorSetEmojisEnabled(
           that: this, emojisEnabled: emojisEnabled);
 
-  set freeFormReports(bool freeFormReports) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetFreeFormReports(
-          that: this, freeFormReports: freeFormReports);
-
   set hasMenuWidget(bool hasMenuWidget) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetHasMenuWidget(
           that: this, hasMenuWidget: hasMenuWidget);
-
-  set headerImg(String? headerImg) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetHeaderImg(
-          that: this, headerImg: headerImg);
-
-  set headerSize(Int64List? headerSize) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetHeaderSize(
-          that: this, headerSize: headerSize);
 
   set headerTitle(String headerTitle) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetHeaderTitle(
@@ -22383,29 +25438,13 @@ class SubredditImpl extends RustOpaque implements Subreddit {
       .redditApiModelSubredditSubredditAutoAccessorSetIsEnrolledInNewModmail(
           that: this, isEnrolledInNewModmail: isEnrolledInNewModmail);
 
-  set keyColor(String keyColor) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetKeyColor(
-          that: this, keyColor: keyColor);
-
   set lang(String lang) =>
       RustLib.instance.api.redditApiModelSubredditSubredditAutoAccessorSetLang(
           that: this, lang: lang);
 
-  set linkFlairEnabled(bool linkFlairEnabled) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetLinkFlairEnabled(
-          that: this, linkFlairEnabled: linkFlairEnabled);
-
-  set linkFlairPosition(String linkFlairPosition) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetLinkFlairPosition(
-          that: this, linkFlairPosition: linkFlairPosition);
-
   set mobileBannerImage(String mobileBannerImage) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetMobileBannerImage(
           that: this, mobileBannerImage: mobileBannerImage);
-
-  set name(String name) =>
-      RustLib.instance.api.redditApiModelSubredditSubredditAutoAccessorSetName(
-          that: this, name: name);
 
   set notificationLevel(String? notificationLevel) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetNotificationLevel(
@@ -22415,6 +25454,10 @@ class SubredditImpl extends RustOpaque implements Subreddit {
       .instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetOriginalContentTagEnabled(
           that: this, originalContentTagEnabled: originalContentTagEnabled);
+
+  set other(Common other) =>
+      RustLib.instance.api.redditApiModelSubredditSubredditAutoAccessorSetOther(
+          that: this, other: other);
 
   set over18(bool over18) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetOver18(
@@ -22427,14 +25470,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
               that: this,
               predictionLeaderboardEntryType: predictionLeaderboardEntryType);
 
-  set primaryColor(String primaryColor) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetPrimaryColor(
-          that: this, primaryColor: primaryColor);
-
-  set publicDescription(String publicDescription) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetPublicDescription(
-          that: this, publicDescription: publicDescription);
-
   set publicDescriptionHtml(String? publicDescriptionHtml) =>
       RustLib.instance.api
           .redditApiModelSubredditSubredditAutoAccessorSetPublicDescriptionHtml(
@@ -22443,18 +25478,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
   set publicTraffic(bool publicTraffic) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetPublicTraffic(
           that: this, publicTraffic: publicTraffic);
-
-  set quarantine(bool quarantine) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetQuarantine(
-          that: this, quarantine: quarantine);
-
-  set restrictCommenting(bool restrictCommenting) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetRestrictCommenting(
-          that: this, restrictCommenting: restrictCommenting);
-
-  set restrictPosting(bool restrictPosting) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetRestrictPosting(
-          that: this, restrictPosting: restrictPosting);
 
   set shouldArchivePosts(bool shouldArchivePosts) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetShouldArchivePosts(
@@ -22466,10 +25489,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
               that: this,
               shouldShowMediaInCommentsSetting:
                   shouldShowMediaInCommentsSetting);
-
-  set showMedia(bool showMedia) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetShowMedia(
-          that: this, showMedia: showMedia);
 
   set showMediaPreview(bool showMediaPreview) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetShowMediaPreview(
@@ -22483,10 +25502,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
       .redditApiModelSubredditSubredditAutoAccessorSetSubmissionType(
           that: this, submissionType: submissionType);
 
-  set submitLinkLabel(String submitLinkLabel) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetSubmitLinkLabel(
-          that: this, submitLinkLabel: submitLinkLabel);
-
   set submitText(String submitText) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetSubmitText(
           that: this, submitText: submitText);
@@ -22495,28 +25510,9 @@ class SubredditImpl extends RustOpaque implements Subreddit {
       .redditApiModelSubredditSubredditAutoAccessorSetSubmitTextHtml(
           that: this, submitTextHtml: submitTextHtml);
 
-  set submitTextLabel(String submitTextLabel) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetSubmitTextLabel(
-          that: this, submitTextLabel: submitTextLabel);
-
-  set subredditType(String subredditType) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetSubredditType(
-          that: this, subredditType: subredditType);
-
-  set subscribers(PlatformInt64 subscribers) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetSubscribers(
-          that: this, subscribers: subscribers);
-
   set suggestedCommentSort(String? suggestedCommentSort) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetSuggestedCommentSort(
           that: this, suggestedCommentSort: suggestedCommentSort);
-
-  set title(String title) =>
-      RustLib.instance.api.redditApiModelSubredditSubredditAutoAccessorSetTitle(
-          that: this, title: title);
-
-  set url(String url) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetUrl(that: this, url: url);
 
   set userCanFlairInSr(bool? userCanFlairInSr) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetUserCanFlairInSr(
@@ -22534,26 +25530,6 @@ class SubredditImpl extends RustOpaque implements Subreddit {
       .redditApiModelSubredditSubredditAutoAccessorSetUserHasFavorited(
           that: this, userHasFavorited: userHasFavorited);
 
-  set userIsBanned(bool userIsBanned) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetUserIsBanned(
-          that: this, userIsBanned: userIsBanned);
-
-  set userIsContributor(bool userIsContributor) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetUserIsContributor(
-          that: this, userIsContributor: userIsContributor);
-
-  set userIsModerator(bool userIsModerator) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetUserIsModerator(
-          that: this, userIsModerator: userIsModerator);
-
-  set userIsMuted(bool userIsMuted) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetUserIsMuted(
-          that: this, userIsMuted: userIsMuted);
-
-  set userIsSubscriber(bool userIsSubscriber) => RustLib.instance.api
-      .redditApiModelSubredditSubredditAutoAccessorSetUserIsSubscriber(
-          that: this, userIsSubscriber: userIsSubscriber);
-
   set userSrFlairEnabled(bool? userSrFlairEnabled) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetUserSrFlairEnabled(
           that: this, userSrFlairEnabled: userSrFlairEnabled);
@@ -22566,11 +25542,12 @@ class SubredditImpl extends RustOpaque implements Subreddit {
       .redditApiModelSubredditSubredditAutoAccessorSetWikiEnabled(
           that: this, wikiEnabled: wikiEnabled);
 
-  set wls(BigInt? wls) => RustLib.instance.api
+  set wls(int? wls) => RustLib.instance.api
       .redditApiModelSubredditSubredditAutoAccessorSetWls(that: this, wls: wls);
 
   /// flutter_rust_bridge:getter,sync
-  Icon? get icon => RustLib.instance.api.redditApiModelSubredditSubredditIcon(
+  SubredditIcon get icon =>
+      RustLib.instance.api.redditApiModelSubredditSubredditIcon(
         that: this,
       );
 }
@@ -22594,6 +25571,11 @@ class SubredditInfoImpl extends RustOpaque implements SubredditInfo {
         RustLib.instance.api.rust_arc_decrement_strong_count_SubredditInfoPtr,
   );
 
+  Details? get details => RustLib.instance.api
+          .redditApiModelSubredditSubredditInfoAutoAccessorGetDetails(
+        that: this,
+      );
+
   String get subreddit => RustLib.instance.api
           .redditApiModelSubredditSubredditInfoAutoAccessorGetSubreddit(
         that: this,
@@ -22609,15 +25591,14 @@ class SubredditInfoImpl extends RustOpaque implements SubredditInfo {
         that: this,
       );
 
-  String get subredditType => RustLib.instance.api
-          .redditApiModelSubredditSubredditInfoAutoAccessorGetSubredditType(
-        that: this,
-      );
-
-  BigInt get subscribers => RustLib.instance.api
+  int get subscribers => RustLib.instance.api
           .redditApiModelSubredditSubredditInfoAutoAccessorGetSubscribers(
         that: this,
       );
+
+  set details(Details? details) => RustLib.instance.api
+      .redditApiModelSubredditSubredditInfoAutoAccessorSetDetails(
+          that: this, details: details);
 
   set subreddit(String subreddit) => RustLib.instance.api
       .redditApiModelSubredditSubredditInfoAutoAccessorSetSubreddit(
@@ -22632,11 +25613,7 @@ class SubredditInfoImpl extends RustOpaque implements SubredditInfo {
       .redditApiModelSubredditSubredditInfoAutoAccessorSetSubredditNamePrefixed(
           that: this, subredditNamePrefixed: subredditNamePrefixed);
 
-  set subredditType(String subredditType) => RustLib.instance.api
-      .redditApiModelSubredditSubredditInfoAutoAccessorSetSubredditType(
-          that: this, subredditType: subredditType);
-
-  set subscribers(BigInt subscribers) => RustLib.instance.api
+  set subscribers(int subscribers) => RustLib.instance.api
       .redditApiModelSubredditSubredditInfoAutoAccessorSetSubscribers(
           that: this, subscribers: subscribers);
 }

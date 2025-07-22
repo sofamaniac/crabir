@@ -5,9 +5,26 @@
 
 import '../../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'post.dart';
 
-// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `GalleryData`, `MediaId`, `MediaKind`, `MediaMetadata`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `Image`, `MediaId`, `MediaKind`, `MediaMetadata`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`
+// These functions are ignored (category: IgnoreBecauseOwnerTyShouldIgnore): `default`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Gallery>>
-abstract class Gallery implements RustOpaqueInterface {}
+abstract class Gallery implements RustOpaqueInterface {
+  static Future<Gallery> default_() =>
+      RustLib.instance.api.redditApiModelGalleryGalleryDefault();
+
+  /// flutter_rust_bridge:sync
+  ImageBase get_({required int index});
+
+  /// flutter_rust_bridge:sync,getter
+  int get length;
+}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<GalleryData>>
+abstract class GalleryData implements RustOpaqueInterface {
+  static Future<GalleryData> default_() =>
+      RustLib.instance.api.redditApiModelGalleryGalleryDataDefault();
+}

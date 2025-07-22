@@ -3,10 +3,13 @@
 
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
-import '../../../frb_generated.dart';
+import '../../../../frb_generated.dart';
+import '../../model.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
+part 'model.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
 
 class Features {
   final bool modmailHarassmentFilter;
@@ -64,7 +67,7 @@ class Features {
   });
 
   static Future<Features> default_() =>
-      RustLib.instance.api.redditApiModelUserFeaturesDefault();
+      RustLib.instance.api.redditApiModelUserModelFeaturesDefault();
 
   @override
   int get hashCode =>
@@ -156,7 +159,7 @@ class Preferences {
   });
 
   static Future<Preferences> default_() =>
-      RustLib.instance.api.redditApiModelUserPreferencesDefault();
+      RustLib.instance.api.redditApiModelUserModelPreferencesDefault();
 
   @override
   int get hashCode =>
@@ -200,7 +203,7 @@ class Snoovatar {
   });
 
   static Future<Snoovatar> default_() =>
-      RustLib.instance.api.redditApiModelUserSnoovatarDefault();
+      RustLib.instance.api.redditApiModelUserModelSnoovatarDefault();
 
   @override
   int get hashCode =>
@@ -281,7 +284,7 @@ class User {
   });
 
   static Future<User> default_() =>
-      RustLib.instance.api.redditApiModelUserUserDefault();
+      RustLib.instance.api.redditApiModelUserModelUserDefault();
 
   @override
   int get hashCode =>
@@ -408,7 +411,7 @@ class UserInfo {
   });
 
   static Future<UserInfo> default_() =>
-      RustLib.instance.api.redditApiModelUserUserInfoDefault();
+      RustLib.instance.api.redditApiModelUserModelUserInfoDefault();
 
   @override
   int get hashCode =>
@@ -466,6 +469,20 @@ class UserInfo {
           acceptFollowers == other.acceptFollowers &&
           acceptChats == other.acceptChats &&
           acceptPms == other.acceptPms;
+}
+
+@freezed
+sealed class UserStreamSort with _$UserStreamSort {
+  const UserStreamSort._();
+
+  const factory UserStreamSort.hot() = UserStreamSort_Hot;
+  const factory UserStreamSort.top(
+    Timeframe field0,
+  ) = UserStreamSort_Top;
+  const factory UserStreamSort.new_() = UserStreamSort_New;
+  const factory UserStreamSort.controversial(
+    Timeframe field0,
+  ) = UserStreamSort_Controversial;
 }
 
 class UserSubreddit {
@@ -554,7 +571,7 @@ class UserSubreddit {
   });
 
   static Future<UserSubreddit> default_() =>
-      RustLib.instance.api.redditApiModelUserUserSubredditDefault();
+      RustLib.instance.api.redditApiModelUserModelUserSubredditDefault();
 
   @override
   int get hashCode =>

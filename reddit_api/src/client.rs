@@ -1,7 +1,7 @@
-use crate::listing_stream::{ListingStream, Wrapper};
-use crate::model::Fullname;
 use crate::model::comment::Comment;
-use crate::model::feed::Feed;
+use crate::model::feed::{self, Feed};
+use crate::model::{Fullname, comment, user};
+use crate::streamable::Streamable;
 use crate::{model::feed::FeedStream, result::Result};
 use std::backtrace::Backtrace;
 use std::collections::HashMap;
@@ -11,6 +11,7 @@ use base64::Engine;
 use base64::prelude::BASE64_URL_SAFE_NO_PAD;
 use chrono::{DateTime, Utc};
 use futures::{Stream, lock::Mutex};
+use futures::{StreamExt, TryStreamExt, stream};
 use log::{debug, error, info};
 use reqwest::RequestBuilder;
 
@@ -22,11 +23,11 @@ use serde::{
 
 use crate::{
     error::Error,
-    model::{Listing, Sort, Thing, post::Post, user::UserInfo},
+    model::{Listing, Thing, post::Post, user::model::UserInfo},
 };
 
-const USER_AGENT: &str = "com.sofamaniac.crabir";
-const CLIENT_ID: &str = "w0DROpe2H7uv2inVTvSfZw";
+const USER_AGENT: &str = dotenv_codegen::dotenv!("USER_AGENT");
+const CLIENT_ID: &str = dotenv_codegen::dotenv!("REDDIT_API_KEY");
 
 #[derive(Clone, Debug)]
 pub struct Client {
@@ -106,14 +107,15 @@ impl Client {
         }
     }
 
-    async fn base_url(&self) -> Url {
-        if self.current_access_token.lock().await.is_some() {
-            Url::parse("https://oauth.reddit.com/").expect("Should not panic.")
-        } else {
-            // FIXME: putting www.reddit.com results in requests being blocked
-            // Switch to oauth for anonymous instead (see https://github.com/reddit-archive/reddit/wiki/OAuth2#application-only-oauth)
-            Url::parse("https://reddit.com/").expect("Should not panic.")
-        }
+    fn base_url(&self) -> Url {
+        Url::parse("https://oauth.reddit.com/").expect("Should not panic.")
+        // if self.current_access_token.lock().await.is_some() {
+        //     Url::parse("https://oauth.reddit.com/").expect("Should not panic.")
+        // } else {
+        //     // FIXME: putting www.reddit.com results in requests being blocked
+        //     // Switch to oauth for anonymous instead (see https://github.com/reddit-archive/reddit/wiki/OAuth2#application-only-oauth)
+        //     Url::parse("https://reddit.com/").expect("Should not panic.")
+        // }
     }
 
     /// Authenticate the current client
@@ -233,6 +235,40 @@ impl Client {
         }
     }
 
+    /// Create a new access token for a logged out user
+    pub async fn new_logged_out_user_token(&self) -> Result<()> {
+        debug!("NEW LOGGED OUT USER TOKEN CREATION");
+        let url =
+            Url::parse("https://www.reddit.com/api/v1/access_token").expect("Should not fail");
+        //FIXME: should be random per user;
+        let device_id = "6314586208524fac959440a7f7a0ab";
+        let mut body = HashMap::new();
+        body.insert(
+            "grant_type",
+            "https://oauth.reddit.com/grants/installed_client",
+        );
+        body.insert("device_id", device_id);
+        let request = self
+            .http
+            .post(url)
+            .basic_auth::<&str, &str>(CLIENT_ID, None)
+            .form(&body)
+            .build()
+            .expect("Building request should not fail");
+        #[derive(Deserialize)]
+        struct Response {
+            access_token: String,
+            token_type: String,
+            expires_in: u64,
+            scope: String,
+        }
+        let response = self.http.execute(request).await?;
+        let response: Response = parse_response(response).await?;
+        *self.current_access_token.lock().await = Some(response.access_token);
+        info!("[CLIENT] Anonymous token created.");
+        Ok(())
+    }
+
     /// Get a new access token
     async fn refresh_token(&self) -> Result<()> {
         #[derive(Deserialize)]
@@ -290,10 +326,10 @@ impl Client {
     pub(crate) async fn feed_request(
         &self,
         feed: &Feed,
-        sort: &Sort,
+        sort: &feed::FeedSort,
         pager: &Pager,
     ) -> Result<Listing> {
-        let base_url = self.base_url().await;
+        let base_url = self.base_url();
         let url = match feed {
             Feed::Home => base_url.clone(),
             Feed::All => base_url.join("r/all/").expect("Should not fail."),
@@ -305,6 +341,7 @@ impl Client {
         let url = sort.add_to_url(&url);
         let url = pager.add_to_url(url);
         let request = self.get(url);
+        let request = request.query(&[("sr_detail", "true")]);
         let posts = self.execute(request).await?;
         let json = parse_response(posts).await?;
         match json {
@@ -315,22 +352,27 @@ impl Client {
         }
     }
 
+    /// flutter_rust_bridge:sync
+    pub fn feed_stream(&self, feed: &Feed, sort: &feed::FeedSort) -> Streamable {
+        let base_url = self.base_url();
+        Streamable::new(feed::FeedStream::new(
+            self.clone(),
+            feed.clone(),
+            *sort,
+            base_url,
+        ))
+    }
+
     /// Get the info of the current user.
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
     pub async fn logged_user_info(&self) -> Result<UserInfo> {
-        let base_url = self.base_url().await;
+        let base_url = self.base_url();
         let url = base_url.join("api/v1/me.json").expect("Should not fail");
         let request = self.get(url);
         let response = self.execute(request).await?;
         let json = parse_response(response).await?;
         Ok(json)
-    }
-
-    /// Get a stream of posts for the specified feed with the specified sort.
-    /// Yield an error when the request to reddit API failed.
-    pub fn feed(&self, feed: Feed, sort: Sort) -> impl Stream<Item = Result<Post>> + Send + Sync {
-        Wrapper::new(FeedStream::new(self.clone(), feed, sort))
     }
 
     /// Get one page of a listing.
@@ -358,42 +400,139 @@ impl Client {
         thing.try_into()
     }
 
-    /// Try to collect everything from a paged request. Will continue until there is no
-    /// more item to collect.
-    async fn collect_paged<T: TryFrom<Thing>>(&self, url: &Url) -> Result<Vec<T>> {
-        let (mut things, pager) = self.paged_request(url, &Pager::default()).await?;
-        loop {
-            let (mut page_things, pager) = self.paged_request(url, &pager).await?;
-            things.append(&mut page_things);
-            match pager.after {
-                Some(s) if s.is_empty() => break,
-                None => break,
-                _ => (),
-            }
-        }
-        Ok(things)
+    fn stream_listing(
+        &self,
+        url: Url,
+        pager: Option<Pager>,
+        query_params: &[(&str, &str)],
+    ) -> impl Stream<Item = Result<Listing>> {
+        stream::unfold(
+            (url, pager.unwrap_or_default()),
+            move |(url, mut pager)| async move {
+                let client = self.clone();
+                let url = pager.add_to_url(url.clone());
+                let request = client.get(url.clone());
+                let request = request.query(query_params);
+                let response = client.execute(request).await;
+                debug!("[stream_listing] page done");
+                match response {
+                    Err(e) => Some((Err(e), (url, Pager::default()))),
+                    Ok(response) => match parse_response::<Thing>(response).await {
+                        Ok(thing) => match thing {
+                            Thing::Listing(listing) => {
+                                pager.after(listing.after.clone());
+                                debug!("{pager:?}");
+                                if listing.after.clone()?.is_empty() {
+                                    return None;
+                                }
+                                Some((Ok(listing), (url, pager)))
+                            }
+                            _ => Some((
+                                Err(Error::InvalidThing {
+                                    backtrace: Backtrace::capture(),
+                                }),
+                                (url, Pager::default()),
+                            )),
+                        },
+                        Err(e) => Some((Err(e), (url, Pager::default()))),
+                    },
+                }
+            },
+        )
     }
 
-    /// Get the list of subreddits the current user is subscribed to.
+    pub(crate) fn stream_vec<T>(
+        self,
+        url: Url,
+        pager: Option<Pager>,
+        query_params: &[(&str, &str)],
+    ) -> impl Stream<Item = Result<T>>
+    where
+        T: TryFrom<Thing>,
+    {
+        stream::unfold(
+            (url, pager.unwrap_or_default(), Vec::new()),
+            move |(url, mut pager, mut buffer)| {
+                let client = self.clone();
+                async move {
+                    if let Some(thing) = buffer.pop() {
+                        Some((Ok(thing), (url, pager, buffer)))
+                    } else {
+                        let url = pager.add_to_url(url.clone());
+                        let request = client.get(url.clone());
+                        let request = request.query(query_params);
+                        let response = client.execute(request).await;
+                        match response {
+                            Err(e) => Some((Err(e), (url, Pager::default(), buffer))),
+                            Ok(response) => match parse_response::<Thing>(response).await {
+                                Ok(thing) => match thing {
+                                    Thing::Listing(listing) => {
+                                        pager.after(listing.after.clone());
+                                        debug!("{pager:?}");
+                                        if listing.after.clone()?.is_empty() {
+                                            return None;
+                                        }
+                                        buffer = listing
+                                            .children
+                                            .into_iter()
+                                            .filter_map(|item| item.try_into().ok())
+                                            .collect();
+                                        buffer.reverse();
+
+                                        buffer.pop().map(|thing| (Ok(thing), (url, pager, buffer)))
+                                    }
+                                    _ => Some((
+                                        Err(Error::InvalidThing {
+                                            backtrace: Backtrace::capture(),
+                                        }),
+                                        (url, Pager::default(), buffer),
+                                    )),
+                                },
+                                Err(e) => Some((Err(e), (url, Pager::default(), buffer))),
+                            },
+                        }
+                    }
+                }
+            },
+        )
+    }
+
+    /// Try to collect everything from a paged request. Will continue until there is no
+    /// more item to collect.
+    async fn collect_paged<T: TryFrom<Thing>>(
+        &self,
+        url: &Url,
+        query_params: &[(&str, &str)],
+    ) -> Result<Vec<T>> {
+        let res = self.stream_listing(url.clone(), None, query_params);
+        let res: Vec<Listing> = res.try_collect().await?;
+        Ok(res
+            .into_iter()
+            .flat_map(|listing| listing.children)
+            .filter_map(|e| e.try_into().ok())
+            .collect())
+    }
+
+    /// Get the list of all subreddits the current user is subscribed to.
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
     pub async fn subsriptions(&self) -> Result<Vec<crate::model::subreddit::Subreddit>> {
-        let base_url = self.base_url().await;
+        let base_url = self.base_url();
         let url = base_url
             .join("subreddits/mine/subscriber.json")
             .expect("Should not fail.");
-        self.collect_paged(&url).await
+        self.collect_paged(&url, &[]).await
     }
 
     /// Get the list of multireddits the current user is subscribed to.
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
     pub async fn multis(&self) -> Result<Vec<crate::model::multi::Multi>> {
-        let base_url = self.base_url().await;
+        let base_url = self.base_url();
         let url = base_url
             .join("api/multi/mine.json")
             .expect("Should not fail.");
-        self.collect_paged(&url).await
+        self.collect_paged(&url, &[]).await
     }
 
     /// Vote on a votable item (i.e. a [`Post`] or a [`Comment`]).
@@ -406,11 +545,7 @@ impl Client {
             VoteDirection::Neutral => 0,
         };
 
-        let url = self
-            .base_url()
-            .await
-            .join("api/vote")
-            .expect("Should not fail.");
+        let url = self.base_url().join("api/vote").expect("Should not fail.");
         let request = self.post(url);
         let request = request.query(&[("id", thing.as_ref()), ("dir", &format!("{dir}"))]);
         let _ = self.execute(request).await?;
@@ -421,11 +556,7 @@ impl Client {
     /// # Errors
     /// Returns an error if the request failed.
     pub async fn save(&self, thing: &Fullname) -> Result<()> {
-        let url = self
-            .base_url()
-            .await
-            .join("api/save")
-            .expect("Should not fail.");
+        let url = self.base_url().join("api/save").expect("Should not fail.");
         let request = self.post(url);
         let request = request.query(&[("id", &thing)]);
         let _ = self.execute(request).await?;
@@ -438,7 +569,6 @@ impl Client {
     pub async fn unsave(&self, thing: &Fullname) -> Result<()> {
         let url = self
             .base_url()
-            .await
             .join("api/unsave")
             .expect("Should not fail.");
         let request = self.post(url);
@@ -450,25 +580,98 @@ impl Client {
     /// Get saved items ( both [`Post`] and [`Comment`] ) for the specified user.
     /// # Errors
     /// Fails if api request fails.
-    pub fn saved(&self, username: String) -> impl Stream<Item = Result<Thing>> + Send + Sync {
-        Wrapper::new(SaveFeed {
-            client: self.clone(),
+    /// flutter_rust_bridge:sync
+    pub fn user_saved(&self, username: String) -> Streamable {
+        Streamable::new(user::streams::UserStream::new(
+            self.clone(),
             username,
-        })
+            String::from("saved"),
+        ))
+    }
+
+    /// flutter_rust_bridge:sync
+    pub fn user_overview(&self, username: String, sort: user::model::UserStreamSort) -> Streamable {
+        Streamable::new(user::streams::UserStreamSorted::new(
+            self.clone(),
+            username,
+            sort,
+            String::from("overview"),
+        ))
+    }
+    /// flutter_rust_bridge:sync
+    pub fn user_submitted(
+        &self,
+        username: String,
+        sort: user::model::UserStreamSort,
+    ) -> Streamable {
+        Streamable::new(user::streams::UserStreamSorted::new(
+            self.clone(),
+            username,
+            sort,
+            String::from("submitted"),
+        ))
+    }
+    /// flutter_rust_bridge:sync
+    pub fn user_comments(&self, username: String, sort: user::model::UserStreamSort) -> Streamable {
+        Streamable::new(user::streams::UserStreamSorted::new(
+            self.clone(),
+            username,
+            sort,
+            String::from("comments"),
+        ))
+    }
+    /// flutter_rust_bridge:sync
+    pub fn user_upvoted(&self, username: String) -> Streamable {
+        Streamable::new(user::streams::UserStream::new(
+            self.clone(),
+            username,
+            String::from("upvoted"),
+        ))
+    }
+    /// flutter_rust_bridge:sync
+    pub fn user_downvoted(&self, username: String) -> Streamable {
+        Streamable::new(user::streams::UserStream::new(
+            self.clone(),
+            username,
+            String::from("downvoted"),
+        ))
+    }
+    /// flutter_rust_bridge:sync
+    pub fn user_hidden(&self, username: String) -> Streamable {
+        Streamable::new(user::streams::UserStream::new(
+            self.clone(),
+            username,
+            String::from("hidden"),
+        ))
+    }
+    /// flutter_rust_bridge:sync
+    pub fn user_gilded(&self, username: String) -> Streamable {
+        Streamable::new(user::streams::UserStream::new(
+            self.clone(),
+            username,
+            String::from("gilded"),
+        ))
     }
 
     /// Returns the comments for the post at the given permalink. Each element in the vec is either
     /// a [`Thing::Comment`] or a [`Thing::More`].
     /// # Errors
     /// Fails if the request fails or the parsing of the response fails.
-    // TODO: sort
-    pub async fn comments(&self, permalink: String) -> Result<Vec<Thing>> {
+    pub async fn comments(
+        &self,
+        permalink: String,
+        sort: Option<comment::CommentSort>,
+    ) -> Result<Vec<Thing>> {
         let url = self
             .base_url()
-            .await
             .join(&format!("{permalink}.json"))
             .expect("Should not fail.");
         let request = self.get(url);
+        let request = if let Some(sort) = sort {
+            request.query(&[("sort", sort.to_url())])
+        } else {
+            request
+        };
         let result = self.execute(request).await?;
         let result: [Thing; 2] = parse_response(result).await?;
         if let [_, Thing::Listing(comments)] = result {
@@ -480,30 +683,21 @@ impl Client {
         }
     }
 
-    // TODO: sort
+    // FIXME: crash when there are too many children because the url is too long.
+    // the doc says that it supports only up to 100 children.
     pub async fn load_more_comments(
         &self,
         parent_id: Fullname,
         children: Vec<String>,
+        sort: Option<comment::CommentSort>,
     ) -> Result<Vec<Thing>> {
-        let url = self
-            .base_url()
-            .await
-            .join("api/morechildren.json")
-            .expect("Should not fail.");
-        let request = self.get(url).query(&[
-            ("api_type", "json"),
-            ("children", &children.join(",")),
-            ("link_id", parent_id.as_ref()),
-            ("sort", "confidence"),
-        ]);
         #[derive(Deserialize)]
         struct Response {
             json: Json,
         }
         #[derive(Deserialize)]
         struct Json {
-            errors: Vec<String>,
+            // error: Option<String>,
             #[serde(default)]
             data: Data,
         }
@@ -511,35 +705,49 @@ impl Client {
         struct Data {
             things: Vec<Thing>,
         }
+        let url = self
+            .base_url()
+            .join("api/morechildren.json")
+            .expect("Should not fail.");
+        let request = self.get(url).query(&[
+            ("api_type", "json"),
+            ("children", &children.join(",")),
+            ("link_id", parent_id.as_ref()),
+        ]);
+        let request = if let Some(sort) = sort {
+            request.query(&[("sort", sort.to_url())])
+        } else {
+            request
+        };
         let result = self.execute(request).await?;
         let result: Response = parse_response(result).await?;
         Ok(result.json.data.things)
     }
-}
 
-struct SaveFeed {
-    client: Client,
-    username: String,
-}
-
-impl ListingStream for SaveFeed {
-    type Output = Thing;
-
-    fn fetch_next(
-        &self,
-        pager: &Pager,
-    ) -> std::pin::Pin<Box<dyn Future<Output = Result<Listing>> + Send + Sync>> {
-        let client = self.client.clone();
-        let pager = pager.clone();
-        let username = self.username.clone();
-        let fut = async move {
-            let url = client
-                .base_url()
-                .await
-                .join(&format!("user/{username}/saved.json"))
-                .expect("Should not fail.");
-            client.paged_listing(&url, &pager).await
-        };
-        Box::pin(fut)
+    pub(crate) fn user_stream<T: TryFrom<Thing>>(
+        self,
+        endpoint: String,
+        pager: Option<Pager>,
+    ) -> impl Stream<Item = Result<T>> {
+        let url = self
+            .base_url()
+            .join(&endpoint)
+            .expect("Should not fail to build url.");
+        self.clone().stream_vec(url, pager, &[])
+    }
+    pub(crate) fn sorted_user_stream<T: TryFrom<Thing>>(
+        self,
+        endpoint: String,
+        sort: user::model::UserStreamSort,
+        pager: Option<Pager>,
+    ) -> impl Stream<Item = Result<T>> {
+        let mut url = self
+            .base_url()
+            .join(&endpoint)
+            .expect("Should not fail to build url.");
+        for (name, value) in sort.to_query() {
+            url.query_pairs_mut().append_pair(name, value);
+        }
+        self.stream_vec(url, pager, &[])
     }
 }

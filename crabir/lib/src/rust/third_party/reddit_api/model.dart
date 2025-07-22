@@ -4,17 +4,16 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
-import 'client.dart';
 import 'model/comment.dart';
 import 'model/multi.dart';
 import 'model/post.dart';
 import 'model/subreddit.dart';
-import 'model/user.dart';
+import 'model/user/model.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'model.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `as_ref`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `cmp`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `partial_cmp`, `try_from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `as_ref`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `cmp`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `partial_cmp`, `try_from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Fullname>>
 abstract class Fullname implements RustOpaqueInterface {
@@ -30,7 +29,7 @@ abstract class Listing implements RustOpaqueInterface {
 
   List<Thing> get children;
 
-  BigInt? get dist;
+  int? get dist;
 
   String? get modhash;
 
@@ -40,33 +39,12 @@ abstract class Listing implements RustOpaqueInterface {
 
   set children(List<Thing> children);
 
-  set dist(BigInt? dist);
+  set dist(int? dist);
 
   set modhash(String? modhash);
 
   static Future<Listing> default_() =>
       RustLib.instance.api.redditApiModelListingDefault();
-}
-
-@freezed
-sealed class Sort with _$Sort {
-  const Sort._();
-
-  const factory Sort.best() = Sort_Best;
-  const factory Sort.hot() = Sort_Hot;
-  const factory Sort.new_(
-    Timeframe field0,
-  ) = Sort_New;
-  const factory Sort.top(
-    Timeframe field0,
-  ) = Sort_Top;
-  const factory Sort.rising() = Sort_Rising;
-  const factory Sort.controversial(
-    Timeframe field0,
-  ) = Sort_Controversial;
-
-  Future<Url> addToUrl({required Url url}) =>
-      RustLib.instance.api.redditApiModelSortAddToUrl(that: this, url: url);
 }
 
 @freezed
@@ -96,12 +74,21 @@ sealed class Thing with _$Thing {
 
   /// How to load more comment in a given thread
   const factory Thing.more({
+    /// Has the same id as its first children
+    /// If there is no children is "_".
     required String id,
-    required String name,
+
+    /// Name of the first children. If there is none is "t1__".
+    required Fullname name,
     required int count,
     required int depth,
     required List<String> children,
   }) = Thing_More;
+
+  /// flutter_rust_bridge:getter,sync
+  Fullname? get name => RustLib.instance.api.redditApiModelThingName(
+        that: this,
+      );
 }
 
 enum Timeframe {

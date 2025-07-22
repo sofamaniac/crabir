@@ -6,6 +6,8 @@ edition = "2024"
 [dependencies]
 base64 = "0.22.1"
 chrono = { version = "0.4.41", features = ["serde"] }
+dotenv = "0.15.0"
+dotenv_codegen = "0.15.0"
 futures = "0.3.31"
 log = "0.4.27"
 reqwest = { version = "0.12.15", features = [
@@ -14,7 +16,7 @@ reqwest = { version = "0.12.15", features = [
   "http2",
 ], default-features = false }
 serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.140"
+serde_json = { version = "1.0.140", features = ["unbounded_depth"] }
 serde_with = { version = "3.12.0", features = ["chrono_0_4"] }
 thiserror = "2.0.12"
 

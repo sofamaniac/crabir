@@ -14,8 +14,8 @@ class VideoContent extends StatefulWidget {
 class _VideoContentState extends State<VideoContent> {
   late VideoPlayerController _controller;
   late ChewieController _chewieController;
-  int width = 1;
-  int height = 1;
+  late int width;
+  late int height;
 
   @override
   void initState() {
@@ -36,8 +36,8 @@ class _VideoContentState extends State<VideoContent> {
       case Media_Oembed():
         final video = (widget.post.secureMedia! as Media_Oembed);
         url = video.oembed.providerUrl;
-        width = video.oembed.width;
-        height = video.oembed.height;
+        width = video.oembed.width.toInt();
+        height = video.oembed.height.toInt();
         break;
     }
     _controller = VideoPlayerController.networkUrl(Uri.parse(url));

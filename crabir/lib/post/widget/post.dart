@@ -1,17 +1,17 @@
 import 'package:crabir/feed/feed.dart';
-import 'package:crabir/feed/gif.dart';
-import 'package:crabir/feed/html_with_fade.dart';
-import 'package:crabir/feed/image.dart';
-import 'package:crabir/feed/video.dart';
+import 'package:crabir/media/media.dart';
+import 'package:crabir/post/widget/gallery.dart';
+import 'package:crabir/post/widget/gif.dart';
+import 'package:crabir/post/widget/html_with_fade.dart';
+import 'package:crabir/post/widget/image.dart';
+import 'package:crabir/post/widget/video.dart';
 import 'package:crabir/flair.dart';
+import 'package:crabir/subreddit.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
-import 'package:crabir/thread/thread.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 final horizontalPadding = 16.0;
 
@@ -110,6 +110,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
   Widget header(BuildContext context) {
     final labelStyle = Theme.of(context).textTheme.labelSmall;
     final subreddit = widget.post.subreddit.subreddit;
+    final subredditIcon = widget.post.subreddit.details?.icon;
     return Row(
       children: [
         InkWell(
@@ -118,15 +119,21 @@ class _RedditPostCardState extends State<RedditPostCard> {
             MaterialPageRoute(
               builder: (_) => FeedView(
                 feed: Feed.subreddit(subreddit),
-                initialSort: Sort.best(),
+                initialSort: FeedSort.best(),
               ),
             ),
           ),
-          child: Text(
-            'r/$subreddit',
-            style: labelStyle?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-            ),
+          child: Row(
+            spacing: 8,
+            children: [
+              if (subredditIcon != null) SubredditIcon(icon: subredditIcon),
+              Text(
+                'r/$subreddit',
+                style: labelStyle?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ],
           ),
         ),
         const Text(' • '),
@@ -249,17 +256,18 @@ class _RedditPostCardState extends State<RedditPostCard> {
         ),
       Kind.meta => Text("meta"),
       Kind.video => VideoContent(post: this.widget.post),
-      Kind.gallery => Text("gallery"),
-      Kind.image => switch (this.widget.post.url.endsWith(".gif")) {
-          false => ImageContent(
-              post: this.widget.post,
-              fullscreen: (context, post) =>
-                  FullscreenImageViewer(imageUrl: post.url),
-            ),
-          true => GifContent(
-              post: this.widget.post,
-            ),
-        },
+      Kind.gallery => GalleryView(gallery: this.widget.post.gallery!),
+      // Kind.image => switch (this.widget.post.url.endsWith(".gif")) {
+      //     false => ImageContent(
+      //         post: this.widget.post,
+      //         fullscreen: (context, post) =>
+      //             FullscreenImageView(imageUrl: post.url),
+      //       ),
+      //     true => GifContent(
+      //         post: this.widget.post,
+      //       ),
+      //   },
+      Kind.image => RedditImageView(image: this.widget.post.preview!.images[0]),
       Kind.link => Container(),
       Kind.unknown => Text("unknown"),
     };

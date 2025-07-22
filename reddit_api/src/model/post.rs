@@ -33,7 +33,7 @@ pub struct Post {
     pub name: Fullname,
     pub id: PostID,
     pub user_reports: Vec<Option<String>>,
-    pub gilded: i64,
+    pub gilded: u32,
     pub title: String,
     pub domain: String,
     pub url: String,
@@ -41,7 +41,7 @@ pub struct Post {
     pub url_overridden_by_dest: Option<String>,
     pub selftext: Option<String>,
     pub selftext_html: Option<String>,
-    pub num_comments: i64,
+    pub num_comments: u32,
 
     /// Date of creation in UTC
     #[serde_as(as = "serde_with::TimestampSecondsWithFrac<f64>")]
@@ -59,10 +59,10 @@ pub struct Post {
     pub visited: bool,
 
     // Score
-    pub downs: i64,
+    pub downs: u32,
     pub upvote_ratio: f64,
-    pub ups: i64,
-    pub score: i64,
+    pub ups: u32,
+    pub score: u32,
 
     #[serde(flatten, with = "prefix_link_flair")]
     pub link_flair: Flair,
@@ -103,10 +103,11 @@ pub struct Post {
     pub mod_reason_by: Option<String>,
     pub removal_reason: Option<String>,
     pub removed_by: Option<String>,
-    pub banned_at_utc: Option<f32>,
-    pub approved_at_utc: Option<f32>,
+    pub banned_at_utc: Option<f64>,
+    pub approved_at_utc: Option<f64>,
     pub mod_reason_title: Option<String>,
-    pub report_reasons: Option<String>,
+    #[serde(deserialize_with = "utils::response_or_default")]
+    pub report_reasons: Vec<String>,
     pub mod_reports: Vec<Option<String>>,
 
     // Post kind
@@ -137,26 +138,26 @@ pub struct Post {
 
     // Other stuff
     pub top_awarded_type: Option<String>,
-    pub total_awards_received: Option<i64>,
+    pub total_awards_received: Option<u32>,
     pub gildings: Gildings,
     #[serde_as(deserialize_as = "serde_with::DefaultOnNull")]
     pub content_categories: Vec<String>,
-    pub wls: Option<i64>,
-    pub pwls: Option<i64>,
+    pub wls: Option<u32>,
+    pub pwls: Option<u32>,
     pub allow_live_comments: bool,
     pub no_follow: bool,
     pub all_awardings: Vec<Option<String>>,
     pub awarders: Vec<Option<String>>,
     pub can_gild: bool,
     pub treatment_tags: Vec<Option<String>>,
-    pub num_reports: Option<String>,
+    pub num_reports: Option<u32>,
     pub distinguished: Option<String>,
     pub is_robot_indexable: bool,
-    pub num_duplicates: Option<u64>,
+    pub num_duplicates: Option<u32>,
     pub discussion_type: Option<String>,
     pub send_replies: bool,
     pub contest_mode: bool,
-    pub num_crossposts: Option<i64>,
+    pub num_crossposts: Option<u32>,
 }
 
 impl Post {
@@ -217,15 +218,15 @@ impl TryFrom<Thing> for Post {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MediaEmbed {
     pub content: String,
-    pub width: i64,
+    pub width: u32,
     pub scrolling: bool,
-    pub height: i64,
+    pub height: u32,
 }
 
 pub struct Thumbnail {
     pub url: String,
-    pub height: u64,
-    pub width: u64,
+    pub height: u32,
+    pub width: u32,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -233,9 +234,9 @@ pub struct ThumbnailOption {
     #[serde(rename = "thumbnail")]
     pub url: Option<String>,
     #[serde(rename = "thumbnail_height")]
-    pub height: Option<u64>,
+    pub height: Option<u32>,
     #[serde(rename = "thumbnail_width")]
-    pub width: Option<u64>,
+    pub width: Option<u32>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -244,9 +245,9 @@ pub struct ThumbnailURL {
     #[serde(rename = "thumbnail_url")]
     pub url: Option<String>,
     #[serde(rename = "thumbnail_height")]
-    pub height: Option<u64>,
+    pub height: Option<u32>,
     #[serde(rename = "thumbnail_width")]
-    pub width: Option<u64>,
+    pub width: Option<u32>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
@@ -265,9 +266,9 @@ pub enum SecureMedia {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 /// flutter_rust_bridge:non_opaque
 pub struct RedditVideo {
-    pub bitrate_kbps: u64,
-    pub width: u64,
-    pub height: u64,
+    pub bitrate_kbps: u32,
+    pub width: u32,
+    pub height: u32,
     pub has_audio: bool,
     pub is_gif: bool,
     pub fallback_url: String,
@@ -275,18 +276,18 @@ pub struct RedditVideo {
     pub dash_url: String,
     pub hls_url: String,
     /// Duration in seconds
-    //#[serde_as(as = "DurationSeconds<u64>")]
-    pub duration: u64,
+    //#[serde_as(as = "DurationSeconds<u32>")]
+    pub duration: u32,
     pub transcoding_status: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SecureMediaEmbed {
     pub content: String,
-    pub width: i64,
+    pub width: u32,
     pub scrolling: bool,
     pub media_domain_url: String,
-    pub height: i64,
+    pub height: u32,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -310,8 +311,8 @@ pub struct RedditImage {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ImageBase {
     pub url: String,
-    pub width: i64,
-    pub height: i64,
+    pub width: u32,
+    pub height: u32,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -349,8 +350,8 @@ pub struct Oembed {
     pub provider_url: String,
     pub title: String,
     pub html: String,
-    pub height: i64,
-    pub width: i64,
+    pub height: u32,
+    pub width: u32,
     pub version: String,
     pub author_name: String,
     pub provider_name: String,

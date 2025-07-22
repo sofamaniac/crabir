@@ -5,53 +5,17 @@
 
 import '../frb_generated.dart';
 import '../third_party/reddit_api/client.dart';
-import '../third_party/reddit_api/model.dart';
-import '../third_party/reddit_api/model/feed.dart';
+import '../third_party/reddit_api/model/comment.dart';
 import '../third_party/reddit_api/model/post.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `new_bg_task`, `setup_the_logger`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`
+// These functions are ignored because they are not marked as `pub`: `setup_the_logger`
 
 void debugPost({required Post post}) =>
     RustLib.instance.api.crateApiSimpleDebugPost(post: post);
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FeedState>>
-abstract class FeedState implements RustOpaqueInterface {
-  bool get done;
-
-  Feed get feed;
-
-  int get length;
-
-  bool get loading;
-
-  Sort get sort;
-
-  String get sortString;
-
-  String get title;
-
-  factory FeedState({required Feed feed, required Sort sort}) =>
-      RustLib.instance.api.crateApiSimpleFeedStateNew(feed: feed, sort: sort);
-
-  /// Returns true if there is no more posts to load
-  Future<bool> next();
-
-  Post? nth({required int n});
-
-  Future<void> refresh();
-
-  /// Save / unsave a post
-  Future<void> save({required int index, required bool save});
-
-  set feed(Feed feed);
-
-  set sort(Sort sort);
-
-  /// Vote on a post
-  Future<void> vote({required int index, required VoteDirection direction});
-}
+void debugComment({required Comment comment}) =>
+    RustLib.instance.api.crateApiSimpleDebugComment(comment: comment);
 
 class RedditAPI {
   const RedditAPI();

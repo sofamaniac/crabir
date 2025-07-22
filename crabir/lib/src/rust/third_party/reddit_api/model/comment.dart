@@ -11,9 +11,9 @@ import 'multi.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'post.dart';
 import 'subreddit.dart';
-import 'user.dart';
+import 'user/model.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `eq`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `try_from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Comment>>
 abstract class Comment implements RustOpaqueInterface {
@@ -31,19 +31,19 @@ abstract class Comment implements RustOpaqueInterface {
 
   bool get collapsed;
 
-  PlatformInt64 get controversiality;
+  int get controversiality;
 
   double get created;
 
   double get createdUtc;
 
-  PlatformInt64 get depth;
+  int get depth;
 
-  PlatformInt64 get downs;
+  int get downs;
 
   double? get edited;
 
-  PlatformInt64 get gilded;
+  int get gilded;
 
   String get id;
 
@@ -65,7 +65,7 @@ abstract class Comment implements RustOpaqueInterface {
 
   bool get saved;
 
-  PlatformInt64 get score;
+  int get score;
 
   bool get scoreHidden;
 
@@ -81,7 +81,7 @@ abstract class Comment implements RustOpaqueInterface {
 
   String get subredditType;
 
-  PlatformInt64 get ups;
+  int get ups;
 
   set archived(bool archived);
 
@@ -97,19 +97,19 @@ abstract class Comment implements RustOpaqueInterface {
 
   set collapsed(bool collapsed);
 
-  set controversiality(PlatformInt64 controversiality);
+  set controversiality(int controversiality);
 
   set created(double created);
 
   set createdUtc(double createdUtc);
 
-  set depth(PlatformInt64 depth);
+  set depth(int depth);
 
-  set downs(PlatformInt64 downs);
+  set downs(int downs);
 
   set edited(double? edited);
 
-  set gilded(PlatformInt64 gilded);
+  set gilded(int gilded);
 
   set id(String id);
 
@@ -131,7 +131,7 @@ abstract class Comment implements RustOpaqueInterface {
 
   set saved(bool saved);
 
-  set score(PlatformInt64 score);
+  set score(int score);
 
   set scoreHidden(bool scoreHidden);
 
@@ -147,11 +147,23 @@ abstract class Comment implements RustOpaqueInterface {
 
   set subredditType(String subredditType);
 
-  set ups(PlatformInt64 ups);
+  set ups(int ups);
 
   static Future<Comment> default_() =>
       RustLib.instance.api.redditApiModelCommentCommentDefault();
 
   /// flutter_rust_bridge:getter,sync
   List<Thing> get replies;
+}
+
+enum CommentSort {
+  confidence,
+  top,
+  new_,
+  controversial,
+  old,
+  random,
+  qa,
+  live,
+  ;
 }

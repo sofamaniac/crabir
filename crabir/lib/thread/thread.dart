@@ -1,14 +1,72 @@
-import 'package:crabir/feed/post.dart';
-import 'package:crabir/flair.dart';
+import 'package:crabir/comment.dart';
+import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/src/rust/api/simple.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
+
+/// Returns the id of a comment.
+/// Throws an error if `comment` is not a `Thing_Comment` or a `Thing_More`.
+String _commentId(Thing comment) {
+  return switch (comment) {
+    Thing_Comment(field0: final comment) => comment.id,
+    Thing_More(id: final id) => id,
+    _ => throw Exception("[_commentId] Expected Thing_Comment or Thing_More")
+  };
+}
+
+class _CommentsState extends ChangeNotifier {
+  final Set<String> _collapsed = {};
+  final Set<String> _hidden = {};
+
+  bool collapsed(Thing comment) {
+    return _collapsed.contains(_commentId(comment));
+  }
+
+  bool hidden(Thing comment) {
+    return _hidden.contains(_commentId(comment));
+  }
+
+  void collapse(Comment comment) {
+    if (_collapsed.add(comment.id)) {
+      for (final reply in comment.replies) {
+        _hide(reply);
+      }
+    } else {
+      _collapsed.remove(comment.id);
+      for (final reply in comment.replies) {
+        _reveal(reply);
+      }
+    }
+    notifyListeners();
+  }
+
+  void _hide(Thing comment) {
+    _hidden.add(_commentId(comment));
+    switch (comment) {
+      case Thing_Comment(field0: final comment):
+        for (final reply in comment.replies) {
+          _hide(reply);
+        }
+      default:
+    }
+  }
+
+  void _reveal(Thing comment) {
+    _hidden.remove(_commentId(comment));
+    switch (comment) {
+      case Thing_Comment(field0: final comment):
+        for (final reply in comment.replies) {
+          _reveal(reply);
+        }
+      default:
+    }
+  }
+}
 
 class Thread extends StatefulWidget {
   final Post post;
@@ -19,17 +77,9 @@ class Thread extends StatefulWidget {
 
 class _ThreadState extends State<Thread> {
   List<Thing> comments = List.empty();
-  final Set<String> collapsedIds = {};
   List<Thing> flatComments = [];
   bool loaded = false;
   final log = Logger("Thread");
-
-  void toggle(String id) {
-    setState(() {
-      if (!collapsedIds.add(id)) collapsedIds.remove(id);
-    });
-    HapticFeedback.selectionClick();
-  }
 
   Future<void> handleLoadMore(Thing_More more) async {
     final newThings = await RedditAPI.client().loadMoreComments(
@@ -54,13 +104,13 @@ class _ThreadState extends State<Thread> {
       flatComments.removeAt(index);
       flatComments.insertAll(
         index,
-        flattenWithCollapse(newThings, collapsedIds),
+        flatten(newThings),
       );
     });
   }
 
-  PreferredSizeWidget appBar() {
-    return AppBar();
+  Widget appBar() {
+    return SliverAppBar();
   }
 
   @override
@@ -71,57 +121,45 @@ class _ThreadState extends State<Thread> {
             await RedditAPI.client().comments(permalink: widget.post.permalink);
         setState(() {
           loaded = true;
-          flatComments = flattenWithCollapse(comments, collapsedIds);
+          flatComments = flatten(comments);
         });
       });
     }
-    List<Thing> filteredList = [];
-    for (int index = 0; index < flatComments.length; index++) {
-      filteredList.add(flatComments[index]);
-      final id = switch (flatComments[index]) {
-        Thing_Comment(field0: final comment) => comment.id,
-        Thing_More(id: final id) => id,
-        _ => ""
-      };
-      if (collapsedIds.contains(id)) {
-        final currentDepth = switch (flatComments[index]) {
-          Thing_Comment(field0: final comment) => comment.depth,
-          Thing_More(depth: final depth) => depth,
-          _ => -1 >>> 1,
-        };
-        index++;
-        int depth = switch (flatComments[index]) {
-          Thing_Comment(field0: final comment) => comment.depth,
-          Thing_More(depth: final depth) => depth,
-          _ => -1 >>> 1,
-        };
-        while (depth > currentDepth) {
-          index++;
-          depth = switch (flatComments[index]) {
-            Thing_Comment(field0: final comment) => comment.depth,
-            Thing_More(depth: final depth) => depth,
-            _ => -1 >>> 1,
-          };
-        }
-      }
-    }
-    return Scaffold(
-      appBar: appBar(),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: RedditPostCard(
-              post: widget.post,
-              // max int (yes this is ugly)
-              maxLines: -1 >>> 1,
+    return NestedScrollView(
+      headerSliverBuilder: (context, innerBoxIsScrolled) => [appBar()],
+      floatHeaderSlivers: true,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            comments = [];
+            loaded = false;
+          });
+        },
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: RedditPostCard(
+                post: widget.post,
+                // max int (yes this is ugly)
+                maxLines: -1 >>> 1,
+              ),
             ),
-          ),
-          CommentsList(
-            comments: flatComments,
-            onLoadMore: handleLoadMore,
-            onToggle: toggle,
-          ),
-        ],
+            if (!loaded)
+              SliverToBoxAdapter(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            if (loaded)
+              ChangeNotifierProvider(
+                create: (context) => _CommentsState(),
+                child: CommentsList(
+                  comments: flatComments,
+                  onLoadMore: handleLoadMore,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -135,8 +173,8 @@ class IndentGuidesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.red
-      ..strokeWidth = 2.0;
+      ..color = Colors.grey.shade800
+      ..strokeWidth = 1.0;
 
     const double spacing = 12.0;
     for (int i = 0; i < depth; i++) {
@@ -150,7 +188,32 @@ class IndentGuidesPainter extends CustomPainter {
       oldDelegate.depth != depth;
 }
 
-class _CommentViewState extends State<CommentView> {
+class CommentBox extends StatelessWidget {
+  final Thing comment;
+  final void Function(Thing_More more) loadMore;
+  const CommentBox({super.key, required this.comment, required this.loadMore});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<_CommentsState>();
+    final inner = switch (comment) {
+      Thing_Comment(field0: final comment) => CommentRow(comment: comment),
+      Thing_More(count: final count) => TextButton(
+          onPressed: () => loadMore(comment as Thing_More),
+          child: Text("Load more comments ($count)"),
+        ),
+      _ => Container()
+    };
+
+    return AnimatedSize(
+      duration: Duration(milliseconds: 200),
+      alignment: Alignment.topCenter,
+      child: state.hidden(comment) ? SizedBox.shrink() : inner,
+    );
+  }
+}
+
+class _CommentViewHandlerState extends State<_CommentViewHandler> {
   bool showBottomBar = false;
   bool? likes;
   bool saved = false;
@@ -164,120 +227,35 @@ class _CommentViewState extends State<CommentView> {
   @override
   Widget build(BuildContext context) {
     final comment = widget.comment;
-    return GestureDetector(
-      onLongPress: widget.onLongPress,
-      onTap: () => setState(
-        () => showBottomBar = !showBottomBar,
-      ),
-      child: Card(
-        color: Colors.transparent,
-        child: AnimatedSize(
-          duration: Duration(milliseconds: 200),
-          alignment: Alignment.topCenter,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                spacing: 8,
-                children: [
-                  Text(
-                    comment.author?.username ?? "u/[deleted]",
-                  ),
-                  if (comment.author?.flair != null)
-                    Flexible(child: FlairView(flair: comment.author!.flair))
-                ],
-              ),
-              Html(
-                data: comment.bodyHtml,
-              ),
-              if (showBottomBar) bottomBar(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> upvote() async {
-    final direction = switch (likes) {
-      true => VoteDirection.neutral,
-      _ => VoteDirection.up,
-    };
-    await RedditAPI.client()
-        .vote(thing: widget.comment.name, direction: direction);
-    setState(() {
-      if (likes == true) {
-        likes = null;
-      } else {
-        likes = true;
-      }
-    });
-  }
-
-  Future<void> downvote() async {
-    final direction = switch (likes) {
-      false => VoteDirection.neutral,
-      _ => VoteDirection.down,
-    };
-    await RedditAPI.client()
-        .vote(thing: widget.comment.name, direction: direction);
-    setState(() {
-      if (likes == false) {
-        likes = null;
-      } else {
-        likes = false;
-      }
-    });
-  }
-
-  Widget bottomBar() {
-    final likeColor = Theme.of(context).colorScheme.primary;
-    final dislikeColor = Theme.of(context).colorScheme.secondary;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        IconButton(
-          onPressed: () => upvote(),
-          icon: Icon(Icons.thumb_up, color: (likes == true) ? likeColor : null),
-        ),
-        IconButton(
-          onPressed: () => downvote(),
-          icon: Icon(Icons.thumb_down,
-              color: (likes == false) ? dislikeColor : null),
-        ),
-        IconButton(
-          onPressed: () => (),
-          icon: Icon(Icons.book_outlined),
-        ),
-        IconButton(
-          onPressed: () => (),
-          icon: Icon(Icons.reply_rounded),
-        ),
-      ],
+    final _CommentsState state = context.watch();
+    return CommentView(
+      comment: comment,
+      onLongPress: () {
+        state.collapse(comment);
+        HapticFeedback.selectionClick();
+      },
+      animateBottomBar: true,
     );
   }
 }
 
-class CommentView extends StatefulWidget {
+class _CommentViewHandler extends StatefulWidget {
   final Comment comment;
-  final VoidCallback? onLongPress;
 
-  const CommentView({super.key, required this.comment, this.onLongPress});
+  const _CommentViewHandler({super.key, required this.comment});
 
   @override
-  State<StatefulWidget> createState() => _CommentViewState();
+  State<StatefulWidget> createState() => _CommentViewHandlerState();
 }
 
 class CommentsList extends StatefulWidget {
   final List<Thing> comments;
   final Future<void> Function(Thing_More more) onLoadMore;
-  final void Function(String id) onToggle;
 
   const CommentsList({
     super.key,
     required this.comments,
     required this.onLoadMore,
-    required this.onToggle,
   });
 
   @override
@@ -285,86 +263,83 @@ class CommentsList extends StatefulWidget {
 }
 
 class _CommentsListState extends State<CommentsList> {
-  final Set<String> collapsedIds = {};
-
   @override
   Widget build(BuildContext context) {
     return SliverList.builder(
       itemCount: widget.comments.length,
       itemBuilder: (context, index) {
         final comment = widget.comments[index];
-        return switch (comment) {
-          Thing_Comment(field0: final comment) => CommentRow(
-              comment: comment,
-              isCollapsed: collapsedIds.contains(comment.id),
-              onToggle: () => widget.onToggle(comment.id),
-            ),
-          Thing_More(count: final count) => TextButton(
-              onPressed: () => widget.onLoadMore(comment),
-              child: Text("Load more comments ($count)"),
-            ),
-          _ => SizedBox.shrink()
-        };
+        final commentView = CommentBox(
+          comment: comment,
+          loadMore: widget.onLoadMore,
+        );
+        if (index < widget.comments.length - 1 &&
+            depth(widget.comments[index + 1]) == 0) {
+          return Column(
+            children: [
+              commentView,
+              Divider(height: 0),
+            ],
+          );
+        }
+        return commentView;
       },
     );
   }
 }
 
-List<Thing> flattenWithCollapse(
+List<Thing> flatten(
   List<Thing> comments,
-  Set<String> collapsedIds,
 ) {
   final result = <Thing>[];
   for (final c in comments) {
     result.add(c);
-    final isCollapsed = switch (c) {
-      Thing_Comment(field0: final comment) => collapsedIds.contains(comment.id),
-      Thing_More(id: final id) => collapsedIds.contains(id),
-      _ => false
-    };
-    if (!isCollapsed) {
-      if (c is Thing_Comment) {
-        result.addAll(flattenWithCollapse(c.field0.replies, collapsedIds));
-      }
+    if (c is Thing_Comment) {
+      result.addAll(flatten(c.field0.replies));
     }
   }
   return result;
 }
 
+int depth(Thing comment) {
+  return switch (comment) {
+    Thing_Comment(field0: final comment) => comment.depth,
+    Thing_More(depth: final depth) => depth,
+    _ => -1,
+  };
+}
+
 class CommentRow extends StatelessWidget {
   final Comment comment;
-  final bool isCollapsed;
-  final VoidCallback onToggle;
 
   const CommentRow({
     super.key,
     required this.comment,
-    required this.isCollapsed,
-    required this.onToggle,
   });
 
   @override
   Widget build(BuildContext context) {
     final depth = comment.depth;
-    final indentWidth = 12.0;
+    final indentWidth = 16.0;
+
+    final List<Widget> dividers = [];
+
+    for (int i = 0; i < depth; i++) {
+      dividers.add(
+        VerticalDivider(
+          width: indentWidth,
+        ),
+      );
+    }
 
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(
-            width: depth * indentWidth,
-            child: Container(
-              color: Colors.transparent,
-              child: CustomPaint(
-                painter: IndentGuidesPainter(depth: depth),
-              ),
-            ),
-          ),
+          ...dividers,
           Expanded(
-            child: CommentView(
+            child: _CommentViewHandler(
               comment: comment,
-              onLongPress: onToggle,
             ),
           ),
         ],

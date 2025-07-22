@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::Error;
 
-use super::Thing;
+use super::{Fullname, Thing};
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -13,7 +13,7 @@ pub struct Multi {
     pub can_edit: bool,
     #[serde(rename = "display_name")]
     pub display_name: String,
-    pub name: String,
+    pub name: Fullname,
     #[serde(rename = "description_html")]
     pub description_html: String,
     #[serde(rename = "num_subscribers")]

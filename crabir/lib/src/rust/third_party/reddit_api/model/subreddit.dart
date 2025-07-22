@@ -4,20 +4,195 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../../frb_generated.dart';
+import '../model.dart';
 import 'flair.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
+part 'subreddit.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `try_from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `try_from`
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Common>>
+abstract class Common implements RustOpaqueInterface {
+  bool get acceptFollowers;
+
+  List<String> get allowedMediaInComments;
+
+  String get bannerImg;
+
+  Int64List? get bannerSize;
+
+  double get created;
+
+  double get createdUtc;
+
+  bool get disableContributorRequests;
+
+  String get displayName;
+
+  String get displayNamePrefixed;
+
+  bool get freeFormReports;
+
+  String? get headerImg;
+
+  Int64List? get headerSize;
+
+  String get keyColor;
+
+  bool get linkFlairEnabled;
+
+  String get linkFlairPosition;
+
+  Fullname get name;
+
+  String get primaryColor;
+
+  String get publicDescription;
+
+  bool get quarantine;
+
+  bool get restrictCommenting;
+
+  bool get restrictPosting;
+
+  bool get showMedia;
+
+  String get submitLinkLabel;
+
+  String get submitTextLabel;
+
+  String get subredditType;
+
+  PlatformInt64 get subscribers;
+
+  String get title;
+
+  String get url;
+
+  bool get userIsBanned;
+
+  bool get userIsContributor;
+
+  bool get userIsModerator;
+
+  bool get userIsMuted;
+
+  bool get userIsSubscriber;
+
+  set acceptFollowers(bool acceptFollowers);
+
+  set allowedMediaInComments(List<String> allowedMediaInComments);
+
+  set bannerImg(String bannerImg);
+
+  set bannerSize(Int64List? bannerSize);
+
+  set created(double created);
+
+  set createdUtc(double createdUtc);
+
+  set disableContributorRequests(bool disableContributorRequests);
+
+  set displayName(String displayName);
+
+  set displayNamePrefixed(String displayNamePrefixed);
+
+  set freeFormReports(bool freeFormReports);
+
+  set headerImg(String? headerImg);
+
+  set headerSize(Int64List? headerSize);
+
+  set keyColor(String keyColor);
+
+  set linkFlairEnabled(bool linkFlairEnabled);
+
+  set linkFlairPosition(String linkFlairPosition);
+
+  set name(Fullname name);
+
+  set primaryColor(String primaryColor);
+
+  set publicDescription(String publicDescription);
+
+  set quarantine(bool quarantine);
+
+  set restrictCommenting(bool restrictCommenting);
+
+  set restrictPosting(bool restrictPosting);
+
+  set showMedia(bool showMedia);
+
+  set submitLinkLabel(String submitLinkLabel);
+
+  set submitTextLabel(String submitTextLabel);
+
+  set subredditType(String subredditType);
+
+  set subscribers(PlatformInt64 subscribers);
+
+  set title(String title);
+
+  set url(String url);
+
+  set userIsBanned(bool userIsBanned);
+
+  set userIsContributor(bool userIsContributor);
+
+  set userIsModerator(bool userIsModerator);
+
+  set userIsMuted(bool userIsMuted);
+
+  set userIsSubscriber(bool userIsSubscriber);
+
+  static Future<Common> default_() =>
+      RustLib.instance.api.redditApiModelSubredditCommonDefault();
+
+  /// flutter_rust_bridge:getter,sync
+  SubredditIcon get icon;
+}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Details>>
+abstract class Details implements RustOpaqueInterface {
+  bool get defaultSet;
+
+  String get description;
+
+  String get iconColor;
+
+  Common get other;
+
+  bool get over18;
+
+  List<String> get previousNames;
+
+  set defaultSet(bool defaultSet);
+
+  set description(String description);
+
+  set iconColor(String iconColor);
+
+  set other(Common other);
+
+  set over18(bool over18);
+
+  set previousNames(List<String> previousNames);
+
+  static Future<Details> default_() =>
+      RustLib.instance.api.redditApiModelSubredditDetailsDefault();
+
+  /// flutter_rust_bridge:getter,sync
+  SubredditIcon get icon;
+}
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Subreddit>>
 abstract class Subreddit implements RustOpaqueInterface {
-  bool get acceptFollowers;
-
-  BigInt? get accountsActive;
+  int? get accountsActive;
 
   bool get accountsActiveIsFuzzed;
 
-  BigInt get activeUserCount;
+  int get activeUserCount;
 
   String get advertiserCategory;
 
@@ -43,15 +218,9 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   bool get allowVideos;
 
-  List<String> get allowedMediaInComments;
-
   String get bannerBackgroundColor;
 
   String get bannerBackgroundImage;
-
-  String get bannerImg;
-
-  Int64List? get bannerSize;
 
   bool get canAssignLinkFlair;
 
@@ -65,31 +234,15 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   bool get communityReviewed;
 
-  double get created;
-
-  double get createdUtc;
-
   String get description;
 
   String? get descriptionHtml;
-
-  bool get disableContributorRequests;
-
-  String get displayName;
-
-  String get displayNamePrefixed;
 
   Int64List? get emojisCustomSize;
 
   bool get emojisEnabled;
 
-  bool get freeFormReports;
-
   bool get hasMenuWidget;
-
-  String? get headerImg;
-
-  Int64List? get headerSize;
 
   String get headerTitle;
 
@@ -101,45 +254,27 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   bool? get isEnrolledInNewModmail;
 
-  String get keyColor;
-
   String get lang;
 
-  bool get linkFlairEnabled;
-
-  String get linkFlairPosition;
-
   String get mobileBannerImage;
-
-  String get name;
 
   String? get notificationLevel;
 
   bool get originalContentTagEnabled;
 
+  Common get other;
+
   bool get over18;
 
   PlatformInt64 get predictionLeaderboardEntryType;
-
-  String get primaryColor;
-
-  String get publicDescription;
 
   String? get publicDescriptionHtml;
 
   bool get publicTraffic;
 
-  bool get quarantine;
-
-  bool get restrictCommenting;
-
-  bool get restrictPosting;
-
   bool get shouldArchivePosts;
 
   bool get shouldShowMediaInCommentsSetting;
-
-  bool get showMedia;
 
   bool get showMediaPreview;
 
@@ -147,23 +282,11 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   String get submissionType;
 
-  String get submitLinkLabel;
-
   String get submitText;
 
   String? get submitTextHtml;
 
-  String get submitTextLabel;
-
-  String get subredditType;
-
-  PlatformInt64 get subscribers;
-
   String? get suggestedCommentSort;
-
-  String get title;
-
-  String get url;
 
   bool? get userCanFlairInSr;
 
@@ -173,31 +296,19 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   bool get userHasFavorited;
 
-  bool get userIsBanned;
-
-  bool get userIsContributor;
-
-  bool get userIsModerator;
-
-  bool get userIsMuted;
-
-  bool get userIsSubscriber;
-
   bool? get userSrFlairEnabled;
 
   bool get userSrThemeEnabled;
 
   bool? get wikiEnabled;
 
-  BigInt? get wls;
+  int? get wls;
 
-  set acceptFollowers(bool acceptFollowers);
-
-  set accountsActive(BigInt? accountsActive);
+  set accountsActive(int? accountsActive);
 
   set accountsActiveIsFuzzed(bool accountsActiveIsFuzzed);
 
-  set activeUserCount(BigInt activeUserCount);
+  set activeUserCount(int activeUserCount);
 
   set advertiserCategory(String advertiserCategory);
 
@@ -223,15 +334,9 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   set allowVideos(bool allowVideos);
 
-  set allowedMediaInComments(List<String> allowedMediaInComments);
-
   set bannerBackgroundColor(String bannerBackgroundColor);
 
   set bannerBackgroundImage(String bannerBackgroundImage);
-
-  set bannerImg(String bannerImg);
-
-  set bannerSize(Int64List? bannerSize);
 
   set canAssignLinkFlair(bool canAssignLinkFlair);
 
@@ -246,31 +351,15 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   set communityReviewed(bool communityReviewed);
 
-  set created(double created);
-
-  set createdUtc(double createdUtc);
-
   set description(String description);
 
   set descriptionHtml(String? descriptionHtml);
-
-  set disableContributorRequests(bool disableContributorRequests);
-
-  set displayName(String displayName);
-
-  set displayNamePrefixed(String displayNamePrefixed);
 
   set emojisCustomSize(Int64List? emojisCustomSize);
 
   set emojisEnabled(bool emojisEnabled);
 
-  set freeFormReports(bool freeFormReports);
-
   set hasMenuWidget(bool hasMenuWidget);
-
-  set headerImg(String? headerImg);
-
-  set headerSize(Int64List? headerSize);
 
   set headerTitle(String headerTitle);
 
@@ -282,46 +371,28 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   set isEnrolledInNewModmail(bool? isEnrolledInNewModmail);
 
-  set keyColor(String keyColor);
-
   set lang(String lang);
 
-  set linkFlairEnabled(bool linkFlairEnabled);
-
-  set linkFlairPosition(String linkFlairPosition);
-
   set mobileBannerImage(String mobileBannerImage);
-
-  set name(String name);
 
   set notificationLevel(String? notificationLevel);
 
   set originalContentTagEnabled(bool originalContentTagEnabled);
+
+  set other(Common other);
 
   set over18(bool over18);
 
   set predictionLeaderboardEntryType(
       PlatformInt64 predictionLeaderboardEntryType);
 
-  set primaryColor(String primaryColor);
-
-  set publicDescription(String publicDescription);
-
   set publicDescriptionHtml(String? publicDescriptionHtml);
 
   set publicTraffic(bool publicTraffic);
 
-  set quarantine(bool quarantine);
-
-  set restrictCommenting(bool restrictCommenting);
-
-  set restrictPosting(bool restrictPosting);
-
   set shouldArchivePosts(bool shouldArchivePosts);
 
   set shouldShowMediaInCommentsSetting(bool shouldShowMediaInCommentsSetting);
-
-  set showMedia(bool showMedia);
 
   set showMediaPreview(bool showMediaPreview);
 
@@ -329,23 +400,11 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   set submissionType(String submissionType);
 
-  set submitLinkLabel(String submitLinkLabel);
-
   set submitText(String submitText);
 
   set submitTextHtml(String? submitTextHtml);
 
-  set submitTextLabel(String submitTextLabel);
-
-  set subredditType(String subredditType);
-
-  set subscribers(PlatformInt64 subscribers);
-
   set suggestedCommentSort(String? suggestedCommentSort);
-
-  set title(String title);
-
-  set url(String url);
 
   set userCanFlairInSr(bool? userCanFlairInSr);
 
@@ -355,29 +414,19 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   set userHasFavorited(bool userHasFavorited);
 
-  set userIsBanned(bool userIsBanned);
-
-  set userIsContributor(bool userIsContributor);
-
-  set userIsModerator(bool userIsModerator);
-
-  set userIsMuted(bool userIsMuted);
-
-  set userIsSubscriber(bool userIsSubscriber);
-
   set userSrFlairEnabled(bool? userSrFlairEnabled);
 
   set userSrThemeEnabled(bool userSrThemeEnabled);
 
   set wikiEnabled(bool? wikiEnabled);
 
-  set wls(BigInt? wls);
+  set wls(int? wls);
 
   static Future<Subreddit> default_() =>
       RustLib.instance.api.redditApiModelSubredditSubredditDefault();
 
   /// flutter_rust_bridge:getter,sync
-  Icon? get icon;
+  SubredditIcon get icon;
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SubredditID>>
@@ -388,15 +437,17 @@ abstract class SubredditId implements RustOpaqueInterface {
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SubredditInfo>>
 abstract class SubredditInfo implements RustOpaqueInterface {
+  Details? get details;
+
   String get subreddit;
 
   SubredditId get subredditId;
 
   String get subredditNamePrefixed;
 
-  String get subredditType;
+  int get subscribers;
 
-  BigInt get subscribers;
+  set details(Details? details);
 
   set subreddit(String subreddit);
 
@@ -404,9 +455,7 @@ abstract class SubredditInfo implements RustOpaqueInterface {
 
   set subredditNamePrefixed(String subredditNamePrefixed);
 
-  set subredditType(String subredditType);
-
-  set subscribers(BigInt subscribers);
+  set subscribers(int subscribers);
 
   static Future<SubredditInfo> default_() =>
       RustLib.instance.api.redditApiModelSubredditSubredditInfoDefault();
@@ -464,4 +513,16 @@ enum NotificationLevel {
 
   static Future<NotificationLevel> default_() =>
       RustLib.instance.api.redditApiModelSubredditNotificationLevelDefault();
+}
+
+@freezed
+sealed class SubredditIcon with _$SubredditIcon {
+  const SubredditIcon._();
+
+  const factory SubredditIcon.image(
+    Icon field0,
+  ) = SubredditIcon_Image;
+  const factory SubredditIcon.color(
+    String field0,
+  ) = SubredditIcon_Color;
 }

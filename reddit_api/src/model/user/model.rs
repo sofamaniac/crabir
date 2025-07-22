@@ -1,5 +1,28 @@
 use serde::{Deserialize, Serialize};
 
+use crate::model::{Fullname, Timeframe};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// flutter_rust_bridge:non_opaque
+pub enum UserStreamSort {
+    Hot,
+    Top(Timeframe),
+    New,
+    Controversial(Timeframe),
+}
+impl UserStreamSort {
+    pub(crate) fn to_query(self) -> Vec<(&'static str, &'static str)> {
+        match self {
+            Self::Hot => vec![("sort", "hot")],
+            Self::New => vec![("sort", "new")],
+            Self::Top(timeframe) => vec![("sort", "top"), ("t", timeframe.as_query_param())],
+            Self::Controversial(timeframe) => {
+                vec![("sort", "controversial"), ("t", timeframe.as_query_param())]
+            }
+        }
+    }
+}
+
 /// Info return by /u/me/about.json
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -58,6 +81,11 @@ pub struct User {
     pub has_visited_new_profile: bool,
     #[serde(rename = "has_external_account")]
     pub has_external_account: bool,
+}
+impl User {
+    pub(crate) fn name(&self) -> crate::model::Fullname {
+        Fullname(format!("t2_{}", self.info.id))
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
