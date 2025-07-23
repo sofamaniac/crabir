@@ -1,5 +1,5 @@
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
-import 'package:crabir/drawer.dart';
+import 'package:crabir/drawer/drawer.dart';
 import 'package:crabir/login.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/user.dart';
@@ -49,7 +49,13 @@ class Crabir extends StatelessWidget {
       child: MaterialApp(
         themeMode: ThemeMode.system,
         theme: ThemeData.light(useMaterial3: true),
-        darkTheme: ThemeData.dark(useMaterial3: true),
+        //darkTheme: ThemeData.dark(useMaterial3: true),
+        darkTheme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.orange,
+            brightness: Brightness.dark,
+          ),
+        ),
         home: DefaultTabController(
           length: 5,
           child: Scaffold(
