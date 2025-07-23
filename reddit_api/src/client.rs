@@ -1,8 +1,7 @@
-use crate::model::comment::Comment;
 use crate::model::feed::{self, Feed};
 use crate::model::{Fullname, comment, user};
+use crate::result::Result;
 use crate::streamable::Streamable;
-use crate::{model::feed::FeedStream, result::Result};
 use std::backtrace::Backtrace;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -11,7 +10,7 @@ use base64::Engine;
 use base64::prelude::BASE64_URL_SAFE_NO_PAD;
 use chrono::{DateTime, Utc};
 use futures::{Stream, lock::Mutex};
-use futures::{StreamExt, TryStreamExt, stream};
+use futures::{TryStreamExt, stream};
 use log::{debug, error, info};
 use reqwest::RequestBuilder;
 
@@ -24,7 +23,7 @@ use uuid::Uuid;
 
 use crate::{
     error::Error,
-    model::{Listing, Thing, post::Post, user::model::UserInfo},
+    model::{Listing, Thing, user::model::UserInfo},
 };
 
 const USER_AGENT: &str = dotenv_codegen::dotenv!("USER_AGENT");
@@ -260,9 +259,12 @@ impl Client {
         #[derive(Deserialize)]
         struct Response {
             access_token: String,
-            token_type: String,
-            expires_in: u64,
-            scope: String,
+            #[serde(rename = "token_type")]
+            _token_type: String,
+            #[serde(rename = "expires_in")]
+            _expires_in: u64,
+            #[serde(rename = "scope")]
+            _scope: String,
         }
         let response = self.http.execute(request).await?;
         let response: Response = parse_response(response).await?;
@@ -325,35 +327,6 @@ impl Client {
         res.error_for_status().map_err(Into::into)
     }
 
-    pub(crate) async fn feed_request(
-        &self,
-        feed: &Feed,
-        sort: &feed::FeedSort,
-        pager: &Pager,
-    ) -> Result<Listing> {
-        let base_url = self.base_url();
-        let url = match feed {
-            Feed::Home => base_url.clone(),
-            Feed::All => base_url.join("r/all/").expect("Should not fail."),
-            Feed::Popular => base_url.join("r/popular/").expect("Should not fail."),
-            Feed::Subreddit(subreddit) => base_url
-                .join(&format!("r/{subreddit}/"))
-                .expect("Should not fail"),
-        };
-        let url = sort.add_to_url(&url);
-        let url = pager.add_to_url(url);
-        let request = self.get(url);
-        let request = request.query(&[("sr_detail", "true")]);
-        let posts = self.execute(request).await?;
-        let json = parse_response(posts).await?;
-        match json {
-            Thing::Listing(listing) => Ok(listing),
-            _ => Err(Error::InvalidThing {
-                backtrace: Backtrace::capture(),
-            }),
-        }
-    }
-
     /// flutter_rust_bridge:sync
     pub fn feed_stream(&self, feed: &Feed, sort: &feed::FeedSort) -> Streamable {
         let base_url = self.base_url();
@@ -375,31 +348,6 @@ impl Client {
         let response = self.execute(request).await?;
         let json = parse_response(response).await?;
         Ok(json)
-    }
-
-    /// Get one page of a listing.
-    async fn paged_request<T: TryFrom<Thing>>(
-        &self,
-        url: &Url,
-        pager: &Pager,
-    ) -> Result<(Vec<T>, Pager)> {
-        let listing = self.paged_listing(url, pager).await?;
-        let mut pager = Pager::default();
-        pager.after(listing.after);
-        let things = listing
-            .children
-            .into_iter()
-            .filter_map(|e| e.try_into().ok())
-            .collect();
-        Ok((things, pager))
-    }
-
-    async fn paged_listing(&self, url: &Url, pager: &Pager) -> Result<Listing> {
-        let url = pager.add_to_url(url.clone());
-        let request = self.get(url);
-        let response = self.execute(request).await?;
-        let thing: Thing = parse_response(response).await?;
-        thing.try_into()
     }
 
     fn stream_listing(
@@ -670,7 +618,7 @@ impl Client {
             .expect("Should not fail.");
         let request = self.get(url);
         let request = if let Some(sort) = sort {
-            request.query(&[("sort", sort.to_url())])
+            request.query(&[("sort", sort.as_url())])
         } else {
             request
         };
@@ -717,7 +665,7 @@ impl Client {
             ("link_id", parent_id.as_ref()),
         ]);
         let request = if let Some(sort) = sort {
-            request.query(&[("sort", sort.to_url())])
+            request.query(&[("sort", sort.as_url())])
         } else {
             request
         };

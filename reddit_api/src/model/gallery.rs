@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::post::{ImageBase, RedditImage, Variants};
+use super::post::ImageBase;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
 pub struct Gallery {
@@ -15,7 +15,7 @@ impl Gallery {
     pub fn get(&self, index: u32) -> ImageBase {
         // TODO: support for resolution, and obfuscation
         let id = &self.gallery_data.items[index as usize];
-        if let MediaMetadata::Media { source: source, .. } =
+        if let MediaMetadata::Media(Media { source, .. }) =
             self.media_metadata.get(&id.media_id).unwrap()
         {
             source.clone().into()
@@ -47,21 +47,25 @@ pub struct MediaId {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "status")]
+pub struct Media {
+    #[serde(rename = "e")]
+    pub kind: MediaKind,
+    #[serde(rename = "m")]
+    /// A string like "image/jpg", or "image/gif"
+    pub media_type: String,
+    #[serde(rename = "s")]
+    source: Image,
+    #[serde(rename = "p")]
+    previews: Vec<Image>,
+    #[serde(rename = "o", default)]
+    obfuscated: Vec<Image>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "status")]
 pub enum MediaMetadata {
     #[serde(rename = "valid")]
-    Media {
-        #[serde(rename = "e")]
-        kind: MediaKind,
-        #[serde(rename = "m")]
-        /// A string like "image/jpg", or "image/gif"
-        media_type: String,
-        #[serde(rename = "s")]
-        source: Image,
-        #[serde(rename = "p")]
-        previews: Vec<Image>,
-        #[serde(rename = "o", default)]
-        obfuscated: Vec<Image>,
-    },
+    Media(Media),
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

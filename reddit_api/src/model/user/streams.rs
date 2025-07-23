@@ -2,7 +2,6 @@
 // Copyright (c) 2025 sofamaniac. All Rights Reserved.
 
 use super::model::UserStreamSort;
-use crate::streamable::IntoStream;
 use crate::streamable::stream::IntoStreamPrivate;
 use crate::{client::Client, model::Thing, result::Result};
 use futures::stream::BoxStream;

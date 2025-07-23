@@ -3,7 +3,6 @@ use std::backtrace::Backtrace;
 use comment::Comment;
 use multi::Multi;
 pub use post::Post;
-use reqwest::Url;
 use serde::{Deserialize, Serialize};
 use subreddit::Subreddit;
 use user::model::User;

@@ -136,7 +136,7 @@ pub enum CommentSort {
 }
 
 impl CommentSort {
-    pub(crate) fn to_url(&self) -> &'static str {
+    pub(crate) fn as_url(&self) -> &'static str {
         match self {
             Self::Confidence => "confidence",
             Self::Top => "top",

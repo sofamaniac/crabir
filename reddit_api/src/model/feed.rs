@@ -1,13 +1,11 @@
-use std::pin::Pin;
-
-use crate::client::{Client, Pager};
+use crate::client::Client;
 use crate::result::Result;
 use crate::streamable::stream::IntoStreamPrivate;
 pub use futures::{Stream, StreamExt};
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
-use super::{Listing, Post, Thing, Timeframe};
+use super::{Thing, Timeframe};
 
 /// All the kind of available feeds on reddit
 #[derive(Debug, Default, PartialEq, Eq, Clone)]
