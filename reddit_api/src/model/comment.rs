@@ -57,7 +57,7 @@ pub struct Comment {
     // pub user_reports: Vec<Value>,
     // pub banned_at_utc: Value,
     // pub mod_reason_title: Value,
-    pub gilded: u32,
+    pub gilded: i32,
     pub archived: bool,
     // pub collapsed_reason_code: Value,
     pub no_follow: bool,
@@ -65,7 +65,7 @@ pub struct Comment {
     pub created_utc: f64,
     pub send_replies: bool,
     pub parent_id: String,
-    pub score: u32,
+    pub score: i32,
     // pub approved_by: Value,
     // pub mod_note: Value,
     // pub all_awardings: Vec<Value>,
@@ -76,7 +76,7 @@ pub struct Comment {
     // pub top_awarded_type: Value,
     pub name: Fullname,
     pub is_submitter: bool,
-    pub downs: u32,
+    pub downs: i32,
     pub body_html: String,
     // pub removal_reason: Value,
     // pub collapsed_reason: Value,
@@ -93,14 +93,14 @@ pub struct Comment {
     pub created: f64,
     // pub treatment_tags: Vec<Value>,
     pub link_id: String,
-    pub controversiality: u32,
+    pub controversiality: i32,
     // Depth is absent when requesting the user's overview.
     #[serde(default)]
-    pub depth: u32,
+    pub depth: i32,
     // pub collapsed_because_crowd_control: Value,
     // pub mod_reports: Vec<Value>,
     // pub num_reports: Value,
-    pub ups: u32,
+    pub ups: i32,
 }
 
 impl Comment {

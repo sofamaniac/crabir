@@ -15,7 +15,7 @@ impl Gallery {
     pub fn get(&self, index: u32) -> ImageBase {
         // TODO: support for resolution, and obfuscation
         let id = &self.gallery_data.items[index as usize];
-        if let MediaMetadata::Media(Media { source, .. }) =
+        if let MediaMetadata::Media(GalleryMedia { source, .. }) =
             self.media_metadata.get(&id.media_id).unwrap()
         {
             source.clone().into()
@@ -47,7 +47,7 @@ pub struct MediaId {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "status")]
-pub struct Media {
+pub struct GalleryMedia {
     #[serde(rename = "e")]
     pub kind: MediaKind,
     #[serde(rename = "m")]
@@ -65,7 +65,7 @@ pub struct Media {
 #[serde(tag = "status")]
 pub enum MediaMetadata {
     #[serde(rename = "valid")]
-    Media(Media),
+    Media(GalleryMedia),
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

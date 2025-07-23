@@ -62,7 +62,7 @@ pub struct Post {
     pub downs: u32,
     pub upvote_ratio: f64,
     pub ups: u32,
-    pub score: u32,
+    pub score: i32,
 
     #[serde(flatten, with = "prefix_link_flair")]
     pub link_flair: Flair,
@@ -142,8 +142,8 @@ pub struct Post {
     pub gildings: Gildings,
     #[serde_as(deserialize_as = "serde_with::DefaultOnNull")]
     pub content_categories: Vec<String>,
-    pub wls: Option<u32>,
-    pub pwls: Option<u32>,
+    pub wls: Option<i32>,
+    pub pwls: Option<i32>,
     pub allow_live_comments: bool,
     pub no_follow: bool,
     pub all_awardings: Vec<Option<String>>,
