@@ -40,17 +40,19 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
         status: AccountStatus.uninit,
       ));
     } else {
-      if (currentAccount?.id == UserAccount.anonymous().id) {
+      if (currentAccount == UserAccount.anonymous()) {
         await RedditAPI.client().newLoggedOutUserToken();
       } else {
         await RedditAPI.client().authenticate(
-          refreshToken: currentAccount!.refreshToken ?? "random",
+          refreshToken: currentAccount!.refreshToken!,
         );
       }
-      emit(AccountState(
-        status: AccountStatus.unloaded,
-        account: currentAccount,
-      ));
+      emit(
+        AccountState(
+          status: AccountStatus.unloaded,
+          account: currentAccount,
+        ),
+      );
     }
   }
 

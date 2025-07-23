@@ -20,6 +20,7 @@ use serde::{
     Deserialize,
     de::{DeserializeOwned, Error as _},
 };
+use uuid::Uuid;
 
 use crate::{
     error::Error,
@@ -240,14 +241,15 @@ impl Client {
         debug!("NEW LOGGED OUT USER TOKEN CREATION");
         let url =
             Url::parse("https://www.reddit.com/api/v1/access_token").expect("Should not fail");
-        //FIXME: should be random per user;
-        let device_id = "6314586208524fac959440a7f7a0ab";
+        // WARN: Reddit recommends having a unique UUID per user, but with this method it will be
+        // unique per session.
+        let device_id = Uuid::new_v4().simple().to_string();
         let mut body = HashMap::new();
         body.insert(
             "grant_type",
             "https://oauth.reddit.com/grants/installed_client",
         );
-        body.insert("device_id", device_id);
+        body.insert("device_id", &device_id);
         let request = self
             .http
             .post(url)

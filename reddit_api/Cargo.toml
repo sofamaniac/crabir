@@ -19,6 +19,7 @@ serde = { version = "1.0.219", features = ["derive"] }
 serde_json = { version = "1.0.140", features = ["unbounded_depth"] }
 serde_with = { version = "3.12.0", features = ["chrono_0_4"] }
 thiserror = "2.0.12"
+uuid = { version = "1.17.0", features = ["v4"] }
 
 [dev-dependencies]
 tokio = { version = "1.45.0", features = ["full"] }
