@@ -686,6 +686,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Preview dco_decode_preview(dynamic raw);
 
   @protected
+  (
+    Post,
+    List<Thing>
+  ) dco_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_post_list_thing(
+      dynamic raw);
+
+  @protected
   RedditAPI dco_decode_reddit_api(dynamic raw);
 
   @protected
@@ -1352,6 +1359,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Preview sse_decode_preview(SseDeserializer deserializer);
+
+  @protected
+  (
+    Post,
+    List<Thing>
+  ) sse_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_post_list_thing(
+      SseDeserializer deserializer);
 
   @protected
   RedditAPI sse_decode_reddit_api(SseDeserializer deserializer);
@@ -2038,6 +2052,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_preview(Preview self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_post_list_thing(
+          (Post, List<Thing>) self, SseSerializer serializer);
 
   @protected
   void sse_encode_reddit_api(RedditAPI self, SseSerializer serializer);

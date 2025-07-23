@@ -7,9 +7,9 @@ import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/stream/bloc/stream_bloc.dart';
 import 'package:crabir/stream/things_view.dart';
-import 'package:crabir/thread/thread.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
 
 class FeedView extends StatelessWidget {
@@ -99,12 +99,13 @@ class _FeedViewBodyState extends State<FeedViewBody>
                   onSave: (save) async {
                     state.add(Save(saved: save, name: post.name));
                   },
-                  onTap: () => Navigator.push(
-                    context,
-                    SwipeablePageRoute(
-                      builder: (context) => Thread(post: post),
-                    ),
-                  ),
+                  onTap: () => context.push(post.permalink),
+                  // Navigator.push(
+                  //   context,
+                  //   SwipeablePageRoute(
+                  //     builder: (context) => Thread(post: post),
+                  //   ),
+                  // ),
                 );
               },
             ),
@@ -115,32 +116,6 @@ class _FeedViewBodyState extends State<FeedViewBody>
     );
   }
 }
-
-// Widget _postView(BuildContext context, Post post) {
-//   final state = context.read<StreamBloc>();
-//   return RedditPostCard(
-//     post: post,
-//     onLike: (direction) async {
-//       state.add(Vote(direction: direction, name: post.name));
-//     },
-//     onSave: (save) async {
-//       state.add(Save(saved: save, name: post.name));
-//     },
-//     // onTap: () => Navigator.push(
-//     //   context,
-//     //   CupertinoPageRoute(
-//     //     builder: (context) => Thread(post: post),
-//     //   ),
-//     // ),
-//     onTap: () => Navigator.push(
-//       context,
-//       SwipeablePageRoute(
-//         child: Thread(post: post),
-//         previousPage: FeedView(feed: widget.feed, initialSort: sort),
-//       ),
-//     ),
-//   );
-// }
 
 const timeOptions = [
   Timeframe.hour,

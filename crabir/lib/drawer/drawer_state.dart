@@ -45,7 +45,8 @@ class DrawerState extends State<AppDrawer> {
                   if (account.account != null) ...[
                     CircleAvatar(
                       radius: 32,
-                      child: Image.network(account.account!.profilePicture),
+                      foregroundImage:
+                          NetworkImage(account.account!.profilePicture),
                     ),
                     Text(account.account!.username)
                   ] else
@@ -55,13 +56,6 @@ class DrawerState extends State<AppDrawer> {
               ),
             ),
           );
-          // return UserAccountsDrawerHeader(
-          //   decoration: BoxDecoration(color: Colors.black),
-          //   currentAccountPicture: Image.network(account.account!.profilePicture),
-          //   accountName: Text(account.account!.username),
-          //   accountEmail: null,
-          //   onDetailsPressed: changeMode,
-          // );
         } else {
           return CircularProgressIndicator();
         }
@@ -77,20 +71,23 @@ class DrawerState extends State<AppDrawer> {
     return Expanded(
       child: ListView(
         children: [
-          ...state.accounts.mapIndexed((index, account) => InkWell(
+          ...state.accounts.mapIndexed(
+            (index, account) => ListTile(
               onTap: () async {
                 state.add(SelectAccount(index: index));
                 // close menu after selection
                 changeMode(isSelectingAccount: false);
               },
-              child: account.build(context))),
-          InkWell(
+              title: Text(account.username),
+            ),
+          ),
+          ListTile(
             onTap: () async {
               if (await loginToReddit()) {
                 state.add(Initialize());
               }
             },
-            child: Text("Add an account"),
+            title: Text("Add an account"),
           )
         ],
       ),

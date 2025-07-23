@@ -22,6 +22,47 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
 
   DrawerFeedSelectionState();
 
+  List<Widget> baseFeeds(BuildContext context) {
+    return [
+      ListTile(
+        title: Text("Home"),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FeedView(
+              feed: Feed.home(),
+              initialSort: FeedSort.best(),
+            ),
+          ),
+        ),
+      ),
+      ListTile(
+        title: Text("Popular"),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FeedView(
+              feed: Feed.popular(),
+              initialSort: FeedSort.best(),
+            ),
+          ),
+        ),
+      ),
+      ListTile(
+        title: Text("All"),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FeedView(
+              feed: Feed.all(),
+              initialSort: FeedSort.best(),
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = context.read<AccountsBloc>();
@@ -36,7 +77,7 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
             fit: FlexFit.loose,
             child: ListView(
               children: [
-                ...feeds.map((feed) => ListTile(title: Text(feed))),
+                ...baseFeeds(context),
                 Divider(),
                 ...userOptions.map((option) => ListTile(title: Text(option))),
                 Divider(),
@@ -64,15 +105,11 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
 
 Widget _subredditView(BuildContext context, subreddit.Subreddit sub) {
   return ListTile(
-    onTap: () => Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => FeedView(
-          feed: Feed.subreddit(sub.other.displayName),
-          initialSort: FeedSort.best(),
-        ),
-      ),
-    ),
+    onTap: () {
+      // close drawer
+      Navigator.pop(context);
+      context.push("/r/${sub.other.displayName}");
+    },
     leading: SubredditIcon(icon: sub.icon, radius: 16),
     title: Text(
       sub.other.displayNamePrefixed,

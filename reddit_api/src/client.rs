@@ -1,5 +1,5 @@
 use crate::model::feed::{self, Feed};
-use crate::model::{Fullname, comment, user};
+use crate::model::{Fullname, Post, comment, user};
 use crate::result::Result;
 use crate::streamable::Streamable;
 use std::backtrace::Backtrace;
@@ -611,7 +611,7 @@ impl Client {
         &self,
         permalink: String,
         sort: Option<comment::CommentSort>,
-    ) -> Result<Vec<Thing>> {
+    ) -> Result<(Post, Vec<Thing>)> {
         let url = self
             .base_url()
             .join(&format!("{permalink}.json"))
@@ -624,8 +624,13 @@ impl Client {
         };
         let result = self.execute(request).await?;
         let result: [Thing; 2] = parse_response(result).await?;
-        if let [_, Thing::Listing(comments)] = result {
-            Ok(comments.children)
+        if let [Thing::Listing(post), Thing::Listing(comments)] = result {
+            match post.children.first() {
+                Some(Thing::Post(post)) => Ok((post.clone(), comments.children)),
+                _ => Err(Error::InvalidThing {
+                    backtrace: Backtrace::capture(),
+                }),
+            }
         } else {
             Err(Error::InvalidThing {
                 backtrace: Backtrace::capture(),

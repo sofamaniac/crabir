@@ -9,7 +9,7 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 android_logger = "0.15.0"
 chrono = "0.4.41"
-flutter_rust_bridge = { version = "=2.10.0", features = ["chrono"] }
+flutter_rust_bridge = { version = "=2.11.1", features = ["chrono"] }
 futures = "0.3.31"
 log = "0.4.27"
 reddit_api = { path = "../reddit_api" }

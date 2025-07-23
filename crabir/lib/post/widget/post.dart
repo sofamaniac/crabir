@@ -12,6 +12,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 final horizontalPadding = 16.0;
 
@@ -114,15 +115,16 @@ class _RedditPostCardState extends State<RedditPostCard> {
     return Row(
       children: [
         InkWell(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => FeedView(
-                feed: Feed.subreddit(subreddit),
-                initialSort: FeedSort.best(),
-              ),
-            ),
-          ),
+          onTap: () => context.push("/r/$subreddit"),
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (_) => FeedView(
+          //       feed: Feed.subreddit(subreddit),
+          //       initialSort: FeedSort.best(),
+          //     ),
+          //   ),
+          // ),
           child: Row(
             spacing: 8,
             children: [

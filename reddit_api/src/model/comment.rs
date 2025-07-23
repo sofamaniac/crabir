@@ -1,5 +1,6 @@
 use std::backtrace::Backtrace;
 
+use log::debug;
 use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
@@ -101,24 +102,44 @@ pub struct Comment {
     // pub mod_reports: Vec<Value>,
     // pub num_reports: Value,
     pub ups: i32,
+
+    #[serde(skip)]
+    parsed_replies: Vec<Thing>,
 }
 
 impl Comment {
-    /// flutter_rust_bridge:getter,sync
-    pub fn replies(&self) -> Vec<Thing> {
-        // match &self.replies {
-        //     Some(listing) => match &**listing {
-        //         Thing::Listing(listing) => listing.children.clone(),
-        //         _ => Vec::new(),
-        //     },
-        //     None => Vec::new(),
-        // }
-        match &self.replies {
-            Some(value) => match serde_json::from_value(value.clone()) {
-                Ok(Thing::Listing(listing)) => listing.children.clone(),
-                _ => Vec::new(),
-            },
-            None => Vec::new(),
+    /// flutter_rust_bridge:sync
+    pub fn replies(&mut self) -> Vec<Thing> {
+        if self.parsed_replies.is_empty() {
+            self.parsed_replies = match &self.replies {
+                Some(value) => match serde_json::from_value(value.clone()) {
+                    Ok(Thing::Listing(listing)) => listing.children.clone(),
+                    _ => Vec::new(),
+                },
+                None => Vec::new(),
+            }
+        }
+        self.parsed_replies.clone()
+    }
+
+    /// flutter_rust_bridge:sync
+    /// If `more` is a `Thing::More`, if it exists in `Self::replies` or in the replies of one of
+    /// its children, will replace it with `new_things`.
+    pub fn replace_more(&mut self, more: &Thing, new_things: &[Thing]) {
+        if let Thing::More { .. } = more {
+            // Ensure replies where parsed.
+            let _ = self.replies();
+            if let Some(index) = self.parsed_replies.iter().position(|t| t == more) {
+                debug!("replaced more");
+                self.parsed_replies
+                    .splice(index..index + 1, new_things.to_vec());
+            } else {
+                for thing in &mut self.parsed_replies {
+                    if let Thing::Comment(comment) = thing {
+                        comment.replace_more(more, new_things);
+                    }
+                }
+            }
         }
     }
 }

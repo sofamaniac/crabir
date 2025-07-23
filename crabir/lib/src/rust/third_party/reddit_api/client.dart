@@ -26,7 +26,8 @@ abstract class Client implements RustOpaqueInterface {
   /// a [`Thing::Comment`] or a [`Thing::More`].
   /// # Errors
   /// Fails if the request fails or the parsing of the response fails.
-  Future<List<Thing>> comments({required String permalink, CommentSort? sort});
+  Future<(Post, List<Thing>)> comments(
+      {required String permalink, CommentSort? sort});
 
   static Future<Client> default_() =>
       RustLib.instance.api.redditApiClientClientDefault();
