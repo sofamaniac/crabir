@@ -1,4 +1,3 @@
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/sort_display.dart';
@@ -12,13 +11,12 @@ import 'package:crabir/stream/bloc/stream_bloc.dart';
 import 'package:crabir/stream/things_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:swipeable_page_route/swipeable_page_route.dart';
 
 @RoutePage()
 class FeedView extends StatelessWidget {
-  const FeedView({super.key, required this.feed, required this.initialSort});
+  const FeedView({super.key, required this.feed, this.initialSort});
   final Feed feed;
-  final FeedSort initialSort;
+  final FeedSort? initialSort;
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +29,9 @@ class FeedView extends StatelessWidget {
 
 class FeedViewBody extends StatefulWidget {
   final Feed feed;
-  final FeedSort initialSort;
+  final FeedSort? initialSort;
 
-  const FeedViewBody(
-      {super.key, required this.feed, required this.initialSort});
+  const FeedViewBody({super.key, required this.feed, this.initialSort});
 
   @override
   State<FeedViewBody> createState() => _FeedViewBodyState();
@@ -42,19 +39,27 @@ class FeedViewBody extends StatefulWidget {
 
 class _FeedViewBodyState extends State<FeedViewBody>
     with AutomaticKeepAliveClientMixin {
-  FeedSort sort = FeedSort.best();
+  late FeedSort sort;
 
   @override
   bool get wantKeepAlive => true;
+
+  void _initializeSort() {
+    // TODO: read from user option for preferred sort.
+    sort = widget.initialSort ?? FeedSort.best();
+  }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
+    _initializeSort();
+
     return BlocBuilder<AccountsBloc, AccountState>(
       builder: (context, account) {
         if (account.status == AccountStatus.uninit) {
-          return Center(child: CircularProgressIndicator());
+          //return Center(child: CircularProgressIndicator());
+          return Container();
         } else if (account.status != AccountStatus.failure) {
           return NestedScrollView(
             headerSliverBuilder: (context, __) {

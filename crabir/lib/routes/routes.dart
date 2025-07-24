@@ -5,6 +5,7 @@ import 'package:crabir/main.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
+import 'package:crabir/subscriptions_tab.dart';
 import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/user.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +36,7 @@ class AppRouter extends RootStackRouter {
               children: [
                 AutoRoute(page: FeedRoute.page),
                 AutoRoute(page: MultiRoute.page),
+                AutoRoute(page: SubscriptionsTabRoute.page),
               ],
             ),
           ],

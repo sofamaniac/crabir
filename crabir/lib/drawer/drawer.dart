@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/feed.dart';
+import 'package:crabir/feed_list.dart';
 import 'package:crabir/login.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';

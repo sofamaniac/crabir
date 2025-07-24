@@ -1,9 +1,7 @@
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/drawer/drawer.dart';
 import 'package:crabir/routes/routes.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/frb_generated.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,31 +37,6 @@ class Crabir extends StatelessWidget {
           ),
         ),
         routerConfig: _appRouter.config(),
-        // home: DefaultTabController(
-        //   length: 5,
-        //   child: Scaffold(
-        //     drawer: AppDrawer(),
-        //     bottomNavigationBar: const TabBar(
-        //       tabs: [
-        //         Tab(icon: Icon(Icons.home)),
-        //         Tab(icon: Icon(Icons.search)),
-        //         Tab(icon: Icon(Icons.list)),
-        //         Tab(icon: Icon(Icons.mail)),
-        //         Tab(icon: Icon(Icons.person))
-        //       ],
-        //     ),
-        //     body: TabBarView(
-        //       physics: NeverScrollableScrollPhysics(),
-        //       children: [
-        //         FeedView(feed: Feed.home(), initialSort: FeedSort.best()),
-        //         FeedView(feed: Feed.home(), initialSort: FeedSort.best()),
-        //         FeedView(feed: Feed.home(), initialSort: FeedSort.best()),
-        //         FeedView(feed: Feed.home(), initialSort: FeedSort.best()),
-        //         CurrentUserView(),
-        //       ],
-        //     ),
-        //   ),
-        // ),
       ),
     );
   }
@@ -78,7 +51,7 @@ class MainScreenView extends StatelessWidget {
       //FeedRoute(feed: Feed.home(), initialSort: FeedSort.best()),
       NamedRoute("HomeFeedRoute"),
       CurrentUserRoute(),
-      SubscriptionsOrFeedRoute(),
+      SubscriptionsTabRoute(),
       CurrentUserRoute(),
       CurrentUserRoute(),
     ];
@@ -96,8 +69,10 @@ class MainScreenView extends StatelessWidget {
             onTap: (index) {
               tabController.animateTo(index);
               tabsRouter.setActiveIndex(index);
-              if (index == tabController.previousIndex || index == 2) {
-                tabsRouter.stackRouterOfIndex(index)?.popUntilRoot();
+              if (index == 2) {
+                tabsRouter
+                    .stackRouterOfIndex(index)
+                    ?.replaceAll([SubscriptionsTabRoute()]);
               }
             },
             tabs: [

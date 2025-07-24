@@ -32,7 +32,7 @@ class FeedRoute extends PageRouteInfo<FeedRouteArgs> {
   FeedRoute({
     Key? key,
     required Feed feed,
-    required FeedSort initialSort,
+    FeedSort? initialSort,
     List<PageRouteInfo>? children,
   }) : super(
          FeedRoute.name,
@@ -56,17 +56,13 @@ class FeedRoute extends PageRouteInfo<FeedRouteArgs> {
 }
 
 class FeedRouteArgs {
-  const FeedRouteArgs({
-    this.key,
-    required this.feed,
-    required this.initialSort,
-  });
+  const FeedRouteArgs({this.key, required this.feed, this.initialSort});
 
   final Key? key;
 
   final Feed feed;
 
-  final FeedSort initialSort;
+  final FeedSort? initialSort;
 
   @override
   String toString() {
@@ -174,6 +170,22 @@ class SubscriptionsOrFeedRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const SubscriptionsOrFeedView();
+    },
+  );
+}
+
+/// generated route for
+/// [SubscriptionsTab]
+class SubscriptionsTabRoute extends PageRouteInfo<void> {
+  const SubscriptionsTabRoute({List<PageRouteInfo>? children})
+    : super(SubscriptionsTabRoute.name, initialChildren: children);
+
+  static const String name = 'SubscriptionsTabRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SubscriptionsTab();
     },
   );
 }

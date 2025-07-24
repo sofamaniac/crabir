@@ -1,4 +1,4 @@
-import 'package:auto_route/auto_route.dart';
+import 'package:crabir/feed_list.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/post/widget/gallery.dart';
 import 'package:crabir/post/widget/html_with_fade.dart';
@@ -113,21 +113,12 @@ class _RedditPostCardState extends State<RedditPostCard> {
     return Row(
       children: [
         InkWell(
-          onTap: () => context.navigateTo(
+          onTap: () => navigateToSubscriptionsTab(
+            context,
             FeedRoute(
               feed: Feed.subreddit(subreddit),
-              initialSort: FeedSort.best(),
             ),
           ),
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (_) => FeedView(
-          //       feed: Feed.subreddit(subreddit),
-          //       initialSort: FeedSort.best(),
-          //     ),
-          //   ),
-          // ),
           child: Row(
             spacing: 8,
             children: [
