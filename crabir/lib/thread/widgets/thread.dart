@@ -17,19 +17,16 @@ class Thread extends StatelessWidget {
   const Thread({super.key, required this.permalink});
 
   Widget appBar() {
+    // TODO: add sort options
     return SliverAppBar();
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return BlocProvider(
-      create: (context) => ThreadBloc(permalink),
+      create: (context) => ThreadBloc(permalink)..add(Load()),
       child: BlocBuilder<ThreadBloc, ThreadState>(
         builder: (BuildContext context, ThreadState state) {
-          if (state.status == Status.unloaded) {
-            context.read<ThreadBloc>().add(Load());
-          }
           return NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) => [appBar()],
             floatHeaderSlivers: true,

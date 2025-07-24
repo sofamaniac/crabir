@@ -64,33 +64,37 @@ class DrawerState extends State<AppDrawer> {
   }
 
   Widget accountSelector(BuildContext context) {
-    final state = context.watch<AccountsBloc>();
-    if (state.selectedAccount == null) {
-      return const CircularProgressIndicator();
-    }
-    return Expanded(
-      child: ListView(
-        children: [
-          ...state.accounts.mapIndexed(
-            (index, account) => ListTile(
-              onTap: () async {
-                state.add(SelectAccount(index: index));
-                // close menu after selection
-                changeMode(isSelectingAccount: false);
-              },
-              title: Text(account.username),
-            ),
+    return BlocBuilder<AccountsBloc, AccountState>(
+      builder: (context, state) {
+        if (state.account == null) {
+          return const CircularProgressIndicator();
+        }
+        final bloc = context.read<AccountsBloc>();
+        return Expanded(
+          child: ListView(
+            children: [
+              ...state.allAccounts.mapIndexed(
+                (index, account) => ListTile(
+                  onTap: () async {
+                    bloc.add(SelectAccount(index: index));
+                    // close menu after selection
+                    changeMode(isSelectingAccount: false);
+                  },
+                  title: Text(account.username),
+                ),
+              ),
+              ListTile(
+                onTap: () async {
+                  if (await loginToReddit()) {
+                    bloc.add(Initialize());
+                  }
+                },
+                title: Text("Add an account"),
+              )
+            ],
           ),
-          ListTile(
-            onTap: () async {
-              if (await loginToReddit()) {
-                state.add(Initialize());
-              }
-            },
-            title: Text("Add an account"),
-          )
-        ],
-      ),
+        );
+      },
     );
   }
 

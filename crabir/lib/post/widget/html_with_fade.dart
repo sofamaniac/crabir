@@ -34,7 +34,7 @@ class _HtmlWithConditionalFadeState extends State<HtmlWithConditionalFade>
     with AutomaticKeepAliveClientMixin {
   final GlobalKey _key = GlobalKey();
   bool _overflowing = false;
-  double _contentHeight = 1000;
+  double _contentHeight = double.infinity;
   bool _ready = false;
 
   // We use the AutomaticKeepAliveClientMixin to ensure that the height is computed only once.
@@ -43,6 +43,10 @@ class _HtmlWithConditionalFadeState extends State<HtmlWithConditionalFade>
 
   void _checkOverflow() {
     if (widget.maxLines == null) {
+      setState(() {
+        _overflowing = false;
+        _ready = true;
+      });
       return;
     }
     final context = _key.currentContext;

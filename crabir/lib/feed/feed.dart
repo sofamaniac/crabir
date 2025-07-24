@@ -48,12 +48,9 @@ class _FeedViewBodyState extends State<FeedViewBody>
   Widget build(BuildContext context) {
     super.build(context);
 
-    final accountsBloc = context.read<AccountsBloc>();
-
     return BlocBuilder<AccountsBloc, AccountState>(
       builder: (context, account) {
         if (account.status == AccountStatus.uninit) {
-          accountsBloc.add(Initialize());
           return Center(child: CircularProgressIndicator());
         } else if (account.status != AccountStatus.failure) {
           return NestedScrollView(
@@ -92,6 +89,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
               postView: (context, post) {
                 final state = context.read<StreamBloc>();
                 return RedditPostCard(
+                  maxLines: 5,
                   post: post,
                   onLike: (direction) async {
                     state.add(Vote(direction: direction, name: post.name));
@@ -100,12 +98,6 @@ class _FeedViewBodyState extends State<FeedViewBody>
                     state.add(Save(saved: save, name: post.name));
                   },
                   onTap: () => context.push(post.permalink),
-                  // Navigator.push(
-                  //   context,
-                  //   SwipeablePageRoute(
-                  //     builder: (context) => Thread(post: post),
-                  //   ),
-                  // ),
                 );
               },
             ),

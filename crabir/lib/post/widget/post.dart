@@ -77,7 +77,7 @@ class RedditPostCard extends StatefulWidget {
   final Future<void> Function(bool)? onSave;
   final Future<void> Function(VoteDirection)? onLike;
   final VoidCallback? onTap;
-  final int maxLines;
+  final int? maxLines;
 
   const RedditPostCard({
     super.key,
@@ -85,7 +85,7 @@ class RedditPostCard extends StatefulWidget {
     this.onLike,
     this.onSave,
     this.onTap,
-    this.maxLines = 5,
+    this.maxLines,
   });
   @override
   State<StatefulWidget> createState() => _RedditPostCardState();
@@ -259,16 +259,6 @@ class _RedditPostCardState extends State<RedditPostCard> {
       Kind.meta => Text("meta"),
       Kind.video => VideoContent(post: this.widget.post),
       Kind.gallery => GalleryView(gallery: this.widget.post.gallery!),
-      // Kind.image => switch (this.widget.post.url.endsWith(".gif")) {
-      //     false => ImageContent(
-      //         post: this.widget.post,
-      //         fullscreen: (context, post) =>
-      //             FullscreenImageView(imageUrl: post.url),
-      //       ),
-      //     true => GifContent(
-      //         post: this.widget.post,
-      //       ),
-      //   },
       Kind.image => RedditImageView(image: this.widget.post.preview!.images[0]),
       Kind.link => Container(),
       Kind.unknown => Text("unknown"),

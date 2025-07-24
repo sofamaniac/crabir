@@ -9,8 +9,8 @@ part 'account_event.dart';
 part 'account_state.dart';
 
 class AccountsBloc extends Bloc<AccountEvent, AccountState> {
-  List<UserAccount> accounts = [];
-  int? selectedAccount;
+  List<UserAccount> _accounts = [];
+  int? _selectedAccount;
 
   final Logger log = Logger("AccountsBloc");
 
@@ -21,46 +21,48 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
   }
 
   Future<void> _initialize(Initialize _, Emitter<AccountState> emit) async {
-    if (accounts.isNotEmpty) return;
+    if (_accounts.isNotEmpty) return;
 
     try {
-      accounts = await AccountDatabase().getAccounts();
+      _accounts = await AccountDatabase().getAccounts();
     } catch (_) {
       emit(AccountState(status: AccountStatus.failure));
       log.severe("Error while loading accounts");
     }
-    accounts.add(UserAccount.anonymous());
+    _accounts.add(UserAccount.anonymous());
 
     // Restore account index from shared preferences
     // if no account was set default to anonymous
     final prefs = await SharedPreferences.getInstance();
-    selectedAccount = prefs.getInt("currentAccount") ?? accounts.length - 1;
-    if (currentAccount == null) {
+    _selectedAccount = prefs.getInt("currentAccount") ?? _accounts.length - 1;
+    if (_currentAccount == null) {
       emit(AccountState(
         status: AccountStatus.uninit,
       ));
     } else {
-      if (currentAccount == UserAccount.anonymous()) {
+      if (_currentAccount == UserAccount.anonymous()) {
         await RedditAPI.client().newLoggedOutUserToken();
       } else {
         await RedditAPI.client().authenticate(
-          refreshToken: currentAccount!.refreshToken!,
+          refreshToken: _currentAccount!.refreshToken!,
         );
       }
       emit(
         AccountState(
           status: AccountStatus.unloaded,
-          account: currentAccount,
+          account: _currentAccount,
+          allAccounts: _accounts,
         ),
       );
+      await _onLoadSubscriptions(LoadSubscriptions(), emit);
     }
   }
 
-  UserAccount? get currentAccount {
-    if (selectedAccount == null || selectedAccount! >= accounts.length) {
+  UserAccount? get _currentAccount {
+    if (_selectedAccount == null || _selectedAccount! >= _accounts.length) {
       return null;
     }
-    return accounts[selectedAccount!];
+    return _accounts[_selectedAccount!];
   }
 
   Future<void> _selectAccount(
@@ -70,26 +72,27 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
     // Save account index to disk
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt("currentAccount", event.index);
-    selectedAccount = event.index;
+    _selectedAccount = event.index;
 
     // Authenticate client
-    if (currentAccount!.id != UserAccount.anonymous().id) {
+    if (_currentAccount!.id != UserAccount.anonymous().id) {
       await RedditAPI.client().authenticate(
-        refreshToken: currentAccount!.refreshToken!,
+        refreshToken: _currentAccount!.refreshToken!,
       );
     }
     emit(AccountState(
       status: AccountStatus.unloaded,
-      account: currentAccount,
+      account: _currentAccount,
     ));
+    await _onLoadSubscriptions(LoadSubscriptions(), emit);
   }
 
   Future<void> _onLoadSubscriptions(
       LoadSubscriptions _, Emitter<AccountState> emit) async {
-    if (currentAccount == UserAccount.anonymous()) {
+    if (_currentAccount == UserAccount.anonymous()) {
       return;
     }
-    log.info("Requesting subscriptions for ${currentAccount!.username}");
+    log.info("Requesting subscriptions for ${_currentAccount!.username}");
     try {
       List<Subreddit> subreddits = await RedditAPI.client().subsriptions();
       subreddits.sort((a, b) => a.other.displayName
@@ -100,7 +103,7 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
         subscriptions: subreddits,
       ));
     } catch (err) {
-      //log.severe("Error while loading subscriptions: $err");
+      log.severe("Error while loading subscriptions: $err");
       emit(state.copyWith(status: AccountStatus.failure));
     }
   }

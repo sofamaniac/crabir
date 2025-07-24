@@ -40,6 +40,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       log.info("comments (${_comments.length}) and post loaded");
       emit(state.copyWith(post: _post, flatComments: flatten(_comments)));
     } catch (e) {
+      log.severe("Error during initial load: $e");
       emit(state.copyWith(status: Status.failure));
     }
   }
@@ -53,6 +54,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       log.info("comments (${_comments.length}) refreshed");
       emit(state.copyWith(flatComments: flatten(_comments)));
     } catch (e) {
+      log.severe("Error while refreshing comments: $e");
       emit(state.copyWith(status: Status.failure));
     }
   }
@@ -95,7 +97,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
 
   Future<void> _loadMore(LoadMore event, Emitter<ThreadState> emit) async {
     try {
-      final Logger log = Logger("_loadMore");
+      log.info("Loading comments");
       final newThings = await RedditAPI.client().loadMoreComments(
         parentId: _post.name,
         children: event.more.children,
@@ -103,6 +105,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       _moreLoaded[event.more.id] = newThings;
       emit(state.copyWith(flatComments: flatten(_comments)));
     } catch (e) {
+      log.severe("Error while loading comments: $e");
       emit(state.copyWith(status: Status.failure));
     }
   }
