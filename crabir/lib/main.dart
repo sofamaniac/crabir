@@ -1,33 +1,13 @@
+import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/drawer/drawer.dart';
-import 'package:crabir/routes.dart';
+import 'package:crabir/routes/routes.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/frb_generated.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
-
-final _router = GoRouter(
-  initialLocation: "/home",
-  routes: [
-    ShellRoute(
-      builder: (context, state, child) => Scaffold(
-        drawer: AppDrawer(),
-        body: child,
-      ),
-      routes: ROUTES
-          .map(
-            (route) => GoRoute(path: route.path, builder: route.builder),
-          )
-          .toList(),
-    ),
-    // No drawer nor bottom bar when in post
-    GoRoute(
-      path: PostRoute().path,
-      builder: PostRoute().builder,
-    )
-  ],
-);
 
 Future<void> main() async {
   await RustLib.init();
@@ -36,11 +16,13 @@ Future<void> main() async {
     debugPrint('${record.level.name}: ${record.time}: ${record.message}');
   });
 
-  runApp(const Crabir());
+  runApp(Crabir());
 }
 
 class Crabir extends StatelessWidget {
-  const Crabir({super.key});
+  Crabir({super.key});
+
+  final _appRouter = AppRouter();
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +38,7 @@ class Crabir extends StatelessWidget {
             brightness: Brightness.dark,
           ),
         ),
-        routerConfig: _router,
+        routerConfig: _appRouter.config(),
         // home: DefaultTabController(
         //   length: 5,
         //   child: Scaffold(
@@ -85,4 +67,54 @@ class Crabir extends StatelessWidget {
       ),
     );
   }
+}
+
+@RoutePage()
+class MainScreenView extends StatelessWidget {
+  const MainScreenView({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final routes = <PageRouteInfo>[
+      //FeedRoute(feed: Feed.home(), initialSort: FeedSort.best()),
+      NamedRoute("HomeFeedRoute"),
+      CurrentUserRoute(),
+      SubscriptionsOrFeedRoute(),
+      CurrentUserRoute(),
+      CurrentUserRoute(),
+    ];
+    return AutoTabsRouter.tabBar(
+      homeIndex: 0,
+      physics: NeverScrollableScrollPhysics(),
+      routes: routes,
+      builder: (context, child, tabController) {
+        final tabsRouter = AutoTabsRouter.of(context);
+        return Scaffold(
+          body: child,
+          drawer: AppDrawer(),
+          bottomNavigationBar: TabBar(
+            controller: tabController,
+            onTap: (index) {
+              tabController.animateTo(index);
+              tabsRouter.setActiveIndex(index);
+              if (index == tabController.previousIndex || index == 2) {
+                tabsRouter.stackRouterOfIndex(index)?.popUntilRoot();
+              }
+            },
+            tabs: [
+              Tab(icon: Icon(Icons.home)),
+              Tab(icon: Icon(Icons.search)),
+              Tab(icon: Icon(Icons.list)),
+              Tab(icon: Icon(Icons.mail)),
+              Tab(icon: Icon(Icons.person)),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+@RoutePage()
+class SubscriptionsOrFeedView extends AutoRouter {
+  const SubscriptionsOrFeedView({super.key});
 }

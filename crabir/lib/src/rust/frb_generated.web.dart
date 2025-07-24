@@ -37,6 +37,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       get rust_arc_decrement_strong_count_BoxFeedStreamPtr => wire
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxFeedStream;
 
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_BoxMultiStreamPtr => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxMultiStream;
+
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_ClientPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient;
 
@@ -72,6 +76,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_MultiPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti;
 
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_MultiStreamPtr => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMultiStream;
+
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_PagerPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager;
 
@@ -104,6 +112,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   BoxFeedStream
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxFeedStream(
+          dynamic raw);
+
+  @protected
+  BoxMultiStream
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxMultiStream(
           dynamic raw);
 
   @protected
@@ -159,6 +172,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Multi
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          dynamic raw);
+
+  @protected
+  MultiStream
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMultiStream(
           dynamic raw);
 
   @protected
@@ -341,6 +359,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           dynamic raw);
 
   @protected
+  BoxMultiStream
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxMultiStream(
+          dynamic raw);
+
+  @protected
   Client
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
           dynamic raw);
@@ -393,6 +416,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Multi
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          dynamic raw);
+
+  @protected
+  MultiStream
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMultiStream(
           dynamic raw);
 
   @protected
@@ -596,7 +624,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Richtext> dco_decode_list_richtext(dynamic raw);
 
   @protected
-  List<SubredditName> dco_decode_list_subreddit_name(dynamic raw);
+  List<SubredditDetails> dco_decode_list_subreddit_details(dynamic raw);
 
   @protected
   List<Thing> dco_decode_list_thing(dynamic raw);
@@ -711,10 +739,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Snoovatar dco_decode_snoovatar(dynamic raw);
 
   @protected
-  SubredditIcon dco_decode_subreddit_icon(dynamic raw);
+  SubredditDetails dco_decode_subreddit_details(dynamic raw);
 
   @protected
-  SubredditName dco_decode_subreddit_name(dynamic raw);
+  SubredditIcon dco_decode_subreddit_icon(dynamic raw);
 
   @protected
   Thing dco_decode_thing(dynamic raw);
@@ -773,6 +801,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
+  BoxMultiStream
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxMultiStream(
+          SseDeserializer deserializer);
+
+  @protected
   Client
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
           SseDeserializer deserializer);
@@ -825,6 +858,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Multi
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          SseDeserializer deserializer);
+
+  @protected
+  MultiStream
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMultiStream(
           SseDeserializer deserializer);
 
   @protected
@@ -1007,6 +1045,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
+  BoxMultiStream
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxMultiStream(
+          SseDeserializer deserializer);
+
+  @protected
   Client
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
           SseDeserializer deserializer);
@@ -1059,6 +1102,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Multi
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          SseDeserializer deserializer);
+
+  @protected
+  MultiStream
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMultiStream(
           SseDeserializer deserializer);
 
   @protected
@@ -1265,7 +1313,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Richtext> sse_decode_list_richtext(SseDeserializer deserializer);
 
   @protected
-  List<SubredditName> sse_decode_list_subreddit_name(
+  List<SubredditDetails> sse_decode_list_subreddit_details(
       SseDeserializer deserializer);
 
   @protected
@@ -1386,10 +1434,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Snoovatar sse_decode_snoovatar(SseDeserializer deserializer);
 
   @protected
-  SubredditIcon sse_decode_subreddit_icon(SseDeserializer deserializer);
+  SubredditDetails sse_decode_subreddit_details(SseDeserializer deserializer);
 
   @protected
-  SubredditName sse_decode_subreddit_name(SseDeserializer deserializer);
+  SubredditIcon sse_decode_subreddit_icon(SseDeserializer deserializer);
 
   @protected
   Thing sse_decode_thing(SseDeserializer deserializer);
@@ -1450,6 +1498,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxMultiStream(
+          BoxMultiStream self, SseSerializer serializer);
+
+  @protected
+  void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
           Client self, SseSerializer serializer);
 
@@ -1502,6 +1555,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
           Multi self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMultiStream(
+          MultiStream self, SseSerializer serializer);
 
   @protected
   void
@@ -1686,6 +1744,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxMultiStream(
+          BoxMultiStream self, SseSerializer serializer);
+
+  @protected
+  void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
           Client self, SseSerializer serializer);
 
@@ -1738,6 +1801,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
           Multi self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMultiStream(
+          MultiStream self, SseSerializer serializer);
 
   @protected
   void
@@ -1954,8 +2022,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_list_richtext(List<Richtext> self, SseSerializer serializer);
 
   @protected
-  void sse_encode_list_subreddit_name(
-      List<SubredditName> self, SseSerializer serializer);
+  void sse_encode_list_subreddit_details(
+      List<SubredditDetails> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_thing(List<Thing> self, SseSerializer serializer);
@@ -2078,10 +2146,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_snoovatar(Snoovatar self, SseSerializer serializer);
 
   @protected
-  void sse_encode_subreddit_icon(SubredditIcon self, SseSerializer serializer);
+  void sse_encode_subreddit_details(
+      SubredditDetails self, SseSerializer serializer);
 
   @protected
-  void sse_encode_subreddit_name(SubredditName self, SseSerializer serializer);
+  void sse_encode_subreddit_icon(SubredditIcon self, SseSerializer serializer);
 
   @protected
   void sse_encode_thing(Thing self, SseSerializer serializer);
@@ -2149,6 +2218,18 @@ class RustLibWire implements BaseWire {
           int ptr) =>
       wasmModule
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxFeedStream(
+              ptr);
+
+  void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxMultiStream(
+          int ptr) =>
+      wasmModule
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxMultiStream(
+              ptr);
+
+  void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxMultiStream(
+          int ptr) =>
+      wasmModule
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxMultiStream(
               ptr);
 
   void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
@@ -2283,6 +2364,18 @@ class RustLibWire implements BaseWire {
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
               ptr);
 
+  void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMultiStream(
+          int ptr) =>
+      wasmModule
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMultiStream(
+              ptr);
+
+  void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMultiStream(
+          int ptr) =>
+      wasmModule
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMultiStream(
+              ptr);
+
   void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPager(
           int ptr) =>
       wasmModule
@@ -2395,6 +2488,14 @@ extension type RustLibWasmModule._(JSObject _) implements JSObject {
           int ptr);
 
   external void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxMultiStream(
+          int ptr);
+
+  external void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBoxMultiStream(
+          int ptr);
+
+  external void
       rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
           int ptr);
 
@@ -2480,6 +2581,14 @@ extension type RustLibWasmModule._(JSObject _) implements JSObject {
 
   external void
       rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMulti(
+          int ptr);
+
+  external void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMultiStream(
+          int ptr);
+
+  external void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMultiStream(
           int ptr);
 
   external void

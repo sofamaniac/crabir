@@ -81,6 +81,8 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
                 Divider(),
                 ...userOptions.map((option) => ListTile(title: Text(option))),
                 Divider(),
+                ...account.multis.map((multi) => _multiView(context, multi)),
+                Divider(),
                 ...account.subscriptions.map(
                   (sub) => _subredditView(context, sub),
                 ),
@@ -103,16 +105,50 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
   }
 }
 
+void _navigate(context, destination) {
+  // close drawer
+  Navigator.pop(context);
+
+  final tabsRouter = AutoTabsRouter.of(context);
+  // Tabs are lazily loaded, so if it was never visited the tab router does not exists
+  tabsRouter.setActiveIndex(2);
+  final subscriptionsTabRouter = tabsRouter.stackRouterOfIndex(2);
+  subscriptionsTabRouter?.replaceAll([destination, SubscriptionsOrFeedRoute()]);
+}
+
 Widget _subredditView(BuildContext context, subreddit.Subreddit sub) {
   return ListTile(
     onTap: () {
-      // close drawer
-      Navigator.pop(context);
-      context.push("/r/${sub.other.displayName}");
+      final destination = FeedRoute(
+        feed: Feed.subreddit(sub.other.displayName),
+        initialSort: FeedSort.best(),
+      );
+      _navigate(context, destination);
     },
     leading: SubredditIcon(icon: sub.icon, radius: 16),
     title: Text(
       sub.other.displayNamePrefixed,
+      style: Theme.of(context).textTheme.bodyMedium,
+      maxLines: 1,
+    ),
+  );
+}
+
+Widget _multiView(BuildContext context, Multi multi) {
+  return ListTile(
+    onTap: () {
+      final destination = MultiRoute(
+        multi: multi,
+        initialSort: FeedSort.best(),
+      );
+      _navigate(context, destination);
+    },
+    leading: CircleAvatar(
+      radius: 16,
+      foregroundImage: NetworkImage(multi.iconUrl),
+    ),
+    title: Text(
+      multi.displayName,
       style: Theme.of(context).textTheme.bodyMedium,
       maxLines: 1,
     ),

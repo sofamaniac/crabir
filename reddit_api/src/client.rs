@@ -1,4 +1,5 @@
 use crate::model::feed::{self, Feed};
+use crate::model::multi::{self, Multi, MultiStream};
 use crate::model::{Fullname, Post, comment, user};
 use crate::result::Result;
 use crate::streamable::Streamable;
@@ -482,7 +483,25 @@ impl Client {
         let url = base_url
             .join("api/multi/mine.json")
             .expect("Should not fail.");
-        self.collect_paged(&url, &[]).await
+        let request = self.get(url);
+        //let request = self.get(url).query(&[("expand_srs", "true")]);
+        let result = self.execute(request).await?;
+        Ok(parse_response::<Vec<Thing>>(result)
+            .await?
+            .into_iter()
+            .filter_map(|t| TryInto::<Multi>::try_into(t).ok())
+            .collect())
+    }
+
+    ///flutter_rust_bridge:sync
+    pub fn multi_posts(&self, multi: &Multi, sort: &feed::FeedSort) -> Streamable {
+        let base_url = self.base_url();
+        Streamable::new(MultiStream::new(
+            self.clone(),
+            multi.clone(),
+            *sort,
+            base_url,
+        ))
     }
 
     /// Vote on a votable item (i.e. a [`Post`] or a [`Comment`]).

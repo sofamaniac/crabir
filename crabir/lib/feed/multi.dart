@@ -1,4 +1,3 @@
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/sort_display.dart';
@@ -6,41 +5,40 @@ import 'package:crabir/feed/sort_menu.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/api/simple.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/stream/bloc/stream_bloc.dart';
 import 'package:crabir/stream/things_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:swipeable_page_route/swipeable_page_route.dart';
 
 @RoutePage()
-class FeedView extends StatelessWidget {
-  const FeedView({super.key, required this.feed, required this.initialSort});
-  final Feed feed;
+class MultiView extends StatelessWidget {
+  const MultiView({super.key, required this.multi, required this.initialSort});
+  final Multi multi;
   final FeedSort initialSort;
 
   @override
   Widget build(BuildContext context) {
-    return FeedViewBody(
-      feed: feed,
+    return MultiViewBody(
+      multi: multi,
       initialSort: initialSort,
     );
   }
 }
 
-class FeedViewBody extends StatefulWidget {
-  final Feed feed;
+class MultiViewBody extends StatefulWidget {
+  final Multi multi;
   final FeedSort initialSort;
 
-  const FeedViewBody(
-      {super.key, required this.feed, required this.initialSort});
+  const MultiViewBody(
+      {super.key, required this.multi, required this.initialSort});
 
   @override
-  State<FeedViewBody> createState() => _FeedViewBodyState();
+  State<MultiViewBody> createState() => _MultiViewBodyState();
 }
 
-class _FeedViewBodyState extends State<FeedViewBody>
+class _MultiViewBodyState extends State<MultiViewBody>
     with AutomaticKeepAliveClientMixin {
   FeedSort sort = FeedSort.best();
 
@@ -85,8 +83,8 @@ class _FeedViewBodyState extends State<FeedViewBody>
             body: ThingsScaffold(
               // Forces rebuild when sort changes
               key: ValueKey(sort.toString()),
-              stream: RedditAPI.client().feedStream(
-                feed: widget.feed,
+              stream: RedditAPI.client().multiPosts(
+                multi: widget.multi,
                 sort: sort,
               ),
               postView: (context, post) {
@@ -112,24 +110,4 @@ class _FeedViewBodyState extends State<FeedViewBody>
       },
     );
   }
-}
-
-const timeOptions = [
-  Timeframe.hour,
-  Timeframe.day,
-  Timeframe.week,
-  Timeframe.month,
-  Timeframe.year,
-  Timeframe.all
-];
-
-String timeframeToString(Timeframe timeframe) {
-  return switch (timeframe) {
-    Timeframe.hour => "Hour",
-    Timeframe.day => "Day",
-    Timeframe.week => "Week",
-    Timeframe.month => "Month",
-    Timeframe.year => "Year",
-    Timeframe.all => "All",
-  };
 }

@@ -1,15 +1,20 @@
 use std::backtrace::Backtrace;
+use std::collections::HashMap;
 
+use futures::StreamExt;
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
-use crate::error::Error;
+use crate::result::Result;
+use crate::{client::Client, error::Error, streamable::stream::IntoStreamPrivate};
 
-use super::{Fullname, Thing};
+use super::{Fullname, Thing, feed::FeedSort};
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Multi {
-    #[serde(rename = "can_edit")]
+    #[serde(rename = "can_edit", default)]
     pub can_edit: bool,
     #[serde(rename = "display_name")]
     pub display_name: String,
@@ -22,7 +27,7 @@ pub struct Multi {
     pub copied_from: Option<String>,
     #[serde(rename = "icon_url")]
     pub icon_url: String,
-    pub subreddits: Vec<SubredditName>,
+    pub subreddits: Vec<SubredditDetails>,
     #[serde(rename = "created_utc")]
     pub created_utc: f64,
     pub visibility: String,
@@ -46,7 +51,7 @@ pub struct Multi {
 impl TryFrom<Thing> for Multi {
     type Error = Error;
 
-    fn try_from(value: Thing) -> Result<Self, Self::Error> {
+    fn try_from(value: Thing) -> Result<Self> {
         match value {
             Thing::Multi(multi) => Ok(multi),
             _ => Err(Error::InvalidThing {
@@ -58,7 +63,44 @@ impl TryFrom<Thing> for Multi {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SubredditName {
+pub struct SubredditDetails {
     /// name of the subreddit (e.g. awwnime)
     pub name: String,
+    // TODO: parse data
+}
+
+pub struct MultiStream {
+    client: Client,
+    multi: Multi,
+    sort: FeedSort,
+    base_url: Url,
+}
+
+impl MultiStream {
+    pub fn new(client: Client, multi: Multi, sort: FeedSort, base_url: Url) -> Box<Self> {
+        Box::new(Self {
+            client,
+            multi,
+            sort,
+            base_url,
+        })
+    }
+
+    fn to_url(&self) -> Url {
+        let base_url = self.base_url.clone();
+        let url = base_url.join(&self.multi.path).expect("Should not fail.");
+        let url = &self.sort.add_to_url(&url);
+        url.clone()
+    }
+}
+
+impl IntoStreamPrivate for MultiStream {
+    type Output = Thing;
+
+    fn to_stream(&self) -> futures::stream::BoxStream<'static, Result<Self::Output>> {
+        self.client
+            .clone()
+            .stream_vec(self.to_url(), None, &[("sr_detail", "true")])
+            .boxed()
+    }
 }

@@ -4,10 +4,16 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../../frb_generated.dart';
+import '../../../lib.dart';
+import '../client.dart';
 import '../model.dart';
+import 'feed.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `try_from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `to_stream`, `try_from`
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Box < MultiStream >>>
+abstract class BoxMultiStream implements RustOpaqueInterface {}
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Multi>>
 abstract class Multi implements RustOpaqueInterface {
@@ -45,7 +51,7 @@ abstract class Multi implements RustOpaqueInterface {
 
   String get path;
 
-  List<SubredditName> get subreddits;
+  List<SubredditDetails> get subreddits;
 
   String get visibility;
 
@@ -83,7 +89,7 @@ abstract class Multi implements RustOpaqueInterface {
 
   set path(String path);
 
-  set subreddits(List<SubredditName> subreddits);
+  set subreddits(List<SubredditDetails> subreddits);
 
   set visibility(String visibility);
 
@@ -91,16 +97,28 @@ abstract class Multi implements RustOpaqueInterface {
       RustLib.instance.api.redditApiModelMultiMultiDefault();
 }
 
-class SubredditName {
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MultiStream>>
+abstract class MultiStream implements RustOpaqueInterface {
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<BoxMultiStream> newInstance(
+          {required Client client,
+          required Multi multi,
+          required FeedSort sort,
+          required Url baseUrl}) =>
+      RustLib.instance.api.redditApiModelMultiMultiStreamNew(
+          client: client, multi: multi, sort: sort, baseUrl: baseUrl);
+}
+
+class SubredditDetails {
   /// name of the subreddit (e.g. awwnime)
   final String name;
 
-  const SubredditName({
+  const SubredditDetails({
     required this.name,
   });
 
-  static Future<SubredditName> default_() =>
-      RustLib.instance.api.redditApiModelMultiSubredditNameDefault();
+  static Future<SubredditDetails> default_() =>
+      RustLib.instance.api.redditApiModelMultiSubredditDetailsDefault();
 
   @override
   int get hashCode => name.hashCode;
@@ -108,7 +126,7 @@ class SubredditName {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SubredditName &&
+      other is SubredditDetails &&
           runtimeType == other.runtimeType &&
           name == other.name;
 }

@@ -1,18 +1,16 @@
-import 'package:crabir/feed/feed.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/post/widget/gallery.dart';
-import 'package:crabir/post/widget/gif.dart';
 import 'package:crabir/post/widget/html_with_fade.dart';
-import 'package:crabir/post/widget/image.dart';
 import 'package:crabir/post/widget/video.dart';
 import 'package:crabir/flair.dart';
+import 'package:crabir/routes/routes.dart';
 import 'package:crabir/subreddit.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 final horizontalPadding = 16.0;
 
@@ -115,7 +113,12 @@ class _RedditPostCardState extends State<RedditPostCard> {
     return Row(
       children: [
         InkWell(
-          onTap: () => context.push("/r/$subreddit"),
+          onTap: () => context.navigateTo(
+            FeedRoute(
+              feed: Feed.subreddit(subreddit),
+              initialSort: FeedSort.best(),
+            ),
+          ),
           // Navigator.push(
           //   context,
           //   MaterialPageRoute(

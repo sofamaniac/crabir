@@ -1,5 +1,6 @@
 import 'package:crabir/login.dart';
 import 'package:crabir/src/rust/api/simple.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
@@ -95,12 +96,21 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
     log.info("Requesting subscriptions for ${_currentAccount!.username}");
     try {
       List<Subreddit> subreddits = await RedditAPI.client().subsriptions();
-      subreddits.sort((a, b) => a.other.displayName
-          .toLowerCase()
-          .compareTo(b.other.displayName.toLowerCase()));
+      subreddits.sort(
+        (a, b) => a.other.displayName.toLowerCase().compareTo(
+              b.other.displayName.toLowerCase(),
+            ),
+      );
+      List<Multi> multis = await RedditAPI.client().multis();
+      multis.sort(
+        (a, b) => a.displayName.toLowerCase().compareTo(
+              b.displayName.toLowerCase(),
+            ),
+      );
       emit(state.copyWith(
         status: AccountStatus.loaded,
         subscriptions: subreddits,
+        multis: multis,
       ));
     } catch (err) {
       log.severe("Error while loading subscriptions: $err");

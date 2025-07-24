@@ -1,7 +1,9 @@
+import 'package:auto_route/annotations.dart';
 import 'package:crabir/comment.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/thread/bloc/thread_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,9 +14,11 @@ part 'comments_list.dart';
 part 'comment_row.dart';
 part 'indent_guides_painter.dart';
 
+@RoutePage(name: "ThreadRoute")
 class Thread extends StatelessWidget {
   final String permalink;
-  const Thread({super.key, required this.permalink});
+  final Post? post;
+  const Thread({super.key, required this.permalink, this.post});
 
   Widget appBar() {
     // TODO: add sort options
@@ -27,6 +31,7 @@ class Thread extends StatelessWidget {
       create: (context) => ThreadBloc(permalink)..add(Load()),
       child: BlocBuilder<ThreadBloc, ThreadState>(
         builder: (BuildContext context, ThreadState state) {
+          final post = this.post ?? state.post;
           return NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) => [appBar()],
             floatHeaderSlivers: true,
@@ -36,10 +41,10 @@ class Thread extends StatelessWidget {
               },
               child: CustomScrollView(
                 slivers: [
-                  if (state.post != null)
+                  if (post != null)
                     SliverToBoxAdapter(
                       child: RedditPostCard(
-                        post: state.post!,
+                        post: post,
                         // max int (yes this is ugly)
                         maxLines: -1 >>> 1,
                       ),

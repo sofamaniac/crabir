@@ -1,3 +1,4 @@
+import 'package:auto_route/annotations.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/comment.dart';
 import 'package:crabir/post/widget/post.dart';
@@ -40,6 +41,7 @@ enum _Tabs {
   }
 }
 
+@RoutePage()
 class CurrentUserView extends StatelessWidget {
   const CurrentUserView({super.key});
 
