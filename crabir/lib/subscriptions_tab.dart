@@ -13,17 +13,25 @@ class SubscriptionsTab extends StatefulWidget {
 }
 
 class _SubscriptionsTabState extends State<SubscriptionsTab> {
+  String filter = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: SearchBar()),
-      body: SubscriptonsList(),
+      appBar: AppBar(
+        title: SearchBar(
+          onChanged: (input) => setState(() {
+            filter = input;
+          }),
+        ),
+      ),
+      body: _SubscriptonsList(filter: filter),
     );
   }
 }
 
-class SubscriptonsList extends StatelessWidget {
-  const SubscriptonsList({super.key});
+class _SubscriptonsList extends StatelessWidget {
+  final String filter;
+  const _SubscriptonsList({super.key, this.filter = ""});
 
   @override
   Widget build(BuildContext context) {
@@ -39,16 +47,34 @@ class SubscriptonsList extends StatelessWidget {
             fit: FlexFit.loose,
             child: ListView(
               children: [
-                ...baseFeeds.map(
-                  (feed) => ListTile(
-                    leading: Icon(feed.icon),
-                    title: Text(feed.title),
-                  ),
-                ),
-                ...account.multis.map((multi) => MultiRedditTile(multi: multi)),
-                ...account.subscriptions.map(
-                  (sub) => SubredditTile(sub: sub),
-                ),
+                ...baseFeeds
+                    .where(
+                      (feed) => feed.title
+                          .toLowerCase()
+                          .contains(filter.toLowerCase()),
+                    )
+                    .map(
+                      (feed) => ListTile(
+                        leading: Icon(feed.icon),
+                        title: Text(feed.title),
+                      ),
+                    ),
+                ...account.multis
+                    .where(
+                      (multi) => multi.displayName
+                          .toLowerCase()
+                          .contains(filter.toLowerCase()),
+                    )
+                    .map((multi) => MultiRedditTile(multi: multi)),
+                ...account.subscriptions
+                    .where(
+                      (sub) => sub.other.displayName
+                          .toLowerCase()
+                          .contains(filter.toLowerCase()),
+                    )
+                    .map(
+                      (sub) => SubredditTile(sub: sub),
+                    ),
               ],
             ),
           );
