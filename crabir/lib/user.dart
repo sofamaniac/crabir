@@ -1,8 +1,10 @@
 import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/comment.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/login.dart';
+import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -138,7 +140,15 @@ class CurrentUserView extends StatelessWidget {
 }
 
 Widget _postView(BuildContext context, Post post) {
-  return RedditPostCard(post: post);
+  return RedditPostCard(
+    post: post,
+    onTap: () => context.pushRoute(
+      ThreadRoute(
+        permalink: post.permalink,
+        post: post,
+      ),
+    ),
+  );
 }
 
 Widget _commentView(BuildContext context, Comment comment) {

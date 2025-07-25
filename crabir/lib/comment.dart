@@ -52,7 +52,6 @@ class _CommentViewState extends State<CommentView> {
         duration: Duration(milliseconds: 200),
         alignment: Alignment.topCenter,
         child: Card(
-          color: Colors.transparent,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.0),
             child: Column(

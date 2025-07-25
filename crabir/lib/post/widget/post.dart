@@ -11,6 +11,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final horizontalPadding = 16.0;
 
@@ -196,12 +197,23 @@ class _RedditPostCardState extends State<RedditPostCard> {
         IconButton(
           icon: const Icon(Icons.comment),
           tooltip: 'Comments',
-          onPressed: () {},
+          onPressed: () => navigateToSubscriptionsTab(
+            context,
+            ThreadRoute(
+              permalink: widget.post.permalink,
+              post: widget.post,
+            ),
+          ),
         ),
         IconButton(
           icon: const Icon(Icons.exit_to_app),
           tooltip: 'Open in',
-          onPressed: () {},
+          onPressed: () async {
+            final url = Uri.parse(
+              widget.post.urlOverriddenByDest ?? widget.post.url,
+            );
+            await launchUrl(url);
+          },
         ),
         IconButton(
           icon: const Icon(Icons.share),

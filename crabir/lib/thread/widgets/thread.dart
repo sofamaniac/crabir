@@ -32,31 +32,33 @@ class Thread extends StatelessWidget {
       child: BlocBuilder<ThreadBloc, ThreadState>(
         builder: (BuildContext context, ThreadState state) {
           final post = this.post ?? state.post;
-          return NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) => [appBar()],
-            floatHeaderSlivers: true,
-            body: RefreshIndicator(
-              onRefresh: () async {
-                context.read<ThreadBloc>().add(Refresh());
-              },
-              child: CustomScrollView(
-                slivers: [
-                  if (post != null)
-                    SliverToBoxAdapter(
-                      child: RedditPostCard(
-                        post: post,
-                        // max int (yes this is ugly)
-                        maxLines: -1 >>> 1,
+          return Scaffold(
+            backgroundColor: Theme.of(context)
+                .scaffoldBackgroundColor, // Ensure the background is opaque
+            body: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                appBar(), // Your custom sliver app bar
+              ],
+              floatHeaderSlivers: true,
+              body: RefreshIndicator(
+                onRefresh: () async {
+                  context.read<ThreadBloc>().add(Refresh());
+                },
+                child: CustomScrollView(
+                  slivers: [
+                    if (post != null)
+                      SliverToBoxAdapter(
+                        child: RedditPostCard(post: post),
+                      )
+                    else
+                      SliverToBoxAdapter(
+                        child: Center(child: CircularProgressIndicator()),
                       ),
-                    )
-                  else
-                    SliverToBoxAdapter(
-                      child: Center(child: CircularProgressIndicator()),
+                    CommentsList(
+                      comments: state.flatComments,
                     ),
-                  CommentsList(
-                    comments: state.flatComments,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
