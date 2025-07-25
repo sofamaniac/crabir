@@ -5,9 +5,10 @@ import 'package:crabir/main.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/user/model.dart';
 import 'package:crabir/subscriptions_tab.dart';
 import 'package:crabir/thread/widgets/thread.dart';
-import 'package:crabir/user.dart';
+import 'package:crabir/user/user.dart';
 import 'package:flutter/material.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
 
@@ -30,7 +31,8 @@ class AppRouter extends RootStackRouter {
               ),
             ),
             RedirectRoute(path: "", redirectTo: "home"),
-            AutoRoute(page: CurrentUserRoute.page),
+            //AutoRoute(page: CurrentUserRoute.page),
+            currentUserRoute,
             AutoRoute(
               page: SubscriptionsOrFeedRoute.page,
               children: [
@@ -39,6 +41,8 @@ class AppRouter extends RootStackRouter {
                 AutoRoute(page: SubscriptionsTabRoute.page),
               ],
             ),
+            AutoRoute(page: SearchRoute.page),
+            AutoRoute(page: InboxRoute.page),
           ],
         ),
         CustomRoute(

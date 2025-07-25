@@ -54,10 +54,7 @@ class _SubscriptonsList extends StatelessWidget {
                           .contains(filter.toLowerCase()),
                     )
                     .map(
-                      (feed) => ListTile(
-                        leading: Icon(feed.icon),
-                        title: Text(feed.title),
-                      ),
+                      (feed) => feed.toTile(context),
                     ),
                 ...account.multis
                     .where(

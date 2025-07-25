@@ -29,10 +29,7 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
             child: ListView(
               children: [
                 ...baseFeeds.map(
-                  (feed) => ListTile(
-                    leading: Icon(feed.icon),
-                    title: Text(feed.title),
-                  ),
+                  (feed) => feed.toTile(context),
                 ),
                 Divider(),
                 ...userOptions.map((option) => ListTile(title: Text(option))),

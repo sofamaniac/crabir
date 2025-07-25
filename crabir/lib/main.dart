@@ -47,11 +47,10 @@ class MainScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final routes = <PageRouteInfo>[
-      //FeedRoute(feed: Feed.home(), initialSort: FeedSort.best()),
       NamedRoute("HomeFeedRoute"),
-      CurrentUserRoute(),
+      SearchRoute(),
       SubscriptionsTabRoute(),
-      CurrentUserRoute(),
+      InboxRoute(),
       CurrentUserRoute(),
     ];
     return AutoTabsRouter.tabBar(
@@ -91,4 +90,14 @@ class MainScreenView extends StatelessWidget {
 @RoutePage()
 class SubscriptionsOrFeedView extends AutoRouter {
   const SubscriptionsOrFeedView({super.key});
+}
+
+@RoutePage()
+class SearchView extends AutoRouter {
+  const SearchView({super.key});
+}
+
+@RoutePage()
+class InboxView extends AutoRouter {
+  const InboxView({super.key});
 }

@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 final baseFeeds = const [
   HomeFeed(),
@@ -16,6 +18,14 @@ sealed class BaseFeed {
   final IconData icon;
   PageRouteInfo get route;
   const BaseFeed(this.title, this.icon);
+
+  Widget toTile(BuildContext context) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      onTap: () => context.pushRoute(route),
+    );
+  }
 }
 
 class HomeFeed extends BaseFeed {
@@ -39,7 +49,20 @@ class PopularFeed extends BaseFeed {
 class SavedFeed extends BaseFeed {
   const SavedFeed() : super("Saved", Icons.bookmark_rounded);
   @override
-  PageRouteInfo get route => FeedRoute(feed: Feed.popular());
+  PageRouteInfo get route => UserSavedRoute(username: "me");
+
+  @override
+  Widget toTile(BuildContext context) {
+    return BlocBuilder<AccountsBloc, AccountState>(
+      builder: (context, state) => ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        onTap: () => context.pushRoute(UserSavedRoute(
+          username: state.account!.username,
+        )),
+      ),
+    );
+  }
 }
 
 class HistoryFeed extends BaseFeed {
