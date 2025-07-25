@@ -42,11 +42,11 @@ class ImageThumbnail extends StatelessWidget {
 }
 
 /// Display an image and goes fullscreen on tap.
-class ImageContent extends StatelessWidget {
+class _ImageContent extends StatelessWidget {
   final ImageBase image;
   final String? placeholderUrl;
   final Widget Function(BuildContext, Post)? fullscreen;
-  const ImageContent({
+  const _ImageContent({
     super.key,
     required this.image,
     this.placeholderUrl,

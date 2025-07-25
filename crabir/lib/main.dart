@@ -29,7 +29,6 @@ class Crabir extends StatelessWidget {
       child: MaterialApp.router(
         themeMode: ThemeMode.system,
         theme: ThemeData.light(useMaterial3: true),
-        //darkTheme: ThemeData.dark(useMaterial3: true),
         darkTheme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.orange,

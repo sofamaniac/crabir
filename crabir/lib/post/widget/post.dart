@@ -2,6 +2,7 @@ import 'package:crabir/feed_list.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/post/widget/gallery.dart';
 import 'package:crabir/post/widget/html_with_fade.dart';
+import 'package:crabir/post/widget/image.dart';
 import 'package:crabir/post/widget/video.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/routes/routes.dart';
@@ -246,7 +247,12 @@ class _RedditPostCardState extends State<RedditPostCard> {
 
   Widget _contentWrap(Widget widget) {
     return switch (this.widget.post.kind) {
-      Kind.image || Kind.gallery || Kind.video || Kind.selftext => widget,
+      Kind.image ||
+      Kind.gallery ||
+      Kind.video ||
+      Kind.youtubeVideo ||
+      Kind.mediaGallery =>
+        widget,
       _ => _wrap(widget),
     };
   }
@@ -264,8 +270,10 @@ class _RedditPostCardState extends State<RedditPostCard> {
         ),
       Kind.meta => Text("meta"),
       Kind.video => VideoContent(post: this.widget.post),
+      Kind.youtubeVideo => YoutubeContent(post: this.widget.post),
       Kind.gallery => GalleryView(gallery: this.widget.post.gallery!),
-      Kind.image => RedditImageView(image: this.widget.post.preview!.images[0]),
+      Kind.mediaGallery => Text("Some kind of gallery"),
+      Kind.image => ImageContent(post: this.widget.post),
       Kind.link => Container(),
       Kind.unknown => Text("unknown"),
     };

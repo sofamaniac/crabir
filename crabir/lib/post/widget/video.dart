@@ -3,6 +3,15 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';
 
+class YoutubeContent extends StatelessWidget {
+  final Post post;
+  const YoutubeContent({super.key, required this.post});
+  @override
+  Widget build(BuildContext context) {
+    return Text("A Youtube Video");
+  }
+}
+
 class VideoContent extends StatefulWidget {
   final Post post;
   const VideoContent({super.key, required this.post});

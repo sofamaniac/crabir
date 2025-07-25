@@ -1,9 +1,29 @@
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:crabir/media/media.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
+
+class ImageContent extends StatelessWidget {
+  final Post post;
+  const ImageContent({super.key, required this.post});
+  @override
+  Widget build(BuildContext context) {
+    if (post.preview != null) {
+      return RedditImageView(image: post.preview!.images[0]);
+    } else {
+      return CachedNetworkImage(
+        imageUrl: post.url,
+        // No fade out
+        fadeOutDuration: Duration(seconds: 0),
+        fadeInDuration: Duration(seconds: 0),
+        placeholderFadeInDuration: Duration(seconds: 0),
+      );
+    }
+  }
+}
 
 /// Display the image at `url` and `placeholderUrl` while the image is loading.
 class ImageThumbnail extends StatelessWidget {
@@ -46,59 +66,3 @@ class ImageThumbnail extends StatelessWidget {
   }
 }
 
-/// Display an image and goes fullscreen on tap.
-class ImageContent extends StatelessWidget {
-  final ImageBase image;
-  final String? placeholderUrl;
-  final Widget Function(BuildContext, Post)? fullscreen;
-  const ImageContent({
-    super.key,
-    required this.image,
-    this.placeholderUrl,
-    this.fullscreen,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    late final Future? Function() onTap;
-    onTap = () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FullscreenImageView(imageUrl: image.url),
-          ),
-        );
-
-    return InkWell(
-      onTap: onTap,
-      child: ImageThumbnail(
-        image: image,
-        placeholderUrl: placeholderUrl,
-      ),
-    );
-  }
-}
-
-class FullscreenImageView extends StatelessWidget {
-  final String imageUrl;
-  const FullscreenImageView({super.key, required this.imageUrl});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.black,
-      body: Dismissible(
-        key: UniqueKey(),
-        direction: DismissDirection.vertical,
-        onDismissed: (_) => Navigator.pop(context),
-        child: PhotoViewGestureDetectorScope(
-          axis: Axis.vertical,
-          child: PhotoView(
-            imageProvider: NetworkImage(imageUrl),
-            minScale: PhotoViewComputedScale.contained * 1.0,
-            maxScale: PhotoViewComputedScale.contained * 5.0,
-          ),
-        ),
-      ),
-    );
-  }
-}

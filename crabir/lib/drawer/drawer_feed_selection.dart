@@ -8,60 +8,11 @@ class DrawerFeedSelection extends StatefulWidget {
 }
 
 class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
-  final List<String> feeds = ["Home", "Popular", "All", "Saved", "History"];
   final List<String> userOptions = ["Profile", "Inbox", "Moderation"];
   final log = Logger("DrawerFeedSelection");
   UserAccount? account;
-  final List<Feed> baseSubscriptions = [
-    Feed.home(),
-    Feed.popular(),
-    Feed.all()
-    //"Saved",
-    //"History",
-  ];
 
   DrawerFeedSelectionState();
-
-  List<Widget> baseFeeds(BuildContext context) {
-    return [
-      ListTile(
-        title: Text("Home"),
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FeedView(
-              feed: Feed.home(),
-              initialSort: FeedSort.best(),
-            ),
-          ),
-        ),
-      ),
-      ListTile(
-        title: Text("Popular"),
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FeedView(
-              feed: Feed.popular(),
-              initialSort: FeedSort.best(),
-            ),
-          ),
-        ),
-      ),
-      ListTile(
-        title: Text("All"),
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FeedView(
-              feed: Feed.all(),
-              initialSort: FeedSort.best(),
-            ),
-          ),
-        ),
-      ),
-    ];
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,14 +28,25 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
             fit: FlexFit.loose,
             child: ListView(
               children: [
-                ...baseFeeds(context),
+                ...baseFeeds.map(
+                  (feed) => ListTile(
+                    leading: Icon(feed.icon),
+                    title: Text(feed.title),
+                  ),
+                ),
                 Divider(),
                 ...userOptions.map((option) => ListTile(title: Text(option))),
                 Divider(),
-                ...account.multis.map((multi) => MultiRedditTile(multi: multi)),
+                ...account.multis.map((multi) => MultiRedditTile(
+                      multi: multi,
+                      closeDrawer: true,
+                    )),
                 Divider(),
                 ...account.subscriptions.map(
-                  (sub) => SubredditTile(sub: sub),
+                  (sub) => SubredditTile(
+                    sub: sub,
+                    closeDrawer: true,
+                  ),
                 ),
                 Divider(),
                 ListTile(

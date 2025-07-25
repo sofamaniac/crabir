@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
-import 'package:crabir/post/widget/image.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
@@ -37,7 +36,8 @@ class RedditImageView extends StatelessWidget {
       return _GifContent(mp4: image.variants.mp4, gif: image.variants.gif!);
     } else {
       // TODO: resolution
-      return ImageContent(image: image.source);
+      // TODO: placeholder
+      return _ImageContent(image: image.source);
     }
   }
 }

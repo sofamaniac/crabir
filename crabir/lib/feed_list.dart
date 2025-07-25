@@ -7,6 +7,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart'
 import 'package:crabir/subreddit.dart';
 import 'package:flutter/material.dart';
 
+// FIX: does not work properly on first call
 void navigateToSubscriptionsTab(context, destination) {
   final tabsRouter = AutoTabsRouter.of(context);
   // Tabs are lazily loaded, so if it was never visited the tab router does not exists
@@ -15,9 +16,14 @@ void navigateToSubscriptionsTab(context, destination) {
   subscriptionsTabRouter?.replaceAll([destination]);
 }
 
+/// Widget to display a subreddit in a list
 class SubredditTile extends StatelessWidget {
   final subreddit.Subreddit sub;
-  const SubredditTile({super.key, required this.sub});
+
+  /// If set to `true`, calls `Navigator.pop()` before navigating to the destination
+  final bool closeDrawer;
+
+  const SubredditTile({super.key, required this.sub, this.closeDrawer = false});
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -26,6 +32,9 @@ class SubredditTile extends StatelessWidget {
           feed: Feed.subreddit(sub.other.displayName),
           initialSort: FeedSort.best(),
         );
+        if (closeDrawer) {
+          Navigator.pop(context);
+        }
         navigateToSubscriptionsTab(context, destination);
       },
       leading: SubredditIcon(icon: sub.icon, radius: 16),
@@ -38,9 +47,19 @@ class SubredditTile extends StatelessWidget {
   }
 }
 
+/// Widget to display a multireddit in a list
 class MultiRedditTile extends StatelessWidget {
   final Multi multi;
-  const MultiRedditTile({super.key, required this.multi});
+
+  /// If set to `true`, calls `Navigator.pop()` before navigating to the destination
+  final bool closeDrawer;
+
+  const MultiRedditTile({
+    super.key,
+    required this.multi,
+    this.closeDrawer = false,
+  });
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -49,6 +68,9 @@ class MultiRedditTile extends StatelessWidget {
           multi: multi,
           initialSort: FeedSort.best(),
         );
+        if (closeDrawer) {
+          Navigator.pop(context);
+        }
         navigateToSubscriptionsTab(context, destination);
       },
       leading: CircleAvatar(

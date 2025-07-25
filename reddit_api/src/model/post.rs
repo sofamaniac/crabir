@@ -18,8 +18,14 @@ pub enum Kind {
     Selftext,
     Meta,
     Image,
+    /// Video hosted on Reddit
     Video,
+    /// Video hosted on Youtube
+    YoutubeVideo,
+    /// Gallery present in `Post::Gallery`
     Gallery,
+    /// Gallery at `Post::url`
+    MediaGallery,
     Link,
     Unknown,
 }
@@ -120,6 +126,8 @@ pub struct Post {
     pub media_only: bool,
     pub category: Option<String>,
     pub is_video: bool,
+    #[serde(default)]
+    pub is_gallery: bool,
 
     // Post properties
     pub pinned: bool,
@@ -192,14 +200,30 @@ impl Post {
         } else if let Some(post_hint) = &self.post_hint {
             match post_hint.as_str() {
                 "image" => Kind::Image,
-                "rich:video" | "hosted:video" => Kind::Video,
+                "hosted:video" => Kind::Video,
+                "rich:video" => {
+                    if self.domain == "youtbe.com" || self.domain == "youtu.be" {
+                        Kind::YoutubeVideo
+                    } else {
+                        Kind::Video
+                    }
+                }
                 "link" => Kind::Link,
                 _ => Kind::Unknown,
             }
+        } else if self.url.starts_with("https://www.reddit.com/gallery") {
+            Kind::MediaGallery
+        } else if is_image_url(&self.url) {
+            Kind::Image
         } else {
             Kind::Unknown
         }
     }
+}
+
+fn is_image_url(url: &str) -> bool {
+    const EXTENSIONS: [&str; 5] = ["jpg", "jpeg", "png", "svg", "gif"];
+    EXTENSIONS.iter().any(|pat| url.ends_with(pat))
 }
 
 impl TryFrom<Thing> for Post {

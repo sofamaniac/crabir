@@ -78,6 +78,8 @@ abstract class Post implements RustOpaqueInterface {
 
   bool get isCrosspostable;
 
+  bool get isGallery;
+
   bool get isMeta;
 
   bool get isOriginalContent;
@@ -249,6 +251,8 @@ abstract class Post implements RustOpaqueInterface {
   set isCreatedFromAdsUi(bool isCreatedFromAdsUi);
 
   set isCrosspostable(bool isCrosspostable);
+
+  set isGallery(bool isGallery);
 
   set isMeta(bool isMeta);
 
@@ -422,8 +426,18 @@ enum Kind {
   selftext,
   meta,
   image,
+
+  /// Video hosted on Reddit
   video,
+
+  /// Video hosted on Youtube
+  youtubeVideo,
+
+  /// Gallery present in `Post::Gallery`
   gallery,
+
+  /// Gallery at `Post::url`
+  mediaGallery,
   link,
   unknown,
   ;
