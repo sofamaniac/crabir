@@ -53,36 +53,39 @@ class MainScreenView extends StatelessWidget {
       InboxRoute(),
       CurrentUserRoute(),
     ];
-    return AutoTabsRouter.tabBar(
-      homeIndex: 0,
-      physics: NeverScrollableScrollPhysics(),
-      routes: routes,
-      builder: (context, child, tabController) {
-        final tabsRouter = AutoTabsRouter.of(context);
-        return Scaffold(
-          body: child,
-          drawer: AppDrawer(),
-          bottomNavigationBar: TabBar(
-            controller: tabController,
-            onTap: (index) {
-              tabController.animateTo(index);
-              tabsRouter.setActiveIndex(index);
-              if (index == 2) {
-                tabsRouter
-                    .stackRouterOfIndex(index)
-                    ?.replaceAll([SubscriptionsTabRoute()]);
-              }
-            },
-            tabs: [
-              Tab(icon: Icon(Icons.home)),
-              Tab(icon: Icon(Icons.search)),
-              Tab(icon: Icon(Icons.list)),
-              Tab(icon: Icon(Icons.mail)),
-              Tab(icon: Icon(Icons.person)),
-            ],
-          ),
-        );
-      },
+    return BlocBuilder<AccountsBloc, AccountState>(
+      builder: (context, state) => AutoTabsRouter.tabBar(
+        key: ValueKey(state.account?.username ?? ""),
+        homeIndex: 0,
+        physics: NeverScrollableScrollPhysics(),
+        routes: routes,
+        builder: (context, child, tabController) {
+          final tabsRouter = AutoTabsRouter.of(context);
+          return Scaffold(
+            body: child,
+            drawer: AppDrawer(),
+            bottomNavigationBar: TabBar(
+              controller: tabController,
+              onTap: (index) {
+                tabController.animateTo(index);
+                tabsRouter.setActiveIndex(index);
+                if (index == 2) {
+                  tabsRouter
+                      .stackRouterOfIndex(index)
+                      ?.replaceAll([SubscriptionsTabRoute()]);
+                }
+              },
+              tabs: [
+                Tab(icon: Icon(Icons.home)),
+                Tab(icon: Icon(Icons.search)),
+                Tab(icon: Icon(Icons.list)),
+                Tab(icon: Icon(Icons.mail)),
+                Tab(icon: Icon(Icons.person)),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

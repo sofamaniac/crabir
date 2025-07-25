@@ -27,7 +27,7 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
     try {
       _accounts = await AccountDatabase().getAccounts();
     } catch (_) {
-      emit(AccountState(status: AccountStatus.failure));
+      emit(state.copyWith(status: AccountStatus.failure));
       log.severe("Error while loading accounts");
     }
     _accounts.add(UserAccount.anonymous());
@@ -37,7 +37,7 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
     final prefs = await SharedPreferences.getInstance();
     _selectedAccount = prefs.getInt("currentAccount") ?? _accounts.length - 1;
     if (_currentAccount == null) {
-      emit(AccountState(
+      emit(state.copyWith(
         status: AccountStatus.uninit,
       ));
     } else {
@@ -49,7 +49,7 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
         );
       }
       emit(
-        AccountState(
+        state.copyWith(
           status: AccountStatus.unloaded,
           account: _currentAccount,
           allAccounts: _accounts,
@@ -81,7 +81,7 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
         refreshToken: _currentAccount!.refreshToken!,
       );
     }
-    emit(AccountState(
+    emit(state.copyWith(
       status: AccountStatus.unloaded,
       account: _currentAccount,
     ));

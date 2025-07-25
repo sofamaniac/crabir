@@ -74,7 +74,11 @@ class _FeedViewBodyState extends State<FeedViewBody>
                     ],
                   ),
                   actions: [
-                    IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+                    IconButton(
+                        onPressed: () {
+                          //TODO:
+                        },
+                        icon: Icon(Icons.search)),
                     SortMenu(
                       onSelect: (sort) => setState(
                         () {
