@@ -83,6 +83,70 @@ class FeedRouteArgs {
 }
 
 /// generated route for
+/// [FullscreenImageView]
+class FullscreenImageRoute extends PageRouteInfo<FullscreenImageRouteArgs> {
+  FullscreenImageRoute({
+    Key? key,
+    required String imageUrl,
+    String? title,
+    List<PageRouteInfo>? children,
+  }) : super(
+         FullscreenImageRoute.name,
+         args: FullscreenImageRouteArgs(
+           key: key,
+           imageUrl: imageUrl,
+           title: title,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'FullscreenImageRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<FullscreenImageRouteArgs>();
+      return FullscreenImageView(
+        key: args.key,
+        imageUrl: args.imageUrl,
+        title: args.title,
+      );
+    },
+  );
+}
+
+class FullscreenImageRouteArgs {
+  const FullscreenImageRouteArgs({
+    this.key,
+    required this.imageUrl,
+    this.title,
+  });
+
+  final Key? key;
+
+  final String imageUrl;
+
+  final String? title;
+
+  @override
+  String toString() {
+    return 'FullscreenImageRouteArgs{key: $key, imageUrl: $imageUrl, title: $title}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! FullscreenImageRouteArgs) return false;
+    return key == other.key &&
+        imageUrl == other.imageUrl &&
+        title == other.title;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ imageUrl.hashCode ^ title.hashCode;
+}
+
+/// generated route for
 /// [InboxView]
 class InboxRoute extends PageRouteInfo<void> {
   const InboxRoute({List<PageRouteInfo>? children})

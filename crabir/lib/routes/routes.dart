@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:crabir/feed/feed.dart';
 import 'package:crabir/feed/multi.dart';
 import 'package:crabir/main.dart';
+import 'package:crabir/media/media.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -45,17 +46,21 @@ class AppRouter extends RootStackRouter {
             AutoRoute(page: InboxRoute.page),
           ],
         ),
-        CustomRoute(
-          page: ThreadRoute.page,
-          customRouteBuilder:
-              <T>(BuildContext context, Widget child, AutoRoutePage<T> page) {
-            return SwipeablePageRoute(
-              settings: page,
-              builder: (BuildContext context) {
-                return child;
-              },
-            );
-          },
-        ),
+        threadRoute,
+        AutoRoute(page: FullscreenImageRoute.page)
       ];
 }
+
+/// Route with swipe to go back
+final threadRoute = CustomRoute(
+  page: ThreadRoute.page,
+  customRouteBuilder:
+      <T>(BuildContext context, Widget child, AutoRoutePage<T> page) {
+    return SwipeablePageRoute(
+      settings: page,
+      builder: (BuildContext context) {
+        return child;
+      },
+    );
+  },
+);

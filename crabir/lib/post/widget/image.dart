@@ -1,10 +1,9 @@
-import 'dart:math';
-
+import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crabir/media/media.dart';
+import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
-import 'package:photo_view/photo_view.dart';
 
 class ImageContent extends StatelessWidget {
   final Post post;
@@ -12,57 +11,30 @@ class ImageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (post.preview != null) {
-      return RedditImageView(image: post.preview!.images[0]);
-    } else {
-      return CachedNetworkImage(
-        imageUrl: post.url,
-        // No fade out
-        fadeOutDuration: Duration(seconds: 0),
-        fadeInDuration: Duration(seconds: 0),
-        placeholderFadeInDuration: Duration(seconds: 0),
-      );
-    }
-  }
-}
-
-/// Display the image at `url` and `placeholderUrl` while the image is loading.
-class ImageThumbnail extends StatelessWidget {
-  final String? placeholderUrl;
-  final ImageBase image;
-
-  const ImageThumbnail({
-    super.key,
-    required this.image,
-    this.placeholderUrl,
-  });
-
-  Widget thumbnail(BuildContext context, String url) {
-    if (placeholderUrl != null) {
-      return Image.network(
-        placeholderUrl!,
-        width: double.infinity,
-        fit: BoxFit.fitWidth,
+      // TODO: resolution & blur
+      final image = post.preview!.images[0];
+      return InkWell(
+        onTap: () => context.pushRoute(
+          FullscreenImageRoute(imageUrl: image.source.url),
+        ),
+        child: ImageThumbnail.redditImage(
+          image,
+          title: post.selftext,
+        ),
       );
     } else {
-      return CircularProgressIndicator();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: image.width / max(1, image.height),
-      child: Center(
+      return InkWell(
+        onTap: () => context.pushRoute(
+          FullscreenImageRoute(imageUrl: post.url),
+        ),
         child: CachedNetworkImage(
-          imageUrl: image.url,
-          placeholder: thumbnail,
+          imageUrl: post.url,
           // No fade out
           fadeOutDuration: Duration(seconds: 0),
           fadeInDuration: Duration(seconds: 0),
           placeholderFadeInDuration: Duration(seconds: 0),
         ),
-      ),
-    );
+      );
+    }
   }
 }
-

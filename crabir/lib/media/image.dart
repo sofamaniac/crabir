@@ -3,15 +3,53 @@ part of 'media.dart';
 /// Display the image at `url` and `placeholderUrl` while the image is loading.
 class ImageThumbnail extends StatelessWidget {
   final String? placeholderUrl;
-  final ImageBase image;
+  //final ImageBase image;
+  final String? title;
+  final String imageUrl;
+  final int? width;
+  final int? height;
 
   const ImageThumbnail({
     super.key,
-    required this.image,
+    required this.imageUrl,
+    //required this.image,
     this.placeholderUrl,
+    this.title,
+    this.width,
+    this.height,
   });
 
-  Widget thumbnail(BuildContext context, String url) {
+  static ImageThumbnail redditImage(
+    RedditImage image, {
+    Resolution resolution = Resolution.source,
+    bool blur = false,
+    String? title,
+  }) {
+    final length = image.resolutions.length;
+    final ImageBase imageBase = switch (resolution) {
+      Resolution.source => image.source,
+      Resolution.high => image.resolutions[length - 2],
+      Resolution.medium => image.resolutions[length >> 1],
+      Resolution.low => image.resolutions[0],
+    };
+    return ImageThumbnail(
+      imageUrl: imageBase.url,
+      width: imageBase.width,
+      height: imageBase.height,
+      title: title,
+    );
+  }
+
+  static ImageThumbnail imageBase(ImageBase image, {String? title}) {
+    return ImageThumbnail(
+      imageUrl: image.url,
+      width: image.width,
+      height: image.height,
+      title: title,
+    );
+  }
+
+  Widget _thumbnail(BuildContext context, String url) {
     if (placeholderUrl != null) {
       return Image.network(
         placeholderUrl!,
@@ -26,56 +64,47 @@ class ImageThumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: image.width / max(1, image.height),
-      child: Center(
-        child: CachedNetworkImage(
-          imageUrl: image.url,
-          placeholder: thumbnail,
-          // No fade out
-          fadeOutDuration: Duration(seconds: 0),
-          fadeInDuration: Duration(seconds: 0),
-          placeholderFadeInDuration: Duration(seconds: 0),
-        ),
-      ),
-    );
-  }
-}
-
-/// Display an image and goes fullscreen on tap.
-class _ImageContent extends StatelessWidget {
-  final ImageBase image;
-  final String? placeholderUrl;
-  final Widget Function(BuildContext, Post)? fullscreen;
-  const _ImageContent({
-    super.key,
-    required this.image,
-    this.placeholderUrl,
-    this.fullscreen,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    late final Future? Function() onTap;
-    onTap = () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FullscreenImageView(imageUrl: image.url),
+      aspectRatio: (width ?? 1) / max(1, (height ?? 1)),
+      child: Stack(
+        children: [
+          Center(
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              placeholder: _thumbnail,
+              // No fade out
+              fadeOutDuration: Duration(seconds: 0),
+              fadeInDuration: Duration(seconds: 0),
+              placeholderFadeInDuration: Duration(seconds: 0),
+            ),
           ),
-        );
-
-    return InkWell(
-      onTap: onTap,
-      child: ImageThumbnail(
-        image: image,
-        placeholderUrl: placeholderUrl,
+          if (title != null && title!.isNotEmpty)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                color: Colors.black45,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    title!,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
 }
 
+@RoutePage()
 class FullscreenImageView extends StatelessWidget {
   final String imageUrl;
-  const FullscreenImageView({super.key, required this.imageUrl});
+  final String? title;
+  const FullscreenImageView({super.key, required this.imageUrl, this.title});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,7 +113,7 @@ class FullscreenImageView extends StatelessWidget {
       body: Dismissible(
         key: UniqueKey(),
         direction: DismissDirection.vertical,
-        onDismissed: (_) => Navigator.pop(context),
+        onDismissed: (_) => context.pop(),
         child: PhotoViewGestureDetectorScope(
           axis: Axis.vertical,
           child: PhotoView(

@@ -1,6 +1,6 @@
 import 'dart:math';
+import 'package:crabir/media/media.dart';
 import 'package:flutter/material.dart';
-import 'package:crabir/post/widget/image.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart';
 
 class GalleryView extends StatefulWidget {
@@ -65,7 +65,7 @@ class _GalleryViewState extends State<GalleryView> {
               controller: _pageController,
               itemBuilder: (context, index) {
                 final image = widget.gallery.get_(index: index);
-                return ImageThumbnail(image: image);
+                return ImageThumbnail.imageBase(image);
               },
               itemCount: widget.gallery.length,
             ),
@@ -155,8 +155,8 @@ class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
             controller: _pageController,
             itemBuilder: (context, index) {
               final image = widget.gallery.get_(index: index);
-              return ImageThumbnail(
-                image: image,
+              return ImageThumbnail.imageBase(
+                image,
               );
             },
             itemCount: widget.gallery.length,

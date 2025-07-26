@@ -168,9 +168,6 @@ class UserCommentsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text("TODO");
-    return _scaffold(
-      RedditAPI.client().userOverview(username: username, sort: sort),
-    );
   }
 }
 
@@ -270,9 +267,6 @@ class UserGildedView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text("TODO");
-    return _scaffold(
-      RedditAPI.client().userOverview(username: username, sort: sort),
-    );
   }
 }
 
@@ -289,9 +283,6 @@ class UserFriendsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text("TODO");
-    return _scaffold(
-      RedditAPI.client().userOverview(username: username, sort: sort),
-    );
   }
 }
 
@@ -308,8 +299,5 @@ class UserBlockedView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text("TODO");
-    return _scaffold(
-      RedditAPI.client().userOverview(username: username, sort: sort),
-    );
   }
 }

@@ -58,7 +58,6 @@ class _FeedViewBodyState extends State<FeedViewBody>
     return BlocBuilder<AccountsBloc, AccountState>(
       builder: (context, account) {
         if (account.status == AccountStatus.uninit) {
-          //return Center(child: CircularProgressIndicator());
           return Container();
         } else if (account.status != AccountStatus.failure) {
           return NestedScrollView(
@@ -93,7 +92,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
             floatHeaderSlivers: true,
             body: ThingsScaffold(
               // Forces rebuild when sort changes
-              key: ValueKey(sort.toString()),
+              key: ValueKey(sort),
               stream: RedditAPI.client().feedStream(
                 feed: widget.feed,
                 sort: sort,

@@ -31,7 +31,7 @@ class _SubscriptionsTabState extends State<SubscriptionsTab> {
 
 class _SubscriptonsList extends StatelessWidget {
   final String filter;
-  const _SubscriptonsList({super.key, this.filter = ""});
+  const _SubscriptonsList({this.filter = ""});
 
   @override
   Widget build(BuildContext context) {

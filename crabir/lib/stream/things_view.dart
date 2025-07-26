@@ -22,6 +22,7 @@ class ThingsScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
+      key: ValueKey(stream),
       create: (_) => StreamBloc(streamable: stream)..add(Fetch()),
       child: ThingsView(
         postView: postView,

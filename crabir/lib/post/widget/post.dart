@@ -1,5 +1,4 @@
 import 'package:crabir/feed_list.dart';
-import 'package:crabir/media/media.dart';
 import 'package:crabir/post/widget/gallery.dart';
 import 'package:crabir/post/widget/html_with_fade.dart';
 import 'package:crabir/post/widget/image.dart';
@@ -112,7 +111,36 @@ class _RedditPostCardState extends State<RedditPostCard> {
     final labelStyle = Theme.of(context).textTheme.labelSmall;
     final subreddit = widget.post.subreddit.subreddit;
     final subredditIcon = widget.post.subreddit.details?.icon;
-    return Row(
+
+    final header = TextSpan(
+      children: [
+        WidgetSpan(
+          child: InkWell(
+            onTap: () => navigateToSubscriptionsTab(
+              context,
+              FeedRoute(
+                feed: Feed.subreddit(subreddit),
+              ),
+            ),
+            child: Row(
+              spacing: 8,
+              children: [
+                if (subredditIcon != null) SubredditIcon(icon: subredditIcon),
+                Text(
+                  subreddit,
+                  style: labelStyle?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        )
+      ],
+    );
+
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         InkWell(
           onTap: () => navigateToSubscriptionsTab(
@@ -122,11 +150,12 @@ class _RedditPostCardState extends State<RedditPostCard> {
             ),
           ),
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             spacing: 8,
             children: [
               if (subredditIcon != null) SubredditIcon(icon: subredditIcon),
               Text(
-                'r/$subreddit',
+                subreddit,
                 style: labelStyle?.copyWith(
                   color: Theme.of(context).colorScheme.primary,
                 ),
@@ -138,14 +167,31 @@ class _RedditPostCardState extends State<RedditPostCard> {
         InkWell(
           onTap: () => (),
           child: Text(
-            'u/${widget.post.author?.username ?? "[deleted]"}',
+            widget.post.author?.username ?? "[deleted]",
             style: labelStyle?.copyWith(
               color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ),
+        if (_showDomain()) ...[
+          const Text(' • '),
+          Text(
+            widget.post.domain,
+            style: labelStyle?.copyWith(
+              color: Theme.of(context).colorScheme.onSecondaryFixedVariant,
+            ),
+          ),
+        ],
       ],
     );
+  }
+
+  bool _showDomain() {
+    final blackList = [
+      "i.redd.it",
+      "reddit.com",
+    ];
+    return !blackList.contains(widget.post.domain) && !widget.post.isSelf;
   }
 
   Widget footer(BuildContext context) {
