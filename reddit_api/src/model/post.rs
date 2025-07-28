@@ -35,6 +35,7 @@ pub struct PostID(String);
 
 #[serde_as]
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+///flutter_rust_bridge:opaque
 pub struct Post {
     pub name: Fullname,
     pub id: PostID,
@@ -117,17 +118,17 @@ pub struct Post {
     pub mod_reports: Vec<Option<String>>,
 
     // Post kind
-    pub post_hint: Option<String>,
+    post_hint: Option<String>,
     pub is_self: bool,
     pub is_original_content: bool,
     pub is_reddit_media_domain: bool,
-    pub is_meta: bool,
-    pub is_created_from_ads_ui: bool,
-    pub media_only: bool,
-    pub category: Option<String>,
-    pub is_video: bool,
+    is_meta: bool,
+    is_created_from_ads_ui: bool,
+    media_only: bool,
+    category: Option<String>,
+    is_video: bool,
     #[serde(default)]
-    pub is_gallery: bool,
+    is_gallery: bool,
 
     // Post properties
     pub pinned: bool,
@@ -166,10 +167,13 @@ pub struct Post {
     pub send_replies: bool,
     pub contest_mode: bool,
     pub num_crossposts: Option<u32>,
+    #[serde(default)]
+    pub crosspost_parent_list: Vec<Post>,
 }
 
 impl Post {
     #[must_use]
+    ///flutter_rust_bridge:sync,getter
     pub fn thumbnail(&self) -> Option<Thumbnail> {
         if let ThumbnailOption {
             url: Some(url),
@@ -177,17 +181,31 @@ impl Post {
             height: Some(height),
         } = &self.thumbnail
         {
-            Some(Thumbnail {
-                url: url.clone(),
-                height: *height,
-                width: *width,
-            })
+            if url == "default" {
+                None
+            } else {
+                Some(Thumbnail {
+                    url: url.clone(),
+                    height: *height,
+                    width: *width,
+                })
+            }
         } else {
             None
         }
     }
 
+    fn video_kind(&self) -> Kind {
+        const DOMAINS: [&str; 2] = ["youtube.com", "youtu.be"];
+        if DOMAINS.contains(&self.domain.as_str()) {
+            Kind::YoutubeVideo
+        } else {
+            Kind::Video
+        }
+    }
+
     #[must_use]
+    ///flutter_rust_bridge:sync,getter
     pub fn kind(&self) -> Kind {
         if self.is_video {
             Kind::Video
@@ -201,13 +219,7 @@ impl Post {
             match post_hint.as_str() {
                 "image" => Kind::Image,
                 "hosted:video" => Kind::Video,
-                "rich:video" => {
-                    if self.domain == "youtbe.com" || self.domain == "youtu.be" {
-                        Kind::YoutubeVideo
-                    } else {
-                        Kind::Video
-                    }
-                }
+                "rich:video" => self.video_kind(),
                 "link" => Kind::Link,
                 _ => Kind::Unknown,
             }
@@ -218,6 +230,11 @@ impl Post {
         } else {
             Kind::Unknown
         }
+    }
+
+    ///flutter_rust_bridge:sync,getter
+    pub fn is_crosspost(&self) -> bool {
+        !self.crosspost_parent_list.is_empty()
     }
 }
 

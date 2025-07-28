@@ -1,3 +1,4 @@
+import 'package:crabir/cartouche.dart';
 import 'package:crabir/feed_list.dart';
 import 'package:crabir/post/widget/gallery.dart';
 import 'package:crabir/post/widget/html_with_fade.dart';
@@ -14,6 +15,17 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final horizontalPadding = 16.0;
+
+class NsfwTag extends StatelessWidget {
+  const NsfwTag({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Cartouche(
+      "NSFW",
+      background: Colors.red,
+    );
+  }
+}
 
 class _PostTitle extends StatelessWidget {
   final Post post;
@@ -42,17 +54,29 @@ class _PostTitle extends StatelessWidget {
       textAlign: TextAlign.start,
       style: Theme.of(context).textTheme.titleMedium,
     );
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      title,
-      FlairView(flair: post.linkFlair),
-      Row(
-        children: [
-          Text("${post.ups}"),
-          Text(" "),
-          Text("${post.numComments} comments")
-        ],
-      )
-    ]);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        title,
+        FlairView(flair: post.linkFlair),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: 4,
+          children: [
+            Text(
+              "${post.ups}",
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Text('•', style: Theme.of(context).textTheme.bodySmall),
+            Text(
+              "${post.numComments} comments",
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            if (post.over18) NsfwTag(),
+          ],
+        ),
+      ],
+    );
   }
 
   @override
@@ -104,40 +128,13 @@ class _RedditPostCardState extends State<RedditPostCard> {
   }
 
   Widget _wrap(Widget widget) {
-    return Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: widget);
+    return Padding(padding: EdgeInsets.symmetric(horizontal: 4), child: widget);
   }
 
   Widget header(BuildContext context) {
     final labelStyle = Theme.of(context).textTheme.labelSmall;
     final subreddit = widget.post.subreddit.subreddit;
     final subredditIcon = widget.post.subreddit.details?.icon;
-
-    final header = TextSpan(
-      children: [
-        WidgetSpan(
-          child: InkWell(
-            onTap: () => navigateToSubscriptionsTab(
-              context,
-              FeedRoute(
-                feed: Feed.subreddit(subreddit),
-              ),
-            ),
-            child: Row(
-              spacing: 8,
-              children: [
-                if (subredditIcon != null) SubredditIcon(icon: subredditIcon),
-                Text(
-                  subreddit,
-                  style: labelStyle?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        )
-      ],
-    );
 
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
@@ -163,6 +160,11 @@ class _RedditPostCardState extends State<RedditPostCard> {
             ],
           ),
         ),
+        if (widget.post.isCrosspost)
+          const RotatedBox(
+            quarterTurns: 1,
+            child: Icon(Icons.alt_route, color: Colors.greenAccent),
+          ),
         const Text(' • '),
         InkWell(
           onTap: () => (),
@@ -187,11 +189,9 @@ class _RedditPostCardState extends State<RedditPostCard> {
   }
 
   bool _showDomain() {
-    final blackList = [
-      "i.redd.it",
-      "reddit.com",
-    ];
-    return !blackList.contains(widget.post.domain) && !widget.post.isSelf;
+    return !widget.post.isSelf &&
+        !widget.post.isRedditMediaDomain &&
+        widget.post.domain != "reddit.com";
   }
 
   Widget footer(BuildContext context) {
@@ -201,7 +201,10 @@ class _RedditPostCardState extends State<RedditPostCard> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(
-          icon: Icon(Icons.thumb_up, color: (likes == true) ? likeColor : null),
+          icon: Icon(
+            Icons.thumb_up,
+            color: (likes == true) ? likeColor : null,
+          ),
           tooltip: 'Upvote',
           onPressed: () async {
             await widget.onLike?.call(
@@ -217,8 +220,10 @@ class _RedditPostCardState extends State<RedditPostCard> {
           },
         ),
         IconButton(
-          icon: Icon(Icons.thumb_down,
-              color: (likes == false) ? dislikeColor : null),
+          icon: Icon(
+            Icons.thumb_down,
+            color: (likes == false) ? dislikeColor : null,
+          ),
           tooltip: 'Downvote',
           onPressed: () async {
             await widget.onLike?.call(
@@ -318,7 +323,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
       Kind.video => VideoContent(post: this.widget.post),
       Kind.youtubeVideo => YoutubeContent(post: this.widget.post),
       Kind.gallery => GalleryView(gallery: this.widget.post.gallery!),
-      Kind.mediaGallery => Text("Some kind of gallery"),
+      Kind.mediaGallery => MediaGalleryView(post: this.widget.post),
       Kind.image => ImageContent(post: this.widget.post),
       Kind.link => Container(),
       Kind.unknown => Text("unknown"),
