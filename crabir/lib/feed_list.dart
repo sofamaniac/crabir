@@ -13,7 +13,7 @@ void navigateToSubscriptionsTab(context, destination) {
   // Tabs are lazily loaded, so if it was never visited the tab router does not exists
   tabsRouter.setActiveIndex(2);
   final subscriptionsTabRouter = tabsRouter.stackRouterOfIndex(2);
-  subscriptionsTabRouter?.replaceAll([destination]);
+  subscriptionsTabRouter?.push(destination);
 }
 
 /// Widget to display a subreddit in a list

@@ -40,8 +40,6 @@ abstract class Post implements RustOpaqueInterface {
 
   bool get canModPost;
 
-  String? get category;
-
   bool get clicked;
 
   List<String> get contentCategories;
@@ -51,6 +49,8 @@ abstract class Post implements RustOpaqueInterface {
   DateTime get created;
 
   DateTime get createdUtc;
+
+  List<Post> get crosspostParentList;
 
   String? get discussionType;
 
@@ -74,13 +74,7 @@ abstract class Post implements RustOpaqueInterface {
 
   PostId get id;
 
-  bool get isCreatedFromAdsUi;
-
   bool get isCrosspostable;
-
-  bool get isGallery;
-
-  bool get isMeta;
 
   bool get isOriginalContent;
 
@@ -89,8 +83,6 @@ abstract class Post implements RustOpaqueInterface {
   bool get isRobotIndexable;
 
   bool get isSelf;
-
-  bool get isVideo;
 
   bool? get likes;
 
@@ -101,8 +93,6 @@ abstract class Post implements RustOpaqueInterface {
   Media? get media;
 
   MediaEmbed? get mediaEmbed;
-
-  bool get mediaOnly;
 
   String? get modNote;
 
@@ -129,8 +119,6 @@ abstract class Post implements RustOpaqueInterface {
   String get permalink;
 
   bool get pinned;
-
-  String? get postHint;
 
   Preview? get preview;
 
@@ -214,8 +202,6 @@ abstract class Post implements RustOpaqueInterface {
 
   set canModPost(bool canModPost);
 
-  set category(String? category);
-
   set clicked(bool clicked);
 
   set contentCategories(List<String> contentCategories);
@@ -225,6 +211,8 @@ abstract class Post implements RustOpaqueInterface {
   set created(DateTime created);
 
   set createdUtc(DateTime createdUtc);
+
+  set crosspostParentList(List<Post> crosspostParentList);
 
   set discussionType(String? discussionType);
 
@@ -248,13 +236,7 @@ abstract class Post implements RustOpaqueInterface {
 
   set id(PostId id);
 
-  set isCreatedFromAdsUi(bool isCreatedFromAdsUi);
-
   set isCrosspostable(bool isCrosspostable);
-
-  set isGallery(bool isGallery);
-
-  set isMeta(bool isMeta);
 
   set isOriginalContent(bool isOriginalContent);
 
@@ -263,8 +245,6 @@ abstract class Post implements RustOpaqueInterface {
   set isRobotIndexable(bool isRobotIndexable);
 
   set isSelf(bool isSelf);
-
-  set isVideo(bool isVideo);
 
   set likes(bool? likes);
 
@@ -275,8 +255,6 @@ abstract class Post implements RustOpaqueInterface {
   set media(Media? media);
 
   set mediaEmbed(MediaEmbed? mediaEmbed);
-
-  set mediaOnly(bool mediaOnly);
 
   set modNote(String? modNote);
 
@@ -303,8 +281,6 @@ abstract class Post implements RustOpaqueInterface {
   set permalink(String permalink);
 
   set pinned(bool pinned);
-
-  set postHint(String? postHint);
 
   set preview(Preview? preview);
 
@@ -368,6 +344,9 @@ abstract class Post implements RustOpaqueInterface {
 
   static Future<Post> default_() =>
       RustLib.instance.api.redditApiModelPostPostDefault();
+
+  ///flutter_rust_bridge:sync,getter
+  bool get isCrosspost;
 
   Kind get kind;
 
