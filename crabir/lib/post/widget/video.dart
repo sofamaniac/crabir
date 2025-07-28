@@ -1,6 +1,9 @@
 import 'package:chewie/chewie.dart';
+import 'package:crabir/cartouche.dart';
+import 'package:crabir/media/media.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:video_player/video_player.dart';
 
 class YoutubeContent extends StatelessWidget {
@@ -8,7 +11,22 @@ class YoutubeContent extends StatelessWidget {
   const YoutubeContent({super.key, required this.post});
   @override
   Widget build(BuildContext context) {
-    return Text("A Youtube Video");
+    return InkWell(
+      onTap: () => launchUrlString(post.url),
+      child: Stack(
+        children: [
+          ImageThumbnail.redditImage(post.preview!.images[0]),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Cartouche(
+              "YOUTUBE",
+              background: Colors.red,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -32,9 +50,15 @@ class _VideoContentState extends State<VideoContent> {
     final String url;
     switch (widget.post.secureMedia) {
       case null:
-        url = "";
-        width = 1;
-        height = 1;
+        if (widget.post.preview?.images[0].variants.mp4 != null) {
+          url = widget.post.preview!.images[0].variants.mp4!.source.url;
+          width = widget.post.preview!.images[0].variants.mp4!.source.width;
+          height = widget.post.preview!.images[0].variants.mp4!.source.height;
+        } else {
+          url = "";
+          width = 1;
+          height = 1;
+        }
         break;
       case Media_RedditVideo():
         final video = (widget.post.secureMedia! as Media_RedditVideo);
