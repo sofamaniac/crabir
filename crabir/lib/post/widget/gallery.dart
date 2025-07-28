@@ -1,7 +1,33 @@
 import 'dart:math';
+import 'package:crabir/cartouche.dart';
 import 'package:crabir/media/media.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart';
+
+class MediaGalleryView extends StatelessWidget {
+  final Post post;
+  const MediaGalleryView({super.key, required this.post});
+  @override
+  Widget build(BuildContext context) {
+    if (post.gallery != null) {
+      return GalleryView(
+        gallery: post.gallery!,
+      );
+    } else if (post.isCrosspost) {
+      final gallery = post.crosspostParentList[0].gallery;
+      if (gallery != null) {
+        return GalleryView(
+          gallery: gallery,
+        );
+      } else {
+        return Text("some kind of gallery");
+      }
+    } else {
+      return Text("some kind of gallery");
+    }
+  }
+}
 
 class GalleryView extends StatefulWidget {
   final Gallery gallery;
@@ -74,19 +100,10 @@ class _GalleryViewState extends State<GalleryView> {
         Positioned(
           top: 4,
           right: 4,
-          child: Container(
-            padding: EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Colors.black54,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              '${_currentPage + 1} / ${widget.gallery.length}',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-              ),
-            ),
+          child: Cartouche(
+            '${_currentPage + 1} / ${widget.gallery.length}',
+            background: Colors.black54,
+            foreground: Colors.white,
           ),
         ),
       ],
