@@ -21,33 +21,30 @@ class CurrentUserView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AccountsBloc, AccountState>(
-      builder: (context, state) {
-        if (state.account == null) {
-          return Container();
-        }
-        final username = state.account!.username;
-        return AutoTabsRouter.tabBar(
-          homeIndex: 0,
-          routes: allUserTabs.map((tab) => tab.route(username)).toList(),
-          builder: (context, child, tabController) {
-            return NestedScrollView(
-              headerSliverBuilder: (_, __) => [
-                SliverAppBar.large(
-                  //floating: true,
-                  pinned: false,
-                  bottom: TabBar(
-                    isScrollable: true,
-                    tabAlignment: TabAlignment.start,
-                    tabs: allUserTabs.map((tab) => Text(tab.name())).toList(),
-                    controller: tabController,
-                  ),
-                )
-              ],
-              floatHeaderSlivers: true,
-              body: child,
-            );
-          },
+    final state = context.watch<AccountsBloc>().state;
+    if (state.account == null) {
+      return Container();
+    }
+    final username = state.account!.username;
+    return AutoTabsRouter.tabBar(
+      homeIndex: 0,
+      routes: allUserTabs.map((tab) => tab.route(username)).toList(),
+      builder: (context, child, tabController) {
+        return NestedScrollView(
+          headerSliverBuilder: (_, __) => [
+            SliverAppBar.large(
+              //floating: true,
+              pinned: false,
+              bottom: TabBar(
+                isScrollable: true,
+                tabAlignment: TabAlignment.start,
+                tabs: allUserTabs.map((tab) => Text(tab.name())).toList(),
+                controller: tabController,
+              ),
+            )
+          ],
+          floatHeaderSlivers: true,
+          body: child,
         );
       },
     );

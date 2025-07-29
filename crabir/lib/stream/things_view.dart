@@ -56,53 +56,51 @@ class _ThingsViewState extends State<ThingsView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<StreamBloc, StreamState>(
-      builder: (context, state) {
-        switch (state.status) {
-          case StreamStatus.failure:
-            return const Center(child: Text("Failed to load items."));
-          case StreamStatus.initial:
-            context.read<StreamBloc>().add(Fetch());
-            return const Center(child: CircularProgressIndicator());
-          case StreamStatus.success:
-            if (state.items.isEmpty) {
-              return const Center(child: Text("Nothing to see here"));
-            }
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<StreamBloc>().add(Refresh());
-              },
-              child: Scrollbar(
-                child: ListView.builder(
-                  itemCount: state.items.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index < state.items.length) {
-                      switch (state.items[index]) {
-                        case Thing_Post(field0: final post):
-                          if (widget.postView != null) {
-                            return widget.postView!(context, post);
-                          } else {
-                            return Container();
-                          }
-                        case Thing_Comment(field0: final comment):
-                          if (widget.commentView != null) {
-                            return widget.commentView!(context, comment);
-                          } else {
-                            return Container();
-                          }
-                        default:
-                          return SizedBox.shrink();
-                      }
-                    } else {
-                      context.read<StreamBloc>().add(Fetch());
-                      return Center(child: CircularProgressIndicator());
-                    }
-                  },
-                ),
-              ),
-            );
+    final bloc = context.read<StreamBloc>();
+    final state = context.watch<StreamBloc>().state;
+    switch (state.status) {
+      case StreamStatus.failure:
+        return const Center(child: Text("Failed to load items."));
+      case StreamStatus.initial:
+        bloc.add(Fetch());
+        return const Center(child: CircularProgressIndicator());
+      case StreamStatus.success:
+        if (state.items.isEmpty) {
+          return const Center(child: Text("Nothing to see here"));
         }
-      },
-    );
+        return RefreshIndicator(
+          onRefresh: () async {
+            bloc.add(Refresh());
+          },
+          child: Scrollbar(
+            child: ListView.builder(
+              itemCount: state.items.length + 1,
+              itemBuilder: (context, index) {
+                if (index < state.items.length) {
+                  switch (state.items[index]) {
+                    case Thing_Post(field0: final post):
+                      if (widget.postView != null) {
+                        return widget.postView!(context, post);
+                      } else {
+                        return Container();
+                      }
+                    case Thing_Comment(field0: final comment):
+                      if (widget.commentView != null) {
+                        return widget.commentView!(context, comment);
+                      } else {
+                        return Container();
+                      }
+                    default:
+                      return SizedBox.shrink();
+                  }
+                } else {
+                  bloc.add(Fetch());
+                  return Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+          ),
+        );
+    }
   }
 }

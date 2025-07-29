@@ -6,12 +6,14 @@ import 'package:crabir/post/widget/image.dart';
 import 'package:crabir/post/widget/video.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/routes/routes.dart';
+import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/subreddit.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final horizontalPadding = 16.0;
@@ -33,8 +35,11 @@ class _PostTitle extends StatelessWidget {
   final bool showThumbnail;
   final bool showFlair;
 
-  const _PostTitle(
-      {required this.post, this.showThumbnail = false, this.showFlair = true});
+  const _PostTitle({
+    required this.post,
+    this.showThumbnail = false,
+    this.showFlair = true,
+  });
 
   Widget thumbnail() {
     return Expanded(
@@ -49,10 +54,14 @@ class _PostTitle extends StatelessWidget {
   }
 
   Widget title(BuildContext context) {
+    final theme = context.watch<ThemeBloc>().state;
     final title = Text(
       post.title,
       textAlign: TextAlign.start,
-      style: Theme.of(context).textTheme.titleMedium,
+      style: Theme.of(context)
+          .textTheme
+          .titleMedium!
+          .copyWith(color: theme.postTitle),
     );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,6 +144,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
     final labelStyle = Theme.of(context).textTheme.labelSmall;
     final subreddit = widget.post.subreddit.subreddit;
     final subredditIcon = widget.post.subreddit.details?.icon;
+    final theme = context.watch<ThemeBloc>().state;
 
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
@@ -154,7 +164,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
               Text(
                 subreddit,
                 style: labelStyle?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: theme.highlight,
                 ),
               ),
             ],
@@ -171,7 +181,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
           child: Text(
             widget.post.author?.username ?? "[deleted]",
             style: labelStyle?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
+              color: theme.highlight,
             ),
           ),
         ),
@@ -195,8 +205,10 @@ class _RedditPostCardState extends State<RedditPostCard> {
   }
 
   Widget footer(BuildContext context) {
-    final likeColor = Theme.of(context).colorScheme.primary;
+    final theme = context.watch<ThemeBloc>().state;
+    final likeColor = theme.primaryColor;
     final dislikeColor = Theme.of(context).colorScheme.secondary;
+    final savedColor = Colors.yellow;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -243,7 +255,10 @@ class _RedditPostCardState extends State<RedditPostCard> {
             await widget.onSave?.call(!saved);
             saved = !saved;
           },
-          icon: const Icon(Icons.bookmark_outlined),
+          icon: Icon(
+            Icons.bookmark_outlined,
+            color: saved ? savedColor : null,
+          ),
           tooltip: "Save",
         ),
         IconButton(
