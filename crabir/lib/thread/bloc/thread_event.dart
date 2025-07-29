@@ -1,20 +1,14 @@
 part of 'thread_bloc.dart';
 
-sealed class ThreadEvent {}
+@freezed
+sealed class ThreadEvent with _$ThreadEvent {
+  /// Initial load of post and comments
+  const factory ThreadEvent.load() = Load;
+  const factory ThreadEvent.refresh() = Refresh;
 
-/// Initial load of post and comments
-class Load extends ThreadEvent {}
+  /// (Un)Collapse the specified comment
+  factory ThreadEvent.collapse(Comment comment) = Collapse;
 
-/// (Un)Collapse the specified comment
-class Collapse extends ThreadEvent {
-  final Comment comment;
-  Collapse(this.comment);
+  /// Load more comments
+  factory ThreadEvent.loadMore(Thing_More more) = LoadMore;
 }
-
-/// Load more comments
-class LoadMore extends ThreadEvent {
-  final Thing_More more;
-  LoadMore(this.more);
-}
-
-class Refresh extends ThreadEvent {}

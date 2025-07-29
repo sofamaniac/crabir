@@ -5,10 +5,12 @@ import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:logging/logging.dart';
 
 part 'thread_event.dart';
 part 'thread_state.dart';
+part 'thread_bloc.freezed.dart';
 
 class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   final Set<String> _collapsed = {};

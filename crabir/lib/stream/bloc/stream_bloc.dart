@@ -4,10 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
     as reddit_stream;
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:logging/logging.dart';
 
 part 'stream_state.dart';
 part 'stream_event.dart';
+part 'stream_bloc.freezed.dart';
 
 class StreamBloc extends Bloc<StreamEvent, StreamState> {
   StreamBloc({required this.streamable}) : super(const StreamState()) {

@@ -3,11 +3,13 @@ import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'account_event.dart';
 part 'account_state.dart';
+part 'accounts_bloc.freezed.dart';
 
 class AccountsBloc extends Bloc<AccountEvent, AccountState> {
   List<UserAccount> _accounts = [];

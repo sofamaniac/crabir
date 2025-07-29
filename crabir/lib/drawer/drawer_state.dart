@@ -76,7 +76,7 @@ class DrawerState extends State<AppDrawer> {
               ...state.allAccounts.mapIndexed(
                 (index, account) => ListTile(
                   onTap: () async {
-                    bloc.add(SelectAccount(index: index));
+                    bloc.add(SelectAccount(index));
                     // close menu after selection
                     changeMode(isSelectingAccount: false);
                   },
