@@ -6,6 +6,7 @@ import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/frb_generated.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart';
 
 Future<void> main() async {
@@ -31,6 +32,11 @@ class Crabir extends StatelessWidget {
         BlocProvider(create: (context) => ThemeBloc()),
       ],
       child: MaterialApp.router(
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         themeMode: ThemeMode.system,
         theme: ThemeData.light(useMaterial3: true),
         darkTheme: ThemeData.dark(useMaterial3: true),
@@ -53,6 +59,7 @@ class MainScreenView extends StatelessWidget {
       CurrentUserRoute(),
     ];
     final state = context.watch<AccountsBloc>().state;
+    final theme = context.watch<ThemeBloc>().state;
     return AutoTabsRouter.tabBar(
       key: ValueKey(state.account?.username ?? ""),
       homeIndex: 0,
@@ -61,9 +68,12 @@ class MainScreenView extends StatelessWidget {
       builder: (context, child, tabController) {
         final tabsRouter = AutoTabsRouter.of(context);
         return Scaffold(
+          backgroundColor: theme.background,
           body: child,
           drawer: AppDrawer(),
           bottomNavigationBar: TabBar(
+            labelColor: Theme.of(context).primaryTextTheme.bodyLarge!.color,
+            indicatorColor: theme.primaryColor,
             controller: tabController,
             onTap: (index) {
               tabController.animateTo(index);

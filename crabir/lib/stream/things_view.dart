@@ -73,7 +73,7 @@ class _ThingsViewState extends State<ThingsView> {
             bloc.add(Refresh());
           },
           child: Scrollbar(
-            child: ListView.builder(
+            child: ListView.separated(
               itemCount: state.items.length + 1,
               itemBuilder: (context, index) {
                 if (index < state.items.length) {
@@ -98,6 +98,7 @@ class _ThingsViewState extends State<ThingsView> {
                   return Center(child: CircularProgressIndicator());
                 }
               },
+              separatorBuilder: (context, _) => Divider(),
             ),
           ),
         );

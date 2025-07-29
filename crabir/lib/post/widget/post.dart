@@ -3,6 +3,7 @@ import 'package:crabir/feed_list.dart';
 import 'package:crabir/post/widget/gallery.dart';
 import 'package:crabir/post/widget/html_with_fade.dart';
 import 'package:crabir/post/widget/image.dart';
+import 'package:crabir/post/widget/time_display.dart';
 import 'package:crabir/post/widget/video.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/routes/routes.dart';
@@ -141,7 +142,10 @@ class _RedditPostCardState extends State<RedditPostCard> {
   }
 
   Widget header(BuildContext context) {
-    final labelStyle = Theme.of(context).textTheme.labelSmall;
+    final labelStyle = Theme.of(context)
+        .textTheme
+        .labelSmall!
+        .copyWith(fontWeight: FontWeight.normal);
     final subreddit = widget.post.subreddit.subreddit;
     final subredditIcon = widget.post.subreddit.details?.icon;
     final theme = context.watch<ThemeBloc>().state;
@@ -163,7 +167,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
               if (subredditIcon != null) SubredditIcon(icon: subredditIcon),
               Text(
                 subreddit,
-                style: labelStyle?.copyWith(
+                style: labelStyle.copyWith(
                   color: theme.highlight,
                 ),
               ),
@@ -180,18 +184,16 @@ class _RedditPostCardState extends State<RedditPostCard> {
           onTap: () => (),
           child: Text(
             widget.post.author?.username ?? "[deleted]",
-            style: labelStyle?.copyWith(
-              color: theme.highlight,
-            ),
+            style: labelStyle,
           ),
         ),
+        const Text(' • '),
+        TimeDisplay(widget.post.createdUtc, style: labelStyle),
         if (_showDomain()) ...[
           const Text(' • '),
           Text(
             widget.post.domain,
-            style: labelStyle?.copyWith(
-              color: Theme.of(context).colorScheme.onSecondaryFixedVariant,
-            ),
+            style: labelStyle,
           ),
         ],
       ],
@@ -340,8 +342,8 @@ class _RedditPostCardState extends State<RedditPostCard> {
       Kind.gallery => GalleryView(gallery: this.widget.post.gallery!),
       Kind.mediaGallery => MediaGalleryView(post: this.widget.post),
       Kind.image => ImageContent(post: this.widget.post),
-      Kind.link => Container(),
-      Kind.unknown => Text("unknown"),
+      Kind.link || Kind.unknown => Container(),
+      //Kind.unknown => Text("unknown"),
     };
 
     return _contentWrap(widget);
@@ -360,10 +362,15 @@ class _RedditPostCardState extends State<RedditPostCard> {
         _wrap(footer(context)),
       ],
     );
+    final theme = context.watch<ThemeBloc>().state;
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
+      color: theme.background,
       elevation: 1,
-      child: InkWell(onTap: widget.onTap, child: contentWidget),
+      child: InkWell(
+        onTap: widget.onTap,
+        child: contentWidget,
+      ),
     );
   }
 }

@@ -46,7 +46,7 @@ class SortMenu extends StatelessWidget {
               controller.open();
             }
           },
-          icon: const Icon(Icons.list),
+          icon: const Icon(Icons.sort),
         );
       },
     );

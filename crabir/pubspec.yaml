@@ -57,6 +57,10 @@ dependencies:
   swipeable_page_route: ^0.4.7
   cached_network_image: ^3.4.1
   auto_route: ^10.1.0+1
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  flutter_speed_dial: ^7.0.0
 
 dev_dependencies:
   flutter_test:

@@ -31,14 +31,15 @@ class SortDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     final timeframe = timeframeString();
     if (timeframe != null) {
-      return Row(
-        children: [
-          Text(sortString()),
-          Text(timeframe),
-        ],
+      return Text(
+        "${sortString()} $timeframe",
+        style: Theme.of(context).textTheme.labelSmall,
       );
     } else {
-      return Text(sortString());
+      return Text(
+        sortString(),
+        style: Theme.of(context).textTheme.labelSmall,
+      );
     }
   }
 }

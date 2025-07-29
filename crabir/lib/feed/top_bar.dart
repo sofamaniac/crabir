@@ -1,5 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:crabir/feed/sort_display.dart';
 import 'package:crabir/feed/sort_menu.dart';
+import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:flutter/material.dart';
 
@@ -19,20 +21,35 @@ class FeedTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      title: Column(
-        children: [
-          // TODO styling
-          Text("TODO"),
-          SortDisplay(sort: sort),
-        ],
-      ),
+      floating: true,
+      title: feedTitle(),
       actions: [
-        IconButton(onPressed: () => (), icon: Icon(Icons.search)),
+        IconButton(
+          icon: Icon(Icons.search),
+          onPressed: () {
+            context.pushRoute(SearchRoute());
+          },
+        ),
         SortMenu(
-          onSelect: (sort) => (),
+          onSelect: setSort,
         ),
       ],
-      floating: true,
+    );
+  }
+
+  Widget feedTitle() {
+    final title = switch (feed) {
+      Feed_Home() => "Home",
+      Feed_All() => "All",
+      Feed_Subreddit(:final field0) => field0,
+      Feed_Popular() => "Popular",
+    };
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title),
+        SortDisplay(sort: sort),
+      ],
     );
   }
 }
