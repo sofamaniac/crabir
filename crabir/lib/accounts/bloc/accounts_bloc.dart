@@ -82,6 +82,8 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
       await RedditAPI.client().authenticate(
         refreshToken: _currentAccount!.refreshToken!,
       );
+    } else {
+      await RedditAPI.client().newLoggedOutUserToken();
     }
     emit(state.copyWith(
       status: AccountStatus.unloaded,
