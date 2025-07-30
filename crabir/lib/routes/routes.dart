@@ -39,7 +39,10 @@ class AppRouter extends RootStackRouter {
               children: [
                 AutoRoute(page: FeedRoute.page),
                 AutoRoute(page: MultiRoute.page),
-                AutoRoute(page: SubscriptionsTabRoute.page),
+                AutoRoute(
+                  page: SubscriptionsTabRoute.page,
+                  initial: true,
+                ),
               ],
             ),
             AutoRoute(page: SearchRoute.page),

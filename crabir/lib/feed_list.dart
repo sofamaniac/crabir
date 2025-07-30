@@ -8,12 +8,13 @@ import 'package:crabir/subreddit.dart';
 import 'package:flutter/material.dart';
 
 // FIX: does not work properly on first call
-void navigateToSubscriptionsTab(context, destination) {
+void navigateToSubscriptionsTab(BuildContext context, destination) {
   final tabsRouter = AutoTabsRouter.of(context);
   // Tabs are lazily loaded, so if it was never visited the tab router does not exists
   tabsRouter.setActiveIndex(2);
-  final subscriptionsTabRouter = tabsRouter.stackRouterOfIndex(2);
-  subscriptionsTabRouter?.push(destination);
+  // final subscriptionsTabRouter = tabsRouter.stackRouterOfIndex(2);
+  // subscriptionsTabRouter?.push(destination);
+  context.router.navigate(destination);
 }
 
 /// Widget to display a subreddit in a list
