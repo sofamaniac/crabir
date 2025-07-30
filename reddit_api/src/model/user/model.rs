@@ -32,13 +32,13 @@ pub struct User {
 
     #[serde(rename = "gold_expiration")]
     pub gold_expiration: Option<String>,
-    #[serde(rename = "has_gold_subscription")]
-    pub has_gold_subscription: bool,
+    // #[serde(rename = "has_gold_subscription")]
+    // pub has_gold_subscription: bool,
     #[serde(rename = "is_sponsor")]
     pub is_sponsor: bool,
     #[serde(rename = "num_friends")]
     pub num_friends: i64,
-    pub features: Features,
+    //pub features: Features,
     #[serde(rename = "can_edit_name")]
     pub can_edit_name: bool,
     #[serde(rename = "new_modmail_exists")]
@@ -48,23 +48,23 @@ pub struct User {
     pub can_create_subreddit: bool,
     #[serde(rename = "suspension_expiration_utc")]
     pub suspension_expiration_utc: Option<f32>,
-    #[serde(rename = "has_stripe_subscription")]
-    pub has_stripe_subscription: bool,
-    #[serde(rename = "has_android_subscription")]
-    pub has_android_subscription: bool,
+    // #[serde(rename = "has_stripe_subscription")]
+    // pub has_stripe_subscription: bool,
+    // #[serde(rename = "has_android_subscription")]
+    // pub has_android_subscription: bool,
     #[serde(rename = "has_mod_mail")]
     pub has_mod_mail: bool,
     #[serde(rename = "has_mail")]
     pub has_mail: bool,
-    #[serde(rename = "has_paypal_subscription")]
-    pub has_paypal_subscription: bool,
-    #[serde(rename = "has_subscribed_to_premium")]
-    pub has_subscribed_to_premium: bool,
-    #[serde(rename = "in_redesign_beta")]
-    pub in_redesign_beta: bool,
+    // #[serde(rename = "has_paypal_subscription")]
+    // pub has_paypal_subscription: bool,
+    // #[serde(rename = "has_subscribed_to_premium")]
+    // pub has_subscribed_to_premium: bool,
+    // #[serde(rename = "in_redesign_beta")]
+    // pub in_redesign_beta: bool,
     #[serde(rename = "password_set")]
     pub password_set: bool,
-    pub modhash: String,
+    //  pub modhash: String,
     #[serde(rename = "is_suspended")]
     pub is_suspended: bool,
     #[serde(rename = "force_password_reset")]
@@ -75,12 +75,12 @@ pub struct User {
     pub gold_creddits: i64,
     #[serde(rename = "has_ios_subscription")]
     pub has_ios_subscription: bool,
-    #[serde(rename = "in_beta")]
-    pub in_beta: bool,
-    #[serde(rename = "has_visited_new_profile")]
-    pub has_visited_new_profile: bool,
-    #[serde(rename = "has_external_account")]
-    pub has_external_account: bool,
+    // #[serde(rename = "in_beta")]
+    // pub in_beta: bool,
+    // #[serde(rename = "has_visited_new_profile")]
+    // pub has_visited_new_profile: bool,
+    // #[serde(rename = "has_external_account")]
+    // pub has_external_account: bool,
 }
 impl User {
     pub(crate) fn name(&self) -> crate::model::Fullname {
@@ -165,61 +165,6 @@ pub struct UserSubreddit {
     pub subreddit_type: String,
     #[serde(rename = "user_is_subscriber")]
     pub user_is_subscriber: bool,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Features {
-    #[serde(rename = "modmail_harassment_filter")]
-    pub modmail_harassment_filter: bool,
-    #[serde(rename = "mod_service_mute_writes")]
-    pub mod_service_mute_writes: bool,
-    #[serde(rename = "promoted_trend_blanks")]
-    pub promoted_trend_blanks: bool,
-    #[serde(rename = "show_amp_link")]
-    pub show_amp_link: bool,
-    #[serde(rename = "is_email_permission_required")]
-    pub is_email_permission_required: bool,
-    #[serde(rename = "mod_awards")]
-    pub mod_awards: bool,
-    #[serde(rename = "expensive_coins_package")]
-    pub expensive_coins_package: bool,
-    #[serde(rename = "chat_subreddit")]
-    pub chat_subreddit: bool,
-    #[serde(rename = "awards_on_streams")]
-    pub awards_on_streams: bool,
-    #[serde(rename = "mweb_xpromo_modal_listing_click_daily_dismissible_ios")]
-    pub mweb_xpromo_modal_listing_click_daily_dismissible_ios: bool,
-    #[serde(rename = "cookie_consent_banner")]
-    pub cookie_consent_banner: bool,
-    #[serde(rename = "modlog_copyright_removal")]
-    pub modlog_copyright_removal: bool,
-    #[serde(rename = "do_not_track")]
-    pub do_not_track: bool,
-    #[serde(rename = "images_in_comments")]
-    pub images_in_comments: bool,
-    #[serde(rename = "mod_service_mute_reads")]
-    pub mod_service_mute_reads: bool,
-    #[serde(rename = "chat_user_settings")]
-    pub chat_user_settings: bool,
-    #[serde(rename = "use_pref_account_deployment")]
-    pub use_pref_account_deployment: bool,
-    #[serde(rename = "mweb_xpromo_interstitial_comments_ios")]
-    pub mweb_xpromo_interstitial_comments_ios: bool,
-    #[serde(rename = "mweb_xpromo_modal_listing_click_daily_dismissible_android")]
-    pub mweb_xpromo_modal_listing_click_daily_dismissible_android: bool,
-    #[serde(rename = "premium_subscriptions_table")]
-    pub premium_subscriptions_table: bool,
-    #[serde(rename = "mweb_xpromo_interstitial_comments_android")]
-    pub mweb_xpromo_interstitial_comments_android: bool,
-    #[serde(rename = "crowd_control_for_post")]
-    pub crowd_control_for_post: bool,
-    #[serde(rename = "chat_group_rollout")]
-    pub chat_group_rollout: bool,
-    #[serde(rename = "resized_styles_images")]
-    pub resized_styles_images: bool,
-    #[serde(rename = "noreferrer_to_noopener")]
-    pub noreferrer_to_noopener: bool,
 }
 
 /// Info returned by /u/someuser/about.json
