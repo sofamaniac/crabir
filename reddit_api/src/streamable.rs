@@ -52,12 +52,18 @@ impl Streamable {
     /// Returns true if there are still elements remaining.
     /// flutter_rust_bridge:
     pub async fn next(&mut self) -> Result<bool> {
+        // Calling stream.next() after its completions is an error.
+        if *self.done.lock().await {
+            return Ok(false);
+        }
         let mut stream = self.stream.lock().await;
         if let Some(next) = stream.next().await {
             let mut things = self.things.lock().await;
             things.push(next?);
             Ok(true)
         } else {
+            let mut done = self.done.lock().await;
+            *done = true;
             Ok(false)
         }
     }

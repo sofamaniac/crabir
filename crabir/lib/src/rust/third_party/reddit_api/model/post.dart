@@ -34,8 +34,6 @@ abstract class Post implements RustOpaqueInterface {
 
   double? get bannedAtUtc;
 
-  String? get bannedBy;
-
   bool get canGild;
 
   bool get canModPost;
@@ -195,8 +193,6 @@ abstract class Post implements RustOpaqueInterface {
   set awarders(List<String?> awarders);
 
   set bannedAtUtc(double? bannedAtUtc);
-
-  set bannedBy(String? bannedBy);
 
   set canGild(bool canGild);
 

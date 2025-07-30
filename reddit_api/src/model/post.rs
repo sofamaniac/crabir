@@ -106,7 +106,7 @@ pub struct Post {
     pub approved_by: Option<String>,
     pub mod_note: Option<String>,
     pub removed_by_category: Option<String>,
-    pub banned_by: Option<String>,
+    //pub banned_by: Option<String>,
     pub mod_reason_by: Option<String>,
     pub removal_reason: Option<String>,
     pub removed_by: Option<String>,

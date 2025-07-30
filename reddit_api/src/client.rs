@@ -365,7 +365,6 @@ impl Client {
                 let request = client.get(url.clone());
                 let request = request.query(query_params);
                 let response = client.execute(request).await;
-                debug!("[stream_listing] page done");
                 match response {
                     Err(e) => Some((Err(e), (url, Pager::default()))),
                     Ok(response) => match parse_response::<Thing>(response).await {
@@ -402,27 +401,25 @@ impl Client {
         T: TryFrom<Thing>,
     {
         stream::unfold(
-            (url, pager.unwrap_or_default(), Vec::new()),
-            move |(url, mut pager, mut buffer)| {
+            (url, pager.unwrap_or_default(), Vec::new(), false),
+            move |(url, mut pager, mut buffer, done)| {
                 let client = self.clone();
                 async move {
                     if let Some(thing) = buffer.pop() {
-                        Some((Ok(thing), (url, pager, buffer)))
-                    } else {
+                        Some((Ok(thing), (url, pager, buffer, done)))
+                    } else if !done {
                         let url = pager.add_to_url(url.clone());
                         let request = client.get(url.clone());
                         let request = request.query(query_params);
                         let response = client.execute(request).await;
                         match response {
-                            Err(e) => Some((Err(e), (url, Pager::default(), buffer))),
+                            Err(e) => Some((Err(e), (url, Pager::default(), buffer, done))),
                             Ok(response) => match parse_response::<Thing>(response).await {
                                 Ok(thing) => match thing {
                                     Thing::Listing(listing) => {
                                         pager.after(listing.after.clone());
-                                        debug!("{pager:?}");
-                                        if listing.after.clone()?.is_empty() {
-                                            return None;
-                                        }
+                                        let done = listing.after.is_none()
+                                            || listing.after.is_some_and(|after| after.is_empty());
                                         buffer = listing
                                             .children
                                             .into_iter()
@@ -430,18 +427,22 @@ impl Client {
                                             .collect();
                                         buffer.reverse();
 
-                                        buffer.pop().map(|thing| (Ok(thing), (url, pager, buffer)))
+                                        buffer
+                                            .pop()
+                                            .map(|thing| (Ok(thing), (url, pager, buffer, done)))
                                     }
                                     _ => Some((
                                         Err(Error::InvalidThing {
                                             backtrace: Backtrace::capture(),
                                         }),
-                                        (url, Pager::default(), buffer),
+                                        (url, Pager::default(), buffer, done),
                                     )),
                                 },
-                                Err(e) => Some((Err(e), (url, Pager::default(), buffer))),
+                                Err(e) => Some((Err(e), (url, Pager::default(), buffer, done))),
                             },
                         }
+                    } else {
+                        None
                     }
                 }
             },

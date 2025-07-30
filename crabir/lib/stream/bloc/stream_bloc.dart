@@ -26,18 +26,16 @@ class StreamBloc extends Bloc<StreamEvent, StreamState> {
 
   Future<void> _onFetched(Fetch event, Emitter<StreamState> emit) async {
     if (state.hasReachedMax) {
-      return;
+      return emit(state);
     }
 
     final hasReachedMax = !await streamable.next();
-    if (hasReachedMax) {
-      return emit(state.copyWith(hasReachedMax: hasReachedMax));
-    }
     final things = await streamable.getAll();
     emit(
       state.copyWith(
         status: StreamStatus.success,
         items: things,
+        hasReachedMax: hasReachedMax,
       ),
     );
   }
