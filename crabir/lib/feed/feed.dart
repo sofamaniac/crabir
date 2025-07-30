@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
-import 'package:crabir/feed/sort_display.dart';
-import 'package:crabir/feed/sort_menu.dart';
+import 'package:crabir/feed/scroll_aware_fab.dart';
 import 'package:crabir/feed/top_bar.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/routes/routes.dart';
@@ -45,7 +44,6 @@ class _FeedViewBodyState extends State<FeedViewBody>
   FeedSort? sort;
 
   late final ScrollController _scrollController;
-  bool _showScrollToTop = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -55,14 +53,6 @@ class _FeedViewBodyState extends State<FeedViewBody>
     super.initState();
     _initializeSort();
     _scrollController = ScrollController();
-    _scrollController.addListener(() {
-      final shouldShow = _scrollController.offset > 300;
-      if (_showScrollToTop != shouldShow) {
-        setState(() {
-          _showScrollToTop = shouldShow;
-        });
-      }
-    });
   }
 
   @override
@@ -90,89 +80,58 @@ class _FeedViewBodyState extends State<FeedViewBody>
       return Container();
     } else if (account.status != AccountStatus.failure) {
       return Scaffold(
-        floatingActionButton: ActionButton(
-          scrollController: _scrollController,
-        ),
-        body: NestedScrollView(
-          controller: _scrollController,
-          headerSliverBuilder: (context, __) {
-            return [
-              FeedTopBar(
-                feed: widget.feed,
-                sort: sort!,
-                setSort: (sort) => setState(() {
-                  this.sort = sort;
-                }),
-              ),
-            ];
-          },
-          floatHeaderSlivers: true,
-          body: ThingsScaffold(
-            stream: RedditAPI.client().feedStream(
-              feed: widget.feed,
-              sort: sort!,
-            ),
-            postView: (context, post) {
-              final state = context.read<StreamBloc>();
-              return RedditPostCard(
-                maxLines: 5,
-                post: post,
-                onLike: (direction) async {
-                  state.add(Vote(direction: direction, name: post.name));
-                },
-                onSave: (save) async {
-                  state.add(Save(saved: save, name: post.name));
-                },
-                onTap: () => context.pushRoute(
-                  ThreadRoute(permalink: post.permalink, post: post),
+        body: Stack(
+          children: [
+            NestedScrollView(
+              controller: _scrollController,
+              headerSliverBuilder: (context, __) => [
+                FeedTopBar(
+                  feed: widget.feed,
+                  sort: sort!,
+                  setSort: (sort) => setState(() {
+                    this.sort = sort;
+                  }),
                 ),
-              );
-            },
-          ),
+              ],
+              floatHeaderSlivers: true,
+              body: ThingsScaffold(
+                stream: RedditAPI.client().feedStream(
+                  feed: widget.feed,
+                  sort: sort!,
+                ),
+                postView: (context, post) {
+                  final state = context.read<StreamBloc>();
+                  return RedditPostCard(
+                    maxLines: 5,
+                    post: post,
+                    onLike: (direction) async {
+                      state.add(Vote(direction: direction, name: post.name));
+                    },
+                    onSave: (save) async {
+                      state.add(Save(saved: save, name: post.name));
+                    },
+                    onTap: () => context.pushRoute(
+                      ThreadRoute(permalink: post.permalink, post: post),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // Overlay the FAB using Positioned
+            Positioned(
+              bottom: 16,
+              right: 16,
+              child: AnimatedSwitcher(
+                duration: Duration(milliseconds: 200),
+                child: ScrollAwareFab(scrollController: _scrollController),
+              ),
+            ),
+          ],
         ),
       );
     }
     return Center(child: Text("Failure in account manager"));
-  }
-}
-
-class ActionButton extends StatelessWidget {
-  final ScrollController scrollController;
-  const ActionButton({super.key, required this.scrollController});
-  @override
-  Widget build(BuildContext context) {
-    final theme = context.watch<ThemeBloc>().state;
-    return SpeedDial(
-      icon: Icons.add,
-      activeIcon: Icons.close,
-      backgroundColor: theme.primaryColor,
-      children: [
-        SpeedDialChild(
-          backgroundColor: theme.primaryColor,
-          child: Icon(Icons.clear_all),
-          label: 'Clear read',
-          onTap: () {},
-        ),
-        SpeedDialChild(
-          backgroundColor: theme.primaryColor,
-          child: Icon(Icons.edit),
-          label: 'Create Post',
-          onTap: () {},
-        ),
-        SpeedDialChild(
-          backgroundColor: theme.primaryColor,
-          child: Icon(Icons.keyboard_arrow_up),
-          label: 'Scroll to Top',
-          onTap: () {
-            scrollController.animateTo(
-              0,
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeOut,
-            );
-          },
-        ),
-      ],
-    );
   }
 }
 
