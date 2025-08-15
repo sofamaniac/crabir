@@ -1,7 +1,9 @@
 use crate::model::feed::{self, Feed};
-use crate::model::multi::{self, Multi, MultiStream};
+use crate::model::flair::Flair;
+use crate::model::multi::{Multi, MultiStream};
 use crate::model::{Fullname, Post, comment, user};
 use crate::result::Result;
+use crate::search::{SearchPost, SearchSort, SearchSubreddit};
 use crate::streamable::Streamable;
 use std::backtrace::Backtrace;
 use std::collections::HashMap;
@@ -16,6 +18,7 @@ use log::{debug, error, info};
 use reqwest::RequestBuilder;
 
 pub use reqwest::{IntoUrl, Url};
+use serde::Serialize;
 use serde::{
     Deserialize,
     de::{DeserializeOwned, Error as _},
@@ -108,15 +111,8 @@ impl Client {
         }
     }
 
-    fn base_url(&self) -> Url {
+    pub(crate) fn base_url(&self) -> Url {
         Url::parse("https://oauth.reddit.com/").expect("Should not panic.")
-        // if self.current_access_token.lock().await.is_some() {
-        //     Url::parse("https://oauth.reddit.com/").expect("Should not panic.")
-        // } else {
-        //     // FIXME: putting www.reddit.com results in requests being blocked
-        //     // Switch to oauth for anonymous instead (see https://github.com/reddit-archive/reddit/wiki/OAuth2#application-only-oauth)
-        //     Url::parse("https://reddit.com/").expect("Should not panic.")
-        // }
     }
 
     /// Authenticate the current client
@@ -180,12 +176,21 @@ async fn parse_response<T: DeserializeOwned>(response: reqwest::Response) -> Res
             let text = response.text().await?;
             match serde_json::from_str(&text) {
                 Ok(json) => Ok(json),
-                Err(e) => Err(Error::Parsing {
-                    source: serde_json::Error::custom(format!(
-                        "serde_json error {e}. Failed to parse this post: {text}"
-                    )),
-                    backtrace: Backtrace::capture(),
-                }),
+                Err(e) => {
+                    error!("Error while parsing {e}");
+                    error!(
+                        "Context column ({} to {}): {}",
+                        e.column().saturating_sub(2000),
+                        e.column().saturating_add(1000),
+                        &text[e.column().saturating_sub(2000)..e.column().saturating_add(1000)]
+                    );
+                    Err(Error::Parsing {
+                        source: serde_json::Error::custom(format!(
+                            "serde_json error {e}. Failed to parse : {text}"
+                        )),
+                        backtrace: Backtrace::capture(),
+                    })
+                }
             }
         }
         Err(error) => {
@@ -391,26 +396,28 @@ impl Client {
         )
     }
 
-    pub(crate) fn stream_vec<T>(
+    pub(crate) fn stream_vec<T, Q>(
         self,
         url: Url,
         pager: Option<Pager>,
-        query_params: &[(&str, &str)],
+        query_params: Q,
     ) -> impl Stream<Item = Result<T>>
     where
         T: TryFrom<Thing>,
+        Q: Serialize + Clone,
     {
         stream::unfold(
             (url, pager.unwrap_or_default(), Vec::new(), false),
             move |(url, mut pager, mut buffer, done)| {
                 let client = self.clone();
+                let query_params = query_params.clone();
                 async move {
                     if let Some(thing) = buffer.pop() {
                         Some((Ok(thing), (url, pager, buffer, done)))
                     } else if !done {
                         let url = pager.add_to_url(url.clone());
                         let request = client.get(url.clone());
-                        let request = request.query(query_params);
+                        let request = request.query(&query_params);
                         let response = client.execute(request).await;
                         match response {
                             Err(e) => Some((Err(e), (url, Pager::default(), buffer, done))),
@@ -708,7 +715,7 @@ impl Client {
             .base_url()
             .join(&endpoint)
             .expect("Should not fail to build url.");
-        self.clone().stream_vec(url, pager, &[])
+        self.clone().stream_vec(url, pager, ())
     }
     pub(crate) fn sorted_user_stream<T: TryFrom<Thing>>(
         self,
@@ -723,6 +730,26 @@ impl Client {
         for (name, value) in sort.to_query() {
             url.query_pairs_mut().append_pair(name, value);
         }
-        self.stream_vec(url, pager, &[])
+        self.stream_vec(url, pager, ())
+    }
+
+    ///flutter_rust_bridge:sync
+    pub fn search_post(
+        &self,
+        subreddit: Option<String>,
+        flair: Option<Flair>,
+        query: Option<String>,
+    ) -> Streamable {
+        Streamable::new(Box::new(SearchPost::new(
+            self.clone(),
+            subreddit,
+            flair,
+            query,
+        )))
+    }
+
+    ///flutter_rust_bridge:sync
+    pub fn search_subreddits(&self, query: String, sort: SearchSort) -> Streamable {
+        Streamable::new(Box::new(SearchSubreddit::new(self.clone(), query, sort)))
     }
 }

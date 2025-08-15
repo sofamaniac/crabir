@@ -5,7 +5,7 @@ pub use futures::{Stream, StreamExt};
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
-use super::{Thing, Timeframe};
+use super::{Thing, Timeframe, flair::Flair};
 
 /// All the kind of available feeds on reddit
 #[derive(Debug, Default, PartialEq, Eq, Clone)]
@@ -93,9 +93,10 @@ impl IntoStreamPrivate for FeedStream {
     type Output = Thing;
 
     fn to_stream(&self) -> futures::stream::BoxStream<'static, Result<Self::Output>> {
+        let query_parameters = vec![("sr_detail".to_owned(), "true".to_owned())];
         self.client
             .clone()
-            .stream_vec(self.to_url(), None, &[("sr_detail", "true")])
+            .stream_vec(self.to_url(), None, query_parameters)
             .boxed()
     }
 }

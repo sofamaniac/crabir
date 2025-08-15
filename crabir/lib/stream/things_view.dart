@@ -33,7 +33,7 @@ class ThingsScaffold extends StatelessWidget {
 }
 
 /// Display things from a `StreamWrapper` in context.
-class ThingsView extends StatefulWidget {
+class ThingsView extends StatelessWidget {
   /// Function to use do build a `Post` view.
   final Widget Function(BuildContext, Post)? postView;
 
@@ -44,20 +44,11 @@ class ThingsView extends StatefulWidget {
     this.postView,
     this.commentView,
   });
-  @override
-  createState() => _ThingsViewState();
-}
-
-class _ThingsViewState extends State<ThingsView> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<StreamBloc>();
-    final state = context.watch<StreamBloc>().state;
+    final bloc = context.watch<StreamBloc>();
+    final state = bloc.state;
     switch (state.status) {
       case StreamStatus.failure:
         return const Center(child: Text("Failed to load items."));
@@ -79,14 +70,14 @@ class _ThingsViewState extends State<ThingsView> {
                 if (index < state.items.length) {
                   switch (state.items[index]) {
                     case Thing_Post(field0: final post):
-                      if (widget.postView != null) {
-                        return widget.postView!(context, post);
+                      if (postView != null) {
+                        return postView!(context, post);
                       } else {
                         return Container();
                       }
                     case Thing_Comment(field0: final comment):
-                      if (widget.commentView != null) {
-                        return widget.commentView!(context, comment);
+                      if (commentView != null) {
+                        return commentView!(context, comment);
                       } else {
                         return Container();
                       }

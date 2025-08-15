@@ -74,14 +74,24 @@ class DrawerState extends State<AppDrawer> {
           child: ListView(
             children: [
               ...state.allAccounts.mapIndexed(
-                (index, account) => ListTile(
-                  onTap: () async {
-                    bloc.add(SelectAccount(index));
-                    // close menu after selection
-                    changeMode(isSelectingAccount: false);
-                  },
-                  title: Text(account.username),
-                ),
+                (index, account) {
+                  if (account == state.account) {
+                    return Container();
+                  } else {
+                    return ListTile(
+                      onTap: () async {
+                        bloc.add(SelectAccount(index));
+                        // close menu after selection
+                        changeMode(isSelectingAccount: false);
+                      },
+                      leading: CircleAvatar(
+                        radius: 24,
+                        foregroundImage: NetworkImage(account.profilePicture),
+                      ),
+                      title: Text(account.username),
+                    );
+                  }
+                },
               ),
               ListTile(
                 onTap: () async {

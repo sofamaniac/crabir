@@ -9,129 +9,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'model.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
-
-class Features {
-  final bool modmailHarassmentFilter;
-  final bool modServiceMuteWrites;
-  final bool promotedTrendBlanks;
-  final bool showAmpLink;
-  final bool isEmailPermissionRequired;
-  final bool modAwards;
-  final bool expensiveCoinsPackage;
-  final bool chatSubreddit;
-  final bool awardsOnStreams;
-  final bool mwebXpromoModalListingClickDailyDismissibleIos;
-  final bool cookieConsentBanner;
-  final bool modlogCopyrightRemoval;
-  final bool doNotTrack;
-  final bool imagesInComments;
-  final bool modServiceMuteReads;
-  final bool chatUserSettings;
-  final bool usePrefAccountDeployment;
-  final bool mwebXpromoInterstitialCommentsIos;
-  final bool mwebXpromoModalListingClickDailyDismissibleAndroid;
-  final bool premiumSubscriptionsTable;
-  final bool mwebXpromoInterstitialCommentsAndroid;
-  final bool crowdControlForPost;
-  final bool chatGroupRollout;
-  final bool resizedStylesImages;
-  final bool noreferrerToNoopener;
-
-  const Features({
-    required this.modmailHarassmentFilter,
-    required this.modServiceMuteWrites,
-    required this.promotedTrendBlanks,
-    required this.showAmpLink,
-    required this.isEmailPermissionRequired,
-    required this.modAwards,
-    required this.expensiveCoinsPackage,
-    required this.chatSubreddit,
-    required this.awardsOnStreams,
-    required this.mwebXpromoModalListingClickDailyDismissibleIos,
-    required this.cookieConsentBanner,
-    required this.modlogCopyrightRemoval,
-    required this.doNotTrack,
-    required this.imagesInComments,
-    required this.modServiceMuteReads,
-    required this.chatUserSettings,
-    required this.usePrefAccountDeployment,
-    required this.mwebXpromoInterstitialCommentsIos,
-    required this.mwebXpromoModalListingClickDailyDismissibleAndroid,
-    required this.premiumSubscriptionsTable,
-    required this.mwebXpromoInterstitialCommentsAndroid,
-    required this.crowdControlForPost,
-    required this.chatGroupRollout,
-    required this.resizedStylesImages,
-    required this.noreferrerToNoopener,
-  });
-
-  static Future<Features> default_() =>
-      RustLib.instance.api.redditApiModelUserModelFeaturesDefault();
-
-  @override
-  int get hashCode =>
-      modmailHarassmentFilter.hashCode ^
-      modServiceMuteWrites.hashCode ^
-      promotedTrendBlanks.hashCode ^
-      showAmpLink.hashCode ^
-      isEmailPermissionRequired.hashCode ^
-      modAwards.hashCode ^
-      expensiveCoinsPackage.hashCode ^
-      chatSubreddit.hashCode ^
-      awardsOnStreams.hashCode ^
-      mwebXpromoModalListingClickDailyDismissibleIos.hashCode ^
-      cookieConsentBanner.hashCode ^
-      modlogCopyrightRemoval.hashCode ^
-      doNotTrack.hashCode ^
-      imagesInComments.hashCode ^
-      modServiceMuteReads.hashCode ^
-      chatUserSettings.hashCode ^
-      usePrefAccountDeployment.hashCode ^
-      mwebXpromoInterstitialCommentsIos.hashCode ^
-      mwebXpromoModalListingClickDailyDismissibleAndroid.hashCode ^
-      premiumSubscriptionsTable.hashCode ^
-      mwebXpromoInterstitialCommentsAndroid.hashCode ^
-      crowdControlForPost.hashCode ^
-      chatGroupRollout.hashCode ^
-      resizedStylesImages.hashCode ^
-      noreferrerToNoopener.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Features &&
-          runtimeType == other.runtimeType &&
-          modmailHarassmentFilter == other.modmailHarassmentFilter &&
-          modServiceMuteWrites == other.modServiceMuteWrites &&
-          promotedTrendBlanks == other.promotedTrendBlanks &&
-          showAmpLink == other.showAmpLink &&
-          isEmailPermissionRequired == other.isEmailPermissionRequired &&
-          modAwards == other.modAwards &&
-          expensiveCoinsPackage == other.expensiveCoinsPackage &&
-          chatSubreddit == other.chatSubreddit &&
-          awardsOnStreams == other.awardsOnStreams &&
-          mwebXpromoModalListingClickDailyDismissibleIos ==
-              other.mwebXpromoModalListingClickDailyDismissibleIos &&
-          cookieConsentBanner == other.cookieConsentBanner &&
-          modlogCopyrightRemoval == other.modlogCopyrightRemoval &&
-          doNotTrack == other.doNotTrack &&
-          imagesInComments == other.imagesInComments &&
-          modServiceMuteReads == other.modServiceMuteReads &&
-          chatUserSettings == other.chatUserSettings &&
-          usePrefAccountDeployment == other.usePrefAccountDeployment &&
-          mwebXpromoInterstitialCommentsIos ==
-              other.mwebXpromoInterstitialCommentsIos &&
-          mwebXpromoModalListingClickDailyDismissibleAndroid ==
-              other.mwebXpromoModalListingClickDailyDismissibleAndroid &&
-          premiumSubscriptionsTable == other.premiumSubscriptionsTable &&
-          mwebXpromoInterstitialCommentsAndroid ==
-              other.mwebXpromoInterstitialCommentsAndroid &&
-          crowdControlForPost == other.crowdControlForPost &&
-          chatGroupRollout == other.chatGroupRollout &&
-          resizedStylesImages == other.resizedStylesImages &&
-          noreferrerToNoopener == other.noreferrerToNoopener;
-}
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
 
 class Preferences {
   final bool prefAutoplay;
@@ -225,62 +103,40 @@ class Snoovatar {
 class User {
   final UserInfo info;
   final String? goldExpiration;
-  final bool hasGoldSubscription;
   final bool isSponsor;
   final PlatformInt64 numFriends;
-  final Features features;
   final bool canEditName;
   final String? newModmailExists;
   final PlatformInt64 coins;
   final bool canCreateSubreddit;
   final double? suspensionExpirationUtc;
-  final bool hasStripeSubscription;
-  final bool hasAndroidSubscription;
   final bool hasModMail;
   final bool hasMail;
-  final bool hasPaypalSubscription;
-  final bool hasSubscribedToPremium;
-  final bool inRedesignBeta;
   final bool passwordSet;
-  final String modhash;
   final bool isSuspended;
   final bool forcePasswordReset;
   final PlatformInt64 inboxCount;
   final PlatformInt64 goldCreddits;
   final bool hasIosSubscription;
-  final bool inBeta;
-  final bool hasVisitedNewProfile;
-  final bool hasExternalAccount;
 
   const User({
     required this.info,
     this.goldExpiration,
-    required this.hasGoldSubscription,
     required this.isSponsor,
     required this.numFriends,
-    required this.features,
     required this.canEditName,
     this.newModmailExists,
     required this.coins,
     required this.canCreateSubreddit,
     this.suspensionExpirationUtc,
-    required this.hasStripeSubscription,
-    required this.hasAndroidSubscription,
     required this.hasModMail,
     required this.hasMail,
-    required this.hasPaypalSubscription,
-    required this.hasSubscribedToPremium,
-    required this.inRedesignBeta,
     required this.passwordSet,
-    required this.modhash,
     required this.isSuspended,
     required this.forcePasswordReset,
     required this.inboxCount,
     required this.goldCreddits,
     required this.hasIosSubscription,
-    required this.inBeta,
-    required this.hasVisitedNewProfile,
-    required this.hasExternalAccount,
   });
 
   static Future<User> default_() =>
@@ -290,32 +146,21 @@ class User {
   int get hashCode =>
       info.hashCode ^
       goldExpiration.hashCode ^
-      hasGoldSubscription.hashCode ^
       isSponsor.hashCode ^
       numFriends.hashCode ^
-      features.hashCode ^
       canEditName.hashCode ^
       newModmailExists.hashCode ^
       coins.hashCode ^
       canCreateSubreddit.hashCode ^
       suspensionExpirationUtc.hashCode ^
-      hasStripeSubscription.hashCode ^
-      hasAndroidSubscription.hashCode ^
       hasModMail.hashCode ^
       hasMail.hashCode ^
-      hasPaypalSubscription.hashCode ^
-      hasSubscribedToPremium.hashCode ^
-      inRedesignBeta.hashCode ^
       passwordSet.hashCode ^
-      modhash.hashCode ^
       isSuspended.hashCode ^
       forcePasswordReset.hashCode ^
       inboxCount.hashCode ^
       goldCreddits.hashCode ^
-      hasIosSubscription.hashCode ^
-      inBeta.hashCode ^
-      hasVisitedNewProfile.hashCode ^
-      hasExternalAccount.hashCode;
+      hasIosSubscription.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -324,32 +169,21 @@ class User {
           runtimeType == other.runtimeType &&
           info == other.info &&
           goldExpiration == other.goldExpiration &&
-          hasGoldSubscription == other.hasGoldSubscription &&
           isSponsor == other.isSponsor &&
           numFriends == other.numFriends &&
-          features == other.features &&
           canEditName == other.canEditName &&
           newModmailExists == other.newModmailExists &&
           coins == other.coins &&
           canCreateSubreddit == other.canCreateSubreddit &&
           suspensionExpirationUtc == other.suspensionExpirationUtc &&
-          hasStripeSubscription == other.hasStripeSubscription &&
-          hasAndroidSubscription == other.hasAndroidSubscription &&
           hasModMail == other.hasModMail &&
           hasMail == other.hasMail &&
-          hasPaypalSubscription == other.hasPaypalSubscription &&
-          hasSubscribedToPremium == other.hasSubscribedToPremium &&
-          inRedesignBeta == other.inRedesignBeta &&
           passwordSet == other.passwordSet &&
-          modhash == other.modhash &&
           isSuspended == other.isSuspended &&
           forcePasswordReset == other.forcePasswordReset &&
           inboxCount == other.inboxCount &&
           goldCreddits == other.goldCreddits &&
-          hasIosSubscription == other.hasIosSubscription &&
-          inBeta == other.inBeta &&
-          hasVisitedNewProfile == other.hasVisitedNewProfile &&
-          hasExternalAccount == other.hasExternalAccount;
+          hasIosSubscription == other.hasIosSubscription;
 }
 
 /// Info returned by /u/someuser/about.json

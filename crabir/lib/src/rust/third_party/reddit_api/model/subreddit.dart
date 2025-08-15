@@ -18,7 +18,7 @@ abstract class Common implements RustOpaqueInterface {
 
   List<String> get allowedMediaInComments;
 
-  String get bannerImg;
+  String? get bannerImg;
 
   Int64List? get bannerSize;
 
@@ -38,17 +38,17 @@ abstract class Common implements RustOpaqueInterface {
 
   Int64List? get headerSize;
 
-  String get keyColor;
+  String? get keyColor;
 
   bool get linkFlairEnabled;
 
-  String get linkFlairPosition;
+  String? get linkFlairPosition;
 
   Fullname get name;
 
-  String get primaryColor;
+  String? get primaryColor;
 
-  String get publicDescription;
+  String? get publicDescription;
 
   bool get quarantine;
 
@@ -58,15 +58,15 @@ abstract class Common implements RustOpaqueInterface {
 
   bool get showMedia;
 
-  String get submitLinkLabel;
+  String? get submitLinkLabel;
 
-  String get submitTextLabel;
+  String? get submitTextLabel;
 
-  String get subredditType;
+  String? get subredditType;
 
   PlatformInt64 get subscribers;
 
-  String get title;
+  String? get title;
 
   String get url;
 
@@ -84,7 +84,7 @@ abstract class Common implements RustOpaqueInterface {
 
   set allowedMediaInComments(List<String> allowedMediaInComments);
 
-  set bannerImg(String bannerImg);
+  set bannerImg(String? bannerImg);
 
   set bannerSize(Int64List? bannerSize);
 
@@ -104,17 +104,17 @@ abstract class Common implements RustOpaqueInterface {
 
   set headerSize(Int64List? headerSize);
 
-  set keyColor(String keyColor);
+  set keyColor(String? keyColor);
 
   set linkFlairEnabled(bool linkFlairEnabled);
 
-  set linkFlairPosition(String linkFlairPosition);
+  set linkFlairPosition(String? linkFlairPosition);
 
   set name(Fullname name);
 
-  set primaryColor(String primaryColor);
+  set primaryColor(String? primaryColor);
 
-  set publicDescription(String publicDescription);
+  set publicDescription(String? publicDescription);
 
   set quarantine(bool quarantine);
 
@@ -124,15 +124,15 @@ abstract class Common implements RustOpaqueInterface {
 
   set showMedia(bool showMedia);
 
-  set submitLinkLabel(String submitLinkLabel);
+  set submitLinkLabel(String? submitLinkLabel);
 
-  set submitTextLabel(String submitTextLabel);
+  set submitTextLabel(String? submitTextLabel);
 
-  set subredditType(String subredditType);
+  set subredditType(String? subredditType);
 
   set subscribers(PlatformInt64 subscribers);
 
-  set title(String title);
+  set title(String? title);
 
   set url(String url);
 
@@ -157,9 +157,9 @@ abstract class Common implements RustOpaqueInterface {
 abstract class Details implements RustOpaqueInterface {
   bool get defaultSet;
 
-  String get description;
+  String? get description;
 
-  String get iconColor;
+  String? get iconColor;
 
   Common get other;
 
@@ -169,9 +169,9 @@ abstract class Details implements RustOpaqueInterface {
 
   set defaultSet(bool defaultSet);
 
-  set description(String description);
+  set description(String? description);
 
-  set iconColor(String iconColor);
+  set iconColor(String? iconColor);
 
   set other(Common other);
 
@@ -194,7 +194,7 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   int get activeUserCount;
 
-  String get advertiserCategory;
+  String? get advertiserCategory;
 
   bool get allOriginalContent;
 
@@ -218,9 +218,9 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   bool get allowVideos;
 
-  String get bannerBackgroundColor;
+  String? get bannerBackgroundColor;
 
-  String get bannerBackgroundImage;
+  String? get bannerBackgroundImage;
 
   bool get canAssignLinkFlair;
 
@@ -230,11 +230,11 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   CommentContributionSettings get commentContributionSettings;
 
-  PlatformInt64 get commentScoreHideMins;
+  PlatformInt64? get commentScoreHideMins;
 
   bool get communityReviewed;
 
-  String get description;
+  String? get description;
 
   String? get descriptionHtml;
 
@@ -244,7 +244,7 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   bool get hasMenuWidget;
 
-  String get headerTitle;
+  String? get headerTitle;
 
   bool get hideAds;
 
@@ -254,9 +254,9 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   bool? get isEnrolledInNewModmail;
 
-  String get lang;
+  String? get lang;
 
-  String get mobileBannerImage;
+  String? get mobileBannerImage;
 
   String? get notificationLevel;
 
@@ -280,9 +280,9 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   bool get spoilersEnabled;
 
-  String get submissionType;
+  String? get submissionType;
 
-  String get submitText;
+  String? get submitText;
 
   String? get submitTextHtml;
 
@@ -310,7 +310,7 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   set activeUserCount(int activeUserCount);
 
-  set advertiserCategory(String advertiserCategory);
+  set advertiserCategory(String? advertiserCategory);
 
   set allOriginalContent(bool allOriginalContent);
 
@@ -334,9 +334,9 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   set allowVideos(bool allowVideos);
 
-  set bannerBackgroundColor(String bannerBackgroundColor);
+  set bannerBackgroundColor(String? bannerBackgroundColor);
 
-  set bannerBackgroundImage(String bannerBackgroundImage);
+  set bannerBackgroundImage(String? bannerBackgroundImage);
 
   set canAssignLinkFlair(bool canAssignLinkFlair);
 
@@ -347,11 +347,11 @@ abstract class Subreddit implements RustOpaqueInterface {
   set commentContributionSettings(
       CommentContributionSettings commentContributionSettings);
 
-  set commentScoreHideMins(PlatformInt64 commentScoreHideMins);
+  set commentScoreHideMins(PlatformInt64? commentScoreHideMins);
 
   set communityReviewed(bool communityReviewed);
 
-  set description(String description);
+  set description(String? description);
 
   set descriptionHtml(String? descriptionHtml);
 
@@ -361,7 +361,7 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   set hasMenuWidget(bool hasMenuWidget);
 
-  set headerTitle(String headerTitle);
+  set headerTitle(String? headerTitle);
 
   set hideAds(bool hideAds);
 
@@ -371,9 +371,9 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   set isEnrolledInNewModmail(bool? isEnrolledInNewModmail);
 
-  set lang(String lang);
+  set lang(String? lang);
 
-  set mobileBannerImage(String mobileBannerImage);
+  set mobileBannerImage(String? mobileBannerImage);
 
   set notificationLevel(String? notificationLevel);
 
@@ -398,9 +398,9 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   set spoilersEnabled(bool spoilersEnabled);
 
-  set submissionType(String submissionType);
+  set submissionType(String? submissionType);
 
-  set submitText(String submitText);
+  set submitText(String? submitText);
 
   set submitTextHtml(String? submitTextHtml);
 

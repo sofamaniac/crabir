@@ -55,6 +55,7 @@ pub struct Post {
     pub created_utc: DateTime<Utc>,
     /// Date of creation in logged in user locale
     #[serde_as(as = "serde_with::TimestampSecondsWithFrac<f64>")]
+    #[serde(default)]
     pub created: DateTime<Local>,
 
     // User relationship

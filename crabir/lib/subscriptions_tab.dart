@@ -38,24 +38,19 @@ class _SubscriptonsList extends StatelessWidget {
     final state = context.read<AccountsBloc>();
     return BlocBuilder<AccountsBloc, AccountState>(
       builder: (context, account) {
-        if (account.status == AccountStatus.uninit) {
+        if (account.status case Uninit()) {
           state.add(Initialize());
-        } else if (account.status == AccountStatus.unloaded) {
+        } else if (account.status case Unloaded()) {
           state.add(LoadSubscriptions());
-        } else if (account.status == AccountStatus.loaded) {
+        } else if (account.status case Loaded()) {
           return Flexible(
             fit: FlexFit.loose,
             child: ListView(
               children: [
-                ...baseFeeds
-                    .where(
-                      (feed) => feed.title
-                          .toLowerCase()
-                          .contains(filter.toLowerCase()),
-                    )
-                    .map(
-                      (feed) => feed.toTile(context),
-                    ),
+                ...baseFeeds(context, closeDrawer: false).where(
+                  (feed) =>
+                      feed.title.toLowerCase().contains(filter.toLowerCase()),
+                ),
                 ...account.multis
                     .where(
                       (multi) => multi.displayName

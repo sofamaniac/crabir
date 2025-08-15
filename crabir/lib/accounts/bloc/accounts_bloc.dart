@@ -28,9 +28,9 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
 
     try {
       _accounts = await AccountDatabase().getAccounts();
-    } catch (_) {
-      emit(state.copyWith(status: AccountStatus.failure));
-      log.severe("Error while loading accounts");
+    } catch (err) {
+      log.severe("Error while loading accounts: $err");
+      emit(state.copyWith(status: Failure(message: "$err")));
     }
     _accounts.add(UserAccount.anonymous());
 
@@ -40,10 +40,10 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
     _selectedAccount = prefs.getInt("currentAccount") ?? _accounts.length - 1;
     if (_currentAccount == null) {
       emit(state.copyWith(
-        status: AccountStatus.uninit,
+        status: Uninit(),
       ));
     } else {
-      if (_currentAccount == UserAccount.anonymous()) {
+      if (_currentAccount?.isAnonymous == true) {
         await RedditAPI.client().newLoggedOutUserToken();
       } else {
         await RedditAPI.client().authenticate(
@@ -52,7 +52,7 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
       }
       emit(
         state.copyWith(
-          status: AccountStatus.unloaded,
+          status: Unloaded(),
           account: _currentAccount,
           allAccounts: _accounts,
         ),
@@ -86,15 +86,18 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
       await RedditAPI.client().newLoggedOutUserToken();
     }
     emit(state.copyWith(
-      status: AccountStatus.unloaded,
+      status: Unloaded(),
       account: _currentAccount,
     ));
     await _onLoadSubscriptions(LoadSubscriptions(), emit);
   }
 
   Future<void> _onLoadSubscriptions(
-      LoadSubscriptions _, Emitter<AccountState> emit) async {
-    if (_currentAccount == UserAccount.anonymous()) {
+    LoadSubscriptions _,
+    Emitter<AccountState> emit,
+  ) async {
+    if (_currentAccount?.isAnonymous == true) {
+      emit(state.copyWith(status: Loaded(), subscriptions: [], multis: []));
       return;
     }
     log.info("Requesting subscriptions for ${_currentAccount!.username}");
@@ -112,13 +115,13 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
             ),
       );
       emit(state.copyWith(
-        status: AccountStatus.loaded,
+        status: Loaded(),
         subscriptions: subreddits,
         multis: multis,
       ));
     } catch (err) {
       log.severe("Error while loading subscriptions: $err");
-      emit(state.copyWith(status: AccountStatus.failure));
+      emit(state.copyWith(status: Failure(message: "$err")));
     }
   }
 }

@@ -23,6 +23,7 @@ import 'third_party/reddit_api/model/multi.dart';
 import 'third_party/reddit_api/model/post.dart';
 import 'third_party/reddit_api/model/subreddit.dart';
 import 'third_party/reddit_api/model/user/model.dart';
+import 'third_party/reddit_api/search.dart';
 import 'third_party/reddit_api/streamable.dart';
 
 abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
@@ -88,6 +89,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_PostIdPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_SearchPostPtr =>
+      wire.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchPost;
+
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_SearchSubredditPtr => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchSubreddit;
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_StreamablePtr =>
       wire.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable;
@@ -192,6 +200,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   PostId
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
+          dynamic raw);
+
+  @protected
+  SearchPost
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchPost(
+          dynamic raw);
+
+  @protected
+  SearchSubreddit
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchSubreddit(
           dynamic raw);
 
   @protected
@@ -439,6 +457,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           dynamic raw);
 
   @protected
+  SearchPost
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchPost(
+          dynamic raw);
+
+  @protected
+  SearchSubreddit
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchSubreddit(
+          dynamic raw);
+
+  @protected
   Streamable
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
           dynamic raw);
@@ -508,7 +536,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FeedSort dco_decode_box_autoadd_feed_sort(dynamic raw);
 
   @protected
+  Flair dco_decode_box_autoadd_flair(dynamic raw);
+
+  @protected
   int dco_decode_box_autoadd_i_32(dynamic raw);
+
+  @protected
+  PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
 
   @protected
   Icon dco_decode_box_autoadd_icon(dynamic raw);
@@ -561,9 +595,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   double dco_decode_f_64(dynamic raw);
-
-  @protected
-  Features dco_decode_features(dynamic raw);
 
   @protected
   Feed dco_decode_feed(dynamic raw);
@@ -683,7 +714,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double? dco_decode_opt_box_autoadd_f_64(dynamic raw);
 
   @protected
+  Flair? dco_decode_opt_box_autoadd_flair(dynamic raw);
+
+  @protected
   int? dco_decode_opt_box_autoadd_i_32(dynamic raw);
+
+  @protected
+  PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
 
   @protected
   Media? dco_decode_opt_box_autoadd_media(dynamic raw);
@@ -736,6 +773,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Richtext dco_decode_richtext(dynamic raw);
+
+  @protected
+  SearchSort dco_decode_search_sort(dynamic raw);
 
   @protected
   SecureMediaEmbed dco_decode_secure_media_embed(dynamic raw);
@@ -883,6 +923,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   PostId
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
+          SseDeserializer deserializer);
+
+  @protected
+  SearchPost
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchPost(
+          SseDeserializer deserializer);
+
+  @protected
+  SearchSubreddit
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchSubreddit(
           SseDeserializer deserializer);
 
   @protected
@@ -1130,6 +1180,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
+  SearchPost
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchPost(
+          SseDeserializer deserializer);
+
+  @protected
+  SearchSubreddit
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchSubreddit(
+          SseDeserializer deserializer);
+
+  @protected
   Streamable
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
           SseDeserializer deserializer);
@@ -1199,7 +1259,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FeedSort sse_decode_box_autoadd_feed_sort(SseDeserializer deserializer);
 
   @protected
+  Flair sse_decode_box_autoadd_flair(SseDeserializer deserializer);
+
+  @protected
   int sse_decode_box_autoadd_i_32(SseDeserializer deserializer);
+
+  @protected
+  PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
 
   @protected
   Icon sse_decode_box_autoadd_icon(SseDeserializer deserializer);
@@ -1255,9 +1321,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   double sse_decode_f_64(SseDeserializer deserializer);
-
-  @protected
-  Features sse_decode_features(SseDeserializer deserializer);
 
   @protected
   Feed sse_decode_feed(SseDeserializer deserializer);
@@ -1380,7 +1443,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer);
 
   @protected
+  Flair? sse_decode_opt_box_autoadd_flair(SseDeserializer deserializer);
+
+  @protected
   int? sse_decode_opt_box_autoadd_i_32(SseDeserializer deserializer);
+
+  @protected
+  PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
 
   @protected
   Media? sse_decode_opt_box_autoadd_media(SseDeserializer deserializer);
@@ -1436,6 +1505,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Richtext sse_decode_richtext(SseDeserializer deserializer);
+
+  @protected
+  SearchSort sse_decode_search_sort(SseDeserializer deserializer);
 
   @protected
   SecureMediaEmbed sse_decode_secure_media_embed(SseDeserializer deserializer);
@@ -1585,6 +1657,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
           PostId self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchPost(
+          SearchPost self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchSubreddit(
+          SearchSubreddit self, SseSerializer serializer);
 
   @protected
   void
@@ -1834,6 +1916,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchPost(
+          SearchPost self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchSubreddit(
+          SearchSubreddit self, SseSerializer serializer);
+
+  @protected
+  void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
           Streamable self, SseSerializer serializer);
 
@@ -1906,7 +1998,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       FeedSort self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_flair(Flair self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_i_64(
+      PlatformInt64 self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_icon(Icon self, SseSerializer serializer);
@@ -1965,9 +2064,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_f_64(double self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_features(Features self, SseSerializer serializer);
 
   @protected
   void sse_encode_feed(Feed self, SseSerializer serializer);
@@ -2095,7 +2191,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_opt_box_autoadd_flair(Flair? self, SseSerializer serializer);
+
+  @protected
   void sse_encode_opt_box_autoadd_i_32(int? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_i_64(
+      PlatformInt64? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_media(Media? self, SseSerializer serializer);
@@ -2152,6 +2255,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_richtext(Richtext self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_search_sort(SearchSort self, SseSerializer serializer);
 
   @protected
   void sse_encode_secure_media_embed(
@@ -2427,6 +2533,30 @@ class RustLibWire implements BaseWire {
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
               ptr);
 
+  void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchPost(
+          int ptr) =>
+      wasmModule
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchPost(
+              ptr);
+
+  void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchPost(
+          int ptr) =>
+      wasmModule
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchPost(
+              ptr);
+
+  void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchSubreddit(
+          int ptr) =>
+      wasmModule
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchSubreddit(
+              ptr);
+
+  void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchSubreddit(
+          int ptr) =>
+      wasmModule
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchSubreddit(
+              ptr);
+
   void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerStreamable(
           int ptr) =>
       wasmModule
@@ -2628,6 +2758,22 @@ extension type RustLibWasmModule._(JSObject _) implements JSObject {
 
   external void
       rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPostID(
+          int ptr);
+
+  external void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchPost(
+          int ptr);
+
+  external void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchPost(
+          int ptr);
+
+  external void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchSubreddit(
+          int ptr);
+
+  external void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSearchSubreddit(
           int ptr);
 
   external void

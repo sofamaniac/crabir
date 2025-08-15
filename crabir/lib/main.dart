@@ -3,6 +3,8 @@ import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/drawer/drawer.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
+import 'package:crabir/tabs_index.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/frb_generated.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,9 +22,7 @@ Future<void> main() async {
 }
 
 class Crabir extends StatelessWidget {
-  Crabir({super.key});
-
-  final _appRouter = AppRouter();
+  const Crabir({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,17 +31,26 @@ class Crabir extends StatelessWidget {
         BlocProvider(create: (context) => AccountsBloc()..add(Initialize())),
         BlocProvider(create: (context) => ThemeBloc()),
       ],
-      child: MaterialApp.router(
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        themeMode: ThemeMode.system,
-        theme: ThemeData.light(useMaterial3: true),
-        darkTheme: ThemeData.dark(useMaterial3: true),
-        routerConfig: _appRouter.config(),
-      ),
+      child: TopLevel(),
+    );
+  }
+}
+
+class TopLevel extends StatelessWidget {
+  final _appRouter = AppRouter();
+  TopLevel({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      themeMode: ThemeMode.system,
+      theme: ThemeData.light(useMaterial3: true),
+      darkTheme: ThemeData.dark(useMaterial3: true),
+      routerConfig: _appRouter.config(),
     );
   }
 }
@@ -53,15 +62,15 @@ class MainScreenView extends StatelessWidget {
   Widget build(BuildContext context) {
     final routes = <PageRouteInfo>[
       NamedRoute("HomeFeedRoute"),
-      SearchRoute(),
+      SearchSubredditsRoute(),
       SubscriptionsTabRoute(),
       InboxRoute(),
       CurrentUserRoute(),
     ];
-    final state = context.watch<AccountsBloc>().state;
+    final accounts = context.watch<AccountsBloc>().state;
     final theme = context.watch<ThemeBloc>().state;
     return AutoTabsRouter.tabBar(
-      key: ValueKey(state.account?.username ?? ""),
+      key: ValueKey(accounts.account?.username ?? ""),
       homeIndex: 0,
       physics: NeverScrollableScrollPhysics(),
       routes: routes,
@@ -78,7 +87,7 @@ class MainScreenView extends StatelessWidget {
             onTap: (index) {
               tabController.animateTo(index);
               tabsRouter.setActiveIndex(index);
-              if (index == 2) {
+              if (index == subscriptionsIndex) {
                 tabsRouter
                     .stackRouterOfIndex(index)
                     ?.replaceAll([SubscriptionsTabRoute()]);
@@ -96,19 +105,4 @@ class MainScreenView extends StatelessWidget {
       },
     );
   }
-}
-
-@RoutePage()
-class SubscriptionsOrFeedView extends AutoRouter {
-  const SubscriptionsOrFeedView({super.key});
-}
-
-@RoutePage()
-class SearchView extends AutoRouter {
-  const SearchView({super.key});
-}
-
-@RoutePage()
-class InboxView extends AutoRouter {
-  const InboxView({super.key});
 }

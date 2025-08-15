@@ -19,7 +19,9 @@ where
     match MyHelper::deserialize(d) {
         Ok(MyHelper::Object(r)) => Ok(Some(r)),
         Ok(MyHelper::String("") | MyHelper::None {} | MyHelper::Bool(false)) => Ok(None),
-        Ok(MyHelper::String(_)) => Err(D::Error::custom("Only empty strings may be provided")),
+        Ok(MyHelper::String(s)) => Err(D::Error::custom(format!(
+            "Only empty strings may be provided (got:\"{s}\")"
+        ))),
         Ok(MyHelper::EmptyVec(v)) if v.is_empty() => Ok(None),
         Ok(MyHelper::EmptyVec(_)) => Err(D::Error::custom("Only empty vecs may be provided")),
         Ok(MyHelper::Option(option)) => Ok(option),

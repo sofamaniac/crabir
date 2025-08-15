@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/feed_list.dart';
 import 'package:crabir/post/widget/gallery.dart';
@@ -68,7 +69,16 @@ class _PostTitle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         title,
-        FlairView(flair: post.linkFlair),
+        InkWell(
+          onTap: () => navigateToSubscriptionsTab(
+            context,
+            SearchRoute(
+              subreddit: post.subreddit.subreddit,
+              flair: post.linkFlair,
+            ),
+          ),
+          child: FlairView(flair: post.linkFlair),
+        ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           spacing: 4,

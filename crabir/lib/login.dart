@@ -38,16 +38,22 @@ const scopes = [
   "wikiread",
 ];
 
-class UserAccount extends StatelessWidget {
+class UserAccount {
   final String id;
   final String username;
   final String profilePicture;
   final String? accessToken;
   final String? refreshToken;
 
-  const UserAccount(this.id, this.username, this.profilePicture,
-      this.accessToken, this.refreshToken,
-      {super.key});
+  bool get isAnonymous => id == "anonymous";
+
+  const UserAccount(
+    this.id,
+    this.username,
+    this.profilePicture,
+    this.accessToken,
+    this.refreshToken,
+  );
 
   Map<String, dynamic> toMap() => {
         'id': id,
@@ -74,11 +80,6 @@ class UserAccount extends StatelessWidget {
       "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_1.png",
       null,
       null);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(username);
-  }
 }
 
 class AccountDatabase {

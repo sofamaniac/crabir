@@ -51,62 +51,63 @@ class _MultiViewBodyState extends State<MultiViewBody>
 
     return BlocBuilder<AccountsBloc, AccountState>(
       builder: (context, account) {
-        if (account.status == AccountStatus.uninit) {
-          return Center(child: CircularProgressIndicator());
-        } else if (account.status != AccountStatus.failure) {
-          return NestedScrollView(
-            headerSliverBuilder: (context, __) {
-              return [
-                SliverAppBar(
-                  floating: true,
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Feed title"),
-                      SortDisplay(sort: sort),
+        return switch (account.status) {
+          Uninit() => Center(child: CircularProgressIndicator()),
+          Failure(:final message) =>
+            Center(child: Text("Failure in Account Manager: $message")),
+          Loaded() => NestedScrollView(
+              headerSliverBuilder: (context, __) {
+                return [
+                  SliverAppBar(
+                    floating: true,
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Feed title"),
+                        SortDisplay(sort: sort),
+                      ],
+                    ),
+                    actions: [
+                      IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+                      SortMenu(
+                        onSelect: (sort) => setState(
+                          () {
+                            this.sort = sort;
+                          },
+                        ),
+                      ),
                     ],
                   ),
-                  actions: [
-                    IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-                    SortMenu(
-                      onSelect: (sort) => setState(
-                        () {
-                          this.sort = sort;
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ];
-            },
-            floatHeaderSlivers: true,
-            body: ThingsScaffold(
-              // Forces rebuild when sort changes
-              key: ValueKey(sort.toString()),
-              stream: RedditAPI.client().multiPosts(
-                multi: widget.multi,
-                sort: sort,
-              ),
-              postView: (context, post) {
-                final state = context.read<StreamBloc>();
-                return RedditPostCard(
-                  maxLines: 5,
-                  post: post,
-                  onLike: (direction) async {
-                    state.add(Vote(direction: direction, name: post.name));
-                  },
-                  onSave: (save) async {
-                    state.add(Save(saved: save, name: post.name));
-                  },
-                  onTap: () => context.pushRoute(
-                    ThreadRoute(permalink: post.permalink, post: post),
-                  ),
-                );
+                ];
               },
+              floatHeaderSlivers: true,
+              body: ThingsScaffold(
+                // Forces rebuild when sort changes
+                key: ValueKey(sort.toString()),
+                stream: RedditAPI.client().multiPosts(
+                  multi: widget.multi,
+                  sort: sort,
+                ),
+                postView: (context, post) {
+                  final state = context.read<StreamBloc>();
+                  return RedditPostCard(
+                    maxLines: 5,
+                    post: post,
+                    onLike: (direction) async {
+                      state.add(Vote(direction: direction, name: post.name));
+                    },
+                    onSave: (save) async {
+                      state.add(Save(saved: save, name: post.name));
+                    },
+                    onTap: () => context.pushRoute(
+                      ThreadRoute(permalink: post.permalink, post: post),
+                    ),
+                  );
+                },
+              ),
             ),
-          );
-        }
-        return Center(child: Text("Failure in account manager"));
+          _ => Center(child: CircularProgressIndicator())
+        };
       },
     );
   }

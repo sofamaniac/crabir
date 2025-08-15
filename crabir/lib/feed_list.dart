@@ -7,7 +7,6 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart'
 import 'package:crabir/subreddit.dart';
 import 'package:flutter/material.dart';
 
-// FIX: does not work properly on first call
 void navigateToSubscriptionsTab(BuildContext context, destination) {
   final tabsRouter = AutoTabsRouter.of(context);
   // Tabs are lazily loaded, so if it was never visited the tab router does not exists

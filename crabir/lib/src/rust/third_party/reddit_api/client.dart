@@ -8,11 +8,13 @@ import '../../lib.dart';
 import 'model.dart';
 import 'model/comment.dart';
 import 'model/feed.dart';
+import 'model/flair.dart';
 import 'model/multi.dart';
 import 'model/post.dart';
 import 'model/subreddit.dart';
 import 'model/user/model.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'search.dart';
 import 'streamable.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `from`
@@ -69,6 +71,13 @@ abstract class Client implements RustOpaqueInterface {
   /// # Errors
   /// Returns an error if the request failed.
   Future<void> save({required Fullname thing});
+
+  ///flutter_rust_bridge:sync
+  Streamable searchPost({String? subreddit, Flair? flair, String? query});
+
+  ///flutter_rust_bridge:sync
+  Streamable searchSubreddits(
+      {required String query, required SearchSort sort});
 
   /// Get the list of all subreddits the current user is subscribed to.
   /// # Errors

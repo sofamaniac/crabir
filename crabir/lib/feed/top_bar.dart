@@ -3,41 +3,16 @@ import 'package:crabir/feed/sort_display.dart';
 import 'package:crabir/feed/sort_menu.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:flutter/material.dart';
 
-class FeedTopBar extends StatelessWidget {
-  // Callback when changing sort.
-  final void Function(FeedSort) setSort;
-  // Current sort.
-  final FeedSort sort;
-  // Current feed.
+class FeedTitle extends StatelessWidget {
   final Feed feed;
-  const FeedTopBar({
-    super.key,
-    required this.feed,
-    required this.sort,
-    required this.setSort,
-  });
+  final FeedSort sort;
+  const FeedTitle({super.key, required this.feed, required this.sort});
+
   @override
   Widget build(BuildContext context) {
-    return SliverAppBar(
-      floating: true,
-      title: feedTitle(),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.search),
-          onPressed: () {
-            context.pushRoute(SearchRoute());
-          },
-        ),
-        SortMenu(
-          onSelect: setSort,
-        ),
-      ],
-    );
-  }
-
-  Widget feedTitle() {
     final title = switch (feed) {
       Feed_Home() => "Home",
       Feed_All() => "All",

@@ -140,6 +140,170 @@ class LoadSubscriptions implements AccountEvent {
 }
 
 /// @nodoc
+mixin _$AccountStatus {
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is AccountStatus);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'AccountStatus()';
+  }
+}
+
+/// @nodoc
+class $AccountStatusCopyWith<$Res> {
+  $AccountStatusCopyWith(AccountStatus _, $Res Function(AccountStatus) __);
+}
+
+/// @nodoc
+
+class Uninit implements AccountStatus {
+  const Uninit();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is Uninit);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'AccountStatus.uninit()';
+  }
+}
+
+/// @nodoc
+
+class Loading implements AccountStatus {
+  const Loading();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is Loading);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'AccountStatus.loading()';
+  }
+}
+
+/// @nodoc
+
+class Unloaded implements AccountStatus {
+  const Unloaded();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is Unloaded);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'AccountStatus.unloaded()';
+  }
+}
+
+/// @nodoc
+
+class Loaded implements AccountStatus {
+  const Loaded();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is Loaded);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'AccountStatus.loaded()';
+  }
+}
+
+/// @nodoc
+
+class Failure implements AccountStatus {
+  const Failure({this.message});
+
+  final String? message;
+
+  /// Create a copy of AccountStatus
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $FailureCopyWith<Failure> get copyWith =>
+      _$FailureCopyWithImpl<Failure>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is Failure &&
+            (identical(other.message, message) || other.message == message));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, message);
+
+  @override
+  String toString() {
+    return 'AccountStatus.failure(message: $message)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $FailureCopyWith<$Res>
+    implements $AccountStatusCopyWith<$Res> {
+  factory $FailureCopyWith(Failure value, $Res Function(Failure) _then) =
+      _$FailureCopyWithImpl;
+  @useResult
+  $Res call({String? message});
+}
+
+/// @nodoc
+class _$FailureCopyWithImpl<$Res> implements $FailureCopyWith<$Res> {
+  _$FailureCopyWithImpl(this._self, this._then);
+
+  final Failure _self;
+  final $Res Function(Failure) _then;
+
+  /// Create a copy of AccountStatus
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? message = freezed,
+  }) {
+    return _then(Failure(
+      message: freezed == message
+          ? _self.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
 mixin _$AccountState {
   AccountStatus get status;
   UserAccount? get account;
@@ -196,6 +360,8 @@ abstract mixin class $AccountStateCopyWith<$Res> {
       List<Subreddit> subscriptions,
       List<Multi> multis,
       List<UserAccount> allAccounts});
+
+  $AccountStatusCopyWith<$Res> get status;
 }
 
 /// @nodoc
@@ -239,13 +405,23 @@ class _$AccountStateCopyWithImpl<$Res> implements $AccountStateCopyWith<$Res> {
               as List<UserAccount>,
     ));
   }
+
+  /// Create a copy of AccountState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AccountStatusCopyWith<$Res> get status {
+    return $AccountStatusCopyWith<$Res>(_self.status, (value) {
+      return _then(_self.copyWith(status: value));
+    });
+  }
 }
 
 /// @nodoc
 
 class _AccountState implements AccountState {
   _AccountState(
-      {this.status = AccountStatus.uninit,
+      {this.status = const Uninit(),
       this.account,
       final List<Subreddit> subscriptions = const [],
       final List<Multi> multis = const [],
@@ -337,6 +513,9 @@ abstract mixin class _$AccountStateCopyWith<$Res>
       List<Subreddit> subscriptions,
       List<Multi> multis,
       List<UserAccount> allAccounts});
+
+  @override
+  $AccountStatusCopyWith<$Res> get status;
 }
 
 /// @nodoc
@@ -380,6 +559,16 @@ class __$AccountStateCopyWithImpl<$Res>
           : allAccounts // ignore: cast_nullable_to_non_nullable
               as List<UserAccount>,
     ));
+  }
+
+  /// Create a copy of AccountState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AccountStatusCopyWith<$Res> get status {
+    return $AccountStatusCopyWith<$Res>(_self.status, (value) {
+      return _then(_self.copyWith(status: value));
+    });
   }
 }
 

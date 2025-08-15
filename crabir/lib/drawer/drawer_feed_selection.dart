@@ -19,25 +19,25 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
     final bloc = context.watch<AccountsBloc>();
     final account = bloc.state;
 
-    if (account.status == AccountStatus.uninit) {
+    if (account.status case Uninit()) {
       bloc.add(Initialize());
-    } else if (account.status == AccountStatus.unloaded) {
+    } else if (account.status case Unloaded()) {
       bloc.add(LoadSubscriptions());
-    } else if (account.status == AccountStatus.loaded) {
+    } else if (account.status case Loaded()) {
       return Flexible(
         fit: FlexFit.loose,
         child: ListView(
           children: [
-            ...baseFeeds.map(
-              (feed) => feed.toTile(context),
-            ),
+            ...baseFeeds(context, closeDrawer: true),
             Divider(),
             ...userOptions.map((option) => ListTile(title: Text(option))),
             Divider(),
-            ...account.multis.map((multi) => MultiRedditTile(
-                  multi: multi,
-                  closeDrawer: true,
-                )),
+            ...account.multis.map(
+              (multi) => MultiRedditTile(
+                multi: multi,
+                closeDrawer: true,
+              ),
+            ),
             Divider(),
             ...account.subscriptions.map(
               (sub) => SubredditTile(

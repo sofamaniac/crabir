@@ -5,68 +5,72 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-final baseFeeds = const [
-  HomeFeed(),
-  PopularFeed(),
-  AllFeed(),
-  SavedFeed(),
-  HistoryFeed()
-];
+List<BaseFeed> baseFeeds(BuildContext context, {bool closeDrawer = true}) {
+  final account = context.read<AccountsBloc>().state;
+  return [
+    BaseFeed(
+      "Home",
+      Icons.home,
+      closeDrawer: closeDrawer,
+      route: FeedRoute(feed: Feed.home()),
+    ),
+    BaseFeed(
+      "Popular",
+      Icons.arrow_outward,
+      closeDrawer: closeDrawer,
+      route: FeedRoute(feed: Feed.popular()),
+    ),
+    BaseFeed(
+      "All",
+      Icons.all_inclusive_rounded,
+      closeDrawer: closeDrawer,
+      route: FeedRoute(feed: Feed.all()),
+    ),
+    if (account.account != null) ...[
+      BaseFeed(
+        "Saved",
+        Icons.bookmark,
+        closeDrawer: closeDrawer,
+        route: UserSavedRoute(
+          username: account.account!.username,
+        ),
+      ),
+      BaseFeed(
+        "History",
+        Icons.history,
+        closeDrawer: closeDrawer,
+        // TODO:
+        route: FeedRoute(feed: Feed.popular()),
+      ),
+    ],
+  ];
+}
 
-sealed class BaseFeed {
+class BaseFeed extends StatelessWidget {
   final String title;
   final IconData icon;
-  PageRouteInfo get route;
-  const BaseFeed(this.title, this.icon);
+  final int tabIndex;
+  final bool closeDrawer;
+  final PageRouteInfo route;
+  const BaseFeed(
+    this.title,
+    this.icon, {
+    super.key,
+    this.tabIndex = 2,
+    this.closeDrawer = true,
+    required this.route,
+  });
 
-  Widget toTile(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     return ListTile(
       leading: Icon(icon),
       title: Text(title),
-      onTap: () => context.pushRoute(route),
+      onTap: () {
+        final tabsRouter = AutoTabsRouter.of(context);
+        tabsRouter.setActiveIndex(tabIndex);
+        context.router.navigate(route);
+      },
     );
   }
-}
-
-class HomeFeed extends BaseFeed {
-  const HomeFeed() : super("Home", Icons.home);
-  @override
-  PageRouteInfo get route => FeedRoute(feed: Feed.home());
-}
-
-class AllFeed extends BaseFeed {
-  const AllFeed() : super("All", Icons.all_inclusive_rounded);
-  @override
-  PageRouteInfo get route => FeedRoute(feed: Feed.all());
-}
-
-class PopularFeed extends BaseFeed {
-  const PopularFeed() : super("Popular", Icons.arrow_outward);
-  @override
-  PageRouteInfo get route => FeedRoute(feed: Feed.popular());
-}
-
-class SavedFeed extends BaseFeed {
-  const SavedFeed() : super("Saved", Icons.bookmark_rounded);
-  @override
-  PageRouteInfo get route => UserSavedRoute(username: "me");
-
-  @override
-  Widget toTile(BuildContext context) {
-    return BlocBuilder<AccountsBloc, AccountState>(
-      builder: (context, state) => ListTile(
-        leading: Icon(icon),
-        title: Text(title),
-        onTap: () => context.pushRoute(UserSavedRoute(
-          username: state.account!.username,
-        )),
-      ),
-    );
-  }
-}
-
-class HistoryFeed extends BaseFeed {
-  const HistoryFeed() : super("History", Icons.history_outlined);
-  @override
-  PageRouteInfo get route => FeedRoute(feed: Feed.popular());
 }

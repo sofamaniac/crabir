@@ -41,8 +41,8 @@ pub struct Common {
     #[serde(default)]
     #[serde(deserialize_with = "utils::response_or_default")]
     pub user_is_contributor: bool,
-    #[serde(rename = "banner_img")]
-    pub banner_img: String,
+    #[serde(rename = "banner_img", deserialize_with = "response_or_none_string")]
+    pub banner_img: Option<String>,
     #[serde(rename = "allowed_media_in_comments", default)]
     #[serde(deserialize_with = "utils::response_or_default")]
     pub allowed_media_in_comments: Vec<String>,
@@ -64,14 +64,16 @@ pub struct Common {
     pub display_name: String,
     #[serde(rename = "header_img")]
     pub header_img: Option<String>,
-    pub title: String,
+    #[serde(rename = "title", deserialize_with = "response_or_none_string")]
+    pub title: Option<String>,
     #[serde(rename = "icon_size", deserialize_with = "response_or_default")]
     icon_size: [usize; 2],
     #[serde(rename = "icon_img", deserialize_with = "response_or_none_string")]
     icon_img: Option<String>,
-    #[serde(rename = "primary_color")]
-    pub primary_color: String,
+    #[serde(rename = "primary_color", deserialize_with = "response_or_none_string")]
+    pub primary_color: Option<String>,
 
+    #[serde(rename = "subscribers", deserialize_with = "response_or_default")]
     pub subscribers: i64,
     pub name: Fullname,
     #[serde(default)]
@@ -89,25 +91,31 @@ pub struct Common {
     #[serde(deserialize_with = "utils::response_or_default")]
     pub restrict_posting: bool,
 
-    #[serde(rename = "key_color")]
-    pub key_color: String,
+    #[serde(rename = "key_color", deserialize_with = "response_or_none_string")]
+    pub key_color: Option<String>,
 
+    #[serde(default)]
+    // missing on user subreddit
     pub created: f64,
 
-    #[serde(rename = "submit_text_label")]
-    pub submit_text_label: String,
+    #[serde(
+        rename = "submit_text_label",
+        deserialize_with = "response_or_none_string"
+    )]
+    pub submit_text_label: Option<String>,
 
     #[serde(rename = "show_media", default)]
     #[serde(deserialize_with = "utils::response_or_default")]
     pub show_media: bool,
 
     #[serde(rename = "public_description")]
-    pub public_description: String,
+    pub public_description: Option<String>,
 
     #[serde(rename = "banner_size")]
     pub banner_size: Option<Vec<i64>>,
 
-    #[serde(rename = "created_utc")]
+    #[serde(rename = "created_utc", default)]
+    // missing on user subreddit
     pub created_utc: f64,
 
     pub url: String,
@@ -117,13 +125,13 @@ pub struct Common {
     pub restrict_commenting: bool,
 
     #[serde(rename = "submit_link_label")]
-    pub submit_link_label: String,
+    pub submit_link_label: Option<String>,
 
     #[serde(rename = "link_flair_enabled", default)]
     #[serde(deserialize_with = "utils::response_or_default")]
     pub link_flair_enabled: bool,
     #[serde(rename = "link_flair_position")]
-    pub link_flair_position: String,
+    pub link_flair_position: Option<String>,
 
     #[serde(rename = "header_size")]
     pub header_size: Option<Vec<i64>>,
@@ -137,7 +145,7 @@ pub struct Common {
     pub disable_contributor_requests: bool,
 
     #[serde(rename = "subreddit_type")]
-    pub subreddit_type: String,
+    pub subreddit_type: Option<String>,
 
     #[serde(rename = "user_is_moderator", default)]
     #[serde(deserialize_with = "utils::response_or_default")]
@@ -148,11 +156,11 @@ pub struct Common {
 pub struct Details {
     #[serde(default, deserialize_with = "utils::response_or_default")]
     pub default_set: bool,
-    pub icon_color: String,
+    pub icon_color: Option<String>,
     pub previous_names: Vec<String>,
     #[serde(default, deserialize_with = "utils::response_or_default")]
     pub over_18: bool,
-    pub description: String,
+    pub description: Option<String>,
     #[serde(flatten)]
     pub other: Common,
 }
@@ -172,109 +180,169 @@ pub struct Subreddit {
     pub wiki_enabled: Option<bool>,
     #[serde(rename = "user_can_flair_in_sr")]
     pub user_can_flair_in_sr: Option<bool>,
-    #[serde(rename = "allow_galleries")]
+    #[serde(rename = "allow_galleries", deserialize_with = "response_or_default")]
     pub allow_galleries: bool,
 
     #[serde(rename = "active_user_count", deserialize_with = "response_or_default")]
     pub active_user_count: u32,
     #[serde(rename = "accounts_active", deserialize_with = "response_or_default")]
     pub accounts_active: Option<u32>,
-    #[serde(rename = "public_traffic")]
+    #[serde(rename = "public_traffic", deserialize_with = "response_or_default")]
     pub public_traffic: bool,
-    #[serde(rename = "hide_ads")]
+    #[serde(rename = "hide_ads", deserialize_with = "response_or_default")]
     pub hide_ads: bool,
-    #[serde(rename = "prediction_leaderboard_entry_type")]
+    #[serde(
+        rename = "prediction_leaderboard_entry_type",
+        deserialize_with = "response_or_default"
+    )]
     pub prediction_leaderboard_entry_type: i64,
     #[serde(rename = "emojis_enabled")]
     pub emojis_enabled: bool,
     #[serde(rename = "advertiser_category")]
-    pub advertiser_category: String,
+    pub advertiser_category: Option<String>,
     #[serde(rename = "comment_score_hide_mins")]
-    pub comment_score_hide_mins: i64,
-    #[serde(rename = "allow_predictions")]
+    pub comment_score_hide_mins: Option<i64>,
+    #[serde(rename = "allow_predictions", deserialize_with = "response_or_default")]
     pub allow_predictions: bool,
-    #[serde(rename = "user_has_favorited")]
+    #[serde(
+        rename = "user_has_favorited",
+        deserialize_with = "response_or_default"
+    )]
     pub user_has_favorited: bool,
     #[serde(rename = "banner_background_image")]
-    pub banner_background_image: String,
-    #[serde(rename = "original_content_tag_enabled")]
+    pub banner_background_image: Option<String>,
+    #[serde(
+        rename = "original_content_tag_enabled",
+        deserialize_with = "response_or_default"
+    )]
     pub original_content_tag_enabled: bool,
-    #[serde(rename = "community_reviewed")]
+    #[serde(
+        rename = "community_reviewed",
+        deserialize_with = "response_or_default"
+    )]
     pub community_reviewed: bool,
     #[serde(rename = "submit_text")]
-    pub submit_text: String,
+    pub submit_text: Option<String>,
     #[serde(rename = "description_html")]
     pub description_html: Option<String>,
-    #[serde(rename = "spoilers_enabled")]
+    #[serde(rename = "spoilers_enabled", deserialize_with = "response_or_default")]
     pub spoilers_enabled: bool,
     #[serde(rename = "comment_contribution_settings")]
     pub comment_contribution_settings: CommentContributionSettings,
-    #[serde(rename = "allow_talks")]
+    #[serde(rename = "allow_talks", deserialize_with = "response_or_default")]
     pub allow_talks: bool,
-    #[serde(rename = "all_original_content")]
+    #[serde(
+        rename = "all_original_content",
+        deserialize_with = "response_or_default"
+    )]
     pub all_original_content: bool,
-    #[serde(rename = "has_menu_widget")]
+    #[serde(rename = "has_menu_widget", deserialize_with = "response_or_default")]
     pub has_menu_widget: bool,
     #[serde(rename = "is_enrolled_in_new_modmail")]
     pub is_enrolled_in_new_modmail: Option<bool>,
-    #[serde(rename = "can_assign_user_flair")]
+    #[serde(
+        rename = "can_assign_user_flair",
+        deserialize_with = "response_or_default"
+    )]
     pub can_assign_user_flair: bool,
     pub wls: Option<u32>,
-    #[serde(rename = "show_media_preview")]
+    #[serde(
+        rename = "show_media_preview",
+        deserialize_with = "response_or_default"
+    )]
     pub show_media_preview: bool,
-    #[serde(rename = "submission_type")]
-    pub submission_type: String,
-    #[serde(rename = "allow_videogifs")]
+    #[serde(
+        rename = "submission_type",
+        deserialize_with = "response_or_none_string"
+    )]
+    pub submission_type: Option<String>,
+    #[serde(rename = "allow_videogifs", deserialize_with = "response_or_default")]
     pub allow_videogifs: bool,
-    #[serde(rename = "should_archive_posts")]
+    #[serde(
+        rename = "should_archive_posts",
+        deserialize_with = "response_or_default"
+    )]
     pub should_archive_posts: bool,
-    #[serde(rename = "allow_polls")]
+    #[serde(rename = "allow_polls", deserialize_with = "response_or_default")]
     pub allow_polls: bool,
-    #[serde(rename = "collapse_deleted_comments")]
+    #[serde(
+        rename = "collapse_deleted_comments",
+        deserialize_with = "response_or_default"
+    )]
     pub collapse_deleted_comments: bool,
     #[serde(rename = "emojis_custom_size")]
     pub emojis_custom_size: Option<Vec<i64>>,
     #[serde(rename = "public_description_html")]
     pub public_description_html: Option<String>,
-    #[serde(rename = "allow_videos")]
+    #[serde(rename = "allow_videos", deserialize_with = "response_or_default")]
     pub allow_videos: bool,
     #[serde(rename = "is_crosspostable_subreddit")]
     pub is_crosspostable_subreddit: Option<bool>,
     #[serde(rename = "notification_level", default)]
     pub notification_level: Option<String>,
-    #[serde(rename = "should_show_media_in_comments_setting")]
+    #[serde(
+        rename = "should_show_media_in_comments_setting",
+        deserialize_with = "response_or_default"
+    )]
     pub should_show_media_in_comments_setting: bool,
-    #[serde(rename = "can_assign_link_flair")]
+    #[serde(
+        rename = "can_assign_link_flair",
+        deserialize_with = "response_or_default"
+    )]
     pub can_assign_link_flair: bool,
-    #[serde(rename = "accounts_active_is_fuzzed")]
+    #[serde(
+        rename = "accounts_active_is_fuzzed",
+        deserialize_with = "response_or_default"
+    )]
     pub accounts_active_is_fuzzed: bool,
-    #[serde(rename = "allow_prediction_contributors")]
+    #[serde(
+        rename = "allow_prediction_contributors",
+        deserialize_with = "response_or_default"
+    )]
     pub allow_prediction_contributors: bool,
     #[serde(rename = "user_sr_flair_enabled")]
     pub user_sr_flair_enabled: Option<bool>,
-    #[serde(rename = "user_flair_enabled_in_sr")]
+    #[serde(
+        rename = "user_flair_enabled_in_sr",
+        deserialize_with = "response_or_default"
+    )]
     pub user_flair_enabled_in_sr: bool,
-    #[serde(rename = "allow_discovery")]
+    #[serde(rename = "allow_discovery", deserialize_with = "response_or_default")]
     pub allow_discovery: bool,
-    #[serde(rename = "user_sr_theme_enabled")]
+    #[serde(
+        rename = "user_sr_theme_enabled",
+        deserialize_with = "response_or_default"
+    )]
     pub user_sr_theme_enabled: bool,
     #[serde(rename = "suggested_comment_sort")]
     pub suggested_comment_sort: Option<String>,
-    #[serde(rename = "banner_background_color")]
-    pub banner_background_color: String,
+    #[serde(
+        rename = "banner_background_color",
+        deserialize_with = "response_or_none_string"
+    )]
+    pub banner_background_color: Option<String>,
     pub id: String,
+    #[serde(default, deserialize_with = "utils::response_or_default")]
     pub over18: bool,
-    #[serde(rename = "header_title")]
-    pub header_title: String,
-    pub description: String,
-    #[serde(rename = "allow_images")]
+    #[serde(rename = "header_title", deserialize_with = "response_or_none_string")]
+    pub header_title: Option<String>,
+    #[serde(rename = "description", deserialize_with = "response_or_none_string")]
+    pub description: Option<String>,
+    #[serde(rename = "allow_images", deserialize_with = "response_or_default")]
     pub allow_images: bool,
-    pub lang: String,
-    #[serde(rename = "mobile_banner_image")]
-    pub mobile_banner_image: String,
+    #[serde(rename = "lang", deserialize_with = "response_or_none_string")]
+    pub lang: Option<String>,
+    #[serde(
+        rename = "mobile_banner_image",
+        deserialize_with = "response_or_none_string"
+    )]
+    pub mobile_banner_image: Option<String>,
     // #[serde(rename = "user_is_contributor")]
     // pub user_is_contributor: bool,
-    #[serde(rename = "allow_predictions_tournament")]
+    #[serde(
+        rename = "allow_predictions_tournament",
+        deserialize_with = "response_or_default"
+    )]
     pub allow_predictions_tournament: bool,
 }
 /// flutter_rust_bridge:non_opaque
@@ -315,7 +383,7 @@ impl Common {
                 height,
             })
         } else {
-            SubredditIcon::Color(self.key_color.clone())
+            SubredditIcon::Color(self.key_color.clone().unwrap_or("black".to_owned()))
         }
     }
 }

@@ -239,19 +239,79 @@ class MultiRouteArgs {
 }
 
 /// generated route for
+/// [SearchSubredditsView]
+class SearchSubredditsRoute extends PageRouteInfo<void> {
+  const SearchSubredditsRoute({List<PageRouteInfo>? children})
+    : super(SearchSubredditsRoute.name, initialChildren: children);
+
+  static const String name = 'SearchSubredditsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SearchSubredditsView();
+    },
+  );
+}
+
+/// generated route for
 /// [SearchView]
-class SearchRoute extends PageRouteInfo<void> {
-  const SearchRoute({List<PageRouteInfo>? children})
-    : super(SearchRoute.name, initialChildren: children);
+class SearchRoute extends PageRouteInfo<SearchRouteArgs> {
+  SearchRoute({
+    Key? key,
+    required String subreddit,
+    required Flair flair,
+    List<PageRouteInfo>? children,
+  }) : super(
+         SearchRoute.name,
+         args: SearchRouteArgs(key: key, subreddit: subreddit, flair: flair),
+         initialChildren: children,
+       );
 
   static const String name = 'SearchRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const SearchView();
+      final args = data.argsAs<SearchRouteArgs>();
+      return SearchView(
+        key: args.key,
+        subreddit: args.subreddit,
+        flair: args.flair,
+      );
     },
   );
+}
+
+class SearchRouteArgs {
+  const SearchRouteArgs({
+    this.key,
+    required this.subreddit,
+    required this.flair,
+  });
+
+  final Key? key;
+
+  final String subreddit;
+
+  final Flair flair;
+
+  @override
+  String toString() {
+    return 'SearchRouteArgs{key: $key, subreddit: $subreddit, flair: $flair}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! SearchRouteArgs) return false;
+    return key == other.key &&
+        subreddit == other.subreddit &&
+        flair == other.flair;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ subreddit.hashCode ^ flair.hashCode;
 }
 
 /// generated route for
