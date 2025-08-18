@@ -61,6 +61,10 @@ dependencies:
     sdk: flutter
   intl: any
   flutter_speed_dial: ^7.0.0
+  hydrated_bloc: ^10.1.1
+  json_serializable: ^6.9.5
+  json_annotation: ^4.9.0
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:

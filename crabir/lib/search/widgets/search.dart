@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/feed_list.dart';
+import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/search/bloc/search_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -47,9 +48,8 @@ class _SearchViewBody extends StatelessWidget {
               );
             } else {
               if (!state.hasReachedMax) {
-                print("fetch");
                 bloc.add(Fetch());
-                return CircularProgressIndicator();
+                return LoadingIndicator();
               } else {
                 return Text("Nothing more to show");
               }

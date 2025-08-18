@@ -50,14 +50,14 @@ class DrawerState extends State<AppDrawer> {
                     ),
                     Text(account.account!.username)
                   ] else
-                    const CircularProgressIndicator(),
+                    const LoadingIndicator(),
                   Icon(icon),
                 ],
               ),
             ),
           );
         } else {
-          return CircularProgressIndicator();
+          return LoadingIndicator();
         }
       },
     );
@@ -67,7 +67,7 @@ class DrawerState extends State<AppDrawer> {
     return BlocBuilder<AccountsBloc, AccountState>(
       builder: (context, state) {
         if (state.account == null) {
-          return const CircularProgressIndicator();
+          return const LoadingIndicator();
         }
         final bloc = context.read<AccountsBloc>();
         return Expanded(

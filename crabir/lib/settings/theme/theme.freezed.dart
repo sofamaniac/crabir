@@ -16,20 +16,31 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Theme {
   /// Color of the foundation
+  @ColorConverter()
   Color get background;
+  @ColorConverter()
   Color get cardBackground;
+  @ColorConverter()
   Color get toolBarBackground;
+  @ColorConverter()
   Color get toolBarText;
 
   /// Buttons and widgets
+  @ColorConverter()
   Color get primaryColor;
 
   /// Communities and usernames
+  @ColorConverter()
   Color get highlight;
+  @ColorConverter()
   Color get postTitle;
+  @ColorConverter()
   Color get readPost;
+  @ColorConverter()
   Color get announcement;
+  @ColorConverter()
   Color get contentText;
+  @ColorConverter()
   Color get linkColor;
 
   /// Create a copy of Theme
@@ -38,6 +49,9 @@ mixin _$Theme {
   @pragma('vm:prefer-inline')
   $ThemeCopyWith<Theme> get copyWith =>
       _$ThemeCopyWithImpl<Theme>(this as Theme, _$identity);
+
+  /// Serializes this Theme to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
@@ -64,6 +78,7 @@ mixin _$Theme {
             const DeepCollectionEquality().equals(other.linkColor, linkColor));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -91,17 +106,17 @@ abstract mixin class $ThemeCopyWith<$Res> {
       _$ThemeCopyWithImpl;
   @useResult
   $Res call(
-      {Color background,
-      Color cardBackground,
-      Color toolBarBackground,
-      Color toolBarText,
-      Color primaryColor,
-      Color highlight,
-      Color postTitle,
-      Color readPost,
-      Color announcement,
-      Color contentText,
-      Color linkColor});
+      {@ColorConverter() Color background,
+      @ColorConverter() Color cardBackground,
+      @ColorConverter() Color toolBarBackground,
+      @ColorConverter() Color toolBarText,
+      @ColorConverter() Color primaryColor,
+      @ColorConverter() Color highlight,
+      @ColorConverter() Color postTitle,
+      @ColorConverter() Color readPost,
+      @ColorConverter() Color announcement,
+      @ColorConverter() Color contentText,
+      @ColorConverter() Color linkColor});
 }
 
 /// @nodoc
@@ -178,59 +193,71 @@ class _$ThemeCopyWithImpl<$Res> implements $ThemeCopyWith<$Res> {
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _Theme extends Theme {
   _Theme(
-      {this.background = Colors.black,
-      this.cardBackground = Colors.black,
-      this.toolBarBackground = Colors.black,
-      this.toolBarText = Colors.white,
-      this.primaryColor = const Color(0xffff6e40),
-      this.highlight = const Color(0xffff0000),
-      this.postTitle = const Color(0xFFF5F6F8),
-      this.readPost = const Color(0xFFB7B8BC),
-      this.announcement = const Color(0xFF00FF00),
-      this.contentText = const Color(0xFFF5F6F8),
-      this.linkColor = const Color(0xFF4B91E2)})
+      {@ColorConverter() this.background = Colors.black,
+      @ColorConverter() this.cardBackground = Colors.black,
+      @ColorConverter() this.toolBarBackground = Colors.black,
+      @ColorConverter() this.toolBarText = Colors.white,
+      @ColorConverter() this.primaryColor = const Color(0xffff6e40),
+      @ColorConverter() this.highlight = const Color(0xffff0000),
+      @ColorConverter() this.postTitle = const Color(0xFFF5F6F8),
+      @ColorConverter() this.readPost = const Color(0xFFB7B8BC),
+      @ColorConverter() this.announcement = const Color(0xFF00FF00),
+      @ColorConverter() this.contentText = const Color(0xFFF5F6F8),
+      @ColorConverter() this.linkColor = const Color(0xFF4B91E2)})
       : super._();
+  factory _Theme.fromJson(Map<String, dynamic> json) => _$ThemeFromJson(json);
 
   /// Color of the foundation
   @override
   @JsonKey()
+  @ColorConverter()
   final Color background;
   @override
   @JsonKey()
+  @ColorConverter()
   final Color cardBackground;
   @override
   @JsonKey()
+  @ColorConverter()
   final Color toolBarBackground;
   @override
   @JsonKey()
+  @ColorConverter()
   final Color toolBarText;
 
   /// Buttons and widgets
   @override
   @JsonKey()
+  @ColorConverter()
   final Color primaryColor;
 
   /// Communities and usernames
   @override
   @JsonKey()
+  @ColorConverter()
   final Color highlight;
   @override
   @JsonKey()
+  @ColorConverter()
   final Color postTitle;
   @override
   @JsonKey()
+  @ColorConverter()
   final Color readPost;
   @override
   @JsonKey()
+  @ColorConverter()
   final Color announcement;
   @override
   @JsonKey()
+  @ColorConverter()
   final Color contentText;
   @override
   @JsonKey()
+  @ColorConverter()
   final Color linkColor;
 
   /// Create a copy of Theme
@@ -240,6 +267,13 @@ class _Theme extends Theme {
   @pragma('vm:prefer-inline')
   _$ThemeCopyWith<_Theme> get copyWith =>
       __$ThemeCopyWithImpl<_Theme>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ThemeToJson(
+      this,
+    );
+  }
 
   @override
   bool operator ==(Object other) {
@@ -266,6 +300,7 @@ class _Theme extends Theme {
             const DeepCollectionEquality().equals(other.linkColor, linkColor));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -294,17 +329,17 @@ abstract mixin class _$ThemeCopyWith<$Res> implements $ThemeCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {Color background,
-      Color cardBackground,
-      Color toolBarBackground,
-      Color toolBarText,
-      Color primaryColor,
-      Color highlight,
-      Color postTitle,
-      Color readPost,
-      Color announcement,
-      Color contentText,
-      Color linkColor});
+      {@ColorConverter() Color background,
+      @ColorConverter() Color cardBackground,
+      @ColorConverter() Color toolBarBackground,
+      @ColorConverter() Color toolBarText,
+      @ColorConverter() Color primaryColor,
+      @ColorConverter() Color highlight,
+      @ColorConverter() Color postTitle,
+      @ColorConverter() Color readPost,
+      @ColorConverter() Color announcement,
+      @ColorConverter() Color contentText,
+      @ColorConverter() Color linkColor});
 }
 
 /// @nodoc

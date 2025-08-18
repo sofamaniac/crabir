@@ -3,13 +3,15 @@ import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/drawer/drawer.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:crabir/tabs_index.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/frb_generated.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logging/logging.dart';
+import 'package:path_provider/path_provider.dart';
 
 Future<void> main() async {
   await RustLib.init();
@@ -17,6 +19,16 @@ Future<void> main() async {
   Logger.root.onRecord.listen((record) {
     debugPrint('${record.level.name}: ${record.time}: ${record.message}');
   });
+
+  // Initializing `HydratedStorage`
+  WidgetsFlutterBinding.ensureInitialized();
+  HydratedBloc.storage = await HydratedStorage.build(
+    storageDirectory: kIsWeb
+        ? HydratedStorageDirectory.web
+        : HydratedStorageDirectory(
+            (await getApplicationDocumentsDirectory()).path,
+          ),
+  );
 
   runApp(Crabir());
 }
@@ -61,16 +73,15 @@ class MainScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final routes = <PageRouteInfo>[
-      NamedRoute("HomeFeedRoute"),
+      NamedRoute(homeRouteName),
       SearchSubredditsRoute(),
       SubscriptionsTabRoute(),
       InboxRoute(),
       CurrentUserRoute(),
     ];
-    final accounts = context.watch<AccountsBloc>().state;
+    //final accounts = context.watch<AccountsBloc>().state;
     final theme = context.watch<ThemeBloc>().state;
     return AutoTabsRouter.tabBar(
-      key: ValueKey(accounts.account?.username ?? ""),
       homeIndex: 0,
       physics: NeverScrollableScrollPhysics(),
       routes: routes,

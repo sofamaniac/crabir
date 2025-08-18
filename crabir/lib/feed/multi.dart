@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/sort_display.dart';
 import 'package:crabir/feed/sort_menu.dart';
+import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/api/simple.dart';
@@ -52,7 +53,7 @@ class _MultiViewBodyState extends State<MultiViewBody>
     return BlocBuilder<AccountsBloc, AccountState>(
       builder: (context, account) {
         return switch (account.status) {
-          Uninit() => Center(child: CircularProgressIndicator()),
+          Uninit() => Center(child: LoadingIndicator()),
           Failure(:final message) =>
             Center(child: Text("Failure in Account Manager: $message")),
           Loaded() => NestedScrollView(
@@ -106,7 +107,7 @@ class _MultiViewBodyState extends State<MultiViewBody>
                 },
               ),
             ),
-          _ => Center(child: CircularProgressIndicator())
+          _ => Center(child: LoadingIndicator())
         };
       },
     );

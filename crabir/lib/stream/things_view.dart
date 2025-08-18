@@ -1,3 +1,4 @@
+import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -54,7 +55,7 @@ class ThingsView extends StatelessWidget {
         return const Center(child: Text("Failed to load items."));
       case StreamStatus.initial:
         bloc.add(Fetch());
-        return const Center(child: CircularProgressIndicator());
+        return const Center(child: LoadingIndicator());
       case StreamStatus.success:
         if (state.items.isEmpty) {
           return const Center(child: Text("Nothing to see here"));
@@ -86,7 +87,7 @@ class ThingsView extends StatelessWidget {
                   }
                 } else {
                   bloc.add(Fetch());
-                  return Center(child: CircularProgressIndicator());
+                  return Center(child: LoadingIndicator());
                 }
               },
               separatorBuilder: (context, _) => Divider(),

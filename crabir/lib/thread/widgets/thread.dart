@@ -1,10 +1,12 @@
 import 'package:auto_route/annotations.dart';
-import 'package:crabir/comment.dart';
+import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/widget/post.dart';
+import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/thread/bloc/thread_bloc.dart';
+import 'package:crabir/thread/widgets/comment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -52,7 +54,7 @@ class Thread extends StatelessWidget {
                       )
                     else
                       SliverToBoxAdapter(
-                        child: Center(child: CircularProgressIndicator()),
+                        child: Center(child: LoadingIndicator()),
                       ),
                     CommentsList(
                       comments: state.flatComments,

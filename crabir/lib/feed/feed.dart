@@ -3,6 +3,7 @@ import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/scroll_aware_fab.dart';
 import 'package:crabir/feed/sort_menu.dart';
 import 'package:crabir/feed/top_bar.dart';
+import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/api/simple.dart';
@@ -80,10 +81,10 @@ class _FeedViewBodyState extends State<FeedViewBody>
   Widget build(BuildContext context) {
     super.build(context);
 
-    final account = context.read<AccountsBloc>().state;
+    final account = context.watch<AccountsBloc>().state;
 
     if (sort == null) {
-      return Center(child: CircularProgressIndicator());
+      return Center(child: LoadingIndicator());
     }
 
     return switch (account.status) {
@@ -140,7 +141,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
             ),
           ],
         ),
-      _ => Center(child: CircularProgressIndicator())
+      _ => Center(child: LoadingIndicator())
     };
   }
 }

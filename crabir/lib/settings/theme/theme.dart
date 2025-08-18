@@ -1,7 +1,9 @@
+import 'package:crabir/settings/theme/color_converter.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'theme.freezed.dart';
+part 'theme.g.dart';
 
 final Theme carbirTheme = Theme();
 
@@ -24,20 +26,22 @@ abstract class Theme with _$Theme {
   Theme._();
   factory Theme({
     /// Color of the foundation
-    @Default(Colors.black) Color background,
-    @Default(Colors.black) Color cardBackground,
-    @Default(Colors.black) Color toolBarBackground,
-    @Default(Colors.white) Color toolBarText,
+    @ColorConverter() @Default(Colors.black) Color background,
+    @ColorConverter() @Default(Colors.black) Color cardBackground,
+    @ColorConverter() @Default(Colors.black) Color toolBarBackground,
+    @ColorConverter() @Default(Colors.white) Color toolBarText,
 
     /// Buttons and widgets
-    @Default(Color(0xffff6e40)) Color primaryColor,
+    @ColorConverter() @Default(Color(0xffff6e40)) Color primaryColor,
 
     /// Communities and usernames
-    @Default(Color(0xffff0000)) Color highlight,
-    @Default(Color(0xFFF5F6F8)) Color postTitle,
-    @Default(Color(0xFFB7B8BC)) Color readPost,
-    @Default(Color(0xFF00FF00)) Color announcement,
-    @Default(Color(0xFFF5F6F8)) Color contentText,
-    @Default(Color(0xFF4B91E2)) Color linkColor,
+    @ColorConverter() @Default(Color(0xffff0000)) Color highlight,
+    @ColorConverter() @Default(Color(0xFFF5F6F8)) Color postTitle,
+    @ColorConverter() @Default(Color(0xFFB7B8BC)) Color readPost,
+    @ColorConverter() @Default(Color(0xFF00FF00)) Color announcement,
+    @ColorConverter() @Default(Color(0xFFF5F6F8)) Color contentText,
+    @ColorConverter() @Default(Color(0xFF4B91E2)) Color linkColor,
   }) = _Theme;
+
+  factory Theme.fromJson(Map<String, dynamic> json) => _$ThemeFromJson(json);
 }

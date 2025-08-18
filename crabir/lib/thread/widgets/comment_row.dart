@@ -1,16 +1,17 @@
 part of 'thread.dart';
 
-class CommentRow extends StatelessWidget {
-  final Comment comment;
+class IndentedBox extends StatelessWidget {
+  final int depth;
+  final Widget child;
 
-  const CommentRow({
+  const IndentedBox({
     super.key,
-    required this.comment,
+    required this.depth,
+    required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    final depth = comment.depth;
     final indentWidth = 16.0;
 
     final List<Widget> dividers = [];
@@ -28,18 +29,14 @@ class CommentRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ...dividers,
-          Expanded(
-            child: _CommentViewHandler(
-              comment: comment,
-            ),
-          ),
+          Expanded(child: child),
         ],
       ),
     );
   }
 }
 
-class _CommentViewHandlerState extends State<_CommentViewHandler> {
+class _CommentViewHandlerState extends State<CommentViewHandler> {
   bool showBottomBar = false;
   bool? likes;
   bool saved = false;
@@ -66,10 +63,10 @@ class _CommentViewHandlerState extends State<_CommentViewHandler> {
   }
 }
 
-class _CommentViewHandler extends StatefulWidget {
+class CommentViewHandler extends StatefulWidget {
   final Comment comment;
 
-  const _CommentViewHandler({required this.comment});
+  const CommentViewHandler({super.key, required this.comment});
 
   @override
   State<StatefulWidget> createState() => _CommentViewHandlerState();

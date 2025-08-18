@@ -7,11 +7,21 @@ class CommentBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.watch<ThreadBloc>();
+    final theme = context.watch<ThemeBloc>().state;
     final inner = switch (comment) {
-      Thing_Comment(field0: final comment) => CommentRow(comment: comment),
-      Thing_More(count: final count) => TextButton(
-          onPressed: () => bloc.add(LoadMore(comment as Thing_More)),
-          child: Text("Load more comments ($count)"),
+      Thing_Comment(field0: final comment) => IndentedBox(
+          depth: comment.depth,
+          child: CommentViewHandler(comment: comment),
+        ),
+      Thing_More(count: final count, depth: final depth) => IndentedBox(
+          depth: depth,
+          child: TextButton(
+            onPressed: () => bloc.add(LoadMore(comment as Thing_More)),
+            child: Text(
+              "Load more comments ($count)",
+              style: TextStyle(color: theme.primaryColor),
+            ),
+          ),
         ),
       _ => Container()
     };

@@ -18,6 +18,9 @@ import 'package:crabir/search/widgets/search.dart';
 
 part 'routes.gr.dart';
 
+const String homeRouteName = "HomeFeedRoute";
+const String homeRoutePath = "home";
+
 @AutoRouterConfig(replaceInRouteName: 'View|Page,Route')
 class AppRouter extends RootStackRouter {
   @override
@@ -27,14 +30,15 @@ class AppRouter extends RootStackRouter {
           page: MainScreenRoute.page,
           children: [
             NamedRouteDef(
-              name: "HomeFeedRoute",
-              path: "home",
+              name: homeRouteName,
+              path: homeRoutePath,
               builder: (context, data) => FeedView(
                 feed: Feed.home(),
                 initialSort: FeedSort.best(),
               ),
+              initial: true,
             ),
-            RedirectRoute(path: "", redirectTo: "home"),
+            RedirectRoute(path: "", redirectTo: homeRoutePath),
             currentUserRoute,
             AutoRoute(
               page: SubscriptionsOrFeedRoute.page,

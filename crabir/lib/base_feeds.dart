@@ -12,7 +12,7 @@ List<BaseFeed> baseFeeds(BuildContext context, {bool closeDrawer = true}) {
       "Home",
       Icons.home,
       closeDrawer: closeDrawer,
-      route: FeedRoute(feed: Feed.home()),
+      route: NamedRoute(homeRouteName),
     ),
     BaseFeed(
       "Popular",

@@ -57,7 +57,7 @@ class ImageThumbnail extends StatelessWidget {
         fit: BoxFit.fitWidth,
       );
     } else {
-      return CircularProgressIndicator();
+      return LoadingIndicator();
     }
   }
 

@@ -1,10 +1,9 @@
 import 'package:crabir/flair.dart';
+import 'package:crabir/post/widget/html_with_fade.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class CommentView extends StatefulWidget {
   final Comment comment;
@@ -71,51 +70,8 @@ class _CommentViewState extends State<CommentView> {
                       Flexible(child: FlairView(flair: comment.author!.flair))
                   ],
                 ),
-                Html(
-                  data: comment.bodyHtml,
-                  shrinkWrap: true,
-                  onLinkTap: (url, _, __) async {
-                    final uri = Uri.parse(url!);
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri);
-                    }
-                  },
-                  style: {
-                    "body": Style(
-                      margin: Margins.zero,
-                      padding: HtmlPaddings.symmetric(vertical: 0),
-                    ),
-                    "ul": Style(
-                      margin: Margins.symmetric(horizontal: 4.0, vertical: 4.0),
-                      padding: HtmlPaddings.all(12),
-                    ),
-                    "li": Style(
-                      margin: Margins.symmetric(horizontal: 8.0, vertical: 8.0),
-                    ),
-                    'blockquote': Style(
-                      margin: Margins.only(left: 8),
-                      padding: HtmlPaddings.all(12),
-                      backgroundColor: Colors.grey.shade900,
-                      border: Border(
-                        left: BorderSide(
-                          color: Colors.blueAccent,
-                          width: 4,
-                        ),
-                      ),
-                    ),
-                    'img': Style(
-                      width: Width(
-                        MediaQuery.of(context).size.width,
-                        Unit.auto,
-                      ),
-                    ),
-                    // Style for divider
-                    "hr": Style(
-                      margin: Margins.symmetric(vertical: 4),
-                      height: Height(4),
-                      backgroundColor: Colors.grey.shade800,
-                    ),
-                  },
+                HtmlWithConditionalFade(
+                  htmlContent: comment.bodyHtml,
                 ),
                 if (showBottomBar) bottomBar(),
               ],

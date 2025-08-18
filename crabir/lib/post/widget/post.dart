@@ -336,15 +336,10 @@ class _RedditPostCardState extends State<RedditPostCard> {
   }
 
   Widget content(BuildContext context) {
-    final fontSize = Theme.of(context).textTheme.bodyMedium?.fontSize ?? 15;
-    final height = Theme.of(context).textTheme.bodyMedium?.height ?? 1;
     final widget = switch (this.widget.post.kind) {
       Kind.selftext => HtmlWithConditionalFade(
           htmlContent: this.widget.post.selftextHtml ?? "",
           maxLines: this.widget.maxLines,
-          backgroundColor: Colors.black,
-          fontSize: fontSize,
-          height: height,
         ),
       Kind.meta => Text("meta"),
       Kind.video => VideoContent(post: this.widget.post),
