@@ -18,7 +18,7 @@ class ImageContent extends StatelessWidget {
       // TODO: resolution & blur
       final image = post.preview!.images[0];
       return InkWell(
-        onTap: () => context.pushRoute(
+        onTap: () => context.router.navigate(
           FullscreenImageRoute(imageUrl: image.source.url),
         ),
         child: ImageThumbnail.redditImage(
@@ -28,7 +28,7 @@ class ImageContent extends StatelessWidget {
       );
     } else {
       return InkWell(
-        onTap: () => context.pushRoute(
+        onTap: () => context.router.navigate(
           FullscreenImageRoute(imageUrl: post.url),
         ),
         child: CachedNetworkImage(

@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/feed/feed.dart';
 import 'package:crabir/feed/multi.dart';
-import 'package:crabir/feed/search.dart';
 import 'package:crabir/main.dart';
 import 'package:crabir/media/media.dart';
+import 'package:crabir/search_posts/widgets/search.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
@@ -14,7 +14,7 @@ import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/user/user.dart';
 import 'package:flutter/material.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
-import 'package:crabir/search/widgets/search.dart';
+import 'package:crabir/search_subreddits/widgets/search.dart';
 
 part 'routes.gr.dart';
 
@@ -51,7 +51,13 @@ class AppRouter extends RootStackRouter {
                 ),
               ],
             ),
-            AutoRoute(page: SearchSubredditsRoute.page),
+            AutoRoute(
+              page: SearchPageRoute.page,
+              children: [
+                AutoRoute(page: SearchSubredditsRoute.page, initial: true),
+                AutoRoute(page: SearchPostsRoute.page),
+              ],
+            ),
             AutoRoute(page: InboxRoute.page),
           ],
         ),
@@ -77,6 +83,11 @@ final threadRoute = CustomRoute(
 @RoutePage()
 class SubscriptionsOrFeedView extends AutoRouter {
   const SubscriptionsOrFeedView({super.key});
+}
+
+@RoutePage(name: "SearchPageRoute")
+class SearchPage extends AutoRouter {
+  const SearchPage({super.key});
 }
 
 @RoutePage()

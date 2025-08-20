@@ -97,11 +97,15 @@ class MainScreenView extends StatelessWidget {
             controller: tabController,
             onTap: (index) {
               tabController.animateTo(index);
-              tabsRouter.setActiveIndex(index);
+              //tabsRouter.setActiveIndex(index);
               if (index == subscriptionsIndex) {
                 tabsRouter
                     .stackRouterOfIndex(index)
                     ?.replaceAll([SubscriptionsTabRoute()]);
+              } else if (index == searchIndex) {
+                tabsRouter
+                    .stackRouterOfIndex(index)
+                    ?.replaceAll([SearchSubredditsRoute()]);
               }
             },
             tabs: [

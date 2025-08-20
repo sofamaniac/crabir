@@ -70,9 +70,8 @@ class _PostTitle extends StatelessWidget {
       children: [
         title,
         InkWell(
-          onTap: () => navigateToSubscriptionsTab(
-            context,
-            SearchRoute(
+          onTap: () => context.router.navigate(
+            SearchPostsRoute(
               subreddit: post.subreddit.subreddit,
               flair: post.linkFlair,
             ),

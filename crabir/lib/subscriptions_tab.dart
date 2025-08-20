@@ -56,7 +56,7 @@ class _SubscriptonsList extends StatelessWidget {
                       .toLowerCase()
                       .contains(filter.toLowerCase()),
                 )
-                .map((multi) => MultiRedditTile(multi: multi)),
+                .map((multi) => MultiRedditTile(multi)),
             ...account.subscriptions
                 .where(
                   (sub) => sub.other.displayName
@@ -64,7 +64,7 @@ class _SubscriptonsList extends StatelessWidget {
                       .contains(filter.toLowerCase()),
                 )
                 .map(
-                  (sub) => SubredditTile(sub: sub),
+                  (sub) => SubredditTile(sub),
                 ),
           ],
         ),
