@@ -34,14 +34,14 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
             Divider(),
             ...account.multis.map(
               (multi) => MultiRedditTile(
-                multi: multi,
+                multi,
                 closeDrawer: true,
               ),
             ),
             Divider(),
             ...account.subscriptions.map(
               (sub) => SubredditTile(
-                sub: sub,
+                sub,
                 closeDrawer: true,
               ),
             ),

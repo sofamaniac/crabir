@@ -9,11 +9,7 @@ import 'package:flutter/material.dart';
 
 void navigateToSubscriptionsTab(BuildContext context, destination) {
   final tabsRouter = AutoTabsRouter.of(context);
-  // Tabs are lazily loaded, so if it was never visited the tab router does not exists
-  tabsRouter.setActiveIndex(2);
-  // final subscriptionsTabRouter = tabsRouter.stackRouterOfIndex(2);
-  // subscriptionsTabRouter?.push(destination);
-  context.router.navigate(destination);
+  tabsRouter.navigate(destination);
 }
 
 /// Widget to display a subreddit in a list
@@ -23,7 +19,7 @@ class SubredditTile extends StatelessWidget {
   /// If set to `true`, calls `Navigator.pop()` before navigating to the destination
   final bool closeDrawer;
 
-  const SubredditTile({super.key, required this.sub, this.closeDrawer = false});
+  const SubredditTile(this.sub, {super.key, this.closeDrawer = false});
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -54,9 +50,9 @@ class MultiRedditTile extends StatelessWidget {
   /// If set to `true`, calls `Navigator.pop()` before navigating to the destination
   final bool closeDrawer;
 
-  const MultiRedditTile({
+  const MultiRedditTile(
+    this.multi, {
     super.key,
-    required this.multi,
     this.closeDrawer = false,
   });
 
