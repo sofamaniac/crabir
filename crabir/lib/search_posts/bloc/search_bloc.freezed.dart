@@ -14,11 +14,11 @@ part of 'search_bloc.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$SubredditSearchEvent {
+mixin _$PostSearchEvent {
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is SubredditSearchEvent);
+        (other.runtimeType == runtimeType && other is PostSearchEvent);
   }
 
   @override
@@ -26,24 +26,26 @@ mixin _$SubredditSearchEvent {
 
   @override
   String toString() {
-    return 'SubredditSearchEvent()';
+    return 'PostSearchEvent()';
   }
 }
 
 /// @nodoc
-class $SubredditSearchEventCopyWith<$Res> {
-  $SubredditSearchEventCopyWith(
-      SubredditSearchEvent _, $Res Function(SubredditSearchEvent) __);
+class $PostSearchEventCopyWith<$Res> {
+  $PostSearchEventCopyWith(
+      PostSearchEvent _, $Res Function(PostSearchEvent) __);
 }
 
 /// @nodoc
 
-class Query implements SubredditSearchEvent {
-  Query(this.query);
+class Query implements PostSearchEvent {
+  Query(this.query, {this.subreddit, this.flair});
 
   final String query;
+  final String? subreddit;
+  final String? flair;
 
-  /// Create a copy of SubredditSearchEvent
+  /// Create a copy of PostSearchEvent
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
@@ -55,25 +57,28 @@ class Query implements SubredditSearchEvent {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is Query &&
-            (identical(other.query, query) || other.query == query));
+            (identical(other.query, query) || other.query == query) &&
+            (identical(other.subreddit, subreddit) ||
+                other.subreddit == subreddit) &&
+            (identical(other.flair, flair) || other.flair == flair));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, query);
+  int get hashCode => Object.hash(runtimeType, query, subreddit, flair);
 
   @override
   String toString() {
-    return 'SubredditSearchEvent.query(query: $query)';
+    return 'PostSearchEvent.query(query: $query, subreddit: $subreddit, flair: $flair)';
   }
 }
 
 /// @nodoc
 abstract mixin class $QueryCopyWith<$Res>
-    implements $SubredditSearchEventCopyWith<$Res> {
+    implements $PostSearchEventCopyWith<$Res> {
   factory $QueryCopyWith(Query value, $Res Function(Query) _then) =
       _$QueryCopyWithImpl;
   @useResult
-  $Res call({String query});
+  $Res call({String query, String? subreddit, String? flair});
 }
 
 /// @nodoc
@@ -83,29 +88,39 @@ class _$QueryCopyWithImpl<$Res> implements $QueryCopyWith<$Res> {
   final Query _self;
   final $Res Function(Query) _then;
 
-  /// Create a copy of SubredditSearchEvent
+  /// Create a copy of PostSearchEvent
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
     Object? query = null,
+    Object? subreddit = freezed,
+    Object? flair = freezed,
   }) {
     return _then(Query(
       null == query
           ? _self.query
           : query // ignore: cast_nullable_to_non_nullable
               as String,
+      subreddit: freezed == subreddit
+          ? _self.subreddit
+          : subreddit // ignore: cast_nullable_to_non_nullable
+              as String?,
+      flair: freezed == flair
+          ? _self.flair
+          : flair // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
 
 /// @nodoc
 
-class SetSort implements SubredditSearchEvent {
+class SetSort implements PostSearchEvent {
   SetSort(this.sort);
 
   final SearchSort sort;
 
-  /// Create a copy of SubredditSearchEvent
+  /// Create a copy of PostSearchEvent
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
@@ -125,13 +140,13 @@ class SetSort implements SubredditSearchEvent {
 
   @override
   String toString() {
-    return 'SubredditSearchEvent.setSort(sort: $sort)';
+    return 'PostSearchEvent.setSort(sort: $sort)';
   }
 }
 
 /// @nodoc
 abstract mixin class $SetSortCopyWith<$Res>
-    implements $SubredditSearchEventCopyWith<$Res> {
+    implements $PostSearchEventCopyWith<$Res> {
   factory $SetSortCopyWith(SetSort value, $Res Function(SetSort) _then) =
       _$SetSortCopyWithImpl;
   @useResult
@@ -145,7 +160,7 @@ class _$SetSortCopyWithImpl<$Res> implements $SetSortCopyWith<$Res> {
   final SetSort _self;
   final $Res Function(SetSort) _then;
 
-  /// Create a copy of SubredditSearchEvent
+  /// Create a copy of PostSearchEvent
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
@@ -162,7 +177,7 @@ class _$SetSortCopyWithImpl<$Res> implements $SetSortCopyWith<$Res> {
 
 /// @nodoc
 
-class Fetch implements SubredditSearchEvent {
+class Fetch implements PostSearchEvent {
   Fetch();
 
   @override
@@ -176,63 +191,89 @@ class Fetch implements SubredditSearchEvent {
 
   @override
   String toString() {
-    return 'SubredditSearchEvent.fetch()';
+    return 'PostSearchEvent.fetch()';
   }
 }
 
 /// @nodoc
-mixin _$SubredditSearchState {
-  StreamStatus get status;
-  List<Subreddit> get items;
-  bool get hasReachedMax;
 
-  /// Create a copy of SubredditSearchState
+class RemoveSubreddit implements PostSearchEvent {
+  RemoveSubreddit();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is RemoveSubreddit);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'PostSearchEvent.removeSubreddit()';
+  }
+}
+
+/// @nodoc
+mixin _$PostSearchState {
+  StreamStatus get status;
+  List<Post> get items;
+  bool get hasReachedMax;
+  String get query;
+
+  /// Create a copy of PostSearchState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $SubredditSearchStateCopyWith<SubredditSearchState> get copyWith =>
-      _$SubredditSearchStateCopyWithImpl<SubredditSearchState>(
-          this as SubredditSearchState, _$identity);
+  $PostSearchStateCopyWith<PostSearchState> get copyWith =>
+      _$PostSearchStateCopyWithImpl<PostSearchState>(
+          this as PostSearchState, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is SubredditSearchState &&
+            other is PostSearchState &&
             (identical(other.status, status) || other.status == status) &&
             const DeepCollectionEquality().equals(other.items, items) &&
             (identical(other.hasReachedMax, hasReachedMax) ||
-                other.hasReachedMax == hasReachedMax));
+                other.hasReachedMax == hasReachedMax) &&
+            (identical(other.query, query) || other.query == query));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, status,
-      const DeepCollectionEquality().hash(items), hasReachedMax);
+      const DeepCollectionEquality().hash(items), hasReachedMax, query);
 
   @override
   String toString() {
-    return 'SubredditSearchState(status: $status, items: $items, hasReachedMax: $hasReachedMax)';
+    return 'PostSearchState(status: $status, items: $items, hasReachedMax: $hasReachedMax, query: $query)';
   }
 }
 
 /// @nodoc
-abstract mixin class $SubredditSearchStateCopyWith<$Res> {
-  factory $SubredditSearchStateCopyWith(SubredditSearchState value,
-          $Res Function(SubredditSearchState) _then) =
-      _$SubredditSearchStateCopyWithImpl;
+abstract mixin class $PostSearchStateCopyWith<$Res> {
+  factory $PostSearchStateCopyWith(
+          PostSearchState value, $Res Function(PostSearchState) _then) =
+      _$PostSearchStateCopyWithImpl;
   @useResult
-  $Res call({StreamStatus status, List<Subreddit> items, bool hasReachedMax});
+  $Res call(
+      {StreamStatus status,
+      List<Post> items,
+      bool hasReachedMax,
+      String query});
 }
 
 /// @nodoc
-class _$SubredditSearchStateCopyWithImpl<$Res>
-    implements $SubredditSearchStateCopyWith<$Res> {
-  _$SubredditSearchStateCopyWithImpl(this._self, this._then);
+class _$PostSearchStateCopyWithImpl<$Res>
+    implements $PostSearchStateCopyWith<$Res> {
+  _$PostSearchStateCopyWithImpl(this._self, this._then);
 
-  final SubredditSearchState _self;
-  final $Res Function(SubredditSearchState) _then;
+  final PostSearchState _self;
+  final $Res Function(PostSearchState) _then;
 
-  /// Create a copy of SubredditSearchState
+  /// Create a copy of PostSearchState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -240,6 +281,7 @@ class _$SubredditSearchStateCopyWithImpl<$Res>
     Object? status = null,
     Object? items = null,
     Object? hasReachedMax = null,
+    Object? query = null,
   }) {
     return _then(_self.copyWith(
       status: null == status
@@ -249,31 +291,36 @@ class _$SubredditSearchStateCopyWithImpl<$Res>
       items: null == items
           ? _self.items
           : items // ignore: cast_nullable_to_non_nullable
-              as List<Subreddit>,
+              as List<Post>,
       hasReachedMax: null == hasReachedMax
           ? _self.hasReachedMax
           : hasReachedMax // ignore: cast_nullable_to_non_nullable
               as bool,
+      query: null == query
+          ? _self.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
 
 /// @nodoc
 
-class _SubredditSearchState implements SubredditSearchState {
-  const _SubredditSearchState(
+class _PostSearchState implements PostSearchState {
+  const _PostSearchState(
       {this.status = StreamStatus.initial,
-      final List<Subreddit> items = const [],
-      this.hasReachedMax = false})
+      final List<Post> items = const [],
+      this.hasReachedMax = false,
+      this.query = ""})
       : _items = items;
 
   @override
   @JsonKey()
   final StreamStatus status;
-  final List<Subreddit> _items;
+  final List<Post> _items;
   @override
   @JsonKey()
-  List<Subreddit> get items {
+  List<Post> get items {
     if (_items is EqualUnmodifiableListView) return _items;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_items);
@@ -282,57 +329,64 @@ class _SubredditSearchState implements SubredditSearchState {
   @override
   @JsonKey()
   final bool hasReachedMax;
+  @override
+  @JsonKey()
+  final String query;
 
-  /// Create a copy of SubredditSearchState
+  /// Create a copy of PostSearchState
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$SubredditSearchStateCopyWith<_SubredditSearchState> get copyWith =>
-      __$SubredditSearchStateCopyWithImpl<_SubredditSearchState>(
-          this, _$identity);
+  _$PostSearchStateCopyWith<_PostSearchState> get copyWith =>
+      __$PostSearchStateCopyWithImpl<_PostSearchState>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _SubredditSearchState &&
+            other is _PostSearchState &&
             (identical(other.status, status) || other.status == status) &&
             const DeepCollectionEquality().equals(other._items, _items) &&
             (identical(other.hasReachedMax, hasReachedMax) ||
-                other.hasReachedMax == hasReachedMax));
+                other.hasReachedMax == hasReachedMax) &&
+            (identical(other.query, query) || other.query == query));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, status,
-      const DeepCollectionEquality().hash(_items), hasReachedMax);
+      const DeepCollectionEquality().hash(_items), hasReachedMax, query);
 
   @override
   String toString() {
-    return 'SubredditSearchState(status: $status, items: $items, hasReachedMax: $hasReachedMax)';
+    return 'PostSearchState(status: $status, items: $items, hasReachedMax: $hasReachedMax, query: $query)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$SubredditSearchStateCopyWith<$Res>
-    implements $SubredditSearchStateCopyWith<$Res> {
-  factory _$SubredditSearchStateCopyWith(_SubredditSearchState value,
-          $Res Function(_SubredditSearchState) _then) =
-      __$SubredditSearchStateCopyWithImpl;
+abstract mixin class _$PostSearchStateCopyWith<$Res>
+    implements $PostSearchStateCopyWith<$Res> {
+  factory _$PostSearchStateCopyWith(
+          _PostSearchState value, $Res Function(_PostSearchState) _then) =
+      __$PostSearchStateCopyWithImpl;
   @override
   @useResult
-  $Res call({StreamStatus status, List<Subreddit> items, bool hasReachedMax});
+  $Res call(
+      {StreamStatus status,
+      List<Post> items,
+      bool hasReachedMax,
+      String query});
 }
 
 /// @nodoc
-class __$SubredditSearchStateCopyWithImpl<$Res>
-    implements _$SubredditSearchStateCopyWith<$Res> {
-  __$SubredditSearchStateCopyWithImpl(this._self, this._then);
+class __$PostSearchStateCopyWithImpl<$Res>
+    implements _$PostSearchStateCopyWith<$Res> {
+  __$PostSearchStateCopyWithImpl(this._self, this._then);
 
-  final _SubredditSearchState _self;
-  final $Res Function(_SubredditSearchState) _then;
+  final _PostSearchState _self;
+  final $Res Function(_PostSearchState) _then;
 
-  /// Create a copy of SubredditSearchState
+  /// Create a copy of PostSearchState
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -340,8 +394,9 @@ class __$SubredditSearchStateCopyWithImpl<$Res>
     Object? status = null,
     Object? items = null,
     Object? hasReachedMax = null,
+    Object? query = null,
   }) {
-    return _then(_SubredditSearchState(
+    return _then(_PostSearchState(
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -349,11 +404,15 @@ class __$SubredditSearchStateCopyWithImpl<$Res>
       items: null == items
           ? _self._items
           : items // ignore: cast_nullable_to_non_nullable
-              as List<Subreddit>,
+              as List<Post>,
       hasReachedMax: null == hasReachedMax
           ? _self.hasReachedMax
           : hasReachedMax // ignore: cast_nullable_to_non_nullable
               as bool,
+      query: null == query
+          ? _self.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }

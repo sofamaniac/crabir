@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/search.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
@@ -22,7 +23,6 @@ class SubredditSearchBloc
   }
   String query;
   SearchSort sort = SearchSort.relevance;
-  DateTime timeSinceQuery = DateTime.now();
 
   reddit_api.Streamable? streamable;
 
@@ -36,10 +36,11 @@ class SubredditSearchBloc
     Emitter<SubredditSearchState> emit,
   ) async {
     if (newQuery.query.isEmpty) {
-      emit(state.copyWith(items: []));
+      emit(state.copyWith(query: query, items: []));
       return;
     } else if (newQuery.query != query) {
       query = newQuery.query;
+      emit(state.copyWith(query: query));
       // throttle
       if (_debounce?.isActive ?? false) {
         _debounce!.cancel();
@@ -87,16 +88,20 @@ class SubredditSearchBloc
           state.copyWith(
             hasReachedMax: hasReachedMax,
             items: subreddits.toList(),
+            query: query,
           ),
         );
       } catch (e) {
         emit(state.copyWith(status: StreamStatus.failure));
       }
     } else {
-      emit(state.copyWith(
-        hasReachedMax: hasReachedMax,
-        items: subreddits.toList(),
-      ));
+      emit(
+        state.copyWith(
+          hasReachedMax: hasReachedMax,
+          items: subreddits.toList(),
+          query: query,
+        ),
+      );
     }
   }
 }
