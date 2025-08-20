@@ -9,11 +9,11 @@ import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
+    as reddit_stream;
 import 'package:crabir/stream/bloc/stream_bloc.dart';
 import 'package:crabir/stream/things_view.dart';
-import 'package:crabir/tabs_index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -55,6 +55,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
   FeedSort? sort;
 
   late final ScrollController _scrollController;
+  late reddit_stream.Streamable _stream;
 
   @override
   bool get wantKeepAlive => true;
@@ -75,6 +76,10 @@ class _FeedViewBodyState extends State<FeedViewBody>
   void _initializeSort() {
     // TODO: read from user option for preferred sort.
     sort = widget.initialSort ?? FeedSort.best();
+    _stream = RedditAPI.client().feedStream(
+      feed: widget.feed,
+      sort: sort!,
+    );
   }
 
   @override
@@ -103,17 +108,17 @@ class _FeedViewBodyState extends State<FeedViewBody>
                     IconButton(
                       icon: Icon(Icons.search),
                       onPressed: () {
-                        final tabsRouter = AutoTabsRouter.of(context);
-                        tabsRouter.setActiveIndex(searchIndex);
-                        context.pushRoute(SearchRoute(
-                            subreddit: "rust",
-                            flair: Flair(richtext: [], text: "bloop")));
+                        context.router.navigate(SearchSubredditsRoute());
                       },
                     ),
                     SortMenu(
                       onSelect: (sort) {
                         setState(() {
                           this.sort = sort;
+                          _stream = RedditAPI.client().feedStream(
+                            feed: widget.feed,
+                            sort: sort,
+                          );
                         });
                       },
                     ),
@@ -122,10 +127,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
               ],
               floatHeaderSlivers: true,
               body: ThingsScaffold(
-                stream: RedditAPI.client().feedStream(
-                  feed: widget.feed,
-                  sort: sort!,
-                ),
+                stream: _stream,
                 postView: postView,
               ),
             ),
@@ -157,7 +159,7 @@ Widget postView(BuildContext context, Post post) {
     onSave: (save) async {
       state.add(Save(saved: save, name: post.name));
     },
-    onTap: () => context.pushRoute(
+    onTap: () => context.router.navigate(
       ThreadRoute(permalink: post.permalink, post: post),
     ),
   );
