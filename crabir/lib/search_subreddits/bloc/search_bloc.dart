@@ -22,7 +22,7 @@ class SubredditSearchBloc
     on<SetSort>(_setSort);
   }
   String query;
-  SearchSort sort = SearchSort.relevance;
+  SubredditSearchSort sort = SubredditSearchSort.relevance;
 
   reddit_api.Streamable? streamable;
 
@@ -30,6 +30,28 @@ class SubredditSearchBloc
   bool hasReachedMax = false;
 
   Timer? _debounce;
+
+  /// Create new stream and throttles api requests.
+  void _newStream({bool debounce = true}) {
+    if (!debounce) {
+      streamable = RedditAPI.client().searchSubreddits(
+        query: query,
+        sort: sort,
+      );
+      hasReachedMax = false;
+      return;
+    }
+    if (_debounce?.isActive ?? false) {
+      _debounce!.cancel();
+    }
+    _debounce = Timer(const Duration(milliseconds: 200), () async {
+      streamable = RedditAPI.client().searchSubreddits(
+        query: query,
+        sort: sort,
+      );
+      hasReachedMax = false;
+    });
+  }
 
   Future<void> _query(
     Query newQuery,
@@ -41,17 +63,7 @@ class SubredditSearchBloc
     } else if (newQuery.query != query) {
       query = newQuery.query;
       emit(state.copyWith(query: query));
-      // throttle
-      if (_debounce?.isActive ?? false) {
-        _debounce!.cancel();
-      }
-      _debounce = Timer(const Duration(milliseconds: 200), () async {
-        streamable = RedditAPI.client().searchSubreddits(
-          query: query,
-          sort: sort,
-        );
-        hasReachedMax = false;
-      });
+      _newStream();
       await _filter(emit);
     }
   }
@@ -68,8 +80,12 @@ class SubredditSearchBloc
     SetSort sort,
     Emitter<SubredditSearchState> emit,
   ) async {
+    if (sort.sort == this.sort) {
+      return;
+    }
     this.sort = sort.sort;
-    await _query(Query(query), emit);
+    _newStream(debounce: false);
+    emit(SubredditSearchState(query: query));
   }
 
   Future<void> _filter(Emitter<SubredditSearchState> emit) async {

@@ -557,6 +557,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Oembed dco_decode_box_autoadd_oembed(dynamic raw);
 
   @protected
+  PostSearchSort dco_decode_box_autoadd_post_search_sort(dynamic raw);
+
+  @protected
   Preview dco_decode_box_autoadd_preview(dynamic raw);
 
   @protected
@@ -750,6 +753,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Int64List? dco_decode_opt_list_prim_i_64_strict(dynamic raw);
 
   @protected
+  PostSearchSort dco_decode_post_search_sort(dynamic raw);
+
+  @protected
   Preferences dco_decode_preferences(dynamic raw);
 
   @protected
@@ -775,9 +781,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Richtext dco_decode_richtext(dynamic raw);
 
   @protected
-  SearchSort dco_decode_search_sort(dynamic raw);
-
-  @protected
   SecureMediaEmbed dco_decode_secure_media_embed(dynamic raw);
 
   @protected
@@ -788,6 +791,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SubredditIcon dco_decode_subreddit_icon(dynamic raw);
+
+  @protected
+  SubredditSearchSort dco_decode_subreddit_search_sort(dynamic raw);
 
   @protected
   Thing dco_decode_thing(dynamic raw);
@@ -1280,6 +1286,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Oembed sse_decode_box_autoadd_oembed(SseDeserializer deserializer);
 
   @protected
+  PostSearchSort sse_decode_box_autoadd_post_search_sort(
+      SseDeserializer deserializer);
+
+  @protected
   Preview sse_decode_box_autoadd_preview(SseDeserializer deserializer);
 
   @protected
@@ -1482,6 +1492,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Int64List? sse_decode_opt_list_prim_i_64_strict(SseDeserializer deserializer);
 
   @protected
+  PostSearchSort sse_decode_post_search_sort(SseDeserializer deserializer);
+
+  @protected
   Preferences sse_decode_preferences(SseDeserializer deserializer);
 
   @protected
@@ -1507,9 +1520,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Richtext sse_decode_richtext(SseDeserializer deserializer);
 
   @protected
-  SearchSort sse_decode_search_sort(SseDeserializer deserializer);
-
-  @protected
   SecureMediaEmbed sse_decode_secure_media_embed(SseDeserializer deserializer);
 
   @protected
@@ -1520,6 +1530,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SubredditIcon sse_decode_subreddit_icon(SseDeserializer deserializer);
+
+  @protected
+  SubredditSearchSort sse_decode_subreddit_search_sort(
+      SseDeserializer deserializer);
 
   @protected
   Thing sse_decode_thing(SseDeserializer deserializer);
@@ -2021,6 +2035,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_oembed(Oembed self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_post_search_sort(
+      PostSearchSort self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_preview(Preview self, SseSerializer serializer);
 
   @protected
@@ -2234,6 +2252,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       Int64List? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_post_search_sort(
+      PostSearchSort self, SseSerializer serializer);
+
+  @protected
   void sse_encode_preferences(Preferences self, SseSerializer serializer);
 
   @protected
@@ -2257,9 +2279,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_richtext(Richtext self, SseSerializer serializer);
 
   @protected
-  void sse_encode_search_sort(SearchSort self, SseSerializer serializer);
-
-  @protected
   void sse_encode_secure_media_embed(
       SecureMediaEmbed self, SseSerializer serializer);
 
@@ -2272,6 +2291,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_subreddit_icon(SubredditIcon self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_subreddit_search_sort(
+      SubredditSearchSort self, SseSerializer serializer);
 
   @protected
   void sse_encode_thing(Thing self, SseSerializer serializer);

@@ -726,6 +726,7 @@ fn wire__reddit_api__client__Client_search_post_impl(
             let api_flair =
                 <Option<reddit_api::model::flair::Flair>>::sse_decode(&mut deserializer);
             let api_query = <Option<String>>::sse_decode(&mut deserializer);
+            let api_sort = <reddit_api::search::PostSearchSort>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let mut api_that_guard = None;
@@ -747,6 +748,7 @@ fn wire__reddit_api__client__Client_search_post_impl(
                     api_subreddit,
                     api_flair,
                     api_query,
+                    api_sort,
                 ))?;
                 Ok(output_ok)
             })())
@@ -778,7 +780,7 @@ fn wire__reddit_api__client__Client_search_subreddits_impl(
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Client>,
             >>::sse_decode(&mut deserializer);
             let api_query = <String>::sse_decode(&mut deserializer);
-            let api_sort = <reddit_api::search::SearchSort>::sse_decode(&mut deserializer);
+            let api_sort = <reddit_api::search::SubredditSearchSort>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let mut api_that_guard = None;
@@ -19758,6 +19760,7 @@ fn wire__reddit_api__search__SearchPost_new_impl(
             let api_flair =
                 <Option<reddit_api::model::flair::Flair>>::sse_decode(&mut deserializer);
             let api_query = <Option<String>>::sse_decode(&mut deserializer);
+            let api_sort = <reddit_api::search::PostSearchSort>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let output_ok = Result::<_, ()>::Ok(reddit_api::search::SearchPost::new(
@@ -19765,6 +19768,7 @@ fn wire__reddit_api__search__SearchPost_new_impl(
                     api_subreddit,
                     api_flair,
                     api_query,
+                    api_sort,
                 ))?;
                 Ok(output_ok)
             })())
@@ -19794,7 +19798,7 @@ fn wire__reddit_api__search__SearchSubreddit_new_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_client = <Client>::sse_decode(&mut deserializer);
             let api_query = <String>::sse_decode(&mut deserializer);
-            let api_sort = <reddit_api::search::SearchSort>::sse_decode(&mut deserializer);
+            let api_sort = <reddit_api::search::SubredditSearchSort>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let output_ok = Result::<_, ()>::Ok(reddit_api::search::SearchSubreddit::new(
@@ -27657,6 +27661,19 @@ const _: fn() = || {
         let _: String = Oembed.author_url;
         let _: reddit_api::model::post::ThumbnailOption = Oembed.thumbnail;
     }
+    match None::<reddit_api::search::PostSearchSort>.unwrap() {
+        reddit_api::search::PostSearchSort::Relevance(field0) => {
+            let _: reddit_api::model::Timeframe = field0;
+        }
+        reddit_api::search::PostSearchSort::Hot => {}
+        reddit_api::search::PostSearchSort::Top(field0) => {
+            let _: reddit_api::model::Timeframe = field0;
+        }
+        reddit_api::search::PostSearchSort::New => {}
+        reddit_api::search::PostSearchSort::Comments(field0) => {
+            let _: reddit_api::model::Timeframe = field0;
+        }
+    }
     {
         let Preferences = None::<reddit_api::model::user::model::Preferences>.unwrap();
         let _: bool = Preferences.pref_autoplay;
@@ -29185,6 +29202,36 @@ impl SseDecode for Option<Vec<i64>> {
     }
 }
 
+impl SseDecode for reddit_api::search::PostSearchSort {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_field0 = <reddit_api::model::Timeframe>::sse_decode(deserializer);
+                return reddit_api::search::PostSearchSort::Relevance(var_field0);
+            }
+            1 => {
+                return reddit_api::search::PostSearchSort::Hot;
+            }
+            2 => {
+                let mut var_field0 = <reddit_api::model::Timeframe>::sse_decode(deserializer);
+                return reddit_api::search::PostSearchSort::Top(var_field0);
+            }
+            3 => {
+                return reddit_api::search::PostSearchSort::New;
+            }
+            4 => {
+                let mut var_field0 = <reddit_api::model::Timeframe>::sse_decode(deserializer);
+                return reddit_api::search::PostSearchSort::Comments(var_field0);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
 impl SseDecode for reddit_api::model::user::model::Preferences {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -29309,18 +29356,6 @@ impl SseDecode for reddit_api::model::flair::Richtext {
     }
 }
 
-impl SseDecode for reddit_api::search::SearchSort {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <i32>::sse_decode(deserializer);
-        return match inner {
-            0 => reddit_api::search::SearchSort::Relevance,
-            1 => reddit_api::search::SearchSort::Activity,
-            _ => unreachable!("Invalid variant for SearchSort: {}", inner),
-        };
-    }
-}
-
 impl SseDecode for reddit_api::model::post::SecureMediaEmbed {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -29378,6 +29413,18 @@ impl SseDecode for reddit_api::model::subreddit::SubredditIcon {
                 unimplemented!("");
             }
         }
+    }
+}
+
+impl SseDecode for reddit_api::search::SubredditSearchSort {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => reddit_api::search::SubredditSearchSort::Relevance,
+            1 => reddit_api::search::SubredditSearchSort::Activity,
+            _ => unreachable!("Invalid variant for SubredditSearchSort: {}", inner),
+        };
     }
 }
 
@@ -31302,6 +31349,38 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::post::Oembe
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::search::PostSearchSort> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            reddit_api::search::PostSearchSort::Relevance(field0) => {
+                [0.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            reddit_api::search::PostSearchSort::Hot => [1.into_dart()].into_dart(),
+            reddit_api::search::PostSearchSort::Top(field0) => {
+                [2.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            reddit_api::search::PostSearchSort::New => [3.into_dart()].into_dart(),
+            reddit_api::search::PostSearchSort::Comments(field0) => {
+                [4.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for FrbWrapper<reddit_api::search::PostSearchSort>
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::search::PostSearchSort>>
+    for reddit_api::search::PostSearchSort
+{
+    fn into_into_dart(self) -> FrbWrapper<reddit_api::search::PostSearchSort> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::user::model::Preferences> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -31452,27 +31531,6 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::flair::Rich
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::search::SearchSort> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        match self.0 {
-            reddit_api::search::SearchSort::Relevance => 0.into_dart(),
-            reddit_api::search::SearchSort::Activity => 1.into_dart(),
-            _ => unreachable!(),
-        }
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for FrbWrapper<reddit_api::search::SearchSort>
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::search::SearchSort>>
-    for reddit_api::search::SearchSort
-{
-    fn into_into_dart(self) -> FrbWrapper<reddit_api::search::SearchSort> {
-        self.into()
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::post::SecureMediaEmbed> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -31559,6 +31617,27 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::subreddit::
     for reddit_api::model::subreddit::SubredditIcon
 {
     fn into_into_dart(self) -> FrbWrapper<reddit_api::model::subreddit::SubredditIcon> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::search::SubredditSearchSort> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            reddit_api::search::SubredditSearchSort::Relevance => 0.into_dart(),
+            reddit_api::search::SubredditSearchSort::Activity => 1.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for FrbWrapper<reddit_api::search::SubredditSearchSort>
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::search::SubredditSearchSort>>
+    for reddit_api::search::SubredditSearchSort
+{
+    fn into_into_dart(self) -> FrbWrapper<reddit_api::search::SubredditSearchSort> {
         self.into()
     }
 }
@@ -33003,6 +33082,35 @@ impl SseEncode for Option<Vec<i64>> {
     }
 }
 
+impl SseEncode for reddit_api::search::PostSearchSort {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            reddit_api::search::PostSearchSort::Relevance(field0) => {
+                <i32>::sse_encode(0, serializer);
+                <reddit_api::model::Timeframe>::sse_encode(field0, serializer);
+            }
+            reddit_api::search::PostSearchSort::Hot => {
+                <i32>::sse_encode(1, serializer);
+            }
+            reddit_api::search::PostSearchSort::Top(field0) => {
+                <i32>::sse_encode(2, serializer);
+                <reddit_api::model::Timeframe>::sse_encode(field0, serializer);
+            }
+            reddit_api::search::PostSearchSort::New => {
+                <i32>::sse_encode(3, serializer);
+            }
+            reddit_api::search::PostSearchSort::Comments(field0) => {
+                <i32>::sse_encode(4, serializer);
+                <reddit_api::model::Timeframe>::sse_encode(field0, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
 impl SseEncode for reddit_api::model::user::model::Preferences {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -33087,22 +33195,6 @@ impl SseEncode for reddit_api::model::flair::Richtext {
     }
 }
 
-impl SseEncode for reddit_api::search::SearchSort {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(
-            match self {
-                reddit_api::search::SearchSort::Relevance => 0,
-                reddit_api::search::SearchSort::Activity => 1,
-                _ => {
-                    unimplemented!("");
-                }
-            },
-            serializer,
-        );
-    }
-}
-
 impl SseEncode for reddit_api::model::post::SecureMediaEmbed {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -33146,6 +33238,22 @@ impl SseEncode for reddit_api::model::subreddit::SubredditIcon {
                 unimplemented!("");
             }
         }
+    }
+}
+
+impl SseEncode for reddit_api::search::SubredditSearchSort {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                reddit_api::search::SubredditSearchSort::Relevance => 0,
+                reddit_api::search::SubredditSearchSort::Activity => 1,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 

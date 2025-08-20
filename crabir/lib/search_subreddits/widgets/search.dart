@@ -3,6 +3,7 @@ import 'package:crabir/feed_list.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/search_subreddits/bloc/search_bloc.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -55,6 +56,7 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
               ),
           ],
         ),
+        actions: [SortMenu()],
       ),
       body: Column(
         children: [
@@ -90,6 +92,45 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class SortMenu extends StatelessWidget {
+  const SortMenu({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = context.watch<SubredditSearchBloc>();
+    return MenuAnchor(
+      menuChildren: [
+        MenuItemButton(
+          onPressed: () => bloc.add(
+            SetSort(SubredditSearchSort.activity),
+          ),
+          child: Text("Activity"),
+        ),
+        MenuItemButton(
+          onPressed: () => bloc.add(
+            SetSort(SubredditSearchSort.relevance),
+          ),
+          child: Text("Relevance"),
+        ),
+      ],
+      builder: (_, MenuController controller, Widget? child) {
+        return IconButton(
+          onPressed: () {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
+          },
+          icon: const Icon(Icons.sort),
+        );
+      },
     );
   }
 }

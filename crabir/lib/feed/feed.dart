@@ -7,7 +7,6 @@ import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/api/simple.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
@@ -163,24 +162,4 @@ Widget postView(BuildContext context, Post post) {
       ThreadRoute(permalink: post.permalink, post: post),
     ),
   );
-}
-
-const timeOptions = [
-  Timeframe.hour,
-  Timeframe.day,
-  Timeframe.week,
-  Timeframe.month,
-  Timeframe.year,
-  Timeframe.all
-];
-
-String timeframeToString(Timeframe timeframe) {
-  return switch (timeframe) {
-    Timeframe.hour => "Hour",
-    Timeframe.day => "Day",
-    Timeframe.week => "Week",
-    Timeframe.month => "Month",
-    Timeframe.year => "Year",
-    Timeframe.all => "All",
-  };
 }

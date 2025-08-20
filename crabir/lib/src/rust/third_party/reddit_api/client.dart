@@ -73,11 +73,15 @@ abstract class Client implements RustOpaqueInterface {
   Future<void> save({required Fullname thing});
 
   ///flutter_rust_bridge:sync
-  Streamable searchPost({String? subreddit, Flair? flair, String? query});
+  Streamable searchPost(
+      {String? subreddit,
+      Flair? flair,
+      String? query,
+      required PostSearchSort sort});
 
   ///flutter_rust_bridge:sync
   Streamable searchSubreddits(
-      {required String query, required SearchSort sort});
+      {required String query, required SubredditSearchSort sort});
 
   /// Get the list of all subreddits the current user is subscribed to.
   /// # Errors

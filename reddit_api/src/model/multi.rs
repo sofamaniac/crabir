@@ -1,10 +1,8 @@
 use std::backtrace::Backtrace;
-use std::collections::HashMap;
 
 use futures::StreamExt;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 use crate::result::Result;
 use crate::{client::Client, error::Error, streamable::stream::IntoStreamPrivate};

@@ -34,6 +34,9 @@ class CurrentUserView extends StatelessWidget {
           headerSliverBuilder: (_, __) => [
             SliverAppBar.large(
               //floating: true,
+              leading: CircleAvatar(
+                foregroundImage: NetworkImage(state.account!.profilePicture),
+              ),
               pinned: false,
               bottom: TabBar(
                 isScrollable: true,

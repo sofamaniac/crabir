@@ -131,10 +131,16 @@ abstract class RustLibApi extends BaseApi {
       {required Client that, required Fullname thing});
 
   Streamable redditApiClientClientSearchPost(
-      {required Client that, String? subreddit, Flair? flair, String? query});
+      {required Client that,
+      String? subreddit,
+      Flair? flair,
+      String? query,
+      required PostSearchSort sort});
 
   Streamable redditApiClientClientSearchSubreddits(
-      {required Client that, required String query, required SearchSort sort});
+      {required Client that,
+      required String query,
+      required SubredditSearchSort sort});
 
   Future<List<Subreddit>> redditApiClientClientSubsriptions(
       {required Client that});
@@ -1243,12 +1249,16 @@ abstract class RustLibApi extends BaseApi {
   Thumbnail? redditApiModelPostPostThumbnail({required Post that});
 
   SearchPost redditApiSearchSearchPostNew(
-      {required Client client, String? subreddit, Flair? flair, String? query});
+      {required Client client,
+      String? subreddit,
+      Flair? flair,
+      String? query,
+      required PostSearchSort sort});
 
   SearchSubreddit redditApiSearchSearchSubredditNew(
       {required Client client,
       required String query,
-      required SearchSort sort});
+      required SubredditSearchSort sort});
 
   Future<List<Thing>> redditApiStreamableStreamableGetAll(
       {required Streamable that});
@@ -2257,7 +2267,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Streamable redditApiClientClientSearchPost(
-      {required Client that, String? subreddit, Flair? flair, String? query}) {
+      {required Client that,
+      String? subreddit,
+      Flair? flair,
+      String? query,
+      required PostSearchSort sort}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -2266,6 +2280,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_opt_String(subreddit, serializer);
         sse_encode_opt_box_autoadd_flair(flair, serializer);
         sse_encode_opt_String(query, serializer);
+        sse_encode_box_autoadd_post_search_sort(sort, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
       },
       codec: SseCodec(
@@ -2274,7 +2289,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: null,
       ),
       constMeta: kRedditApiClientClientSearchPostConstMeta,
-      argValues: [that, subreddit, flair, query],
+      argValues: [that, subreddit, flair, query, sort],
       apiImpl: this,
     ));
   }
@@ -2282,19 +2297,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kRedditApiClientClientSearchPostConstMeta =>
       const TaskConstMeta(
         debugName: "Client_search_post",
-        argNames: ["that", "subreddit", "flair", "query"],
+        argNames: ["that", "subreddit", "flair", "query", "sort"],
       );
 
   @override
   Streamable redditApiClientClientSearchSubreddits(
-      {required Client that, required String query, required SearchSort sort}) {
+      {required Client that,
+      required String query,
+      required SubredditSearchSort sort}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
             that, serializer);
         sse_encode_String(query, serializer);
-        sse_encode_search_sort(sort, serializer);
+        sse_encode_subreddit_search_sort(sort, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
       },
       codec: SseCodec(
@@ -13027,7 +13044,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       {required Client client,
       String? subreddit,
       Flair? flair,
-      String? query}) {
+      String? query,
+      required PostSearchSort sort}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -13036,6 +13054,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_opt_String(subreddit, serializer);
         sse_encode_opt_box_autoadd_flair(flair, serializer);
         sse_encode_opt_String(query, serializer);
+        sse_encode_box_autoadd_post_search_sort(sort, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 407)!;
       },
       codec: SseCodec(
@@ -13044,7 +13063,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: null,
       ),
       constMeta: kRedditApiSearchSearchPostNewConstMeta,
-      argValues: [client, subreddit, flair, query],
+      argValues: [client, subreddit, flair, query, sort],
       apiImpl: this,
     ));
   }
@@ -13052,21 +13071,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kRedditApiSearchSearchPostNewConstMeta =>
       const TaskConstMeta(
         debugName: "SearchPost_new",
-        argNames: ["client", "subreddit", "flair", "query"],
+        argNames: ["client", "subreddit", "flair", "query", "sort"],
       );
 
   @override
   SearchSubreddit redditApiSearchSearchSubredditNew(
       {required Client client,
       required String query,
-      required SearchSort sort}) {
+      required SubredditSearchSort sort}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerClient(
             client, serializer);
         sse_encode_String(query, serializer);
-        sse_encode_search_sort(sort, serializer);
+        sse_encode_subreddit_search_sort(sort, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 408)!;
       },
       codec: SseCodec(
@@ -18646,6 +18665,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PostSearchSort dco_decode_box_autoadd_post_search_sort(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_post_search_sort(raw);
+  }
+
+  @protected
   Preview dco_decode_box_autoadd_preview(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_preview(raw);
@@ -19140,6 +19165,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PostSearchSort dco_decode_post_search_sort(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return PostSearchSort_Relevance(
+          dco_decode_timeframe(raw[1]),
+        );
+      case 1:
+        return PostSearchSort_Hot();
+      case 2:
+        return PostSearchSort_Top(
+          dco_decode_timeframe(raw[1]),
+        );
+      case 3:
+        return PostSearchSort_New();
+      case 4:
+        return PostSearchSort_Comments(
+          dco_decode_timeframe(raw[1]),
+        );
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
   Preferences dco_decode_preferences(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -19252,12 +19302,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  SearchSort dco_decode_search_sort(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SearchSort.values[raw as int];
-  }
-
-  @protected
   SecureMediaEmbed dco_decode_secure_media_embed(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -19311,6 +19355,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       default:
         throw Exception("unreachable");
     }
+  }
+
+  @protected
+  SubredditSearchSort dco_decode_subreddit_search_sort(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SubredditSearchSort.values[raw as int];
   }
 
   @protected
@@ -20426,6 +20476,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PostSearchSort sse_decode_box_autoadd_post_search_sort(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_post_search_sort(deserializer));
+  }
+
+  @protected
   Preview sse_decode_box_autoadd_preview(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_preview(deserializer));
@@ -21092,6 +21149,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PostSearchSort sse_decode_post_search_sort(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_field0 = sse_decode_timeframe(deserializer);
+        return PostSearchSort_Relevance(var_field0);
+      case 1:
+        return PostSearchSort_Hot();
+      case 2:
+        var var_field0 = sse_decode_timeframe(deserializer);
+        return PostSearchSort_Top(var_field0);
+      case 3:
+        return PostSearchSort_New();
+      case 4:
+        var var_field0 = sse_decode_timeframe(deserializer);
+        return PostSearchSort_Comments(var_field0);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
   Preferences sse_decode_preferences(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_prefAutoplay = sse_decode_bool(deserializer);
@@ -21206,13 +21287,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  SearchSort sse_decode_search_sort(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return SearchSort.values[inner];
-  }
-
-  @protected
   SecureMediaEmbed sse_decode_secure_media_embed(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_content = sse_decode_String(deserializer);
@@ -21262,6 +21336,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       default:
         throw UnimplementedError('');
     }
+  }
+
+  @protected
+  SubredditSearchSort sse_decode_subreddit_search_sort(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return SubredditSearchSort.values[inner];
   }
 
   @protected
@@ -22447,6 +22529,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_post_search_sort(
+      PostSearchSort self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_post_search_sort(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_preview(Preview self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_preview(self, serializer);
@@ -23020,6 +23109,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_post_search_sort(
+      PostSearchSort self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case PostSearchSort_Relevance(field0: final field0):
+        sse_encode_i_32(0, serializer);
+        sse_encode_timeframe(field0, serializer);
+      case PostSearchSort_Hot():
+        sse_encode_i_32(1, serializer);
+      case PostSearchSort_Top(field0: final field0):
+        sse_encode_i_32(2, serializer);
+        sse_encode_timeframe(field0, serializer);
+      case PostSearchSort_New():
+        sse_encode_i_32(3, serializer);
+      case PostSearchSort_Comments(field0: final field0):
+        sse_encode_i_32(4, serializer);
+        sse_encode_timeframe(field0, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_preferences(Preferences self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_bool(self.prefAutoplay, serializer);
@@ -23096,12 +23206,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_search_sort(SearchSort self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
   void sse_encode_secure_media_embed(
       SecureMediaEmbed self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -23138,6 +23242,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(1, serializer);
         sse_encode_String(field0, serializer);
     }
+  }
+
+  @protected
+  void sse_encode_subreddit_search_sort(
+      SubredditSearchSort self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -23498,13 +23609,21 @@ class ClientImpl extends RustOpaque implements Client {
       RustLib.instance.api.redditApiClientClientSave(that: this, thing: thing);
 
   ///flutter_rust_bridge:sync
-  Streamable searchPost({String? subreddit, Flair? flair, String? query}) =>
+  Streamable searchPost(
+          {String? subreddit,
+          Flair? flair,
+          String? query,
+          required PostSearchSort sort}) =>
       RustLib.instance.api.redditApiClientClientSearchPost(
-          that: this, subreddit: subreddit, flair: flair, query: query);
+          that: this,
+          subreddit: subreddit,
+          flair: flair,
+          query: query,
+          sort: sort);
 
   ///flutter_rust_bridge:sync
   Streamable searchSubreddits(
-          {required String query, required SearchSort sort}) =>
+          {required String query, required SubredditSearchSort sort}) =>
       RustLib.instance.api.redditApiClientClientSearchSubreddits(
           that: this, query: query, sort: sort);
 

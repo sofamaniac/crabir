@@ -103,7 +103,7 @@ class _$QueryCopyWithImpl<$Res> implements $QueryCopyWith<$Res> {
 class SetSort implements SubredditSearchEvent {
   SetSort(this.sort);
 
-  final SearchSort sort;
+  final SubredditSearchSort sort;
 
   /// Create a copy of SubredditSearchEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -135,7 +135,7 @@ abstract mixin class $SetSortCopyWith<$Res>
   factory $SetSortCopyWith(SetSort value, $Res Function(SetSort) _then) =
       _$SetSortCopyWithImpl;
   @useResult
-  $Res call({SearchSort sort});
+  $Res call({SubredditSearchSort sort});
 }
 
 /// @nodoc
@@ -155,7 +155,7 @@ class _$SetSortCopyWithImpl<$Res> implements $SetSortCopyWith<$Res> {
       null == sort
           ? _self.sort
           : sort // ignore: cast_nullable_to_non_nullable
-              as SearchSort,
+              as SubredditSearchSort,
     ));
   }
 }

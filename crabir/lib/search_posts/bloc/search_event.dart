@@ -7,7 +7,7 @@ sealed class PostSearchEvent with _$PostSearchEvent {
     String? subreddit,
     String? flair,
   }) = Query;
-  factory PostSearchEvent.setSort(SearchSort sort) = SetSort;
+  factory PostSearchEvent.setSort(PostSearchSort sort) = SetSort;
 
   /// asks for the next items
   factory PostSearchEvent.fetch() = Fetch;

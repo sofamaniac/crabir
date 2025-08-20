@@ -87,7 +87,7 @@ Widget _scaffold(reddit_stream.Streamable stream) {
 Widget _postView(BuildContext context, Post post) {
   return RedditPostCard(
     post: post,
-    onTap: () => context.pushRoute(
+    onTap: () => context.router.navigate(
       ThreadRoute(
         permalink: post.permalink,
         post: post,

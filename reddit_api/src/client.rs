@@ -3,7 +3,7 @@ use crate::model::flair::Flair;
 use crate::model::multi::{Multi, MultiStream};
 use crate::model::{Fullname, Post, comment, user};
 use crate::result::Result;
-use crate::search::{SearchPost, SearchSort, SearchSubreddit};
+use crate::search::{PostSearchSort, SearchPost, SearchSubreddit, SubredditSearchSort};
 use crate::streamable::Streamable;
 use std::backtrace::Backtrace;
 use std::collections::HashMap;
@@ -739,17 +739,19 @@ impl Client {
         subreddit: Option<String>,
         flair: Option<Flair>,
         query: Option<String>,
+        sort: PostSearchSort,
     ) -> Streamable {
         Streamable::new(Box::new(SearchPost::new(
             self.clone(),
             subreddit,
             flair,
             query,
+            sort,
         )))
     }
 
     ///flutter_rust_bridge:sync
-    pub fn search_subreddits(&self, query: String, sort: SearchSort) -> Streamable {
+    pub fn search_subreddits(&self, query: String, sort: SubredditSearchSort) -> Streamable {
         Streamable::new(Box::new(SearchSubreddit::new(self.clone(), query, sort)))
     }
 }

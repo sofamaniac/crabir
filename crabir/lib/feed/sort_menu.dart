@@ -1,4 +1,4 @@
-import 'package:crabir/feed/feed.dart';
+import 'package:crabir/sort.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:flutter/material.dart';

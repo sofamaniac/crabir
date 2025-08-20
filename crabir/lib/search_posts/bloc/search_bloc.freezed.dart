@@ -118,7 +118,7 @@ class _$QueryCopyWithImpl<$Res> implements $QueryCopyWith<$Res> {
 class SetSort implements PostSearchEvent {
   SetSort(this.sort);
 
-  final SearchSort sort;
+  final PostSearchSort sort;
 
   /// Create a copy of PostSearchEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -150,7 +150,9 @@ abstract mixin class $SetSortCopyWith<$Res>
   factory $SetSortCopyWith(SetSort value, $Res Function(SetSort) _then) =
       _$SetSortCopyWithImpl;
   @useResult
-  $Res call({SearchSort sort});
+  $Res call({PostSearchSort sort});
+
+  $PostSearchSortCopyWith<$Res> get sort;
 }
 
 /// @nodoc
@@ -170,8 +172,18 @@ class _$SetSortCopyWithImpl<$Res> implements $SetSortCopyWith<$Res> {
       null == sort
           ? _self.sort
           : sort // ignore: cast_nullable_to_non_nullable
-              as SearchSort,
+              as PostSearchSort,
     ));
+  }
+
+  /// Create a copy of PostSearchEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PostSearchSortCopyWith<$Res> get sort {
+    return $PostSearchSortCopyWith<$Res>(_self.sort, (value) {
+      return _then(_self.copyWith(sort: value));
+    });
   }
 }
 

@@ -14,8 +14,11 @@ part 'search_state.dart';
 part 'search_bloc.freezed.dart';
 
 class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
-  PostSearchBloc({this.query = "", this.subreddit})
-      : super(
+  PostSearchBloc({
+    this.query = "",
+    this.subreddit,
+    this.sort = const PostSearchSort.hot(),
+  }) : super(
           PostSearchState(
             query: query,
           ),
@@ -28,13 +31,14 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
       streamable = RedditAPI.client().searchPost(
         query: query,
         subreddit: subreddit,
+        sort: sort,
       );
     }
   }
   String query;
   String? subreddit;
 
-  SearchSort sort = SearchSort.relevance;
+  PostSearchSort sort;
   DateTime timeSinceQuery = DateTime.now();
 
   reddit_api.Streamable? streamable;
@@ -51,7 +55,17 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
   }
 
   /// Create new stream and throttles api requests.
-  void newStream() {
+  /// If `debounce` is true, the request will be delayed.
+  void _newStream({bool debounce = true}) {
+    if (!debounce) {
+      streamable = RedditAPI.client().searchPost(
+        query: query,
+        subreddit: subreddit,
+        sort: sort,
+      );
+      hasReachedMax = false;
+      return;
+    }
     if (_debounce?.isActive ?? false) {
       _debounce!.cancel();
     }
@@ -59,6 +73,7 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
       streamable = RedditAPI.client().searchPost(
         query: query,
         subreddit: subreddit,
+        sort: sort,
       );
       hasReachedMax = false;
     });
@@ -74,7 +89,7 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
     } else if (newQuery.query != query) {
       query = newQuery.query;
       emit(state.copyWith(query: query));
-      newStream();
+      _newStream();
       await _filter(emit);
     }
   }
@@ -83,7 +98,7 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
     if (state.hasReachedMax) {
       return emit(state);
     } else if (streamable == null) {
-      newStream();
+      _newStream(debounce: false);
     } else {
       hasReachedMax = !await streamable!.next();
       await _filter(emit);
@@ -94,8 +109,10 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
     SetSort sort,
     Emitter<PostSearchState> emit,
   ) async {
+    if (sort.sort == this.sort) return;
     this.sort = sort.sort;
-    await _query(Query(query), emit);
+    _newStream(debounce: false);
+    emit(PostSearchState(query: query));
   }
 
   Future<void> _filter(Emitter<PostSearchState> emit) async {

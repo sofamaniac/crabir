@@ -135,7 +135,7 @@ pub enum Timeframe {
 }
 
 impl Timeframe {
-    fn as_query_param(self) -> &'static str {
+    pub(crate) fn as_query_param(self) -> &'static str {
         match self {
             Self::Hour => "hour",
             Self::Day => "day",

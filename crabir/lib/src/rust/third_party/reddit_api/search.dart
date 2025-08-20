@@ -5,10 +5,13 @@
 
 import '../../frb_generated.dart';
 import 'client.dart';
+import 'model.dart';
 import 'model/flair.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
+part 'search.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `to_stream`, `to_stream`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `to_stream`, `to_stream`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SearchPost>>
 abstract class SearchPost implements RustOpaqueInterface {
@@ -17,9 +20,14 @@ abstract class SearchPost implements RustOpaqueInterface {
           {required Client client,
           String? subreddit,
           Flair? flair,
-          String? query}) =>
+          String? query,
+          required PostSearchSort sort}) =>
       RustLib.instance.api.redditApiSearchSearchPostNew(
-          client: client, subreddit: subreddit, flair: flair, query: query);
+          client: client,
+          subreddit: subreddit,
+          flair: flair,
+          query: query,
+          sort: sort);
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SearchSubreddit>>
@@ -28,12 +36,29 @@ abstract class SearchSubreddit implements RustOpaqueInterface {
   factory SearchSubreddit(
           {required Client client,
           required String query,
-          required SearchSort sort}) =>
+          required SubredditSearchSort sort}) =>
       RustLib.instance.api.redditApiSearchSearchSubredditNew(
           client: client, query: query, sort: sort);
 }
 
-enum SearchSort {
+@freezed
+sealed class PostSearchSort with _$PostSearchSort {
+  const PostSearchSort._();
+
+  const factory PostSearchSort.relevance(
+    Timeframe field0,
+  ) = PostSearchSort_Relevance;
+  const factory PostSearchSort.hot() = PostSearchSort_Hot;
+  const factory PostSearchSort.top(
+    Timeframe field0,
+  ) = PostSearchSort_Top;
+  const factory PostSearchSort.new_() = PostSearchSort_New;
+  const factory PostSearchSort.comments(
+    Timeframe field0,
+  ) = PostSearchSort_Comments;
+}
+
+enum SubredditSearchSort {
   relevance,
   activity,
   ;

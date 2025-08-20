@@ -5,7 +5,7 @@ pub use futures::{Stream, StreamExt};
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
-use super::{Thing, Timeframe, flair::Flair};
+use super::{Thing, Timeframe};
 
 /// All the kind of available feeds on reddit
 #[derive(Debug, Default, PartialEq, Eq, Clone)]
