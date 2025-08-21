@@ -54,6 +54,7 @@ class TopLevel extends StatelessWidget {
   TopLevel({super.key});
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<ThemeBloc>().state;
     return MaterialApp.router(
       localizationsDelegates: [
         AppLocalizations.delegate,
@@ -66,7 +67,16 @@ class TopLevel extends StatelessWidget {
       ],
       themeMode: ThemeMode.system,
       theme: ThemeData.light(useMaterial3: true),
-      darkTheme: ThemeData.dark(useMaterial3: true),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.dark(
+          primary: theme.primaryColor,
+          surface: theme.background,
+          secondary: theme.highlight,
+          outlineVariant: Colors.white24,
+        ),
+        cardTheme: CardTheme(color: theme.cardBackground),
+      ),
       routerConfig: _appRouter.config(),
     );
   }
