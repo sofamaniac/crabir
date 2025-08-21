@@ -9,5 +9,6 @@ abstract class PostSearchState with _$PostSearchState {
     @Default([]) List<Post> items,
     @Default(false) bool hasReachedMax,
     @Default("") String query,
+    @Default(PostSearchSort.relevance(Timeframe.all)) PostSearchSort sort,
   }) = _PostSearchState;
 }

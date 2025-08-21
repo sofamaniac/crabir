@@ -1,4 +1,6 @@
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 const timeOptions = [
   Timeframe.hour,
@@ -9,13 +11,31 @@ const timeOptions = [
   Timeframe.all
 ];
 
-String timeframeToString(Timeframe timeframe) {
-  return switch (timeframe) {
-    Timeframe.hour => "Hour",
-    Timeframe.day => "Day",
-    Timeframe.week => "Week",
-    Timeframe.month => "Month",
-    Timeframe.year => "Year",
-    Timeframe.all => "All",
-  };
+extension TimeframeLabel on Timeframe {
+  String label(BuildContext context) {
+    final locales = AppLocalizations.of(context)!;
+    return switch (this) {
+      Timeframe.hour => locales.timeframeHour,
+      Timeframe.day => locales.timeframeDay,
+      Timeframe.week => locales.timeframeWeek,
+      Timeframe.month => locales.timeframeMonth,
+      Timeframe.year => locales.timeframeYear,
+      Timeframe.all => locales.timeframeAll,
+    };
+  }
+}
+
+List<Widget> menu<T>(
+  T Function(Timeframe) sort,
+  Function(T) onSelect,
+  BuildContext context,
+) {
+  return timeOptions
+      .map(
+        (timeframe) => MenuItemButton(
+          onPressed: () => onSelect(sort(timeframe)),
+          child: Text(timeframe.label(context)),
+        ),
+      )
+      .toList();
 }

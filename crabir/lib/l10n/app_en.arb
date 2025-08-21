@@ -1,0 +1,19 @@
+{
+    "@local": "en",
+    "timeframeAll": "All time",
+    "timeframeYear": "Year",
+    "timeframeMonth": "Month",
+    "timeframeWeek": "Week",
+    "timeframeDay": "Day",
+    "timeframeHour": "Hour",
+
+    "sortTop": "Top",
+    "sortHot": "Hot",
+    "sortNew": "New",
+    "sortComments": "Comments",
+    "sortRelevance": "Most relevant",
+    "sortActivity": "Activity",
+    "sortControversial": "Controversial",
+    "sortRising": "Rising",
+    "sortBest": "Best"
+}

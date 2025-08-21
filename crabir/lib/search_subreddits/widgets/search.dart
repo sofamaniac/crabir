@@ -6,6 +6,7 @@ import 'package:crabir/search_subreddits/bloc/search_bloc.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 @RoutePage()
 class SearchSubredditsView extends StatefulWidget {
@@ -61,13 +62,18 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
       body: Column(
         children: [
           if (state.query.isNotEmpty)
-            InkWell(
+            ListTile(
+              leading: Icon(Icons.search),
+              title: Text("Search for posts with \"${state.query}\""),
               onTap: () => context.pushRoute(
                 SearchPostsRoute(query: state.query),
               ),
-              child: Text("Search post with \"${state.query}\""),
             ),
-          if (state.query.isNotEmpty) Text("Go to user u/\"${state.query}\""),
+          if (state.query.isNotEmpty)
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text("Go to user u/\"${state.query}\""),
+            ),
           if (state.query.isNotEmpty) Divider(),
           Expanded(
             child: ListView.builder(
@@ -104,19 +110,20 @@ class SortMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.watch<SubredditSearchBloc>();
+    final locales = AppLocalizations.of(context)!;
     return MenuAnchor(
       menuChildren: [
         MenuItemButton(
           onPressed: () => bloc.add(
             SetSort(SubredditSearchSort.activity),
           ),
-          child: Text("Activity"),
+          child: Text(locales.sortActivity),
         ),
         MenuItemButton(
           onPressed: () => bloc.add(
             SetSort(SubredditSearchSort.relevance),
           ),
-          child: Text("Relevance"),
+          child: Text(locales.sortRelevance),
         ),
       ],
       builder: (_, MenuController controller, Widget? child) {

@@ -233,6 +233,7 @@ mixin _$PostSearchState {
   List<Post> get items;
   bool get hasReachedMax;
   String get query;
+  PostSearchSort get sort;
 
   /// Create a copy of PostSearchState
   /// with the given fields replaced by the non-null parameter values.
@@ -251,16 +252,17 @@ mixin _$PostSearchState {
             const DeepCollectionEquality().equals(other.items, items) &&
             (identical(other.hasReachedMax, hasReachedMax) ||
                 other.hasReachedMax == hasReachedMax) &&
-            (identical(other.query, query) || other.query == query));
+            (identical(other.query, query) || other.query == query) &&
+            (identical(other.sort, sort) || other.sort == sort));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, status,
-      const DeepCollectionEquality().hash(items), hasReachedMax, query);
+      const DeepCollectionEquality().hash(items), hasReachedMax, query, sort);
 
   @override
   String toString() {
-    return 'PostSearchState(status: $status, items: $items, hasReachedMax: $hasReachedMax, query: $query)';
+    return 'PostSearchState(status: $status, items: $items, hasReachedMax: $hasReachedMax, query: $query, sort: $sort)';
   }
 }
 
@@ -274,7 +276,10 @@ abstract mixin class $PostSearchStateCopyWith<$Res> {
       {StreamStatus status,
       List<Post> items,
       bool hasReachedMax,
-      String query});
+      String query,
+      PostSearchSort sort});
+
+  $PostSearchSortCopyWith<$Res> get sort;
 }
 
 /// @nodoc
@@ -294,6 +299,7 @@ class _$PostSearchStateCopyWithImpl<$Res>
     Object? items = null,
     Object? hasReachedMax = null,
     Object? query = null,
+    Object? sort = null,
   }) {
     return _then(_self.copyWith(
       status: null == status
@@ -312,7 +318,21 @@ class _$PostSearchStateCopyWithImpl<$Res>
           ? _self.query
           : query // ignore: cast_nullable_to_non_nullable
               as String,
+      sort: null == sort
+          ? _self.sort
+          : sort // ignore: cast_nullable_to_non_nullable
+              as PostSearchSort,
     ));
+  }
+
+  /// Create a copy of PostSearchState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PostSearchSortCopyWith<$Res> get sort {
+    return $PostSearchSortCopyWith<$Res>(_self.sort, (value) {
+      return _then(_self.copyWith(sort: value));
+    });
   }
 }
 
@@ -323,7 +343,8 @@ class _PostSearchState implements PostSearchState {
       {this.status = StreamStatus.initial,
       final List<Post> items = const [],
       this.hasReachedMax = false,
-      this.query = ""})
+      this.query = "",
+      this.sort = const PostSearchSort.relevance(Timeframe.all)})
       : _items = items;
 
   @override
@@ -344,6 +365,9 @@ class _PostSearchState implements PostSearchState {
   @override
   @JsonKey()
   final String query;
+  @override
+  @JsonKey()
+  final PostSearchSort sort;
 
   /// Create a copy of PostSearchState
   /// with the given fields replaced by the non-null parameter values.
@@ -362,16 +386,17 @@ class _PostSearchState implements PostSearchState {
             const DeepCollectionEquality().equals(other._items, _items) &&
             (identical(other.hasReachedMax, hasReachedMax) ||
                 other.hasReachedMax == hasReachedMax) &&
-            (identical(other.query, query) || other.query == query));
+            (identical(other.query, query) || other.query == query) &&
+            (identical(other.sort, sort) || other.sort == sort));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, status,
-      const DeepCollectionEquality().hash(_items), hasReachedMax, query);
+      const DeepCollectionEquality().hash(_items), hasReachedMax, query, sort);
 
   @override
   String toString() {
-    return 'PostSearchState(status: $status, items: $items, hasReachedMax: $hasReachedMax, query: $query)';
+    return 'PostSearchState(status: $status, items: $items, hasReachedMax: $hasReachedMax, query: $query, sort: $sort)';
   }
 }
 
@@ -387,7 +412,11 @@ abstract mixin class _$PostSearchStateCopyWith<$Res>
       {StreamStatus status,
       List<Post> items,
       bool hasReachedMax,
-      String query});
+      String query,
+      PostSearchSort sort});
+
+  @override
+  $PostSearchSortCopyWith<$Res> get sort;
 }
 
 /// @nodoc
@@ -407,6 +436,7 @@ class __$PostSearchStateCopyWithImpl<$Res>
     Object? items = null,
     Object? hasReachedMax = null,
     Object? query = null,
+    Object? sort = null,
   }) {
     return _then(_PostSearchState(
       status: null == status
@@ -425,7 +455,21 @@ class __$PostSearchStateCopyWithImpl<$Res>
           ? _self.query
           : query // ignore: cast_nullable_to_non_nullable
               as String,
+      sort: null == sort
+          ? _self.sort
+          : sort // ignore: cast_nullable_to_non_nullable
+              as PostSearchSort,
     ));
+  }
+
+  /// Create a copy of PostSearchState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PostSearchSortCopyWith<$Res> get sort {
+    return $PostSearchSortCopyWith<$Res>(_self.sort, (value) {
+      return _then(_self.copyWith(sort: value));
+    });
   }
 }
 

@@ -4,9 +4,13 @@ import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/search_posts/bloc/search_bloc.dart';
 import 'package:crabir/search_posts/widgets/sort_menu.dart';
+import 'package:crabir/sort.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 @RoutePage()
 class SearchPostsView extends StatefulWidget {
@@ -68,20 +72,26 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
     final state = bloc.state;
     return Scaffold(
       appBar: AppBar(
-        title: SearchBar(
-          controller: _controller,
-          hintText: "Search for posts",
-          onSubmitted: (query) => bloc.add(Query(query)),
-          onChanged: (query) => bloc.add(Query(query)),
-          trailing: [
-            if (_controller.text.isNotEmpty)
-              IconButton(
-                icon: const Icon(Icons.clear),
-                onPressed: () {
-                  _controller.clear();
-                  setState(() {}); // rebuild so the button disappears
-                },
-              ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SearchBar(
+              controller: _controller,
+              hintText: "Search for posts",
+              onSubmitted: (query) => bloc.add(Query(query)),
+              onChanged: (query) => bloc.add(Query(query)),
+              trailing: [
+                if (_controller.text.isNotEmpty)
+                  IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: () {
+                      _controller.clear();
+                      setState(() {}); // rebuild so the button disappears
+                    },
+                  ),
+              ],
+            ),
+            Text(state.sort.labelWithTimeframe(context)),
           ],
         ),
         actions: [SortMenu()],
@@ -102,5 +112,39 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
         },
       ),
     );
+  }
+}
+
+extension PostSearchSortString on PostSearchSort {
+  String label(BuildContext context) {
+    final locales = AppLocalizations.of(context)!;
+    return switch (this) {
+      PostSearchSort_Relevance() => locales.sortRelevance,
+      PostSearchSort_Hot() => locales.sortHot,
+      PostSearchSort_Top() => locales.sortTop,
+      PostSearchSort_New() => locales.sortNew,
+      PostSearchSort_Comments() => locales.sortComments,
+    };
+  }
+
+  String labelWithTimeframe(BuildContext context) {
+    final sort = label(context);
+    final timeframe = _getTimeframe();
+    if (timeframe != null) {
+      final time = timeframe.label(context);
+      return "$sort  · $time";
+    } else {
+      return sort;
+    }
+  }
+
+  Timeframe? _getTimeframe() {
+    return switch (this) {
+      PostSearchSort_Relevance(field0: final timeframe) ||
+      PostSearchSort_Top(field0: final timeframe) ||
+      PostSearchSort_Comments(field0: final timeframe) =>
+        timeframe,
+      _ => null,
+    };
   }
 }

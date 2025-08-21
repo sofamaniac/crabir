@@ -1,9 +1,9 @@
 import 'package:crabir/search_posts/bloc/search_bloc.dart';
 import 'package:crabir/sort.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SortMenu extends StatelessWidget {
   const SortMenu({super.key});
@@ -11,6 +11,7 @@ class SortMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<PostSearchBloc>();
+    final locales = AppLocalizations.of(context)!;
     return MenuAnchor(
       menuChildren: [
         SubmenuButton(
@@ -21,8 +22,9 @@ class SortMenu extends StatelessWidget {
                 sort,
               ),
             ),
+            context,
           ),
-          child: Text("Top"),
+          child: Text(locales.sortTop),
         ),
         SubmenuButton(
           menuChildren: menu(
@@ -32,20 +34,21 @@ class SortMenu extends StatelessWidget {
                 sort,
               ),
             ),
+            context,
           ),
-          child: Text("Relevance"),
+          child: Text(locales.sortRelevance),
         ),
         MenuItemButton(
           onPressed: () => bloc.add(
             SetSort(PostSearchSort.hot()),
           ),
-          child: Text("Hot"),
+          child: Text(locales.sortHot),
         ),
         MenuItemButton(
           onPressed: () => bloc.add(
             SetSort(PostSearchSort.new_()),
           ),
-          child: Text("New"),
+          child: Text(locales.sortNew),
         ),
         SubmenuButton(
           menuChildren: menu(
@@ -53,8 +56,9 @@ class SortMenu extends StatelessWidget {
             (sort) => bloc.add(
               SetSort(sort),
             ),
+            context,
           ),
-          child: Text("Comments"),
+          child: Text(locales.sortComments),
         ),
       ],
       builder: (_, MenuController controller, Widget? child) {
@@ -70,19 +74,5 @@ class SortMenu extends StatelessWidget {
         );
       },
     );
-  }
-
-  List<Widget> menu(
-    PostSearchSort Function(Timeframe) sort,
-    Function(PostSearchSort) onSelect,
-  ) {
-    return timeOptions
-        .map(
-          (timeframe) => MenuItemButton(
-            onPressed: () => onSelect(sort(timeframe)),
-            child: Text(timeframeToString(timeframe)),
-          ),
-        )
-        .toList();
   }
 }

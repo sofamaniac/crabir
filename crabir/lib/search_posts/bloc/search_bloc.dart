@@ -112,7 +112,7 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
     if (sort.sort == this.sort) return;
     this.sort = sort.sort;
     _newStream(debounce: false);
-    emit(PostSearchState(query: query));
+    emit(PostSearchState(sort: this.sort));
   }
 
   Future<void> _filter(Emitter<PostSearchState> emit) async {
