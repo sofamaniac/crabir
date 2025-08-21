@@ -50,15 +50,16 @@ class _SearchSubredditsViewState extends State<SearchPostsView> {
 
 class _SearchViewBody extends StatefulWidget {
   final String initialQuery;
+
   const _SearchViewBody({required this.initialQuery});
+
   @override
-  State<StatefulWidget> createState() => _SearchViewBodyState();
+  State<_SearchViewBody> createState() => _SearchViewBodyState();
 }
 
 class _SearchViewBodyState extends State<_SearchViewBody> {
-  _SearchViewBodyState();
-
   late final TextEditingController _controller;
+  bool _isSearching = false;
 
   @override
   void initState() {
@@ -70,46 +71,95 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
   Widget build(BuildContext context) {
     final bloc = context.watch<PostSearchBloc>();
     final state = bloc.state;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SearchBar(
-              controller: _controller,
-              hintText: "Search for posts",
-              onSubmitted: (query) => bloc.add(Query(query)),
-              onChanged: (query) => bloc.add(Query(query)),
-              trailing: [
-                if (_controller.text.isNotEmpty)
-                  IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _controller.clear();
-                      setState(() {}); // rebuild so the button disappears
-                    },
-                  ),
-              ],
+      body: NestedScrollView(
+        floatHeaderSlivers: true,
+        headerSliverBuilder: (context, _) => [
+          SliverAppBar(
+            floating: true,
+            title: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: _isSearching
+                  ? SearchBar(
+                      key: const ValueKey('searchBar'),
+                      controller: _controller,
+                      hintText: "Search for posts",
+                      onSubmitted: (query) {
+                        bloc.add(Query(query));
+                        setState(() => _isSearching = false);
+                      },
+                      onChanged: (query) => bloc.add(Query(query)),
+                      onTapOutside: (_) => setState(() => _isSearching = false),
+                      trailing: [
+                        if (_controller.text.isNotEmpty)
+                          IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _controller.clear();
+                              setState(() {});
+                            },
+                          ),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Top row: query text + search icon always visible
+                        Row(
+                          children: [
+                            Expanded(
+                              child: RichText(
+                                text: TextSpan(
+                                  text: state.query,
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text:
+                                          '\n${state.sort.labelWithTimeframe(context)}',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.search),
+                              onPressed: () {
+                                setState(() => _isSearching = true);
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
             ),
-            Text(state.sort.labelWithTimeframe(context)),
-          ],
+            actions: [SortMenu()],
+          ),
+        ],
+        body: ListView.builder(
+          padding: const EdgeInsets.all(8),
+          itemCount: state.items.length + 1,
+          itemBuilder: (context, index) {
+            if (index < state.items.length) {
+              return RedditPostCard(post: state.items[index]);
+            } else if (!state.hasReachedMax && state.query.isNotEmpty) {
+              bloc.add(Fetch());
+              return const LoadingIndicator();
+            } else if (state.hasReachedMax) {
+              return const Center(child: Text("Nothing more to show"));
+            } else {
+              return const SizedBox.shrink();
+            }
+          },
         ),
-        actions: [SortMenu()],
-      ),
-      body: ListView.builder(
-        itemCount: state.items.length + 1,
-        itemBuilder: (context, index) {
-          if (index < state.items.length) {
-            return RedditPostCard(post: state.items[index]);
-          } else if (!state.hasReachedMax && state.query.isNotEmpty) {
-            bloc.add(Fetch());
-            return LoadingIndicator();
-          } else if (state.hasReachedMax) {
-            return Text("Nothing more to show");
-          } else {
-            return Container();
-          }
-        },
       ),
     );
   }
