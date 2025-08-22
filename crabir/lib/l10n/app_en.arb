@@ -15,5 +15,8 @@
     "sortActivity": "Activity",
     "sortControversial": "Controversial",
     "sortRising": "Rising",
-    "sortBest": "Best"
+    "sortBest": "Best",
+
+    "postSearchBar": "Search posts",
+    "subredditsSearchBar": "Search communities"
 }

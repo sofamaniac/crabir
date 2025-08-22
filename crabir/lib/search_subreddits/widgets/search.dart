@@ -39,11 +39,12 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
   Widget build(BuildContext context) {
     final bloc = context.watch<SubredditSearchBloc>();
     final state = bloc.state;
+    final locales = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: SearchBar(
           controller: _controller,
-          hintText: "Search for subreddits",
+          hintText: locales.subredditsSearchBar,
           onSubmitted: (query) => bloc.add(Query(query)),
           onChanged: (query) => bloc.add(Query(query)),
           trailing: [

@@ -1,0 +1,17 @@
+targets:
+  $default:
+    builders:
+      crabir|settings_page:
+        generate_for:
+          - lib/**.dart
+
+builders:
+  settings_page:
+    import: "package:crabir/src/settings_page/settings_page_generator.dart"
+    builder_factories: ["settingsPageBuilder"]
+    build_extensions: {".dart": [".settings_page.dart"]}
+    auto_apply: dependents
+    build_to: source
+    applies_builders: ["source_gen|combining_builder"]
+    runs_before: ["auto_route_generator:auto_route_generator"]
+

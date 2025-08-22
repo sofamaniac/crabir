@@ -30,7 +30,14 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
           children: [
             ...baseFeeds(context, closeDrawer: true),
             Divider(),
-            ...userOptions.map((option) => ListTile(title: Text(option))),
+            ListTile(
+                title: Text("Settings"),
+                onTap: () {
+                  AutoRouter.of(context).push(
+                    CommentsSettingsRoute(settings: CommentsSettings()),
+                  );
+                }),
+            //...userOptions.map((option) => ListTile(title: Text(option))),
             Divider(),
             ...account.multis.map(
               (multi) => MultiRedditTile(

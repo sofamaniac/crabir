@@ -71,6 +71,7 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
   Widget build(BuildContext context) {
     final bloc = context.watch<PostSearchBloc>();
     final state = bloc.state;
+    final locales = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: NestedScrollView(
@@ -83,9 +84,8 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
               curve: Curves.easeInOut,
               child: _isSearching
                   ? SearchBar(
-                      key: const ValueKey('searchBar'),
                       controller: _controller,
-                      hintText: "Search for posts",
+                      hintText: locales.postSearchBar,
                       onSubmitted: (query) {
                         bloc.add(Query(query));
                         setState(() => _isSearching = false);
