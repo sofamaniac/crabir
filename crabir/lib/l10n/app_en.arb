@@ -1,22 +1,65 @@
 {
-    "@local": "en",
-    "timeframeAll": "All time",
-    "timeframeYear": "Year",
-    "timeframeMonth": "Month",
-    "timeframeWeek": "Week",
-    "timeframeDay": "Day",
-    "timeframeHour": "Hour",
+  "@local": "en",
+  "timeframeAll": "All time",
+  "timeframeYear": "Year",
+  "timeframeMonth": "Month",
+  "timeframeWeek": "Week",
+  "timeframeDay": "Day",
+  "timeframeHour": "Hour",
 
-    "sortTop": "Top",
-    "sortHot": "Hot",
-    "sortNew": "New",
-    "sortComments": "Comments",
-    "sortRelevance": "Most relevant",
-    "sortActivity": "Activity",
-    "sortControversial": "Controversial",
-    "sortRising": "Rising",
-    "sortBest": "Best",
+  "sortTop": "Top",
+  "sortHot": "Hot",
+  "sortNew": "New",
+  "sortComments": "Comments",
+  "sortRelevance": "Most relevant",
+  "sortActivity": "Activity",
+  "sortControversial": "Controversial",
+  "sortRising": "Rising",
+  "sortBest": "Best",
 
-    "postSearchBar": "Search posts",
-    "subredditsSearchBar": "Search communities"
+  "postSearchBar": "Search posts",
+  "subredditsSearchBar": "Search communities",
+
+  "comments_sort": "Sort comments",
+  "comments_sortDescription": "Choose how comments are sorted",
+
+  "comments_useSuggestedSort": "Use suggested sort",
+  "comments_useSuggestedSortDescription": "Automatically apply Reddit’s suggested sort",
+
+  "comments_showNavigationBar": "Show navigation bar",
+  "comments_showUserAvatar": "Show user avatar",
+
+  "comments_postMediaPreviewSize": "Post media preview size",
+
+  "comments_buttonsAlwaysVisible": "Always show action buttons",
+  "comments_hideButtonAfterAction": "Hide action button after use",
+
+  "comments_collapseAutoMod": "Collapse AutoModerator",
+  "comments_collapseDisruptiveComment": "Collapse disruptive comments",
+
+  "comments_showPostUpvotePercentage": "Show post upvote percentage",
+  "comments_highlightMyUsername": "Highlight my username",
+  "comments_showFloatingButton": "Show floating button",
+
+  "comments_showAwards": "Show awards",
+  "comments_clickableAwards": "Make awards clickable",
+
+  "comments_showUserFlair": "Show user flair",
+  "comments_showFlairColors": "Show flair colors",
+  "comments_showFlairEmojis": "Show flair emojis",
+
+  "comments_clickToCollapse": "Click to collapse comments",
+  "comments_hideTextCollapsed": "Hide text when collapsed",
+  "comments_loadCollapsed": "Load comments collapsed",
+  "comments_animateCollapse": "Animate collapse",
+
+  "comments_clickableUsername": "Clickable usernames",
+  "comments_highlightNewComments": "Highlight new comments",
+
+  "comments_volumeRockerNavigation": "Navigate with volume rocker",
+  "comments_animateNavigation": "Animate navigation",
+
+  "comments_showSaveButton": "Show save button",
+  "comments_swipeToClose": "Swipe to close thread"
+
 }

@@ -16,31 +16,56 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CommentsSettings {
   CommentSort get sort;
+  @Setting()
   bool get useSuggestedSort;
+  @Setting()
   bool get showNavigationBar;
+  @Setting()
   bool get showUserAvatar; //@Default() MediaPreviewSize postMediaPreviewSize,
+  @Setting()
   bool get buttonsAlwaysVisible;
+  @Setting()
   bool get hideButtonAfterAction;
+  @Setting()
   bool get collapseAutoMod;
+  @Setting()
   bool get collapseDisruptiveComment;
+  @Setting()
   bool get showPostUpvotePercentage; //@Default() GuideStyle threadGuide,
+  @Setting()
   bool get highlightMyUsername;
+  @Setting()
   bool get showFloatingButton;
+  @Setting()
   bool get showAwards;
+  @Setting()
   bool get clickableAwards;
+  @Setting()
   bool get showUserFlair;
+  @Setting()
   bool get showFlairColors;
+  @Setting()
   bool get showFlairEmojis;
+  @Setting()
   bool get clickToCollapse;
+  @Setting()
   bool get hideTextCollapsed;
+  @Setting()
   bool get loadCollapsed;
+  @Setting()
   bool get animateCollapse;
+  @Setting()
   bool get clickableUsername;
+  @Setting()
   bool
       get highlightNewComments; //@Default() NavigationMode defaultNavigationMode,
+  @Setting()
   bool get volumeRockerNavigation;
+  @Setting()
   bool get animateNavigation;
+  @Setting()
   bool get showSaveButton; //@Default() String goToTopButton,
+  @Setting()
   bool get swipeToClose;
 
   /// Create a copy of CommentsSettings
@@ -155,31 +180,31 @@ abstract mixin class $CommentsSettingsCopyWith<$Res> {
   @useResult
   $Res call(
       {CommentSort sort,
-      bool useSuggestedSort,
-      bool showNavigationBar,
-      bool showUserAvatar,
-      bool buttonsAlwaysVisible,
-      bool hideButtonAfterAction,
-      bool collapseAutoMod,
-      bool collapseDisruptiveComment,
-      bool showPostUpvotePercentage,
-      bool highlightMyUsername,
-      bool showFloatingButton,
-      bool showAwards,
-      bool clickableAwards,
-      bool showUserFlair,
-      bool showFlairColors,
-      bool showFlairEmojis,
-      bool clickToCollapse,
-      bool hideTextCollapsed,
-      bool loadCollapsed,
-      bool animateCollapse,
-      bool clickableUsername,
-      bool highlightNewComments,
-      bool volumeRockerNavigation,
-      bool animateNavigation,
-      bool showSaveButton,
-      bool swipeToClose});
+      @Setting() bool useSuggestedSort,
+      @Setting() bool showNavigationBar,
+      @Setting() bool showUserAvatar,
+      @Setting() bool buttonsAlwaysVisible,
+      @Setting() bool hideButtonAfterAction,
+      @Setting() bool collapseAutoMod,
+      @Setting() bool collapseDisruptiveComment,
+      @Setting() bool showPostUpvotePercentage,
+      @Setting() bool highlightMyUsername,
+      @Setting() bool showFloatingButton,
+      @Setting() bool showAwards,
+      @Setting() bool clickableAwards,
+      @Setting() bool showUserFlair,
+      @Setting() bool showFlairColors,
+      @Setting() bool showFlairEmojis,
+      @Setting() bool clickToCollapse,
+      @Setting() bool hideTextCollapsed,
+      @Setting() bool loadCollapsed,
+      @Setting() bool animateCollapse,
+      @Setting() bool clickableUsername,
+      @Setting() bool highlightNewComments,
+      @Setting() bool volumeRockerNavigation,
+      @Setting() bool animateNavigation,
+      @Setting() bool showSaveButton,
+      @Setting() bool swipeToClose});
 }
 
 /// @nodoc
@@ -336,31 +361,31 @@ class _$CommentsSettingsCopyWithImpl<$Res>
 class _CommentsSetttings extends CommentsSettings {
   _CommentsSetttings(
       {this.sort = CommentSort.top,
-      this.useSuggestedSort = true,
-      this.showNavigationBar = true,
-      this.showUserAvatar = true,
-      this.buttonsAlwaysVisible = true,
-      this.hideButtonAfterAction = true,
-      this.collapseAutoMod = true,
-      this.collapseDisruptiveComment = true,
-      this.showPostUpvotePercentage = true,
-      this.highlightMyUsername = true,
-      this.showFloatingButton = true,
-      this.showAwards = true,
-      this.clickableAwards = true,
-      this.showUserFlair = true,
-      this.showFlairColors = true,
-      this.showFlairEmojis = true,
-      this.clickToCollapse = true,
-      this.hideTextCollapsed = true,
-      this.loadCollapsed = true,
-      this.animateCollapse = true,
-      this.clickableUsername = true,
-      this.highlightNewComments = true,
-      this.volumeRockerNavigation = true,
-      this.animateNavigation = true,
-      this.showSaveButton = true,
-      this.swipeToClose = true})
+      @Setting() this.useSuggestedSort = true,
+      @Setting() this.showNavigationBar = true,
+      @Setting() this.showUserAvatar = true,
+      @Setting() this.buttonsAlwaysVisible = true,
+      @Setting() this.hideButtonAfterAction = true,
+      @Setting() this.collapseAutoMod = true,
+      @Setting() this.collapseDisruptiveComment = true,
+      @Setting() this.showPostUpvotePercentage = true,
+      @Setting() this.highlightMyUsername = true,
+      @Setting() this.showFloatingButton = true,
+      @Setting() this.showAwards = true,
+      @Setting() this.clickableAwards = true,
+      @Setting() this.showUserFlair = true,
+      @Setting() this.showFlairColors = true,
+      @Setting() this.showFlairEmojis = true,
+      @Setting() this.clickToCollapse = true,
+      @Setting() this.hideTextCollapsed = true,
+      @Setting() this.loadCollapsed = true,
+      @Setting() this.animateCollapse = true,
+      @Setting() this.clickableUsername = true,
+      @Setting() this.highlightNewComments = true,
+      @Setting() this.volumeRockerNavigation = true,
+      @Setting() this.animateNavigation = true,
+      @Setting() this.showSaveButton = true,
+      @Setting() this.swipeToClose = true})
       : super._();
 
   @override
@@ -368,82 +393,107 @@ class _CommentsSetttings extends CommentsSettings {
   final CommentSort sort;
   @override
   @JsonKey()
+  @Setting()
   final bool useSuggestedSort;
   @override
   @JsonKey()
+  @Setting()
   final bool showNavigationBar;
   @override
   @JsonKey()
+  @Setting()
   final bool showUserAvatar;
 //@Default() MediaPreviewSize postMediaPreviewSize,
   @override
   @JsonKey()
+  @Setting()
   final bool buttonsAlwaysVisible;
   @override
   @JsonKey()
+  @Setting()
   final bool hideButtonAfterAction;
   @override
   @JsonKey()
+  @Setting()
   final bool collapseAutoMod;
   @override
   @JsonKey()
+  @Setting()
   final bool collapseDisruptiveComment;
   @override
   @JsonKey()
+  @Setting()
   final bool showPostUpvotePercentage;
 //@Default() GuideStyle threadGuide,
   @override
   @JsonKey()
+  @Setting()
   final bool highlightMyUsername;
   @override
   @JsonKey()
+  @Setting()
   final bool showFloatingButton;
   @override
   @JsonKey()
+  @Setting()
   final bool showAwards;
   @override
   @JsonKey()
+  @Setting()
   final bool clickableAwards;
   @override
   @JsonKey()
+  @Setting()
   final bool showUserFlair;
   @override
   @JsonKey()
+  @Setting()
   final bool showFlairColors;
   @override
   @JsonKey()
+  @Setting()
   final bool showFlairEmojis;
   @override
   @JsonKey()
+  @Setting()
   final bool clickToCollapse;
   @override
   @JsonKey()
+  @Setting()
   final bool hideTextCollapsed;
   @override
   @JsonKey()
+  @Setting()
   final bool loadCollapsed;
   @override
   @JsonKey()
+  @Setting()
   final bool animateCollapse;
   @override
   @JsonKey()
+  @Setting()
   final bool clickableUsername;
   @override
   @JsonKey()
+  @Setting()
   final bool highlightNewComments;
 //@Default() NavigationMode defaultNavigationMode,
   @override
   @JsonKey()
+  @Setting()
   final bool volumeRockerNavigation;
   @override
   @JsonKey()
+  @Setting()
   final bool animateNavigation;
   @override
   @JsonKey()
+  @Setting()
   final bool showSaveButton;
 //@Default() String goToTopButton,
   @override
   @JsonKey()
+  @Setting()
   final bool swipeToClose;
 
   /// Create a copy of CommentsSettings
@@ -560,31 +610,31 @@ abstract mixin class _$CommentsSetttingsCopyWith<$Res>
   @useResult
   $Res call(
       {CommentSort sort,
-      bool useSuggestedSort,
-      bool showNavigationBar,
-      bool showUserAvatar,
-      bool buttonsAlwaysVisible,
-      bool hideButtonAfterAction,
-      bool collapseAutoMod,
-      bool collapseDisruptiveComment,
-      bool showPostUpvotePercentage,
-      bool highlightMyUsername,
-      bool showFloatingButton,
-      bool showAwards,
-      bool clickableAwards,
-      bool showUserFlair,
-      bool showFlairColors,
-      bool showFlairEmojis,
-      bool clickToCollapse,
-      bool hideTextCollapsed,
-      bool loadCollapsed,
-      bool animateCollapse,
-      bool clickableUsername,
-      bool highlightNewComments,
-      bool volumeRockerNavigation,
-      bool animateNavigation,
-      bool showSaveButton,
-      bool swipeToClose});
+      @Setting() bool useSuggestedSort,
+      @Setting() bool showNavigationBar,
+      @Setting() bool showUserAvatar,
+      @Setting() bool buttonsAlwaysVisible,
+      @Setting() bool hideButtonAfterAction,
+      @Setting() bool collapseAutoMod,
+      @Setting() bool collapseDisruptiveComment,
+      @Setting() bool showPostUpvotePercentage,
+      @Setting() bool highlightMyUsername,
+      @Setting() bool showFloatingButton,
+      @Setting() bool showAwards,
+      @Setting() bool clickableAwards,
+      @Setting() bool showUserFlair,
+      @Setting() bool showFlairColors,
+      @Setting() bool showFlairEmojis,
+      @Setting() bool clickToCollapse,
+      @Setting() bool hideTextCollapsed,
+      @Setting() bool loadCollapsed,
+      @Setting() bool animateCollapse,
+      @Setting() bool clickableUsername,
+      @Setting() bool highlightNewComments,
+      @Setting() bool volumeRockerNavigation,
+      @Setting() bool animateNavigation,
+      @Setting() bool showSaveButton,
+      @Setting() bool swipeToClose});
 }
 
 /// @nodoc
