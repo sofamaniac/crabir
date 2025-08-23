@@ -12,49 +12,18 @@ part of 'routes.dart';
 
 /// generated route for
 /// [CommentsSettingsView]
-class CommentsSettingsRoute extends PageRouteInfo<CommentsSettingsRouteArgs> {
-  CommentsSettingsRoute({
-    Key? key,
-    required CommentsSettings settings,
-    List<PageRouteInfo>? children,
-  }) : super(
-         CommentsSettingsRoute.name,
-         args: CommentsSettingsRouteArgs(key: key, settings: settings),
-         initialChildren: children,
-       );
+class CommentsSettingsRoute extends PageRouteInfo<void> {
+  const CommentsSettingsRoute({List<PageRouteInfo>? children})
+    : super(CommentsSettingsRoute.name, initialChildren: children);
 
   static const String name = 'CommentsSettingsRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<CommentsSettingsRouteArgs>();
-      return CommentsSettingsView(key: args.key, settings: args.settings);
+      return const CommentsSettingsView();
     },
   );
-}
-
-class CommentsSettingsRouteArgs {
-  const CommentsSettingsRouteArgs({this.key, required this.settings});
-
-  final Key? key;
-
-  final CommentsSettings settings;
-
-  @override
-  String toString() {
-    return 'CommentsSettingsRouteArgs{key: $key, settings: $settings}';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! CommentsSettingsRouteArgs) return false;
-    return key == other.key && settings == other.settings;
-  }
-
-  @override
-  int get hashCode => key.hashCode ^ settings.hashCode;
 }
 
 /// generated route for
@@ -387,6 +356,22 @@ class SearchSubredditsRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const SearchSubredditsView();
+    },
+  );
+}
+
+/// generated route for
+/// [SettingsView]
+class SettingsRoute extends PageRouteInfo<void> {
+  const SettingsRoute({List<PageRouteInfo>? children})
+    : super(SettingsRoute.name, initialChildren: children);
+
+  static const String name = 'SettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SettingsView();
     },
   );
 }

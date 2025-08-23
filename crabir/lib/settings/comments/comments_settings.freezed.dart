@@ -4,7 +4,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'setting.dart';
+part of 'comments_settings.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -12,12 +12,16 @@ part of 'setting.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
+CommentsSettings _$CommentsSettingsFromJson(Map<String, dynamic> json) {
+  return _CommentsSetttings.fromJson(json);
+}
 
 /// @nodoc
 mixin _$CommentsSettings {
   CommentSort get sort;
   @Setting()
   bool get useSuggestedSort;
+  @Category(name: "Appearance")
   @Setting()
   bool get showNavigationBar;
   @Setting()
@@ -36,16 +40,19 @@ mixin _$CommentsSettings {
   bool get highlightMyUsername;
   @Setting()
   bool get showFloatingButton;
+  @Category(name: "Awards")
   @Setting()
   bool get showAwards;
   @Setting()
   bool get clickableAwards;
+  @Category(name: "Flairs")
   @Setting()
   bool get showUserFlair;
   @Setting()
   bool get showFlairColors;
   @Setting()
   bool get showFlairEmojis;
+  @Category(name: "Behavior")
   @Setting()
   bool get clickToCollapse;
   @Setting()
@@ -56,6 +63,7 @@ mixin _$CommentsSettings {
   bool get animateCollapse;
   @Setting()
   bool get clickableUsername;
+  @Category(name: "Navigation")
   @Setting()
   bool
       get highlightNewComments; //@Default() NavigationMode defaultNavigationMode,
@@ -63,8 +71,10 @@ mixin _$CommentsSettings {
   bool get volumeRockerNavigation;
   @Setting()
   bool get animateNavigation;
+  @Category(name: "Visible buttons")
   @Setting()
   bool get showSaveButton; //@Default() String goToTopButton,
+  @Category(name: "Gestures")
   @Setting()
   bool get swipeToClose;
 
@@ -75,6 +85,9 @@ mixin _$CommentsSettings {
   $CommentsSettingsCopyWith<CommentsSettings> get copyWith =>
       _$CommentsSettingsCopyWithImpl<CommentsSettings>(
           this as CommentsSettings, _$identity);
+
+  /// Serializes this CommentsSettings to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
@@ -135,6 +148,7 @@ mixin _$CommentsSettings {
                 other.swipeToClose == swipeToClose));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
@@ -181,7 +195,7 @@ abstract mixin class $CommentsSettingsCopyWith<$Res> {
   $Res call(
       {CommentSort sort,
       @Setting() bool useSuggestedSort,
-      @Setting() bool showNavigationBar,
+      @Category(name: "Appearance") @Setting() bool showNavigationBar,
       @Setting() bool showUserAvatar,
       @Setting() bool buttonsAlwaysVisible,
       @Setting() bool hideButtonAfterAction,
@@ -190,21 +204,21 @@ abstract mixin class $CommentsSettingsCopyWith<$Res> {
       @Setting() bool showPostUpvotePercentage,
       @Setting() bool highlightMyUsername,
       @Setting() bool showFloatingButton,
-      @Setting() bool showAwards,
+      @Category(name: "Awards") @Setting() bool showAwards,
       @Setting() bool clickableAwards,
-      @Setting() bool showUserFlair,
+      @Category(name: "Flairs") @Setting() bool showUserFlair,
       @Setting() bool showFlairColors,
       @Setting() bool showFlairEmojis,
-      @Setting() bool clickToCollapse,
+      @Category(name: "Behavior") @Setting() bool clickToCollapse,
       @Setting() bool hideTextCollapsed,
       @Setting() bool loadCollapsed,
       @Setting() bool animateCollapse,
       @Setting() bool clickableUsername,
-      @Setting() bool highlightNewComments,
+      @Category(name: "Navigation") @Setting() bool highlightNewComments,
       @Setting() bool volumeRockerNavigation,
       @Setting() bool animateNavigation,
-      @Setting() bool showSaveButton,
-      @Setting() bool swipeToClose});
+      @Category(name: "Visible buttons") @Setting() bool showSaveButton,
+      @Category(name: "Gestures") @Setting() bool swipeToClose});
 }
 
 /// @nodoc
@@ -357,12 +371,12 @@ class _$CommentsSettingsCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _CommentsSetttings extends CommentsSettings {
   _CommentsSetttings(
       {this.sort = CommentSort.top,
       @Setting() this.useSuggestedSort = true,
-      @Setting() this.showNavigationBar = true,
+      @Category(name: "Appearance") @Setting() this.showNavigationBar = true,
       @Setting() this.showUserAvatar = true,
       @Setting() this.buttonsAlwaysVisible = true,
       @Setting() this.hideButtonAfterAction = true,
@@ -371,22 +385,24 @@ class _CommentsSetttings extends CommentsSettings {
       @Setting() this.showPostUpvotePercentage = true,
       @Setting() this.highlightMyUsername = true,
       @Setting() this.showFloatingButton = true,
-      @Setting() this.showAwards = true,
+      @Category(name: "Awards") @Setting() this.showAwards = true,
       @Setting() this.clickableAwards = true,
-      @Setting() this.showUserFlair = true,
+      @Category(name: "Flairs") @Setting() this.showUserFlair = true,
       @Setting() this.showFlairColors = true,
       @Setting() this.showFlairEmojis = true,
-      @Setting() this.clickToCollapse = true,
+      @Category(name: "Behavior") @Setting() this.clickToCollapse = true,
       @Setting() this.hideTextCollapsed = true,
       @Setting() this.loadCollapsed = true,
       @Setting() this.animateCollapse = true,
       @Setting() this.clickableUsername = true,
-      @Setting() this.highlightNewComments = true,
+      @Category(name: "Navigation") @Setting() this.highlightNewComments = true,
       @Setting() this.volumeRockerNavigation = true,
       @Setting() this.animateNavigation = true,
-      @Setting() this.showSaveButton = true,
-      @Setting() this.swipeToClose = true})
+      @Category(name: "Visible buttons") @Setting() this.showSaveButton = true,
+      @Category(name: "Gestures") @Setting() this.swipeToClose = true})
       : super._();
+  factory _CommentsSetttings.fromJson(Map<String, dynamic> json) =>
+      _$CommentsSetttingsFromJson(json);
 
   @override
   @JsonKey()
@@ -397,6 +413,7 @@ class _CommentsSetttings extends CommentsSettings {
   final bool useSuggestedSort;
   @override
   @JsonKey()
+  @Category(name: "Appearance")
   @Setting()
   final bool showNavigationBar;
   @override
@@ -435,6 +452,7 @@ class _CommentsSetttings extends CommentsSettings {
   final bool showFloatingButton;
   @override
   @JsonKey()
+  @Category(name: "Awards")
   @Setting()
   final bool showAwards;
   @override
@@ -443,6 +461,7 @@ class _CommentsSetttings extends CommentsSettings {
   final bool clickableAwards;
   @override
   @JsonKey()
+  @Category(name: "Flairs")
   @Setting()
   final bool showUserFlair;
   @override
@@ -455,6 +474,7 @@ class _CommentsSetttings extends CommentsSettings {
   final bool showFlairEmojis;
   @override
   @JsonKey()
+  @Category(name: "Behavior")
   @Setting()
   final bool clickToCollapse;
   @override
@@ -475,6 +495,7 @@ class _CommentsSetttings extends CommentsSettings {
   final bool clickableUsername;
   @override
   @JsonKey()
+  @Category(name: "Navigation")
   @Setting()
   final bool highlightNewComments;
 //@Default() NavigationMode defaultNavigationMode,
@@ -488,11 +509,13 @@ class _CommentsSetttings extends CommentsSettings {
   final bool animateNavigation;
   @override
   @JsonKey()
+  @Category(name: "Visible buttons")
   @Setting()
   final bool showSaveButton;
 //@Default() String goToTopButton,
   @override
   @JsonKey()
+  @Category(name: "Gestures")
   @Setting()
   final bool swipeToClose;
 
@@ -503,6 +526,13 @@ class _CommentsSetttings extends CommentsSettings {
   @pragma('vm:prefer-inline')
   _$CommentsSetttingsCopyWith<_CommentsSetttings> get copyWith =>
       __$CommentsSetttingsCopyWithImpl<_CommentsSetttings>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$CommentsSetttingsToJson(
+      this,
+    );
+  }
 
   @override
   bool operator ==(Object other) {
@@ -563,6 +593,7 @@ class _CommentsSetttings extends CommentsSettings {
                 other.swipeToClose == swipeToClose));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
@@ -611,7 +642,7 @@ abstract mixin class _$CommentsSetttingsCopyWith<$Res>
   $Res call(
       {CommentSort sort,
       @Setting() bool useSuggestedSort,
-      @Setting() bool showNavigationBar,
+      @Category(name: "Appearance") @Setting() bool showNavigationBar,
       @Setting() bool showUserAvatar,
       @Setting() bool buttonsAlwaysVisible,
       @Setting() bool hideButtonAfterAction,
@@ -620,21 +651,21 @@ abstract mixin class _$CommentsSetttingsCopyWith<$Res>
       @Setting() bool showPostUpvotePercentage,
       @Setting() bool highlightMyUsername,
       @Setting() bool showFloatingButton,
-      @Setting() bool showAwards,
+      @Category(name: "Awards") @Setting() bool showAwards,
       @Setting() bool clickableAwards,
-      @Setting() bool showUserFlair,
+      @Category(name: "Flairs") @Setting() bool showUserFlair,
       @Setting() bool showFlairColors,
       @Setting() bool showFlairEmojis,
-      @Setting() bool clickToCollapse,
+      @Category(name: "Behavior") @Setting() bool clickToCollapse,
       @Setting() bool hideTextCollapsed,
       @Setting() bool loadCollapsed,
       @Setting() bool animateCollapse,
       @Setting() bool clickableUsername,
-      @Setting() bool highlightNewComments,
+      @Category(name: "Navigation") @Setting() bool highlightNewComments,
       @Setting() bool volumeRockerNavigation,
       @Setting() bool animateNavigation,
-      @Setting() bool showSaveButton,
-      @Setting() bool swipeToClose});
+      @Category(name: "Visible buttons") @Setting() bool showSaveButton,
+      @Category(name: "Gestures") @Setting() bool swipeToClose});
 }
 
 /// @nodoc

@@ -3,7 +3,68 @@ import 'package:build/build.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'annotations.dart';
 
+class CubitGenerator {
+  CubitGenerator();
+
+  String makeCubit(Element element) {
+    final classElement = element as ClassElement;
+    final cubitName = "${classElement.name}Cubit";
+    final constructor =
+        classElement.constructors.firstWhere((c) => c.isFactory);
+    StringBuffer buffer = StringBuffer();
+    buffer.write('''
+// HydratedCubit for ${classElement.name}
+class $cubitName extends HydratedCubit<${classElement.name}> {
+  $cubitName() : super(${classElement.name}());
+
+  @override
+  ${classElement.name}? fromJson(Map<String, dynamic> json) {
+    try {
+      return ${classElement.name}.fromJson(json);
+    } catch (_) {
+      return ${classElement.name}();
+    }
+  }
+
+  @override
+  Map<String, dynamic>? toJson(${classElement.name} state) => state.toJson();
+''');
+
+    // generate methods for each field
+    /// WARN: will only work with @freezed classes.
+    for (final param in constructor.parameters) {
+      final name = param.name;
+      final type = param.type;
+
+      buffer.writeln('''
+  void update${name.toPascalCase()}($type value) => emit(state.copyWith($name: value));
+''');
+    }
+    buffer.writeln('}'); // close cubit class
+    return buffer.toString();
+  }
+}
+
 class SettingsPageGenerator extends GeneratorForAnnotation<SettingsPage> {
+  late String? prefix;
+  late bool useFieldName;
+  late String cubitName;
+
+  void initialize(Element element) {
+    final parameters =
+        TypeChecker.fromRuntime(SettingsPage).firstAnnotationOf(element)!;
+    prefix = parameters.getField("prefix")?.toStringValue();
+    useFieldName = parameters.getField("useFieldName")?.toBoolValue() ?? false;
+    cubitName = "${element.name}Cubit";
+  }
+
+  String imports(BuildStep buildStep) {
+    return '''
+// GENERATED CODE - DO NOT MODIFY BY HAND
+part of "${buildStep.inputId.uri.pathSegments.last}";
+    ''';
+  }
+
   @override
   String generateForAnnotatedElement(
     Element element,
@@ -17,96 +78,47 @@ class SettingsPageGenerator extends GeneratorForAnnotation<SettingsPage> {
       );
     }
 
+    initialize(element);
+
     final classElement = element;
-    final parameters =
-        TypeChecker.fromRuntime(SettingsPage).firstAnnotationOf(element)!;
     final constructor =
         classElement.constructors.firstWhere((c) => c.isFactory);
     final className = '${classElement.name}View';
 
     final buffer = StringBuffer();
-    buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
-    buffer.writeln('import "${buildStep.inputId.uri}";');
-    buffer.writeln('import "package:flutter/material.dart";');
-    buffer.writeln('import "package:auto_route/auto_route.dart";');
-    buffer.writeln(
-        'import "package:flutter_gen/gen_l10n/app_localizations.dart";');
-    buffer.writeln('');
-    buffer.writeln('// SettingsPage for ${classElement.name}');
-    buffer.writeln('@RoutePage()');
-    buffer.writeln('class $className extends StatefulWidget {');
-    buffer.writeln('  final ${classElement.name} settings;');
-    buffer.writeln('  @override');
-    buffer.writeln('  createState() => _${className}State();');
-    buffer.writeln('  const $className({super.key, required this.settings});');
-    buffer.writeln('}');
-    buffer.writeln('class _${className}State extends State<$className> {');
-    buffer.writeln('  late ${classElement.name} settings;');
-    buffer.writeln('  @override');
-    buffer.writeln('  initState() {');
-    buffer.writeln('    settings = widget.settings;');
-    buffer.writeln('  }');
-    buffer.writeln('  @override');
-    buffer.writeln('  Widget build(BuildContext context) {');
-    buffer.writeln('    final locales = AppLocalizations.of(context)!;');
-    buffer.writeln('    return Scaffold(body: ListView(');
-    buffer.writeln('      children: [');
+    buffer.write(imports(buildStep));
+    buffer.write(CubitGenerator().makeCubit(element));
+    final code = '''
+// SettingsPage for ${classElement.name}
+@RoutePage()
+class $className extends StatelessWidget {
+
+  const $className({super.key});
+
+
+  @override
+  Widget build(BuildContext context) {
+    final locales = AppLocalizations.of(context)!;
+    final settings = context.watch<$cubitName>().state;
+    return Scaffold(
+      body: ListView(
+        children: [
+''';
+
+    buffer.writeln(code);
 
     /// WARN: will only work with @freezed classes.
     for (final param in constructor.parameters) {
-      final setting = TypeChecker.fromRuntime(Setting).firstAnnotationOf(param);
-      if (setting == null) {
-        // throw InvalidGenerationSourceError(
-        //   'Constructor parameter `${param.name}` in `${element.name}` must have a @Setting annotation.',
-        //   element: param,
-        // );
-        buffer.writeln('ListTile(title: Text("TODO: ${param.name}")),');
-        continue;
-      }
-      String tempTitle = "";
-      final useFieldName =
-          parameters.getField("useFieldName")?.toBoolValue() ?? false;
-      if (useFieldName) {
-        tempTitle = param.name;
-      } else {
-        try {
-          tempTitle = setting.getField("titleKey")!.toStringValue()!;
-        } catch (e) {
-          throw InvalidGenerationSourceError(
-              "Constructor parameter `${param.name}` in `${element.name}`: A title must be given if `SettingsPage.useFieldName` is not set to true.");
+      final divider =
+          TypeChecker.fromRuntime(Category).firstAnnotationOf(param);
+      if (divider != null) {
+        buffer.writeln("Divider(),");
+        final categoryName = divider.getField("name")?.toStringValue();
+        if (categoryName != null) {
+          buffer.writeln('Text("$categoryName"),');
         }
       }
-      final String titleKey;
-      final prefix = parameters.getField("prefix")?.toStringValue();
-      if (prefix != null) {
-        titleKey = "$prefix$tempTitle";
-      } else {
-        titleKey = tempTitle;
-      }
-      final String? descKey;
-      if (useFieldName) {
-        descKey = "${titleKey}Description";
-      } else {
-        descKey = setting.getField("descriptionKey")?.toStringValue();
-      }
-
-      final widgetType = setting.getField('widget')?.toTypeValue();
-      final hasDescription =
-          setting.getField("hasDescription")?.toBoolValue() ?? false;
-
-      if (widgetType != null) {
-        buffer.writeln('$widgetType('
-            'value: settings.${param.name},'
-            'onChanged: (v) => setState(() => settings = settings.copyWith(${param.name}: v)),'
-            '),');
-      } else if (param.type.isDartCoreBool) {
-        buffer.writeln('SwitchListTile('
-            'title: Text(locales.$titleKey),'
-            'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
-            'value: settings.${param.name},'
-            'onChanged: (v) => setState(() => settings = settings.copyWith(${param.name}: v)),'
-            '),');
-      }
+      buffer.writeln(widget(param, element));
     }
 
     buffer.writeln('      ],');
@@ -115,5 +127,68 @@ class SettingsPageGenerator extends GeneratorForAnnotation<SettingsPage> {
     buffer.writeln('}');
 
     return buffer.toString();
+  }
+
+  String widget(ParameterElement param, Element element) {
+    final setting = TypeChecker.fromRuntime(Setting).firstAnnotationOf(param);
+    if (setting == null) {
+      // throw InvalidGenerationSourceError(
+      //   'Constructor parameter `${param.name}` in `${element.name}` must have a @Setting annotation.',
+      //   element: param,
+      // );
+      return 'ListTile(title: Text("TODO: ${param.name}")),';
+    }
+    String tempTitle = "";
+    if (useFieldName) {
+      tempTitle = param.name;
+    } else {
+      try {
+        tempTitle = setting.getField("titleKey")!.toStringValue()!;
+      } catch (e) {
+        throw InvalidGenerationSourceError(
+            "Constructor parameter `${param.name}` in `${element.name}`: A title must be given if `SettingsPage.useFieldName` is not set to true.");
+      }
+    }
+    final String titleKey;
+    if (prefix != null) {
+      titleKey = "$prefix$tempTitle";
+    } else {
+      titleKey = tempTitle;
+    }
+    final String? descKey;
+    if (useFieldName) {
+      descKey = "${titleKey}Description";
+    } else {
+      descKey = setting.getField("descriptionKey")?.toStringValue();
+    }
+
+    final widgetType = setting.getField('widget')?.toTypeValue();
+    final hasDescription =
+        setting.getField("hasDescription")?.toBoolValue() ?? false;
+
+    if (widgetType != null) {
+      return '$widgetType('
+          'value: settings.${param.name},'
+          'onChanged: (val) => context.read<$cubitName>().update${param.name.toPascalCase()}(val),'
+          '),';
+    } else if (param.type.isDartCoreBool) {
+      return 'SwitchListTile('
+          'title: Text(locales.$titleKey),'
+          'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
+          'value: settings.${param.name},'
+          'onChanged: (val) => context.read<$cubitName>().update${param.name.toPascalCase()}(val),'
+          '),';
+    }
+    return "";
+  }
+}
+
+String pascalCase(String s) {
+  return '${s[0].toUpperCase()}${s.substring(1)}';
+}
+
+extension PascalCase on String {
+  String toPascalCase() {
+    return '${this[0].toUpperCase()}${substring(1)}';
   }
 }

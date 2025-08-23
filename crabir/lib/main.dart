@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/drawer/drawer.dart';
 import 'package:crabir/routes/routes.dart';
+import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/tabs_index.dart';
 import 'package:flutter/foundation.dart';
@@ -43,6 +44,7 @@ class Crabir extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => AccountsBloc()..add(Initialize())),
         BlocProvider(create: (context) => ThemeBloc()),
+        BlocProvider(create: (context) => CommentsSettingsCubit())
       ],
       child: TopLevel(),
     );

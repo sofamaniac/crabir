@@ -33,9 +33,7 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
             ListTile(
                 title: Text("Settings"),
                 onTap: () {
-                  AutoRouter.of(context).push(
-                    CommentsSettingsRoute(settings: CommentsSettings()),
-                  );
+                  context.router.navigate(SettingsRoute());
                 }),
             //...userOptions.map((option) => ListTile(title: Text(option))),
             Divider(),
