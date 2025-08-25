@@ -34,6 +34,9 @@ class CommentsSettingsCubit extends HydratedCubit<CommentsSettings> {
   void updateShowUserAvatar(bool value) =>
       emit(state.copyWith(showUserAvatar: value));
 
+  void updateShowCommentsImage(bool value) =>
+      emit(state.copyWith(showCommentsImage: value));
+
   void updateButtonsAlwaysVisible(bool value) =>
       emit(state.copyWith(buttonsAlwaysVisible: value));
 
@@ -136,6 +139,14 @@ class CommentsSettingsView extends StatelessWidget {
           value: settings.showUserAvatar,
           onChanged: (val) =>
               context.read<CommentsSettingsCubit>().updateShowUserAvatar(val),
+        ),
+        SwitchListTile(
+          title: Text(locales.comments_showCommentsImage),
+          subtitle: null,
+          value: settings.showCommentsImage,
+          onChanged: (val) => context
+              .read<CommentsSettingsCubit>()
+              .updateShowCommentsImage(val),
         ),
         SwitchListTile(
           title: Text(locales.comments_buttonsAlwaysVisible),

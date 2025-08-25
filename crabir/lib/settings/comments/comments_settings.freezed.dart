@@ -25,7 +25,10 @@ mixin _$CommentsSettings {
   @Setting()
   bool get showNavigationBar;
   @Setting()
-  bool get showUserAvatar; //@Default() MediaPreviewSize postMediaPreviewSize,
+  bool get showUserAvatar;
+  @Setting()
+  bool
+      get showCommentsImage; //@Default() MediaPreviewSize postMediaPreviewSize,
   @Setting()
   bool get buttonsAlwaysVisible;
   @Setting()
@@ -101,6 +104,8 @@ mixin _$CommentsSettings {
                 other.showNavigationBar == showNavigationBar) &&
             (identical(other.showUserAvatar, showUserAvatar) ||
                 other.showUserAvatar == showUserAvatar) &&
+            (identical(other.showCommentsImage, showCommentsImage) ||
+                other.showCommentsImage == showCommentsImage) &&
             (identical(other.buttonsAlwaysVisible, buttonsAlwaysVisible) ||
                 other.buttonsAlwaysVisible == buttonsAlwaysVisible) &&
             (identical(other.hideButtonAfterAction, hideButtonAfterAction) ||
@@ -156,6 +161,7 @@ mixin _$CommentsSettings {
         useSuggestedSort,
         showNavigationBar,
         showUserAvatar,
+        showCommentsImage,
         buttonsAlwaysVisible,
         hideButtonAfterAction,
         collapseAutoMod,
@@ -182,7 +188,7 @@ mixin _$CommentsSettings {
 
   @override
   String toString() {
-    return 'CommentsSettings(sort: $sort, useSuggestedSort: $useSuggestedSort, showNavigationBar: $showNavigationBar, showUserAvatar: $showUserAvatar, buttonsAlwaysVisible: $buttonsAlwaysVisible, hideButtonAfterAction: $hideButtonAfterAction, collapseAutoMod: $collapseAutoMod, collapseDisruptiveComment: $collapseDisruptiveComment, showPostUpvotePercentage: $showPostUpvotePercentage, highlightMyUsername: $highlightMyUsername, showFloatingButton: $showFloatingButton, showAwards: $showAwards, clickableAwards: $clickableAwards, showUserFlair: $showUserFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, clickToCollapse: $clickToCollapse, hideTextCollapsed: $hideTextCollapsed, loadCollapsed: $loadCollapsed, animateCollapse: $animateCollapse, clickableUsername: $clickableUsername, highlightNewComments: $highlightNewComments, volumeRockerNavigation: $volumeRockerNavigation, animateNavigation: $animateNavigation, showSaveButton: $showSaveButton, swipeToClose: $swipeToClose)';
+    return 'CommentsSettings(sort: $sort, useSuggestedSort: $useSuggestedSort, showNavigationBar: $showNavigationBar, showUserAvatar: $showUserAvatar, showCommentsImage: $showCommentsImage, buttonsAlwaysVisible: $buttonsAlwaysVisible, hideButtonAfterAction: $hideButtonAfterAction, collapseAutoMod: $collapseAutoMod, collapseDisruptiveComment: $collapseDisruptiveComment, showPostUpvotePercentage: $showPostUpvotePercentage, highlightMyUsername: $highlightMyUsername, showFloatingButton: $showFloatingButton, showAwards: $showAwards, clickableAwards: $clickableAwards, showUserFlair: $showUserFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, clickToCollapse: $clickToCollapse, hideTextCollapsed: $hideTextCollapsed, loadCollapsed: $loadCollapsed, animateCollapse: $animateCollapse, clickableUsername: $clickableUsername, highlightNewComments: $highlightNewComments, volumeRockerNavigation: $volumeRockerNavigation, animateNavigation: $animateNavigation, showSaveButton: $showSaveButton, swipeToClose: $swipeToClose)';
   }
 }
 
@@ -197,6 +203,7 @@ abstract mixin class $CommentsSettingsCopyWith<$Res> {
       @Setting() bool useSuggestedSort,
       @Category(name: "Appearance") @Setting() bool showNavigationBar,
       @Setting() bool showUserAvatar,
+      @Setting() bool showCommentsImage,
       @Setting() bool buttonsAlwaysVisible,
       @Setting() bool hideButtonAfterAction,
       @Setting() bool collapseAutoMod,
@@ -238,6 +245,7 @@ class _$CommentsSettingsCopyWithImpl<$Res>
     Object? useSuggestedSort = null,
     Object? showNavigationBar = null,
     Object? showUserAvatar = null,
+    Object? showCommentsImage = null,
     Object? buttonsAlwaysVisible = null,
     Object? hideButtonAfterAction = null,
     Object? collapseAutoMod = null,
@@ -277,6 +285,10 @@ class _$CommentsSettingsCopyWithImpl<$Res>
       showUserAvatar: null == showUserAvatar
           ? _self.showUserAvatar
           : showUserAvatar // ignore: cast_nullable_to_non_nullable
+              as bool,
+      showCommentsImage: null == showCommentsImage
+          ? _self.showCommentsImage
+          : showCommentsImage // ignore: cast_nullable_to_non_nullable
               as bool,
       buttonsAlwaysVisible: null == buttonsAlwaysVisible
           ? _self.buttonsAlwaysVisible
@@ -378,6 +390,7 @@ class _CommentsSetttings extends CommentsSettings {
       @Setting() this.useSuggestedSort = true,
       @Category(name: "Appearance") @Setting() this.showNavigationBar = true,
       @Setting() this.showUserAvatar = true,
+      @Setting() this.showCommentsImage = true,
       @Setting() this.buttonsAlwaysVisible = true,
       @Setting() this.hideButtonAfterAction = true,
       @Setting() this.collapseAutoMod = true,
@@ -420,6 +433,10 @@ class _CommentsSetttings extends CommentsSettings {
   @JsonKey()
   @Setting()
   final bool showUserAvatar;
+  @override
+  @JsonKey()
+  @Setting()
+  final bool showCommentsImage;
 //@Default() MediaPreviewSize postMediaPreviewSize,
   @override
   @JsonKey()
@@ -546,6 +563,8 @@ class _CommentsSetttings extends CommentsSettings {
                 other.showNavigationBar == showNavigationBar) &&
             (identical(other.showUserAvatar, showUserAvatar) ||
                 other.showUserAvatar == showUserAvatar) &&
+            (identical(other.showCommentsImage, showCommentsImage) ||
+                other.showCommentsImage == showCommentsImage) &&
             (identical(other.buttonsAlwaysVisible, buttonsAlwaysVisible) ||
                 other.buttonsAlwaysVisible == buttonsAlwaysVisible) &&
             (identical(other.hideButtonAfterAction, hideButtonAfterAction) ||
@@ -601,6 +620,7 @@ class _CommentsSetttings extends CommentsSettings {
         useSuggestedSort,
         showNavigationBar,
         showUserAvatar,
+        showCommentsImage,
         buttonsAlwaysVisible,
         hideButtonAfterAction,
         collapseAutoMod,
@@ -627,7 +647,7 @@ class _CommentsSetttings extends CommentsSettings {
 
   @override
   String toString() {
-    return 'CommentsSettings(sort: $sort, useSuggestedSort: $useSuggestedSort, showNavigationBar: $showNavigationBar, showUserAvatar: $showUserAvatar, buttonsAlwaysVisible: $buttonsAlwaysVisible, hideButtonAfterAction: $hideButtonAfterAction, collapseAutoMod: $collapseAutoMod, collapseDisruptiveComment: $collapseDisruptiveComment, showPostUpvotePercentage: $showPostUpvotePercentage, highlightMyUsername: $highlightMyUsername, showFloatingButton: $showFloatingButton, showAwards: $showAwards, clickableAwards: $clickableAwards, showUserFlair: $showUserFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, clickToCollapse: $clickToCollapse, hideTextCollapsed: $hideTextCollapsed, loadCollapsed: $loadCollapsed, animateCollapse: $animateCollapse, clickableUsername: $clickableUsername, highlightNewComments: $highlightNewComments, volumeRockerNavigation: $volumeRockerNavigation, animateNavigation: $animateNavigation, showSaveButton: $showSaveButton, swipeToClose: $swipeToClose)';
+    return 'CommentsSettings(sort: $sort, useSuggestedSort: $useSuggestedSort, showNavigationBar: $showNavigationBar, showUserAvatar: $showUserAvatar, showCommentsImage: $showCommentsImage, buttonsAlwaysVisible: $buttonsAlwaysVisible, hideButtonAfterAction: $hideButtonAfterAction, collapseAutoMod: $collapseAutoMod, collapseDisruptiveComment: $collapseDisruptiveComment, showPostUpvotePercentage: $showPostUpvotePercentage, highlightMyUsername: $highlightMyUsername, showFloatingButton: $showFloatingButton, showAwards: $showAwards, clickableAwards: $clickableAwards, showUserFlair: $showUserFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, clickToCollapse: $clickToCollapse, hideTextCollapsed: $hideTextCollapsed, loadCollapsed: $loadCollapsed, animateCollapse: $animateCollapse, clickableUsername: $clickableUsername, highlightNewComments: $highlightNewComments, volumeRockerNavigation: $volumeRockerNavigation, animateNavigation: $animateNavigation, showSaveButton: $showSaveButton, swipeToClose: $swipeToClose)';
   }
 }
 
@@ -644,6 +664,7 @@ abstract mixin class _$CommentsSetttingsCopyWith<$Res>
       @Setting() bool useSuggestedSort,
       @Category(name: "Appearance") @Setting() bool showNavigationBar,
       @Setting() bool showUserAvatar,
+      @Setting() bool showCommentsImage,
       @Setting() bool buttonsAlwaysVisible,
       @Setting() bool hideButtonAfterAction,
       @Setting() bool collapseAutoMod,
@@ -685,6 +706,7 @@ class __$CommentsSetttingsCopyWithImpl<$Res>
     Object? useSuggestedSort = null,
     Object? showNavigationBar = null,
     Object? showUserAvatar = null,
+    Object? showCommentsImage = null,
     Object? buttonsAlwaysVisible = null,
     Object? hideButtonAfterAction = null,
     Object? collapseAutoMod = null,
@@ -724,6 +746,10 @@ class __$CommentsSetttingsCopyWithImpl<$Res>
       showUserAvatar: null == showUserAvatar
           ? _self.showUserAvatar
           : showUserAvatar // ignore: cast_nullable_to_non_nullable
+              as bool,
+      showCommentsImage: null == showCommentsImage
+          ? _self.showCommentsImage
+          : showCommentsImage // ignore: cast_nullable_to_non_nullable
               as bool,
       buttonsAlwaysVisible: null == buttonsAlwaysVisible
           ? _self.buttonsAlwaysVisible

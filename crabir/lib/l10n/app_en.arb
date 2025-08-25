@@ -29,6 +29,8 @@
   "comments_showNavigationBar": "Show navigation bar",
   "comments_showUserAvatar": "Show user avatar",
 
+  "comments_showCommentsImage": "Show images in comments",
+
   "comments_postMediaPreviewSize": "Post media preview size",
 
   "comments_buttonsAlwaysVisible": "Always show action buttons",

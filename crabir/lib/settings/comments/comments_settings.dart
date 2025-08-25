@@ -23,6 +23,7 @@ abstract class CommentsSettings with _$CommentsSettings {
     @Default(true)
     bool showNavigationBar,
     @Setting() @Default(true) bool showUserAvatar,
+    @Setting() @Default(true) bool showCommentsImage,
     //@Default() MediaPreviewSize postMediaPreviewSize,
     @Setting() @Default(true) bool buttonsAlwaysVisible,
     @Setting() @Default(true) bool hideButtonAfterAction,

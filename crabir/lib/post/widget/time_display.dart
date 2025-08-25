@@ -5,14 +5,15 @@ class TimeDisplay extends StatelessWidget {
   final TextStyle? style;
   const TimeDisplay(this.date, {super.key, this.style});
 
+  // TODO: localization
   String message(Duration delta) {
     if (delta.inDays > 365) {
       final int years = (delta.inDays / 365).toInt();
       return "${years}y";
-    } else if (delta.inDays > 30) {
+    } else if (delta.inDays >= 30) {
       final int months = (delta.inDays / 30).toInt();
       return "${months}m";
-    } else if (delta.inDays > 1) {
+    } else if (delta.inDays >= 1) {
       final int days = delta.inDays;
       return "${days}d";
     } else if (delta.inHours >= 1) {
