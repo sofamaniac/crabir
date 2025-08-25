@@ -1,9 +1,11 @@
 import 'package:crabir/flair.dart';
-import 'package:crabir/post/widget/html_with_fade.dart';
+import 'package:crabir/html_view.dart';
+import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CommentView extends StatefulWidget {
   final Comment comment;
@@ -36,6 +38,7 @@ class _CommentViewState extends State<CommentView> {
   @override
   Widget build(BuildContext context) {
     final comment = widget.comment;
+    final settings = context.watch<CommentsSettingsCubit>().state;
     final VoidCallback? onTap = widget.onTap ??
         (widget.animateBottomBar
             ? () => setState(
@@ -66,12 +69,13 @@ class _CommentViewState extends State<CommentView> {
                           .labelMedium!
                           .apply(color: Colors.red),
                     ),
-                    if (comment.author?.flair != null)
+                    if (comment.author?.flair != null && settings.showUserFlair)
                       Flexible(child: FlairView(flair: comment.author!.flair))
                   ],
                 ),
-                HtmlWithConditionalFade(
+                StyledHtml(
                   htmlContent: comment.bodyHtml,
+                  onLinkTap: defaultLinkHandler,
                 ),
                 if (showBottomBar) bottomBar(),
               ],
