@@ -1,6 +1,6 @@
 part of 'user.dart';
 
-enum _Tabs {
+enum UserTabs {
   overview,
   about,
   posts,
@@ -15,65 +15,73 @@ enum _Tabs {
 
   String name() {
     return switch (this) {
-      _Tabs.overview => "Overview",
-      _Tabs.about => "About",
-      _Tabs.posts => "Posts",
-      _Tabs.comments => "Comments",
-      _Tabs.saved => "Saved",
-      _Tabs.upvoted => "Upvoted",
-      _Tabs.downvoted => "Downvoted",
-      _Tabs.hidden => "Hidden",
-      _Tabs.gilded => "Gilded",
-      _Tabs.friends => "Friends",
-      _Tabs.blocked => "Blocked",
+      UserTabs.overview => "Overview",
+      UserTabs.about => "About",
+      UserTabs.posts => "Posts",
+      UserTabs.comments => "Comments",
+      UserTabs.saved => "Saved",
+      UserTabs.upvoted => "Upvoted",
+      UserTabs.downvoted => "Downvoted",
+      UserTabs.hidden => "Hidden",
+      UserTabs.gilded => "Gilded",
+      UserTabs.friends => "Friends",
+      UserTabs.blocked => "Blocked",
     };
   }
 
   PageRouteInfo route(String username) {
     return switch (this) {
-      _Tabs.overview => UserOverviewRoute(username: username),
-      _Tabs.about => UserAboutRoute(username: username),
-      _Tabs.posts => UserPostsRoute(username: username),
-      _Tabs.comments => UserCommentsRoute(username: username),
-      _Tabs.saved => UserSavedRoute(username: username),
-      _Tabs.upvoted => UserUpvotedRoute(username: username),
-      _Tabs.downvoted => UserDownvotedRoute(username: username),
-      _Tabs.hidden => UserHiddenRoute(username: username),
-      _Tabs.gilded => UserGildedRoute(username: username),
-      _Tabs.friends => UserFriendsRoute(username: username),
-      _Tabs.blocked => UserBlockedRoute(username: username),
+      UserTabs.overview => UserOverviewRoute(username: username),
+      UserTabs.about => UserAboutRoute(username: username),
+      UserTabs.posts => UserPostsRoute(username: username),
+      UserTabs.comments => UserCommentsRoute(username: username),
+      UserTabs.saved => UserSavedRoute(username: username),
+      UserTabs.upvoted => UserUpvotedRoute(username: username),
+      UserTabs.downvoted => UserDownvotedRoute(username: username),
+      UserTabs.hidden => UserHiddenRoute(username: username),
+      UserTabs.gilded => UserGildedRoute(username: username),
+      UserTabs.friends => UserFriendsRoute(username: username),
+      UserTabs.blocked => UserBlockedRoute(username: username),
     };
   }
 
   PageInfo page() {
     return switch (this) {
-      _Tabs.overview => UserOverviewRoute.page,
-      _Tabs.about => UserAboutRoute.page,
-      _Tabs.posts => UserPostsRoute.page,
-      _Tabs.comments => UserCommentsRoute.page,
-      _Tabs.saved => UserSavedRoute.page,
-      _Tabs.upvoted => UserUpvotedRoute.page,
-      _Tabs.downvoted => UserDownvotedRoute.page,
-      _Tabs.hidden => UserHiddenRoute.page,
-      _Tabs.gilded => UserGildedRoute.page,
-      _Tabs.friends => UserFriendsRoute.page,
-      _Tabs.blocked => UserBlockedRoute.page,
+      UserTabs.overview => UserOverviewRoute.page,
+      UserTabs.about => UserAboutRoute.page,
+      UserTabs.posts => UserPostsRoute.page,
+      UserTabs.comments => UserCommentsRoute.page,
+      UserTabs.saved => UserSavedRoute.page,
+      UserTabs.upvoted => UserUpvotedRoute.page,
+      UserTabs.downvoted => UserDownvotedRoute.page,
+      UserTabs.hidden => UserHiddenRoute.page,
+      UserTabs.gilded => UserGildedRoute.page,
+      UserTabs.friends => UserFriendsRoute.page,
+      UserTabs.blocked => UserBlockedRoute.page,
     };
   }
 }
 
 final allUserTabs = [
-  _Tabs.overview,
-  _Tabs.about,
-  _Tabs.posts,
-  _Tabs.comments,
-  _Tabs.saved,
-  _Tabs.upvoted,
-  _Tabs.downvoted,
-  _Tabs.hidden,
-  _Tabs.gilded,
-  _Tabs.friends,
-  _Tabs.blocked,
+  UserTabs.overview,
+  UserTabs.about,
+  UserTabs.posts,
+  UserTabs.comments,
+  UserTabs.saved,
+  UserTabs.upvoted,
+  UserTabs.downvoted,
+  UserTabs.hidden,
+  UserTabs.gilded,
+  UserTabs.friends,
+  UserTabs.blocked,
+];
+
+final publicUserTabs = [
+  UserTabs.overview,
+  UserTabs.about,
+  UserTabs.posts,
+  UserTabs.comments,
+  UserTabs.gilded,
 ];
 
 Widget _scaffold(reddit_stream.Streamable stream) {
@@ -172,7 +180,7 @@ class UserCommentsView extends StatelessWidget {
 }
 
 final currentUserRoute = AutoRoute(
-  page: CurrentUserRoute.page,
+  page: UserRoute.page,
   children: allUserTabs
       .map(
         (tab) => AutoRoute(

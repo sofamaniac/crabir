@@ -15,9 +15,21 @@ import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
 
 part 'tabs.dart';
 
+/// Display a user profile.
+/// If `username` is not specified, defaults to the current user.
 @RoutePage()
-class CurrentUserView extends StatelessWidget {
-  const CurrentUserView({super.key});
+class UserView extends StatelessWidget {
+  const UserView({super.key, this.username});
+
+  final String? username;
+
+  List<UserTabs> _tabs(String currentUser) {
+    if (currentUser == username) {
+      return allUserTabs;
+    } else {
+      return publicUserTabs;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +37,11 @@ class CurrentUserView extends StatelessWidget {
     if (state.account == null) {
       return Container();
     }
-    final username = state.account!.username;
+    final currentUser = state.account!.username;
+    final tabs = _tabs(currentUser);
     return AutoTabsRouter.tabBar(
       homeIndex: 0,
-      routes: allUserTabs.map((tab) => tab.route(username)).toList(),
+      routes: tabs.map((tab) => tab.route(username ?? currentUser)).toList(),
       builder: (context, child, tabController) {
         return NestedScrollView(
           headerSliverBuilder: (_, __) => [
@@ -41,7 +54,7 @@ class CurrentUserView extends StatelessWidget {
               bottom: TabBar(
                 isScrollable: true,
                 tabAlignment: TabAlignment.start,
-                tabs: allUserTabs.map((tab) => Text(tab.name())).toList(),
+                tabs: tabs.map((tab) => Text(tab.name())).toList(),
                 controller: tabController,
               ),
             )

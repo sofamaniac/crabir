@@ -94,9 +94,8 @@ class MainScreenView extends StatelessWidget {
       SearchSubredditsRoute(),
       SubscriptionsTabRoute(),
       InboxRoute(),
-      CurrentUserRoute(),
+      UserRoute(),
     ];
-    //final accounts = context.watch<AccountsBloc>().state;
     final theme = context.watch<ThemeBloc>().state;
     return AutoTabsRouter.tabBar(
       homeIndex: 0,

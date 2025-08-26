@@ -27,22 +27,6 @@ class CommentsSettingsRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [CurrentUserView]
-class CurrentUserRoute extends PageRouteInfo<void> {
-  const CurrentUserRoute({List<PageRouteInfo>? children})
-    : super(CurrentUserRoute.name, initialChildren: children);
-
-  static const String name = 'CurrentUserRoute';
-
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const CurrentUserView();
-    },
-  );
-}
-
-/// generated route for
 /// [FeedView]
 class FeedRoute extends PageRouteInfo<FeedRouteArgs> {
   FeedRoute({
@@ -1096,4 +1080,50 @@ class UserUpvotedRouteArgs {
 
   @override
   int get hashCode => key.hashCode ^ username.hashCode ^ sort.hashCode;
+}
+
+/// generated route for
+/// [UserView]
+class UserRoute extends PageRouteInfo<UserRouteArgs> {
+  UserRoute({Key? key, String? username, List<PageRouteInfo>? children})
+    : super(
+        UserRoute.name,
+        args: UserRouteArgs(key: key, username: username),
+        initialChildren: children,
+      );
+
+  static const String name = 'UserRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<UserRouteArgs>(
+        orElse: () => const UserRouteArgs(),
+      );
+      return UserView(key: args.key, username: args.username);
+    },
+  );
+}
+
+class UserRouteArgs {
+  const UserRouteArgs({this.key, this.username});
+
+  final Key? key;
+
+  final String? username;
+
+  @override
+  String toString() {
+    return 'UserRouteArgs{key: $key, username: $username}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! UserRouteArgs) return false;
+    return key == other.key && username == other.username;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ username.hashCode;
 }

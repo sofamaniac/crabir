@@ -1,5 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/html_view.dart';
+import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
@@ -62,12 +64,22 @@ class _CommentViewState extends State<CommentView> {
                 Row(
                   spacing: 8,
                   children: [
-                    Text(
-                      comment.author?.username ?? "u/[deleted]",
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelMedium!
-                          .apply(color: Colors.red),
+                    InkWell(
+                      onTap: () {
+                        final username = comment.author?.username;
+                        if (username != null) {
+                          context.router.navigate(
+                            UserRoute(username: username),
+                          );
+                        }
+                      },
+                      child: Text(
+                        comment.author?.username ?? "u/[deleted]",
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelMedium!
+                            .apply(color: Colors.red),
+                      ),
                     ),
                     if (comment.author?.flair != null && settings.showUserFlair)
                       Flexible(child: FlairView(flair: comment.author!.flair))
