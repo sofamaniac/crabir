@@ -35,12 +35,10 @@ class _PostTitle extends StatelessWidget {
   final Post post;
 
   final bool showThumbnail;
-  final bool showFlair;
 
   const _PostTitle({
     required this.post,
     this.showThumbnail = false,
-    this.showFlair = true,
   });
 
   Widget thumbnail() {
@@ -70,7 +68,7 @@ class _PostTitle extends StatelessWidget {
       children: [
         title,
         InkWell(
-          onTap: () => context.router.navigate(
+          onTap: () => AutoTabsRouter.of(context).navigate(
             SearchPostsRoute(
               subreddit: post.subreddit.subreddit,
               flair: post.linkFlair,
@@ -190,7 +188,12 @@ class _RedditPostCardState extends State<RedditPostCard> {
           ),
         const Text(' • '),
         InkWell(
-          onTap: () => (),
+          onTap: () {
+            final username = widget.post.author?.username;
+            if (username != null) {
+              context.router.navigate(UserRoute(username: username));
+            }
+          },
           child: Text(
             widget.post.author?.username ?? "[deleted]",
             style: labelStyle,
