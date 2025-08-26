@@ -48,7 +48,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1367208834;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -565505076;
 
 // Section: executor
 
@@ -296,6 +296,64 @@ fn wire__reddit_api__client__Client_from_refresh_token_impl(
                     )?;
                     Ok(output_ok)
                 })())
+            }
+        },
+    )
+}
+fn wire__reddit_api__client__Client_get_post_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "Client_get_post",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Client>,
+            >>::sse_decode(&mut deserializer);
+            let api_permalink = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                    (move || async move {
+                        let mut api_that_guard = None;
+                        let decode_indices_ =
+                            flutter_rust_bridge::for_generated::lockable_compute_decode_order(
+                                vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                    &api_that, 0, false,
+                                )],
+                            );
+                        for i in decode_indices_ {
+                            match i {
+                                0 => {
+                                    api_that_guard =
+                                        Some(api_that.lockable_decode_async_ref().await)
+                                }
+                                _ => unreachable!(),
+                            }
+                        }
+                        let api_that_guard = api_that_guard.unwrap();
+                        let output_ok =
+                            reddit_api::client::Client::get_post(&*api_that_guard, api_permalink)
+                                .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
             }
         },
     )
@@ -8811,52 +8869,6 @@ fn wire__reddit_api__model__gallery__GalleryData_default_impl(
         },
     )
 }
-fn wire__reddit_api__model__gallery__GalleryMedia_auto_accessor_get_kind_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "GalleryMedia_auto_accessor_get_kind",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<GalleryMedia>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.kind.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
 fn wire__reddit_api__model__gallery__GalleryMedia_auto_accessor_get_media_type_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -8898,57 +8910,6 @@ fn wire__reddit_api__model__gallery__GalleryMedia_auto_accessor_get_media_type_i
                 }
                 let api_that_guard = api_that_guard.unwrap();
                 let output_ok = Result::<_, ()>::Ok(api_that_guard.media_type.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__reddit_api__model__gallery__GalleryMedia_auto_accessor_set_kind_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "GalleryMedia_auto_accessor_set_kind",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<GalleryMedia>,
-            >>::sse_decode(&mut deserializer);
-            let api_kind = <reddit_api::model::gallery::MediaKind>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.kind = api_kind;
-                    };
-                })?;
                 Ok(output_ok)
             })())
         },
@@ -9083,6 +9044,54 @@ fn wire__reddit_api__model__gallery__Gallery_get_impl(
                     &*api_that_guard,
                     api_index,
                 ))?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
+fn wire__reddit_api__model__gallery__Gallery_get_aspect_ratio_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "Gallery_get_aspect_ratio(dart_style=aspect_ratio)",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Gallery>,
+            >>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, ()>((move || {
+                let mut api_that_guard = None;
+                let decode_indices_ =
+                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
+                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                            &api_that, 0, false,
+                        ),
+                    ]);
+                for i in decode_indices_ {
+                    match i {
+                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                        _ => unreachable!(),
+                    }
+                }
+                let api_that_guard = api_that_guard.unwrap();
+                let output_ok = Result::<_, ()>::Ok(
+                    reddit_api::model::gallery::Gallery::get_aspect_ratio(&*api_that_guard),
+                )?;
                 Ok(output_ok)
             })())
         },
@@ -26559,6 +26568,39 @@ fn wire__reddit_api__model__subreddit__Subreddit_icon_impl(
         },
     )
 }
+fn wire__reddit_api__model__gallery__animated_image_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "animated_image_default",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok =
+                        Result::<_, ()>::Ok(reddit_api::model::gallery::AnimatedImage::default())?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__reddit_api__model__author__author_info_default_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -26901,6 +26943,39 @@ fn wire__reddit_api__model__post__image_base_default_impl(
                 transform_result_sse::<_, ()>((move || {
                     let output_ok =
                         Result::<_, ()>::Ok(reddit_api::model::post::ImageBase::default())?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__reddit_api__model__gallery__image_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "image_default",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok =
+                        Result::<_, ()>::Ok(reddit_api::model::gallery::Image::default())?;
                     Ok(output_ok)
                 })())
             }
@@ -27570,6 +27645,13 @@ fn wire__reddit_api__model__post__variants_default_impl(
 #[allow(clippy::unnecessary_literal_unwrap)]
 const _: fn() = || {
     {
+        let AnimatedImage = None::<reddit_api::model::gallery::AnimatedImage>.unwrap();
+        let _: u32 = AnimatedImage.x;
+        let _: u32 = AnimatedImage.y;
+        let _: String = AnimatedImage.gif;
+        let _: String = AnimatedImage.mp4;
+    }
+    {
         let AuthorInfo = None::<reddit_api::model::author::AuthorInfo>.unwrap();
         let _: String = AuthorInfo.username;
         let _: bool = AuthorInfo.premium;
@@ -27624,6 +27706,12 @@ const _: fn() = || {
         let _: String = Icon.url;
         let _: usize = Icon.width;
         let _: usize = Icon.height;
+    }
+    {
+        let Image = None::<reddit_api::model::gallery::Image>.unwrap();
+        let _: String = Image.u;
+        let _: u32 = Image.x;
+        let _: u32 = Image.y;
     }
     {
         let ImageBase = None::<reddit_api::model::post::ImageBase>.unwrap();
@@ -27735,6 +27823,14 @@ const _: fn() = || {
         let _: bool = Snoovatar.pref_show_snoovatar;
         let _: Option<String> = Snoovatar.snoovatar_size;
         let _: String = Snoovatar.snoovatar_img;
+    }
+    match None::<reddit_api::model::gallery::Source>.unwrap() {
+        reddit_api::model::gallery::Source::Image { source } => {
+            let _: reddit_api::model::gallery::Image = source;
+        }
+        reddit_api::model::gallery::Source::AnimatedImage { source } => {
+            let _: reddit_api::model::gallery::AnimatedImage = source;
+        }
     }
     {
         let SubredditDetails = None::<reddit_api::model::multi::SubredditDetails>.unwrap();
@@ -28492,6 +28588,22 @@ impl SseDecode for String {
     }
 }
 
+impl SseDecode for reddit_api::model::gallery::AnimatedImage {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_x = <u32>::sse_decode(deserializer);
+        let mut var_y = <u32>::sse_decode(deserializer);
+        let mut var_gif = <String>::sse_decode(deserializer);
+        let mut var_mp4 = <String>::sse_decode(deserializer);
+        return reddit_api::model::gallery::AnimatedImage {
+            x: var_x,
+            y: var_y,
+            gif: var_gif,
+            mp4: var_mp4,
+        };
+    }
+}
+
 impl SseDecode for reddit_api::model::author::AuthorInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -28674,6 +28786,20 @@ impl SseDecode for reddit_api::model::subreddit::Icon {
             url: var_url,
             width: var_width,
             height: var_height,
+        };
+    }
+}
+
+impl SseDecode for reddit_api::model::gallery::Image {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_u = <String>::sse_decode(deserializer);
+        let mut var_x = <u32>::sse_decode(deserializer);
+        let mut var_y = <u32>::sse_decode(deserializer);
+        return reddit_api::model::gallery::Image {
+            u: var_u,
+            x: var_x,
+            y: var_y,
         };
     }
 }
@@ -28900,18 +29026,6 @@ impl SseDecode for reddit_api::model::post::MediaEmbed {
             width: var_width,
             scrolling: var_scrolling,
             height: var_height,
-        };
-    }
-}
-
-impl SseDecode for reddit_api::model::gallery::MediaKind {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <i32>::sse_decode(deserializer);
-        return match inner {
-            0 => reddit_api::model::gallery::MediaKind::Image,
-            1 => reddit_api::model::gallery::MediaKind::AnimatedImage,
-            _ => unreachable!("Invalid variant for MediaKind: {}", inner),
         };
     }
 }
@@ -29388,6 +29502,27 @@ impl SseDecode for reddit_api::model::user::model::Snoovatar {
     }
 }
 
+impl SseDecode for reddit_api::model::gallery::Source {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_source = <reddit_api::model::gallery::Image>::sse_decode(deserializer);
+                return reddit_api::model::gallery::Source::Image { source: var_source };
+            }
+            1 => {
+                let mut var_source =
+                    <reddit_api::model::gallery::AnimatedImage>::sse_decode(deserializer);
+                return reddit_api::model::gallery::Source::AnimatedImage { source: var_source };
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
 impl SseDecode for reddit_api::model::multi::SubredditDetails {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -29844,61 +29979,62 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        6 => wire__reddit_api__client__Client_load_more_comments_impl(
+        6 => wire__reddit_api__client__Client_get_post_impl(port, ptr, rust_vec_len, data_len),
+        7 => wire__reddit_api__client__Client_load_more_comments_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        7 => wire__reddit_api__client__Client_logged_user_info_impl(
+        8 => wire__reddit_api__client__Client_logged_user_info_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        9 => wire__reddit_api__client__Client_multis_impl(port, ptr, rust_vec_len, data_len),
-        10 => {
+        10 => wire__reddit_api__client__Client_multis_impl(port, ptr, rust_vec_len, data_len),
+        11 => {
             wire__reddit_api__client__Client_new_anonymous_impl(port, ptr, rust_vec_len, data_len)
         }
-        11 => wire__reddit_api__client__Client_new_logged_out_user_token_impl(
+        12 => wire__reddit_api__client__Client_new_logged_out_user_token_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        12 => wire__reddit_api__client__Client_save_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__reddit_api__client__Client_subsriptions_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire__reddit_api__client__Client_unsave_impl(port, ptr, rust_vec_len, data_len),
-        25 => wire__reddit_api__client__Client_vote_impl(port, ptr, rust_vec_len, data_len),
-        92 => wire__reddit_api__model__comment__Comment_default_impl(
+        13 => wire__reddit_api__client__Client_save_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__reddit_api__client__Client_subsriptions_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__reddit_api__client__Client_unsave_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire__reddit_api__client__Client_vote_impl(port, ptr, rust_vec_len, data_len),
+        93 => wire__reddit_api__model__comment__Comment_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        161 => wire__reddit_api__model__subreddit__Common_default_impl(
+        162 => wire__reddit_api__model__subreddit__Common_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        175 => wire__reddit_api__model__subreddit__Details_default_impl(
+        176 => wire__reddit_api__model__subreddit__Details_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        177 => {
+        178 => {
             wire__reddit_api__model__feed__FeedStream_new_impl(port, ptr, rust_vec_len, data_len)
         }
-        178 => wire__reddit_api__model__Fullname_default_impl(port, ptr, rust_vec_len, data_len),
-        179 => wire__reddit_api__model__gallery__GalleryData_default_impl(
+        179 => wire__reddit_api__model__Fullname_default_impl(port, ptr, rust_vec_len, data_len),
+        180 => wire__reddit_api__model__gallery__GalleryData_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        184 => wire__reddit_api__model__gallery__Gallery_default_impl(
+        183 => wire__reddit_api__model__gallery__Gallery_default_impl(
             port,
             ptr,
             rust_vec_len,
@@ -29959,129 +30095,138 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        546 => wire__reddit_api__model__author__author_info_default_impl(
+        546 => wire__reddit_api__model__gallery__animated_image_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        547 => wire__reddit_api__model__subreddit__comment_contribution_settings_default_impl(
+        547 => wire__reddit_api__model__author__author_info_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        550 => wire__reddit_api__model__feed__feed_default_impl(port, ptr, rust_vec_len, data_len),
-        551 => wire__reddit_api__model__feed__feed_sort_add_to_url_impl(
+        548 => wire__reddit_api__model__subreddit__comment_contribution_settings_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        552 => {
+        551 => wire__reddit_api__model__feed__feed_default_impl(port, ptr, rust_vec_len, data_len),
+        552 => wire__reddit_api__model__feed__feed_sort_add_to_url_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        553 => {
             wire__reddit_api__model__flair__flair_default_impl(port, ptr, rust_vec_len, data_len)
         }
-        553 => {
+        554 => {
             wire__reddit_api__model__post__gildings_default_impl(port, ptr, rust_vec_len, data_len)
         }
-        554 => wire__reddit_api__model__post__image_base_default_impl(
+        555 => wire__reddit_api__model__post__image_base_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        555 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
-        556 => wire__reddit_api__model__post__media_embed_default_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        557 => wire__reddit_api__model__subreddit__notification_level_default_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        558 => {
-            wire__reddit_api__model__post__oembed_default_impl(port, ptr, rust_vec_len, data_len)
+        556 => {
+            wire__reddit_api__model__gallery__image_default_impl(port, ptr, rust_vec_len, data_len)
         }
-        559 => wire__reddit_api__model__user__model__preferences_default_impl(
+        557 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
+        558 => wire__reddit_api__model__post__media_embed_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        559 => wire__reddit_api__model__subreddit__notification_level_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
         560 => {
+            wire__reddit_api__model__post__oembed_default_impl(port, ptr, rust_vec_len, data_len)
+        }
+        561 => wire__reddit_api__model__user__model__preferences_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        562 => {
             wire__reddit_api__model__post__preview_default_impl(port, ptr, rust_vec_len, data_len)
         }
-        562 => wire__reddit_api__model__post__reddit_image_default_impl(
+        564 => wire__reddit_api__model__post__reddit_image_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        563 => wire__reddit_api__model__post__reddit_video_default_impl(
+        565 => wire__reddit_api__model__post__reddit_video_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        564 => wire__reddit_api__model__post__secure_media_embed_default_impl(
+        566 => wire__reddit_api__model__post__secure_media_embed_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        565 => wire__reddit_api__model__user__model__snoovatar_default_impl(
+        567 => wire__reddit_api__model__user__model__snoovatar_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        566 => wire__reddit_api__model__multi__subreddit_details_default_impl(
+        568 => wire__reddit_api__model__multi__subreddit_details_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        568 => wire__reddit_api__model__post__thumbnail_option_default_impl(
+        570 => wire__reddit_api__model__post__thumbnail_option_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        569 => wire__reddit_api__model__post__thumbnail_url_default_impl(
+        571 => wire__reddit_api__model__post__thumbnail_url_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        570 => wire__reddit_api__model__user__model__user_default_impl(
+        572 => wire__reddit_api__model__user__model__user_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        571 => wire__reddit_api__model__user__model__user_info_default_impl(
+        573 => wire__reddit_api__model__user__model__user_info_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        572 => wire__reddit_api__model__user__model__user_subreddit_default_impl(
+        574 => wire__reddit_api__model__user__model__user_subreddit_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        573 => wire__reddit_api__model__post__variant_inner_default_impl(
+        575 => wire__reddit_api__model__post__variant_inner_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        574 => {
+        576 => {
             wire__reddit_api__model__post__variants_default_impl(port, ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -30097,170 +30242,169 @@ fn pde_ffi_dispatcher_sync_impl(
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
                         4 => wire__reddit_api__client__Client_feed_stream_impl(ptr, rust_vec_len, data_len),
-8 => wire__reddit_api__client__Client_multi_posts_impl(ptr, rust_vec_len, data_len),
-13 => wire__reddit_api__client__Client_search_post_impl(ptr, rust_vec_len, data_len),
-14 => wire__reddit_api__client__Client_search_subreddits_impl(ptr, rust_vec_len, data_len),
-17 => wire__reddit_api__client__Client_user_comments_impl(ptr, rust_vec_len, data_len),
-18 => wire__reddit_api__client__Client_user_downvoted_impl(ptr, rust_vec_len, data_len),
-19 => wire__reddit_api__client__Client_user_gilded_impl(ptr, rust_vec_len, data_len),
-20 => wire__reddit_api__client__Client_user_hidden_impl(ptr, rust_vec_len, data_len),
-21 => wire__reddit_api__client__Client_user_overview_impl(ptr, rust_vec_len, data_len),
-22 => wire__reddit_api__client__Client_user_saved_impl(ptr, rust_vec_len, data_len),
-23 => wire__reddit_api__client__Client_user_submitted_impl(ptr, rust_vec_len, data_len),
-24 => wire__reddit_api__client__Client_user_upvoted_impl(ptr, rust_vec_len, data_len),
-26 => wire__reddit_api__model__comment__Comment_auto_accessor_get_archived_impl(ptr, rust_vec_len, data_len),
-27 => wire__reddit_api__model__comment__Comment_auto_accessor_get_author_impl(ptr, rust_vec_len, data_len),
-28 => wire__reddit_api__model__comment__Comment_auto_accessor_get_body_impl(ptr, rust_vec_len, data_len),
-29 => wire__reddit_api__model__comment__Comment_auto_accessor_get_body_html_impl(ptr, rust_vec_len, data_len),
-30 => wire__reddit_api__model__comment__Comment_auto_accessor_get_can_gild_impl(ptr, rust_vec_len, data_len),
-31 => wire__reddit_api__model__comment__Comment_auto_accessor_get_can_mod_post_impl(ptr, rust_vec_len, data_len),
-32 => wire__reddit_api__model__comment__Comment_auto_accessor_get_collapsed_impl(ptr, rust_vec_len, data_len),
-33 => wire__reddit_api__model__comment__Comment_auto_accessor_get_controversiality_impl(ptr, rust_vec_len, data_len),
-34 => wire__reddit_api__model__comment__Comment_auto_accessor_get_created_impl(ptr, rust_vec_len, data_len),
-35 => wire__reddit_api__model__comment__Comment_auto_accessor_get_created_utc_impl(ptr, rust_vec_len, data_len),
-36 => wire__reddit_api__model__comment__Comment_auto_accessor_get_depth_impl(ptr, rust_vec_len, data_len),
-37 => wire__reddit_api__model__comment__Comment_auto_accessor_get_downs_impl(ptr, rust_vec_len, data_len),
-38 => wire__reddit_api__model__comment__Comment_auto_accessor_get_edited_impl(ptr, rust_vec_len, data_len),
-39 => wire__reddit_api__model__comment__Comment_auto_accessor_get_gilded_impl(ptr, rust_vec_len, data_len),
-40 => wire__reddit_api__model__comment__Comment_auto_accessor_get_id_impl(ptr, rust_vec_len, data_len),
-41 => wire__reddit_api__model__comment__Comment_auto_accessor_get_is_submitter_impl(ptr, rust_vec_len, data_len),
-42 => wire__reddit_api__model__comment__Comment_auto_accessor_get_likes_impl(ptr, rust_vec_len, data_len),
-43 => wire__reddit_api__model__comment__Comment_auto_accessor_get_link_id_impl(ptr, rust_vec_len, data_len),
-44 => wire__reddit_api__model__comment__Comment_auto_accessor_get_locked_impl(ptr, rust_vec_len, data_len),
-45 => wire__reddit_api__model__comment__Comment_auto_accessor_get_name_impl(ptr, rust_vec_len, data_len),
-46 => wire__reddit_api__model__comment__Comment_auto_accessor_get_no_follow_impl(ptr, rust_vec_len, data_len),
-47 => wire__reddit_api__model__comment__Comment_auto_accessor_get_parent_id_impl(ptr, rust_vec_len, data_len),
-48 => wire__reddit_api__model__comment__Comment_auto_accessor_get_permalink_impl(ptr, rust_vec_len, data_len),
-49 => wire__reddit_api__model__comment__Comment_auto_accessor_get_saved_impl(ptr, rust_vec_len, data_len),
-50 => wire__reddit_api__model__comment__Comment_auto_accessor_get_score_impl(ptr, rust_vec_len, data_len),
-51 => wire__reddit_api__model__comment__Comment_auto_accessor_get_score_hidden_impl(ptr, rust_vec_len, data_len),
-52 => wire__reddit_api__model__comment__Comment_auto_accessor_get_send_replies_impl(ptr, rust_vec_len, data_len),
-53 => wire__reddit_api__model__comment__Comment_auto_accessor_get_stickied_impl(ptr, rust_vec_len, data_len),
-54 => wire__reddit_api__model__comment__Comment_auto_accessor_get_subreddit_impl(ptr, rust_vec_len, data_len),
-55 => wire__reddit_api__model__comment__Comment_auto_accessor_get_subreddit_id_impl(ptr, rust_vec_len, data_len),
-56 => wire__reddit_api__model__comment__Comment_auto_accessor_get_subreddit_name_prefixed_impl(ptr, rust_vec_len, data_len),
-57 => wire__reddit_api__model__comment__Comment_auto_accessor_get_subreddit_type_impl(ptr, rust_vec_len, data_len),
-58 => wire__reddit_api__model__comment__Comment_auto_accessor_get_ups_impl(ptr, rust_vec_len, data_len),
-59 => wire__reddit_api__model__comment__Comment_auto_accessor_set_archived_impl(ptr, rust_vec_len, data_len),
-60 => wire__reddit_api__model__comment__Comment_auto_accessor_set_author_impl(ptr, rust_vec_len, data_len),
-61 => wire__reddit_api__model__comment__Comment_auto_accessor_set_body_impl(ptr, rust_vec_len, data_len),
-62 => wire__reddit_api__model__comment__Comment_auto_accessor_set_body_html_impl(ptr, rust_vec_len, data_len),
-63 => wire__reddit_api__model__comment__Comment_auto_accessor_set_can_gild_impl(ptr, rust_vec_len, data_len),
-64 => wire__reddit_api__model__comment__Comment_auto_accessor_set_can_mod_post_impl(ptr, rust_vec_len, data_len),
-65 => wire__reddit_api__model__comment__Comment_auto_accessor_set_collapsed_impl(ptr, rust_vec_len, data_len),
-66 => wire__reddit_api__model__comment__Comment_auto_accessor_set_controversiality_impl(ptr, rust_vec_len, data_len),
-67 => wire__reddit_api__model__comment__Comment_auto_accessor_set_created_impl(ptr, rust_vec_len, data_len),
-68 => wire__reddit_api__model__comment__Comment_auto_accessor_set_created_utc_impl(ptr, rust_vec_len, data_len),
-69 => wire__reddit_api__model__comment__Comment_auto_accessor_set_depth_impl(ptr, rust_vec_len, data_len),
-70 => wire__reddit_api__model__comment__Comment_auto_accessor_set_downs_impl(ptr, rust_vec_len, data_len),
-71 => wire__reddit_api__model__comment__Comment_auto_accessor_set_edited_impl(ptr, rust_vec_len, data_len),
-72 => wire__reddit_api__model__comment__Comment_auto_accessor_set_gilded_impl(ptr, rust_vec_len, data_len),
-73 => wire__reddit_api__model__comment__Comment_auto_accessor_set_id_impl(ptr, rust_vec_len, data_len),
-74 => wire__reddit_api__model__comment__Comment_auto_accessor_set_is_submitter_impl(ptr, rust_vec_len, data_len),
-75 => wire__reddit_api__model__comment__Comment_auto_accessor_set_likes_impl(ptr, rust_vec_len, data_len),
-76 => wire__reddit_api__model__comment__Comment_auto_accessor_set_link_id_impl(ptr, rust_vec_len, data_len),
-77 => wire__reddit_api__model__comment__Comment_auto_accessor_set_locked_impl(ptr, rust_vec_len, data_len),
-78 => wire__reddit_api__model__comment__Comment_auto_accessor_set_name_impl(ptr, rust_vec_len, data_len),
-79 => wire__reddit_api__model__comment__Comment_auto_accessor_set_no_follow_impl(ptr, rust_vec_len, data_len),
-80 => wire__reddit_api__model__comment__Comment_auto_accessor_set_parent_id_impl(ptr, rust_vec_len, data_len),
-81 => wire__reddit_api__model__comment__Comment_auto_accessor_set_permalink_impl(ptr, rust_vec_len, data_len),
-82 => wire__reddit_api__model__comment__Comment_auto_accessor_set_saved_impl(ptr, rust_vec_len, data_len),
-83 => wire__reddit_api__model__comment__Comment_auto_accessor_set_score_impl(ptr, rust_vec_len, data_len),
-84 => wire__reddit_api__model__comment__Comment_auto_accessor_set_score_hidden_impl(ptr, rust_vec_len, data_len),
-85 => wire__reddit_api__model__comment__Comment_auto_accessor_set_send_replies_impl(ptr, rust_vec_len, data_len),
-86 => wire__reddit_api__model__comment__Comment_auto_accessor_set_stickied_impl(ptr, rust_vec_len, data_len),
-87 => wire__reddit_api__model__comment__Comment_auto_accessor_set_subreddit_impl(ptr, rust_vec_len, data_len),
-88 => wire__reddit_api__model__comment__Comment_auto_accessor_set_subreddit_id_impl(ptr, rust_vec_len, data_len),
-89 => wire__reddit_api__model__comment__Comment_auto_accessor_set_subreddit_name_prefixed_impl(ptr, rust_vec_len, data_len),
-90 => wire__reddit_api__model__comment__Comment_auto_accessor_set_subreddit_type_impl(ptr, rust_vec_len, data_len),
-91 => wire__reddit_api__model__comment__Comment_auto_accessor_set_ups_impl(ptr, rust_vec_len, data_len),
-93 => wire__reddit_api__model__comment__Comment_replace_more_impl(ptr, rust_vec_len, data_len),
-94 => wire__reddit_api__model__comment__Comment_replies_impl(ptr, rust_vec_len, data_len),
-95 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_accept_followers_impl(ptr, rust_vec_len, data_len),
-96 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_allowed_media_in_comments_impl(ptr, rust_vec_len, data_len),
-97 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_banner_img_impl(ptr, rust_vec_len, data_len),
-98 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_banner_size_impl(ptr, rust_vec_len, data_len),
-99 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_created_impl(ptr, rust_vec_len, data_len),
-100 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_created_utc_impl(ptr, rust_vec_len, data_len),
-101 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_disable_contributor_requests_impl(ptr, rust_vec_len, data_len),
-102 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_display_name_impl(ptr, rust_vec_len, data_len),
-103 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_display_name_prefixed_impl(ptr, rust_vec_len, data_len),
-104 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_free_form_reports_impl(ptr, rust_vec_len, data_len),
-105 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_header_img_impl(ptr, rust_vec_len, data_len),
-106 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_header_size_impl(ptr, rust_vec_len, data_len),
-107 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_key_color_impl(ptr, rust_vec_len, data_len),
-108 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_link_flair_enabled_impl(ptr, rust_vec_len, data_len),
-109 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_link_flair_position_impl(ptr, rust_vec_len, data_len),
-110 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_name_impl(ptr, rust_vec_len, data_len),
-111 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_primary_color_impl(ptr, rust_vec_len, data_len),
-112 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_public_description_impl(ptr, rust_vec_len, data_len),
-113 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_quarantine_impl(ptr, rust_vec_len, data_len),
-114 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_restrict_commenting_impl(ptr, rust_vec_len, data_len),
-115 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_restrict_posting_impl(ptr, rust_vec_len, data_len),
-116 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_show_media_impl(ptr, rust_vec_len, data_len),
-117 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_submit_link_label_impl(ptr, rust_vec_len, data_len),
-118 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_submit_text_label_impl(ptr, rust_vec_len, data_len),
-119 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_subreddit_type_impl(ptr, rust_vec_len, data_len),
-120 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_subscribers_impl(ptr, rust_vec_len, data_len),
-121 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_title_impl(ptr, rust_vec_len, data_len),
-122 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_url_impl(ptr, rust_vec_len, data_len),
-123 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_user_is_banned_impl(ptr, rust_vec_len, data_len),
-124 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_user_is_contributor_impl(ptr, rust_vec_len, data_len),
-125 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_user_is_moderator_impl(ptr, rust_vec_len, data_len),
-126 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_user_is_muted_impl(ptr, rust_vec_len, data_len),
-127 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_user_is_subscriber_impl(ptr, rust_vec_len, data_len),
-128 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_accept_followers_impl(ptr, rust_vec_len, data_len),
-129 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_allowed_media_in_comments_impl(ptr, rust_vec_len, data_len),
-130 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_banner_img_impl(ptr, rust_vec_len, data_len),
-131 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_banner_size_impl(ptr, rust_vec_len, data_len),
-132 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_created_impl(ptr, rust_vec_len, data_len),
-133 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_created_utc_impl(ptr, rust_vec_len, data_len),
-134 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_disable_contributor_requests_impl(ptr, rust_vec_len, data_len),
-135 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_display_name_impl(ptr, rust_vec_len, data_len),
-136 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_display_name_prefixed_impl(ptr, rust_vec_len, data_len),
-137 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_free_form_reports_impl(ptr, rust_vec_len, data_len),
-138 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_header_img_impl(ptr, rust_vec_len, data_len),
-139 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_header_size_impl(ptr, rust_vec_len, data_len),
-140 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_key_color_impl(ptr, rust_vec_len, data_len),
-141 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_link_flair_enabled_impl(ptr, rust_vec_len, data_len),
-142 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_link_flair_position_impl(ptr, rust_vec_len, data_len),
-143 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_name_impl(ptr, rust_vec_len, data_len),
-144 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_primary_color_impl(ptr, rust_vec_len, data_len),
-145 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_public_description_impl(ptr, rust_vec_len, data_len),
-146 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_quarantine_impl(ptr, rust_vec_len, data_len),
-147 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_restrict_commenting_impl(ptr, rust_vec_len, data_len),
-148 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_restrict_posting_impl(ptr, rust_vec_len, data_len),
-149 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_show_media_impl(ptr, rust_vec_len, data_len),
-150 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_submit_link_label_impl(ptr, rust_vec_len, data_len),
-151 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_submit_text_label_impl(ptr, rust_vec_len, data_len),
-152 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_subreddit_type_impl(ptr, rust_vec_len, data_len),
-153 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_subscribers_impl(ptr, rust_vec_len, data_len),
-154 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_title_impl(ptr, rust_vec_len, data_len),
-155 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_url_impl(ptr, rust_vec_len, data_len),
-156 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_user_is_banned_impl(ptr, rust_vec_len, data_len),
-157 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_user_is_contributor_impl(ptr, rust_vec_len, data_len),
-158 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_user_is_moderator_impl(ptr, rust_vec_len, data_len),
-159 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_user_is_muted_impl(ptr, rust_vec_len, data_len),
-160 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_user_is_subscriber_impl(ptr, rust_vec_len, data_len),
-162 => wire__reddit_api__model__subreddit__Common_icon_impl(ptr, rust_vec_len, data_len),
-163 => wire__reddit_api__model__subreddit__Details_auto_accessor_get_default_set_impl(ptr, rust_vec_len, data_len),
-164 => wire__reddit_api__model__subreddit__Details_auto_accessor_get_description_impl(ptr, rust_vec_len, data_len),
-165 => wire__reddit_api__model__subreddit__Details_auto_accessor_get_icon_color_impl(ptr, rust_vec_len, data_len),
-166 => wire__reddit_api__model__subreddit__Details_auto_accessor_get_other_impl(ptr, rust_vec_len, data_len),
-167 => wire__reddit_api__model__subreddit__Details_auto_accessor_get_over_18_impl(ptr, rust_vec_len, data_len),
-168 => wire__reddit_api__model__subreddit__Details_auto_accessor_get_previous_names_impl(ptr, rust_vec_len, data_len),
-169 => wire__reddit_api__model__subreddit__Details_auto_accessor_set_default_set_impl(ptr, rust_vec_len, data_len),
-170 => wire__reddit_api__model__subreddit__Details_auto_accessor_set_description_impl(ptr, rust_vec_len, data_len),
-171 => wire__reddit_api__model__subreddit__Details_auto_accessor_set_icon_color_impl(ptr, rust_vec_len, data_len),
-172 => wire__reddit_api__model__subreddit__Details_auto_accessor_set_other_impl(ptr, rust_vec_len, data_len),
-173 => wire__reddit_api__model__subreddit__Details_auto_accessor_set_over_18_impl(ptr, rust_vec_len, data_len),
-174 => wire__reddit_api__model__subreddit__Details_auto_accessor_set_previous_names_impl(ptr, rust_vec_len, data_len),
-176 => wire__reddit_api__model__subreddit__Details_icon_impl(ptr, rust_vec_len, data_len),
-180 => wire__reddit_api__model__gallery__GalleryMedia_auto_accessor_get_kind_impl(ptr, rust_vec_len, data_len),
+9 => wire__reddit_api__client__Client_multi_posts_impl(ptr, rust_vec_len, data_len),
+14 => wire__reddit_api__client__Client_search_post_impl(ptr, rust_vec_len, data_len),
+15 => wire__reddit_api__client__Client_search_subreddits_impl(ptr, rust_vec_len, data_len),
+18 => wire__reddit_api__client__Client_user_comments_impl(ptr, rust_vec_len, data_len),
+19 => wire__reddit_api__client__Client_user_downvoted_impl(ptr, rust_vec_len, data_len),
+20 => wire__reddit_api__client__Client_user_gilded_impl(ptr, rust_vec_len, data_len),
+21 => wire__reddit_api__client__Client_user_hidden_impl(ptr, rust_vec_len, data_len),
+22 => wire__reddit_api__client__Client_user_overview_impl(ptr, rust_vec_len, data_len),
+23 => wire__reddit_api__client__Client_user_saved_impl(ptr, rust_vec_len, data_len),
+24 => wire__reddit_api__client__Client_user_submitted_impl(ptr, rust_vec_len, data_len),
+25 => wire__reddit_api__client__Client_user_upvoted_impl(ptr, rust_vec_len, data_len),
+27 => wire__reddit_api__model__comment__Comment_auto_accessor_get_archived_impl(ptr, rust_vec_len, data_len),
+28 => wire__reddit_api__model__comment__Comment_auto_accessor_get_author_impl(ptr, rust_vec_len, data_len),
+29 => wire__reddit_api__model__comment__Comment_auto_accessor_get_body_impl(ptr, rust_vec_len, data_len),
+30 => wire__reddit_api__model__comment__Comment_auto_accessor_get_body_html_impl(ptr, rust_vec_len, data_len),
+31 => wire__reddit_api__model__comment__Comment_auto_accessor_get_can_gild_impl(ptr, rust_vec_len, data_len),
+32 => wire__reddit_api__model__comment__Comment_auto_accessor_get_can_mod_post_impl(ptr, rust_vec_len, data_len),
+33 => wire__reddit_api__model__comment__Comment_auto_accessor_get_collapsed_impl(ptr, rust_vec_len, data_len),
+34 => wire__reddit_api__model__comment__Comment_auto_accessor_get_controversiality_impl(ptr, rust_vec_len, data_len),
+35 => wire__reddit_api__model__comment__Comment_auto_accessor_get_created_impl(ptr, rust_vec_len, data_len),
+36 => wire__reddit_api__model__comment__Comment_auto_accessor_get_created_utc_impl(ptr, rust_vec_len, data_len),
+37 => wire__reddit_api__model__comment__Comment_auto_accessor_get_depth_impl(ptr, rust_vec_len, data_len),
+38 => wire__reddit_api__model__comment__Comment_auto_accessor_get_downs_impl(ptr, rust_vec_len, data_len),
+39 => wire__reddit_api__model__comment__Comment_auto_accessor_get_edited_impl(ptr, rust_vec_len, data_len),
+40 => wire__reddit_api__model__comment__Comment_auto_accessor_get_gilded_impl(ptr, rust_vec_len, data_len),
+41 => wire__reddit_api__model__comment__Comment_auto_accessor_get_id_impl(ptr, rust_vec_len, data_len),
+42 => wire__reddit_api__model__comment__Comment_auto_accessor_get_is_submitter_impl(ptr, rust_vec_len, data_len),
+43 => wire__reddit_api__model__comment__Comment_auto_accessor_get_likes_impl(ptr, rust_vec_len, data_len),
+44 => wire__reddit_api__model__comment__Comment_auto_accessor_get_link_id_impl(ptr, rust_vec_len, data_len),
+45 => wire__reddit_api__model__comment__Comment_auto_accessor_get_locked_impl(ptr, rust_vec_len, data_len),
+46 => wire__reddit_api__model__comment__Comment_auto_accessor_get_name_impl(ptr, rust_vec_len, data_len),
+47 => wire__reddit_api__model__comment__Comment_auto_accessor_get_no_follow_impl(ptr, rust_vec_len, data_len),
+48 => wire__reddit_api__model__comment__Comment_auto_accessor_get_parent_id_impl(ptr, rust_vec_len, data_len),
+49 => wire__reddit_api__model__comment__Comment_auto_accessor_get_permalink_impl(ptr, rust_vec_len, data_len),
+50 => wire__reddit_api__model__comment__Comment_auto_accessor_get_saved_impl(ptr, rust_vec_len, data_len),
+51 => wire__reddit_api__model__comment__Comment_auto_accessor_get_score_impl(ptr, rust_vec_len, data_len),
+52 => wire__reddit_api__model__comment__Comment_auto_accessor_get_score_hidden_impl(ptr, rust_vec_len, data_len),
+53 => wire__reddit_api__model__comment__Comment_auto_accessor_get_send_replies_impl(ptr, rust_vec_len, data_len),
+54 => wire__reddit_api__model__comment__Comment_auto_accessor_get_stickied_impl(ptr, rust_vec_len, data_len),
+55 => wire__reddit_api__model__comment__Comment_auto_accessor_get_subreddit_impl(ptr, rust_vec_len, data_len),
+56 => wire__reddit_api__model__comment__Comment_auto_accessor_get_subreddit_id_impl(ptr, rust_vec_len, data_len),
+57 => wire__reddit_api__model__comment__Comment_auto_accessor_get_subreddit_name_prefixed_impl(ptr, rust_vec_len, data_len),
+58 => wire__reddit_api__model__comment__Comment_auto_accessor_get_subreddit_type_impl(ptr, rust_vec_len, data_len),
+59 => wire__reddit_api__model__comment__Comment_auto_accessor_get_ups_impl(ptr, rust_vec_len, data_len),
+60 => wire__reddit_api__model__comment__Comment_auto_accessor_set_archived_impl(ptr, rust_vec_len, data_len),
+61 => wire__reddit_api__model__comment__Comment_auto_accessor_set_author_impl(ptr, rust_vec_len, data_len),
+62 => wire__reddit_api__model__comment__Comment_auto_accessor_set_body_impl(ptr, rust_vec_len, data_len),
+63 => wire__reddit_api__model__comment__Comment_auto_accessor_set_body_html_impl(ptr, rust_vec_len, data_len),
+64 => wire__reddit_api__model__comment__Comment_auto_accessor_set_can_gild_impl(ptr, rust_vec_len, data_len),
+65 => wire__reddit_api__model__comment__Comment_auto_accessor_set_can_mod_post_impl(ptr, rust_vec_len, data_len),
+66 => wire__reddit_api__model__comment__Comment_auto_accessor_set_collapsed_impl(ptr, rust_vec_len, data_len),
+67 => wire__reddit_api__model__comment__Comment_auto_accessor_set_controversiality_impl(ptr, rust_vec_len, data_len),
+68 => wire__reddit_api__model__comment__Comment_auto_accessor_set_created_impl(ptr, rust_vec_len, data_len),
+69 => wire__reddit_api__model__comment__Comment_auto_accessor_set_created_utc_impl(ptr, rust_vec_len, data_len),
+70 => wire__reddit_api__model__comment__Comment_auto_accessor_set_depth_impl(ptr, rust_vec_len, data_len),
+71 => wire__reddit_api__model__comment__Comment_auto_accessor_set_downs_impl(ptr, rust_vec_len, data_len),
+72 => wire__reddit_api__model__comment__Comment_auto_accessor_set_edited_impl(ptr, rust_vec_len, data_len),
+73 => wire__reddit_api__model__comment__Comment_auto_accessor_set_gilded_impl(ptr, rust_vec_len, data_len),
+74 => wire__reddit_api__model__comment__Comment_auto_accessor_set_id_impl(ptr, rust_vec_len, data_len),
+75 => wire__reddit_api__model__comment__Comment_auto_accessor_set_is_submitter_impl(ptr, rust_vec_len, data_len),
+76 => wire__reddit_api__model__comment__Comment_auto_accessor_set_likes_impl(ptr, rust_vec_len, data_len),
+77 => wire__reddit_api__model__comment__Comment_auto_accessor_set_link_id_impl(ptr, rust_vec_len, data_len),
+78 => wire__reddit_api__model__comment__Comment_auto_accessor_set_locked_impl(ptr, rust_vec_len, data_len),
+79 => wire__reddit_api__model__comment__Comment_auto_accessor_set_name_impl(ptr, rust_vec_len, data_len),
+80 => wire__reddit_api__model__comment__Comment_auto_accessor_set_no_follow_impl(ptr, rust_vec_len, data_len),
+81 => wire__reddit_api__model__comment__Comment_auto_accessor_set_parent_id_impl(ptr, rust_vec_len, data_len),
+82 => wire__reddit_api__model__comment__Comment_auto_accessor_set_permalink_impl(ptr, rust_vec_len, data_len),
+83 => wire__reddit_api__model__comment__Comment_auto_accessor_set_saved_impl(ptr, rust_vec_len, data_len),
+84 => wire__reddit_api__model__comment__Comment_auto_accessor_set_score_impl(ptr, rust_vec_len, data_len),
+85 => wire__reddit_api__model__comment__Comment_auto_accessor_set_score_hidden_impl(ptr, rust_vec_len, data_len),
+86 => wire__reddit_api__model__comment__Comment_auto_accessor_set_send_replies_impl(ptr, rust_vec_len, data_len),
+87 => wire__reddit_api__model__comment__Comment_auto_accessor_set_stickied_impl(ptr, rust_vec_len, data_len),
+88 => wire__reddit_api__model__comment__Comment_auto_accessor_set_subreddit_impl(ptr, rust_vec_len, data_len),
+89 => wire__reddit_api__model__comment__Comment_auto_accessor_set_subreddit_id_impl(ptr, rust_vec_len, data_len),
+90 => wire__reddit_api__model__comment__Comment_auto_accessor_set_subreddit_name_prefixed_impl(ptr, rust_vec_len, data_len),
+91 => wire__reddit_api__model__comment__Comment_auto_accessor_set_subreddit_type_impl(ptr, rust_vec_len, data_len),
+92 => wire__reddit_api__model__comment__Comment_auto_accessor_set_ups_impl(ptr, rust_vec_len, data_len),
+94 => wire__reddit_api__model__comment__Comment_replace_more_impl(ptr, rust_vec_len, data_len),
+95 => wire__reddit_api__model__comment__Comment_replies_impl(ptr, rust_vec_len, data_len),
+96 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_accept_followers_impl(ptr, rust_vec_len, data_len),
+97 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_allowed_media_in_comments_impl(ptr, rust_vec_len, data_len),
+98 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_banner_img_impl(ptr, rust_vec_len, data_len),
+99 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_banner_size_impl(ptr, rust_vec_len, data_len),
+100 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_created_impl(ptr, rust_vec_len, data_len),
+101 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_created_utc_impl(ptr, rust_vec_len, data_len),
+102 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_disable_contributor_requests_impl(ptr, rust_vec_len, data_len),
+103 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_display_name_impl(ptr, rust_vec_len, data_len),
+104 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_display_name_prefixed_impl(ptr, rust_vec_len, data_len),
+105 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_free_form_reports_impl(ptr, rust_vec_len, data_len),
+106 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_header_img_impl(ptr, rust_vec_len, data_len),
+107 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_header_size_impl(ptr, rust_vec_len, data_len),
+108 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_key_color_impl(ptr, rust_vec_len, data_len),
+109 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_link_flair_enabled_impl(ptr, rust_vec_len, data_len),
+110 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_link_flair_position_impl(ptr, rust_vec_len, data_len),
+111 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_name_impl(ptr, rust_vec_len, data_len),
+112 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_primary_color_impl(ptr, rust_vec_len, data_len),
+113 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_public_description_impl(ptr, rust_vec_len, data_len),
+114 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_quarantine_impl(ptr, rust_vec_len, data_len),
+115 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_restrict_commenting_impl(ptr, rust_vec_len, data_len),
+116 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_restrict_posting_impl(ptr, rust_vec_len, data_len),
+117 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_show_media_impl(ptr, rust_vec_len, data_len),
+118 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_submit_link_label_impl(ptr, rust_vec_len, data_len),
+119 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_submit_text_label_impl(ptr, rust_vec_len, data_len),
+120 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_subreddit_type_impl(ptr, rust_vec_len, data_len),
+121 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_subscribers_impl(ptr, rust_vec_len, data_len),
+122 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_title_impl(ptr, rust_vec_len, data_len),
+123 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_url_impl(ptr, rust_vec_len, data_len),
+124 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_user_is_banned_impl(ptr, rust_vec_len, data_len),
+125 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_user_is_contributor_impl(ptr, rust_vec_len, data_len),
+126 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_user_is_moderator_impl(ptr, rust_vec_len, data_len),
+127 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_user_is_muted_impl(ptr, rust_vec_len, data_len),
+128 => wire__reddit_api__model__subreddit__Common_auto_accessor_get_user_is_subscriber_impl(ptr, rust_vec_len, data_len),
+129 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_accept_followers_impl(ptr, rust_vec_len, data_len),
+130 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_allowed_media_in_comments_impl(ptr, rust_vec_len, data_len),
+131 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_banner_img_impl(ptr, rust_vec_len, data_len),
+132 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_banner_size_impl(ptr, rust_vec_len, data_len),
+133 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_created_impl(ptr, rust_vec_len, data_len),
+134 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_created_utc_impl(ptr, rust_vec_len, data_len),
+135 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_disable_contributor_requests_impl(ptr, rust_vec_len, data_len),
+136 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_display_name_impl(ptr, rust_vec_len, data_len),
+137 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_display_name_prefixed_impl(ptr, rust_vec_len, data_len),
+138 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_free_form_reports_impl(ptr, rust_vec_len, data_len),
+139 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_header_img_impl(ptr, rust_vec_len, data_len),
+140 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_header_size_impl(ptr, rust_vec_len, data_len),
+141 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_key_color_impl(ptr, rust_vec_len, data_len),
+142 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_link_flair_enabled_impl(ptr, rust_vec_len, data_len),
+143 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_link_flair_position_impl(ptr, rust_vec_len, data_len),
+144 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_name_impl(ptr, rust_vec_len, data_len),
+145 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_primary_color_impl(ptr, rust_vec_len, data_len),
+146 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_public_description_impl(ptr, rust_vec_len, data_len),
+147 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_quarantine_impl(ptr, rust_vec_len, data_len),
+148 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_restrict_commenting_impl(ptr, rust_vec_len, data_len),
+149 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_restrict_posting_impl(ptr, rust_vec_len, data_len),
+150 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_show_media_impl(ptr, rust_vec_len, data_len),
+151 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_submit_link_label_impl(ptr, rust_vec_len, data_len),
+152 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_submit_text_label_impl(ptr, rust_vec_len, data_len),
+153 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_subreddit_type_impl(ptr, rust_vec_len, data_len),
+154 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_subscribers_impl(ptr, rust_vec_len, data_len),
+155 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_title_impl(ptr, rust_vec_len, data_len),
+156 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_url_impl(ptr, rust_vec_len, data_len),
+157 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_user_is_banned_impl(ptr, rust_vec_len, data_len),
+158 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_user_is_contributor_impl(ptr, rust_vec_len, data_len),
+159 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_user_is_moderator_impl(ptr, rust_vec_len, data_len),
+160 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_user_is_muted_impl(ptr, rust_vec_len, data_len),
+161 => wire__reddit_api__model__subreddit__Common_auto_accessor_set_user_is_subscriber_impl(ptr, rust_vec_len, data_len),
+163 => wire__reddit_api__model__subreddit__Common_icon_impl(ptr, rust_vec_len, data_len),
+164 => wire__reddit_api__model__subreddit__Details_auto_accessor_get_default_set_impl(ptr, rust_vec_len, data_len),
+165 => wire__reddit_api__model__subreddit__Details_auto_accessor_get_description_impl(ptr, rust_vec_len, data_len),
+166 => wire__reddit_api__model__subreddit__Details_auto_accessor_get_icon_color_impl(ptr, rust_vec_len, data_len),
+167 => wire__reddit_api__model__subreddit__Details_auto_accessor_get_other_impl(ptr, rust_vec_len, data_len),
+168 => wire__reddit_api__model__subreddit__Details_auto_accessor_get_over_18_impl(ptr, rust_vec_len, data_len),
+169 => wire__reddit_api__model__subreddit__Details_auto_accessor_get_previous_names_impl(ptr, rust_vec_len, data_len),
+170 => wire__reddit_api__model__subreddit__Details_auto_accessor_set_default_set_impl(ptr, rust_vec_len, data_len),
+171 => wire__reddit_api__model__subreddit__Details_auto_accessor_set_description_impl(ptr, rust_vec_len, data_len),
+172 => wire__reddit_api__model__subreddit__Details_auto_accessor_set_icon_color_impl(ptr, rust_vec_len, data_len),
+173 => wire__reddit_api__model__subreddit__Details_auto_accessor_set_other_impl(ptr, rust_vec_len, data_len),
+174 => wire__reddit_api__model__subreddit__Details_auto_accessor_set_over_18_impl(ptr, rust_vec_len, data_len),
+175 => wire__reddit_api__model__subreddit__Details_auto_accessor_set_previous_names_impl(ptr, rust_vec_len, data_len),
+177 => wire__reddit_api__model__subreddit__Details_icon_impl(ptr, rust_vec_len, data_len),
 181 => wire__reddit_api__model__gallery__GalleryMedia_auto_accessor_get_media_type_impl(ptr, rust_vec_len, data_len),
-182 => wire__reddit_api__model__gallery__GalleryMedia_auto_accessor_set_kind_impl(ptr, rust_vec_len, data_len),
-183 => wire__reddit_api__model__gallery__GalleryMedia_auto_accessor_set_media_type_impl(ptr, rust_vec_len, data_len),
-185 => wire__reddit_api__model__gallery__Gallery_get_impl(ptr, rust_vec_len, data_len),
+182 => wire__reddit_api__model__gallery__GalleryMedia_auto_accessor_set_media_type_impl(ptr, rust_vec_len, data_len),
+184 => wire__reddit_api__model__gallery__Gallery_get_impl(ptr, rust_vec_len, data_len),
+185 => wire__reddit_api__model__gallery__Gallery_get_aspect_ratio_impl(ptr, rust_vec_len, data_len),
 186 => wire__reddit_api__model__gallery__Gallery_get_length_impl(ptr, rust_vec_len, data_len),
 187 => wire__reddit_api__model__Listing_auto_accessor_get_after_impl(ptr, rust_vec_len, data_len),
 188 => wire__reddit_api__model__Listing_auto_accessor_get_before_impl(ptr, rust_vec_len, data_len),
@@ -30602,10 +30746,10 @@ fn pde_ffi_dispatcher_sync_impl(
 542 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_wiki_enabled_impl(ptr, rust_vec_len, data_len),
 543 => wire__reddit_api__model__subreddit__Subreddit_auto_accessor_set_wls_impl(ptr, rust_vec_len, data_len),
 545 => wire__reddit_api__model__subreddit__Subreddit_icon_impl(ptr, rust_vec_len, data_len),
-548 => wire__crate__api__simple__debug_comment_impl(ptr, rust_vec_len, data_len),
-549 => wire__crate__api__simple__debug_post_impl(ptr, rust_vec_len, data_len),
-561 => wire__crate__api__simple__reddit_api_client_impl(ptr, rust_vec_len, data_len),
-567 => wire__reddit_api__model__thing_name_impl(ptr, rust_vec_len, data_len),
+549 => wire__crate__api__simple__debug_comment_impl(ptr, rust_vec_len, data_len),
+550 => wire__crate__api__simple__debug_post_impl(ptr, rust_vec_len, data_len),
+563 => wire__crate__api__simple__reddit_api_client_impl(ptr, rust_vec_len, data_len),
+569 => wire__reddit_api__model__thing_name_impl(ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }
@@ -30973,6 +31117,29 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<Url>> for Url {
 }
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::gallery::AnimatedImage> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.0.x.into_into_dart().into_dart(),
+            self.0.y.into_into_dart().into_dart(),
+            self.0.gif.into_into_dart().into_dart(),
+            self.0.mp4.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for FrbWrapper<reddit_api::model::gallery::AnimatedImage>
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::gallery::AnimatedImage>>
+    for reddit_api::model::gallery::AnimatedImage
+{
+    fn into_into_dart(self) -> FrbWrapper<reddit_api::model::gallery::AnimatedImage> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::author::AuthorInfo> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -31174,6 +31341,28 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::subreddit::
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::gallery::Image> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.0.u.into_into_dart().into_dart(),
+            self.0.x.into_into_dart().into_dart(),
+            self.0.y.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for FrbWrapper<reddit_api::model::gallery::Image>
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::gallery::Image>>
+    for reddit_api::model::gallery::Image
+{
+    fn into_into_dart(self) -> FrbWrapper<reddit_api::model::gallery::Image> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::post::ImageBase> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -31273,27 +31462,6 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::post::Media
     for reddit_api::model::post::MediaEmbed
 {
     fn into_into_dart(self) -> FrbWrapper<reddit_api::model::post::MediaEmbed> {
-        self.into()
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::gallery::MediaKind> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        match self.0 {
-            reddit_api::model::gallery::MediaKind::Image => 0.into_dart(),
-            reddit_api::model::gallery::MediaKind::AnimatedImage => 1.into_dart(),
-            _ => unreachable!(),
-        }
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for FrbWrapper<reddit_api::model::gallery::MediaKind>
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::gallery::MediaKind>>
-    for reddit_api::model::gallery::MediaKind
-{
-    fn into_into_dart(self) -> FrbWrapper<reddit_api::model::gallery::MediaKind> {
         self.into()
     }
 }
@@ -31573,6 +31741,33 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::user::model
     for reddit_api::model::user::model::Snoovatar
 {
     fn into_into_dart(self) -> FrbWrapper<reddit_api::model::user::model::Snoovatar> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<reddit_api::model::gallery::Source> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            reddit_api::model::gallery::Source::Image { source } => {
+                [0.into_dart(), source.into_into_dart().into_dart()].into_dart()
+            }
+            reddit_api::model::gallery::Source::AnimatedImage { source } => {
+                [1.into_dart(), source.into_into_dart().into_dart()].into_dart()
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for FrbWrapper<reddit_api::model::gallery::Source>
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<reddit_api::model::gallery::Source>>
+    for reddit_api::model::gallery::Source
+{
+    fn into_into_dart(self) -> FrbWrapper<reddit_api::model::gallery::Source> {
         self.into()
     }
 }
@@ -32481,6 +32676,16 @@ impl SseEncode for String {
     }
 }
 
+impl SseEncode for reddit_api::model::gallery::AnimatedImage {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u32>::sse_encode(self.x, serializer);
+        <u32>::sse_encode(self.y, serializer);
+        <String>::sse_encode(self.gif, serializer);
+        <String>::sse_encode(self.mp4, serializer);
+    }
+}
+
 impl SseEncode for reddit_api::model::author::AuthorInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -32638,6 +32843,15 @@ impl SseEncode for reddit_api::model::subreddit::Icon {
         <String>::sse_encode(self.url, serializer);
         <usize>::sse_encode(self.width, serializer);
         <usize>::sse_encode(self.height, serializer);
+    }
+}
+
+impl SseEncode for reddit_api::model::gallery::Image {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.u, serializer);
+        <u32>::sse_encode(self.x, serializer);
+        <u32>::sse_encode(self.y, serializer);
     }
 }
 
@@ -32820,22 +33034,6 @@ impl SseEncode for reddit_api::model::post::MediaEmbed {
         <u32>::sse_encode(self.width, serializer);
         <bool>::sse_encode(self.scrolling, serializer);
         <u32>::sse_encode(self.height, serializer);
-    }
-}
-
-impl SseEncode for reddit_api::model::gallery::MediaKind {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(
-            match self {
-                reddit_api::model::gallery::MediaKind::Image => 0,
-                reddit_api::model::gallery::MediaKind::AnimatedImage => 1,
-                _ => {
-                    unimplemented!("");
-                }
-            },
-            serializer,
-        );
     }
 }
 
@@ -33212,6 +33410,25 @@ impl SseEncode for reddit_api::model::user::model::Snoovatar {
         <bool>::sse_encode(self.pref_show_snoovatar, serializer);
         <Option<String>>::sse_encode(self.snoovatar_size, serializer);
         <String>::sse_encode(self.snoovatar_img, serializer);
+    }
+}
+
+impl SseEncode for reddit_api::model::gallery::Source {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            reddit_api::model::gallery::Source::Image { source } => {
+                <i32>::sse_encode(0, serializer);
+                <reddit_api::model::gallery::Image>::sse_encode(source, serializer);
+            }
+            reddit_api::model::gallery::Source::AnimatedImage { source } => {
+                <i32>::sse_encode(1, serializer);
+                <reddit_api::model::gallery::AnimatedImage>::sse_encode(source, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 

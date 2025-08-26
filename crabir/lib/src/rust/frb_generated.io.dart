@@ -492,6 +492,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String dco_decode_String(dynamic raw);
 
   @protected
+  AnimatedImage dco_decode_animated_image(dynamic raw);
+
+  @protected
   AuthorInfo dco_decode_author_info(dynamic raw);
 
   @protected
@@ -511,6 +514,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Gallery
       dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
           dynamic raw);
+
+  @protected
+  AnimatedImage dco_decode_box_autoadd_animated_image(dynamic raw);
 
   @protected
   AuthorInfo dco_decode_box_autoadd_author_info(dynamic raw);
@@ -544,6 +550,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Icon dco_decode_box_autoadd_icon(dynamic raw);
+
+  @protected
+  Image dco_decode_box_autoadd_image(dynamic raw);
 
   @protected
   Media dco_decode_box_autoadd_media(dynamic raw);
@@ -619,6 +628,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Icon dco_decode_icon(dynamic raw);
 
   @protected
+  Image dco_decode_image(dynamic raw);
+
+  @protected
   ImageBase dco_decode_image_base(dynamic raw);
 
   @protected
@@ -671,9 +683,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   MediaEmbed dco_decode_media_embed(dynamic raw);
-
-  @protected
-  MediaKind dco_decode_media_kind(dynamic raw);
 
   @protected
   NotificationLevel dco_decode_notification_level(dynamic raw);
@@ -783,6 +792,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Snoovatar dco_decode_snoovatar(dynamic raw);
+
+  @protected
+  Source dco_decode_source(dynamic raw);
 
   @protected
   SubredditDetails dco_decode_subreddit_details(dynamic raw);
@@ -1221,6 +1233,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
+  AnimatedImage sse_decode_animated_image(SseDeserializer deserializer);
+
+  @protected
   AuthorInfo sse_decode_author_info(SseDeserializer deserializer);
 
   @protected
@@ -1240,6 +1255,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Gallery
       sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
           SseDeserializer deserializer);
+
+  @protected
+  AnimatedImage sse_decode_box_autoadd_animated_image(
+      SseDeserializer deserializer);
 
   @protected
   AuthorInfo sse_decode_box_autoadd_author_info(SseDeserializer deserializer);
@@ -1273,6 +1292,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Icon sse_decode_box_autoadd_icon(SseDeserializer deserializer);
+
+  @protected
+  Image sse_decode_box_autoadd_image(SseDeserializer deserializer);
 
   @protected
   Media sse_decode_box_autoadd_media(SseDeserializer deserializer);
@@ -1352,6 +1374,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Icon sse_decode_icon(SseDeserializer deserializer);
 
   @protected
+  Image sse_decode_image(SseDeserializer deserializer);
+
+  @protected
   ImageBase sse_decode_image_base(SseDeserializer deserializer);
 
   @protected
@@ -1405,9 +1430,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   MediaEmbed sse_decode_media_embed(SseDeserializer deserializer);
-
-  @protected
-  MediaKind sse_decode_media_kind(SseDeserializer deserializer);
 
   @protected
   NotificationLevel sse_decode_notification_level(SseDeserializer deserializer);
@@ -1522,6 +1544,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Snoovatar sse_decode_snoovatar(SseDeserializer deserializer);
+
+  @protected
+  Source sse_decode_source(SseDeserializer deserializer);
 
   @protected
   SubredditDetails sse_decode_subreddit_details(SseDeserializer deserializer);
@@ -1965,6 +1990,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
+  void sse_encode_animated_image(AnimatedImage self, SseSerializer serializer);
+
+  @protected
   void sse_encode_author_info(AuthorInfo self, SseSerializer serializer);
 
   @protected
@@ -1984,6 +2012,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
       sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerGallery(
           Gallery self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_animated_image(
+      AnimatedImage self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_author_info(
@@ -2021,6 +2053,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_box_autoadd_icon(Icon self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_image(Image self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_media(Media self, SseSerializer serializer);
@@ -2103,6 +2138,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_icon(Icon self, SseSerializer serializer);
 
   @protected
+  void sse_encode_image(Image self, SseSerializer serializer);
+
+  @protected
   void sse_encode_image_base(ImageBase self, SseSerializer serializer);
 
   @protected
@@ -2160,9 +2198,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_media_embed(MediaEmbed self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_media_kind(MediaKind self, SseSerializer serializer);
 
   @protected
   void sse_encode_notification_level(
@@ -2282,6 +2317,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_snoovatar(Snoovatar self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_source(Source self, SseSerializer serializer);
 
   @protected
   void sse_encode_subreddit_details(

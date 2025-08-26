@@ -49,6 +49,10 @@ class ImageThumbnail extends StatelessWidget {
     );
   }
 
+  static ImageThumbnail fromGalleryImage(gallery.Image image) {
+    return ImageThumbnail(imageUrl: image.u, width: image.x, height: image.y);
+  }
+
   Widget _thumbnail(BuildContext context, String url) {
     if (placeholderUrl != null) {
       return Image.network(

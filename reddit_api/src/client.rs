@@ -1,3 +1,4 @@
+use crate::model::comment::Comment;
 use crate::model::feed::{self, Feed};
 use crate::model::flair::Flair;
 use crate::model::multi::{Multi, MultiStream};
@@ -663,6 +664,12 @@ impl Client {
                 backtrace: Backtrace::capture(),
             })
         }
+    }
+    /// Returns the content of the post at the given permalink.
+    /// # Errors
+    /// Fails if the request fails or the parsing of the response fails.
+    pub async fn get_post(&self, permalink: String) -> Result<Post> {
+        self.comments(permalink, None).await.map(|r| r.0)
     }
 
     // FIXME: crash when there are too many children because the url is too long.

@@ -5,11 +5,11 @@
 
 import '../../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'post.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
+part 'gallery.freezed.dart';
 
-// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `Image`, `MediaId`, `MediaMetadata`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`
-// These functions are ignored (category: IgnoreBecauseOwnerTyShouldIgnore): `default`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `MediaId`, `MediaMetadata`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Gallery>>
 abstract class Gallery implements RustOpaqueInterface {
@@ -17,7 +17,10 @@ abstract class Gallery implements RustOpaqueInterface {
       RustLib.instance.api.redditApiModelGalleryGalleryDefault();
 
   /// flutter_rust_bridge:sync
-  ImageBase get_({required int index});
+  Source get_({required int index});
+
+  /// flutter_rust_bridge:sync,getter
+  double get aspectRatio;
 
   /// flutter_rust_bridge:sync,getter
   int get length;
@@ -31,17 +34,76 @@ abstract class GalleryData implements RustOpaqueInterface {
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<GalleryMedia>>
 abstract class GalleryMedia implements RustOpaqueInterface {
-  MediaKind get kind;
-
   String get mediaType;
-
-  set kind(MediaKind kind);
 
   set mediaType(String mediaType);
 }
 
-enum MediaKind {
-  image,
-  animatedImage,
-  ;
+class AnimatedImage {
+  final int x;
+  final int y;
+  final String gif;
+  final String mp4;
+
+  const AnimatedImage({
+    required this.x,
+    required this.y,
+    required this.gif,
+    required this.mp4,
+  });
+
+  static Future<AnimatedImage> default_() =>
+      RustLib.instance.api.redditApiModelGalleryAnimatedImageDefault();
+
+  @override
+  int get hashCode => x.hashCode ^ y.hashCode ^ gif.hashCode ^ mp4.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AnimatedImage &&
+          runtimeType == other.runtimeType &&
+          x == other.x &&
+          y == other.y &&
+          gif == other.gif &&
+          mp4 == other.mp4;
+}
+
+class Image {
+  final String u;
+  final int x;
+  final int y;
+
+  const Image({
+    required this.u,
+    required this.x,
+    required this.y,
+  });
+
+  static Future<Image> default_() =>
+      RustLib.instance.api.redditApiModelGalleryImageDefault();
+
+  @override
+  int get hashCode => u.hashCode ^ x.hashCode ^ y.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Image &&
+          runtimeType == other.runtimeType &&
+          u == other.u &&
+          x == other.x &&
+          y == other.y;
+}
+
+@freezed
+sealed class Source with _$Source {
+  const Source._();
+
+  const factory Source.image({
+    required Image source,
+  }) = Source_Image;
+  const factory Source.animatedImage({
+    required AnimatedImage source,
+  }) = Source_AnimatedImage;
 }

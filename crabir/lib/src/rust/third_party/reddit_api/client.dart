@@ -42,6 +42,11 @@ abstract class Client implements RustOpaqueInterface {
       RustLib.instance.api
           .redditApiClientClientFromRefreshToken(refreshToken: refreshToken);
 
+  /// Returns the content of the post at the given permalink.
+  /// # Errors
+  /// Fails if the request fails or the parsing of the response fails.
+  Future<Post> getPost({required String permalink});
+
   Future<List<Thing>> loadMoreComments(
       {required Fullname parentId,
       required List<String> children,

@@ -8,6 +8,8 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart'
+    as gallery;
 
 part 'image.dart';
 part 'gif.dart';

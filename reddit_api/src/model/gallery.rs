@@ -1,4 +1,5 @@
-use std::collections::HashMap;
+use core::f32;
+use std::{cmp::min, collections::HashMap};
 
 use serde::{Deserialize, Serialize};
 
@@ -12,20 +13,37 @@ pub struct Gallery {
 
 impl Gallery {
     /// flutter_rust_bridge:sync
-    pub fn get(&self, index: u32) -> ImageBase {
+    pub fn get(&self, index: u32) -> Source {
         // TODO: support for resolution, and obfuscation
         let id = &self.gallery_data.items[index as usize];
         if let MediaMetadata::Media(GalleryMedia { source, .. }) =
             self.media_metadata.get(&id.media_id).unwrap()
         {
-            source.clone().into()
+            source.clone()
         } else {
-            ImageBase {
-                url: "none".to_string(),
-                width: 0,
-                height: 0,
+            Source::Image {
+                source: Image {
+                    u: "none".to_string(),
+                    x: 0,
+                    y: 0,
+                },
             }
         }
+    }
+
+    /// flutter_rust_bridge:sync,getter
+    pub fn get_aspect_ratio(&self) -> f32 {
+        let mut aspect_ratio = f32::INFINITY;
+        for image in self.media_metadata.values() {
+            if let MediaMetadata::Media(GalleryMedia { source, .. }) = image {
+                if aspect_ratio.is_infinite() {
+                    aspect_ratio = source.aspect_ratio()
+                } else if aspect_ratio > source.aspect_ratio() {
+                    aspect_ratio = source.aspect_ratio();
+                }
+            }
+        }
+        aspect_ratio
     }
 
     /// flutter_rust_bridge:sync,getter
@@ -43,18 +61,17 @@ pub struct GalleryData {
 pub struct MediaId {
     media_id: String,
     id: u32,
+    caption: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "status")]
 pub struct GalleryMedia {
-    #[serde(rename = "e")]
-    pub kind: MediaKind,
     #[serde(rename = "m")]
     /// A string like "image/jpg", or "image/gif"
     pub media_type: String,
-    #[serde(rename = "s")]
-    source: Image,
+    #[serde(rename = "s", flatten)]
+    source: Source,
     #[serde(rename = "p")]
     previews: Vec<Image>,
     #[serde(rename = "o", default)]
@@ -68,11 +85,18 @@ pub enum MediaMetadata {
     Media(GalleryMedia),
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-struct Image {
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Image {
     pub u: String,
     pub x: u32,
     pub y: u32,
+}
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct AnimatedImage {
+    pub x: u32,
+    pub y: u32,
+    pub gif: String,
+    pub mp4: String,
 }
 
 impl From<Image> for ImageBase {
@@ -85,8 +109,26 @@ impl From<Image> for ImageBase {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum MediaKind {
-    Image,
-    AnimatedImage,
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "e")]
+/// flutter_rust_bridge:non_opaque
+pub enum Source {
+    Image {
+        #[serde(rename = "s")]
+        source: Image,
+    },
+    AnimatedImage {
+        #[serde(rename = "s")]
+        source: AnimatedImage,
+    },
+}
+
+impl Source {
+    fn aspect_ratio(&self) -> f32 {
+        let r = match self {
+            Self::Image { source } => source.x as f32 / source.y as f32,
+            Self::AnimatedImage { source } => source.x as f32 / source.y as f32,
+        };
+        if r.is_nan() { f32::INFINITY } else { r }
+    }
 }

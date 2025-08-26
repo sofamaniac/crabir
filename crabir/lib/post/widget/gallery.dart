@@ -1,9 +1,11 @@
 import 'dart:math';
+import 'package:chewie/chewie.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart';
+import 'package:video_player/video_player.dart';
 
 class MediaGalleryView extends StatelessWidget {
   final Post post;
@@ -21,10 +23,10 @@ class MediaGalleryView extends StatelessWidget {
           gallery: gallery,
         );
       } else {
-        return Text("some kind of gallery");
+        return Text("Gallery and is Crosspost but no gallery on parent");
       }
     } else {
-      return Text("some kind of gallery");
+      return Text("Gallery: not Crosspost && no gallery on post");
     }
   }
 }
@@ -73,12 +75,7 @@ class _GalleryViewState extends State<GalleryView> {
 
   @override
   Widget build(BuildContext context) {
-    double aspectRatio = double.infinity;
-    for (int i = 0; i < widget.gallery.length; i++) {
-      final image = widget.gallery.get_(index: i);
-      aspectRatio = min(aspectRatio, image.width / image.height);
-    }
-
+    final aspectRatio = widget.gallery.aspectRatio;
     return Stack(
       children: [
         AspectRatio(
@@ -91,7 +88,16 @@ class _GalleryViewState extends State<GalleryView> {
               controller: _pageController,
               itemBuilder: (context, index) {
                 final image = widget.gallery.get_(index: index);
-                return ImageThumbnail.imageBase(image);
+                return switch (image) {
+                  Source_Image() =>
+                    ImageThumbnail.fromGalleryImage(image.source),
+                  Source_AnimatedImage() => _GifContent(
+                      url: image.source.mp4,
+                      width: image.source.x,
+                      height: image.source.y),
+                };
+
+                //return ImageThumbnail.imageBase(image);
               },
               itemCount: widget.gallery.length,
             ),
@@ -172,14 +178,72 @@ class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
             controller: _pageController,
             itemBuilder: (context, index) {
               final image = widget.gallery.get_(index: index);
-              return ImageThumbnail.imageBase(
-                image,
-              );
+              return switch (image) {
+                Source_Image() => ImageThumbnail.fromGalleryImage(image.source),
+                Source_AnimatedImage() => _GifContent(
+                    url: image.source.mp4,
+                    width: image.source.x,
+                    height: image.source.y),
+              };
             },
             itemCount: widget.gallery.length,
           ),
         ),
       ),
     );
+  }
+}
+
+class _GifContent extends StatefulWidget {
+  final String url;
+  final int width;
+  final int height;
+  const _GifContent({
+    super.key,
+    required this.url,
+    required this.width,
+    required this.height,
+  });
+
+  @override
+  State<_GifContent> createState() => _GifContentState();
+}
+
+class _GifContentState extends State<_GifContent> {
+  late VideoPlayerController _controller;
+  late ChewieController _chewieController;
+  int width = 1;
+  int height = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    final url = widget.url;
+    _controller = VideoPlayerController.networkUrl(Uri.parse(url));
+    _chewieController = ChewieController(
+      videoPlayerController: _controller,
+      autoPlay: true,
+      looping: true,
+      aspectRatio: widget.width / widget.height,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: AspectRatio(
+        aspectRatio: width / height,
+        child: Chewie(
+          controller: _chewieController,
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _chewieController.dispose();
+    super.dispose();
   }
 }
