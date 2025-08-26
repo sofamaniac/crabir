@@ -28,6 +28,7 @@ class FeedView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _ = context.watch<AccountsBloc>().state;
     return FeedViewBody(
       feed: feed,
       initialSort: initialSort,
@@ -55,6 +56,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
 
   late final ScrollController _scrollController;
   late reddit_stream.Streamable _stream;
+  String? currentUser;
 
   @override
   bool get wantKeepAlive => true;
@@ -89,8 +91,18 @@ class _FeedViewBodyState extends State<FeedViewBody>
 
     if (sort == null) {
       return Center(child: LoadingIndicator());
+    } else if (currentUser != account.account?.username) {
+      // reset stream when changing user.
+      currentUser = account.account?.username;
+      if (currentUser != null) {
+        setState(() {
+          _stream = RedditAPI.client().feedStream(
+            feed: widget.feed,
+            sort: sort!,
+          );
+        });
+      }
     }
-
     return switch (account.status) {
       Uninit() => Container(),
       Failure(:final message) =>
