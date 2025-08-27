@@ -33,9 +33,9 @@ abstract class Comment implements RustOpaqueInterface {
 
   int get controversiality;
 
-  double get created;
+  DateTime get created;
 
-  double get createdUtc;
+  DateTime get createdUtc;
 
   int get depth;
 
@@ -99,9 +99,9 @@ abstract class Comment implements RustOpaqueInterface {
 
   set controversiality(int controversiality);
 
-  set created(double created);
+  set created(DateTime created);
 
-  set createdUtc(double createdUtc);
+  set createdUtc(DateTime createdUtc);
 
   set depth(int depth);
 

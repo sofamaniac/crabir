@@ -22,7 +22,7 @@ extension SortLabel on FeedSort {
     final timeframe = _getTimeframe();
     if (timeframe != null) {
       final time = timeframe.label(context);
-      return "$sort  · $time";
+      return "$sort · $time";
     } else {
       return sort;
     }

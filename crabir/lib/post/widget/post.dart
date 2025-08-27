@@ -4,7 +4,6 @@ import 'package:crabir/feed_list.dart';
 import 'package:crabir/post/widget/gallery.dart';
 import 'package:crabir/post/widget/html_with_fade.dart';
 import 'package:crabir/post/widget/image.dart';
-import 'package:crabir/post/widget/time_display.dart';
 import 'package:crabir/post/widget/video.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/routes/routes.dart';
@@ -14,6 +13,7 @@ import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
+import 'package:crabir/time_ellapsed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -200,7 +200,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
           ),
         ),
         const Text(' • '),
-        TimeDisplay(widget.post.createdUtc, style: labelStyle),
+        Text(widget.post.createdUtc.timeSince(), style: labelStyle),
         if (_showDomain()) ...[
           const Text(' • '),
           Text(

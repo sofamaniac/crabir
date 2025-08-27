@@ -210,10 +210,10 @@ abstract class RustLibApi extends BaseApi {
   int redditApiModelCommentCommentAutoAccessorGetControversiality(
       {required Comment that});
 
-  double redditApiModelCommentCommentAutoAccessorGetCreated(
+  DateTime redditApiModelCommentCommentAutoAccessorGetCreated(
       {required Comment that});
 
-  double redditApiModelCommentCommentAutoAccessorGetCreatedUtc(
+  DateTime redditApiModelCommentCommentAutoAccessorGetCreatedUtc(
       {required Comment that});
 
   int redditApiModelCommentCommentAutoAccessorGetDepth({required Comment that});
@@ -305,10 +305,10 @@ abstract class RustLibApi extends BaseApi {
       {required Comment that, required int controversiality});
 
   void redditApiModelCommentCommentAutoAccessorSetCreated(
-      {required Comment that, required double created});
+      {required Comment that, required DateTime created});
 
   void redditApiModelCommentCommentAutoAccessorSetCreatedUtc(
-      {required Comment that, required double createdUtc});
+      {required Comment that, required DateTime createdUtc});
 
   void redditApiModelCommentCommentAutoAccessorSetDepth(
       {required Comment that, required int depth});
@@ -2902,7 +2902,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  double redditApiModelCommentCommentAutoAccessorGetCreated(
+  DateTime redditApiModelCommentCommentAutoAccessorGetCreated(
       {required Comment that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
@@ -2912,7 +2912,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 35)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_f_64,
+        decodeSuccessData: sse_decode_Chrono_Local,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelCommentCommentAutoAccessorGetCreatedConstMeta,
@@ -2929,7 +2929,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  double redditApiModelCommentCommentAutoAccessorGetCreatedUtc(
+  DateTime redditApiModelCommentCommentAutoAccessorGetCreatedUtc(
       {required Comment that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
@@ -2939,7 +2939,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 36)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_f_64,
+        decodeSuccessData: sse_decode_Chrono_Utc,
         decodeErrorData: null,
       ),
       constMeta:
@@ -3807,13 +3807,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelCommentCommentAutoAccessorSetCreated(
-      {required Comment that, required double created}) {
+      {required Comment that, required DateTime created}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        sse_encode_f_64(created, serializer);
+        sse_encode_Chrono_Local(created, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 68)!;
       },
       codec: SseCodec(
@@ -3835,13 +3835,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelCommentCommentAutoAccessorSetCreatedUtc(
-      {required Comment that, required double createdUtc}) {
+      {required Comment that, required DateTime createdUtc}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerComment(
             that, serializer);
-        sse_encode_f_64(createdUtc, serializer);
+        sse_encode_Chrono_Utc(createdUtc, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 69)!;
       },
       codec: SseCodec(
@@ -23935,12 +23935,12 @@ class CommentImpl extends RustOpaque implements Comment {
         that: this,
       );
 
-  double get created =>
+  DateTime get created =>
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorGetCreated(
         that: this,
       );
 
-  double get createdUtc => RustLib.instance.api
+  DateTime get createdUtc => RustLib.instance.api
           .redditApiModelCommentCommentAutoAccessorGetCreatedUtc(
         that: this,
       );
@@ -24091,11 +24091,11 @@ class CommentImpl extends RustOpaque implements Comment {
       .redditApiModelCommentCommentAutoAccessorSetControversiality(
           that: this, controversiality: controversiality);
 
-  set created(double created) =>
+  set created(DateTime created) =>
       RustLib.instance.api.redditApiModelCommentCommentAutoAccessorSetCreated(
           that: this, created: created);
 
-  set createdUtc(double createdUtc) => RustLib.instance.api
+  set createdUtc(DateTime createdUtc) => RustLib.instance.api
       .redditApiModelCommentCommentAutoAccessorSetCreatedUtc(
           that: this, createdUtc: createdUtc);
 

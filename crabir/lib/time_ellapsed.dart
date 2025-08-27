@@ -1,12 +1,6 @@
-import 'package:flutter/material.dart';
-
-class TimeDisplay extends StatelessWidget {
-  final DateTime date;
-  final TextStyle? style;
-  const TimeDisplay(this.date, {super.key, this.style});
-
+extension TimeEllapsed on DateTime {
   // TODO: localization
-  String message(Duration delta) {
+  String _message(Duration delta) {
     if (delta.inDays > 365) {
       final int years = (delta.inDays / 365).toInt();
       return "${years}y";
@@ -28,10 +22,8 @@ class TimeDisplay extends StatelessWidget {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final delta = DateTime.now().toUtc().difference(date);
-    final s = message(delta);
-    return Text(s, style: style);
+  String timeSince() {
+    final delta = DateTime.now().toUtc().difference(this);
+    return _message(delta);
   }
 }
