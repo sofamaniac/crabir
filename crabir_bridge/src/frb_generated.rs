@@ -3429,7 +3429,7 @@ fn wire__reddit_api__model__comment__Comment_auto_accessor_set_created_impl(
             let api_that = <RustOpaqueMoi<
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Comment>,
             >>::sse_decode(&mut deserializer);
-            let api_created = <f64>::sse_decode(&mut deserializer);
+            let api_created = <chrono::DateTime<chrono::Local>>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let mut api_that_guard = None;
@@ -3480,7 +3480,7 @@ fn wire__reddit_api__model__comment__Comment_auto_accessor_set_created_utc_impl(
             let api_that = <RustOpaqueMoi<
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Comment>,
             >>::sse_decode(&mut deserializer);
-            let api_created_utc = <f64>::sse_decode(&mut deserializer);
+            let api_created_utc = <chrono::DateTime<chrono::Utc>>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let mut api_that_guard = None;

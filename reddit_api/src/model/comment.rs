@@ -1,9 +1,13 @@
 use std::backtrace::Backtrace;
 
+use chrono::DateTime;
+use chrono::Local;
+use chrono::Utc;
 use log::debug;
 use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
+use serde_with::serde_as;
 
 use super::Fullname;
 use super::Thing;
@@ -25,6 +29,7 @@ impl TryFrom<Thing> for Comment {
     }
 }
 
+#[serde_as]
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Comment {
     // SUBREDDIT
@@ -38,7 +43,6 @@ pub struct Comment {
         deserialize_with = "author::author_option"
     )]
     pub author: Option<AuthorInfo>,
-    //
     pub saved: bool,
     pub likes: Option<bool>,
     pub id: String,
@@ -46,7 +50,7 @@ pub struct Comment {
     /// Should be a listing if present
     /// Because they can be deeply nested we use a `Value` that is
     /// deserialize only when needed and only one level at a time.
-    //replies: Option<Box<Value>>,
+    /// We have to do that, because otherwise parsing sometimes overflows the stack.
     replies: Option<Value>,
 
     // pub approved_at_utc: Value,
@@ -63,7 +67,12 @@ pub struct Comment {
     // pub collapsed_reason_code: Value,
     pub no_follow: bool,
     pub can_mod_post: bool,
-    pub created_utc: f64,
+    /// Date of creation in UTC
+    #[serde_as(as = "serde_with::TimestampSecondsWithFrac<f64>")]
+    pub created_utc: DateTime<Utc>,
+    /// Date of creation in logged-in user locale
+    #[serde_as(as = "serde_with::TimestampSecondsWithFrac<f64>")]
+    pub created: DateTime<Local>,
     pub send_replies: bool,
     pub parent_id: String,
     pub score: i32,
@@ -91,7 +100,6 @@ pub struct Comment {
     pub permalink: String,
     pub locked: bool,
     // pub report_reasons: Value,
-    pub created: f64,
     // pub treatment_tags: Vec<Value>,
     pub link_id: String,
     pub controversiality: i32,
