@@ -2,11 +2,13 @@ import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/widget/post.dart';
+import 'package:crabir/routes/routes.dart';
 import 'package:crabir/search_posts/bloc/search_bloc.dart';
 import 'package:crabir/search_posts/widgets/sort_menu.dart';
 import 'package:crabir/sort.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -149,7 +151,7 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
           itemCount: state.items.length + 1,
           itemBuilder: (context, index) {
             if (index < state.items.length) {
-              return RedditPostCard(post: state.items[index]);
+              return _postView(context, state.items[index]);
             } else if (!state.hasReachedMax && state.query.isNotEmpty) {
               bloc.add(Fetch());
               return const LoadingIndicator();
@@ -197,4 +199,21 @@ extension PostSearchSortString on PostSearchSort {
       _ => null,
     };
   }
+}
+
+Widget _postView(BuildContext context, Post post) {
+  final state = context.read<PostSearchBloc>();
+  return RedditPostCard(
+    maxLines: 5,
+    post: post,
+    onLike: (direction) async {
+      state.add(Vote(direction: direction, name: post.name));
+    },
+    onSave: (save) async {
+      state.add(Save(save: save, name: post.name));
+    },
+    onTap: () => context.router.navigate(
+      ThreadRoute(permalink: post.permalink, post: post),
+    ),
+  );
 }

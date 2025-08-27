@@ -228,6 +228,145 @@ class RemoveSubreddit implements PostSearchEvent {
 }
 
 /// @nodoc
+
+class Save implements PostSearchEvent {
+  Save({required this.save, required this.name});
+
+  final bool save;
+  final Fullname name;
+
+  /// Create a copy of PostSearchEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $SaveCopyWith<Save> get copyWith =>
+      _$SaveCopyWithImpl<Save>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is Save &&
+            (identical(other.save, save) || other.save == save) &&
+            (identical(other.name, name) || other.name == name));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, save, name);
+
+  @override
+  String toString() {
+    return 'PostSearchEvent.save(save: $save, name: $name)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $SaveCopyWith<$Res>
+    implements $PostSearchEventCopyWith<$Res> {
+  factory $SaveCopyWith(Save value, $Res Function(Save) _then) =
+      _$SaveCopyWithImpl;
+  @useResult
+  $Res call({bool save, Fullname name});
+}
+
+/// @nodoc
+class _$SaveCopyWithImpl<$Res> implements $SaveCopyWith<$Res> {
+  _$SaveCopyWithImpl(this._self, this._then);
+
+  final Save _self;
+  final $Res Function(Save) _then;
+
+  /// Create a copy of PostSearchEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? save = null,
+    Object? name = null,
+  }) {
+    return _then(Save(
+      save: null == save
+          ? _self.save
+          : save // ignore: cast_nullable_to_non_nullable
+              as bool,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as Fullname,
+    ));
+  }
+}
+
+/// @nodoc
+
+class Vote implements PostSearchEvent {
+  Vote({required this.direction, required this.name});
+
+  final VoteDirection direction;
+  final Fullname name;
+
+  /// Create a copy of PostSearchEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $VoteCopyWith<Vote> get copyWith =>
+      _$VoteCopyWithImpl<Vote>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is Vote &&
+            (identical(other.direction, direction) ||
+                other.direction == direction) &&
+            (identical(other.name, name) || other.name == name));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, direction, name);
+
+  @override
+  String toString() {
+    return 'PostSearchEvent.vote(direction: $direction, name: $name)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $VoteCopyWith<$Res>
+    implements $PostSearchEventCopyWith<$Res> {
+  factory $VoteCopyWith(Vote value, $Res Function(Vote) _then) =
+      _$VoteCopyWithImpl;
+  @useResult
+  $Res call({VoteDirection direction, Fullname name});
+}
+
+/// @nodoc
+class _$VoteCopyWithImpl<$Res> implements $VoteCopyWith<$Res> {
+  _$VoteCopyWithImpl(this._self, this._then);
+
+  final Vote _self;
+  final $Res Function(Vote) _then;
+
+  /// Create a copy of PostSearchEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? direction = null,
+    Object? name = null,
+  }) {
+    return _then(Vote(
+      direction: null == direction
+          ? _self.direction
+          : direction // ignore: cast_nullable_to_non_nullable
+              as VoteDirection,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as Fullname,
+    ));
+  }
+}
+
+/// @nodoc
 mixin _$PostSearchState {
   StreamStatus get status;
   List<Post> get items;

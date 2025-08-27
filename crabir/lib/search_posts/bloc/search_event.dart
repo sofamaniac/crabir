@@ -14,4 +14,16 @@ sealed class PostSearchEvent with _$PostSearchEvent {
 
   /// Remove restriction on subreddit.
   factory PostSearchEvent.removeSubreddit() = RemoveSubreddit;
+
+  /// Save / Unsave post
+  factory PostSearchEvent.save({
+    required bool save,
+    required Fullname name,
+  }) = Save;
+
+  /// Vote on post
+  factory PostSearchEvent.vote({
+    required VoteDirection direction,
+    required Fullname name,
+  }) = Vote;
 }
