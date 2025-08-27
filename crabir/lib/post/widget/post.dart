@@ -17,6 +17,7 @@ import 'package:crabir/time_ellapsed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:crabir/bool_to_vote.dart';
 
 final horizontalPadding = 16.0;
 
@@ -68,8 +69,11 @@ class _PostTitle extends StatelessWidget {
       children: [
         title,
         InkWell(
-          onTap: () => AutoTabsRouter.of(context).navigate(
+          onTap: () => context.tabsRouter.navigate(
             SearchPostsRoute(
+              // provide key to differentiate the pages
+              // but prevents rebuilding when clicking the same flair again
+              key: ValueKey("${post.subreddit.subreddit}-${post.linkFlair}"),
               subreddit: post.subreddit.subreddit,
               flair: post.linkFlair,
             ),
@@ -132,7 +136,7 @@ class RedditPostCard extends StatefulWidget {
 }
 
 class _RedditPostCardState extends State<RedditPostCard> {
-  late bool? likes;
+  late VoteDirection? likes;
   late bool saved;
 
   _RedditPostCardState();
@@ -140,7 +144,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
   @override
   void initState() {
     super.initState();
-    likes = widget.post.likes;
+    likes = widget.post.likes.toVoteDirection();
     saved = widget.post.saved;
   }
 
@@ -229,38 +233,32 @@ class _RedditPostCardState extends State<RedditPostCard> {
         IconButton(
           icon: Icon(
             Icons.thumb_up,
-            color: (likes == true) ? likeColor : null,
+            color: (likes == VoteDirection.up) ? likeColor : null,
           ),
           tooltip: 'Upvote',
           onPressed: () async {
-            await widget.onLike?.call(
-              !(likes == true) ? VoteDirection.up : VoteDirection.neutral,
-            );
+            final target = (likes == VoteDirection.up)
+                ? VoteDirection.neutral
+                : VoteDirection.up;
+            await widget.onLike?.call(target);
             setState(() {
-              if (likes == true) {
-                likes = null;
-              } else {
-                likes = true;
-              }
+              likes = target;
             });
           },
         ),
         IconButton(
           icon: Icon(
             Icons.thumb_down,
-            color: (likes == false) ? dislikeColor : null,
+            color: (likes == VoteDirection.down) ? dislikeColor : null,
           ),
           tooltip: 'Downvote',
           onPressed: () async {
-            await widget.onLike?.call(
-              !(likes == false) ? VoteDirection.down : VoteDirection.neutral,
-            );
+            final target = (likes == VoteDirection.down)
+                ? VoteDirection.neutral
+                : VoteDirection.down;
+            await widget.onLike?.call(target);
             setState(() {
-              if (likes == false) {
-                likes = null;
-              } else {
-                likes = false;
-              }
+              likes = target;
             });
           },
         ),

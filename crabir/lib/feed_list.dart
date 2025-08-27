@@ -8,8 +8,7 @@ import 'package:crabir/subreddit.dart';
 import 'package:flutter/material.dart';
 
 void navigateToSubscriptionsTab(BuildContext context, destination) {
-  final tabsRouter = AutoTabsRouter.of(context);
-  tabsRouter.navigate(destination);
+  context.tabsRouter.navigate(destination);
 }
 
 /// Widget to display a subreddit in a list

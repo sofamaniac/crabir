@@ -67,9 +67,7 @@ class BaseFeed extends StatelessWidget {
       leading: Icon(icon),
       title: Text(title),
       onTap: () {
-        final tabsRouter = AutoTabsRouter.of(context);
-        tabsRouter.setActiveIndex(tabIndex);
-        context.router.navigate(route);
+        context.tabsRouter.navigate(route);
       },
     );
   }

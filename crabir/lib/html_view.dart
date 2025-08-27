@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:html/dom.dart' as dom;
 
 /// Render HTML with some styling already done.
 class StyledHtml extends StatelessWidget {
@@ -111,9 +110,20 @@ class RedditImageExtension extends HtmlExtension {
   @override
   StyledElement prepare(
       ExtensionContext context, List<StyledElement> children) {
-    //TODO: extract width from url
-    final parsedWidth = double.tryParse(context.attributes["width"] ?? "");
-    final parsedHeight = double.tryParse(context.attributes["height"] ?? "");
+    final uri = Uri.parse(context.attributes["href"]!);
+
+    final parsedWidth = double.tryParse(uri.queryParameters['width'] ?? '');
+    // seems to always be null
+    final parsedHeight = double.tryParse(uri.queryParameters['height'] ?? '');
+
+    final width = switch (parsedWidth) {
+      double() => Width(parsedWidth),
+      null => null,
+    };
+    final height = switch (parsedHeight) {
+      double() => Height(parsedHeight),
+      null => null,
+    };
 
     return ImageElement(
       name: context.elementName,
@@ -123,8 +133,8 @@ class RedditImageExtension extends HtmlExtension {
       elementId: context.id,
       src: context.attributes["href"]!,
       alt: context.attributes["alt"],
-      width: null,
-      height: null,
+      width: width,
+      height: height,
     );
   }
 
