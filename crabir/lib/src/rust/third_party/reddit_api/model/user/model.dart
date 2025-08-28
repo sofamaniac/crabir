@@ -9,65 +9,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'model.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
-
-class Preferences {
-  final bool prefAutoplay;
-  final bool prefVideoAutoplay;
-  final bool prefNoProfanity;
-  final String prefGeopopular;
-  final bool prefShowTrending;
-  final bool prefShowPresence;
-  final bool prefNightmode;
-  final bool prefTopKarmaSubreddits;
-  final PlatformInt64 prefClickgadget;
-  final bool prefShowTwitter;
-
-  const Preferences({
-    required this.prefAutoplay,
-    required this.prefVideoAutoplay,
-    required this.prefNoProfanity,
-    required this.prefGeopopular,
-    required this.prefShowTrending,
-    required this.prefShowPresence,
-    required this.prefNightmode,
-    required this.prefTopKarmaSubreddits,
-    required this.prefClickgadget,
-    required this.prefShowTwitter,
-  });
-
-  static Future<Preferences> default_() =>
-      RustLib.instance.api.redditApiModelUserModelPreferencesDefault();
-
-  @override
-  int get hashCode =>
-      prefAutoplay.hashCode ^
-      prefVideoAutoplay.hashCode ^
-      prefNoProfanity.hashCode ^
-      prefGeopopular.hashCode ^
-      prefShowTrending.hashCode ^
-      prefShowPresence.hashCode ^
-      prefNightmode.hashCode ^
-      prefTopKarmaSubreddits.hashCode ^
-      prefClickgadget.hashCode ^
-      prefShowTwitter.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Preferences &&
-          runtimeType == other.runtimeType &&
-          prefAutoplay == other.prefAutoplay &&
-          prefVideoAutoplay == other.prefVideoAutoplay &&
-          prefNoProfanity == other.prefNoProfanity &&
-          prefGeopopular == other.prefGeopopular &&
-          prefShowTrending == other.prefShowTrending &&
-          prefShowPresence == other.prefShowPresence &&
-          prefNightmode == other.prefNightmode &&
-          prefTopKarmaSubreddits == other.prefTopKarmaSubreddits &&
-          prefClickgadget == other.prefClickgadget &&
-          prefShowTwitter == other.prefShowTwitter;
-}
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `try_from`
 
 class Snoovatar {
   final bool prefShowSnoovatar;
@@ -106,18 +48,15 @@ class User {
   final bool isSponsor;
   final PlatformInt64 numFriends;
   final bool canEditName;
-  final String? newModmailExists;
+  final bool? newModmailExists;
   final PlatformInt64 coins;
   final bool canCreateSubreddit;
   final double? suspensionExpirationUtc;
   final bool hasModMail;
   final bool hasMail;
-  final bool passwordSet;
   final bool isSuspended;
-  final bool forcePasswordReset;
   final PlatformInt64 inboxCount;
   final PlatformInt64 goldCreddits;
-  final bool hasIosSubscription;
 
   const User({
     required this.info,
@@ -131,12 +70,9 @@ class User {
     this.suspensionExpirationUtc,
     required this.hasModMail,
     required this.hasMail,
-    required this.passwordSet,
     required this.isSuspended,
-    required this.forcePasswordReset,
     required this.inboxCount,
     required this.goldCreddits,
-    required this.hasIosSubscription,
   });
 
   static Future<User> default_() =>
@@ -155,12 +91,9 @@ class User {
       suspensionExpirationUtc.hashCode ^
       hasModMail.hashCode ^
       hasMail.hashCode ^
-      passwordSet.hashCode ^
       isSuspended.hashCode ^
-      forcePasswordReset.hashCode ^
       inboxCount.hashCode ^
-      goldCreddits.hashCode ^
-      hasIosSubscription.hashCode;
+      goldCreddits.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -178,12 +111,9 @@ class User {
           suspensionExpirationUtc == other.suspensionExpirationUtc &&
           hasModMail == other.hasModMail &&
           hasMail == other.hasMail &&
-          passwordSet == other.passwordSet &&
           isSuspended == other.isSuspended &&
-          forcePasswordReset == other.forcePasswordReset &&
           inboxCount == other.inboxCount &&
-          goldCreddits == other.goldCreddits &&
-          hasIosSubscription == other.hasIosSubscription;
+          goldCreddits == other.goldCreddits;
 }
 
 /// Info returned by /u/someuser/about.json
@@ -202,14 +132,9 @@ class UserInfo {
   /// Missing when querying api/v1/me
   final bool isFriend;
   final PlatformInt64 awardeeKarma;
-  final bool isGold;
-  final bool isMod;
   final bool verified;
   final PlatformInt64 awarderKarma;
-  final bool hasVerifiedEmail;
-  final bool hasSubscribed;
   final String iconImg;
-  final bool hideFromRobots;
   final PlatformInt64 linkKarma;
   final PlatformInt64 totalKarma;
   final PlatformInt64 commentKarma;
@@ -228,14 +153,9 @@ class UserInfo {
     required this.isEmployee,
     required this.isFriend,
     required this.awardeeKarma,
-    required this.isGold,
-    required this.isMod,
     required this.verified,
     required this.awarderKarma,
-    required this.hasVerifiedEmail,
-    required this.hasSubscribed,
     required this.iconImg,
-    required this.hideFromRobots,
     required this.linkKarma,
     required this.totalKarma,
     required this.commentKarma,
@@ -259,14 +179,9 @@ class UserInfo {
       isEmployee.hashCode ^
       isFriend.hashCode ^
       awardeeKarma.hashCode ^
-      isGold.hashCode ^
-      isMod.hashCode ^
       verified.hashCode ^
       awarderKarma.hashCode ^
-      hasVerifiedEmail.hashCode ^
-      hasSubscribed.hashCode ^
       iconImg.hashCode ^
-      hideFromRobots.hashCode ^
       linkKarma.hashCode ^
       totalKarma.hashCode ^
       commentKarma.hashCode ^
@@ -289,14 +204,9 @@ class UserInfo {
           isEmployee == other.isEmployee &&
           isFriend == other.isFriend &&
           awardeeKarma == other.awardeeKarma &&
-          isGold == other.isGold &&
-          isMod == other.isMod &&
           verified == other.verified &&
           awarderKarma == other.awarderKarma &&
-          hasVerifiedEmail == other.hasVerifiedEmail &&
-          hasSubscribed == other.hasSubscribed &&
           iconImg == other.iconImg &&
-          hideFromRobots == other.hideFromRobots &&
           linkKarma == other.linkKarma &&
           totalKarma == other.totalKarma &&
           commentKarma == other.commentKarma &&

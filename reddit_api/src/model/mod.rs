@@ -1,5 +1,3 @@
-use std::backtrace::Backtrace;
-
 use comment::Comment;
 use multi::Multi;
 pub use post::Post;
@@ -105,9 +103,7 @@ impl TryFrom<Thing> for Listing {
     fn try_from(value: Thing) -> Result<Self, Self::Error> {
         match value {
             Thing::Listing(listing) => Ok(listing),
-            _ => Err(Error::InvalidThing {
-                backtrace: Backtrace::capture(),
-            }),
+            _ => Err(Error::InvalidThing),
         }
     }
 }

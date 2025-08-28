@@ -765,9 +765,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PostSearchSort dco_decode_post_search_sort(dynamic raw);
 
   @protected
-  Preferences dco_decode_preferences(dynamic raw);
-
-  @protected
   Preview dco_decode_preview(dynamic raw);
 
   @protected
@@ -1515,9 +1512,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PostSearchSort sse_decode_post_search_sort(SseDeserializer deserializer);
-
-  @protected
-  Preferences sse_decode_preferences(SseDeserializer deserializer);
 
   @protected
   Preview sse_decode_preview(SseDeserializer deserializer);
@@ -2289,9 +2283,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_post_search_sort(
       PostSearchSort self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_preferences(Preferences self, SseSerializer serializer);
 
   @protected
   void sse_encode_preview(Preview self, SseSerializer serializer);

@@ -1,12 +1,10 @@
-use crate::model::comment::Comment;
 use crate::model::feed::{self, Feed};
 use crate::model::flair::Flair;
 use crate::model::multi::{Multi, MultiStream};
-use crate::model::{Fullname, Post, comment, user};
+use crate::model::{Fullname, Post, comment};
 use crate::result::Result;
 use crate::search::{PostSearchSort, SearchPost, SearchSubreddit, SubredditSearchSort};
 use crate::streamable::Streamable;
-use std::backtrace::Backtrace;
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -170,7 +168,7 @@ impl Pager {
     }
 }
 
-async fn parse_response<T: DeserializeOwned>(response: reqwest::Response) -> Result<T> {
+pub(crate) async fn parse_response<T: DeserializeOwned>(response: reqwest::Response) -> Result<T> {
     let response = response.error_for_status();
     match response {
         Ok(response) => {
@@ -189,23 +187,19 @@ async fn parse_response<T: DeserializeOwned>(response: reqwest::Response) -> Res
                         source: serde_json::Error::custom(format!(
                             "serde_json error {e}. Failed to parse : {text}"
                         )),
-                        backtrace: Backtrace::capture(),
                     })
                 }
             }
         }
         Err(error) => {
             error!("{error}");
-            Err(Error::Reqwest {
-                source: error,
-                backtrace: Backtrace::capture(),
-            })
+            Err(Error::Reqwest { source: error })
         }
     }
 }
 
 impl Client {
-    fn get(&self, url: impl IntoUrl) -> RequestBuilder {
+    pub(crate) fn get(&self, url: impl IntoUrl) -> RequestBuilder {
         self.http.get(url).query(&[("raw_json", "1")])
     }
     fn post(&self, url: impl IntoUrl) -> RequestBuilder {
@@ -312,7 +306,7 @@ impl Client {
         Ok(())
     }
 
-    async fn execute(&self, request: RequestBuilder) -> Result<reqwest::Response> {
+    pub(crate) async fn execute(&self, request: RequestBuilder) -> Result<reqwest::Response> {
         if !self.is_access_token_valid().await {
             self.refresh_token().await?;
         }
@@ -383,12 +377,7 @@ impl Client {
                                 }
                                 Some((Ok(listing), (url, pager)))
                             }
-                            _ => Some((
-                                Err(Error::InvalidThing {
-                                    backtrace: Backtrace::capture(),
-                                }),
-                                (url, Pager::default()),
-                            )),
+                            _ => Some((Err(Error::InvalidThing), (url, Pager::default()))),
                         },
                         Err(e) => Some((Err(e), (url, Pager::default()))),
                     },
@@ -440,9 +429,7 @@ impl Client {
                                             .map(|thing| (Ok(thing), (url, pager, buffer, done)))
                                     }
                                     _ => Some((
-                                        Err(Error::InvalidThing {
-                                            backtrace: Backtrace::capture(),
-                                        }),
+                                        Err(Error::InvalidThing),
                                         (url, Pager::default(), buffer, done),
                                     )),
                                 },
@@ -555,82 +542,6 @@ impl Client {
         Ok(())
     }
 
-    /// Get saved items ( both [`Post`] and [`Comment`] ) for the specified user.
-    /// # Errors
-    /// Fails if api request fails.
-    /// flutter_rust_bridge:sync
-    pub fn user_saved(&self, username: String) -> Streamable {
-        Streamable::new(user::streams::UserStream::new(
-            self.clone(),
-            username,
-            String::from("saved"),
-        ))
-    }
-
-    /// flutter_rust_bridge:sync
-    pub fn user_overview(&self, username: String, sort: user::model::UserStreamSort) -> Streamable {
-        Streamable::new(user::streams::UserStreamSorted::new(
-            self.clone(),
-            username,
-            sort,
-            String::from("overview"),
-        ))
-    }
-    /// flutter_rust_bridge:sync
-    pub fn user_submitted(
-        &self,
-        username: String,
-        sort: user::model::UserStreamSort,
-    ) -> Streamable {
-        Streamable::new(user::streams::UserStreamSorted::new(
-            self.clone(),
-            username,
-            sort,
-            String::from("submitted"),
-        ))
-    }
-    /// flutter_rust_bridge:sync
-    pub fn user_comments(&self, username: String, sort: user::model::UserStreamSort) -> Streamable {
-        Streamable::new(user::streams::UserStreamSorted::new(
-            self.clone(),
-            username,
-            sort,
-            String::from("comments"),
-        ))
-    }
-    /// flutter_rust_bridge:sync
-    pub fn user_upvoted(&self, username: String) -> Streamable {
-        Streamable::new(user::streams::UserStream::new(
-            self.clone(),
-            username,
-            String::from("upvoted"),
-        ))
-    }
-    /// flutter_rust_bridge:sync
-    pub fn user_downvoted(&self, username: String) -> Streamable {
-        Streamable::new(user::streams::UserStream::new(
-            self.clone(),
-            username,
-            String::from("downvoted"),
-        ))
-    }
-    /// flutter_rust_bridge:sync
-    pub fn user_hidden(&self, username: String) -> Streamable {
-        Streamable::new(user::streams::UserStream::new(
-            self.clone(),
-            username,
-            String::from("hidden"),
-        ))
-    }
-    /// flutter_rust_bridge:sync
-    pub fn user_gilded(&self, username: String) -> Streamable {
-        Streamable::new(user::streams::UserStream::new(
-            self.clone(),
-            username,
-            String::from("gilded"),
-        ))
-    }
-
     /// Returns the comments for the post at the given permalink. Each element in the vec is either
     /// a [`Thing::Comment`] or a [`Thing::More`].
     /// # Errors
@@ -655,14 +566,10 @@ impl Client {
         if let [Thing::Listing(post), Thing::Listing(comments)] = result {
             match post.children.first() {
                 Some(Thing::Post(post)) => Ok((post.clone(), comments.children)),
-                _ => Err(Error::InvalidThing {
-                    backtrace: Backtrace::capture(),
-                }),
+                _ => Err(Error::InvalidThing),
             }
         } else {
-            Err(Error::InvalidThing {
-                backtrace: Backtrace::capture(),
-            })
+            Err(Error::InvalidThing)
         }
     }
     /// Returns the content of the post at the given permalink.
@@ -711,33 +618,6 @@ impl Client {
         let result = self.execute(request).await?;
         let result: Response = parse_response(result).await?;
         Ok(result.json.data.things)
-    }
-
-    pub(crate) fn user_stream<T: TryFrom<Thing>>(
-        self,
-        endpoint: String,
-        pager: Option<Pager>,
-    ) -> impl Stream<Item = Result<T>> {
-        let url = self
-            .base_url()
-            .join(&endpoint)
-            .expect("Should not fail to build url.");
-        self.clone().stream_vec(url, pager, ())
-    }
-    pub(crate) fn sorted_user_stream<T: TryFrom<Thing>>(
-        self,
-        endpoint: String,
-        sort: user::model::UserStreamSort,
-        pager: Option<Pager>,
-    ) -> impl Stream<Item = Result<T>> {
-        let mut url = self
-            .base_url()
-            .join(&endpoint)
-            .expect("Should not fail to build url.");
-        for (name, value) in sort.to_query() {
-            url.query_pairs_mut().append_pair(name, value);
-        }
-        self.stream_vec(url, pager, ())
     }
 
     ///flutter_rust_bridge:sync

@@ -1,4 +1,3 @@
-use std::backtrace::Backtrace;
 use std::borrow::Cow;
 use std::collections::HashMap;
 
@@ -410,9 +409,7 @@ impl TryFrom<Thing> for Subreddit {
     fn try_from(value: Thing) -> Result<Self, Self::Error> {
         match value {
             Thing::Subreddit(subreddit) => Ok(subreddit),
-            _ => Err(Error::InvalidThing {
-                backtrace: Backtrace::capture(),
-            }),
+            _ => Err(Error::InvalidThing),
         }
     }
 }

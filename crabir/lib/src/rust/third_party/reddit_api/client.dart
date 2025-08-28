@@ -98,6 +98,9 @@ abstract class Client implements RustOpaqueInterface {
   /// Returns an error if the request failed.
   Future<void> unsave({required Fullname thing});
 
+  /// flutter_rust_bridge:
+  Future<UserInfo> userAbout({required String username});
+
   /// flutter_rust_bridge:sync
   Streamable userComments(
       {required String username, required UserStreamSort sort});

@@ -84,6 +84,17 @@ final publicUserTabs = [
   UserTabs.gilded,
 ];
 
+final currentUserRoute = AutoRoute(
+  page: UserRoute.page,
+  children: allUserTabs
+      .map(
+        (tab) => AutoRoute(
+          page: tab.page(),
+        ),
+      )
+      .toList(),
+);
+
 Widget _scaffold(reddit_stream.Streamable stream) {
   return ThingsScaffold(
     stream: stream,
@@ -132,11 +143,9 @@ class UserOverviewView extends StatelessWidget {
 @RoutePage()
 class UserAboutView extends StatelessWidget {
   final String username;
-  final UserStreamSort sort;
   const UserAboutView({
     super.key,
     required this.username,
-    this.sort = const UserStreamSort.new_(),
   });
 
   @override
@@ -158,7 +167,7 @@ class UserPostsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _scaffold(
-      RedditAPI.client().userOverview(username: username, sort: sort),
+      RedditAPI.client().userSubmitted(username: username, sort: sort),
     );
   }
 }
@@ -175,29 +184,18 @@ class UserCommentsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text("TODO");
+    return _scaffold(
+      RedditAPI.client().userComments(username: username, sort: sort),
+    );
   }
 }
-
-final currentUserRoute = AutoRoute(
-  page: UserRoute.page,
-  children: allUserTabs
-      .map(
-        (tab) => AutoRoute(
-          page: tab.page(),
-        ),
-      )
-      .toList(),
-);
 
 @RoutePage()
 class UserSavedView extends StatelessWidget {
   final String username;
-  final UserStreamSort sort;
   const UserSavedView({
     super.key,
     required this.username,
-    this.sort = const UserStreamSort.new_(),
   });
 
   @override
@@ -211,11 +209,9 @@ class UserSavedView extends StatelessWidget {
 @RoutePage()
 class UserUpvotedView extends StatelessWidget {
   final String username;
-  final UserStreamSort sort;
   const UserUpvotedView({
     super.key,
     required this.username,
-    this.sort = const UserStreamSort.new_(),
   });
 
   @override
@@ -229,11 +225,9 @@ class UserUpvotedView extends StatelessWidget {
 @RoutePage()
 class UserDownvotedView extends StatelessWidget {
   final String username;
-  final UserStreamSort sort;
   const UserDownvotedView({
     super.key,
     required this.username,
-    this.sort = const UserStreamSort.new_(),
   });
 
   @override

@@ -1,5 +1,3 @@
-use std::backtrace::Backtrace;
-
 use futures::StreamExt;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
@@ -52,9 +50,7 @@ impl TryFrom<Thing> for Multi {
     fn try_from(value: Thing) -> Result<Self> {
         match value {
             Thing::Multi(multi) => Ok(multi),
-            _ => Err(Error::InvalidThing {
-                backtrace: Backtrace::capture(),
-            }),
+            _ => Err(Error::InvalidThing),
         }
     }
 }

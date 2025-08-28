@@ -1,5 +1,4 @@
 pub use chrono::{DateTime, Local, Utc};
-use std::backtrace::Backtrace;
 
 use crate::error::Error;
 use crate::model::author;
@@ -250,9 +249,7 @@ impl TryFrom<Thing> for Post {
     fn try_from(value: Thing) -> Result<Self, Self::Error> {
         match value {
             Thing::Post(post) => Ok(post),
-            _ => Err(Error::InvalidThing {
-                backtrace: Backtrace::capture(),
-            }),
+            _ => Err(Error::InvalidThing),
         }
     }
 }

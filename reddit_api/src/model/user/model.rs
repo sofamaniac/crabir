@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::model::{Fullname, Timeframe};
+use crate::{
+    error::Error,
+    model::{Fullname, Thing, Timeframe},
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 /// flutter_rust_bridge:non_opaque
@@ -30,61 +33,45 @@ pub struct User {
     #[serde(flatten)]
     pub info: UserInfo,
 
-    #[serde(rename = "gold_expiration")]
+    #[serde(rename = "gold_expiration", default)]
     pub gold_expiration: Option<String>,
-    // #[serde(rename = "has_gold_subscription")]
-    // pub has_gold_subscription: bool,
-    #[serde(rename = "is_sponsor")]
+    #[serde(rename = "is_sponsor", default)]
     pub is_sponsor: bool,
-    #[serde(rename = "num_friends")]
+    #[serde(rename = "num_friends", default)]
     pub num_friends: i64,
-    //pub features: Features,
-    #[serde(rename = "can_edit_name")]
+    #[serde(rename = "can_edit_name", default)]
     pub can_edit_name: bool,
-    #[serde(rename = "new_modmail_exists")]
-    pub new_modmail_exists: Option<String>,
+    #[serde(rename = "new_modmail_exists", default)]
+    pub new_modmail_exists: Option<bool>,
     pub coins: i64,
-    #[serde(rename = "can_create_subreddit")]
+    #[serde(rename = "can_create_subreddit", default)]
     pub can_create_subreddit: bool,
-    #[serde(rename = "suspension_expiration_utc")]
+    #[serde(rename = "suspension_expiration_utc", default)]
     pub suspension_expiration_utc: Option<f32>,
-    // #[serde(rename = "has_stripe_subscription")]
-    // pub has_stripe_subscription: bool,
-    // #[serde(rename = "has_android_subscription")]
-    // pub has_android_subscription: bool,
-    #[serde(rename = "has_mod_mail")]
+    #[serde(rename = "has_mod_mail", default)]
     pub has_mod_mail: bool,
-    #[serde(rename = "has_mail")]
+    #[serde(rename = "has_mail", default)]
     pub has_mail: bool,
-    // #[serde(rename = "has_paypal_subscription")]
-    // pub has_paypal_subscription: bool,
-    // #[serde(rename = "has_subscribed_to_premium")]
-    // pub has_subscribed_to_premium: bool,
-    // #[serde(rename = "in_redesign_beta")]
-    // pub in_redesign_beta: bool,
-    #[serde(rename = "password_set")]
-    pub password_set: bool,
-    //  pub modhash: String,
-    #[serde(rename = "is_suspended")]
+    #[serde(rename = "is_suspended", default)]
     pub is_suspended: bool,
-    #[serde(rename = "force_password_reset")]
-    pub force_password_reset: bool,
-    #[serde(rename = "inbox_count")]
+    #[serde(rename = "inbox_count", default)]
     pub inbox_count: i64,
-    #[serde(rename = "gold_creddits")]
+    #[serde(rename = "gold_creddits", default)]
     pub gold_creddits: i64,
-    #[serde(rename = "has_ios_subscription")]
-    pub has_ios_subscription: bool,
-    // #[serde(rename = "in_beta")]
-    // pub in_beta: bool,
-    // #[serde(rename = "has_visited_new_profile")]
-    // pub has_visited_new_profile: bool,
-    // #[serde(rename = "has_external_account")]
-    // pub has_external_account: bool,
 }
 impl User {
     pub(crate) fn name(&self) -> crate::model::Fullname {
         Fullname(format!("t2_{}", self.info.id))
+    }
+}
+
+impl TryFrom<Thing> for User {
+    type Error = Error;
+    fn try_from(value: Thing) -> Result<Self, Self::Error> {
+        match value {
+            Thing::User(user) => Ok(user),
+            _ => Err(Error::InvalidThing),
+        }
     }
 }
 
@@ -189,21 +176,11 @@ pub struct UserInfo {
     pub is_friend: bool,
     #[serde(rename = "awardee_karma")]
     pub awardee_karma: i64,
-    #[serde(rename = "is_gold")]
-    pub is_gold: bool,
-    #[serde(rename = "is_mod")]
-    pub is_mod: bool,
     pub verified: bool,
     #[serde(rename = "awarder_karma")]
     pub awarder_karma: i64,
-    #[serde(rename = "has_verified_email")]
-    pub has_verified_email: bool,
-    #[serde(rename = "has_subscribed")]
-    pub has_subscribed: bool,
     #[serde(rename = "icon_img")]
     pub icon_img: String,
-    #[serde(rename = "hide_from_robots")]
-    pub hide_from_robots: bool,
     #[serde(rename = "link_karma")]
     pub link_karma: i64,
     #[serde(rename = "total_karma")]
@@ -227,28 +204,4 @@ pub struct Snoovatar {
     pub snoovatar_size: Option<String>,
     #[serde(rename = "snoovatar_img")]
     pub snoovatar_img: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Preferences {
-    #[serde(rename = "pref_autoplay", default)]
-    pub pref_autoplay: bool,
-    #[serde(rename = "pref_video_autoplay", default)]
-    pub pref_video_autoplay: bool,
-    #[serde(rename = "pref_no_profanity", default)]
-    pub pref_no_profanity: bool,
-    #[serde(rename = "pref_geopopular", default)]
-    pub pref_geopopular: String,
-    #[serde(rename = "pref_show_trending", default)]
-    pub pref_show_trending: bool,
-    #[serde(rename = "pref_show_presence", default)]
-    pub pref_show_presence: bool,
-    #[serde(rename = "pref_nightmode", default)]
-    pub pref_nightmode: bool,
-    #[serde(rename = "pref_top_karma_subreddits", default)]
-    pub pref_top_karma_subreddits: bool,
-    #[serde(rename = "pref_clickgadget", default)]
-    pub pref_clickgadget: i64,
-    #[serde(rename = "pref_show_twitter", default)]
-    pub pref_show_twitter: bool,
 }

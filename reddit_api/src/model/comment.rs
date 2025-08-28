@@ -1,5 +1,3 @@
-use std::backtrace::Backtrace;
-
 use chrono::DateTime;
 use chrono::Local;
 use chrono::Utc;
@@ -22,9 +20,7 @@ impl TryFrom<Thing> for Comment {
     fn try_from(value: Thing) -> Result<Self, Self::Error> {
         match value {
             Thing::Comment(comment) => Ok(comment),
-            _ => Err(Error::InvalidThing {
-                backtrace: Backtrace::capture(),
-            }),
+            _ => Err(Error::InvalidThing),
         }
     }
 }
