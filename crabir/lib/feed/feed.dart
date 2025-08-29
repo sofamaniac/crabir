@@ -30,6 +30,7 @@ class FeedView extends StatelessWidget {
   Widget build(BuildContext context) {
     final _ = context.watch<AccountsBloc>().state;
     return FeedViewBody(
+      key: ValueKey(feed),
       feed: feed,
       initialSort: initialSort,
     );
