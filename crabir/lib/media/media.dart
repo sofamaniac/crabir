@@ -10,8 +10,15 @@ import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart'
     as gallery;
-import 'package:visibility_detector/visibility_detector.dart';
 
 part 'image.dart';
 part 'gif.dart';
 part 'resolution.dart';
+
+class MediaDisplay extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+}

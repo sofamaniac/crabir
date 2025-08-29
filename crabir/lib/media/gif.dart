@@ -1,10 +1,6 @@
 part of 'media.dart';
 
 class AnimatedContent extends StatefulWidget {
-  //final VariantInner? mp4;
-
-  /// Used as a fallback if `mp4` is not available.
-  //final VariantInner gif;
   final String? placeholderUrl;
   final Resolution preferredResolution;
   final int width;
@@ -86,7 +82,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
 
     // Attach scroll listener
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController = Scrollable.of(context)?.widget.controller;
+      _scrollController = Scrollable.of(context).widget.controller;
       _scrollController ??= PrimaryScrollController.of(context);
       _scrollController?.addListener(_onScroll);
       _onScroll(); // initial check
@@ -130,7 +126,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
       final visibleHeight = visibleBottom - visibleTop;
       final visibleFraction = visibleHeight / size.height;
 
-      if (visibleFraction < 0.1) continue; // skip mostly hidden videos
+      if (visibleFraction < 0.5) continue; // skip mostly hidden videos
 
       // Compute distance from screen center
       final videoCenter = topLeftGlobal.dy + size.height / 2;

@@ -123,6 +123,10 @@ class RedditPostCard extends StatefulWidget {
   final VoidCallback? onTap;
   final int? maxLines;
 
+  /// Whether to show media in full size.
+  /// If set to false, show a thumbnail instead.
+  final bool showMedia;
+
   const RedditPostCard({
     super.key,
     required this.post,
@@ -130,6 +134,7 @@ class RedditPostCard extends StatefulWidget {
     this.onSave,
     this.onTap,
     this.maxLines,
+    this.showMedia = true,
   });
   @override
   State<StatefulWidget> createState() => _RedditPostCardState();
@@ -311,7 +316,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
     } else {
       return switch (widget.post.kind) {
         Kind.link || Kind.unknown => true,
-        _ => false,
+        _ => !widget.showMedia,
       };
     }
   }
@@ -337,18 +342,21 @@ class _RedditPostCardState extends State<RedditPostCard> {
 
   Widget content(BuildContext context) {
     final widget = switch (this.widget.post.kind) {
-      Kind.selftext => HtmlWithConditionalFade(
+      Kind.meta => Text("meta"),
+      Kind.video => VideoContent(post: this.widget.post),
+      Kind.youtubeVideo when this.widget.showMedia =>
+        YoutubeContent(post: this.widget.post),
+      (Kind.mediaGallery || Kind.gallery) when this.widget.showMedia =>
+        GalleryView(post: this.widget.post),
+      Kind.image when this.widget.showMedia => ImageContent(
+          post: this.widget.post,
+          maxLines: this.widget.maxLines ?? 2,
+        ),
+      Kind.link || Kind.unknown => Container(),
+      Kind.selftext || _ => HtmlWithConditionalFade(
           htmlContent: this.widget.post.selftextHtml ?? "",
           maxLines: this.widget.maxLines,
         ),
-      Kind.meta => Text("meta"),
-      Kind.video => VideoContent(post: this.widget.post),
-      Kind.youtubeVideo => YoutubeContent(post: this.widget.post),
-      Kind.gallery => GalleryView(gallery: this.widget.post.gallery!),
-      Kind.mediaGallery => MediaGalleryView(post: this.widget.post),
-      Kind.image => ImageContent(post: this.widget.post),
-      Kind.link || Kind.unknown => Container(),
-      //Kind.unknown => Text("unknown"),
     };
 
     return _contentWrap(widget);

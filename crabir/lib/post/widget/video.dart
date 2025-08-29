@@ -13,7 +13,7 @@ class YoutubeContent extends StatelessWidget {
       onTap: () => launchUrlString(post.url),
       child: Stack(
         children: [
-          ImageThumbnail.redditImage(post.preview!.images[0]),
+          ImageThumbnail.redditImage(post.preview!.images[0], maxLines: 2),
           Positioned(
             top: 8,
             right: 8,

@@ -50,7 +50,10 @@ class Thread extends StatelessWidget {
                   slivers: [
                     if (post != null)
                       SliverToBoxAdapter(
-                        child: RedditPostCard(post: post),
+                        child: RedditPostCard(
+                          post: post,
+                          showMedia: false,
+                        ),
                       )
                     else
                       SliverToBoxAdapter(

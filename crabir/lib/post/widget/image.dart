@@ -8,7 +8,12 @@ import 'package:flutter/material.dart';
 
 class ImageContent extends StatelessWidget {
   final Post post;
-  const ImageContent({super.key, required this.post});
+  final int maxLines;
+  const ImageContent({
+    super.key,
+    required this.post,
+    this.maxLines = 2,
+  });
   @override
   Widget build(BuildContext context) {
     if (post.preview != null) {
@@ -24,6 +29,7 @@ class ImageContent extends StatelessWidget {
         child: ImageThumbnail.redditImage(
           image,
           title: post.selftext,
+          maxLines: maxLines,
         ),
       );
     } else {
@@ -31,12 +37,9 @@ class ImageContent extends StatelessWidget {
         onTap: () => context.router.navigate(
           FullscreenImageRoute(imageUrl: post.url),
         ),
-        child: CachedNetworkImage(
+        child: ImageThumbnail(
           imageUrl: post.url,
-          // No fade out
-          fadeOutDuration: Duration(seconds: 0),
-          fadeInDuration: Duration(seconds: 0),
-          placeholderFadeInDuration: Duration(seconds: 0),
+          maxLines: maxLines,
         ),
       );
     }

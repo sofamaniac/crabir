@@ -1,25 +1,22 @@
-import 'dart:math';
-import 'package:chewie/chewie.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart';
-import 'package:video_player/video_player.dart';
 
-class MediaGalleryView extends StatelessWidget {
+class GalleryView extends StatelessWidget {
   final Post post;
-  const MediaGalleryView({super.key, required this.post});
+  const GalleryView({super.key, required this.post});
   @override
   Widget build(BuildContext context) {
     if (post.gallery != null) {
-      return GalleryView(
+      return _GalleryView(
         gallery: post.gallery!,
       );
     } else if (post.isCrosspost) {
       final gallery = post.crosspostParentList[0].gallery;
       if (gallery != null) {
-        return GalleryView(
+        return _GalleryView(
           gallery: gallery,
         );
       } else {
@@ -31,35 +28,17 @@ class MediaGalleryView extends StatelessWidget {
   }
 }
 
-class GalleryView extends StatefulWidget {
+class _GalleryView extends StatefulWidget {
   final Gallery gallery;
 
-  const GalleryView({super.key, required this.gallery});
+  const _GalleryView({required this.gallery});
 
   @override
-  State<GalleryView> createState() => _GalleryViewState();
+  State<_GalleryView> createState() => _GalleryViewState();
 }
 
-class _GalleryViewState extends State<GalleryView> {
-  late PageController _pageController;
+class _GalleryViewState extends State<_GalleryView> {
   int _currentPage = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-    _pageController.addListener(() {
-      setState(() {
-        _currentPage = _pageController.page?.round() ?? 0;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
 
   void _openFullScreen(int initialPage) {
     Navigator.push(
@@ -76,6 +55,12 @@ class _GalleryViewState extends State<GalleryView> {
   @override
   Widget build(BuildContext context) {
     final aspectRatio = widget.gallery.aspectRatio;
+    final controller = PageController(initialPage: 0);
+    controller.addListener(() {
+      setState(() {
+        _currentPage = controller.page?.round() ?? 0;
+      });
+    });
     return Stack(
       children: [
         AspectRatio(
@@ -84,22 +69,9 @@ class _GalleryViewState extends State<GalleryView> {
             onTap: () {
               _openFullScreen(_currentPage);
             },
-            child: PageView.builder(
-              controller: _pageController,
-              itemBuilder: (context, index) {
-                final image = widget.gallery.get_(index: index);
-                return switch (image) {
-                  Source_Image() =>
-                    ImageThumbnail.fromGalleryImage(image.source),
-                  Source_AnimatedImage() => _GifContent(
-                      url: image.source.mp4,
-                      width: image.source.x,
-                      height: image.source.y),
-                };
-
-                //return ImageThumbnail.imageBase(image);
-              },
-              itemCount: widget.gallery.length,
+            child: _GalleryPageViewer(
+              gallery: widget.gallery,
+              controller: controller,
             ),
           ),
         ),
@@ -132,29 +104,21 @@ class FullScreenGalleryView extends StatefulWidget {
 }
 
 class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
-  late PageController _pageController;
-  int _currentPage = 0;
-
+  late int _currentPage;
   @override
   void initState() {
     super.initState();
     _currentPage = widget.initialPage;
-    _pageController = PageController(initialPage: widget.initialPage);
-    _pageController.addListener(() {
-      setState(() {
-        _currentPage = _pageController.page?.round() ?? 0;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final controller = PageController(initialPage: 0);
+    controller.addListener(() {
+      setState(() {
+        _currentPage = controller.page?.round() ?? 0;
+      });
+    });
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -170,80 +134,56 @@ class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
         ),
       ),
       body: Dismissible(
-        key: Key("FullScreenGalleryView"),
-        direction: DismissDirection.vertical,
-        onDismissed: (_) => Navigator.pop(context),
-        child: Center(
-          child: PageView.builder(
-            controller: _pageController,
-            itemBuilder: (context, index) {
-              final image = widget.gallery.get_(index: index);
-              return switch (image) {
-                Source_Image() => ImageThumbnail.fromGalleryImage(image.source),
-                Source_AnimatedImage() => _GifContent(
-                    url: image.source.mp4,
-                    width: image.source.x,
-                    height: image.source.y),
-              };
-            },
-            itemCount: widget.gallery.length,
-          ),
-        ),
-      ),
+          key: Key("FullScreenGalleryView"),
+          direction: DismissDirection.vertical,
+          onDismissed: (_) => Navigator.pop(context),
+          child: _GalleryPageViewer(
+            gallery: widget.gallery,
+            controller: controller,
+          )),
     );
   }
 }
 
-class _GifContent extends StatefulWidget {
-  final String url;
-  final int width;
-  final int height;
-  const _GifContent({
-    super.key,
-    required this.url,
-    required this.width,
-    required this.height,
+class _GalleryPageViewer extends StatefulWidget {
+  final Gallery gallery;
+  final PageController controller;
+  const _GalleryPageViewer({
+    required this.gallery,
+    required this.controller,
   });
-
   @override
-  State<_GifContent> createState() => _GifContentState();
+  State<_GalleryPageViewer> createState() => _GalleryPageViewerState();
 }
 
-class _GifContentState extends State<_GifContent> {
-  late VideoPlayerController _controller;
-  late ChewieController _chewieController;
-  int width = 1;
-  int height = 1;
-
+class _GalleryPageViewerState extends State<_GalleryPageViewer> {
   @override
-  void initState() {
-    super.initState();
-    final url = widget.url;
-    _controller = VideoPlayerController.networkUrl(Uri.parse(url));
-    _chewieController = ChewieController(
-      videoPlayerController: _controller,
-      autoPlay: true,
-      looping: true,
-      aspectRatio: widget.width / widget.height,
-    );
+  void dispose() {
+    widget.controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: AspectRatio(
-        aspectRatio: width / height,
-        child: Chewie(
-          controller: _chewieController,
-        ),
+      child: PageView.builder(
+        controller: widget.controller,
+        itemBuilder: (context, index) {
+          final image = widget.gallery.get_(index: index);
+          // TODO: handle resolution
+          return Center(
+            child: switch (image) {
+              Source_Image() => ImageThumbnail.fromGalleryImage(image.source),
+              Source_AnimatedImage() => AnimatedContent(
+                  url: image.source.mp4,
+                  width: image.source.x,
+                  height: image.source.y,
+                ),
+            },
+          );
+        },
+        itemCount: widget.gallery.length,
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _chewieController.dispose();
-    super.dispose();
   }
 }

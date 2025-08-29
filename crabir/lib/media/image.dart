@@ -9,9 +9,13 @@ class ImageThumbnail extends StatelessWidget {
   final int? width;
   final int? height;
 
+  /// Maximum number of lines of the title to show.
+  final int maxLines;
+
   const ImageThumbnail({
     super.key,
     required this.imageUrl,
+    required this.maxLines,
     //required this.image,
     this.placeholderUrl,
     this.title,
@@ -24,12 +28,13 @@ class ImageThumbnail extends StatelessWidget {
     Resolution resolution = Resolution.source,
     bool blur = false,
     String? title,
+    required int maxLines,
   }) {
     final length = image.resolutions.length;
     final ImageBase imageBase = switch (resolution) {
       Resolution.source => image.source,
       Resolution.high => image.resolutions[length - 2],
-      Resolution.medium => image.resolutions[length >> 1],
+      Resolution.medium => image.resolutions[(length / 2).toInt()],
       Resolution.low => image.resolutions[0],
     };
     return ImageThumbnail(
@@ -37,20 +42,34 @@ class ImageThumbnail extends StatelessWidget {
       width: imageBase.width,
       height: imageBase.height,
       title: title,
+      maxLines: maxLines,
     );
   }
 
-  static ImageThumbnail imageBase(ImageBase image, {String? title}) {
+  static ImageThumbnail imageBase(
+    ImageBase image, {
+    String? title,
+    required int maxLines,
+  }) {
     return ImageThumbnail(
       imageUrl: image.url,
       width: image.width,
       height: image.height,
       title: title,
+      maxLines: maxLines,
     );
   }
 
-  static ImageThumbnail fromGalleryImage(gallery.Image image) {
-    return ImageThumbnail(imageUrl: image.u, width: image.x, height: image.y);
+  static ImageThumbnail fromGalleryImage(
+    gallery.Image image, {
+    int maxLines = 2,
+  }) {
+    return ImageThumbnail(
+      imageUrl: image.u,
+      width: image.x,
+      height: image.y,
+      maxLines: maxLines,
+    );
   }
 
   Widget _thumbnail(BuildContext context, String url) {
@@ -69,7 +88,7 @@ class ImageThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: (width ?? 1) / max(1, (height ?? 1)),
-      child: Stack(
+      child: Column(
         children: [
           Center(
             child: CachedNetworkImage(
@@ -82,20 +101,12 @@ class ImageThumbnail extends StatelessWidget {
             ),
           ),
           if (title != null && title!.isNotEmpty)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                color: Colors.black45,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    title!,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                title!,
+                maxLines: maxLines,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
         ],
