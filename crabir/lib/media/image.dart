@@ -4,21 +4,14 @@ part of 'media.dart';
 class ImageThumbnail extends StatelessWidget {
   final String? placeholderUrl;
   //final ImageBase image;
-  final String? title;
   final String imageUrl;
   final int? width;
   final int? height;
 
-  /// Maximum number of lines of the title to show.
-  final int maxLines;
-
   const ImageThumbnail({
     super.key,
     required this.imageUrl,
-    required this.maxLines,
-    //required this.image,
     this.placeholderUrl,
-    this.title,
     this.width,
     this.height,
   });
@@ -27,8 +20,6 @@ class ImageThumbnail extends StatelessWidget {
     RedditImage image, {
     Resolution resolution = Resolution.source,
     bool blur = false,
-    String? title,
-    required int maxLines,
   }) {
     final length = image.resolutions.length;
     final ImageBase imageBase = switch (resolution) {
@@ -41,22 +32,16 @@ class ImageThumbnail extends StatelessWidget {
       imageUrl: imageBase.url,
       width: imageBase.width,
       height: imageBase.height,
-      title: title,
-      maxLines: maxLines,
     );
   }
 
   static ImageThumbnail imageBase(
-    ImageBase image, {
-    String? title,
-    required int maxLines,
-  }) {
+    ImageBase image,
+  ) {
     return ImageThumbnail(
       imageUrl: image.url,
       width: image.width,
       height: image.height,
-      title: title,
-      maxLines: maxLines,
     );
   }
 
@@ -68,7 +53,6 @@ class ImageThumbnail extends StatelessWidget {
       imageUrl: image.u,
       width: image.x,
       height: image.y,
-      maxLines: maxLines,
     );
   }
 
