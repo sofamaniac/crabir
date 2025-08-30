@@ -88,28 +88,13 @@ class ImageThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: (width ?? 1) / max(1, (height ?? 1)),
-      child: Column(
-        children: [
-          Center(
-            child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              placeholder: _thumbnail,
-              // No fade out
-              fadeOutDuration: Duration(seconds: 0),
-              fadeInDuration: Duration(seconds: 0),
-              placeholderFadeInDuration: Duration(seconds: 0),
-            ),
-          ),
-          if (title != null && title!.isNotEmpty)
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                title!,
-                maxLines: maxLines,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-        ],
+      child: CachedNetworkImage(
+        imageUrl: imageUrl,
+        placeholder: _thumbnail,
+        // No fade out
+        fadeOutDuration: Duration(seconds: 0),
+        fadeInDuration: Duration(seconds: 0),
+        placeholderFadeInDuration: Duration(seconds: 0),
       ),
     );
   }
