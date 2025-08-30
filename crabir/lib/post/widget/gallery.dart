@@ -1,5 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/media/media.dart';
+import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart';
@@ -41,13 +43,10 @@ class _GalleryViewState extends State<_GalleryView> {
   int _currentPage = 0;
 
   void _openFullScreen(int initialPage) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => FullScreenGalleryView(
-          gallery: widget.gallery,
-          initialPage: initialPage,
-        ),
+    context.router.navigate(
+      FullScreenGalleryRoute(
+        gallery: widget.gallery,
+        initialPage: initialPage,
       ),
     );
   }
@@ -89,6 +88,7 @@ class _GalleryViewState extends State<_GalleryView> {
   }
 }
 
+@RoutePage()
 class FullScreenGalleryView extends StatefulWidget {
   final Gallery gallery;
   final int initialPage;
@@ -113,7 +113,7 @@ class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = PageController(initialPage: 0);
+    final controller = PageController(initialPage: widget.initialPage);
     controller.addListener(() {
       setState(() {
         _currentPage = controller.page?.round() ?? 0;
@@ -171,16 +171,15 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
         itemBuilder: (context, index) {
           final image = widget.gallery.get_(index: index);
           // TODO: handle resolution
-          return Center(
-            child: switch (image) {
-              Source_Image() => ImageThumbnail.fromGalleryImage(image.source),
-              Source_AnimatedImage() => AnimatedContent(
-                  url: image.source.mp4,
-                  width: image.source.x,
-                  height: image.source.y,
-                ),
-            },
-          );
+          // TODO: display title if any
+          return switch (image) {
+            Source_Image() => ImageThumbnail.fromGalleryImage(image.source),
+            Source_AnimatedImage() => AnimatedContent(
+                url: image.source.mp4,
+                width: image.source.x,
+                height: image.source.y,
+              ),
+          };
         },
         itemCount: widget.gallery.length,
       ),

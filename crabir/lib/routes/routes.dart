@@ -1,13 +1,16 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:crabir/account_selection_dialogue.dart';
 import 'package:crabir/feed/feed.dart';
 import 'package:crabir/feed/multi.dart';
 import 'package:crabir/main.dart';
 import 'package:crabir/media/media.dart';
+import 'package:crabir/post/widget/gallery.dart';
 import 'package:crabir/search_posts/widgets/search.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/user/model.dart';
@@ -65,7 +68,9 @@ class AppRouter extends RootStackRouter {
         ),
         threadRoute,
         AutoRoute(page: FullscreenImageRoute.page),
+        AutoRoute(page: FullScreenGalleryRoute.page),
         settingsRoute,
+        AutoRoute(page: AccountSelectionRoute.page),
         AutoRoute(page: CommentsSettingsRoute.page),
       ];
 }

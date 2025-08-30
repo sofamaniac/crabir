@@ -11,6 +11,22 @@
 part of 'routes.dart';
 
 /// generated route for
+/// [AccountSelectionDialogue]
+class AccountSelectionRoute extends PageRouteInfo<void> {
+  const AccountSelectionRoute({List<PageRouteInfo>? children})
+    : super(AccountSelectionRoute.name, initialChildren: children);
+
+  static const String name = 'AccountSelectionRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AccountSelectionDialogue();
+    },
+  );
+}
+
+/// generated route for
 /// [CommentsSettingsView]
 class CommentsSettingsRoute extends PageRouteInfo<void> {
   const CommentsSettingsRoute({List<PageRouteInfo>? children})
@@ -80,6 +96,70 @@ class FeedRouteArgs {
 
   @override
   int get hashCode => key.hashCode ^ feed.hashCode ^ initialSort.hashCode;
+}
+
+/// generated route for
+/// [FullScreenGalleryView]
+class FullScreenGalleryRoute extends PageRouteInfo<FullScreenGalleryRouteArgs> {
+  FullScreenGalleryRoute({
+    Key? key,
+    required Gallery gallery,
+    required int initialPage,
+    List<PageRouteInfo>? children,
+  }) : super(
+         FullScreenGalleryRoute.name,
+         args: FullScreenGalleryRouteArgs(
+           key: key,
+           gallery: gallery,
+           initialPage: initialPage,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'FullScreenGalleryRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<FullScreenGalleryRouteArgs>();
+      return FullScreenGalleryView(
+        key: args.key,
+        gallery: args.gallery,
+        initialPage: args.initialPage,
+      );
+    },
+  );
+}
+
+class FullScreenGalleryRouteArgs {
+  const FullScreenGalleryRouteArgs({
+    this.key,
+    required this.gallery,
+    required this.initialPage,
+  });
+
+  final Key? key;
+
+  final Gallery gallery;
+
+  final int initialPage;
+
+  @override
+  String toString() {
+    return 'FullScreenGalleryRouteArgs{key: $key, gallery: $gallery, initialPage: $initialPage}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! FullScreenGalleryRouteArgs) return false;
+    return key == other.key &&
+        gallery == other.gallery &&
+        initialPage == other.initialPage;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ gallery.hashCode ^ initialPage.hashCode;
 }
 
 /// generated route for
@@ -450,11 +530,10 @@ class UserAboutRoute extends PageRouteInfo<UserAboutRouteArgs> {
   UserAboutRoute({
     Key? key,
     required String username,
-    UserStreamSort sort = const UserStreamSort.new_(),
     List<PageRouteInfo>? children,
   }) : super(
          UserAboutRoute.name,
-         args: UserAboutRouteArgs(key: key, username: username, sort: sort),
+         args: UserAboutRouteArgs(key: key, username: username),
          initialChildren: children,
        );
 
@@ -464,42 +543,32 @@ class UserAboutRoute extends PageRouteInfo<UserAboutRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<UserAboutRouteArgs>();
-      return UserAboutView(
-        key: args.key,
-        username: args.username,
-        sort: args.sort,
-      );
+      return UserAboutView(key: args.key, username: args.username);
     },
   );
 }
 
 class UserAboutRouteArgs {
-  const UserAboutRouteArgs({
-    this.key,
-    required this.username,
-    this.sort = const UserStreamSort.new_(),
-  });
+  const UserAboutRouteArgs({this.key, required this.username});
 
   final Key? key;
 
   final String username;
 
-  final UserStreamSort sort;
-
   @override
   String toString() {
-    return 'UserAboutRouteArgs{key: $key, username: $username, sort: $sort}';
+    return 'UserAboutRouteArgs{key: $key, username: $username}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! UserAboutRouteArgs) return false;
-    return key == other.key && username == other.username && sort == other.sort;
+    return key == other.key && username == other.username;
   }
 
   @override
-  int get hashCode => key.hashCode ^ username.hashCode ^ sort.hashCode;
+  int get hashCode => key.hashCode ^ username.hashCode;
 }
 
 /// generated route for
@@ -624,11 +693,10 @@ class UserDownvotedRoute extends PageRouteInfo<UserDownvotedRouteArgs> {
   UserDownvotedRoute({
     Key? key,
     required String username,
-    UserStreamSort sort = const UserStreamSort.new_(),
     List<PageRouteInfo>? children,
   }) : super(
          UserDownvotedRoute.name,
-         args: UserDownvotedRouteArgs(key: key, username: username, sort: sort),
+         args: UserDownvotedRouteArgs(key: key, username: username),
          initialChildren: children,
        );
 
@@ -638,42 +706,32 @@ class UserDownvotedRoute extends PageRouteInfo<UserDownvotedRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<UserDownvotedRouteArgs>();
-      return UserDownvotedView(
-        key: args.key,
-        username: args.username,
-        sort: args.sort,
-      );
+      return UserDownvotedView(key: args.key, username: args.username);
     },
   );
 }
 
 class UserDownvotedRouteArgs {
-  const UserDownvotedRouteArgs({
-    this.key,
-    required this.username,
-    this.sort = const UserStreamSort.new_(),
-  });
+  const UserDownvotedRouteArgs({this.key, required this.username});
 
   final Key? key;
 
   final String username;
 
-  final UserStreamSort sort;
-
   @override
   String toString() {
-    return 'UserDownvotedRouteArgs{key: $key, username: $username, sort: $sort}';
+    return 'UserDownvotedRouteArgs{key: $key, username: $username}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! UserDownvotedRouteArgs) return false;
-    return key == other.key && username == other.username && sort == other.sort;
+    return key == other.key && username == other.username;
   }
 
   @override
-  int get hashCode => key.hashCode ^ username.hashCode ^ sort.hashCode;
+  int get hashCode => key.hashCode ^ username.hashCode;
 }
 
 /// generated route for
@@ -972,11 +1030,10 @@ class UserSavedRoute extends PageRouteInfo<UserSavedRouteArgs> {
   UserSavedRoute({
     Key? key,
     required String username,
-    UserStreamSort sort = const UserStreamSort.new_(),
     List<PageRouteInfo>? children,
   }) : super(
          UserSavedRoute.name,
-         args: UserSavedRouteArgs(key: key, username: username, sort: sort),
+         args: UserSavedRouteArgs(key: key, username: username),
          initialChildren: children,
        );
 
@@ -986,42 +1043,32 @@ class UserSavedRoute extends PageRouteInfo<UserSavedRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<UserSavedRouteArgs>();
-      return UserSavedView(
-        key: args.key,
-        username: args.username,
-        sort: args.sort,
-      );
+      return UserSavedView(key: args.key, username: args.username);
     },
   );
 }
 
 class UserSavedRouteArgs {
-  const UserSavedRouteArgs({
-    this.key,
-    required this.username,
-    this.sort = const UserStreamSort.new_(),
-  });
+  const UserSavedRouteArgs({this.key, required this.username});
 
   final Key? key;
 
   final String username;
 
-  final UserStreamSort sort;
-
   @override
   String toString() {
-    return 'UserSavedRouteArgs{key: $key, username: $username, sort: $sort}';
+    return 'UserSavedRouteArgs{key: $key, username: $username}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! UserSavedRouteArgs) return false;
-    return key == other.key && username == other.username && sort == other.sort;
+    return key == other.key && username == other.username;
   }
 
   @override
-  int get hashCode => key.hashCode ^ username.hashCode ^ sort.hashCode;
+  int get hashCode => key.hashCode ^ username.hashCode;
 }
 
 /// generated route for
@@ -1030,11 +1077,10 @@ class UserUpvotedRoute extends PageRouteInfo<UserUpvotedRouteArgs> {
   UserUpvotedRoute({
     Key? key,
     required String username,
-    UserStreamSort sort = const UserStreamSort.new_(),
     List<PageRouteInfo>? children,
   }) : super(
          UserUpvotedRoute.name,
-         args: UserUpvotedRouteArgs(key: key, username: username, sort: sort),
+         args: UserUpvotedRouteArgs(key: key, username: username),
          initialChildren: children,
        );
 
@@ -1044,42 +1090,32 @@ class UserUpvotedRoute extends PageRouteInfo<UserUpvotedRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<UserUpvotedRouteArgs>();
-      return UserUpvotedView(
-        key: args.key,
-        username: args.username,
-        sort: args.sort,
-      );
+      return UserUpvotedView(key: args.key, username: args.username);
     },
   );
 }
 
 class UserUpvotedRouteArgs {
-  const UserUpvotedRouteArgs({
-    this.key,
-    required this.username,
-    this.sort = const UserStreamSort.new_(),
-  });
+  const UserUpvotedRouteArgs({this.key, required this.username});
 
   final Key? key;
 
   final String username;
 
-  final UserStreamSort sort;
-
   @override
   String toString() {
-    return 'UserUpvotedRouteArgs{key: $key, username: $username, sort: $sort}';
+    return 'UserUpvotedRouteArgs{key: $key, username: $username}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! UserUpvotedRouteArgs) return false;
-    return key == other.key && username == other.username && sort == other.sort;
+    return key == other.key && username == other.username;
   }
 
   @override
-  int get hashCode => key.hashCode ^ username.hashCode ^ sort.hashCode;
+  int get hashCode => key.hashCode ^ username.hashCode;
 }
 
 /// generated route for
