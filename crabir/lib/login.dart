@@ -176,7 +176,12 @@ Future<bool> loginToReddit() async {
   await RedditAPI.client().authenticate(refreshToken: refreshToken);
   final UserInfo userInfo = await RedditAPI.client().loggedUserInfo();
   await AccountDatabase().insertAccount(
-      UserAccount.fromUserInfo(userInfo, accessToken, refreshToken));
+    UserAccount.fromUserInfo(
+      userInfo,
+      accessToken,
+      refreshToken,
+    ),
+  );
   return true;
 }
 

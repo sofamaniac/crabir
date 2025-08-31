@@ -1,6 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
+import 'package:crabir/accounts/widgets/account_selector.dart';
 import 'package:crabir/drawer/drawer.dart';
+import 'package:crabir/login.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
@@ -85,10 +87,48 @@ class TopLevel extends StatelessWidget {
 }
 
 @RoutePage()
-class MainScreenView extends StatelessWidget {
+class MainScreenView extends StatefulWidget {
   const MainScreenView({super.key});
+
+  @override
+  State<MainScreenView> createState() => _MainScreenViewState();
+}
+
+class _MainScreenViewState extends State<MainScreenView> {
+  bool addListener = true;
+  bool showingDialog = false;
+
+  bool showAccountSelectionDialogue(UserAccount? account, int index) {
+    return (account == null || account.isAnonymous) &&
+        (index == profileIndex || index == inboxIndex);
+  }
+
+  void _showLoginDialog(BuildContext context) async {
+    if (showingDialog) {
+      return;
+    }
+    showingDialog = true;
+    await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Login Required"),
+        content: AccountSelector(
+          showCurrentAccount: false,
+        ),
+        actions: [
+          TextButton(
+            child: const Text("Cancel"),
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+        ],
+      ),
+    );
+    showingDialog = false;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<ThemeBloc>().state;
     final routes = <PageRouteInfo>[
       NamedRoute(homeRouteName),
       SearchSubredditsRoute(),
@@ -96,12 +136,31 @@ class MainScreenView extends StatelessWidget {
       InboxRoute(),
       UserRoute(),
     ];
-    final theme = context.watch<ThemeBloc>().state;
+    final user = context.watch<AccountsBloc>().state.account;
     return AutoTabsRouter.tabBar(
       homeIndex: 0,
       physics: NeverScrollableScrollPhysics(),
       routes: routes,
       builder: (context, child, tabController) {
+        void listener() {
+          final index = tabController.index;
+          if (showAccountSelectionDialogue(user, index) &&
+              tabController.indexIsChanging &&
+              tabController.index > tabController.previousIndex) {
+            // reset to previous tab
+            tabController.index = tabController.previousIndex;
+
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => _showLoginDialog(context),
+            );
+          }
+        }
+
+        if (addListener) {
+          tabController.addListener(listener);
+          addListener = false;
+        }
+
         final tabsRouter = AutoTabsRouter.of(context);
         return Scaffold(
           backgroundColor: theme.background,
@@ -112,8 +171,7 @@ class MainScreenView extends StatelessWidget {
             indicatorColor: theme.primaryColor,
             controller: tabController,
             onTap: (index) {
-              tabController.animateTo(index);
-              //tabsRouter.setActiveIndex(index);
+              tabsRouter.setActiveIndex(index);
               if (index == subscriptionsIndex) {
                 tabsRouter
                     .stackRouterOfIndex(index)

@@ -11,22 +11,6 @@
 part of 'routes.dart';
 
 /// generated route for
-/// [AccountSelectionDialogue]
-class AccountSelectionRoute extends PageRouteInfo<void> {
-  const AccountSelectionRoute({List<PageRouteInfo>? children})
-    : super(AccountSelectionRoute.name, initialChildren: children);
-
-  static const String name = 'AccountSelectionRoute';
-
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const AccountSelectionDialogue();
-    },
-  );
-}
-
-/// generated route for
 /// [CommentsSettingsView]
 class CommentsSettingsRoute extends PageRouteInfo<void> {
   const CommentsSettingsRoute({List<PageRouteInfo>? children})

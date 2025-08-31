@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:collection/collection.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
+import 'package:crabir/accounts/widgets/account_selector.dart';
 import 'package:crabir/base_feeds.dart';
 import 'package:crabir/feed_list.dart';
 import 'package:crabir/loading_indicator.dart';

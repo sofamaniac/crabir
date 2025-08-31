@@ -63,51 +63,6 @@ class DrawerState extends State<AppDrawer> {
     );
   }
 
-  Widget accountSelector(BuildContext context) {
-    return BlocBuilder<AccountsBloc, AccountState>(
-      builder: (context, state) {
-        if (state.account == null) {
-          return const LoadingIndicator();
-        }
-        final bloc = context.read<AccountsBloc>();
-        return Expanded(
-          child: ListView(
-            children: [
-              ...state.allAccounts.mapIndexed(
-                (index, account) {
-                  if (account == state.account) {
-                    return Container();
-                  } else {
-                    return ListTile(
-                      onTap: () async {
-                        bloc.add(SelectAccount(index));
-                        // close menu after selection
-                        changeMode(isSelectingAccount: false);
-                      },
-                      leading: CircleAvatar(
-                        radius: 24,
-                        foregroundImage: NetworkImage(account.profilePicture),
-                      ),
-                      title: Text(account.username),
-                    );
-                  }
-                },
-              ),
-              ListTile(
-                onTap: () async {
-                  if (await loginToReddit()) {
-                    bloc.add(Initialize());
-                  }
-                },
-                title: Text("Add an account"),
-              )
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -115,7 +70,14 @@ class DrawerState extends State<AppDrawer> {
         mainAxisSize: MainAxisSize.min,
         children: [
           currentAccountView(context),
-          isSelectingAccount ? accountSelector(context) : DrawerFeedSelection()
+          isSelectingAccount
+              ? Expanded(
+                  child: AccountSelector(
+                    showCurrentAccount: false,
+                    onTapCallback: () => changeMode(isSelectingAccount: false),
+                  ),
+                )
+              : DrawerFeedSelection()
         ],
       ),
     );

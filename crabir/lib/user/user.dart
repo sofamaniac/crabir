@@ -17,6 +17,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
 part 'tabs.dart';
 
 /// Defaults to the current logged in user if not specified.
+/// Should only be called when there is a non-anonymous user logged in.
 @RoutePage()
 class UserView extends StatelessWidget {
   final String? username;
@@ -26,22 +27,7 @@ class UserView extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUser = context.watch<AccountsBloc>().state.account;
     final user = username ?? currentUser?.username;
-    if (user == null || currentUser?.isAnonymous == true) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        final result = await showDialog(
-          context: context,
-          builder: (context) => const Dialog(
-            child: Text("TODO: account selection"),
-          ),
-        );
-        if (result == null) {
-          context.tabsRouter.setActiveIndex(0);
-        }
-      });
-      return const SizedBox.shrink();
-    } else {
-      return _UserView(username: user);
-    }
+    return _UserView(username: user!);
   }
 }
 

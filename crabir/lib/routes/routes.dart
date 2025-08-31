@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:crabir/account_selection_dialogue.dart';
 import 'package:crabir/feed/feed.dart';
 import 'package:crabir/feed/multi.dart';
 import 'package:crabir/main.dart';
@@ -70,7 +69,6 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: FullscreenImageRoute.page),
         AutoRoute(page: FullScreenGalleryRoute.page),
         settingsRoute,
-        AutoRoute(page: AccountSelectionRoute.page),
         AutoRoute(page: CommentsSettingsRoute.page),
       ];
 }
