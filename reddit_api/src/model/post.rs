@@ -8,7 +8,7 @@ use crate::utils;
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, with_prefix};
 
-use super::{Fullname, Thing, gallery::Gallery, subreddit::SubredditInfo};
+use super::{Fullname, Thing, comment::CommentSort, gallery::Gallery, subreddit::SubredditInfo};
 
 with_prefix!(prefix_link_flair "link_flair_");
 with_prefix!(prefix_flair "flair_");
@@ -140,7 +140,7 @@ pub struct Post {
     #[serde(deserialize_with = "utils::response_or_none")]
     pub edited: Option<f64>,
     /// Suggested sort for comments
-    pub suggested_sort: Option<String>,
+    pub suggested_sort: Option<CommentSort>,
     pub view_count: Option<String>,
     pub archived: bool,
     pub is_crosspostable: bool,

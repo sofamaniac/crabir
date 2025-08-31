@@ -500,7 +500,7 @@ impl Client {
         ))
     }
 
-    /// Vote on a votable item (i.e. a [`Post`] or a [`Comment`]).
+    /// Vote on a votable item (i.e. a [`Post`] or a [`comment::Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
     pub async fn vote(&self, thing: &Fullname, direction: VoteDirection) -> Result<()> {
@@ -517,7 +517,7 @@ impl Client {
         Ok(())
     }
 
-    /// Save a saveable item (i.e. a [`Post`] or a [`Comment`]).
+    /// Save a saveable item (i.e. a [`Post`] or a [`comment::Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
     pub async fn save(&self, thing: &Fullname) -> Result<()> {
@@ -528,7 +528,7 @@ impl Client {
         Ok(())
     }
 
-    /// Unsave a saveable item (i.e. a [`Post`] or a [`Comment`]).
+    /// Unsave a saveable item (i.e. a [`Post`] or a [`comment::Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
     pub async fn unsave(&self, thing: &Fullname) -> Result<()> {

@@ -201,12 +201,75 @@ class _$LoadMoreCopyWithImpl<$Res> implements $LoadMoreCopyWith<$Res> {
 }
 
 /// @nodoc
+
+class SetSort implements ThreadEvent {
+  SetSort(this.sort);
+
+  final CommentSort? sort;
+
+  /// Create a copy of ThreadEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $SetSortCopyWith<SetSort> get copyWith =>
+      _$SetSortCopyWithImpl<SetSort>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SetSort &&
+            (identical(other.sort, sort) || other.sort == sort));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, sort);
+
+  @override
+  String toString() {
+    return 'ThreadEvent.setSort(sort: $sort)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $SetSortCopyWith<$Res>
+    implements $ThreadEventCopyWith<$Res> {
+  factory $SetSortCopyWith(SetSort value, $Res Function(SetSort) _then) =
+      _$SetSortCopyWithImpl;
+  @useResult
+  $Res call({CommentSort? sort});
+}
+
+/// @nodoc
+class _$SetSortCopyWithImpl<$Res> implements $SetSortCopyWith<$Res> {
+  _$SetSortCopyWithImpl(this._self, this._then);
+
+  final SetSort _self;
+  final $Res Function(SetSort) _then;
+
+  /// Create a copy of ThreadEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? sort = freezed,
+  }) {
+    return _then(SetSort(
+      freezed == sort
+          ? _self.sort
+          : sort // ignore: cast_nullable_to_non_nullable
+              as CommentSort?,
+    ));
+  }
+}
+
+/// @nodoc
 mixin _$ThreadState {
   List<Thing> get flatComments;
   Post? get post;
   Status get status;
   Set<String> get collapsed;
   Set<String> get hidden;
+  CommentSort? get sort;
 
   /// Create a copy of ThreadState
   /// with the given fields replaced by the non-null parameter values.
@@ -225,7 +288,8 @@ mixin _$ThreadState {
             (identical(other.post, post) || other.post == post) &&
             (identical(other.status, status) || other.status == status) &&
             const DeepCollectionEquality().equals(other.collapsed, collapsed) &&
-            const DeepCollectionEquality().equals(other.hidden, hidden));
+            const DeepCollectionEquality().equals(other.hidden, hidden) &&
+            (identical(other.sort, sort) || other.sort == sort));
   }
 
   @override
@@ -235,11 +299,12 @@ mixin _$ThreadState {
       post,
       status,
       const DeepCollectionEquality().hash(collapsed),
-      const DeepCollectionEquality().hash(hidden));
+      const DeepCollectionEquality().hash(hidden),
+      sort);
 
   @override
   String toString() {
-    return 'ThreadState(flatComments: $flatComments, post: $post, status: $status, collapsed: $collapsed, hidden: $hidden)';
+    return 'ThreadState(flatComments: $flatComments, post: $post, status: $status, collapsed: $collapsed, hidden: $hidden, sort: $sort)';
   }
 }
 
@@ -254,7 +319,8 @@ abstract mixin class $ThreadStateCopyWith<$Res> {
       Post? post,
       Status status,
       Set<String> collapsed,
-      Set<String> hidden});
+      Set<String> hidden,
+      CommentSort? sort});
 }
 
 /// @nodoc
@@ -274,6 +340,7 @@ class _$ThreadStateCopyWithImpl<$Res> implements $ThreadStateCopyWith<$Res> {
     Object? status = null,
     Object? collapsed = null,
     Object? hidden = null,
+    Object? sort = freezed,
   }) {
     return _then(_self.copyWith(
       flatComments: null == flatComments
@@ -296,6 +363,10 @@ class _$ThreadStateCopyWithImpl<$Res> implements $ThreadStateCopyWith<$Res> {
           ? _self.hidden
           : hidden // ignore: cast_nullable_to_non_nullable
               as Set<String>,
+      sort: freezed == sort
+          ? _self.sort
+          : sort // ignore: cast_nullable_to_non_nullable
+              as CommentSort?,
     ));
   }
 }
@@ -308,7 +379,8 @@ class _ThreadState implements ThreadState {
       this.post,
       this.status = Status.unloaded,
       final Set<String> collapsed = const {},
-      final Set<String> hidden = const {}})
+      final Set<String> hidden = const {},
+      this.sort = null})
       : _flatComments = flatComments,
         _collapsed = collapsed,
         _hidden = hidden;
@@ -345,6 +417,10 @@ class _ThreadState implements ThreadState {
     return EqualUnmodifiableSetView(_hidden);
   }
 
+  @override
+  @JsonKey()
+  final CommentSort? sort;
+
   /// Create a copy of ThreadState
   /// with the given fields replaced by the non-null parameter values.
   @override
@@ -364,7 +440,8 @@ class _ThreadState implements ThreadState {
             (identical(other.status, status) || other.status == status) &&
             const DeepCollectionEquality()
                 .equals(other._collapsed, _collapsed) &&
-            const DeepCollectionEquality().equals(other._hidden, _hidden));
+            const DeepCollectionEquality().equals(other._hidden, _hidden) &&
+            (identical(other.sort, sort) || other.sort == sort));
   }
 
   @override
@@ -374,11 +451,12 @@ class _ThreadState implements ThreadState {
       post,
       status,
       const DeepCollectionEquality().hash(_collapsed),
-      const DeepCollectionEquality().hash(_hidden));
+      const DeepCollectionEquality().hash(_hidden),
+      sort);
 
   @override
   String toString() {
-    return 'ThreadState(flatComments: $flatComments, post: $post, status: $status, collapsed: $collapsed, hidden: $hidden)';
+    return 'ThreadState(flatComments: $flatComments, post: $post, status: $status, collapsed: $collapsed, hidden: $hidden, sort: $sort)';
   }
 }
 
@@ -395,7 +473,8 @@ abstract mixin class _$ThreadStateCopyWith<$Res>
       Post? post,
       Status status,
       Set<String> collapsed,
-      Set<String> hidden});
+      Set<String> hidden,
+      CommentSort? sort});
 }
 
 /// @nodoc
@@ -415,6 +494,7 @@ class __$ThreadStateCopyWithImpl<$Res> implements _$ThreadStateCopyWith<$Res> {
     Object? status = null,
     Object? collapsed = null,
     Object? hidden = null,
+    Object? sort = freezed,
   }) {
     return _then(_ThreadState(
       flatComments: null == flatComments
@@ -437,6 +517,10 @@ class __$ThreadStateCopyWithImpl<$Res> implements _$ThreadStateCopyWith<$Res> {
           ? _self._hidden
           : hidden // ignore: cast_nullable_to_non_nullable
               as Set<String>,
+      sort: freezed == sort
+          ? _self.sort
+          : sort // ignore: cast_nullable_to_non_nullable
+              as CommentSort?,
     ));
   }
 }

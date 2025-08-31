@@ -6,6 +6,7 @@
 import '../../../frb_generated.dart';
 import '../model.dart';
 import 'author.dart';
+import 'comment.dart';
 import 'flair.dart';
 import 'gallery.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -152,7 +153,7 @@ abstract class Post implements RustOpaqueInterface {
 
   SubredditInfo get subreddit;
 
-  String? get suggestedSort;
+  CommentSort? get suggestedSort;
 
   String get title;
 
@@ -312,7 +313,7 @@ abstract class Post implements RustOpaqueInterface {
 
   set subreddit(SubredditInfo subreddit);
 
-  set suggestedSort(String? suggestedSort);
+  set suggestedSort(CommentSort? suggestedSort);
 
   set title(String title);
 

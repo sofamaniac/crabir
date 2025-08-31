@@ -18987,7 +18987,8 @@ fn wire__reddit_api__model__post__Post_auto_accessor_set_suggested_sort_impl(
             let api_that = <RustOpaqueMoi<
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Post>,
             >>::sse_decode(&mut deserializer);
-            let api_suggested_sort = <Option<String>>::sse_decode(&mut deserializer);
+            let api_suggested_sort =
+                <Option<reddit_api::model::comment::CommentSort>>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let mut api_that_guard = None;

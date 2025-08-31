@@ -11,4 +11,7 @@ sealed class ThreadEvent with _$ThreadEvent {
 
   /// Load more comments
   factory ThreadEvent.loadMore(Thing_More more) = LoadMore;
+
+  /// Change sort
+  factory ThreadEvent.setSort(CommentSort? sort) = SetSort;
 }

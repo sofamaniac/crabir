@@ -10,5 +10,6 @@ abstract class ThreadState with _$ThreadState {
     @Default(Status.unloaded) Status status,
     @Default({}) Set<String> collapsed,
     @Default({}) Set<String> hidden,
+    @Default(null) CommentSort? sort,
   }) = _ThreadState;
 }

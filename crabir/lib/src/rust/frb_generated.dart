@@ -971,7 +971,7 @@ abstract class RustLibApi extends BaseApi {
   SubredditInfo redditApiModelPostPostAutoAccessorGetSubreddit(
       {required Post that});
 
-  String? redditApiModelPostPostAutoAccessorGetSuggestedSort(
+  CommentSort? redditApiModelPostPostAutoAccessorGetSuggestedSort(
       {required Post that});
 
   String redditApiModelPostPostAutoAccessorGetTitle({required Post that});
@@ -1205,7 +1205,7 @@ abstract class RustLibApi extends BaseApi {
       {required Post that, required SubredditInfo subreddit});
 
   void redditApiModelPostPostAutoAccessorSetSuggestedSort(
-      {required Post that, String? suggestedSort});
+      {required Post that, CommentSort? suggestedSort});
 
   void redditApiModelPostPostAutoAccessorSetTitle(
       {required Post that, required String title});
@@ -10423,7 +10423,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  String? redditApiModelPostPostAutoAccessorGetSuggestedSort(
+  CommentSort? redditApiModelPostPostAutoAccessorGetSuggestedSort(
       {required Post that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
@@ -10433,7 +10433,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 311)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_String,
+        decodeSuccessData: sse_decode_opt_box_autoadd_comment_sort,
         decodeErrorData: null,
       ),
       constMeta: kRedditApiModelPostPostAutoAccessorGetSuggestedSortConstMeta,
@@ -12613,13 +12613,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void redditApiModelPostPostAutoAccessorSetSuggestedSort(
-      {required Post that, String? suggestedSort}) {
+      {required Post that, CommentSort? suggestedSort}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPost(
             that, serializer);
-        sse_encode_opt_String(suggestedSort, serializer);
+        sse_encode_opt_box_autoadd_comment_sort(suggestedSort, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 391)!;
       },
       codec: SseCodec(
@@ -25318,7 +25318,7 @@ class PostImpl extends RustOpaque implements Post {
         that: this,
       );
 
-  String? get suggestedSort =>
+  CommentSort? get suggestedSort =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorGetSuggestedSort(
         that: this,
       );
@@ -25634,7 +25634,7 @@ class PostImpl extends RustOpaque implements Post {
       RustLib.instance.api.redditApiModelPostPostAutoAccessorSetSubreddit(
           that: this, subreddit: subreddit);
 
-  set suggestedSort(String? suggestedSort) =>
+  set suggestedSort(CommentSort? suggestedSort) =>
       RustLib.instance.api.redditApiModelPostPostAutoAccessorSetSuggestedSort(
           that: this, suggestedSort: suggestedSort);
 

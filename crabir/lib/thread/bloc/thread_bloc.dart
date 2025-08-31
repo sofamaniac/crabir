@@ -20,6 +20,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   bool _loaded = false;
   late final Post _post;
   final String permalink;
+  CommentSort? _sort;
   final Logger log = Logger("ThreadBloc");
 
   ThreadBloc(this.permalink) : super(ThreadState()) {
@@ -27,6 +28,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     on<Collapse>(_collapse);
     on<LoadMore>(_loadMore);
     on<Refresh>(_refresh);
+    on<SetSort>(_setSort);
   }
 
   Future<void> _initialize(Load _, Emitter<ThreadState> emit) async {
@@ -39,7 +41,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       _post = things.$1;
       _comments = things.$2;
       _loaded = true;
-      log.info("comments (${_comments.length}) and post loaded");
+      log.info("(${_comments.length}) comments and post loaded");
       emit(state.copyWith(post: _post, flatComments: flatten(_comments)));
     } catch (e) {
       log.severe("Error during initial load: $e");
@@ -47,14 +49,25 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     }
   }
 
+  Future<void> _setSort(SetSort sort, Emitter<ThreadState> emit) async {
+    print("$_sort, ${sort.sort}");
+    if (_sort == sort.sort) return;
+    _sort = sort.sort;
+    await _refresh(Refresh(), emit);
+  }
+
   Future<void> _refresh(Refresh _, Emitter<ThreadState> emit) async {
     emit(state.copyWith(status: Status.unloaded));
     try {
-      final things = await RedditAPI.client().comments(permalink: permalink);
+      print("SORT: $_sort");
+      final things = await RedditAPI.client().comments(
+        permalink: permalink,
+        sort: _sort,
+      );
       _comments = things.$2;
       _loaded = true;
       log.info("comments (${_comments.length}) refreshed");
-      emit(state.copyWith(flatComments: flatten(_comments)));
+      emit(state.copyWith(sort: _sort, flatComments: flatten(_comments)));
     } catch (e) {
       log.severe("Error while refreshing comments: $e");
       emit(state.copyWith(status: Status.failure));
