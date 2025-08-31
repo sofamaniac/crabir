@@ -1,5 +1,6 @@
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/settings_page/annotations.dart';
+import 'package:crabir/thread/widgets/thread.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -11,50 +12,111 @@ part 'comments_settings.freezed.dart';
 part 'comments_settings.settings_page.dart';
 part 'comments_settings.g.dart';
 
+class _CommentsSortSelection extends StatelessWidget {
+  final CommentSort value;
+  final void Function(CommentSort) onChanged;
+
+  const _CommentsSortSelection({required this.value, required this.onChanged});
+
+  Future<CommentSort?> _showSelectionDialogue(BuildContext context) async {
+    final result = await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Select sort"),
+            actions: commentSorts
+                .map((sort) => ListTile(
+                      title: Text(sort.label()),
+                      onTap: () => Navigator.pop(context, sort),
+                    ))
+                .toList(),
+          );
+        });
+    return result;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text("Default comments sort"),
+      subtitle: Text(value.label()),
+      onTap: () async {
+        final sort = await _showSelectionDialogue(context);
+        if (sort != null) {
+          onChanged(sort);
+        }
+      },
+    );
+  }
+}
+
 @freezed
 @SettingsPage(prefix: "comments_", useFieldName: true)
 abstract class CommentsSettings with _$CommentsSettings {
   CommentsSettings._();
   factory CommentsSettings({
-    @Default(CommentSort.top) CommentSort sort,
+    @Setting(widget: _CommentsSortSelection)
+    @Default(CommentSort.top)
+    CommentSort defaultSort,
     @Setting() @Default(true) bool useSuggestedSort,
     @Category(name: "Appearance")
     @Setting()
     @Default(true)
+    // TODO:
     bool showNavigationBar,
+    // TODO: (requires an additional api call)
     @Setting() @Default(true) bool showUserAvatar,
+    // TODO: I don't understand how `flutter_html` renders images.
     @Setting() @Default(true) bool showCommentsImage,
     //@Default() MediaPreviewSize postMediaPreviewSize,
-    @Setting() @Default(true) bool buttonsAlwaysVisible,
+    @Setting() @Default(false) bool buttonsAlwaysVisible,
     @Setting() @Default(true) bool hideButtonAfterAction,
+    // TODO:
     @Setting() @Default(true) bool collapseAutoMod,
+    // TODO:
     @Setting() @Default(true) bool collapseDisruptiveComment,
+    // TODO:
     @Setting() @Default(true) bool showPostUpvotePercentage,
     //@Default() GuideStyle threadGuide,
     @Setting() @Default(true) bool highlightMyUsername,
+    // TODO:
     @Setting() @Default(true) bool showFloatingButton,
+    // TODO:
     @Category(name: "Awards") @Setting() @Default(true) bool showAwards,
+    // TODO:
     @Setting() @Default(true) bool clickableAwards,
     @Category(name: "Flairs") @Setting() @Default(true) bool showUserFlair,
+    // TODO:
     @Setting() @Default(true) bool showFlairColors,
+    // TODO:
     @Setting() @Default(true) bool showFlairEmojis,
+    // TODO:
     @Category(name: "Behavior") @Setting() @Default(true) bool clickToCollapse,
+    // TODO:
     @Setting() @Default(true) bool hideTextCollapsed,
+    // TODO:
     @Setting() @Default(true) bool loadCollapsed,
+    // TODO:
     @Setting() @Default(true) bool animateCollapse,
     @Setting() @Default(true) bool clickableUsername,
     @Category(name: "Navigation")
     @Setting()
     @Default(true)
+    // TODO:
     bool highlightNewComments,
+    // TODO:
     //@Default() NavigationMode defaultNavigationMode,
+    // TODO:
     @Setting() @Default(true) bool volumeRockerNavigation,
+    // TODO:
     @Setting() @Default(true) bool animateNavigation,
     @Category(name: "Visible buttons")
     @Setting()
     @Default(true)
     bool showSaveButton,
-    //@Default() String goToTopButton,
+    // TODO:
+    //@Default() GoToTopButtonAction goToTopButton,
+    // TODO:
     @Category(name: "Gestures") @Setting() @Default(true) bool swipeToClose,
   }) = _CommentsSetttings;
   factory CommentsSettings.fromJson(Map<String, dynamic> json) =>

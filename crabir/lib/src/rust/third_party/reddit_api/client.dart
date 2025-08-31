@@ -72,7 +72,7 @@ abstract class Client implements RustOpaqueInterface {
   /// Create a new access token for a logged out user
   Future<void> newLoggedOutUserToken();
 
-  /// Save a saveable item (i.e. a [`Post`] or a [`Comment`]).
+  /// Save a saveable item (i.e. a [`Post`] or a [`comment::Comment`]).
   /// # Errors
   /// Returns an error if the request failed.
   Future<void> save({required Fullname thing});
@@ -93,7 +93,7 @@ abstract class Client implements RustOpaqueInterface {
   /// Returns an error if the http client fails or if the parsing of the response fails.
   Future<List<Subreddit>> subsriptions();
 
-  /// Unsave a saveable item (i.e. a [`Post`] or a [`Comment`]).
+  /// Unsave a saveable item (i.e. a [`Post`] or a [`comment::Comment`]).
   /// # Errors
   /// Returns an error if the request failed.
   Future<void> unsave({required Fullname thing});
@@ -131,7 +131,7 @@ abstract class Client implements RustOpaqueInterface {
   /// flutter_rust_bridge:sync
   Streamable userUpvoted({required String username});
 
-  /// Vote on a votable item (i.e. a [`Post`] or a [`Comment`]).
+  /// Vote on a votable item (i.e. a [`Post`] or a [`comment::Comment`]).
   /// # Errors
   /// Returns an error if the request failed.
   Future<void> vote(

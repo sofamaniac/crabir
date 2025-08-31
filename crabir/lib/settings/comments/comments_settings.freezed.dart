@@ -18,65 +18,71 @@ CommentsSettings _$CommentsSettingsFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$CommentsSettings {
-  CommentSort get sort;
+// TODO:
+  @Setting(widget: _CommentsSortSelection)
+  CommentSort get defaultSort;
   @Setting()
   bool get useSuggestedSort;
   @Category(name: "Appearance")
   @Setting()
-  bool get showNavigationBar;
+  bool get showNavigationBar; // TODO: (requires an additional api call)
   @Setting()
-  bool get showUserAvatar;
+  bool
+      get showUserAvatar; // TODO: I don't understand how `flutter_html` renders images.
   @Setting()
   bool
       get showCommentsImage; //@Default() MediaPreviewSize postMediaPreviewSize,
   @Setting()
   bool get buttonsAlwaysVisible;
   @Setting()
-  bool get hideButtonAfterAction;
+  bool get hideButtonAfterAction; // TODO:
   @Setting()
-  bool get collapseAutoMod;
+  bool get collapseAutoMod; // TODO:
   @Setting()
-  bool get collapseDisruptiveComment;
+  bool get collapseDisruptiveComment; // TODO:
   @Setting()
   bool get showPostUpvotePercentage; //@Default() GuideStyle threadGuide,
   @Setting()
-  bool get highlightMyUsername;
+  bool get highlightMyUsername; // TODO:
   @Setting()
-  bool get showFloatingButton;
+  bool get showFloatingButton; // TODO:
   @Category(name: "Awards")
   @Setting()
-  bool get showAwards;
+  bool get showAwards; // TODO:
   @Setting()
   bool get clickableAwards;
   @Category(name: "Flairs")
   @Setting()
-  bool get showUserFlair;
+  bool get showUserFlair; // TODO:
   @Setting()
-  bool get showFlairColors;
+  bool get showFlairColors; // TODO:
   @Setting()
-  bool get showFlairEmojis;
+  bool get showFlairEmojis; // TODO:
   @Category(name: "Behavior")
   @Setting()
-  bool get clickToCollapse;
+  bool get clickToCollapse; // TODO:
   @Setting()
-  bool get hideTextCollapsed;
+  bool get hideTextCollapsed; // TODO:
   @Setting()
-  bool get loadCollapsed;
+  bool get loadCollapsed; // TODO:
   @Setting()
   bool get animateCollapse;
   @Setting()
   bool get clickableUsername;
   @Category(name: "Navigation")
   @Setting()
-  bool
-      get highlightNewComments; //@Default() NavigationMode defaultNavigationMode,
+  bool get highlightNewComments; // TODO:
+//@Default() NavigationMode defaultNavigationMode,
+// TODO:
   @Setting()
-  bool get volumeRockerNavigation;
+  bool get volumeRockerNavigation; // TODO:
   @Setting()
   bool get animateNavigation;
   @Category(name: "Visible buttons")
   @Setting()
-  bool get showSaveButton; //@Default() String goToTopButton,
+  bool get showSaveButton; // TODO:
+//@Default() GoToTopButtonAction goToTopButton,
+// TODO:
   @Category(name: "Gestures")
   @Setting()
   bool get swipeToClose;
@@ -97,7 +103,8 @@ mixin _$CommentsSettings {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is CommentsSettings &&
-            (identical(other.sort, sort) || other.sort == sort) &&
+            (identical(other.defaultSort, defaultSort) ||
+                other.defaultSort == defaultSort) &&
             (identical(other.useSuggestedSort, useSuggestedSort) ||
                 other.useSuggestedSort == useSuggestedSort) &&
             (identical(other.showNavigationBar, showNavigationBar) ||
@@ -157,7 +164,7 @@ mixin _$CommentsSettings {
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
-        sort,
+        defaultSort,
         useSuggestedSort,
         showNavigationBar,
         showUserAvatar,
@@ -188,7 +195,7 @@ mixin _$CommentsSettings {
 
   @override
   String toString() {
-    return 'CommentsSettings(sort: $sort, useSuggestedSort: $useSuggestedSort, showNavigationBar: $showNavigationBar, showUserAvatar: $showUserAvatar, showCommentsImage: $showCommentsImage, buttonsAlwaysVisible: $buttonsAlwaysVisible, hideButtonAfterAction: $hideButtonAfterAction, collapseAutoMod: $collapseAutoMod, collapseDisruptiveComment: $collapseDisruptiveComment, showPostUpvotePercentage: $showPostUpvotePercentage, highlightMyUsername: $highlightMyUsername, showFloatingButton: $showFloatingButton, showAwards: $showAwards, clickableAwards: $clickableAwards, showUserFlair: $showUserFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, clickToCollapse: $clickToCollapse, hideTextCollapsed: $hideTextCollapsed, loadCollapsed: $loadCollapsed, animateCollapse: $animateCollapse, clickableUsername: $clickableUsername, highlightNewComments: $highlightNewComments, volumeRockerNavigation: $volumeRockerNavigation, animateNavigation: $animateNavigation, showSaveButton: $showSaveButton, swipeToClose: $swipeToClose)';
+    return 'CommentsSettings(defaultSort: $defaultSort, useSuggestedSort: $useSuggestedSort, showNavigationBar: $showNavigationBar, showUserAvatar: $showUserAvatar, showCommentsImage: $showCommentsImage, buttonsAlwaysVisible: $buttonsAlwaysVisible, hideButtonAfterAction: $hideButtonAfterAction, collapseAutoMod: $collapseAutoMod, collapseDisruptiveComment: $collapseDisruptiveComment, showPostUpvotePercentage: $showPostUpvotePercentage, highlightMyUsername: $highlightMyUsername, showFloatingButton: $showFloatingButton, showAwards: $showAwards, clickableAwards: $clickableAwards, showUserFlair: $showUserFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, clickToCollapse: $clickToCollapse, hideTextCollapsed: $hideTextCollapsed, loadCollapsed: $loadCollapsed, animateCollapse: $animateCollapse, clickableUsername: $clickableUsername, highlightNewComments: $highlightNewComments, volumeRockerNavigation: $volumeRockerNavigation, animateNavigation: $animateNavigation, showSaveButton: $showSaveButton, swipeToClose: $swipeToClose)';
   }
 }
 
@@ -199,7 +206,7 @@ abstract mixin class $CommentsSettingsCopyWith<$Res> {
       _$CommentsSettingsCopyWithImpl;
   @useResult
   $Res call(
-      {CommentSort sort,
+      {@Setting(widget: _CommentsSortSelection) CommentSort defaultSort,
       @Setting() bool useSuggestedSort,
       @Category(name: "Appearance") @Setting() bool showNavigationBar,
       @Setting() bool showUserAvatar,
@@ -241,7 +248,7 @@ class _$CommentsSettingsCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? sort = null,
+    Object? defaultSort = null,
     Object? useSuggestedSort = null,
     Object? showNavigationBar = null,
     Object? showUserAvatar = null,
@@ -270,9 +277,9 @@ class _$CommentsSettingsCopyWithImpl<$Res>
     Object? swipeToClose = null,
   }) {
     return _then(_self.copyWith(
-      sort: null == sort
-          ? _self.sort
-          : sort // ignore: cast_nullable_to_non_nullable
+      defaultSort: null == defaultSort
+          ? _self.defaultSort
+          : defaultSort // ignore: cast_nullable_to_non_nullable
               as CommentSort,
       useSuggestedSort: null == useSuggestedSort
           ? _self.useSuggestedSort
@@ -386,12 +393,13 @@ class _$CommentsSettingsCopyWithImpl<$Res>
 @JsonSerializable()
 class _CommentsSetttings extends CommentsSettings {
   _CommentsSetttings(
-      {this.sort = CommentSort.top,
+      {@Setting(widget: _CommentsSortSelection)
+      this.defaultSort = CommentSort.top,
       @Setting() this.useSuggestedSort = true,
       @Category(name: "Appearance") @Setting() this.showNavigationBar = true,
       @Setting() this.showUserAvatar = true,
       @Setting() this.showCommentsImage = true,
-      @Setting() this.buttonsAlwaysVisible = true,
+      @Setting() this.buttonsAlwaysVisible = false,
       @Setting() this.hideButtonAfterAction = true,
       @Setting() this.collapseAutoMod = true,
       @Setting() this.collapseDisruptiveComment = true,
@@ -417,9 +425,11 @@ class _CommentsSetttings extends CommentsSettings {
   factory _CommentsSetttings.fromJson(Map<String, dynamic> json) =>
       _$CommentsSetttingsFromJson(json);
 
+// TODO:
   @override
   @JsonKey()
-  final CommentSort sort;
+  @Setting(widget: _CommentsSortSelection)
+  final CommentSort defaultSort;
   @override
   @JsonKey()
   @Setting()
@@ -429,10 +439,12 @@ class _CommentsSetttings extends CommentsSettings {
   @Category(name: "Appearance")
   @Setting()
   final bool showNavigationBar;
+// TODO: (requires an additional api call)
   @override
   @JsonKey()
   @Setting()
   final bool showUserAvatar;
+// TODO: I don't understand how `flutter_html` renders images.
   @override
   @JsonKey()
   @Setting()
@@ -446,14 +458,17 @@ class _CommentsSetttings extends CommentsSettings {
   @JsonKey()
   @Setting()
   final bool hideButtonAfterAction;
+// TODO:
   @override
   @JsonKey()
   @Setting()
   final bool collapseAutoMod;
+// TODO:
   @override
   @JsonKey()
   @Setting()
   final bool collapseDisruptiveComment;
+// TODO:
   @override
   @JsonKey()
   @Setting()
@@ -463,15 +478,18 @@ class _CommentsSetttings extends CommentsSettings {
   @JsonKey()
   @Setting()
   final bool highlightMyUsername;
+// TODO:
   @override
   @JsonKey()
   @Setting()
   final bool showFloatingButton;
+// TODO:
   @override
   @JsonKey()
   @Category(name: "Awards")
   @Setting()
   final bool showAwards;
+// TODO:
   @override
   @JsonKey()
   @Setting()
@@ -481,27 +499,33 @@ class _CommentsSetttings extends CommentsSettings {
   @Category(name: "Flairs")
   @Setting()
   final bool showUserFlair;
+// TODO:
   @override
   @JsonKey()
   @Setting()
   final bool showFlairColors;
+// TODO:
   @override
   @JsonKey()
   @Setting()
   final bool showFlairEmojis;
+// TODO:
   @override
   @JsonKey()
   @Category(name: "Behavior")
   @Setting()
   final bool clickToCollapse;
+// TODO:
   @override
   @JsonKey()
   @Setting()
   final bool hideTextCollapsed;
+// TODO:
   @override
   @JsonKey()
   @Setting()
   final bool loadCollapsed;
+// TODO:
   @override
   @JsonKey()
   @Setting()
@@ -515,11 +539,14 @@ class _CommentsSetttings extends CommentsSettings {
   @Category(name: "Navigation")
   @Setting()
   final bool highlightNewComments;
+// TODO:
 //@Default() NavigationMode defaultNavigationMode,
+// TODO:
   @override
   @JsonKey()
   @Setting()
   final bool volumeRockerNavigation;
+// TODO:
   @override
   @JsonKey()
   @Setting()
@@ -529,7 +556,9 @@ class _CommentsSetttings extends CommentsSettings {
   @Category(name: "Visible buttons")
   @Setting()
   final bool showSaveButton;
-//@Default() String goToTopButton,
+// TODO:
+//@Default() GoToTopButtonAction goToTopButton,
+// TODO:
   @override
   @JsonKey()
   @Category(name: "Gestures")
@@ -556,7 +585,8 @@ class _CommentsSetttings extends CommentsSettings {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _CommentsSetttings &&
-            (identical(other.sort, sort) || other.sort == sort) &&
+            (identical(other.defaultSort, defaultSort) ||
+                other.defaultSort == defaultSort) &&
             (identical(other.useSuggestedSort, useSuggestedSort) ||
                 other.useSuggestedSort == useSuggestedSort) &&
             (identical(other.showNavigationBar, showNavigationBar) ||
@@ -616,7 +646,7 @@ class _CommentsSetttings extends CommentsSettings {
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
-        sort,
+        defaultSort,
         useSuggestedSort,
         showNavigationBar,
         showUserAvatar,
@@ -647,7 +677,7 @@ class _CommentsSetttings extends CommentsSettings {
 
   @override
   String toString() {
-    return 'CommentsSettings(sort: $sort, useSuggestedSort: $useSuggestedSort, showNavigationBar: $showNavigationBar, showUserAvatar: $showUserAvatar, showCommentsImage: $showCommentsImage, buttonsAlwaysVisible: $buttonsAlwaysVisible, hideButtonAfterAction: $hideButtonAfterAction, collapseAutoMod: $collapseAutoMod, collapseDisruptiveComment: $collapseDisruptiveComment, showPostUpvotePercentage: $showPostUpvotePercentage, highlightMyUsername: $highlightMyUsername, showFloatingButton: $showFloatingButton, showAwards: $showAwards, clickableAwards: $clickableAwards, showUserFlair: $showUserFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, clickToCollapse: $clickToCollapse, hideTextCollapsed: $hideTextCollapsed, loadCollapsed: $loadCollapsed, animateCollapse: $animateCollapse, clickableUsername: $clickableUsername, highlightNewComments: $highlightNewComments, volumeRockerNavigation: $volumeRockerNavigation, animateNavigation: $animateNavigation, showSaveButton: $showSaveButton, swipeToClose: $swipeToClose)';
+    return 'CommentsSettings(defaultSort: $defaultSort, useSuggestedSort: $useSuggestedSort, showNavigationBar: $showNavigationBar, showUserAvatar: $showUserAvatar, showCommentsImage: $showCommentsImage, buttonsAlwaysVisible: $buttonsAlwaysVisible, hideButtonAfterAction: $hideButtonAfterAction, collapseAutoMod: $collapseAutoMod, collapseDisruptiveComment: $collapseDisruptiveComment, showPostUpvotePercentage: $showPostUpvotePercentage, highlightMyUsername: $highlightMyUsername, showFloatingButton: $showFloatingButton, showAwards: $showAwards, clickableAwards: $clickableAwards, showUserFlair: $showUserFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, clickToCollapse: $clickToCollapse, hideTextCollapsed: $hideTextCollapsed, loadCollapsed: $loadCollapsed, animateCollapse: $animateCollapse, clickableUsername: $clickableUsername, highlightNewComments: $highlightNewComments, volumeRockerNavigation: $volumeRockerNavigation, animateNavigation: $animateNavigation, showSaveButton: $showSaveButton, swipeToClose: $swipeToClose)';
   }
 }
 
@@ -660,7 +690,7 @@ abstract mixin class _$CommentsSetttingsCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {CommentSort sort,
+      {@Setting(widget: _CommentsSortSelection) CommentSort defaultSort,
       @Setting() bool useSuggestedSort,
       @Category(name: "Appearance") @Setting() bool showNavigationBar,
       @Setting() bool showUserAvatar,
@@ -702,7 +732,7 @@ class __$CommentsSetttingsCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? sort = null,
+    Object? defaultSort = null,
     Object? useSuggestedSort = null,
     Object? showNavigationBar = null,
     Object? showUserAvatar = null,
@@ -731,9 +761,9 @@ class __$CommentsSetttingsCopyWithImpl<$Res>
     Object? swipeToClose = null,
   }) {
     return _then(_CommentsSetttings(
-      sort: null == sort
-          ? _self.sort
-          : sort // ignore: cast_nullable_to_non_nullable
+      defaultSort: null == defaultSort
+          ? _self.defaultSort
+          : defaultSort // ignore: cast_nullable_to_non_nullable
               as CommentSort,
       useSuggestedSort: null == useSuggestedSort
           ? _self.useSuggestedSort

@@ -86,7 +86,8 @@ pub struct Comment {
     pub body_html: String,
     // pub removal_reason: Value,
     // pub collapsed_reason: Value,
-    // pub distinguished: Value,
+    #[serde(default)]
+    pub distinguished: Option<String>,
     // pub associated_award: Value,
     pub stickied: bool,
     pub can_gild: bool,

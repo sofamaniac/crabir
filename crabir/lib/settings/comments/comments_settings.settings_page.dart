@@ -23,7 +23,8 @@ class CommentsSettingsCubit extends HydratedCubit<CommentsSettings> {
 
   @override
   Map<String, dynamic>? toJson(CommentsSettings state) => state.toJson();
-  void updateSort(CommentSort value) => emit(state.copyWith(sort: value));
+  void updateDefaultSort(CommentSort value) =>
+      emit(state.copyWith(defaultSort: value));
 
   void updateUseSuggestedSort(bool value) =>
       emit(state.copyWith(useSuggestedSort: value));
@@ -115,7 +116,11 @@ class CommentsSettingsView extends StatelessWidget {
     return Scaffold(
         body: ListView(
       children: [
-        ListTile(title: Text("TODO: sort")),
+        _CommentsSortSelection(
+          value: settings.defaultSort,
+          onChanged: (val) =>
+              context.read<CommentsSettingsCubit>().updateDefaultSort(val),
+        ),
         SwitchListTile(
           title: Text(locales.comments_useSuggestedSort),
           subtitle: null,

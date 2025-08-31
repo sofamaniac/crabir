@@ -29,6 +29,7 @@ final commentSorts = [
 
 extension Label on CommentSort {
   String label() {
+    // TODO: localization
     return switch (this) {
       CommentSort.confidence => "Best",
       CommentSort.top => "Top",
@@ -108,8 +109,9 @@ class Thread extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = context.read<CommentsSettingsCubit>().state;
-    final CommentSort? sort =
-        settings.useSuggestedSort ? (post?.suggestedSort) : settings.sort;
+    final CommentSort? sort = settings.useSuggestedSort
+        ? (post?.suggestedSort)
+        : settings.defaultSort;
     return BlocProvider(
       create: (context) => ThreadBloc(permalink)
         ..add(Load())

@@ -20,7 +20,7 @@
   "postSearchBar": "Search posts",
   "subredditsSearchBar": "Search communities",
 
-  "comments_sort": "Sort comments",
+  "comments_defaultSort": "Default Sort",
   "comments_sortDescription": "Choose how comments are sorted",
 
   "comments_useSuggestedSort": "Use suggested sort",

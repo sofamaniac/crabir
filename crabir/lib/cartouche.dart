@@ -9,7 +9,7 @@ class Cartouche extends StatelessWidget {
   const Cartouche(
     this.text, {
     super.key,
-    this.background = Colors.black,
+    this.background = Colors.transparent,
     this.foreground = Colors.white,
     this.fontSize = 12,
   });

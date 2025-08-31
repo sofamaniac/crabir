@@ -8,13 +8,14 @@ part of 'comments_settings.dart';
 
 _CommentsSetttings _$CommentsSetttingsFromJson(Map<String, dynamic> json) =>
     _CommentsSetttings(
-      sort: $enumDecodeNullable(_$CommentSortEnumMap, json['sort']) ??
-          CommentSort.top,
+      defaultSort:
+          $enumDecodeNullable(_$CommentSortEnumMap, json['defaultSort']) ??
+              CommentSort.top,
       useSuggestedSort: json['useSuggestedSort'] as bool? ?? true,
       showNavigationBar: json['showNavigationBar'] as bool? ?? true,
       showUserAvatar: json['showUserAvatar'] as bool? ?? true,
       showCommentsImage: json['showCommentsImage'] as bool? ?? true,
-      buttonsAlwaysVisible: json['buttonsAlwaysVisible'] as bool? ?? true,
+      buttonsAlwaysVisible: json['buttonsAlwaysVisible'] as bool? ?? false,
       hideButtonAfterAction: json['hideButtonAfterAction'] as bool? ?? true,
       collapseAutoMod: json['collapseAutoMod'] as bool? ?? true,
       collapseDisruptiveComment:
@@ -42,7 +43,7 @@ _CommentsSetttings _$CommentsSetttingsFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$CommentsSetttingsToJson(_CommentsSetttings instance) =>
     <String, dynamic>{
-      'sort': _$CommentSortEnumMap[instance.sort]!,
+      'defaultSort': _$CommentSortEnumMap[instance.defaultSort]!,
       'useSuggestedSort': instance.useSuggestedSort,
       'showNavigationBar': instance.showNavigationBar,
       'showUserAvatar': instance.showUserAvatar,

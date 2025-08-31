@@ -14,11 +14,16 @@ class StyledHtml extends StatelessWidget {
 
   final OnTap? onLinkTap;
 
+  /// Whether to show images or not.
+  /// TODO: showImages
+  final bool showImages;
+
   const StyledHtml({
     super.key,
     required this.htmlContent,
     this.additionalStyles = const {},
     this.onLinkTap,
+    this.showImages = true,
   });
 
   @override

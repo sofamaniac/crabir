@@ -50,7 +50,6 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   }
 
   Future<void> _setSort(SetSort sort, Emitter<ThreadState> emit) async {
-    print("$_sort, ${sort.sort}");
     if (_sort == sort.sort) return;
     _sort = sort.sort;
     await _refresh(Refresh(), emit);
@@ -59,7 +58,6 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   Future<void> _refresh(Refresh _, Emitter<ThreadState> emit) async {
     emit(state.copyWith(status: Status.unloaded));
     try {
-      print("SORT: $_sort");
       final things = await RedditAPI.client().comments(
         permalink: permalink,
         sort: _sort,

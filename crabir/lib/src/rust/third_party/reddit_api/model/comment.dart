@@ -39,6 +39,8 @@ abstract class Comment implements RustOpaqueInterface {
 
   int get depth;
 
+  String? get distinguished;
+
   int get downs;
 
   double? get edited;
@@ -104,6 +106,8 @@ abstract class Comment implements RustOpaqueInterface {
   set createdUtc(DateTime createdUtc);
 
   set depth(int depth);
+
+  set distinguished(String? distinguished);
 
   set downs(int downs);
 
