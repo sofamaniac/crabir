@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/post/widget/video.dart';
 import 'package:crabir/routes/routes.dart';
@@ -28,8 +27,6 @@ class ImageContent extends StatelessWidget {
         ),
         child: ImageThumbnail.redditImage(
           image,
-          title: post.selftext,
-          maxLines: maxLines,
         ),
       );
     } else {
@@ -39,7 +36,6 @@ class ImageContent extends StatelessWidget {
         ),
         child: ImageThumbnail(
           imageUrl: post.url,
-          maxLines: maxLines,
         ),
       );
     }
