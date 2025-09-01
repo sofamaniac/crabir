@@ -2,18 +2,19 @@ import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/settings/theme/theme_event.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
-class ThemeBloc extends HydratedBloc<ThemeEvent, Theme> {
-  ThemeBloc() : super(Theme()) {
+class ThemeBloc extends HydratedBloc<ThemeEvent, CrabirTheme> {
+  ThemeBloc() : super(CrabirTheme()) {
     on<SetColor>(_updateColor);
   }
 
   @override
-  Map<String, dynamic>? toJson(Theme state) => state.toJson();
+  Map<String, dynamic>? toJson(CrabirTheme state) => state.toJson();
 
   @override
-  Theme? fromJson(Map<String, dynamic> json) => Theme.fromJson(json);
+  CrabirTheme? fromJson(Map<String, dynamic> json) =>
+      CrabirTheme.fromJson(json);
 
-  Future<void> _updateColor(SetColor event, Emitter<Theme> emit) async {
+  Future<void> _updateColor(SetColor event, Emitter<CrabirTheme> emit) async {
     final color = event.color;
     final newState = switch (event.field) {
       ThemeField.background => state.copyWith(background: color),

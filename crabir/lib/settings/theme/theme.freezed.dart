@@ -47,8 +47,8 @@ mixin _$Theme {
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $ThemeCopyWith<Theme> get copyWith =>
-      _$ThemeCopyWithImpl<Theme>(this as Theme, _$identity);
+  $ThemeCopyWith<CrabirTheme> get copyWith =>
+      _$ThemeCopyWithImpl<CrabirTheme>(this as CrabirTheme, _$identity);
 
   /// Serializes this Theme to a JSON map.
   Map<String, dynamic> toJson();
@@ -57,7 +57,7 @@ mixin _$Theme {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is Theme &&
+            other is CrabirTheme &&
             const DeepCollectionEquality()
                 .equals(other.background, background) &&
             const DeepCollectionEquality()
@@ -102,7 +102,7 @@ mixin _$Theme {
 
 /// @nodoc
 abstract mixin class $ThemeCopyWith<$Res> {
-  factory $ThemeCopyWith(Theme value, $Res Function(Theme) _then) =
+  factory $ThemeCopyWith(CrabirTheme value, $Res Function(CrabirTheme) _then) =
       _$ThemeCopyWithImpl;
   @useResult
   $Res call(
@@ -123,8 +123,8 @@ abstract mixin class $ThemeCopyWith<$Res> {
 class _$ThemeCopyWithImpl<$Res> implements $ThemeCopyWith<$Res> {
   _$ThemeCopyWithImpl(this._self, this._then);
 
-  final Theme _self;
-  final $Res Function(Theme) _then;
+  final CrabirTheme _self;
+  final $Res Function(CrabirTheme) _then;
 
   /// Create a copy of Theme
   /// with the given fields replaced by the non-null parameter values.
@@ -194,7 +194,7 @@ class _$ThemeCopyWithImpl<$Res> implements $ThemeCopyWith<$Res> {
 
 /// @nodoc
 @JsonSerializable()
-class _Theme extends Theme {
+class _Theme extends CrabirTheme {
   _Theme(
       {@ColorConverter() this.background = Colors.black,
       @ColorConverter() this.cardBackground = Colors.black,

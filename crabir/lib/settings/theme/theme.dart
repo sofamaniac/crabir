@@ -5,7 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'theme.freezed.dart';
 part 'theme.g.dart';
 
-final Theme carbirTheme = Theme();
+final CrabirTheme carbirTheme = CrabirTheme();
 
 enum ThemeField {
   background,
@@ -22,9 +22,9 @@ enum ThemeField {
 }
 
 @freezed
-abstract class Theme with _$Theme {
-  Theme._();
-  factory Theme({
+abstract class CrabirTheme with _$Theme {
+  CrabirTheme._();
+  factory CrabirTheme({
     /// Color of the foundation
     @ColorConverter() @Default(Colors.black) Color background,
     @ColorConverter() @Default(Colors.black) Color cardBackground,
@@ -43,5 +43,6 @@ abstract class Theme with _$Theme {
     @ColorConverter() @Default(Color(0xFF4B91E2)) Color linkColor,
   }) = _Theme;
 
-  factory Theme.fromJson(Map<String, dynamic> json) => _$ThemeFromJson(json);
+  factory CrabirTheme.fromJson(Map<String, dynamic> json) =>
+      _$ThemeFromJson(json);
 }
