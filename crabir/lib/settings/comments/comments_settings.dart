@@ -116,7 +116,6 @@ abstract class CommentsSettings with _$CommentsSettings {
     bool showSaveButton,
     // TODO:
     //@Default() GoToTopButtonAction goToTopButton,
-    // TODO:
     @Category(name: "Gestures") @Setting() @Default(true) bool swipeToClose,
   }) = _CommentsSetttings;
   factory CommentsSettings.fromJson(Map<String, dynamic> json) =>

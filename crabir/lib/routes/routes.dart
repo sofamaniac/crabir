@@ -17,6 +17,7 @@ import 'package:crabir/subscriptions_tab.dart';
 import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/user/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
 import 'package:crabir/search_subreddits/widgets/search.dart';
 
@@ -76,14 +77,26 @@ class AppRouter extends RootStackRouter {
 /// Route with swipe to go back
 final threadRoute = CustomRoute(
   page: ThreadRoute.page,
-  customRouteBuilder:
-      <T>(BuildContext context, Widget child, AutoRoutePage<T> page) {
-    return SwipeablePageRoute(
-      settings: page,
-      builder: (BuildContext context) {
-        return child;
-      },
-    );
+  customRouteBuilder: <T>(
+    BuildContext context,
+    Widget child,
+    AutoRoutePage<T> page,
+  ) {
+    if (context.read<CommentsSettingsCubit>().state.swipeToClose) {
+      return SwipeablePageRoute(
+        settings: page,
+        builder: (BuildContext context) {
+          return child;
+        },
+      );
+    } else {
+      return PageRouteBuilder<T>(
+        fullscreenDialog: page.fullscreenDialog,
+        // this is important
+        settings: page,
+        pageBuilder: (_, __, ___) => child,
+      );
+    }
   },
 );
 
