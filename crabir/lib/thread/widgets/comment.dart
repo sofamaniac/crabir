@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
+import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/html_view.dart';
@@ -92,8 +93,6 @@ class _Username extends StatelessWidget {
 class _CommentViewState extends State<CommentView>
     with AutomaticKeepAliveClientMixin {
   bool showBottomBar = false;
-  bool? likes;
-  bool saved = false;
 
   // we have to keep alive to remember `showBottomBar`.
   @override
@@ -102,8 +101,6 @@ class _CommentViewState extends State<CommentView>
   @override
   void initState() {
     super.initState();
-    likes = widget.comment.likes;
-    saved = widget.comment.saved;
     showBottomBar = !widget.animateBottomBar;
   }
 
@@ -184,86 +181,50 @@ class _CommentViewState extends State<CommentView>
     );
   }
 
-  Future<void> upvote() async {
-    final direction = switch (likes) {
-      true => VoteDirection.neutral,
-      _ => VoteDirection.up,
-    };
+  Future<void> vote(VoteDirection target, bool hideButtonAfterAction) async {
     await RedditAPI.client()
-        .vote(thing: widget.comment.name, direction: direction);
+        .vote(thing: widget.comment.name, direction: target);
     setState(() {
-      if (likes == true) {
-        likes = null;
-      } else {
-        likes = true;
+      if (hideButtonAfterAction) {
+        showBottomBar = false;
       }
     });
   }
 
-  Future<void> downvote() async {
-    final direction = switch (likes) {
-      false => VoteDirection.neutral,
-      _ => VoteDirection.down,
-    };
-    await RedditAPI.client()
-        .vote(thing: widget.comment.name, direction: direction);
-    setState(() {
-      if (likes == false) {
-        likes = null;
-      } else {
-        likes = false;
-      }
-    });
-  }
-
-  Future<void> save() async {
-    if (saved) {
+  Future<void> save(target) async {
+    if (target) {
       await RedditAPI.client().unsave(thing: widget.comment.name);
     } else {
       await RedditAPI.client().save(thing: widget.comment.name);
     }
-
-    setState(() {
-      saved = !saved;
-    });
   }
 
   Widget bottomBar() {
     final likeColor = Theme.of(context).colorScheme.primary;
-    final dislikeColor = Theme.of(context).colorScheme.secondary;
+    final dislikeColor = Colors.cyanAccent;
     final settings = context.watch<CommentsSettingsCubit>().state;
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.max,
       children: [
-        IconButton(
-          onPressed: () {
-            upvote();
-            if (settings.hideButtonAfterAction) {
-              showBottomBar = false;
-            }
+        VoteButton.like(
+          initialValue: widget.comment.likes,
+          colorActive: likeColor,
+          onChange: (target) async {
+            await vote(target, settings.hideButtonAfterAction);
           },
-          icon: Icon(Icons.thumb_up, color: (likes == true) ? likeColor : null),
         ),
-        IconButton(
-          onPressed: () {
-            downvote();
-            if (settings.hideButtonAfterAction) {
-              showBottomBar = false;
-            }
+        VoteButton.dislike(
+          initialValue: widget.comment.likes,
+          colorActive: dislikeColor,
+          onChange: (target) async {
+            await vote(target, settings.hideButtonAfterAction);
           },
-          icon: Icon(Icons.thumb_down,
-              color: (likes == false) ? dislikeColor : null),
         ),
         if (settings.showSaveButton)
-          IconButton(
-            onPressed: () {
-              save();
-              if (settings.hideButtonAfterAction) {
-                showBottomBar = false;
-              }
-            },
-            icon: Icon(Icons.book_outlined),
+          SaveButton(
+            initialValue: widget.comment.saved,
+            onChange: save,
           ),
         IconButton(
           onPressed: () {

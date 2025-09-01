@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/feed_list.dart';
 import 'package:crabir/post/widget/gallery.dart';
@@ -17,7 +18,6 @@ import 'package:crabir/time_ellapsed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:crabir/bool_to_vote.dart';
 
 final horizontalPadding = 16.0;
 
@@ -115,7 +115,7 @@ class _PostTitle extends StatelessWidget {
   }
 }
 
-class RedditPostCard extends StatefulWidget {
+class RedditPostCard extends StatelessWidget {
   final Post post;
 
   final Future<void> Function(bool)? onSave;
@@ -136,22 +136,6 @@ class RedditPostCard extends StatefulWidget {
     this.maxLines,
     this.showMedia = true,
   });
-  @override
-  State<StatefulWidget> createState() => _RedditPostCardState();
-}
-
-class _RedditPostCardState extends State<RedditPostCard> {
-  late VoteDirection? likes;
-  late bool saved;
-
-  _RedditPostCardState();
-
-  @override
-  void initState() {
-    super.initState();
-    likes = widget.post.likes.toVoteDirection();
-    saved = widget.post.saved;
-  }
 
   Widget _wrap(Widget widget) {
     return Padding(padding: EdgeInsets.symmetric(horizontal: 4), child: widget);
@@ -162,8 +146,8 @@ class _RedditPostCardState extends State<RedditPostCard> {
         .textTheme
         .labelSmall!
         .copyWith(fontWeight: FontWeight.normal);
-    final subreddit = widget.post.subreddit.subreddit;
-    final subredditIcon = widget.post.subreddit.details?.icon;
+    final subreddit = post.subreddit.subreddit;
+    final subredditIcon = post.subreddit.details?.icon;
     final theme = context.watch<ThemeBloc>().state;
 
     return Wrap(
@@ -190,7 +174,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
             ],
           ),
         ),
-        if (widget.post.isCrosspost)
+        if (post.isCrosspost)
           const RotatedBox(
             quarterTurns: 1,
             child: Icon(Icons.alt_route, color: Colors.greenAccent),
@@ -198,22 +182,22 @@ class _RedditPostCardState extends State<RedditPostCard> {
         const Text(' • '),
         InkWell(
           onTap: () {
-            final username = widget.post.author?.username;
+            final username = post.author?.username;
             if (username != null) {
               context.router.navigate(UserRoute(username: username));
             }
           },
           child: Text(
-            widget.post.author?.username ?? "[deleted]",
+            post.author?.username ?? "[deleted]",
             style: labelStyle,
           ),
         ),
         const Text(' • '),
-        Text(widget.post.createdUtc.timeSince(), style: labelStyle),
+        Text(post.createdUtc.timeSince(), style: labelStyle),
         if (_showDomain()) ...[
           const Text(' • '),
           Text(
-            widget.post.domain,
+            post.domain,
             style: labelStyle,
           ),
         ],
@@ -222,61 +206,31 @@ class _RedditPostCardState extends State<RedditPostCard> {
   }
 
   bool _showDomain() {
-    return !widget.post.isSelf &&
-        !widget.post.isRedditMediaDomain &&
-        widget.post.domain != "reddit.com";
+    return !post.isSelf &&
+        !post.isRedditMediaDomain &&
+        post.domain != "reddit.com";
   }
 
   Widget footer(BuildContext context) {
     final theme = context.watch<ThemeBloc>().state;
     final likeColor = theme.primaryColor;
-    final dislikeColor = Theme.of(context).colorScheme.secondary;
-    final savedColor = Colors.yellow;
+    final dislikeColor = Colors.cyanAccent;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        IconButton(
-          icon: Icon(
-            Icons.thumb_up,
-            color: (likes == VoteDirection.up) ? likeColor : null,
-          ),
-          tooltip: 'Upvote',
-          onPressed: () async {
-            final target = (likes == VoteDirection.up)
-                ? VoteDirection.neutral
-                : VoteDirection.up;
-            await widget.onLike?.call(target);
-            setState(() {
-              likes = target;
-            });
-          },
+        VoteButton.like(
+          initialValue: post.likes,
+          colorActive: likeColor,
+          onChange: onLike?.call,
         ),
-        IconButton(
-          icon: Icon(
-            Icons.thumb_down,
-            color: (likes == VoteDirection.down) ? dislikeColor : null,
-          ),
-          tooltip: 'Downvote',
-          onPressed: () async {
-            final target = (likes == VoteDirection.down)
-                ? VoteDirection.neutral
-                : VoteDirection.down;
-            await widget.onLike?.call(target);
-            setState(() {
-              likes = target;
-            });
-          },
+        VoteButton.dislike(
+          initialValue: post.likes,
+          colorActive: dislikeColor,
+          onChange: onLike?.call,
         ),
-        IconButton(
-          onPressed: () async {
-            await widget.onSave?.call(!saved);
-            saved = !saved;
-          },
-          icon: Icon(
-            Icons.bookmark_outlined,
-            color: saved ? savedColor : null,
-          ),
-          tooltip: "Save",
+        SaveButton(
+          initialValue: post.saved,
+          onChange: onSave?.call,
         ),
         IconButton(
           icon: const Icon(Icons.comment),
@@ -284,8 +238,8 @@ class _RedditPostCardState extends State<RedditPostCard> {
           onPressed: () => navigateToSubscriptionsTab(
             context,
             ThreadRoute(
-              permalink: widget.post.permalink,
-              post: widget.post,
+              permalink: post.permalink,
+              post: post,
             ),
           ),
         ),
@@ -294,7 +248,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
           tooltip: 'Open in',
           onPressed: () async {
             final url = Uri.parse(
-              widget.post.urlOverriddenByDest ?? widget.post.url,
+              post.urlOverriddenByDest ?? post.url,
             );
             await launchUrl(url);
           },
@@ -303,7 +257,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
           icon: const Icon(Icons.share),
           tooltip: 'Share',
           onPressed: () {
-            debugPost(post: widget.post);
+            debugPost(post: post);
           },
         ),
       ],
@@ -311,25 +265,25 @@ class _RedditPostCardState extends State<RedditPostCard> {
   }
 
   bool showThumbnail() {
-    if (widget.post.thumbnail == null) {
+    if (post.thumbnail == null) {
       return false;
     } else {
-      return switch (widget.post.kind) {
+      return switch (post.kind) {
         Kind.link || Kind.unknown => true,
-        _ => !widget.showMedia,
+        _ => !showMedia,
       };
     }
   }
 
   Widget title(BuildContext context) {
     return _PostTitle(
-      post: widget.post,
+      post: post,
       showThumbnail: showThumbnail(),
     );
   }
 
   Widget _contentWrap(Widget widget) {
-    return switch (this.widget.post.kind) {
+    return switch (post.kind) {
       Kind.image ||
       Kind.gallery ||
       Kind.video ||
@@ -341,21 +295,20 @@ class _RedditPostCardState extends State<RedditPostCard> {
   }
 
   Widget content(BuildContext context) {
-    final widget = switch (this.widget.post.kind) {
+    final widget = switch (post.kind) {
       Kind.meta => Text("meta"),
-      Kind.video => VideoContent(post: this.widget.post),
-      Kind.youtubeVideo when this.widget.showMedia =>
-        YoutubeContent(post: this.widget.post),
-      (Kind.mediaGallery || Kind.gallery) when this.widget.showMedia =>
-        GalleryView(post: this.widget.post),
-      Kind.image when this.widget.showMedia => ImageContent(
-          post: this.widget.post,
-          maxLines: this.widget.maxLines ?? 2,
+      Kind.video => VideoContent(post: post),
+      Kind.youtubeVideo when showMedia => YoutubeContent(post: post),
+      (Kind.mediaGallery || Kind.gallery) when showMedia =>
+        GalleryView(post: post),
+      Kind.image when showMedia => ImageContent(
+          post: post,
+          maxLines: maxLines ?? 2,
         ),
       Kind.link || Kind.unknown => Container(),
       Kind.selftext || _ => HtmlWithConditionalFade(
-          htmlContent: this.widget.post.selftextHtml ?? "",
-          maxLines: this.widget.maxLines,
+          htmlContent: post.selftextHtml ?? "",
+          maxLines: maxLines,
         ),
     };
 
@@ -381,7 +334,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
       color: theme.background,
       elevation: 1,
       child: InkWell(
-        onTap: widget.onTap,
+        onTap: onTap,
         child: contentWidget,
       ),
     );
