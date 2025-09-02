@@ -10,6 +10,7 @@ import '../model.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'feed.freezed.dart';
+part 'feed.g.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `to_stream`
 
@@ -67,6 +68,6 @@ sealed class FeedSort with _$FeedSort {
     Timeframe field0,
   ) = FeedSort_Controversial;
 
-  Future<Url> addToUrl({required Url url}) => RustLib.instance.api
-      .redditApiModelFeedFeedSortAddToUrl(that: this, url: url);
+  factory FeedSort.fromJson(Map<String, dynamic> json) =>
+      _$FeedSortFromJson(json);
 }

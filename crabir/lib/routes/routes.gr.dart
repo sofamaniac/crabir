@@ -303,6 +303,22 @@ class MultiRouteArgs {
 }
 
 /// generated route for
+/// [PostsSettingsView]
+class PostsSettingsRoute extends PageRouteInfo<void> {
+  const PostsSettingsRoute({List<PageRouteInfo>? children})
+    : super(PostsSettingsRoute.name, initialChildren: children);
+
+  static const String name = 'PostsSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const PostsSettingsView();
+    },
+  );
+}
+
+/// generated route for
 /// [SearchPage]
 class SearchPageRoute extends PageRouteInfo<void> {
   const SearchPageRoute({List<PageRouteInfo>? children})

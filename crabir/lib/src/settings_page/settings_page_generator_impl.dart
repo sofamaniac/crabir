@@ -168,15 +168,17 @@ class $className extends StatelessWidget {
 
     if (widgetType != null) {
       return '$widgetType('
-          'value: settings.${param.name},'
-          'onChanged: (val) => context.read<$cubitName>().update${param.name.toPascalCase()}(val),'
-          '),';
-    } else if (param.type.isDartCoreBool) {
-      return 'SwitchListTile('
           'title: Text(locales.$titleKey),'
           'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
           'value: settings.${param.name},'
           'onChanged: (val) => context.read<$cubitName>().update${param.name.toPascalCase()}(val),'
+          '),';
+    } else if (param.type.isDartCoreBool) {
+      return 'CheckboxListTile('
+          'title: Text(locales.$titleKey),'
+          'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
+          'value: settings.${param.name},'
+          'onChanged: (val) => context.read<$cubitName>().update${param.name.toPascalCase()}(val!),'
           '),';
     }
     return "";

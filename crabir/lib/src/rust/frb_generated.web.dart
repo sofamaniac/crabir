@@ -362,10 +362,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           dynamic raw);
 
   @protected
-  Url dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUrl(
-      dynamic raw);
-
-  @protected
   DateTime dco_decode_Chrono_Local(dynamic raw);
 
   @protected
@@ -1098,10 +1094,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SubredditInfo
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
           SseDeserializer deserializer);
-
-  @protected
-  Url sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUrl(
-      SseDeserializer deserializer);
 
   @protected
   DateTime sse_decode_Chrono_Local(SseDeserializer deserializer);
@@ -1850,11 +1842,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSubredditInfo(
           SubredditInfo self, SseSerializer serializer);
-
-  @protected
-  void
-      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUrl(
-          Url self, SseSerializer serializer);
 
   @protected
   void sse_encode_Chrono_Local(DateTime self, SseSerializer serializer);

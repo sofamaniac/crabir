@@ -6,6 +6,7 @@ import 'package:crabir/media/media.dart';
 import 'package:crabir/post/widget/gallery.dart';
 import 'package:crabir/search_posts/widgets/search.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
+import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
@@ -69,8 +70,11 @@ class AppRouter extends RootStackRouter {
         threadRoute,
         AutoRoute(page: FullscreenImageRoute.page),
         AutoRoute(page: FullScreenGalleryRoute.page),
-        settingsRoute,
+
+        // Settings
+        AutoRoute(page: SettingsRoute.page),
         AutoRoute(page: CommentsSettingsRoute.page),
+        AutoRoute(page: PostsSettingsRoute.page),
       ];
 }
 
@@ -98,10 +102,6 @@ final threadRoute = CustomRoute(
       );
     }
   },
-);
-
-final settingsRoute = AutoRoute(
-  page: SettingsRoute.page,
 );
 
 @RoutePage()

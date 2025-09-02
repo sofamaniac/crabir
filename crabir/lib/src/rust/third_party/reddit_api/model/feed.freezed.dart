@@ -159,14 +159,39 @@ class _$Feed_SubredditCopyWithImpl<$Res>
   }
 }
 
+FeedSort _$FeedSortFromJson(Map<String, dynamic> json) {
+  switch (json['runtimeType']) {
+    case 'best':
+      return FeedSort_Best.fromJson(json);
+    case 'hot':
+      return FeedSort_Hot.fromJson(json);
+    case 'new_':
+      return FeedSort_New.fromJson(json);
+    case 'top':
+      return FeedSort_Top.fromJson(json);
+    case 'rising':
+      return FeedSort_Rising.fromJson(json);
+    case 'controversial':
+      return FeedSort_Controversial.fromJson(json);
+
+    default:
+      throw CheckedFromJsonException(json, 'runtimeType', 'FeedSort',
+          'Invalid union type "${json['runtimeType']}"!');
+  }
+}
+
 /// @nodoc
 mixin _$FeedSort {
+  /// Serializes this FeedSort to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType && other is FeedSort);
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => runtimeType.hashCode;
 
@@ -182,9 +207,23 @@ class $FeedSortCopyWith<$Res> {
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class FeedSort_Best extends FeedSort {
-  const FeedSort_Best() : super._();
+  const FeedSort_Best({final String? $type})
+      : $type = $type ?? 'best',
+        super._();
+  factory FeedSort_Best.fromJson(Map<String, dynamic> json) =>
+      _$FeedSort_BestFromJson(json);
+
+  @JsonKey(name: 'runtimeType')
+  final String $type;
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$FeedSort_BestToJson(
+      this,
+    );
+  }
 
   @override
   bool operator ==(Object other) {
@@ -192,6 +231,7 @@ class FeedSort_Best extends FeedSort {
         (other.runtimeType == runtimeType && other is FeedSort_Best);
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => runtimeType.hashCode;
 
@@ -202,9 +242,23 @@ class FeedSort_Best extends FeedSort {
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class FeedSort_Hot extends FeedSort {
-  const FeedSort_Hot() : super._();
+  const FeedSort_Hot({final String? $type})
+      : $type = $type ?? 'hot',
+        super._();
+  factory FeedSort_Hot.fromJson(Map<String, dynamic> json) =>
+      _$FeedSort_HotFromJson(json);
+
+  @JsonKey(name: 'runtimeType')
+  final String $type;
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$FeedSort_HotToJson(
+      this,
+    );
+  }
 
   @override
   bool operator ==(Object other) {
@@ -212,6 +266,7 @@ class FeedSort_Hot extends FeedSort {
         (other.runtimeType == runtimeType && other is FeedSort_Hot);
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => runtimeType.hashCode;
 
@@ -222,11 +277,18 @@ class FeedSort_Hot extends FeedSort {
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class FeedSort_New extends FeedSort {
-  const FeedSort_New(this.field0) : super._();
+  const FeedSort_New(this.field0, {final String? $type})
+      : $type = $type ?? 'new_',
+        super._();
+  factory FeedSort_New.fromJson(Map<String, dynamic> json) =>
+      _$FeedSort_NewFromJson(json);
 
   final Timeframe field0;
+
+  @JsonKey(name: 'runtimeType')
+  final String $type;
 
   /// Create a copy of FeedSort
   /// with the given fields replaced by the non-null parameter values.
@@ -236,6 +298,13 @@ class FeedSort_New extends FeedSort {
       _$FeedSort_NewCopyWithImpl<FeedSort_New>(this, _$identity);
 
   @override
+  Map<String, dynamic> toJson() {
+    return _$FeedSort_NewToJson(
+      this,
+    );
+  }
+
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -243,6 +312,7 @@ class FeedSort_New extends FeedSort {
             (identical(other.field0, field0) || other.field0 == field0));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 
@@ -285,11 +355,18 @@ class _$FeedSort_NewCopyWithImpl<$Res> implements $FeedSort_NewCopyWith<$Res> {
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class FeedSort_Top extends FeedSort {
-  const FeedSort_Top(this.field0) : super._();
+  const FeedSort_Top(this.field0, {final String? $type})
+      : $type = $type ?? 'top',
+        super._();
+  factory FeedSort_Top.fromJson(Map<String, dynamic> json) =>
+      _$FeedSort_TopFromJson(json);
 
   final Timeframe field0;
+
+  @JsonKey(name: 'runtimeType')
+  final String $type;
 
   /// Create a copy of FeedSort
   /// with the given fields replaced by the non-null parameter values.
@@ -299,6 +376,13 @@ class FeedSort_Top extends FeedSort {
       _$FeedSort_TopCopyWithImpl<FeedSort_Top>(this, _$identity);
 
   @override
+  Map<String, dynamic> toJson() {
+    return _$FeedSort_TopToJson(
+      this,
+    );
+  }
+
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -306,6 +390,7 @@ class FeedSort_Top extends FeedSort {
             (identical(other.field0, field0) || other.field0 == field0));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 
@@ -348,9 +433,23 @@ class _$FeedSort_TopCopyWithImpl<$Res> implements $FeedSort_TopCopyWith<$Res> {
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class FeedSort_Rising extends FeedSort {
-  const FeedSort_Rising() : super._();
+  const FeedSort_Rising({final String? $type})
+      : $type = $type ?? 'rising',
+        super._();
+  factory FeedSort_Rising.fromJson(Map<String, dynamic> json) =>
+      _$FeedSort_RisingFromJson(json);
+
+  @JsonKey(name: 'runtimeType')
+  final String $type;
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$FeedSort_RisingToJson(
+      this,
+    );
+  }
 
   @override
   bool operator ==(Object other) {
@@ -358,6 +457,7 @@ class FeedSort_Rising extends FeedSort {
         (other.runtimeType == runtimeType && other is FeedSort_Rising);
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => runtimeType.hashCode;
 
@@ -368,11 +468,18 @@ class FeedSort_Rising extends FeedSort {
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class FeedSort_Controversial extends FeedSort {
-  const FeedSort_Controversial(this.field0) : super._();
+  const FeedSort_Controversial(this.field0, {final String? $type})
+      : $type = $type ?? 'controversial',
+        super._();
+  factory FeedSort_Controversial.fromJson(Map<String, dynamic> json) =>
+      _$FeedSort_ControversialFromJson(json);
 
   final Timeframe field0;
+
+  @JsonKey(name: 'runtimeType')
+  final String $type;
 
   /// Create a copy of FeedSort
   /// with the given fields replaced by the non-null parameter values.
@@ -383,6 +490,13 @@ class FeedSort_Controversial extends FeedSort {
           this, _$identity);
 
   @override
+  Map<String, dynamic> toJson() {
+    return _$FeedSort_ControversialToJson(
+      this,
+    );
+  }
+
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -390,6 +504,7 @@ class FeedSort_Controversial extends FeedSort {
             (identical(other.field0, field0) || other.field0 == field0));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 

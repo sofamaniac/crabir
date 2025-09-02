@@ -117,218 +117,221 @@ class CommentsSettingsView extends StatelessWidget {
         body: ListView(
       children: [
         _CommentsSortSelection(
+          title: Text(locales.comments_defaultSort),
+          subtitle: null,
           value: settings.defaultSort,
           onChanged: (val) =>
               context.read<CommentsSettingsCubit>().updateDefaultSort(val),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_useSuggestedSort),
           subtitle: null,
           value: settings.useSuggestedSort,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateUseSuggestedSort(val),
+          onChanged: (val) => context
+              .read<CommentsSettingsCubit>()
+              .updateUseSuggestedSort(val!),
         ),
         Divider(),
         Text("Appearance"),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_showNavigationBar),
           subtitle: null,
           value: settings.showNavigationBar,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
-              .updateShowNavigationBar(val),
+              .updateShowNavigationBar(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_showUserAvatar),
           subtitle: null,
           value: settings.showUserAvatar,
           onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateShowUserAvatar(val),
+              context.read<CommentsSettingsCubit>().updateShowUserAvatar(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_showCommentsImage),
           subtitle: null,
           value: settings.showCommentsImage,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
-              .updateShowCommentsImage(val),
+              .updateShowCommentsImage(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_buttonsAlwaysVisible),
           subtitle: null,
           value: settings.buttonsAlwaysVisible,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
-              .updateButtonsAlwaysVisible(val),
+              .updateButtonsAlwaysVisible(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_hideButtonAfterAction),
           subtitle: null,
           value: settings.hideButtonAfterAction,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
-              .updateHideButtonAfterAction(val),
+              .updateHideButtonAfterAction(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_collapseAutoMod),
           subtitle: null,
           value: settings.collapseAutoMod,
           onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateCollapseAutoMod(val),
+              context.read<CommentsSettingsCubit>().updateCollapseAutoMod(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_collapseDisruptiveComment),
           subtitle: null,
           value: settings.collapseDisruptiveComment,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
-              .updateCollapseDisruptiveComment(val),
+              .updateCollapseDisruptiveComment(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_showPostUpvotePercentage),
           subtitle: null,
           value: settings.showPostUpvotePercentage,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
-              .updateShowPostUpvotePercentage(val),
+              .updateShowPostUpvotePercentage(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_highlightMyUsername),
           subtitle: null,
           value: settings.highlightMyUsername,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
-              .updateHighlightMyUsername(val),
+              .updateHighlightMyUsername(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_showFloatingButton),
           subtitle: null,
           value: settings.showFloatingButton,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
-              .updateShowFloatingButton(val),
+              .updateShowFloatingButton(val!),
         ),
         Divider(),
         Text("Awards"),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_showAwards),
           subtitle: null,
           value: settings.showAwards,
           onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateShowAwards(val),
+              context.read<CommentsSettingsCubit>().updateShowAwards(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_clickableAwards),
           subtitle: null,
           value: settings.clickableAwards,
           onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateClickableAwards(val),
+              context.read<CommentsSettingsCubit>().updateClickableAwards(val!),
         ),
         Divider(),
         Text("Flairs"),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_showUserFlair),
           subtitle: null,
           value: settings.showUserFlair,
           onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateShowUserFlair(val),
+              context.read<CommentsSettingsCubit>().updateShowUserFlair(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_showFlairColors),
           subtitle: null,
           value: settings.showFlairColors,
           onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateShowFlairColors(val),
+              context.read<CommentsSettingsCubit>().updateShowFlairColors(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_showFlairEmojis),
           subtitle: null,
           value: settings.showFlairEmojis,
           onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateShowFlairEmojis(val),
+              context.read<CommentsSettingsCubit>().updateShowFlairEmojis(val!),
         ),
         Divider(),
         Text("Behavior"),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_clickToCollapse),
           subtitle: null,
           value: settings.clickToCollapse,
           onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateClickToCollapse(val),
+              context.read<CommentsSettingsCubit>().updateClickToCollapse(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_hideTextCollapsed),
           subtitle: null,
           value: settings.hideTextCollapsed,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
-              .updateHideTextCollapsed(val),
+              .updateHideTextCollapsed(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_loadCollapsed),
           subtitle: null,
           value: settings.loadCollapsed,
           onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateLoadCollapsed(val),
+              context.read<CommentsSettingsCubit>().updateLoadCollapsed(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_animateCollapse),
           subtitle: null,
           value: settings.animateCollapse,
           onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateAnimateCollapse(val),
+              context.read<CommentsSettingsCubit>().updateAnimateCollapse(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_clickableUsername),
           subtitle: null,
           value: settings.clickableUsername,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
-              .updateClickableUsername(val),
+              .updateClickableUsername(val!),
         ),
         Divider(),
         Text("Navigation"),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_highlightNewComments),
           subtitle: null,
           value: settings.highlightNewComments,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
-              .updateHighlightNewComments(val),
+              .updateHighlightNewComments(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_volumeRockerNavigation),
           subtitle: null,
           value: settings.volumeRockerNavigation,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
-              .updateVolumeRockerNavigation(val),
+              .updateVolumeRockerNavigation(val!),
         ),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_animateNavigation),
           subtitle: null,
           value: settings.animateNavigation,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
-              .updateAnimateNavigation(val),
+              .updateAnimateNavigation(val!),
         ),
         Divider(),
         Text("Visible buttons"),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_showSaveButton),
           subtitle: null,
           value: settings.showSaveButton,
           onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateShowSaveButton(val),
+              context.read<CommentsSettingsCubit>().updateShowSaveButton(val!),
         ),
         Divider(),
         Text("Gestures"),
-        SwitchListTile(
+        CheckboxListTile(
           title: Text(locales.comments_swipeToClose),
           subtitle: null,
           value: settings.swipeToClose,
           onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateSwipeToClose(val),
+              context.read<CommentsSettingsCubit>().updateSwipeToClose(val!),
         ),
       ],
     ));

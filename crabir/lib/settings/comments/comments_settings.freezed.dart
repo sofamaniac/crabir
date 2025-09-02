@@ -18,7 +18,6 @@ CommentsSettings _$CommentsSettingsFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$CommentsSettings {
-// TODO:
   @Setting(widget: _CommentsSortSelection)
   CommentSort get defaultSort;
   @Setting()
@@ -82,7 +81,6 @@ mixin _$CommentsSettings {
   @Setting()
   bool get showSaveButton; // TODO:
 //@Default() GoToTopButtonAction goToTopButton,
-// TODO:
   @Category(name: "Gestures")
   @Setting()
   bool get swipeToClose;
@@ -425,7 +423,6 @@ class _CommentsSetttings extends CommentsSettings {
   factory _CommentsSetttings.fromJson(Map<String, dynamic> json) =>
       _$CommentsSetttingsFromJson(json);
 
-// TODO:
   @override
   @JsonKey()
   @Setting(widget: _CommentsSortSelection)
@@ -558,7 +555,6 @@ class _CommentsSetttings extends CommentsSettings {
   final bool showSaveButton;
 // TODO:
 //@Default() GoToTopButtonAction goToTopButton,
-// TODO:
   @override
   @JsonKey()
   @Category(name: "Gestures")

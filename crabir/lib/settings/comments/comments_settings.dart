@@ -1,3 +1,4 @@
+import 'package:crabir/sort.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/settings_page/annotations.dart';
 import 'package:crabir/thread/widgets/thread.dart';
@@ -11,44 +12,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 part 'comments_settings.freezed.dart';
 part 'comments_settings.settings_page.dart';
 part 'comments_settings.g.dart';
-
-class _CommentsSortSelection extends StatelessWidget {
-  final CommentSort value;
-  final void Function(CommentSort) onChanged;
-
-  const _CommentsSortSelection({required this.value, required this.onChanged});
-
-  Future<CommentSort?> _showSelectionDialogue(BuildContext context) async {
-    final result = await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Select sort"),
-            actions: commentSorts
-                .map((sort) => ListTile(
-                      title: Text(sort.label()),
-                      onTap: () => Navigator.pop(context, sort),
-                    ))
-                .toList(),
-          );
-        });
-    return result;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text("Default comments sort"),
-      subtitle: Text(value.label()),
-      onTap: () async {
-        final sort = await _showSelectionDialogue(context);
-        if (sort != null) {
-          onChanged(sort);
-        }
-      },
-    );
-  }
-}
+part '__comments_sort_selection.dart';
 
 @freezed
 @SettingsPage(prefix: "comments_", useFieldName: true)

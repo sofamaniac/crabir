@@ -16,6 +16,10 @@
   "sortControversial": "Controversial",
   "sortRising": "Rising",
   "sortBest": "Best",
+  "sortOld": "Old",
+  "sortQA": "Q&A",
+  "sortLive": "Live",
+  "sortRandom": "Random",
 
   "postSearchBar": "Search posts",
   "subredditsSearchBar": "Search communities",
@@ -62,6 +66,29 @@
   "comments_animateNavigation": "Animate navigation",
 
   "comments_showSaveButton": "Show save button",
-  "comments_swipeToClose": "Swipe to close thread"
+  "comments_swipeToClose": "Swipe to close thread",
 
+  "posts_defaultHomeSort": "Default Home sort",
+  "posts_defaultSort": "Default sort",
+  "posts_rememberSortByCommunity": "Remember by Community",
+  "posts_rememberSortByCommunityDescription": "Each community will remember the last sort you selected.",
+
+  "posts_showAwards": "Show awards",
+  "posts_clickableAwards": "Clickable awards",
+
+  "posts_showPostFlair": "Show post flair",
+  "posts_showFlairColors": "Show flair colors",
+  "posts_showEmojis": "Show emojis",
+  "posts_tapFlairToSearch": "Tap flair to search",
+
+  "posts_showAuthor": "Show author",
+  "posts_clickableCommunity": "Tap community to visit",
+  "posts_clickableUser": "Tap username to view profile",
+
+  "posts_showFloatingButton": "Show floating button",
+  "posts_showHideButton": "Hide",
+  "posts_showMarkAsReadButton": "Mark as read",
+  "posts_showShareButton": "Share",
+  "posts_showCommentsButton": "Comments",
+  "posts_showOpenInAppButton": "Open in app"
 }

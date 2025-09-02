@@ -5,6 +5,7 @@ import 'package:crabir/drawer/drawer.dart';
 import 'package:crabir/login.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
+import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/tabs_index.dart';
 import 'package:flutter/foundation.dart';
@@ -46,7 +47,8 @@ class Crabir extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => AccountsBloc()..add(Initialize())),
         BlocProvider(create: (context) => ThemeBloc()),
-        BlocProvider(create: (context) => CommentsSettingsCubit())
+        BlocProvider(create: (context) => CommentsSettingsCubit()),
+        BlocProvider(create: (context) => PostsSettingsCubit())
       ],
       child: TopLevel(),
     );
@@ -98,7 +100,9 @@ class _MainScreenViewState extends State<MainScreenView> {
   bool addListener = true;
   bool showingDialog = false;
 
-  bool showAccountSelectionDialogue(UserAccount? account, int index) {
+  bool showAccountSelectionDialogue(int index) {
+    final account = context.read<AccountsBloc>().state.account;
+    print("${account?.username}");
     return (account == null || account.isAnonymous) &&
         (index == profileIndex || index == inboxIndex);
   }
@@ -129,6 +133,7 @@ class _MainScreenViewState extends State<MainScreenView> {
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<ThemeBloc>().state;
+    final _ = context.watch<AccountsBloc>().state.account;
     final routes = <PageRouteInfo>[
       NamedRoute(homeRouteName),
       SearchSubredditsRoute(),
@@ -136,7 +141,6 @@ class _MainScreenViewState extends State<MainScreenView> {
       InboxRoute(),
       UserRoute(),
     ];
-    final user = context.watch<AccountsBloc>().state.account;
     return AutoTabsRouter.tabBar(
       homeIndex: 0,
       physics: NeverScrollableScrollPhysics(),
@@ -144,7 +148,7 @@ class _MainScreenViewState extends State<MainScreenView> {
       builder: (context, child, tabController) {
         void listener() {
           final index = tabController.index;
-          if (showAccountSelectionDialogue(user, index) &&
+          if (showAccountSelectionDialogue(index) &&
               tabController.indexIsChanging &&
               tabController.index > tabController.previousIndex) {
             // reset to previous tab

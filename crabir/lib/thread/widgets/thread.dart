@@ -3,6 +3,7 @@ import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/sort.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -27,35 +28,6 @@ final commentSorts = [
   CommentSort.random,
 ];
 
-extension Label on CommentSort {
-  String label() {
-    // TODO: localization
-    return switch (this) {
-      CommentSort.confidence => "Best",
-      CommentSort.top => "Top",
-      CommentSort.new_ => "New",
-      CommentSort.controversial => "Controversial",
-      CommentSort.old => "Old",
-      CommentSort.qa => "Q&A",
-      CommentSort.random => "Random",
-      CommentSort.live => "Live"
-    };
-  }
-
-  IconData icon() {
-    return switch (this) {
-      CommentSort.confidence => Icons.rocket,
-      CommentSort.top => Icons.bar_chart,
-      CommentSort.new_ => Icons.fiber_new,
-      CommentSort.controversial => Icons.chat,
-      CommentSort.old => Icons.history,
-      CommentSort.qa => Icons.forum,
-      CommentSort.random => Icons.shuffle,
-      CommentSort.live => Icons.whatshot,
-    };
-  }
-}
-
 @RoutePage(name: "ThreadRoute")
 class Thread extends StatelessWidget {
   final String permalink;
@@ -73,7 +45,7 @@ class Thread extends StatelessWidget {
             (bloc.state.sort ??
                     bloc.state.post?.suggestedSort ??
                     CommentSort.confidence)
-                .label(),
+                .label(context),
             style: Theme.of(context).textTheme.labelSmall,
           ),
         ],
@@ -85,7 +57,7 @@ class Thread extends StatelessWidget {
                 (sort) => MenuItemButton(
                   onPressed: () => bloc.add(SetSort(sort)),
                   leadingIcon: Icon(sort.icon()),
-                  child: Text(sort.label()),
+                  child: Text(sort.label(context)),
                 ),
               )
               .toList(),
