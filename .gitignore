@@ -1,2 +1,5 @@
 target/
 .direnv/
+lib/src/rust/*
+rust/src/frb_generated*
+frb_generated*
