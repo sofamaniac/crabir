@@ -135,7 +135,7 @@ abstract class Client implements RustOpaqueInterface {
   /// # Errors
   /// Returns an error if the request failed.
   Future<void> vote(
-      {required Fullname thing, required VoteDirection direction});
+      {required Fullname fullname, required VoteDirection direction});
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Pager>>

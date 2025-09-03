@@ -490,6 +490,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String dco_decode_String(dynamic raw);
 
   @protected
+  Votable dco_decode_TraitDef_Votable(dynamic raw);
+
+  @protected
   AnimatedImage dco_decode_animated_image(dynamic raw);
 
   @protected

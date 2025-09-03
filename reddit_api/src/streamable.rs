@@ -2,7 +2,7 @@ use futures::lock::Mutex;
 
 use crate::{
     client::{Client, VoteDirection},
-    model::{Fullname, Thing},
+    model::{Fullname, Thing, Votable as _},
     result::Result,
 };
 use futures::{StreamExt, stream::BoxStream};
@@ -25,7 +25,7 @@ impl<T: IntoStreamPrivate<Output = Thing> + Send + Sync> IntoStream for T {}
 /// flutter_rust_bridge:opaque
 pub struct Streamable {
     listing: Box<dyn IntoStream>,
-    things: Mutex<Vec<Thing>>,
+    things: Vec<Thing>,
     done: Mutex<bool>,
     stream: Mutex<BoxStream<'static, Result<Thing>>>,
 }
@@ -35,7 +35,7 @@ impl Streamable {
         Self {
             stream: listing.to_stream().into(),
             listing,
-            things: Vec::new().into(),
+            things: Vec::new(),
             done: false.into(),
         }
     }
@@ -43,8 +43,8 @@ impl Streamable {
     pub async fn refresh(&mut self) {
         let mut stream = self.stream.lock().await;
         *stream = self.listing.to_stream();
-        let mut things = self.things.lock().await;
-        things.clear();
+        //let mut things = self.things.lock().await;
+        self.things.clear();
         let mut done = self.done.lock().await;
         *done = false;
     }
@@ -58,8 +58,8 @@ impl Streamable {
         }
         let mut stream = self.stream.lock().await;
         if let Some(next) = stream.next().await {
-            let mut things = self.things.lock().await;
-            things.push(next?);
+            //let mut things = self.things.lock().await;
+            self.things.push(next?);
             Ok(true)
         } else {
             let mut done = self.done.lock().await;
@@ -68,50 +68,65 @@ impl Streamable {
         }
     }
 
-    pub async fn nth(&self, n: u32) -> Option<Thing> {
-        let things = self.things.lock().await;
-        things.get(n as usize).cloned()
+    /// flutter_rust_bridge:sync
+    pub fn nth(&self, n: u32) -> Option<Thing> {
+        self.things.get(n as usize).cloned()
     }
 
-    /// flutter_rust_bridge:getter
-    pub async fn get_length(&self) -> u32 {
-        self.things.lock().await.len() as u32
+    /// flutter_rust_bridge:sync
+    pub fn get_all(&self) -> Vec<Thing> {
+        self.things.clone()
+    }
+
+    /// flutter_rust_bridge:getter,sync
+    pub fn get_length(&self) -> u32 {
+        //self.things.lock().await.len() as u32
+        self.things.len() as u32
     }
 
     pub async fn vote(
-        &self,
+        &mut self,
         name: &Fullname,
         direction: VoteDirection,
         client: &Client,
     ) -> Result<()> {
-        client.vote(name, direction).await?;
-        let mut things = self.things.lock().await;
-        let thing = things
+        let index = self
+            .things
             .iter()
-            .position(|thing| &thing.name().unwrap_or_default() == name);
-        if let Some(thing) = thing {
-            things[thing].likes(direction);
+            .position(|t| t.name().is_some_and(|n| &n == name));
+        if index.is_none() {
+            return Ok(());
         }
+        let thing = self.things.get_mut(index.unwrap());
+        match thing {
+            Some(Thing::Post(val)) => val.vote(direction, client).await?,
+            Some(Thing::Comment(val)) => val.vote(direction, client).await?,
+            _ => (),
+        };
         Ok(())
     }
 
-    pub async fn save(&self, name: &Fullname, save: bool, client: &Client) -> Result<()> {
+    pub async fn save(&mut self, name: &Fullname, save: bool, client: &Client) -> Result<()> {
         if save {
             client.save(name).await?;
         } else {
             client.unsave(name).await?;
         }
-        let mut things = self.things.lock().await;
-        let thing = things
+        let index = self
+            .things
             .iter()
             .position(|thing| &thing.name().unwrap_or_default() == name);
-        if let Some(thing) = thing {
-            things[thing].save(save);
+        if index.is_none() {
+            return Ok(());
         }
+        let thing = self.things.get_mut(index.unwrap());
+        match thing {
+            Some(Thing::Post(val)) if save => val.save(client).await?,
+            Some(Thing::Post(val)) if !save => val.unsave(client).await?,
+            Some(Thing::Comment(val)) if save => val.save(client).await?,
+            Some(Thing::Comment(val)) if !save => val.unsave(client).await?,
+            _ => (),
+        };
         Ok(())
-    }
-
-    pub async fn get_all(&self) -> Vec<Thing> {
-        self.things.lock().await.clone()
     }
 }

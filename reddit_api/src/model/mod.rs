@@ -5,7 +5,10 @@ use serde::{Deserialize, Serialize};
 use subreddit::Subreddit;
 use user::model::User;
 
-use crate::error::Error;
+use crate::{
+    client::{Client, VoteDirection},
+    error::Error,
+};
 
 pub mod author;
 pub mod comment;
@@ -70,7 +73,7 @@ impl Thing {
             Thing::Listing(_) => None,
             Thing::Comment(comment) => Some(comment.name.clone()),
             Thing::User(user) => Some(user.name()),
-            Thing::Post(post) => Some(post.name.clone()),
+            Thing::Post(post) => Some(post.get_name()),
             Thing::Message => todo!(),
             Thing::Subreddit(subreddit) => Some(subreddit.other.name.clone()),
             Thing::Award => None,
@@ -79,22 +82,26 @@ impl Thing {
         }
     }
 
-    pub(crate) fn likes(&mut self, direction: crate::client::VoteDirection) {
-        let likes: Option<bool> = direction.into();
-        match self {
-            Thing::Comment(comment) => comment.likes = likes,
-            Thing::Post(post) => post.likes = likes,
-            _ => (),
-        }
-    }
-
-    pub(crate) fn save(&mut self, save: bool) {
-        match self {
-            Thing::Comment(comment) => comment.saved = save,
-            Thing::Post(post) => post.saved = save,
-            _ => (),
-        }
-    }
+    // pub(crate) fn likes(&mut self, direction: crate::client::VoteDirection) {
+    //     let likes: Option<bool> = direction.into();
+    //     match self {
+    //         Thing::Comment(comment) => comment.likes = likes,
+    //         Thing::Post(post) => {
+    //             let _ = post.set_likes(likes);
+    //         }
+    //         _ => (),
+    //     }
+    // }
+    //
+    // pub(crate) fn save(&mut self, save: bool) {
+    //     match self {
+    //         Thing::Comment(comment) => comment.saved = save,
+    //         Thing::Post(post) => {
+    //             let _ = post.set_saved(save);
+    //         }
+    //         _ => (),
+    //     }
+    // }
 }
 
 impl TryFrom<Thing> for Listing {
@@ -141,4 +148,14 @@ impl Timeframe {
             Self::All => "all",
         }
     }
+}
+
+pub trait Votable {
+    async fn vote(
+        &mut self,
+        direction: VoteDirection,
+        client: &Client,
+    ) -> crate::result::Result<()>;
+    async fn save(&mut self, client: &Client) -> crate::result::Result<()>;
+    async fn unsave(&mut self, client: &Client) -> crate::result::Result<()>;
 }

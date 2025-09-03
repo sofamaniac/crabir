@@ -1,17 +1,13 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/sort_display.dart';
 import 'package:crabir/feed/sort_menu.dart';
-import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
-import 'package:crabir/stream/bloc/stream_bloc.dart';
 import 'package:crabir/stream/things_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 @RoutePage()
 class MultiView extends StatelessWidget {
@@ -49,67 +45,64 @@ class _MultiViewBodyState extends State<MultiViewBody>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
-    return BlocBuilder<AccountsBloc, AccountState>(
-      builder: (context, account) {
-        return switch (account.status) {
-          Uninit() => Center(child: LoadingIndicator()),
-          Failure(:final message) =>
-            Center(child: Text("Failure in Account Manager: $message")),
-          Loaded() => NestedScrollView(
-              headerSliverBuilder: (context, __) {
-                return [
-                  SliverAppBar(
-                    floating: true,
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Feed title"),
-                        SortDisplay(sort: sort),
-                      ],
-                    ),
-                    actions: [
-                      IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-                      SortMenu(
-                        onSelect: (sort) => setState(
-                          () {
-                            this.sort = sort;
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ];
-              },
-              floatHeaderSlivers: true,
-              body: ThingsScaffold(
-                // Forces rebuild when sort changes
-                key: ValueKey(sort.toString()),
-                stream: RedditAPI.client().multiPosts(
-                  multi: widget.multi,
-                  sort: sort,
-                ),
-                postView: (context, post) {
-                  final state = context.read<StreamBloc>();
-                  return RedditPostCard(
-                    maxLines: 5,
-                    post: post,
-                    onLike: (direction) async {
-                      state.add(Vote(direction: direction, name: post.name));
-                    },
-                    onSave: (save) async {
-                      state.add(Save(saved: save, name: post.name));
-                    },
-                    onTap: () => context.pushRoute(
-                      ThreadRoute(permalink: post.permalink, post: post),
-                    ),
-                  );
-                },
-              ),
+    final stream = RedditAPI.client().multiPosts(
+      multi: widget.multi,
+      sort: sort,
+    );
+    return NestedScrollView(
+      headerSliverBuilder: (context, __) {
+        return [
+          SliverAppBar(
+            floating: true,
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.multi.displayName),
+                SortDisplay(sort: sort),
+              ],
             ),
-          _ => Center(child: LoadingIndicator())
-        };
+            actions: [
+              IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+              SortMenu(
+                onSelect: (sort) => setState(
+                  () {
+                    this.sort = sort;
+                  },
+                ),
+              ),
+            ],
+          ),
+        ];
       },
+      floatHeaderSlivers: true,
+      body: ThingsScaffold(
+        // Forces rebuild when sort changes
+        key: ValueKey(sort.toString()),
+        stream: stream,
+        postView: (context, post) {
+          return RedditPostCard(
+            maxLines: 5,
+            post: post,
+            onLike: (direction) async {
+              await stream.vote(
+                name: post.name,
+                direction: direction,
+                client: RedditAPI.client(),
+              );
+            },
+            onSave: (save) async {
+              await stream.save(
+                name: post.name,
+                save: save,
+                client: RedditAPI.client(),
+              );
+            },
+            onTap: () => context.pushRoute(
+              ThreadRoute(permalink: post.permalink, post: post),
+            ),
+          );
+        },
+      ),
     );
   }
 }

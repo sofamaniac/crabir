@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../../frb_generated.dart';
+import '../client.dart';
 import '../model.dart';
 import 'author.dart';
 import 'flair.dart';
@@ -16,7 +17,7 @@ import 'user/model.dart';
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `try_from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Comment>>
-abstract class Comment implements RustOpaqueInterface {
+abstract class Comment implements RustOpaqueInterface, Votable {
   bool get archived;
 
   AuthorInfo? get author;
@@ -163,6 +164,15 @@ abstract class Comment implements RustOpaqueInterface {
 
   /// flutter_rust_bridge:sync
   List<Thing> replies();
+
+  @override
+  Future<void> save({required Client client});
+
+  @override
+  Future<void> unsave({required Client client});
+
+  @override
+  Future<void> vote({required VoteDirection direction, required Client client});
 }
 
 enum CommentSort {

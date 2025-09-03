@@ -503,7 +503,7 @@ impl Client {
     /// Vote on a votable item (i.e. a [`Post`] or a [`comment::Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
-    pub async fn vote(&self, thing: &Fullname, direction: VoteDirection) -> Result<()> {
+    pub async fn vote(&self, fullname: &Fullname, direction: VoteDirection) -> Result<()> {
         let dir = match direction {
             VoteDirection::Up => 1,
             VoteDirection::Down => -1,
@@ -512,7 +512,7 @@ impl Client {
 
         let url = self.base_url().join("api/vote").expect("Should not fail.");
         let request = self.post(url);
-        let request = request.query(&[("id", thing.as_ref()), ("dir", &format!("{dir}"))]);
+        let request = request.query(&[("id", fullname.as_ref()), ("dir", &format!("{dir}"))]);
         let _ = self.execute(request).await?;
         Ok(())
     }

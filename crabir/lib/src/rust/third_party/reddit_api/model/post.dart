@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../../frb_generated.dart';
+import '../client.dart';
 import '../model.dart';
 import 'author.dart';
 import 'comment.dart';
@@ -18,336 +19,239 @@ part 'post.freezed.dart';
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `try_from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Post>>
-abstract class Post implements RustOpaqueInterface {
-  List<String?> get allAwardings;
-
-  bool get allowLiveComments;
-
-  double? get approvedAtUtc;
-
-  String? get approvedBy;
-
-  bool get archived;
-
-  AuthorInfo? get author;
-
-  List<String?> get awarders;
-
-  double? get bannedAtUtc;
-
-  bool get canGild;
-
-  bool get canModPost;
-
-  bool get clicked;
-
-  List<String> get contentCategories;
-
-  bool get contestMode;
-
-  DateTime get created;
-
-  DateTime get createdUtc;
-
-  List<Post> get crosspostParentList;
-
-  String? get discussionType;
-
-  String? get distinguished;
-
-  String get domain;
-
-  int get downs;
-
-  double? get edited;
-
-  Gallery? get gallery;
-
-  int get gilded;
-
-  Gildings get gildings;
-
-  bool get hidden;
-
-  bool get hideScore;
-
-  PostId get id;
-
-  bool get isCrosspostable;
-
-  bool get isOriginalContent;
-
-  bool get isRedditMediaDomain;
-
-  bool get isRobotIndexable;
-
-  bool get isSelf;
-
-  bool? get likes;
-
-  Flair get linkFlair;
-
-  bool get locked;
-
-  Media? get media;
-
-  MediaEmbed? get mediaEmbed;
-
-  String? get modNote;
-
-  String? get modReasonBy;
-
-  String? get modReasonTitle;
-
-  List<String?> get modReports;
-
-  Fullname get name;
-
-  bool get noFollow;
-
-  int get numComments;
-
-  int? get numCrossposts;
-
-  int? get numDuplicates;
-
-  int? get numReports;
-
-  bool get over18;
-
-  String get permalink;
-
-  bool get pinned;
-
-  Preview? get preview;
-
-  int? get pwls;
-
-  bool get quarantine;
-
-  String? get removalReason;
-
-  String? get removedBy;
-
-  String? get removedByCategory;
-
-  List<String> get reportReasons;
-
-  bool get saved;
-
-  int get score;
-
-  Media? get secureMedia;
-
-  SecureMediaEmbed? get secureMediaEmbed;
-
-  String? get selftext;
-
-  String? get selftextHtml;
-
-  bool get sendReplies;
-
-  bool get spoiler;
-
-  bool get stickied;
-
-  SubredditInfo get subreddit;
-
-  CommentSort? get suggestedSort;
-
-  String get title;
-
-  String? get topAwardedType;
-
-  int? get totalAwardsReceived;
-
-  List<String?> get treatmentTags;
-
-  int get ups;
-
-  double get upvoteRatio;
-
-  String get url;
-
-  String? get urlOverriddenByDest;
-
-  List<String?> get userReports;
-
-  String? get viewCount;
-
-  bool get visited;
-
-  int? get wls;
-
-  set allAwardings(List<String?> allAwardings);
-
-  set allowLiveComments(bool allowLiveComments);
-
-  set approvedAtUtc(double? approvedAtUtc);
-
-  set approvedBy(String? approvedBy);
-
-  set archived(bool archived);
-
-  set author(AuthorInfo? author);
-
-  set awarders(List<String?> awarders);
-
-  set bannedAtUtc(double? bannedAtUtc);
-
-  set canGild(bool canGild);
-
-  set canModPost(bool canModPost);
-
-  set clicked(bool clicked);
-
-  set contentCategories(List<String> contentCategories);
-
-  set contestMode(bool contestMode);
-
-  set created(DateTime created);
-
-  set createdUtc(DateTime createdUtc);
-
-  set crosspostParentList(List<Post> crosspostParentList);
-
-  set discussionType(String? discussionType);
-
-  set distinguished(String? distinguished);
-
-  set domain(String domain);
-
-  set downs(int downs);
-
-  set edited(double? edited);
-
-  set gallery(Gallery? gallery);
-
-  set gilded(int gilded);
-
-  set gildings(Gildings gildings);
-
-  set hidden(bool hidden);
-
-  set hideScore(bool hideScore);
-
-  set id(PostId id);
-
-  set isCrosspostable(bool isCrosspostable);
-
-  set isOriginalContent(bool isOriginalContent);
-
-  set isRedditMediaDomain(bool isRedditMediaDomain);
-
-  set isRobotIndexable(bool isRobotIndexable);
-
-  set isSelf(bool isSelf);
-
-  set likes(bool? likes);
-
-  set linkFlair(Flair linkFlair);
-
-  set locked(bool locked);
-
-  set media(Media? media);
-
-  set mediaEmbed(MediaEmbed? mediaEmbed);
-
-  set modNote(String? modNote);
-
-  set modReasonBy(String? modReasonBy);
-
-  set modReasonTitle(String? modReasonTitle);
-
-  set modReports(List<String?> modReports);
-
-  set name(Fullname name);
-
-  set noFollow(bool noFollow);
-
-  set numComments(int numComments);
-
-  set numCrossposts(int? numCrossposts);
-
-  set numDuplicates(int? numDuplicates);
-
-  set numReports(int? numReports);
-
-  set over18(bool over18);
-
-  set permalink(String permalink);
-
-  set pinned(bool pinned);
-
-  set preview(Preview? preview);
-
-  set pwls(int? pwls);
-
-  set quarantine(bool quarantine);
-
-  set removalReason(String? removalReason);
-
-  set removedBy(String? removedBy);
-
-  set removedByCategory(String? removedByCategory);
-
-  set reportReasons(List<String> reportReasons);
-
-  set saved(bool saved);
-
-  set score(int score);
-
-  set secureMedia(Media? secureMedia);
-
-  set secureMediaEmbed(SecureMediaEmbed? secureMediaEmbed);
-
-  set selftext(String? selftext);
-
-  set selftextHtml(String? selftextHtml);
-
-  set sendReplies(bool sendReplies);
-
-  set spoiler(bool spoiler);
-
-  set stickied(bool stickied);
-
-  set subreddit(SubredditInfo subreddit);
-
-  set suggestedSort(CommentSort? suggestedSort);
-
-  set title(String title);
-
-  set topAwardedType(String? topAwardedType);
-
-  set totalAwardsReceived(int? totalAwardsReceived);
-
-  set treatmentTags(List<String?> treatmentTags);
-
-  set ups(int ups);
-
-  set upvoteRatio(double upvoteRatio);
-
-  set url(String url);
-
-  set urlOverriddenByDest(String? urlOverriddenByDest);
-
-  set userReports(List<String?> userReports);
-
-  set viewCount(String? viewCount);
-
-  set visited(bool visited);
-
-  set wls(int? wls);
-
+abstract class Post implements RustOpaqueInterface, Votable {
   static Future<Post> default_() =>
       RustLib.instance.api.redditApiModelPostPostDefault();
+
+  Future<List<String?>> getAllAwardings();
+
+  Future<bool> getAllowLiveComments();
+
+  Future<double?> getApprovedAtUtc();
+
+  Future<String?> getApprovedBy();
+
+  Future<bool> getArchived();
+
+  /// flutter_rust_bridge:getter,sync
+  AuthorInfo? get author;
+
+  Future<List<String?>> getAwarders();
+
+  Future<double?> getBannedAtUtc();
+
+  Future<bool> getCanGild();
+
+  Future<bool> getCanModPost();
+
+  Future<String?> getCategory();
+
+  Future<bool> getClicked();
+
+  Future<List<String>> getContentCategories();
+
+  Future<bool> getContestMode();
+
+  /// Date of creation in logged in user locale
+  Future<DateTime> getCreated();
+
+  /// Date of creation in UTC
+  /// flutter_rust_bridge:getter,sync
+  DateTime get createdUtc;
+
+  /// flutter_rust_bridge:getter,sync
+  List<Post> get crosspostParentList;
+
+  Future<String?> getDiscussionType();
+
+  Future<String?> getDistinguished();
+
+  /// flutter_rust_bridge:getter,sync
+  String get domain;
+
+  /// flutter_rust_bridge:getter,sync
+  int get downs;
+
+  /// flutter_rust_bridge:getter,sync
+  double? get edited;
+
+  /// flutter_rust_bridge:getter,sync
+  Gallery? get gallery;
+
+  Future<int> getGilded();
+
+  Future<Gildings> getGildings();
+
+  Future<bool> getHidden();
+
+  Future<bool> getHideScore();
+
+  /// flutter_rust_bridge:getter,sync
+  PostId get id;
+
+  Future<bool> getIsCreatedFromAdsUi();
+
+  Future<bool> getIsCrosspostable();
+
+  Future<bool> getIsGallery();
+
+  Future<bool> getIsMeta();
+
+  Future<bool> getIsOriginalContent();
+
+  /// flutter_rust_bridge:getter,sync
+  bool get isRedditMediaDomain;
+
+  Future<bool> getIsRobotIndexable();
+
+  /// flutter_rust_bridge:getter,sync
+  bool get isSelf;
+
+  Future<bool> getIsVideo();
+
+  /// Some(true) if upvoted, Some(false) if downvoted, None otherwise
+  /// flutter_rust_bridge:getter,sync
+  bool? get likes;
+
+  /// flutter_rust_bridge:getter,sync
+  Flair get linkFlair;
+
+  /// flutter_rust_bridge:getter,sync
+  bool get locked;
+
+  /// flutter_rust_bridge:getter,sync
+  Media? get media;
+
+  /// flutter_rust_bridge:getter,sync
+  MediaEmbed? get mediaEmbed;
+
+  Future<bool> getMediaOnly();
+
+  Future<String?> getModNote();
+
+  Future<String?> getModReasonBy();
+
+  Future<String?> getModReasonTitle();
+
+  Future<List<String?>> getModReports();
+
+  /// flutter_rust_bridge:getter,sync
+  Fullname get name;
+
+  Future<bool> getNoFollow();
+
+  /// flutter_rust_bridge:getter,sync
+  int get numComments;
+
+  Future<int?> getNumCrossposts();
+
+  Future<int?> getNumDuplicates();
+
+  Future<int?> getNumReports();
+
+  /// flutter_rust_bridge:getter,sync
+  bool get over18;
+
+  /// flutter_rust_bridge:getter,sync
+  String get permalink;
+
+  /// flutter_rust_bridge:getter,sync
+  bool get pinned;
+
+  Future<String?> getPostHint();
+
+  /// flutter_rust_bridge:getter,sync
+  Preview? get preview;
+
+  Future<int?> getPwls();
+
+  Future<bool> getQuarantine();
+
+  Future<String?> getRemovalReason();
+
+  Future<String?> getRemovedBy();
+
+  Future<String?> getRemovedByCategory();
+
+  Future<List<String>> getReportReasons();
+
+  /// flutter_rust_bridge:getter,sync
+  bool get saved;
+
+  /// flutter_rust_bridge:getter,sync
+  int get score;
+
+  /// flutter_rust_bridge:getter,sync
+  Media? get secureMedia;
+
+  /// flutter_rust_bridge:getter,sync
+  SecureMediaEmbed? get secureMediaEmbed;
+
+  /// flutter_rust_bridge:getter,sync
+  String? get selftext;
+
+  /// flutter_rust_bridge:getter,sync
+  String? get selftextHtml;
+
+  Future<bool> getSendReplies();
+
+  /// flutter_rust_bridge:getter,sync
+  bool get spoiler;
+
+  /// flutter_rust_bridge:getter,sync
+  bool get stickied;
+
+  /// flutter_rust_bridge:getter,sync
+  SubredditInfo get subreddit;
+
+  /// Suggested sort for comments
+  /// flutter_rust_bridge:getter,sync
+  CommentSort? get suggestedSort;
+
+  /// flutter_rust_bridge:getter,sync
+  String get title;
+
+  Future<String?> getTopAwardedType();
+
+  Future<int?> getTotalAwardsReceived();
+
+  Future<List<String?>> getTreatmentTags();
+
+  /// flutter_rust_bridge:getter,sync
+  int get ups;
+
+  /// flutter_rust_bridge:getter,sync
+  double get upvoteRatio;
+
+  /// flutter_rust_bridge:getter,sync
+  String get url;
+
+  /// flutter_rust_bridge:getter,sync
+  String? get urlOverriddenByDest;
+
+  Future<List<String?>> getUserReports();
+
+  Future<String?> getViewCount();
+
+  Future<bool> getVisited();
+
+  Future<int?> getWls();
 
   ///flutter_rust_bridge:sync,getter
   bool get isCrosspost;
 
   Kind get kind;
 
+  @override
+  Future<void> save({required Client client});
+
   Thumbnail? get thumbnail;
+
+  @override
+  Future<void> unsave({required Client client});
+
+  @override
+  Future<void> vote({required VoteDirection direction, required Client client});
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PostID>>

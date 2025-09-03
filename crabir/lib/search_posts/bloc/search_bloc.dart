@@ -153,14 +153,14 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
 
   Future<void> _filter(Emitter<PostSearchState> emit) async {
     if (_streamable == null) return;
-    final posts = (await _streamable!.getAll())
+    final posts = (_streamable!.getAll())
         .whereType<Thing_Post>()
         .map((post) => post.field0);
     if (posts.length < 20 && !_hasReachedMax) {
       try {
-        while (await _streamable!.next() && await _streamable!.length < 20) {}
+        while (await _streamable!.next() && _streamable!.length < 20) {}
         _hasReachedMax = !await _streamable!.next();
-        final posts = (await _streamable!.getAll())
+        final posts = (_streamable!.getAll())
             .whereType<Thing_Post>()
             .map((post) => post.field0);
         emit(

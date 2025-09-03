@@ -6,12 +6,12 @@ import 'package:crabir/feed/top_bar.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/routes/routes.dart';
+import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
     as reddit_stream;
-import 'package:crabir/stream/bloc/stream_bloc.dart';
 import 'package:crabir/stream/things_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,6 +24,8 @@ class FeedView extends StatelessWidget {
     this.initialSort,
   });
   final Feed feed;
+
+  /// Override the setting-defined preferred sort.
   final FeedSort? initialSort;
 
   @override
@@ -76,8 +78,8 @@ class _FeedViewBodyState extends State<FeedViewBody>
   }
 
   void _initializeSort() {
-    // TODO: read from user option for preferred sort.
-    sort = widget.initialSort ?? FeedSort.best();
+    final settings = context.read<PostsSettingsCubit>().state;
+    sort = widget.initialSort ?? settings.defaultSort;
     _stream = RedditAPI.client().feedStream(
       feed: widget.feed,
       sort: sort!,
@@ -158,21 +160,28 @@ class _FeedViewBodyState extends State<FeedViewBody>
       _ => Center(child: LoadingIndicator())
     };
   }
-}
 
-Widget postView(BuildContext context, Post post) {
-  final state = context.read<StreamBloc>();
-  return RedditPostCard(
-    maxLines: 5,
-    post: post,
-    onLike: (direction) async {
-      state.add(Vote(direction: direction, name: post.name));
-    },
-    onSave: (save) async {
-      state.add(Save(saved: save, name: post.name));
-    },
-    onTap: () => context.router.navigate(
-      ThreadRoute(permalink: post.permalink, post: post),
-    ),
-  );
+  Widget postView(BuildContext context, Post post) {
+    return RedditPostCard(
+      maxLines: 5,
+      post: post,
+      onLike: (direction) async {
+        await _stream.vote(
+          name: post.name,
+          direction: direction,
+          client: RedditAPI.client(),
+        );
+      },
+      onSave: (save) async {
+        await _stream.save(
+          name: post.name,
+          save: save,
+          client: RedditAPI.client(),
+        );
+      },
+      onTap: () => context.router.navigate(
+        ThreadRoute(permalink: post.permalink, post: post),
+      ),
+    );
+  }
 }

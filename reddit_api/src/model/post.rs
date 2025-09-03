@@ -1,13 +1,16 @@
+use crate::result::Result;
 pub use chrono::{DateTime, Local, Utc};
+use getset::{CloneGetters, CopyGetters, Getters, Setters};
 
-use crate::error::Error;
 use crate::model::author;
 use crate::model::author::AuthorInfo;
 use crate::model::flair::Flair;
 use crate::utils;
+use crate::{client::VoteDirection, error::Error};
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, with_prefix};
 
+use super::Votable;
 use super::{Fullname, Thing, comment::CommentSort, gallery::Gallery, subreddit::SubredditInfo};
 
 with_prefix!(prefix_link_flair "link_flair_");
@@ -33,48 +36,71 @@ pub enum Kind {
 pub struct PostID(String);
 
 #[serde_as]
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-///flutter_rust_bridge:opaque
+#[derive(
+    Default, Debug, Clone, PartialEq, Serialize, Deserialize, CloneGetters, Getters, Setters,
+)]
+#[getset(get_clone = "pub with_prefix", get = "pub(crate)")]
 pub struct Post {
-    pub name: Fullname,
-    pub id: PostID,
-    pub user_reports: Vec<Option<String>>,
-    pub gilded: u32,
-    pub title: String,
-    pub domain: String,
-    pub url: String,
-    pub permalink: String,
-    pub url_overridden_by_dest: Option<String>,
-    pub selftext: Option<String>,
-    pub selftext_html: Option<String>,
-    pub num_comments: u32,
+    /// flutter_rust_bridge:getter,sync
+    name: Fullname,
+    /// flutter_rust_bridge:getter,sync
+    id: PostID,
+    user_reports: Vec<Option<String>>,
+    gilded: u32,
+    /// flutter_rust_bridge:getter,sync
+    title: String,
+    /// flutter_rust_bridge:getter,sync
+    domain: String,
+    /// flutter_rust_bridge:getter,sync
+    url: String,
+    /// flutter_rust_bridge:getter,sync
+    permalink: String,
+    /// flutter_rust_bridge:getter,sync
+    url_overridden_by_dest: Option<String>,
+    /// flutter_rust_bridge:getter,sync
+    selftext: Option<String>,
+    /// flutter_rust_bridge:getter,sync
+    selftext_html: Option<String>,
+    /// flutter_rust_bridge:getter,sync
+    num_comments: u32,
 
     /// Date of creation in UTC
+    /// flutter_rust_bridge:getter,sync
     #[serde_as(as = "serde_with::TimestampSecondsWithFrac<f64>")]
-    pub created_utc: DateTime<Utc>,
+    created_utc: DateTime<Utc>,
     /// Date of creation in logged in user locale
     #[serde_as(as = "serde_with::TimestampSecondsWithFrac<f64>")]
     #[serde(default)]
-    pub created: DateTime<Local>,
+    created: DateTime<Local>,
 
     // User relationship
-    pub clicked: bool,
-    pub hidden: bool,
-    pub saved: bool,
+    clicked: bool,
+    hidden: bool,
+    /// flutter_rust_bridge:getter,sync
+    #[getset(set = "pub(crate)")]
+    saved: bool,
     /// Some(true) if upvoted, Some(false) if downvoted, None otherwise
-    pub likes: Option<bool>,
-    pub visited: bool,
+    /// flutter_rust_bridge:getter,sync
+    #[getset(set = "pub(crate)")]
+    likes: Option<bool>,
+    visited: bool,
 
     // Score
-    pub downs: u32,
-    pub upvote_ratio: f64,
-    pub ups: u32,
-    pub score: i32,
+    /// flutter_rust_bridge:getter,sync
+    downs: u32,
+    /// flutter_rust_bridge:getter,sync
+    upvote_ratio: f64,
+    /// flutter_rust_bridge:getter,sync
+    ups: u32,
+    /// flutter_rust_bridge:getter,sync
+    score: i32,
 
     #[serde(flatten, with = "prefix_link_flair")]
-    pub link_flair: Flair,
+    /// flutter_rust_bridge:getter,sync
+    link_flair: Flair,
 
     #[serde(flatten)]
+    #[getset(skip)]
     thumbnail: ThumbnailOption,
 
     #[serde(
@@ -82,46 +108,55 @@ pub struct Post {
         serialize_with = "author::serialize_author_option",
         deserialize_with = "author::author_option"
     )]
-    pub author: Option<AuthorInfo>,
+    /// flutter_rust_bridge:getter,sync
+    author: Option<AuthorInfo>,
 
     #[serde(flatten)]
-    pub subreddit: SubredditInfo,
+    /// flutter_rust_bridge:getter,sync
+    subreddit: SubredditInfo,
 
     // Media
     #[serde(deserialize_with = "utils::response_or_none")]
-    pub media: Option<Media>,
+    /// flutter_rust_bridge:getter,sync
+    media: Option<Media>,
     #[serde(deserialize_with = "utils::response_or_none")]
-    pub media_embed: Option<MediaEmbed>,
+    /// flutter_rust_bridge:getter,sync
+    media_embed: Option<MediaEmbed>,
     #[serde(deserialize_with = "utils::response_or_none")]
-    pub secure_media: Option<Media>,
+    /// flutter_rust_bridge:getter,sync
+    secure_media: Option<Media>,
     #[serde(deserialize_with = "utils::response_or_none")]
-    pub secure_media_embed: Option<SecureMediaEmbed>,
+    /// flutter_rust_bridge:getter,sync
+    secure_media_embed: Option<SecureMediaEmbed>,
     #[serde(flatten)]
-    pub gallery: Option<Gallery>,
+    /// flutter_rust_bridge:getter,sync
+    gallery: Option<Gallery>,
 
     // Moderation
-    pub hide_score: bool,
-    pub quarantine: bool,
-    pub can_mod_post: bool,
-    pub approved_by: Option<String>,
-    pub mod_note: Option<String>,
-    pub removed_by_category: Option<String>,
+    hide_score: bool,
+    quarantine: bool,
+    can_mod_post: bool,
+    approved_by: Option<String>,
+    mod_note: Option<String>,
+    removed_by_category: Option<String>,
     //pub banned_by: Option<String>,
-    pub mod_reason_by: Option<String>,
-    pub removal_reason: Option<String>,
-    pub removed_by: Option<String>,
-    pub banned_at_utc: Option<f64>,
-    pub approved_at_utc: Option<f64>,
-    pub mod_reason_title: Option<String>,
+    mod_reason_by: Option<String>,
+    removal_reason: Option<String>,
+    removed_by: Option<String>,
+    banned_at_utc: Option<f64>,
+    approved_at_utc: Option<f64>,
+    mod_reason_title: Option<String>,
     #[serde(deserialize_with = "utils::response_or_default")]
-    pub report_reasons: Vec<String>,
-    pub mod_reports: Vec<Option<String>>,
+    report_reasons: Vec<String>,
+    mod_reports: Vec<Option<String>>,
 
     // Post kind
     post_hint: Option<String>,
-    pub is_self: bool,
-    pub is_original_content: bool,
-    pub is_reddit_media_domain: bool,
+    /// flutter_rust_bridge:getter,sync
+    is_self: bool,
+    is_original_content: bool,
+    /// flutter_rust_bridge:getter,sync
+    is_reddit_media_domain: bool,
     is_meta: bool,
     is_created_from_ads_ui: bool,
     media_only: bool,
@@ -131,44 +166,53 @@ pub struct Post {
     is_gallery: bool,
 
     // Post properties
-    pub pinned: bool,
-    pub over_18: bool,
-    pub preview: Option<Preview>,
-    pub spoiler: bool,
-    pub locked: bool,
-    pub stickied: bool,
+    /// flutter_rust_bridge:getter,sync
+    pinned: bool,
+    /// flutter_rust_bridge:getter,sync
+    over_18: bool,
+    /// flutter_rust_bridge:getter,sync
+    preview: Option<Preview>,
+    /// flutter_rust_bridge:getter,sync
+    spoiler: bool,
+    /// flutter_rust_bridge:getter,sync
+    locked: bool,
+    /// flutter_rust_bridge:getter,sync
+    stickied: bool,
     #[serde(deserialize_with = "utils::response_or_none")]
-    pub edited: Option<f64>,
+    /// flutter_rust_bridge:getter,sync
+    edited: Option<f64>,
     /// Suggested sort for comments
-    pub suggested_sort: Option<CommentSort>,
-    pub view_count: Option<String>,
-    pub archived: bool,
-    pub is_crosspostable: bool,
+    /// flutter_rust_bridge:getter,sync
+    suggested_sort: Option<CommentSort>,
+    view_count: Option<String>,
+    archived: bool,
+    is_crosspostable: bool,
 
     // Other stuff
-    pub top_awarded_type: Option<String>,
-    pub total_awards_received: Option<u32>,
-    pub gildings: Gildings,
+    top_awarded_type: Option<String>,
+    total_awards_received: Option<u32>,
+    gildings: Gildings,
     #[serde_as(deserialize_as = "serde_with::DefaultOnNull")]
-    pub content_categories: Vec<String>,
-    pub wls: Option<i32>,
-    pub pwls: Option<i32>,
-    pub allow_live_comments: bool,
-    pub no_follow: bool,
-    pub all_awardings: Vec<Option<String>>,
-    pub awarders: Vec<Option<String>>,
-    pub can_gild: bool,
-    pub treatment_tags: Vec<Option<String>>,
-    pub num_reports: Option<u32>,
-    pub distinguished: Option<String>,
-    pub is_robot_indexable: bool,
-    pub num_duplicates: Option<u32>,
-    pub discussion_type: Option<String>,
-    pub send_replies: bool,
-    pub contest_mode: bool,
-    pub num_crossposts: Option<u32>,
+    content_categories: Vec<String>,
+    wls: Option<i32>,
+    pwls: Option<i32>,
+    allow_live_comments: bool,
+    no_follow: bool,
+    all_awardings: Vec<Option<String>>,
+    awarders: Vec<Option<String>>,
+    can_gild: bool,
+    treatment_tags: Vec<Option<String>>,
+    num_reports: Option<u32>,
+    distinguished: Option<String>,
+    is_robot_indexable: bool,
+    num_duplicates: Option<u32>,
+    discussion_type: Option<String>,
+    send_replies: bool,
+    contest_mode: bool,
+    num_crossposts: Option<u32>,
     #[serde(default)]
-    pub crosspost_parent_list: Vec<Post>,
+    /// flutter_rust_bridge:getter,sync
+    crosspost_parent_list: Vec<Post>,
 }
 
 impl Post {
@@ -238,6 +282,29 @@ impl Post {
     }
 }
 
+impl Votable for Post {
+    async fn vote(
+        &mut self,
+        direction: VoteDirection,
+        client: &crate::client::Client,
+    ) -> crate::result::Result<()> {
+        client.vote(&self.name, direction).await?;
+        self.likes = direction.into();
+        Ok(())
+    }
+
+    async fn save(&mut self, client: &crate::client::Client) -> crate::result::Result<()> {
+        client.save(&self.name).await?;
+        self.saved = true;
+        Ok(())
+    }
+    async fn unsave(&mut self, client: &crate::client::Client) -> crate::result::Result<()> {
+        client.unsave(&self.name).await?;
+        self.saved = false;
+        Ok(())
+    }
+}
+
 fn is_image_url(url: &str) -> bool {
     const EXTENSIONS: [&str; 5] = ["jpg", "jpeg", "png", "svg", "gif"];
     EXTENSIONS.iter().any(|pat| url.ends_with(pat))
@@ -246,7 +313,7 @@ fn is_image_url(url: &str) -> bool {
 impl TryFrom<Thing> for Post {
     type Error = Error;
 
-    fn try_from(value: Thing) -> Result<Self, Self::Error> {
+    fn try_from(value: Thing) -> std::result::Result<Self, Self::Error> {
         match value {
             Thing::Post(post) => Ok(post),
             _ => Err(Error::InvalidThing),

@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import 'client.dart';
 import 'model/comment.dart';
 import 'model/multi.dart';
 import 'model/post.dart';
@@ -45,6 +46,14 @@ abstract class Listing implements RustOpaqueInterface {
 
   static Future<Listing> default_() =>
       RustLib.instance.api.redditApiModelListingDefault();
+}
+
+abstract class Votable {
+  Future<void> save({required Client client});
+
+  Future<void> unsave({required Client client});
+
+  Future<void> vote({required VoteDirection direction, required Client client});
 }
 
 @freezed

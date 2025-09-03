@@ -182,8 +182,7 @@ class _CommentViewState extends State<CommentView>
   }
 
   Future<void> vote(VoteDirection target, bool hideButtonAfterAction) async {
-    await RedditAPI.client()
-        .vote(thing: widget.comment.name, direction: target);
+    await widget.comment.vote(client: RedditAPI.client(), direction: target);
     setState(() {
       if (hideButtonAfterAction) {
         showBottomBar = false;

@@ -128,15 +128,19 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   ) {
     final result = <Thing>[];
     for (final c in comments) {
-      if (c is Thing_Comment) {
-        result.add(c);
-        result.addAll(flatten(c.field0.replies()));
-      } else if (c is Thing_More) {
-        if (_moreLoaded.containsKey(c.id)) {
-          result.addAll(flatten(_moreLoaded[c.id]!));
-        } else {
+      switch (c) {
+        case Thing_Comment(:final field0):
           result.add(c);
-        }
+          result.addAll(flatten(field0.replies()));
+          break;
+        case Thing_More(:final id):
+          if (_moreLoaded.containsKey(id)) {
+            result.addAll(flatten(_moreLoaded[id]!));
+          } else {
+            result.add(c);
+          }
+          break;
+        default:
       }
     }
     return result;

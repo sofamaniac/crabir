@@ -23,7 +23,7 @@ pub enum Feed {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
-/// flutter_rust_bridge:non_opaque
+/// flutter_rust_bridge:non_opaque,json_serializable
 pub enum FeedSort {
     Best,
     Hot,
@@ -35,7 +35,7 @@ pub enum FeedSort {
 
 impl FeedSort {
     #[must_use]
-    pub fn add_to_url(&self, url: &Url) -> Url {
+    pub(crate) fn add_to_url(&self, url: &Url) -> Url {
         let sort = match &self {
             Self::Best => "best.json",
             Self::Hot => "hot.json",

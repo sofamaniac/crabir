@@ -9,6 +9,7 @@ use serde_with::serde_as;
 
 use super::Fullname;
 use super::Thing;
+use super::Votable;
 use super::author;
 use super::author::AuthorInfo;
 use crate::error::Error;
@@ -146,6 +147,24 @@ impl Comment {
                 }
             }
         }
+    }
+}
+
+impl Votable for Comment {
+    async fn vote(
+        &mut self,
+        direction: crate::client::VoteDirection,
+        client: &crate::client::Client,
+    ) -> crate::result::Result<()> {
+        todo!()
+    }
+
+    async fn save(&mut self, client: &crate::client::Client) -> crate::result::Result<()> {
+        todo!()
+    }
+
+    async fn unsave(&mut self, client: &crate::client::Client) -> crate::result::Result<()> {
+        todo!()
     }
 }
 

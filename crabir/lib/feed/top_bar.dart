@@ -9,6 +9,7 @@ class FeedTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: localization
     final title = switch (feed) {
       Feed_Home() => "Home",
       Feed_All() => "All",
