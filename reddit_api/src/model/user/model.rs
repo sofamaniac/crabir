@@ -43,6 +43,7 @@ pub struct User {
     pub can_edit_name: bool,
     #[serde(rename = "new_modmail_exists", default)]
     pub new_modmail_exists: Option<bool>,
+    #[serde(default)]
     pub coins: i64,
     #[serde(rename = "can_create_subreddit", default)]
     pub can_create_subreddit: bool,
@@ -103,10 +104,9 @@ pub struct UserSubreddit {
     #[serde(rename = "header_img")]
     pub header_img: Option<String>,
     pub title: String,
-    pub coins: i64,
     #[serde(rename = "previous_names")]
     pub previous_names: Vec<String>,
-    #[serde(rename = "over_18")]
+    #[serde(rename = "over_18", default)]
     pub over_18: bool,
     #[serde(rename = "icon_size")]
     pub icon_size: Vec<i64>,
@@ -118,7 +118,7 @@ pub struct UserSubreddit {
     #[serde(rename = "submit_link_label")]
     pub submit_link_label: String,
     #[serde(rename = "header_size")]
-    pub header_size: Option<String>,
+    pub header_size: Option<Vec<i64>>,
     #[serde(rename = "restrict_posting")]
     pub restrict_posting: bool,
     #[serde(rename = "restrict_commenting")]
@@ -139,7 +139,7 @@ pub struct UserSubreddit {
     pub url: String,
     pub quarantine: bool,
     #[serde(rename = "banner_size")]
-    pub banner_size: Option<String>,
+    pub banner_size: Option<Vec<i64>>,
     #[serde(rename = "user_is_moderator")]
     pub user_is_moderator: bool,
     #[serde(rename = "public_description")]
@@ -162,7 +162,7 @@ pub struct UserInfo {
     pub name: String,
     pub subreddit: UserSubreddit,
     pub created: f64,
-    #[serde(rename = "over_18")]
+    #[serde(rename = "over_18", default)]
     pub over_18: bool,
     #[serde(rename = "created_utc")]
     pub created_utc: f64,
@@ -200,8 +200,7 @@ pub struct Snoovatar {
     #[serde(rename = "pref_show_snoovatar")]
     pub pref_show_snoovatar: bool,
     #[serde(rename = "snoovatar_size")]
-    // TODO find what the type is
-    pub snoovatar_size: Option<String>,
+    pub snoovatar_size: Option<Vec<i64>>,
     #[serde(rename = "snoovatar_img")]
     pub snoovatar_img: String,
 }

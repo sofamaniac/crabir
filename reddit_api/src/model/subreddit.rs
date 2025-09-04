@@ -155,6 +155,7 @@ pub struct Common {
 pub struct Details {
     #[serde(default, deserialize_with = "utils::response_or_default")]
     pub default_set: bool,
+    #[serde(default, deserialize_with = "utils::response_or_none_string")]
     pub icon_color: Option<String>,
     pub previous_names: Vec<String>,
     #[serde(default, deserialize_with = "utils::response_or_default")]
@@ -382,7 +383,11 @@ impl Common {
                 height,
             })
         } else {
-            SubredditIcon::Color(self.key_color.clone().unwrap_or("black".to_owned()))
+            let color = self
+                .key_color
+                .clone()
+                .unwrap_or(self.primary_color.clone().unwrap_or("black".to_owned()));
+            SubredditIcon::Color(color)
         }
     }
 }
