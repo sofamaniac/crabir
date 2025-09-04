@@ -14,7 +14,7 @@ part of 'theme.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$Theme {
+mixin _$CrabirTheme {
   /// Color of the foundation
   @ColorConverter()
   Color get background;
@@ -43,14 +43,14 @@ mixin _$Theme {
   @ColorConverter()
   Color get linkColor;
 
-  /// Create a copy of Theme
+  /// Create a copy of CrabirTheme
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $ThemeCopyWith<CrabirTheme> get copyWith =>
-      _$ThemeCopyWithImpl<CrabirTheme>(this as CrabirTheme, _$identity);
+  $CrabirThemeCopyWith<CrabirTheme> get copyWith =>
+      _$CrabirThemeCopyWithImpl<CrabirTheme>(this as CrabirTheme, _$identity);
 
-  /// Serializes this Theme to a JSON map.
+  /// Serializes this CrabirTheme to a JSON map.
   Map<String, dynamic> toJson();
 
   @override
@@ -96,14 +96,15 @@ mixin _$Theme {
 
   @override
   String toString() {
-    return 'Theme(background: $background, cardBackground: $cardBackground, toolBarBackground: $toolBarBackground, toolBarText: $toolBarText, primaryColor: $primaryColor, highlight: $highlight, postTitle: $postTitle, readPost: $readPost, announcement: $announcement, contentText: $contentText, linkColor: $linkColor)';
+    return 'CrabirTheme(background: $background, cardBackground: $cardBackground, toolBarBackground: $toolBarBackground, toolBarText: $toolBarText, primaryColor: $primaryColor, highlight: $highlight, postTitle: $postTitle, readPost: $readPost, announcement: $announcement, contentText: $contentText, linkColor: $linkColor)';
   }
 }
 
 /// @nodoc
-abstract mixin class $ThemeCopyWith<$Res> {
-  factory $ThemeCopyWith(CrabirTheme value, $Res Function(CrabirTheme) _then) =
-      _$ThemeCopyWithImpl;
+abstract mixin class $CrabirThemeCopyWith<$Res> {
+  factory $CrabirThemeCopyWith(
+          CrabirTheme value, $Res Function(CrabirTheme) _then) =
+      _$CrabirThemeCopyWithImpl;
   @useResult
   $Res call(
       {@ColorConverter() Color background,
@@ -120,13 +121,13 @@ abstract mixin class $ThemeCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$ThemeCopyWithImpl<$Res> implements $ThemeCopyWith<$Res> {
-  _$ThemeCopyWithImpl(this._self, this._then);
+class _$CrabirThemeCopyWithImpl<$Res> implements $CrabirThemeCopyWith<$Res> {
+  _$CrabirThemeCopyWithImpl(this._self, this._then);
 
   final CrabirTheme _self;
   final $Res Function(CrabirTheme) _then;
 
-  /// Create a copy of Theme
+  /// Create a copy of CrabirTheme
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -194,8 +195,8 @@ class _$ThemeCopyWithImpl<$Res> implements $ThemeCopyWith<$Res> {
 
 /// @nodoc
 @JsonSerializable()
-class _Theme extends CrabirTheme {
-  _Theme(
+class _CrabirTheme extends CrabirTheme {
+  _CrabirTheme(
       {@ColorConverter() this.background = Colors.black,
       @ColorConverter() this.cardBackground = Colors.black,
       @ColorConverter() this.toolBarBackground = Colors.black,
@@ -208,7 +209,8 @@ class _Theme extends CrabirTheme {
       @ColorConverter() this.contentText = const Color(0xFFF5F6F8),
       @ColorConverter() this.linkColor = const Color(0xFF4B91E2)})
       : super._();
-  factory _Theme.fromJson(Map<String, dynamic> json) => _$ThemeFromJson(json);
+  factory _CrabirTheme.fromJson(Map<String, dynamic> json) =>
+      _$CrabirThemeFromJson(json);
 
   /// Color of the foundation
   @override
@@ -260,17 +262,17 @@ class _Theme extends CrabirTheme {
   @ColorConverter()
   final Color linkColor;
 
-  /// Create a copy of Theme
+  /// Create a copy of CrabirTheme
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$ThemeCopyWith<_Theme> get copyWith =>
-      __$ThemeCopyWithImpl<_Theme>(this, _$identity);
+  _$CrabirThemeCopyWith<_CrabirTheme> get copyWith =>
+      __$CrabirThemeCopyWithImpl<_CrabirTheme>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$ThemeToJson(
+    return _$CrabirThemeToJson(
       this,
     );
   }
@@ -279,7 +281,7 @@ class _Theme extends CrabirTheme {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _Theme &&
+            other is _CrabirTheme &&
             const DeepCollectionEquality()
                 .equals(other.background, background) &&
             const DeepCollectionEquality()
@@ -318,14 +320,16 @@ class _Theme extends CrabirTheme {
 
   @override
   String toString() {
-    return 'Theme(background: $background, cardBackground: $cardBackground, toolBarBackground: $toolBarBackground, toolBarText: $toolBarText, primaryColor: $primaryColor, highlight: $highlight, postTitle: $postTitle, readPost: $readPost, announcement: $announcement, contentText: $contentText, linkColor: $linkColor)';
+    return 'CrabirTheme(background: $background, cardBackground: $cardBackground, toolBarBackground: $toolBarBackground, toolBarText: $toolBarText, primaryColor: $primaryColor, highlight: $highlight, postTitle: $postTitle, readPost: $readPost, announcement: $announcement, contentText: $contentText, linkColor: $linkColor)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$ThemeCopyWith<$Res> implements $ThemeCopyWith<$Res> {
-  factory _$ThemeCopyWith(_Theme value, $Res Function(_Theme) _then) =
-      __$ThemeCopyWithImpl;
+abstract mixin class _$CrabirThemeCopyWith<$Res>
+    implements $CrabirThemeCopyWith<$Res> {
+  factory _$CrabirThemeCopyWith(
+          _CrabirTheme value, $Res Function(_CrabirTheme) _then) =
+      __$CrabirThemeCopyWithImpl;
   @override
   @useResult
   $Res call(
@@ -343,13 +347,13 @@ abstract mixin class _$ThemeCopyWith<$Res> implements $ThemeCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$ThemeCopyWithImpl<$Res> implements _$ThemeCopyWith<$Res> {
-  __$ThemeCopyWithImpl(this._self, this._then);
+class __$CrabirThemeCopyWithImpl<$Res> implements _$CrabirThemeCopyWith<$Res> {
+  __$CrabirThemeCopyWithImpl(this._self, this._then);
 
-  final _Theme _self;
-  final $Res Function(_Theme) _then;
+  final _CrabirTheme _self;
+  final $Res Function(_CrabirTheme) _then;
 
-  /// Create a copy of Theme
+  /// Create a copy of CrabirTheme
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -366,7 +370,7 @@ class __$ThemeCopyWithImpl<$Res> implements _$ThemeCopyWith<$Res> {
     Object? contentText = freezed,
     Object? linkColor = freezed,
   }) {
-    return _then(_Theme(
+    return _then(_CrabirTheme(
       background: freezed == background
           ? _self.background
           : background // ignore: cast_nullable_to_non_nullable

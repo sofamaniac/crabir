@@ -1,9 +1,45 @@
 // Taken from https://stackoverflow.com/a/50081214
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
+
+/// Convert a string of the form "#ffffff" or of the form "black" to a `Color`.
+/// If the string could not be converted, return `defaultColor`.
+extension StringToColor on String {
+  Color stringToColor({Color defaultColor = Colors.grey}) {
+    final log = Logger("stringToColor");
+    if (startsWith("#")) {
+      return HexColor.fromHex(this);
+    } else {
+      return switch (this) {
+        "black" => Colors.black,
+        "transparent" => Colors.transparent,
+        "light" => Colors.white,
+        "dark" => Colors.black,
+        "gray" => Colors.grey,
+        "" => defaultColor,
+        _ => () {
+            log.warning("Unknown color \"$this\"");
+            return defaultColor;
+          }()
+      };
+    }
+  }
+}
+
+extension StringToColorNull on String? {
+  Color stringToColor({Color defaultColor = Colors.grey}) {
+    if (this == null) {
+      return defaultColor;
+    } else {
+      return this!.stringToColor(defaultColor: defaultColor);
+    }
+  }
+}
 
 extension HexColor on Color {
   /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
   static Color fromHex(String hexString) {
+    final _log = Logger("HexColor");
     if (hexString.isEmpty) {
       return Colors.black;
     }
@@ -13,6 +49,7 @@ extension HexColor on Color {
     try {
       return Color(int.parse(buffer.toString(), radix: 16));
     } catch (e) {
+      _log.warning("Failed to parse $hexString ($e)");
       return Color(0x00000000);
     }
   }

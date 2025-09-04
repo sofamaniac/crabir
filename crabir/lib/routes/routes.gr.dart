@@ -319,6 +319,22 @@ class PostsSettingsRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ProfilePageWrapper]
+class ProfilePageRoute extends PageRouteInfo<void> {
+  const ProfilePageRoute({List<PageRouteInfo>? children})
+    : super(ProfilePageRoute.name, initialChildren: children);
+
+  static const String name = 'ProfilePageRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ProfilePageWrapper();
+    },
+  );
+}
+
+/// generated route for
 /// [SearchPage]
 class SearchPageRoute extends PageRouteInfo<void> {
   const SearchPageRoute({List<PageRouteInfo>? children})
@@ -530,10 +546,11 @@ class UserAboutRoute extends PageRouteInfo<UserAboutRouteArgs> {
   UserAboutRoute({
     Key? key,
     required String username,
+    UserInfo? about,
     List<PageRouteInfo>? children,
   }) : super(
          UserAboutRoute.name,
-         args: UserAboutRouteArgs(key: key, username: username),
+         args: UserAboutRouteArgs(key: key, username: username, about: about),
          initialChildren: children,
        );
 
@@ -543,32 +560,40 @@ class UserAboutRoute extends PageRouteInfo<UserAboutRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<UserAboutRouteArgs>();
-      return UserAboutView(key: args.key, username: args.username);
+      return UserAboutView(
+        key: args.key,
+        username: args.username,
+        about: args.about,
+      );
     },
   );
 }
 
 class UserAboutRouteArgs {
-  const UserAboutRouteArgs({this.key, required this.username});
+  const UserAboutRouteArgs({this.key, required this.username, this.about});
 
   final Key? key;
 
   final String username;
 
+  final UserInfo? about;
+
   @override
   String toString() {
-    return 'UserAboutRouteArgs{key: $key, username: $username}';
+    return 'UserAboutRouteArgs{key: $key, username: $username, about: $about}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! UserAboutRouteArgs) return false;
-    return key == other.key && username == other.username;
+    return key == other.key &&
+        username == other.username &&
+        about == other.about;
   }
 
   @override
-  int get hashCode => key.hashCode ^ username.hashCode;
+  int get hashCode => key.hashCode ^ username.hashCode ^ about.hashCode;
 }
 
 /// generated route for

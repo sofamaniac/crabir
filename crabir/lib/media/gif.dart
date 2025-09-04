@@ -1,5 +1,9 @@
 part of 'media.dart';
 
+class AnimatedContentController {
+  static ValueNotifier<String?> currentlyPlaying = ValueNotifier(null);
+}
+
 class AnimatedContent extends StatefulWidget {
   final String? placeholderUrl;
   final Resolution preferredResolution;
@@ -50,10 +54,6 @@ class _AnimatedContentState extends State<AnimatedContent> {
   late final VideoPlayerController _controller;
   late final ChewieController _chewieController;
 
-  /// Tracks which video should currently play and its score (distance / fraction)
-  static final ValueNotifier<String?> _currentlyPlayingUrl =
-      ValueNotifier(null);
-
   /// Stores all registered videos
   static final Map<String, _AnimatedContentState> _allVideos = {};
 
@@ -73,6 +73,8 @@ class _AnimatedContentState extends State<AnimatedContent> {
       videoPlayerController: _controller,
       autoPlay: false, // manual control
       looping: true,
+      autoInitialize: true,
+      showControlsOnInitialize: false,
       aspectRatio: widget.width / widget.height,
       placeholder: placeholder(),
     );
@@ -88,7 +90,8 @@ class _AnimatedContentState extends State<AnimatedContent> {
       _onScroll(); // initial check
     });
 
-    _currentlyPlayingUrl.addListener(_updateGlobalPlayState);
+    AnimatedContentController.currentlyPlaying
+        .addListener(_updateGlobalPlayState);
   }
 
   Widget placeholder() => widget.placeholderUrl != null
@@ -96,7 +99,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
       : const SizedBox.shrink();
 
   void _updateGlobalPlayState() {
-    if (_currentlyPlayingUrl.value == widget.url) {
+    if (AnimatedContentController.currentlyPlaying.value == widget.url) {
       if (!_controller.value.isPlaying) _controller.play();
     } else {
       if (_controller.value.isPlaying) _controller.pause();
@@ -104,9 +107,10 @@ class _AnimatedContentState extends State<AnimatedContent> {
   }
 
   void _onScroll() {
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenSize = MediaQuery.of(context).size;
     final bottomBarHeight = kBottomNavigationBarHeight;
-    final screenCenter = (screenHeight - bottomBarHeight) / 2;
+    final screenCenterY = (screenSize.height - bottomBarHeight) / 2;
+    final screenCenterX = screenSize.width / 2;
 
     String? bestUrl;
     double bestScore = double.infinity;
@@ -120,17 +124,19 @@ class _AnimatedContentState extends State<AnimatedContent> {
       final topLeftGlobal = renderObject.localToGlobal(Offset.zero);
 
       // Compute visible fraction
-      final visibleTop = topLeftGlobal.dy.clamp(0, screenHeight);
+      final visibleTop = topLeftGlobal.dy.clamp(0, screenSize.height);
       final visibleBottom =
-          (topLeftGlobal.dy + size.height).clamp(0, screenHeight);
+          (topLeftGlobal.dy + size.height).clamp(0, screenSize.height);
       final visibleHeight = visibleBottom - visibleTop;
       final visibleFraction = visibleHeight / size.height;
 
       if (visibleFraction < 0.5) continue; // skip mostly hidden videos
 
       // Compute distance from screen center
-      final videoCenter = topLeftGlobal.dy + size.height / 2;
-      final distance = (videoCenter - screenCenter).abs();
+      final videoCenterY = topLeftGlobal.dy + size.height / 2;
+      final videoCenterX = topLeftGlobal.dx + size.width / 2;
+      final distance = (videoCenterY - screenCenterY).abs() +
+          (videoCenterX - screenCenterX).abs();
 
       // score = distance / fraction
       final score = distance / visibleFraction;
@@ -141,8 +147,8 @@ class _AnimatedContentState extends State<AnimatedContent> {
       }
     }
 
-    if (_currentlyPlayingUrl.value != bestUrl) {
-      _currentlyPlayingUrl.value = bestUrl;
+    if (AnimatedContentController.currentlyPlaying.value != bestUrl) {
+      AnimatedContentController.currentlyPlaying.value = bestUrl;
     }
   }
 
@@ -161,7 +167,8 @@ class _AnimatedContentState extends State<AnimatedContent> {
 
   @override
   void dispose() {
-    _currentlyPlayingUrl.removeListener(_updateGlobalPlayState);
+    AnimatedContentController.currentlyPlaying
+        .removeListener(_updateGlobalPlayState);
     _scrollController?.removeListener(_onScroll);
     _allVideos.remove(widget.url);
 

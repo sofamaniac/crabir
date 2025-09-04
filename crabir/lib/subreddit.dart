@@ -19,7 +19,7 @@ class SubredditIcon extends StatelessWidget {
         ),
       subreddit.SubredditIcon_Color(field0: final color) => CircleAvatar(
           radius: 16,
-          backgroundColor: HexColor.fromHex(color),
+          backgroundColor: color.stringToColor(),
           child: Text("r/"),
         )
     };

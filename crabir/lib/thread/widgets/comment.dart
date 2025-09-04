@@ -31,65 +31,6 @@ class CommentView extends StatefulWidget {
   createState() => _CommentViewState();
 }
 
-class _Username extends StatelessWidget {
-  final AuthorInfo? author;
-  final bool isSubmitter;
-  final String? distinguished;
-  const _Username({
-    required this.author,
-    required this.isSubmitter,
-    required this.distinguished,
-  });
-
-  Widget _username(
-      CommentsSettings settings, String? currentUser, Color foreground) {
-    final username = author?.username;
-    if (username == currentUser &&
-        username != null &&
-        settings.highlightMyUsername) {
-      return Cartouche(
-        username,
-        background: foreground,
-        foreground: Colors.white,
-      );
-    } else if (isSubmitter) {
-      return Cartouche(
-        username!,
-        background: Colors.cyan,
-        foreground: Colors.white,
-      );
-    } else if (distinguished == "moderator") {
-      return Cartouche(
-        username!,
-        background: Colors.green,
-        foreground: Colors.white,
-      );
-    } else {
-      return Cartouche(
-        username ?? "u/[deleted]",
-        foreground: foreground,
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final settings = context.read<CommentsSettingsCubit>().state;
-    final currentUser = context.read<AccountsBloc>().state.account?.username;
-    final theme = context.read<ThemeBloc>().state;
-    return InkWell(
-      onTap: () {
-        if (author?.username != null && settings.clickableUsername) {
-          context.router.navigate(
-            UserRoute(username: author!.username),
-          );
-        }
-      },
-      child: _username(settings, currentUser, theme.primaryColor),
-    );
-  }
-}
-
 class _CommentViewState extends State<CommentView>
     with AutomaticKeepAliveClientMixin {
   bool showBottomBar = false;
@@ -190,12 +131,17 @@ class _CommentViewState extends State<CommentView>
     });
   }
 
-  Future<void> save(target) async {
+  Future<void> save(bool target, bool hideButtonAfterAction) async {
     if (target) {
       await RedditAPI.client().unsave(thing: widget.comment.name);
     } else {
       await RedditAPI.client().save(thing: widget.comment.name);
     }
+    setState(() {
+      if (hideButtonAfterAction) {
+        showBottomBar = false;
+      }
+    });
   }
 
   Widget bottomBar() {
@@ -223,7 +169,9 @@ class _CommentViewState extends State<CommentView>
         if (settings.showSaveButton)
           SaveButton(
             initialValue: widget.comment.saved,
-            onChange: save,
+            onChange: (target) async {
+              await save(target, settings.hideButtonAfterAction);
+            },
           ),
         IconButton(
           onPressed: () {
@@ -244,6 +192,65 @@ class _CommentViewState extends State<CommentView>
           icon: Icon(Icons.share),
         ),
       ],
+    );
+  }
+}
+
+class _Username extends StatelessWidget {
+  final AuthorInfo? author;
+  final bool isSubmitter;
+  final String? distinguished;
+  const _Username({
+    required this.author,
+    required this.isSubmitter,
+    required this.distinguished,
+  });
+
+  Widget _username(
+      CommentsSettings settings, String? currentUser, Color foreground) {
+    final username = author?.username;
+    if (username == currentUser &&
+        username != null &&
+        settings.highlightMyUsername) {
+      return Cartouche(
+        username,
+        background: foreground,
+        foreground: Colors.white,
+      );
+    } else if (isSubmitter) {
+      return Cartouche(
+        username!,
+        background: Colors.cyan,
+        foreground: Colors.white,
+      );
+    } else if (distinguished == "moderator") {
+      return Cartouche(
+        username!,
+        background: Colors.green,
+        foreground: Colors.white,
+      );
+    } else {
+      return Cartouche(
+        username ?? "u/[deleted]",
+        foreground: foreground,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final settings = context.read<CommentsSettingsCubit>().state;
+    final currentUser = context.read<AccountsBloc>().state.account?.username;
+    final theme = context.read<ThemeBloc>().state;
+    return InkWell(
+      onTap: () {
+        if (author?.username != null && settings.clickableUsername) {
+          context.router.navigate(
+            UserRoute(username: author!.username),
+          );
+        }
+      },
+      child: _username(settings, currentUser, theme.primaryColor),
     );
   }
 }

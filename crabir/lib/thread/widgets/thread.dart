@@ -4,6 +4,7 @@ import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/sort.dart';
+import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -13,10 +14,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-part 'comment_box.dart';
+part 'thread_entry.dart';
 part 'comments_list.dart';
-part 'comment_row.dart';
-part 'indent_guides_painter.dart';
+part 'indented_box.dart';
 
 final commentSorts = [
   CommentSort.confidence,
@@ -96,7 +96,7 @@ class Thread extends StatelessWidget {
                 .scaffoldBackgroundColor, // Ensure the background is opaque
             body: NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                appBar(context, context.read()), // Your custom sliver app bar
+                appBar(context, context.read()),
               ],
               floatHeaderSlivers: true,
               body: RefreshIndicator(
@@ -106,19 +106,12 @@ class Thread extends StatelessWidget {
                 child: CustomScrollView(
                   slivers: [
                     if (post != null)
-                      SliverToBoxAdapter(
-                        child: RedditPostCard(
-                          post: post,
-                          showMedia: false,
-                        ),
-                      )
+                      SliverToBoxAdapter(child: _PostView(post: post))
                     else
                       SliverToBoxAdapter(
                         child: Center(child: LoadingIndicator()),
                       ),
-                    CommentsList(
-                      comments: state.flatComments,
-                    ),
+                    CommentsList(),
                   ],
                 ),
               ),
@@ -136,4 +129,69 @@ int depth(Thing comment) {
     Thing_More(depth: final depth) => depth,
     _ => -1,
   };
+}
+
+class _PostView extends RedditPostCard {
+  const _PostView({
+    required super.post,
+  }) : super(showMedia: false);
+
+  @override
+  bool showThumbnail() {
+    return super.showThumbnail() && post.crosspostParentList.isEmpty;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final contentWidget = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      spacing: 8,
+      children: [
+        wrap(Header(post: post)),
+        wrap(title(context)),
+        if (post.crosspostParentList.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white54),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DenseCard(post: post.crosspostParentList.first),
+              ),
+            ),
+          )
+        else
+          content(context),
+        wrap(
+          Footer(
+            post: post,
+            onLike: (direction) async {
+              await post.vote(direction: direction, client: RedditAPI.client());
+            },
+            onSave: (save) async {
+              if (save) {
+                await post.save(client: RedditAPI.client());
+              } else {
+                await post.unsave(client: RedditAPI.client());
+              }
+            },
+          ),
+        ),
+      ],
+    );
+    final theme = context.watch<ThemeBloc>().state;
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      color: theme.background,
+      elevation: 1,
+      child: InkWell(
+        onTap: onTap,
+        child: contentWidget,
+      ),
+    );
+  }
 }

@@ -1,14 +1,20 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/routes/routes.dart';
+import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class GalleryView extends StatelessWidget {
   final Post post;
-  const GalleryView({super.key, required this.post});
+  final void Function(VoteDirection)? onVote;
+  final void Function(bool)? onSave;
+  const GalleryView({super.key, required this.post, this.onVote, this.onSave});
   @override
   Widget build(BuildContext context) {
     if (post.gallery != null) {
@@ -22,18 +28,20 @@ class GalleryView extends StatelessWidget {
           gallery: gallery,
         );
       } else {
-        return Text("Gallery and is Crosspost but no gallery on parent");
+        return Text("Error: Gallery and is Crosspost but no gallery on parent");
       }
     } else {
-      return Text("Gallery: not Crosspost && no gallery on post");
+      return Text("Error: Gallery: not Crosspost && no gallery on post");
     }
   }
 }
 
 class _GalleryView extends StatefulWidget {
   final Gallery gallery;
+  final void Function(VoteDirection)? onVote;
+  final void Function(bool)? onSave;
 
-  const _GalleryView({required this.gallery});
+  const _GalleryView({required this.gallery, this.onVote, this.onSave});
 
   @override
   State<_GalleryView> createState() => _GalleryViewState();
@@ -105,10 +113,17 @@ class FullScreenGalleryView extends StatefulWidget {
 
 class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
   late int _currentPage;
+  bool _showBars = true;
   @override
   void initState() {
     super.initState();
     _currentPage = widget.initialPage;
+  }
+
+  void _toggleBars() {
+    setState(() {
+      _showBars = !_showBars;
+    });
   }
 
   @override
@@ -121,27 +136,95 @@ class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
     });
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          '${_currentPage + 1} / ${widget.gallery.length}',
-          style: TextStyle(color: Colors.white),
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _toggleBars,
+        child: Stack(
+          children: [
+            Dismissible(
+              key: Key("FullScreenGalleryView"),
+              direction: DismissDirection.vertical,
+              onDismissed: (_) => Navigator.pop(context),
+              child: _GalleryPageViewer(
+                gallery: widget.gallery,
+                controller: controller,
+              ),
+            ),
+            _topBar(),
+            _bottomBar(),
+          ],
         ),
       ),
-      body: Dismissible(
-          key: Key("FullScreenGalleryView"),
-          direction: DismissDirection.vertical,
-          onDismissed: (_) => Navigator.pop(context),
-          child: _GalleryPageViewer(
-            gallery: widget.gallery,
-            controller: controller,
-          )),
     );
+  }
+
+  Widget _slidingBar(Widget child, Offset offset, Alignment alignment) {
+    return AnimatedSlide(
+      offset: _showBars ? Offset.zero : offset,
+      duration: const Duration(milliseconds: 250),
+      child: AnimatedOpacity(
+        opacity: _showBars ? 1 : 0,
+        duration: const Duration(milliseconds: 250),
+        child: Align(
+          alignment: alignment,
+          child: Container(
+            color: Colors.black54,
+            padding: const EdgeInsets.all(12),
+            child: child,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _bottomBar() {
+    final theme = context.watch<ThemeBloc>().state;
+    final bar = SafeArea(
+      top: false,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          VoteButton.like(initialValue: null, colorActive: theme.primaryColor),
+          IconButton(
+            icon: const Icon(Icons.favorite_border, color: Colors.white),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.share, color: Colors.white),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.download, color: Colors.white),
+            onPressed: () {},
+          ),
+        ],
+      ),
+    );
+    return _slidingBar(bar, Offset(0, 1), Alignment.bottomCenter);
+  }
+
+  Widget _topBar() {
+    final bar = SafeArea(
+      bottom: false,
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.close, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+          const Spacer(),
+          Text(
+            '${_currentPage + 1} / ${widget.gallery.length}',
+            style: TextStyle(color: Colors.white),
+          ),
+          IconButton(
+            icon: const Icon(Icons.more_vert, color: Colors.white),
+            onPressed: () {},
+          ),
+        ],
+      ),
+    );
+    return _slidingBar(bar, Offset(0, -1), Alignment.topCenter);
   }
 }
 
@@ -163,23 +246,37 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
     super.dispose();
   }
 
+  void _onPageChange(int index) {
+    final image = widget.gallery.get_(index: index);
+    if (image case Source_AnimatedImage()) {
+      AnimatedContentController.currentlyPlaying.value = image.source.mp4;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
       child: PageView.builder(
         controller: widget.controller,
+        onPageChanged: _onPageChange,
         itemBuilder: (context, index) {
           final image = widget.gallery.get_(index: index);
           // TODO: handle resolution
-          // TODO: display title if any
-          return switch (image) {
-            Source_Image() => ImageThumbnail.fromGalleryImage(image.source),
-            Source_AnimatedImage() => AnimatedContent(
+          final Widget imageWidget;
+          switch (image) {
+            case Source_Image():
+              imageWidget = ImageThumbnail.fromGalleryImage(image.source);
+            case Source_AnimatedImage():
+              AnimatedContentController.currentlyPlaying.value =
+                  image.source.mp4;
+              imageWidget = AnimatedContent(
                 url: image.source.mp4,
                 width: image.source.x,
                 height: image.source.y,
-              ),
-          };
+              );
+          }
+          // TODO: display title if any
+          return imageWidget;
         },
         itemCount: widget.gallery.length,
       ),

@@ -22,7 +22,7 @@ enum ThemeField {
 }
 
 @freezed
-abstract class CrabirTheme with _$Theme {
+abstract class CrabirTheme with _$CrabirTheme {
   CrabirTheme._();
   factory CrabirTheme({
     /// Color of the foundation
@@ -41,8 +41,8 @@ abstract class CrabirTheme with _$Theme {
     @ColorConverter() @Default(Color(0xFF00FF00)) Color announcement,
     @ColorConverter() @Default(Color(0xFFF5F6F8)) Color contentText,
     @ColorConverter() @Default(Color(0xFF4B91E2)) Color linkColor,
-  }) = _Theme;
+  }) = _CrabirTheme;
 
   factory CrabirTheme.fromJson(Map<String, dynamic> json) =>
-      _$ThemeFromJson(json);
+      _$CrabirThemeFromJson(json);
 }

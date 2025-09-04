@@ -27,12 +27,15 @@ class UserView extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUser = context.watch<AccountsBloc>().state.account;
     final user = username ?? currentUser?.username;
-    return _UserView(username: user!);
+    if (user == null) {
+      return Center(child: LoadingIndicator());
+    }
+    return _UserView(key: ValueKey(user), username: user);
   }
 }
 
 class _UserView extends StatefulWidget {
-  const _UserView({required this.username});
+  const _UserView({super.key, required this.username});
 
   final String username;
 
@@ -49,7 +52,7 @@ class _UserViewState extends State<_UserView> {
     _userFuture = RedditAPI.client().userAbout(username: widget.username);
   }
 
-  List<UserTabs> _tabs(String currentUser) {
+  List<UserTabs> _tabs(String? currentUser) {
     if (currentUser == widget.username) {
       return allUserTabs;
     } else {
@@ -60,10 +63,7 @@ class _UserViewState extends State<_UserView> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AccountsBloc>().state;
-    if (state.account == null) {
-      return Container();
-    }
-    final currentUser = state.account!.username;
+    final currentUser = state.account?.username;
     final tabs = _tabs(currentUser);
     return FutureBuilder(
         future: _userFuture,
@@ -73,17 +73,40 @@ class _UserViewState extends State<_UserView> {
           } else if (snapshot.hasError) {
             return Text("Error while fetching user info");
           } else if (snapshot.hasData) {
+            final infos = snapshot.data!;
             return AutoTabsRouter.tabBar(
               homeIndex: 0,
-              routes: tabs.map((tab) => tab.route(widget.username)).toList(),
+              routes: tabs.map((tab) {
+                if (tab case UserTabs.about) {
+                  return UserAboutRoute(
+                    username: widget.username,
+                    about: infos,
+                  );
+                } else {
+                  return tab.route(widget.username);
+                }
+              }).toList(),
               builder: (context, child, tabController) {
                 return NestedScrollView(
                   headerSliverBuilder: (_, __) => [
                     SliverAppBar.large(
                       //floating: true,
-                      leading: CircleAvatar(
-                        foregroundImage:
-                            NetworkImage(state.account!.profilePicture),
+                      flexibleSpace: FlexibleSpaceBar(
+                        background: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 40,
+                              backgroundImage: NetworkImage(infos.iconImg),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              infos.name,
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
                       pinned: false,
                       bottom: TabBar(

@@ -6,7 +6,7 @@ part of 'theme.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Theme _$ThemeFromJson(Map<String, dynamic> json) => _Theme(
+_CrabirTheme _$CrabirThemeFromJson(Map<String, dynamic> json) => _CrabirTheme(
       background: json['background'] == null
           ? Colors.black
           : const ColorConverter().fromJson(json['background'] as String),
@@ -43,7 +43,8 @@ _Theme _$ThemeFromJson(Map<String, dynamic> json) => _Theme(
           : const ColorConverter().fromJson(json['linkColor'] as String),
     );
 
-Map<String, dynamic> _$ThemeToJson(_Theme instance) => <String, dynamic>{
+Map<String, dynamic> _$CrabirThemeToJson(_CrabirTheme instance) =>
+    <String, dynamic>{
       'background': const ColorConverter().toJson(instance.background),
       'cardBackground': const ColorConverter().toJson(instance.cardBackground),
       'toolBarBackground':

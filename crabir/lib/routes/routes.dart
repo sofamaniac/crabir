@@ -45,7 +45,13 @@ class AppRouter extends RootStackRouter {
               initial: true,
             ),
             RedirectRoute(path: "", redirectTo: homeRoutePath),
-            currentUserRoute,
+            AutoRoute(
+              page: ProfilePageRoute.page,
+              children: [
+                currentUserRoute,
+                // you could add other user-related routes here too
+              ],
+            ),
             AutoRoute(
               page: SubscriptionsOrFeedRoute.page,
               children: [

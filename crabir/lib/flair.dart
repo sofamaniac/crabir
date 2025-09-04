@@ -90,9 +90,9 @@ class FlairView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = stringToColor(flair.backgroundColor ?? "",
-        defaultColor: Colors.transparent);
-    final foregroundColor = stringToColor(flair.textColor ?? "",
+    final backgroundColor =
+        flair.backgroundColor.stringToColor(defaultColor: Colors.transparent);
+    final foregroundColor = flair.textColor.stringToColor(
         defaultColor:
             Theme.of(context).textTheme.labelSmall?.foreground?.color ??
                 Colors.grey);
@@ -137,27 +137,5 @@ class FlairView extends StatelessWidget {
       ),
       child: textWidget,
     );
-  }
-}
-
-/// Convert a string of the form "#ffffff" or of the form "black" to a `Color`.
-/// If the string could not be converted, return `defaultColor`.
-Color stringToColor(String s, {Color defaultColor = Colors.grey}) {
-  final log = Logger("stringToColor");
-  if (s.startsWith("#")) {
-    return HexColor.fromHex(s);
-  } else {
-    return switch (s) {
-      "black" => Colors.black,
-      "transparent" => Colors.transparent,
-      "light" => Colors.white,
-      "dark" => Colors.black,
-      "gray" => Colors.grey,
-      "" => defaultColor,
-      _ => () {
-          log.warning("Unknown color \"$s\"");
-          return defaultColor;
-        }()
-    };
   }
 }

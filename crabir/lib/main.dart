@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/accounts/widgets/account_selector.dart';
 import 'package:crabir/drawer/drawer.dart';
-import 'package:crabir/login.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
@@ -102,7 +101,6 @@ class _MainScreenViewState extends State<MainScreenView> {
 
   bool showAccountSelectionDialogue(int index) {
     final account = context.read<AccountsBloc>().state.account;
-    print("${account?.username}");
     return (account == null || account.isAnonymous) &&
         (index == profileIndex || index == inboxIndex);
   }
@@ -176,14 +174,17 @@ class _MainScreenViewState extends State<MainScreenView> {
             controller: tabController,
             onTap: (index) {
               tabsRouter.setActiveIndex(index);
-              if (index == subscriptionsIndex) {
-                tabsRouter
-                    .stackRouterOfIndex(index)
-                    ?.replaceAll([SubscriptionsTabRoute()]);
-              } else if (index == searchIndex) {
-                tabsRouter
-                    .stackRouterOfIndex(index)
-                    ?.replaceAll([SearchSubredditsRoute()]);
+              final rootRoutes = {
+                subscriptionsIndex: const SubscriptionsTabRoute(),
+                searchIndex: const SearchSubredditsRoute(),
+                profileIndex: UserRoute(),
+              };
+
+              final route = rootRoutes[index];
+              if (route != null) {
+                print("REPLACEING ROUTE");
+                tabsRouter.stackRouterOfIndex(index)!.popUntilRoot();
+                tabsRouter.stackRouterOfIndex(index)?.replaceAll([route]);
               }
             },
             tabs: [

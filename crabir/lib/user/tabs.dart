@@ -84,6 +84,12 @@ final publicUserTabs = [
   UserTabs.gilded,
 ];
 
+// Required, otherwise the stackRouterOfIndex in the main screen is null.
+@RoutePage(name: "ProfilePageRoute")
+class ProfilePageWrapper extends AutoRouter {
+  const ProfilePageWrapper({super.key});
+}
+
 final currentUserRoute = AutoRoute(
   page: UserRoute.page,
   children: allUserTabs
@@ -142,14 +148,19 @@ class UserOverviewView extends StatelessWidget {
 
 @RoutePage()
 class UserAboutView extends StatelessWidget {
+  final UserInfo? about;
   final String username;
   const UserAboutView({
     super.key,
     required this.username,
+    this.about,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (about != null) {
+      return Text("Karma: ${about!.totalKarma}");
+    }
     return Text("TODO");
   }
 }
