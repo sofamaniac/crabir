@@ -15,7 +15,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:crabir/l10n/app_localizations.dart';
 
 Future<void> main() async {
   await RustLib.init();
@@ -80,7 +80,7 @@ class TopLevel extends StatelessWidget {
           secondary: theme.highlight,
           outlineVariant: Colors.white24,
         ),
-        cardTheme: CardTheme(color: theme.cardBackground),
+        cardTheme: CardThemeData(color: theme.cardBackground),
       ),
       routerConfig: _appRouter.config(),
     );

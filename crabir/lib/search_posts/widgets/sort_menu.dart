@@ -1,9 +1,9 @@
+import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/search_posts/bloc/search_bloc.dart';
 import 'package:crabir/sort.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SortMenu extends StatelessWidget {
   const SortMenu({super.key});

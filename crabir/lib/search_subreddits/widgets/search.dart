@@ -1,12 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/feed_list.dart';
+import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/search_subreddits/bloc/search_bloc.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 @RoutePage()
 class SearchSubredditsView extends StatefulWidget {

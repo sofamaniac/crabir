@@ -3,3 +3,16 @@ target/
 lib/src/rust/*
 rust/src/frb_generated*
 frb_generated*
+.env
+.gradle/
+.android/
+
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml

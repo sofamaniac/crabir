@@ -4,7 +4,7 @@ import 'package:crabir/src/settings_page/annotations.dart';
 import 'package:crabir/thread/widgets/thread.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:crabir/l10n/app_localizations.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';

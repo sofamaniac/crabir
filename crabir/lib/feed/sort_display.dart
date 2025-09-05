@@ -1,8 +1,8 @@
+import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/sort.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 extension SortLabel on FeedSort {
   String label(BuildContext context) {
