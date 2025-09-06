@@ -82,7 +82,7 @@ class PostsSettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final locales = AppLocalizations.of(context)!;
+    final locales = AppLocalizations.of(context);
     final settings = context.watch<PostsSettingsCubit>().state;
     return Scaffold(
         body: ListView(

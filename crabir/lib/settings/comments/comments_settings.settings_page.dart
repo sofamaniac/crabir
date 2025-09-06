@@ -111,7 +111,7 @@ class CommentsSettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final locales = AppLocalizations.of(context)!;
+    final locales = AppLocalizations.of(context);
     final settings = context.watch<CommentsSettingsCubit>().state;
     return Scaffold(
         body: ListView(

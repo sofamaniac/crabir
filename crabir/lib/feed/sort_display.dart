@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 extension SortLabel on FeedSort {
   String label(BuildContext context) {
-    final locales = AppLocalizations.of(context)!;
+    final locales = AppLocalizations.of(context);
     return switch (this) {
       FeedSort_Best() => locales.sortBest,
       FeedSort_Hot() => locales.sortHot,

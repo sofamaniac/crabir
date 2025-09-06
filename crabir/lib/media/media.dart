@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chewie/chewie.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +14,3 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart'
 part 'image.dart';
 part 'gif.dart';
 part 'resolution.dart';
-
-class MediaDisplay extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  }
-}

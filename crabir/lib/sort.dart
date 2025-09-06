@@ -15,7 +15,7 @@ const timeOptions = [
 
 extension TimeframeLabel on Timeframe {
   String label(BuildContext context) {
-    final locales = AppLocalizations.of(context)!;
+    final locales = AppLocalizations.of(context);
     return switch (this) {
       Timeframe.hour => locales.timeframeHour,
       Timeframe.day => locales.timeframeDay,
@@ -44,7 +44,7 @@ List<Widget> menu<T>(
 
 extension FeedSortLabel on FeedSort {
   String label(BuildContext context) {
-    final locales = AppLocalizations.of(context)!;
+    final locales = AppLocalizations.of(context);
     return switch (this) {
       FeedSort_Best() => locales.sortBest,
       FeedSort_Hot() => locales.sortHot,
@@ -69,7 +69,7 @@ extension FeedSortLabel on FeedSort {
 
 extension Label on CommentSort {
   String label(BuildContext context) {
-    final locales = AppLocalizations.of(context)!;
+    final locales = AppLocalizations.of(context);
     return switch (this) {
       CommentSort.confidence => locales.sortBest,
       CommentSort.top => locales.sortTop,

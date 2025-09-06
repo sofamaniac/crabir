@@ -39,7 +39,7 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
   Widget build(BuildContext context) {
     final bloc = context.watch<SubredditSearchBloc>();
     final state = bloc.state;
-    final locales = AppLocalizations.of(context)!;
+    final locales = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: SearchBar(
@@ -111,7 +111,7 @@ class SortMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.watch<SubredditSearchBloc>();
-    final locales = AppLocalizations.of(context)!;
+    final locales = AppLocalizations.of(context);
     return MenuAnchor(
       menuChildren: [
         MenuItemButton(

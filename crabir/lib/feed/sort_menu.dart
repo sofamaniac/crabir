@@ -10,7 +10,7 @@ class SortMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final locales = AppLocalizations.of(context)!;
+    final locales = AppLocalizations.of(context);
     return MenuAnchor(
       menuChildren: [
         MenuItemButton(
