@@ -240,6 +240,8 @@ class _GalleryPageViewer extends StatefulWidget {
 }
 
 class _GalleryPageViewerState extends State<_GalleryPageViewer> {
+  int _currentPage = 0;
+
   @override
   void dispose() {
     widget.controller.dispose();
@@ -251,6 +253,9 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
     if (image case Source_AnimatedImage()) {
       AnimatedContentController.currentlyPlaying.value = image.source.mp4;
     }
+    setState(() {
+      _currentPage = widget.controller.page?.round() ?? 0;
+    });
   }
 
   @override
@@ -270,10 +275,11 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
               AnimatedContentController.currentlyPlaying.value =
                   image.source.mp4;
               imageWidget = AnimatedContent(
-                url: image.source.mp4,
-                width: image.source.x,
-                height: image.source.y,
-              );
+                  url: image.source.mp4,
+                  width: image.source.x,
+                  height: image.source.y,
+                  // TODO: get placeholder image
+                  shouldPlay: index == _currentPage);
           }
           // TODO: display title if any
           return imageWidget;
