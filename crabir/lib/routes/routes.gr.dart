@@ -14,7 +14,7 @@ part of 'routes.dart';
 /// [CommentsSettingsView]
 class CommentsSettingsRoute extends PageRouteInfo<void> {
   const CommentsSettingsRoute({List<PageRouteInfo>? children})
-    : super(CommentsSettingsRoute.name, initialChildren: children);
+      : super(CommentsSettingsRoute.name, initialChildren: children);
 
   static const String name = 'CommentsSettingsRoute';
 
@@ -22,6 +22,22 @@ class CommentsSettingsRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const CommentsSettingsView();
+    },
+  );
+}
+
+/// generated route for
+/// [DataSettingsView]
+class DataSettingsRoute extends PageRouteInfo<void> {
+  const DataSettingsRoute({List<PageRouteInfo>? children})
+      : super(DataSettingsRoute.name, initialChildren: children);
+
+  static const String name = 'DataSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const DataSettingsView();
     },
   );
 }
@@ -35,10 +51,10 @@ class FeedRoute extends PageRouteInfo<FeedRouteArgs> {
     FeedSort? initialSort,
     List<PageRouteInfo>? children,
   }) : super(
-         FeedRoute.name,
-         args: FeedRouteArgs(key: key, feed: feed, initialSort: initialSort),
-         initialChildren: children,
-       );
+          FeedRoute.name,
+          args: FeedRouteArgs(key: key, feed: feed, initialSort: initialSort),
+          initialChildren: children,
+        );
 
   static const String name = 'FeedRoute';
 
@@ -91,14 +107,14 @@ class FullScreenGalleryRoute extends PageRouteInfo<FullScreenGalleryRouteArgs> {
     required int initialPage,
     List<PageRouteInfo>? children,
   }) : super(
-         FullScreenGalleryRoute.name,
-         args: FullScreenGalleryRouteArgs(
-           key: key,
-           gallery: gallery,
-           initialPage: initialPage,
-         ),
-         initialChildren: children,
-       );
+          FullScreenGalleryRoute.name,
+          args: FullScreenGalleryRouteArgs(
+            key: key,
+            gallery: gallery,
+            initialPage: initialPage,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'FullScreenGalleryRoute';
 
@@ -155,14 +171,14 @@ class FullscreenImageRoute extends PageRouteInfo<FullscreenImageRouteArgs> {
     String? title,
     List<PageRouteInfo>? children,
   }) : super(
-         FullscreenImageRoute.name,
-         args: FullscreenImageRouteArgs(
-           key: key,
-           imageUrl: imageUrl,
-           title: title,
-         ),
-         initialChildren: children,
-       );
+          FullscreenImageRoute.name,
+          args: FullscreenImageRouteArgs(
+            key: key,
+            imageUrl: imageUrl,
+            title: title,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'FullscreenImageRoute';
 
@@ -214,7 +230,7 @@ class FullscreenImageRouteArgs {
 /// [InboxView]
 class InboxRoute extends PageRouteInfo<void> {
   const InboxRoute({List<PageRouteInfo>? children})
-    : super(InboxRoute.name, initialChildren: children);
+      : super(InboxRoute.name, initialChildren: children);
 
   static const String name = 'InboxRoute';
 
@@ -230,7 +246,7 @@ class InboxRoute extends PageRouteInfo<void> {
 /// [MainScreenView]
 class MainScreenRoute extends PageRouteInfo<void> {
   const MainScreenRoute({List<PageRouteInfo>? children})
-    : super(MainScreenRoute.name, initialChildren: children);
+      : super(MainScreenRoute.name, initialChildren: children);
 
   static const String name = 'MainScreenRoute';
 
@@ -251,10 +267,11 @@ class MultiRoute extends PageRouteInfo<MultiRouteArgs> {
     required FeedSort initialSort,
     List<PageRouteInfo>? children,
   }) : super(
-         MultiRoute.name,
-         args: MultiRouteArgs(key: key, multi: multi, initialSort: initialSort),
-         initialChildren: children,
-       );
+          MultiRoute.name,
+          args:
+              MultiRouteArgs(key: key, multi: multi, initialSort: initialSort),
+          initialChildren: children,
+        );
 
   static const String name = 'MultiRoute';
 
@@ -306,7 +323,7 @@ class MultiRouteArgs {
 /// [PostsSettingsView]
 class PostsSettingsRoute extends PageRouteInfo<void> {
   const PostsSettingsRoute({List<PageRouteInfo>? children})
-    : super(PostsSettingsRoute.name, initialChildren: children);
+      : super(PostsSettingsRoute.name, initialChildren: children);
 
   static const String name = 'PostsSettingsRoute';
 
@@ -322,7 +339,7 @@ class PostsSettingsRoute extends PageRouteInfo<void> {
 /// [ProfilePageWrapper]
 class ProfilePageRoute extends PageRouteInfo<void> {
   const ProfilePageRoute({List<PageRouteInfo>? children})
-    : super(ProfilePageRoute.name, initialChildren: children);
+      : super(ProfilePageRoute.name, initialChildren: children);
 
   static const String name = 'ProfilePageRoute';
 
@@ -338,7 +355,7 @@ class ProfilePageRoute extends PageRouteInfo<void> {
 /// [SearchPage]
 class SearchPageRoute extends PageRouteInfo<void> {
   const SearchPageRoute({List<PageRouteInfo>? children})
-    : super(SearchPageRoute.name, initialChildren: children);
+      : super(SearchPageRoute.name, initialChildren: children);
 
   static const String name = 'SearchPageRoute';
 
@@ -360,15 +377,15 @@ class SearchPostsRoute extends PageRouteInfo<SearchPostsRouteArgs> {
     String? subreddit,
     List<PageRouteInfo>? children,
   }) : super(
-         SearchPostsRoute.name,
-         args: SearchPostsRouteArgs(
-           key: key,
-           query: query,
-           flair: flair,
-           subreddit: subreddit,
-         ),
-         initialChildren: children,
-       );
+          SearchPostsRoute.name,
+          args: SearchPostsRouteArgs(
+            key: key,
+            query: query,
+            flair: flair,
+            subreddit: subreddit,
+          ),
+          initialChildren: children,
+        );
 
   static const String name = 'SearchPostsRoute';
 
@@ -428,7 +445,7 @@ class SearchPostsRouteArgs {
 /// [SearchSubredditsView]
 class SearchSubredditsRoute extends PageRouteInfo<void> {
   const SearchSubredditsRoute({List<PageRouteInfo>? children})
-    : super(SearchSubredditsRoute.name, initialChildren: children);
+      : super(SearchSubredditsRoute.name, initialChildren: children);
 
   static const String name = 'SearchSubredditsRoute';
 
@@ -444,7 +461,7 @@ class SearchSubredditsRoute extends PageRouteInfo<void> {
 /// [SettingsView]
 class SettingsRoute extends PageRouteInfo<void> {
   const SettingsRoute({List<PageRouteInfo>? children})
-    : super(SettingsRoute.name, initialChildren: children);
+      : super(SettingsRoute.name, initialChildren: children);
 
   static const String name = 'SettingsRoute';
 
@@ -460,7 +477,7 @@ class SettingsRoute extends PageRouteInfo<void> {
 /// [SubscriptionsOrFeedView]
 class SubscriptionsOrFeedRoute extends PageRouteInfo<void> {
   const SubscriptionsOrFeedRoute({List<PageRouteInfo>? children})
-    : super(SubscriptionsOrFeedRoute.name, initialChildren: children);
+      : super(SubscriptionsOrFeedRoute.name, initialChildren: children);
 
   static const String name = 'SubscriptionsOrFeedRoute';
 
@@ -476,7 +493,7 @@ class SubscriptionsOrFeedRoute extends PageRouteInfo<void> {
 /// [SubscriptionsTab]
 class SubscriptionsTabRoute extends PageRouteInfo<void> {
   const SubscriptionsTabRoute({List<PageRouteInfo>? children})
-    : super(SubscriptionsTabRoute.name, initialChildren: children);
+      : super(SubscriptionsTabRoute.name, initialChildren: children);
 
   static const String name = 'SubscriptionsTabRoute';
 
@@ -497,10 +514,10 @@ class ThreadRoute extends PageRouteInfo<ThreadRouteArgs> {
     Post? post,
     List<PageRouteInfo>? children,
   }) : super(
-         ThreadRoute.name,
-         args: ThreadRouteArgs(key: key, permalink: permalink, post: post),
-         initialChildren: children,
-       );
+          ThreadRoute.name,
+          args: ThreadRouteArgs(key: key, permalink: permalink, post: post),
+          initialChildren: children,
+        );
 
   static const String name = 'ThreadRoute';
 
@@ -549,10 +566,10 @@ class UserAboutRoute extends PageRouteInfo<UserAboutRouteArgs> {
     UserInfo? about,
     List<PageRouteInfo>? children,
   }) : super(
-         UserAboutRoute.name,
-         args: UserAboutRouteArgs(key: key, username: username, about: about),
-         initialChildren: children,
-       );
+          UserAboutRoute.name,
+          args: UserAboutRouteArgs(key: key, username: username, about: about),
+          initialChildren: children,
+        );
 
   static const String name = 'UserAboutRoute';
 
@@ -605,10 +622,10 @@ class UserBlockedRoute extends PageRouteInfo<UserBlockedRouteArgs> {
     UserStreamSort sort = const UserStreamSort.new_(),
     List<PageRouteInfo>? children,
   }) : super(
-         UserBlockedRoute.name,
-         args: UserBlockedRouteArgs(key: key, username: username, sort: sort),
-         initialChildren: children,
-       );
+          UserBlockedRoute.name,
+          args: UserBlockedRouteArgs(key: key, username: username, sort: sort),
+          initialChildren: children,
+        );
 
   static const String name = 'UserBlockedRoute';
 
@@ -663,10 +680,10 @@ class UserCommentsRoute extends PageRouteInfo<UserCommentsRouteArgs> {
     UserStreamSort sort = const UserStreamSort.new_(),
     List<PageRouteInfo>? children,
   }) : super(
-         UserCommentsRoute.name,
-         args: UserCommentsRouteArgs(key: key, username: username, sort: sort),
-         initialChildren: children,
-       );
+          UserCommentsRoute.name,
+          args: UserCommentsRouteArgs(key: key, username: username, sort: sort),
+          initialChildren: children,
+        );
 
   static const String name = 'UserCommentsRoute';
 
@@ -720,10 +737,10 @@ class UserDownvotedRoute extends PageRouteInfo<UserDownvotedRouteArgs> {
     required String username,
     List<PageRouteInfo>? children,
   }) : super(
-         UserDownvotedRoute.name,
-         args: UserDownvotedRouteArgs(key: key, username: username),
-         initialChildren: children,
-       );
+          UserDownvotedRoute.name,
+          args: UserDownvotedRouteArgs(key: key, username: username),
+          initialChildren: children,
+        );
 
   static const String name = 'UserDownvotedRoute';
 
@@ -768,10 +785,10 @@ class UserFriendsRoute extends PageRouteInfo<UserFriendsRouteArgs> {
     UserStreamSort sort = const UserStreamSort.new_(),
     List<PageRouteInfo>? children,
   }) : super(
-         UserFriendsRoute.name,
-         args: UserFriendsRouteArgs(key: key, username: username, sort: sort),
-         initialChildren: children,
-       );
+          UserFriendsRoute.name,
+          args: UserFriendsRouteArgs(key: key, username: username, sort: sort),
+          initialChildren: children,
+        );
 
   static const String name = 'UserFriendsRoute';
 
@@ -826,10 +843,10 @@ class UserGildedRoute extends PageRouteInfo<UserGildedRouteArgs> {
     UserStreamSort sort = const UserStreamSort.new_(),
     List<PageRouteInfo>? children,
   }) : super(
-         UserGildedRoute.name,
-         args: UserGildedRouteArgs(key: key, username: username, sort: sort),
-         initialChildren: children,
-       );
+          UserGildedRoute.name,
+          args: UserGildedRouteArgs(key: key, username: username, sort: sort),
+          initialChildren: children,
+        );
 
   static const String name = 'UserGildedRoute';
 
@@ -884,10 +901,10 @@ class UserHiddenRoute extends PageRouteInfo<UserHiddenRouteArgs> {
     UserStreamSort sort = const UserStreamSort.new_(),
     List<PageRouteInfo>? children,
   }) : super(
-         UserHiddenRoute.name,
-         args: UserHiddenRouteArgs(key: key, username: username, sort: sort),
-         initialChildren: children,
-       );
+          UserHiddenRoute.name,
+          args: UserHiddenRouteArgs(key: key, username: username, sort: sort),
+          initialChildren: children,
+        );
 
   static const String name = 'UserHiddenRoute';
 
@@ -942,10 +959,10 @@ class UserOverviewRoute extends PageRouteInfo<UserOverviewRouteArgs> {
     UserStreamSort sort = const UserStreamSort.new_(),
     List<PageRouteInfo>? children,
   }) : super(
-         UserOverviewRoute.name,
-         args: UserOverviewRouteArgs(key: key, username: username, sort: sort),
-         initialChildren: children,
-       );
+          UserOverviewRoute.name,
+          args: UserOverviewRouteArgs(key: key, username: username, sort: sort),
+          initialChildren: children,
+        );
 
   static const String name = 'UserOverviewRoute';
 
@@ -1000,10 +1017,10 @@ class UserPostsRoute extends PageRouteInfo<UserPostsRouteArgs> {
     UserStreamSort sort = const UserStreamSort.new_(),
     List<PageRouteInfo>? children,
   }) : super(
-         UserPostsRoute.name,
-         args: UserPostsRouteArgs(key: key, username: username, sort: sort),
-         initialChildren: children,
-       );
+          UserPostsRoute.name,
+          args: UserPostsRouteArgs(key: key, username: username, sort: sort),
+          initialChildren: children,
+        );
 
   static const String name = 'UserPostsRoute';
 
@@ -1057,10 +1074,10 @@ class UserSavedRoute extends PageRouteInfo<UserSavedRouteArgs> {
     required String username,
     List<PageRouteInfo>? children,
   }) : super(
-         UserSavedRoute.name,
-         args: UserSavedRouteArgs(key: key, username: username),
-         initialChildren: children,
-       );
+          UserSavedRoute.name,
+          args: UserSavedRouteArgs(key: key, username: username),
+          initialChildren: children,
+        );
 
   static const String name = 'UserSavedRoute';
 
@@ -1104,10 +1121,10 @@ class UserUpvotedRoute extends PageRouteInfo<UserUpvotedRouteArgs> {
     required String username,
     List<PageRouteInfo>? children,
   }) : super(
-         UserUpvotedRoute.name,
-         args: UserUpvotedRouteArgs(key: key, username: username),
-         initialChildren: children,
-       );
+          UserUpvotedRoute.name,
+          args: UserUpvotedRouteArgs(key: key, username: username),
+          initialChildren: children,
+        );
 
   static const String name = 'UserUpvotedRoute';
 
@@ -1147,11 +1164,11 @@ class UserUpvotedRouteArgs {
 /// [UserView]
 class UserRoute extends PageRouteInfo<UserRouteArgs> {
   UserRoute({Key? key, String? username, List<PageRouteInfo>? children})
-    : super(
-        UserRoute.name,
-        args: UserRouteArgs(key: key, username: username),
-        initialChildren: children,
-      );
+      : super(
+          UserRoute.name,
+          args: UserRouteArgs(key: key, username: username),
+          initialChildren: children,
+        );
 
   static const String name = 'UserRoute';
 

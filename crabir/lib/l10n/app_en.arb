@@ -93,5 +93,20 @@
   "posts_showMarkAsReadButton": "Mark as read",
   "posts_showShareButton": "Share",
   "posts_showCommentsButton": "Comments",
-  "posts_showOpenInAppButton": "Open in app"
+  "posts_showOpenInAppButton": "Open in app",
+
+  "data_wifiDataSaver": "Wifi data saver",
+  "data_wifiDataSaverDescription": "Load lower-size media",
+
+  "data_mobileDataSaver": "Mobile data saver",
+  "data_mobileDataSaverDescription": "Load lower-size media",
+
+  "data_autoplay": "Autoplay videos",
+
+  "data_videoQuality": "Video quality",
+
+  "data_minimumQuality": "Minimum quality",
+  "data_maximumQuality": "Maximum quality",
+
+  "data_loadImages": "Load images"
 }

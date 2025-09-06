@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -33,6 +32,231 @@ mixin _$PostSearchSort {
 /// @nodoc
 class $PostSearchSortCopyWith<$Res> {
   $PostSearchSortCopyWith(PostSearchSort _, $Res Function(PostSearchSort) __);
+}
+
+/// Adds pattern-matching-related methods to [PostSearchSort].
+extension PostSearchSortPatterns on PostSearchSort {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(PostSearchSort_Relevance value)? relevance,
+    TResult Function(PostSearchSort_Hot value)? hot,
+    TResult Function(PostSearchSort_Top value)? top,
+    TResult Function(PostSearchSort_New value)? new_,
+    TResult Function(PostSearchSort_Comments value)? comments,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case PostSearchSort_Relevance() when relevance != null:
+        return relevance(_that);
+      case PostSearchSort_Hot() when hot != null:
+        return hot(_that);
+      case PostSearchSort_Top() when top != null:
+        return top(_that);
+      case PostSearchSort_New() when new_ != null:
+        return new_(_that);
+      case PostSearchSort_Comments() when comments != null:
+        return comments(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(PostSearchSort_Relevance value) relevance,
+    required TResult Function(PostSearchSort_Hot value) hot,
+    required TResult Function(PostSearchSort_Top value) top,
+    required TResult Function(PostSearchSort_New value) new_,
+    required TResult Function(PostSearchSort_Comments value) comments,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case PostSearchSort_Relevance():
+        return relevance(_that);
+      case PostSearchSort_Hot():
+        return hot(_that);
+      case PostSearchSort_Top():
+        return top(_that);
+      case PostSearchSort_New():
+        return new_(_that);
+      case PostSearchSort_Comments():
+        return comments(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(PostSearchSort_Relevance value)? relevance,
+    TResult? Function(PostSearchSort_Hot value)? hot,
+    TResult? Function(PostSearchSort_Top value)? top,
+    TResult? Function(PostSearchSort_New value)? new_,
+    TResult? Function(PostSearchSort_Comments value)? comments,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case PostSearchSort_Relevance() when relevance != null:
+        return relevance(_that);
+      case PostSearchSort_Hot() when hot != null:
+        return hot(_that);
+      case PostSearchSort_Top() when top != null:
+        return top(_that);
+      case PostSearchSort_New() when new_ != null:
+        return new_(_that);
+      case PostSearchSort_Comments() when comments != null:
+        return comments(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(Timeframe field0)? relevance,
+    TResult Function()? hot,
+    TResult Function(Timeframe field0)? top,
+    TResult Function()? new_,
+    TResult Function(Timeframe field0)? comments,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case PostSearchSort_Relevance() when relevance != null:
+        return relevance(_that.field0);
+      case PostSearchSort_Hot() when hot != null:
+        return hot();
+      case PostSearchSort_Top() when top != null:
+        return top(_that.field0);
+      case PostSearchSort_New() when new_ != null:
+        return new_();
+      case PostSearchSort_Comments() when comments != null:
+        return comments(_that.field0);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(Timeframe field0) relevance,
+    required TResult Function() hot,
+    required TResult Function(Timeframe field0) top,
+    required TResult Function() new_,
+    required TResult Function(Timeframe field0) comments,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case PostSearchSort_Relevance():
+        return relevance(_that.field0);
+      case PostSearchSort_Hot():
+        return hot();
+      case PostSearchSort_Top():
+        return top(_that.field0);
+      case PostSearchSort_New():
+        return new_();
+      case PostSearchSort_Comments():
+        return comments(_that.field0);
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(Timeframe field0)? relevance,
+    TResult? Function()? hot,
+    TResult? Function(Timeframe field0)? top,
+    TResult? Function()? new_,
+    TResult? Function(Timeframe field0)? comments,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case PostSearchSort_Relevance() when relevance != null:
+        return relevance(_that.field0);
+      case PostSearchSort_Hot() when hot != null:
+        return hot();
+      case PostSearchSort_Top() when top != null:
+        return top(_that.field0);
+      case PostSearchSort_New() when new_ != null:
+        return new_();
+      case PostSearchSort_Comments() when comments != null:
+        return comments(_that.field0);
+      case _:
+        return null;
+    }
+  }
 }
 
 /// @nodoc

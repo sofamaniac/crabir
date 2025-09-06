@@ -2,9 +2,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/accounts/widgets/account_selector.dart';
 import 'package:crabir/drawer/drawer.dart';
+import 'package:crabir/network_status.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
+import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
+import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/tabs_index.dart';
 import 'package:flutter/foundation.dart';
@@ -34,6 +37,9 @@ Future<void> main() async {
           ),
   );
 
+  // Initializing `NetworkStatus`
+  await NetworkStatus.init();
+
   runApp(Crabir());
 }
 
@@ -45,9 +51,11 @@ class Crabir extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => AccountsBloc()..add(Initialize())),
+        //...initSettingsBlocs(),
         BlocProvider(create: (context) => ThemeBloc()),
         BlocProvider(create: (context) => CommentsSettingsCubit()),
-        BlocProvider(create: (context) => PostsSettingsCubit())
+        BlocProvider(create: (context) => PostsSettingsCubit()),
+        BlocProvider(create: (context) => DataSettingsCubit()),
       ],
       child: TopLevel(),
     );

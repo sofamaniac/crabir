@@ -98,7 +98,7 @@ class $className extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final locales = AppLocalizations.of(context)!;
+    final locales = AppLocalizations.of(context);
     final settings = context.watch<$cubitName>().state;
     return Scaffold(
       body: ListView(

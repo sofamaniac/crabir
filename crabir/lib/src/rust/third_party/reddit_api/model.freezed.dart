@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -33,6 +32,312 @@ mixin _$Thing {
 /// @nodoc
 class $ThingCopyWith<$Res> {
   $ThingCopyWith(Thing _, $Res Function(Thing) __);
+}
+
+/// Adds pattern-matching-related methods to [Thing].
+extension ThingPatterns on Thing {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(Thing_Listing value)? listing,
+    TResult Function(Thing_Comment value)? comment,
+    TResult Function(Thing_User value)? user,
+    TResult Function(Thing_Post value)? post,
+    TResult Function(Thing_Message value)? message,
+    TResult Function(Thing_Subreddit value)? subreddit,
+    TResult Function(Thing_Award value)? award,
+    TResult Function(Thing_Multi value)? multi,
+    TResult Function(Thing_More value)? more,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Thing_Listing() when listing != null:
+        return listing(_that);
+      case Thing_Comment() when comment != null:
+        return comment(_that);
+      case Thing_User() when user != null:
+        return user(_that);
+      case Thing_Post() when post != null:
+        return post(_that);
+      case Thing_Message() when message != null:
+        return message(_that);
+      case Thing_Subreddit() when subreddit != null:
+        return subreddit(_that);
+      case Thing_Award() when award != null:
+        return award(_that);
+      case Thing_Multi() when multi != null:
+        return multi(_that);
+      case Thing_More() when more != null:
+        return more(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(Thing_Listing value) listing,
+    required TResult Function(Thing_Comment value) comment,
+    required TResult Function(Thing_User value) user,
+    required TResult Function(Thing_Post value) post,
+    required TResult Function(Thing_Message value) message,
+    required TResult Function(Thing_Subreddit value) subreddit,
+    required TResult Function(Thing_Award value) award,
+    required TResult Function(Thing_Multi value) multi,
+    required TResult Function(Thing_More value) more,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Thing_Listing():
+        return listing(_that);
+      case Thing_Comment():
+        return comment(_that);
+      case Thing_User():
+        return user(_that);
+      case Thing_Post():
+        return post(_that);
+      case Thing_Message():
+        return message(_that);
+      case Thing_Subreddit():
+        return subreddit(_that);
+      case Thing_Award():
+        return award(_that);
+      case Thing_Multi():
+        return multi(_that);
+      case Thing_More():
+        return more(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Thing_Listing value)? listing,
+    TResult? Function(Thing_Comment value)? comment,
+    TResult? Function(Thing_User value)? user,
+    TResult? Function(Thing_Post value)? post,
+    TResult? Function(Thing_Message value)? message,
+    TResult? Function(Thing_Subreddit value)? subreddit,
+    TResult? Function(Thing_Award value)? award,
+    TResult? Function(Thing_Multi value)? multi,
+    TResult? Function(Thing_More value)? more,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Thing_Listing() when listing != null:
+        return listing(_that);
+      case Thing_Comment() when comment != null:
+        return comment(_that);
+      case Thing_User() when user != null:
+        return user(_that);
+      case Thing_Post() when post != null:
+        return post(_that);
+      case Thing_Message() when message != null:
+        return message(_that);
+      case Thing_Subreddit() when subreddit != null:
+        return subreddit(_that);
+      case Thing_Award() when award != null:
+        return award(_that);
+      case Thing_Multi() when multi != null:
+        return multi(_that);
+      case Thing_More() when more != null:
+        return more(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(Listing field0)? listing,
+    TResult Function(Comment field0)? comment,
+    TResult Function(User field0)? user,
+    TResult Function(Post field0)? post,
+    TResult Function()? message,
+    TResult Function(Subreddit field0)? subreddit,
+    TResult Function()? award,
+    TResult Function(Multi field0)? multi,
+    TResult Function(String id, Fullname name, int count, int depth,
+            List<String> children)?
+        more,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Thing_Listing() when listing != null:
+        return listing(_that.field0);
+      case Thing_Comment() when comment != null:
+        return comment(_that.field0);
+      case Thing_User() when user != null:
+        return user(_that.field0);
+      case Thing_Post() when post != null:
+        return post(_that.field0);
+      case Thing_Message() when message != null:
+        return message();
+      case Thing_Subreddit() when subreddit != null:
+        return subreddit(_that.field0);
+      case Thing_Award() when award != null:
+        return award();
+      case Thing_Multi() when multi != null:
+        return multi(_that.field0);
+      case Thing_More() when more != null:
+        return more(
+            _that.id, _that.name, _that.count, _that.depth, _that.children);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(Listing field0) listing,
+    required TResult Function(Comment field0) comment,
+    required TResult Function(User field0) user,
+    required TResult Function(Post field0) post,
+    required TResult Function() message,
+    required TResult Function(Subreddit field0) subreddit,
+    required TResult Function() award,
+    required TResult Function(Multi field0) multi,
+    required TResult Function(String id, Fullname name, int count, int depth,
+            List<String> children)
+        more,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Thing_Listing():
+        return listing(_that.field0);
+      case Thing_Comment():
+        return comment(_that.field0);
+      case Thing_User():
+        return user(_that.field0);
+      case Thing_Post():
+        return post(_that.field0);
+      case Thing_Message():
+        return message();
+      case Thing_Subreddit():
+        return subreddit(_that.field0);
+      case Thing_Award():
+        return award();
+      case Thing_Multi():
+        return multi(_that.field0);
+      case Thing_More():
+        return more(
+            _that.id, _that.name, _that.count, _that.depth, _that.children);
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(Listing field0)? listing,
+    TResult? Function(Comment field0)? comment,
+    TResult? Function(User field0)? user,
+    TResult? Function(Post field0)? post,
+    TResult? Function()? message,
+    TResult? Function(Subreddit field0)? subreddit,
+    TResult? Function()? award,
+    TResult? Function(Multi field0)? multi,
+    TResult? Function(String id, Fullname name, int count, int depth,
+            List<String> children)?
+        more,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Thing_Listing() when listing != null:
+        return listing(_that.field0);
+      case Thing_Comment() when comment != null:
+        return comment(_that.field0);
+      case Thing_User() when user != null:
+        return user(_that.field0);
+      case Thing_Post() when post != null:
+        return post(_that.field0);
+      case Thing_Message() when message != null:
+        return message();
+      case Thing_Subreddit() when subreddit != null:
+        return subreddit(_that.field0);
+      case Thing_Award() when award != null:
+        return award();
+      case Thing_Multi() when multi != null:
+        return multi(_that.field0);
+      case Thing_More() when more != null:
+        return more(
+            _that.id, _that.name, _that.count, _that.depth, _that.children);
+      case _:
+        return null;
+    }
+  }
 }
 
 /// @nodoc

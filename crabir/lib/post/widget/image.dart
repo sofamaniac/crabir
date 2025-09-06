@@ -20,6 +20,7 @@ class ImageContent extends StatelessWidget {
         return VideoContent(post: post);
       }
       // TODO: resolution & blur
+      // Can crash.
       final image = post.preview!.images[0];
       return InkWell(
         onTap: () => context.router.navigate(

@@ -6,6 +6,7 @@ import 'package:crabir/media/media.dart';
 import 'package:crabir/post/widget/gallery.dart';
 import 'package:crabir/search_posts/widgets/search.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
+import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
@@ -81,6 +82,7 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: SettingsRoute.page),
         AutoRoute(page: CommentsSettingsRoute.page),
         AutoRoute(page: PostsSettingsRoute.page),
+        AutoRoute(page: DataSettingsRoute.page),
       ];
 }
 

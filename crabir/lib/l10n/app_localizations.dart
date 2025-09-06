@@ -525,6 +525,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open in app'**
   String get posts_showOpenInAppButton;
+
+  /// No description provided for @data_wifiDataSaver.
+  ///
+  /// In en, this message translates to:
+  /// **'Wifi data saver'**
+  String get data_wifiDataSaver;
+
+  /// No description provided for @data_wifiDataSaverDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Load lower-size media'**
+  String get data_wifiDataSaverDescription;
+
+  /// No description provided for @data_mobileDataSaver.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile data saver'**
+  String get data_mobileDataSaver;
+
+  /// No description provided for @data_mobileDataSaverDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Load lower-size media'**
+  String get data_mobileDataSaverDescription;
+
+  /// No description provided for @data_autoplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Autoplay videos'**
+  String get data_autoplay;
+
+  /// No description provided for @data_videoQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Video quality'**
+  String get data_videoQuality;
+
+  /// No description provided for @data_minimumQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum quality'**
+  String get data_minimumQuality;
+
+  /// No description provided for @data_maximumQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum quality'**
+  String get data_maximumQuality;
+
+  /// No description provided for @data_loadImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Load images'**
+  String get data_loadImages;
 }
 
 class _AppLocalizationsDelegate

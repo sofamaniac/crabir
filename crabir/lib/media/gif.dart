@@ -65,6 +65,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
   bool _isInitialized = false;
   bool _showControls = false;
   bool _muted = false;
+  bool canAutoplay = false;
 
   Timer? _hideControlsTimer;
   Timer? _debounceTimer;
@@ -80,6 +81,10 @@ class _AnimatedContentState extends State<AnimatedContent> {
   void initState() {
     super.initState();
     _allVideos[widget.url] = this;
+
+    ImageLoading setting = context.read<DataSettingsCubit>().state.autoplay;
+
+    canAutoplay = NetworkStatus.canAutoplay(setting);
 
     if (_isCarouselMode) {
       // Carousel mode: initialize only if shouldPlay is true
@@ -102,12 +107,14 @@ class _AnimatedContentState extends State<AnimatedContent> {
 
     _disposeControllers();
 
-    _controller = VideoPlayerController.network(widget.url);
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url));
     await _controller!.initialize();
     _controller!.setLooping(true);
 
     // Play based on mode
-    if (_isCarouselMode ? widget.shouldPlay! : _isActiveFeedVideo()) {
+    if (canAutoplay && _isCarouselMode
+        ? widget.shouldPlay!
+        : _isActiveFeedVideo()) {
       _controller!.play();
     }
 
@@ -121,7 +128,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
   void _updateGlobalPlayState() {
     if (_isCarouselMode) return;
 
-    if (_isActiveFeedVideo()) {
+    if (_isActiveFeedVideo() && canAutoplay) {
       _initialize();
       _controller?.play();
     } else {
@@ -189,11 +196,12 @@ class _AnimatedContentState extends State<AnimatedContent> {
   }
 
   void _toggleMute() {
-    if (mounted)
+    if (mounted) {
       setState(() {
         _muted = !_muted;
         _controller!.setVolume(_muted ? 0 : 1);
       });
+    }
   }
 
   void _disposeControllers() {

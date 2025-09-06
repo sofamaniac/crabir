@@ -226,4 +226,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get posts_showOpenInAppButton => 'Open in app';
+
+  @override
+  String get data_wifiDataSaver => 'Wifi data saver';
+
+  @override
+  String get data_wifiDataSaverDescription => 'Load lower-size media';
+
+  @override
+  String get data_mobileDataSaver => 'Mobile data saver';
+
+  @override
+  String get data_mobileDataSaverDescription => 'Load lower-size media';
+
+  @override
+  String get data_autoplay => 'Autoplay videos';
+
+  @override
+  String get data_videoQuality => 'Video quality';
+
+  @override
+  String get data_minimumQuality => 'Minimum quality';
+
+  @override
+  String get data_maximumQuality => 'Maximum quality';
+
+  @override
+  String get data_loadImages => 'Load images';
 }

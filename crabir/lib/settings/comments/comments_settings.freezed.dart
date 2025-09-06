@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -384,6 +383,328 @@ class _$CommentsSettingsCopyWithImpl<$Res>
           : swipeToClose // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [CommentsSettings].
+extension CommentsSettingsPatterns on CommentsSettings {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_CommentsSetttings value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _CommentsSetttings() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_CommentsSetttings value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CommentsSetttings():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_CommentsSetttings value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CommentsSetttings() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            @Setting(widget: _CommentsSortSelection) CommentSort defaultSort,
+            @Setting() bool useSuggestedSort,
+            @Category(name: "Appearance") @Setting() bool showNavigationBar,
+            @Setting() bool showUserAvatar,
+            @Setting() bool showCommentsImage,
+            @Setting() bool buttonsAlwaysVisible,
+            @Setting() bool hideButtonAfterAction,
+            @Setting() bool collapseAutoMod,
+            @Setting() bool collapseDisruptiveComment,
+            @Setting() bool showPostUpvotePercentage,
+            @Setting() bool highlightMyUsername,
+            @Setting() bool showFloatingButton,
+            @Category(name: "Awards") @Setting() bool showAwards,
+            @Setting() bool clickableAwards,
+            @Category(name: "Flairs") @Setting() bool showUserFlair,
+            @Setting() bool showFlairColors,
+            @Setting() bool showFlairEmojis,
+            @Category(name: "Behavior") @Setting() bool clickToCollapse,
+            @Setting() bool hideTextCollapsed,
+            @Setting() bool loadCollapsed,
+            @Setting() bool animateCollapse,
+            @Setting() bool clickableUsername,
+            @Category(name: "Navigation") @Setting() bool highlightNewComments,
+            @Setting() bool volumeRockerNavigation,
+            @Setting() bool animateNavigation,
+            @Category(name: "Visible buttons") @Setting() bool showSaveButton,
+            @Category(name: "Gestures") @Setting() bool swipeToClose)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _CommentsSetttings() when $default != null:
+        return $default(
+            _that.defaultSort,
+            _that.useSuggestedSort,
+            _that.showNavigationBar,
+            _that.showUserAvatar,
+            _that.showCommentsImage,
+            _that.buttonsAlwaysVisible,
+            _that.hideButtonAfterAction,
+            _that.collapseAutoMod,
+            _that.collapseDisruptiveComment,
+            _that.showPostUpvotePercentage,
+            _that.highlightMyUsername,
+            _that.showFloatingButton,
+            _that.showAwards,
+            _that.clickableAwards,
+            _that.showUserFlair,
+            _that.showFlairColors,
+            _that.showFlairEmojis,
+            _that.clickToCollapse,
+            _that.hideTextCollapsed,
+            _that.loadCollapsed,
+            _that.animateCollapse,
+            _that.clickableUsername,
+            _that.highlightNewComments,
+            _that.volumeRockerNavigation,
+            _that.animateNavigation,
+            _that.showSaveButton,
+            _that.swipeToClose);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            @Setting(widget: _CommentsSortSelection) CommentSort defaultSort,
+            @Setting() bool useSuggestedSort,
+            @Category(name: "Appearance") @Setting() bool showNavigationBar,
+            @Setting() bool showUserAvatar,
+            @Setting() bool showCommentsImage,
+            @Setting() bool buttonsAlwaysVisible,
+            @Setting() bool hideButtonAfterAction,
+            @Setting() bool collapseAutoMod,
+            @Setting() bool collapseDisruptiveComment,
+            @Setting() bool showPostUpvotePercentage,
+            @Setting() bool highlightMyUsername,
+            @Setting() bool showFloatingButton,
+            @Category(name: "Awards") @Setting() bool showAwards,
+            @Setting() bool clickableAwards,
+            @Category(name: "Flairs") @Setting() bool showUserFlair,
+            @Setting() bool showFlairColors,
+            @Setting() bool showFlairEmojis,
+            @Category(name: "Behavior") @Setting() bool clickToCollapse,
+            @Setting() bool hideTextCollapsed,
+            @Setting() bool loadCollapsed,
+            @Setting() bool animateCollapse,
+            @Setting() bool clickableUsername,
+            @Category(name: "Navigation") @Setting() bool highlightNewComments,
+            @Setting() bool volumeRockerNavigation,
+            @Setting() bool animateNavigation,
+            @Category(name: "Visible buttons") @Setting() bool showSaveButton,
+            @Category(name: "Gestures") @Setting() bool swipeToClose)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CommentsSetttings():
+        return $default(
+            _that.defaultSort,
+            _that.useSuggestedSort,
+            _that.showNavigationBar,
+            _that.showUserAvatar,
+            _that.showCommentsImage,
+            _that.buttonsAlwaysVisible,
+            _that.hideButtonAfterAction,
+            _that.collapseAutoMod,
+            _that.collapseDisruptiveComment,
+            _that.showPostUpvotePercentage,
+            _that.highlightMyUsername,
+            _that.showFloatingButton,
+            _that.showAwards,
+            _that.clickableAwards,
+            _that.showUserFlair,
+            _that.showFlairColors,
+            _that.showFlairEmojis,
+            _that.clickToCollapse,
+            _that.hideTextCollapsed,
+            _that.loadCollapsed,
+            _that.animateCollapse,
+            _that.clickableUsername,
+            _that.highlightNewComments,
+            _that.volumeRockerNavigation,
+            _that.animateNavigation,
+            _that.showSaveButton,
+            _that.swipeToClose);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            @Setting(widget: _CommentsSortSelection) CommentSort defaultSort,
+            @Setting() bool useSuggestedSort,
+            @Category(name: "Appearance") @Setting() bool showNavigationBar,
+            @Setting() bool showUserAvatar,
+            @Setting() bool showCommentsImage,
+            @Setting() bool buttonsAlwaysVisible,
+            @Setting() bool hideButtonAfterAction,
+            @Setting() bool collapseAutoMod,
+            @Setting() bool collapseDisruptiveComment,
+            @Setting() bool showPostUpvotePercentage,
+            @Setting() bool highlightMyUsername,
+            @Setting() bool showFloatingButton,
+            @Category(name: "Awards") @Setting() bool showAwards,
+            @Setting() bool clickableAwards,
+            @Category(name: "Flairs") @Setting() bool showUserFlair,
+            @Setting() bool showFlairColors,
+            @Setting() bool showFlairEmojis,
+            @Category(name: "Behavior") @Setting() bool clickToCollapse,
+            @Setting() bool hideTextCollapsed,
+            @Setting() bool loadCollapsed,
+            @Setting() bool animateCollapse,
+            @Setting() bool clickableUsername,
+            @Category(name: "Navigation") @Setting() bool highlightNewComments,
+            @Setting() bool volumeRockerNavigation,
+            @Setting() bool animateNavigation,
+            @Category(name: "Visible buttons") @Setting() bool showSaveButton,
+            @Category(name: "Gestures") @Setting() bool swipeToClose)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CommentsSetttings() when $default != null:
+        return $default(
+            _that.defaultSort,
+            _that.useSuggestedSort,
+            _that.showNavigationBar,
+            _that.showUserAvatar,
+            _that.showCommentsImage,
+            _that.buttonsAlwaysVisible,
+            _that.hideButtonAfterAction,
+            _that.collapseAutoMod,
+            _that.collapseDisruptiveComment,
+            _that.showPostUpvotePercentage,
+            _that.highlightMyUsername,
+            _that.showFloatingButton,
+            _that.showAwards,
+            _that.clickableAwards,
+            _that.showUserFlair,
+            _that.showFlairColors,
+            _that.showFlairEmojis,
+            _that.clickToCollapse,
+            _that.hideTextCollapsed,
+            _that.loadCollapsed,
+            _that.animateCollapse,
+            _that.clickableUsername,
+            _that.highlightNewComments,
+            _that.volumeRockerNavigation,
+            _that.animateNavigation,
+            _that.showSaveButton,
+            _that.swipeToClose);
+      case _:
+        return null;
+    }
   }
 }
 
