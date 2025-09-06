@@ -72,7 +72,7 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
   Widget build(BuildContext context) {
     final bloc = context.watch<PostSearchBloc>();
     final state = bloc.state;
-    final locales = AppLocalizations.of(context)!;
+    final locales = AppLocalizations.of(context);
 
     return Scaffold(
       body: NestedScrollView(
@@ -168,7 +168,7 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
 
 extension PostSearchSortString on PostSearchSort {
   String label(BuildContext context) {
-    final locales = AppLocalizations.of(context)!;
+    final locales = AppLocalizations.of(context);
     return switch (this) {
       PostSearchSort_Relevance() => locales.sortRelevance,
       PostSearchSort_Hot() => locales.sortHot,
