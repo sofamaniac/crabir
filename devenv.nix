@@ -60,6 +60,10 @@
     git --version | grep --color=auto "${pkgs.git.version}"
   '';
 
+  scripts.frun.exec = ''
+    flutter run --dart-define-from-file ../.env
+  '';
+
   # https://devenv.sh/git-hooks/
   # git-hooks.hooks.shellcheck.enable = true;
 
