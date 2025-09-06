@@ -1,4 +1,7 @@
-import 'package:crabir/login.dart';
+import 'dart:async';
+
+import 'package:crabir/accounts/login.dart';
+import 'package:crabir/accounts/user_account.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart';
@@ -21,18 +24,31 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
     on<Initialize>(_initialize);
     on<SelectAccount>(_selectAccount);
     on<LoadSubscriptions>(_onLoadSubscriptions);
+    on<AddAccount>(_addAccount);
+    on<Logout>(_logout);
+  }
+
+  /// Load accounts into _accounts
+  /// Throws an exception when failing to access the database.
+  Future<void> _loadAccounts() async {
+    try {
+      _accounts = await AccountDatabase().getAccounts();
+    } catch (err) {
+      log.severe("Error while loading accounts: $err");
+      rethrow;
+    }
+    _accounts.add(UserAccount.anonymous());
   }
 
   Future<void> _initialize(Initialize _, Emitter<AccountState> emit) async {
     if (_accounts.isNotEmpty) return;
 
     try {
-      _accounts = await AccountDatabase().getAccounts();
+      await _loadAccounts();
     } catch (err) {
       log.severe("Error while loading accounts: $err");
       emit(state.copyWith(status: Failure(message: "$err")));
     }
-    _accounts.add(UserAccount.anonymous());
 
     // Restore account index from shared preferences
     // if no account was set default to anonymous
@@ -122,6 +138,34 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
     } catch (err) {
       log.severe("Error while loading subscriptions: $err");
       emit(state.copyWith(status: Failure(message: "$err")));
+    }
+  }
+
+  FutureOr<void> _addAccount(
+      AddAccount event, Emitter<AccountState> emit) async {
+    if (await loginToReddit()) {
+      await _loadAccounts();
+      final index = _accounts.length - 2;
+      await _selectAccount(SelectAccount(index), emit);
+    }
+  }
+
+  FutureOr<void> _logout(Logout event, Emitter<AccountState> emit) async {
+    if (_currentAccount != null) {
+      print("calling logout");
+      try {
+        await RedditAPI.client().logout();
+      } catch (err) {
+        print("Failed to logout $err");
+        return;
+      }
+      print("removing from db");
+      await AccountDatabase().removeAccount(_currentAccount!);
+      print("reloading accounts");
+      await _loadAccounts();
+      final index = _accounts.length - 1;
+      print("switching to anonymous");
+      await _selectAccount(SelectAccount(index), emit);
     }
   }
 }

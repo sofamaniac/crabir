@@ -2,15 +2,18 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:crabir/accounts/user_account.dart';
 import 'package:crabir/src/rust/api/simple.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/user/model.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:http/http.dart' as http;
 
 const clientId = String.fromEnvironment("REDDIT_API_KEY");
-const redirectUri = "${String.fromEnvironment("USER_AGENT")}://callback";
+const userAgent = String.fromEnvironment("USER_AGENT");
+const redirectUri = "$userAgent://callback";
 const baseUri = "www.reddit.com";
 const authorizationEndpoint = '/api/v1/authorize';
 const tokenEndpoint = '/api/v1/access_token';
@@ -36,50 +39,6 @@ const scopes = [
   "wikiedit",
   "wikiread",
 ];
-
-class UserAccount {
-  final String id;
-  final String username;
-  final String profilePicture;
-  final String? accessToken;
-  final String? refreshToken;
-
-  bool get isAnonymous => id == "anonymous";
-
-  const UserAccount(
-    this.id,
-    this.username,
-    this.profilePicture,
-    this.accessToken,
-    this.refreshToken,
-  );
-
-  Map<String, dynamic> toMap() => {
-        'id': id,
-        'username': username,
-        'profilePicture': profilePicture,
-        'accessToken': accessToken,
-        'refreshToken': refreshToken,
-      };
-  factory UserAccount.fromMap(Map<String, dynamic> json) => UserAccount(
-        json['id'],
-        json['username'],
-        json['profilePicture'],
-        json['accessToken'],
-        json['refreshToken'],
-      );
-
-  factory UserAccount.fromUserInfo(
-          UserInfo info, String accessToken, String refreshToken) =>
-      UserAccount(info.id, info.name, info.iconImg, accessToken, refreshToken);
-
-  factory UserAccount.anonymous() => UserAccount(
-      "anonymous",
-      "anonymous",
-      "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_1.png",
-      null,
-      null);
-}
 
 class AccountDatabase {
   Database? _db;
@@ -111,22 +70,31 @@ class AccountDatabase {
 
   Future<int> insertAccount(UserAccount account) async {
     final db = await database;
-    return await db.insert("accounts", account.toMap(),
+    return await db.insert("accounts", account.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  /// Removes an account from the database
+  Future removeAccount(UserAccount account) async {
+    final db = await database;
+    return await db.delete(
+      "accounts",
+      where: "id = ?",
+      whereArgs: [account.id],
+    );
   }
 
   Future<List<UserAccount>> getAccounts() async {
     final db = await database;
     final maps = await db.query('accounts', orderBy: 'ord ASC');
 
-    return maps.map((map) => UserAccount.fromMap(map)).toList();
+    return maps.map((map) => UserAccount.fromJson(map)).toList();
   }
 }
 
 /// Initiate log in to reddit. Returns `true` if process was successfull.
 /// Throws an exception if the request might have been subject to a CSRF attack.
 Future<bool> loginToReddit() async {
-  print("CLIENT ID: $clientId");
   final state = _generateRandomState();
   final authUrl = Uri.https(baseUri, authorizationEndpoint, {
     'client_id': clientId,
@@ -140,7 +108,7 @@ Future<bool> loginToReddit() async {
   // Open the browser for login
   final resultString = await FlutterWebAuth2.authenticate(
     url: authUrl.toString(),
-    callbackUrlScheme: String.fromEnvironment("USER_AGENT"),
+    callbackUrlScheme: userAgent,
   );
 
   final result = Uri.parse(resultString);
@@ -169,21 +137,24 @@ Future<bool> loginToReddit() async {
     },
   );
 
-  // TODO return true if login was successfull and false otherwise
-
   final tokenData = json.decode(tokenResponse.body);
   final accessToken = tokenData["access_token"];
   final refreshToken = tokenData["refresh_token"];
-  await RedditAPI.client().authenticate(refreshToken: refreshToken);
-  final UserInfo userInfo = await RedditAPI.client().loggedUserInfo();
-  await AccountDatabase().insertAccount(
-    UserAccount.fromUserInfo(
-      userInfo,
-      accessToken,
-      refreshToken,
-    ),
-  );
-  return true;
+  try {
+    await RedditAPI.client().authenticate(refreshToken: refreshToken);
+    final UserInfo userInfo = await RedditAPI.client().loggedUserInfo();
+    await AccountDatabase().insertAccount(
+      UserAccount.fromUserInfo(
+        userInfo,
+        accessToken,
+        refreshToken,
+      ),
+    );
+    return true;
+  } catch (e) {
+    Logger("Loggin to Reddit").severe("Failed to log in to reddit: $e");
+    return false;
+  }
 }
 
 String _generateRandomState([int length = 32]) {

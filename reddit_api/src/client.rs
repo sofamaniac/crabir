@@ -306,6 +306,37 @@ impl Client {
         Ok(())
     }
 
+    pub async fn logout(&self) -> Result<()> {
+        let access_token = (*self.current_access_token.lock().await).clone();
+        if let Some(access_token) = access_token {
+            let url = self
+                .base_url()
+                .join("api/v1/revoke_token")
+                .expect("Should not fail");
+            let request = self
+                .http
+                .post(url)
+                .basic_auth::<&str, &str>(CLIENT_ID, None)
+                .query(&[
+                    ("token", access_token),
+                    ("token_type_hint", String::from("access_token")),
+                ])
+                .build()
+                .expect("Building request should not fail");
+            let res = self.http.execute(request).await?.error_for_status();
+            if res.is_err() {
+                log::error!("Failed to loguout: {res:#?}");
+                res?;
+            }
+            log::info!("[logout] Successfully logged out");
+            // self.new_logged_out_user_token().await
+            Ok(())
+        } else {
+            log::info!("[logout] The access_token was null.");
+            Ok(())
+        }
+    }
+
     pub(crate) async fn execute(&self, request: RequestBuilder) -> Result<reqwest::Response> {
         if !self.is_access_token_valid().await {
             self.refresh_token().await?;

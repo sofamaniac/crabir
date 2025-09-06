@@ -67,9 +67,7 @@ class TopLevel extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('en'),
-      ],
+      supportedLocales: AppLocalizations.supportedLocales,
       themeMode: ThemeMode.system,
       theme: ThemeData.light(useMaterial3: true),
       darkTheme: ThemeData(

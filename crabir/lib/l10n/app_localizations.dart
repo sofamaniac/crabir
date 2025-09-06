@@ -66,8 +66,8 @@ abstract class AppLocalizations {
 
   final String localeName;
 
-  static AppLocalizations? of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  static AppLocalizations of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
   static const LocalizationsDelegate<AppLocalizations> delegate =
@@ -207,6 +207,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Random'**
   String get sortRandom;
+
+  /// No description provided for @loginButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an account'**
+  String get loginButtonLabel;
+
+  /// No description provided for @logoutButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logoutButtonLabel;
 
   /// No description provided for @postSearchBar.
   ///

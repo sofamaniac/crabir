@@ -66,6 +66,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sortRandom => 'Random';
 
   @override
+  String get loginButtonLabel => 'Add an account';
+
+  @override
+  String get logoutButtonLabel => 'Logout';
+
+  @override
   String get postSearchBar => 'Search posts';
 
   @override

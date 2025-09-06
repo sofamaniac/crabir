@@ -1,21 +1,5 @@
 part of 'accounts_bloc.dart';
 
-// enum AccountStatus {
-//   /// Need to load accounts from disk
-//   uninit,
-//
-//   /// Need to fetch subscriptions
-//   unloaded,
-//   loading,
-//
-//   /// All good for current account
-//   loaded,
-//   failure;
-//
-//   final String? error;
-//   const AccountStatus({this.error});
-// }
-
 @freezed
 class AccountStatus with _$AccountStatus {
   const factory AccountStatus.uninit() = Uninit;

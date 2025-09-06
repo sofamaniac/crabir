@@ -140,6 +140,46 @@ class LoadSubscriptions implements AccountEvent {
 }
 
 /// @nodoc
+
+class AddAccount implements AccountEvent {
+  const AddAccount();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is AddAccount);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'AccountEvent.addAccount()';
+  }
+}
+
+/// @nodoc
+
+class Logout implements AccountEvent {
+  const Logout();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is Logout);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'AccountEvent.logout()';
+  }
+}
+
+/// @nodoc
 mixin _$AccountStatus {
   @override
   bool operator ==(Object other) {
@@ -362,6 +402,7 @@ abstract mixin class $AccountStateCopyWith<$Res> {
       List<UserAccount> allAccounts});
 
   $AccountStatusCopyWith<$Res> get status;
+  $UserAccountCopyWith<$Res>? get account;
 }
 
 /// @nodoc
@@ -413,6 +454,20 @@ class _$AccountStateCopyWithImpl<$Res> implements $AccountStateCopyWith<$Res> {
   $AccountStatusCopyWith<$Res> get status {
     return $AccountStatusCopyWith<$Res>(_self.status, (value) {
       return _then(_self.copyWith(status: value));
+    });
+  }
+
+  /// Create a copy of AccountState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserAccountCopyWith<$Res>? get account {
+    if (_self.account == null) {
+      return null;
+    }
+
+    return $UserAccountCopyWith<$Res>(_self.account!, (value) {
+      return _then(_self.copyWith(account: value));
     });
   }
 }
@@ -516,6 +571,8 @@ abstract mixin class _$AccountStateCopyWith<$Res>
 
   @override
   $AccountStatusCopyWith<$Res> get status;
+  @override
+  $UserAccountCopyWith<$Res>? get account;
 }
 
 /// @nodoc
@@ -568,6 +625,20 @@ class __$AccountStateCopyWithImpl<$Res>
   $AccountStatusCopyWith<$Res> get status {
     return $AccountStatusCopyWith<$Res>(_self.status, (value) {
       return _then(_self.copyWith(status: value));
+    });
+  }
+
+  /// Create a copy of AccountState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserAccountCopyWith<$Res>? get account {
+    if (_self.account == null) {
+      return null;
+    }
+
+    return $UserAccountCopyWith<$Res>(_self.account!, (value) {
+      return _then(_self.copyWith(account: value));
     });
   }
 }

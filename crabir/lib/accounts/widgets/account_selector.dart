@@ -41,6 +41,7 @@ class AccountSelector extends StatelessWidget {
           },
         ),
         LoginButton(),
+        LogoutButton(),
       ],
     );
   }

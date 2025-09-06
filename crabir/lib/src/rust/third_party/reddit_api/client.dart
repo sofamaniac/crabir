@@ -57,6 +57,8 @@ abstract class Client implements RustOpaqueInterface {
   /// Returns an error if the http client fails or if the parsing of the response fails.
   Future<UserInfo> loggedUserInfo();
 
+  Future<void> logout();
+
   ///flutter_rust_bridge:sync
   Streamable multiPosts({required Multi multi, required FeedSort sort});
 

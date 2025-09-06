@@ -21,6 +21,9 @@
   "sortLive": "Live",
   "sortRandom": "Random",
 
+  "loginButtonLabel": "Add an account",
+  "logoutButtonLabel": "Logout",
+
   "postSearchBar": "Search posts",
   "subredditsSearchBar": "Search communities",
 
