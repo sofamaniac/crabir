@@ -140,7 +140,7 @@ Future<bool> loginToReddit() async {
   // Open the browser for login
   final resultString = await FlutterWebAuth2.authenticate(
     url: authUrl.toString(),
-    callbackUrlScheme: "com.sofamaniac.crabir",
+    callbackUrlScheme: String.fromEnvironment("USER_AGENT"),
   );
 
   final result = Uri.parse(resultString);
