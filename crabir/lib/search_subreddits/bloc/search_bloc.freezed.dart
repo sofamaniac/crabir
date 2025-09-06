@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -34,6 +33,195 @@ mixin _$SubredditSearchEvent {
 class $SubredditSearchEventCopyWith<$Res> {
   $SubredditSearchEventCopyWith(
       SubredditSearchEvent _, $Res Function(SubredditSearchEvent) __);
+}
+
+/// Adds pattern-matching-related methods to [SubredditSearchEvent].
+extension SubredditSearchEventPatterns on SubredditSearchEvent {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(Query value)? query,
+    TResult Function(SetSort value)? setSort,
+    TResult Function(Fetch value)? fetch,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Query() when query != null:
+        return query(_that);
+      case SetSort() when setSort != null:
+        return setSort(_that);
+      case Fetch() when fetch != null:
+        return fetch(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(Query value) query,
+    required TResult Function(SetSort value) setSort,
+    required TResult Function(Fetch value) fetch,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Query():
+        return query(_that);
+      case SetSort():
+        return setSort(_that);
+      case Fetch():
+        return fetch(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Query value)? query,
+    TResult? Function(SetSort value)? setSort,
+    TResult? Function(Fetch value)? fetch,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Query() when query != null:
+        return query(_that);
+      case SetSort() when setSort != null:
+        return setSort(_that);
+      case Fetch() when fetch != null:
+        return fetch(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String query)? query,
+    TResult Function(SubredditSearchSort sort)? setSort,
+    TResult Function()? fetch,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Query() when query != null:
+        return query(_that.query);
+      case SetSort() when setSort != null:
+        return setSort(_that.sort);
+      case Fetch() when fetch != null:
+        return fetch();
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String query) query,
+    required TResult Function(SubredditSearchSort sort) setSort,
+    required TResult Function() fetch,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Query():
+        return query(_that.query);
+      case SetSort():
+        return setSort(_that.sort);
+      case Fetch():
+        return fetch();
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String query)? query,
+    TResult? Function(SubredditSearchSort sort)? setSort,
+    TResult? Function()? fetch,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Query() when query != null:
+        return query(_that.query);
+      case SetSort() when setSort != null:
+        return setSort(_that.sort);
+      case Fetch() when fetch != null:
+        return fetch();
+      case _:
+        return null;
+    }
+  }
 }
 
 /// @nodoc
@@ -269,6 +457,172 @@ class _$SubredditSearchStateCopyWithImpl<$Res>
   }
 }
 
+/// Adds pattern-matching-related methods to [SubredditSearchState].
+extension SubredditSearchStatePatterns on SubredditSearchState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SubredditSearchState value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SubredditSearchState() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SubredditSearchState value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SubredditSearchState():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SubredditSearchState value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SubredditSearchState() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(StreamStatus status, List<Subreddit> items,
+            bool hasReachedMax, String query)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SubredditSearchState() when $default != null:
+        return $default(
+            _that.status, _that.items, _that.hasReachedMax, _that.query);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(StreamStatus status, List<Subreddit> items,
+            bool hasReachedMax, String query)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SubredditSearchState():
+        return $default(
+            _that.status, _that.items, _that.hasReachedMax, _that.query);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(StreamStatus status, List<Subreddit> items,
+            bool hasReachedMax, String query)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SubredditSearchState() when $default != null:
+        return $default(
+            _that.status, _that.items, _that.hasReachedMax, _that.query);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
 class _SubredditSearchState implements SubredditSearchState {
@@ -469,6 +823,172 @@ class _$PostSearchStateCopyWithImpl<$Res>
           : query // ignore: cast_nullable_to_non_nullable
               as String,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [PostSearchState].
+extension PostSearchStatePatterns on PostSearchState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_PostSearchState value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _PostSearchState() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_PostSearchState value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PostSearchState():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_PostSearchState value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PostSearchState() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(StreamStatus status, List<Post> items, bool hasReachedMax,
+            String query)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _PostSearchState() when $default != null:
+        return $default(
+            _that.status, _that.items, _that.hasReachedMax, _that.query);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(StreamStatus status, List<Post> items, bool hasReachedMax,
+            String query)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PostSearchState():
+        return $default(
+            _that.status, _that.items, _that.hasReachedMax, _that.query);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(StreamStatus status, List<Post> items, bool hasReachedMax,
+            String query)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PostSearchState() when $default != null:
+        return $default(
+            _that.status, _that.items, _that.hasReachedMax, _that.query);
+      case _:
+        return null;
+    }
   }
 }
 

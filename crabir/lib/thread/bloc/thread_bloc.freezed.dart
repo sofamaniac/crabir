@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -33,6 +32,231 @@ mixin _$ThreadEvent {
 /// @nodoc
 class $ThreadEventCopyWith<$Res> {
   $ThreadEventCopyWith(ThreadEvent _, $Res Function(ThreadEvent) __);
+}
+
+/// Adds pattern-matching-related methods to [ThreadEvent].
+extension ThreadEventPatterns on ThreadEvent {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(Load value)? load,
+    TResult Function(Refresh value)? refresh,
+    TResult Function(Collapse value)? collapse,
+    TResult Function(LoadMore value)? loadMore,
+    TResult Function(SetSort value)? setSort,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Load() when load != null:
+        return load(_that);
+      case Refresh() when refresh != null:
+        return refresh(_that);
+      case Collapse() when collapse != null:
+        return collapse(_that);
+      case LoadMore() when loadMore != null:
+        return loadMore(_that);
+      case SetSort() when setSort != null:
+        return setSort(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(Load value) load,
+    required TResult Function(Refresh value) refresh,
+    required TResult Function(Collapse value) collapse,
+    required TResult Function(LoadMore value) loadMore,
+    required TResult Function(SetSort value) setSort,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Load():
+        return load(_that);
+      case Refresh():
+        return refresh(_that);
+      case Collapse():
+        return collapse(_that);
+      case LoadMore():
+        return loadMore(_that);
+      case SetSort():
+        return setSort(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(Load value)? load,
+    TResult? Function(Refresh value)? refresh,
+    TResult? Function(Collapse value)? collapse,
+    TResult? Function(LoadMore value)? loadMore,
+    TResult? Function(SetSort value)? setSort,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Load() when load != null:
+        return load(_that);
+      case Refresh() when refresh != null:
+        return refresh(_that);
+      case Collapse() when collapse != null:
+        return collapse(_that);
+      case LoadMore() when loadMore != null:
+        return loadMore(_that);
+      case SetSort() when setSort != null:
+        return setSort(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? load,
+    TResult Function()? refresh,
+    TResult Function(Comment comment)? collapse,
+    TResult Function(Thing_More more)? loadMore,
+    TResult Function(CommentSort? sort)? setSort,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Load() when load != null:
+        return load();
+      case Refresh() when refresh != null:
+        return refresh();
+      case Collapse() when collapse != null:
+        return collapse(_that.comment);
+      case LoadMore() when loadMore != null:
+        return loadMore(_that.more);
+      case SetSort() when setSort != null:
+        return setSort(_that.sort);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() load,
+    required TResult Function() refresh,
+    required TResult Function(Comment comment) collapse,
+    required TResult Function(Thing_More more) loadMore,
+    required TResult Function(CommentSort? sort) setSort,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Load():
+        return load();
+      case Refresh():
+        return refresh();
+      case Collapse():
+        return collapse(_that.comment);
+      case LoadMore():
+        return loadMore(_that.more);
+      case SetSort():
+        return setSort(_that.sort);
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? load,
+    TResult? Function()? refresh,
+    TResult? Function(Comment comment)? collapse,
+    TResult? Function(Thing_More more)? loadMore,
+    TResult? Function(CommentSort? sort)? setSort,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case Load() when load != null:
+        return load();
+      case Refresh() when refresh != null:
+        return refresh();
+      case Collapse() when collapse != null:
+        return collapse(_that.comment);
+      case LoadMore() when loadMore != null:
+        return loadMore(_that.more);
+      case SetSort() when setSort != null:
+        return setSort(_that.sort);
+      case _:
+        return null;
+    }
+  }
 }
 
 /// @nodoc
@@ -368,6 +592,172 @@ class _$ThreadStateCopyWithImpl<$Res> implements $ThreadStateCopyWith<$Res> {
           : sort // ignore: cast_nullable_to_non_nullable
               as CommentSort?,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [ThreadState].
+extension ThreadStatePatterns on ThreadState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ThreadState value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ThreadState() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ThreadState value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ThreadState():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ThreadState value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ThreadState() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<Thing> flatComments, Post? post, Status status,
+            Set<String> collapsed, Set<String> hidden, CommentSort? sort)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ThreadState() when $default != null:
+        return $default(_that.flatComments, _that.post, _that.status,
+            _that.collapsed, _that.hidden, _that.sort);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<Thing> flatComments, Post? post, Status status,
+            Set<String> collapsed, Set<String> hidden, CommentSort? sort)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ThreadState():
+        return $default(_that.flatComments, _that.post, _that.status,
+            _that.collapsed, _that.hidden, _that.sort);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<Thing> flatComments, Post? post, Status status,
+            Set<String> collapsed, Set<String> hidden, CommentSort? sort)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ThreadState() when $default != null:
+        return $default(_that.flatComments, _that.post, _that.status,
+            _that.collapsed, _that.hidden, _that.sort);
+      case _:
+        return null;
+    }
   }
 }
 
