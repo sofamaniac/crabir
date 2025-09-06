@@ -9,8 +9,8 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:http/http.dart' as http;
 
-const clientId = 'w0DROpe2H7uv2inVTvSfZw';
-const redirectUri = 'com.sofamaniac.reboost://callback';
+const clientId = String.fromEnvironment("REDDIT_API_KEY");
+const redirectUri = "${String.fromEnvironment("USER_AGENT")}://callback";
 const baseUri = "www.reddit.com";
 const authorizationEndpoint = '/api/v1/authorize';
 const tokenEndpoint = '/api/v1/access_token';
@@ -126,6 +126,7 @@ class AccountDatabase {
 /// Initiate log in to reddit. Returns `true` if process was successfull.
 /// Throws an exception if the request might have been subject to a CSRF attack.
 Future<bool> loginToReddit() async {
+  print("CLIENT ID: $clientId");
   final state = _generateRandomState();
   final authUrl = Uri.https(baseUri, authorizationEndpoint, {
     'client_id': clientId,
@@ -139,7 +140,7 @@ Future<bool> loginToReddit() async {
   // Open the browser for login
   final resultString = await FlutterWebAuth2.authenticate(
     url: authUrl.toString(),
-    callbackUrlScheme: "com.sofamaniac.reboost",
+    callbackUrlScheme: "com.sofamaniac.crabir",
   );
 
   final result = Uri.parse(resultString);
