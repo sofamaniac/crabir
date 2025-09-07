@@ -75,6 +75,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedPopular => 'Popular';
 
   @override
+  String get feedSaved => 'Saved';
+
+  @override
+  String get feedHistory => 'History';
+
+  @override
   String get loginButtonLabel => 'Add an account';
 
   @override

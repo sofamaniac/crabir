@@ -24,6 +24,8 @@
   "feedHome": "Home",
   "feedAll" : "All",
   "feedPopular": "Popular",
+  "feedSaved": "Saved",
+  "feedHistory": "History",
 
   "loginButtonLabel": "Add an account",
   "logoutButtonLabel": "Logout",

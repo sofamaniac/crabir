@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
+import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:flutter/material.dart';
@@ -7,28 +8,29 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 List<BaseFeed> baseFeeds(BuildContext context, {bool closeDrawer = true}) {
   final account = context.read<AccountsBloc>().state;
+  final locales = AppLocalizations.of(context);
   return [
     BaseFeed(
-      "Home",
+      locales.feedHome,
       Icons.home,
       closeDrawer: closeDrawer,
       route: NamedRoute(homeRouteName),
     ),
     BaseFeed(
-      "Popular",
+      locales.feedPopular,
       Icons.arrow_outward,
       closeDrawer: closeDrawer,
       route: FeedRoute(feed: Feed.popular()),
     ),
     BaseFeed(
-      "All",
+      locales.feedAll,
       Icons.all_inclusive_rounded,
       closeDrawer: closeDrawer,
       route: FeedRoute(feed: Feed.all()),
     ),
     if (account.account != null) ...[
       BaseFeed(
-        "Saved",
+        locales.feedSaved,
         Icons.bookmark,
         closeDrawer: closeDrawer,
         route: UserSavedRoute(
@@ -36,7 +38,7 @@ List<BaseFeed> baseFeeds(BuildContext context, {bool closeDrawer = true}) {
         ),
       ),
       BaseFeed(
-        "History",
+        locales.feedHistory,
         Icons.history,
         closeDrawer: closeDrawer,
         // TODO:

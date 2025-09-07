@@ -226,6 +226,18 @@ abstract class AppLocalizations {
   /// **'Popular'**
   String get feedPopular;
 
+  /// No description provided for @feedSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get feedSaved;
+
+  /// No description provided for @feedHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get feedHistory;
+
   /// No description provided for @loginButtonLabel.
   ///
   /// In en, this message translates to:
