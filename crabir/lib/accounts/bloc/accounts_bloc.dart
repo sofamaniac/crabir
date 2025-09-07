@@ -152,19 +152,14 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
 
   FutureOr<void> _logout(Logout event, Emitter<AccountState> emit) async {
     if (_currentAccount != null) {
-      print("calling logout");
       try {
         await RedditAPI.client().logout();
       } catch (err) {
-        print("Failed to logout $err");
         return;
       }
-      print("removing from db");
       await AccountDatabase().removeAccount(_currentAccount!);
-      print("reloading accounts");
       await _loadAccounts();
       final index = _accounts.length - 1;
-      print("switching to anonymous");
       await _selectAccount(SelectAccount(index), emit);
     }
   }
