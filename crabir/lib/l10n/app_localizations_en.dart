@@ -81,6 +81,72 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logoutButtonLabel => 'Logout';
 
   @override
+  String yearsAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '${count}y',
+      one: '${count}y',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String monthsAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '${count}m',
+      one: '${count}m',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String daysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '${count}d',
+      one: '${count}d',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String hoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '${count}h',
+      one: '${count}h',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String minutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '${count}min',
+      one: '${count}min',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String secondsAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '${count}s',
+      one: '${count}s',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String loadMoreComments(int n) {
     String _temp0 = intl.Intl.pluralLogic(
       n,

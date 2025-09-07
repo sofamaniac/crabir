@@ -1,29 +1,27 @@
+import 'package:crabir/l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
+
 extension TimeEllapsed on DateTime {
-  // TODO: localization
-  String _message(Duration delta) {
+  String _message(BuildContext context, Duration delta) {
     if (delta.inDays > 365) {
-      final int years = (delta.inDays / 365).toInt();
-      return "${years}y";
+      final years = (delta.inDays / 365).toInt();
+      return AppLocalizations.of(context).yearsAgo(years);
     } else if (delta.inDays >= 30) {
-      final int months = (delta.inDays / 30).toInt();
-      return "${months}m";
+      final months = (delta.inDays / 30).toInt();
+      return AppLocalizations.of(context).monthsAgo(months);
     } else if (delta.inDays >= 1) {
-      final int days = delta.inDays;
-      return "${days}d";
+      return AppLocalizations.of(context).daysAgo(delta.inDays);
     } else if (delta.inHours >= 1) {
-      final hours = delta.inHours;
-      return "${hours}h";
+      return AppLocalizations.of(context).hoursAgo(delta.inHours);
     } else if (delta.inMinutes >= 1) {
-      final minutes = delta.inMinutes;
-      return "${minutes}min";
+      return AppLocalizations.of(context).minutesAgo(delta.inMinutes);
     } else {
-      final seconds = delta.inSeconds;
-      return "${seconds}s";
+      return AppLocalizations.of(context).secondsAgo(delta.inSeconds);
     }
   }
 
-  String timeSince() {
+  String timeSince(BuildContext context) {
     final delta = DateTime.now().toUtc().difference(this);
-    return _message(delta);
+    return _message(context, delta);
   }
 }

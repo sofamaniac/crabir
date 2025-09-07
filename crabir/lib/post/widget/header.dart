@@ -89,7 +89,7 @@ class Header extends StatelessWidget {
         const Text(' • '),
         _author(context),
         const Text(' • '),
-        Text(post.createdUtc.timeSince(), style: _labelStyle(context)),
+        Text(post.createdUtc.timeSince(context), style: _labelStyle(context)),
         if (_showDomain()) ...[
           const Text(' • '),
           Text(

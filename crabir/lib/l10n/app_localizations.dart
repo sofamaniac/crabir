@@ -238,6 +238,42 @@ abstract class AppLocalizations {
   /// **'Logout'**
   String get logoutButtonLabel;
 
+  /// Number of years ago, abbreviated (e.g., '1y', '2y')
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1 {{count}y} other {{count}y}}'**
+  String yearsAgo(int count);
+
+  /// Number of months ago, abbreviated (e.g., '1m', '2m')
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1 {{count}m} other {{count}m}}'**
+  String monthsAgo(int count);
+
+  /// Number of days ago, abbreviated (e.g., '1d', '3d')
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1 {{count}d} other {{count}d}}'**
+  String daysAgo(int count);
+
+  /// Number of hours ago, abbreviated (e.g., '1h', '6h')
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1 {{count}h} other {{count}h}}'**
+  String hoursAgo(int count);
+
+  /// Number of minutes ago, abbreviated (e.g., '1min', '12min')
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1 {{count}min} other {{count}min}}'**
+  String minutesAgo(int count);
+
+  /// Number of seconds ago, abbreviated (e.g., '1s', '45s')
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1 {{count}s} other {{count}s}}'**
+  String secondsAgo(int count);
+
   /// Label for load more button
   ///
   /// In en, this message translates to:

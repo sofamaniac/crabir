@@ -28,6 +28,72 @@
   "loginButtonLabel": "Add an account",
   "logoutButtonLabel": "Logout",
 
+  "yearsAgo": "{count, plural, =1 {{count}y} other {{count}y}}",
+  "@yearsAgo": {
+    "description": "Number of years ago, abbreviated (e.g., '1y', '2y')",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+
+  "monthsAgo": "{count, plural, =1 {{count}m} other {{count}m}}",
+  "@monthsAgo": {
+    "description": "Number of months ago, abbreviated (e.g., '1m', '2m')",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+
+  "daysAgo": "{count, plural, =1 {{count}d} other {{count}d}}",
+  "@daysAgo": {
+    "description": "Number of days ago, abbreviated (e.g., '1d', '3d')",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+
+  "hoursAgo": "{count, plural, =1 {{count}h} other {{count}h}}",
+  "@hoursAgo": {
+    "description": "Number of hours ago, abbreviated (e.g., '1h', '6h')",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "6"
+      }
+    }
+  },
+
+  "minutesAgo": "{count, plural, =1 {{count}min} other {{count}min}}",
+  "@minutesAgo": {
+    "description": "Number of minutes ago, abbreviated (e.g., '1min', '12min')",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+
+  "secondsAgo": "{count, plural, =1 {{count}s} other {{count}s}}",
+  "@secondsAgo": {
+    "description": "Number of seconds ago, abbreviated (e.g., '1s', '45s')",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "45"
+      }
+    }
+  },
+
   "loadMoreComments": "{n, plural, =1{Load 1 comment} other{Load {n} comments}}",
   "@loadMoreComments": {
     "description": "Label for load more button",

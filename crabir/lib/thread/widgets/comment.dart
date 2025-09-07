@@ -74,7 +74,7 @@ class _CommentViewState extends State<CommentView>
           ),
         ),
         Text(
-          "${comment.scoreHidden ? "?" : comment.score} · ${comment.createdUtc.timeSince()}",
+          "${comment.scoreHidden ? "?" : comment.score} · ${comment.createdUtc.timeSince(context)}",
           style: Theme.of(context).textTheme.labelMedium,
         ),
       ],
