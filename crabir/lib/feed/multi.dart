@@ -3,7 +3,7 @@ import 'package:crabir/feed/sort_display.dart';
 import 'package:crabir/feed/sort_menu.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/routes/routes.dart';
-import 'package:crabir/src/rust/api/simple.dart';
+import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/stream/things_view.dart';
@@ -98,7 +98,9 @@ class _MultiViewBodyState extends State<MultiViewBody>
               );
             },
             onTap: () => context.pushRoute(
-              ThreadRoute(permalink: post.permalink, post: post),
+              ThreadRoute(
+                post: post,
+              ),
             ),
           );
         },

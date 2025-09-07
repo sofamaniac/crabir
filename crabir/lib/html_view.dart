@@ -1,7 +1,11 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 /// Render HTML with some styling already done.
@@ -86,15 +90,15 @@ class StyledHtml extends StatelessWidget {
   }
 }
 
-OnTap defaultLinkHandler = (
+Future<void> defaultLinkHandler(
+  StackRouter router,
   String? url,
   Map<String, String> attributes,
   __,
 ) async {
-  final uri = Uri.parse(url!);
+  Uri uri = Uri.parse(url!);
   await launchUrl(uri);
-  if (await canLaunchUrl(uri)) {}
-};
+}
 
 /// Extension that turns reddit preview links into inline images
 class RedditImageExtension extends HtmlExtension {

@@ -114,7 +114,6 @@ Widget _postView(BuildContext context, Post post) {
     post: post,
     onTap: () => context.router.navigate(
       ThreadRoute(
-        permalink: post.permalink,
         post: post,
       ),
     ),

@@ -212,7 +212,9 @@ Widget _postView(BuildContext context, Post post) {
       state.add(Save(save: save, name: post.name));
     },
     onTap: () => context.router.navigate(
-      ThreadRoute(permalink: post.permalink, post: post),
+      ThreadRoute(
+        post: post,
+      ),
     ),
   );
 }

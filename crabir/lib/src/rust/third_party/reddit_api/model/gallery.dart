@@ -17,7 +17,7 @@ abstract class Gallery implements RustOpaqueInterface {
       RustLib.instance.api.redditApiModelGalleryGalleryDefault();
 
   /// flutter_rust_bridge:sync
-  Source get_({required int index});
+  GalleryMedia? get_({required int index});
 
   /// flutter_rust_bridge:sync,getter
   double get aspectRatio;
@@ -30,13 +30,6 @@ abstract class Gallery implements RustOpaqueInterface {
 abstract class GalleryData implements RustOpaqueInterface {
   static Future<GalleryData> default_() =>
       RustLib.instance.api.redditApiModelGalleryGalleryDataDefault();
-}
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<GalleryMedia>>
-abstract class GalleryMedia implements RustOpaqueInterface {
-  String get mediaType;
-
-  set mediaType(String mediaType);
 }
 
 class AnimatedImage {
@@ -67,6 +60,39 @@ class AnimatedImage {
           y == other.y &&
           gif == other.gif &&
           mp4 == other.mp4;
+}
+
+/// flutter_rust_bridge:non_opaque
+class GalleryMedia {
+  /// A string like "image/jpg", or "image/gif"
+  final String mediaType;
+  final Source source;
+  final List<Image> previews;
+  final List<Image> obfuscated;
+
+  const GalleryMedia({
+    required this.mediaType,
+    required this.source,
+    required this.previews,
+    required this.obfuscated,
+  });
+
+  @override
+  int get hashCode =>
+      mediaType.hashCode ^
+      source.hashCode ^
+      previews.hashCode ^
+      obfuscated.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GalleryMedia &&
+          runtimeType == other.runtimeType &&
+          mediaType == other.mediaType &&
+          source == other.source &&
+          previews == other.previews &&
+          obfuscated == other.obfuscated;
 }
 
 class Image {

@@ -253,4 +253,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get data_loadImages => 'Load images';
+
+  @override
+  String get data_preferredQuality => 'Image Quality';
+
+  @override
+  String get filters_blurNSFW => 'Blur images in NSFW posts';
 }

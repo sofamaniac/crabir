@@ -579,6 +579,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Load images'**
   String get data_loadImages;
+
+  /// No description provided for @data_preferredQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Image Quality'**
+  String get data_preferredQuality;
+
+  /// No description provided for @filters_blurNSFW.
+  ///
+  /// In en, this message translates to:
+  /// **'Blur images in NSFW posts'**
+  String get filters_blurNSFW;
 }
 
 class _AppLocalizationsDelegate

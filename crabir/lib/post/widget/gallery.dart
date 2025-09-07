@@ -3,10 +3,11 @@ import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/routes/routes.dart';
+import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Image;
 import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -249,38 +250,61 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
   }
 
   void _onPageChange(int index) {
-    final image = widget.gallery.get_(index: index);
-    if (image case Source_AnimatedImage()) {
-      AnimatedContentController.currentlyPlaying.value = image.source.mp4;
-    }
     setState(() {
       _currentPage = widget.controller.page?.round() ?? 0;
     });
   }
 
+  Widget toWidget(
+      GalleryMedia content, Resolution resolution, bool obfuscate, int index) {
+    final List<Image> resolutions;
+    if (obfuscate) {
+      resolutions = content.obfuscated;
+    } else {
+      resolutions = content.previews;
+    }
+    final placeholder = switch (resolution) {
+      Resolution.source || Resolution.high => resolutions.last,
+      Resolution.medium => resolutions[(resolutions.length / 2).toInt()],
+      Resolution.low => resolutions.first,
+    };
+    switch (content.source) {
+      case Source_AnimatedImage(:final source):
+        // In galleries video do not have alternate resolutions.
+        return AnimatedContent(
+            url: source.mp4,
+            width: source.x,
+            height: source.y,
+            placeholderUrl: placeholder.u,
+            shouldPlay: index == _currentPage);
+      case Source_Image(:final source):
+        if (resolution case Resolution.source) {
+          return ImageThumbnail.fromGalleryImage(source);
+        } else {
+          return ImageThumbnail.fromGalleryImage(
+            placeholder,
+            placeholderUrl: resolutions.first.u,
+          );
+        }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<DataSettingsCubit>().state;
     return Center(
       child: PageView.builder(
         controller: widget.controller,
         onPageChanged: _onPageChange,
         itemBuilder: (context, index) {
-          final image = widget.gallery.get_(index: index);
+          final image = widget.gallery.get_(index: index)!;
           // TODO: handle resolution
-          final Widget imageWidget;
-          switch (image) {
-            case Source_Image():
-              imageWidget = ImageThumbnail.fromGalleryImage(image.source);
-            case Source_AnimatedImage():
-              AnimatedContentController.currentlyPlaying.value =
-                  image.source.mp4;
-              imageWidget = AnimatedContent(
-                  url: image.source.mp4,
-                  width: image.source.x,
-                  height: image.source.y,
-                  // TODO: get placeholder image
-                  shouldPlay: index == _currentPage);
-          }
+          final Widget imageWidget = toWidget(
+            image,
+            settings.preferredQuality,
+            false,
+            index,
+          );
           // TODO: display title if any
           return imageWidget;
         },

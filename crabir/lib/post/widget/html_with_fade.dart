@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:crabir/html_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -31,7 +32,12 @@ class HtmlWithConditionalFade extends StatelessWidget {
     } else {
       return StyledHtml(
         htmlContent: htmlContent,
-        onLinkTap: defaultLinkHandler,
+        onLinkTap: (url, attributes, element) => defaultLinkHandler(
+          context.router,
+          url,
+          attributes,
+          element,
+        ),
       );
     }
   }

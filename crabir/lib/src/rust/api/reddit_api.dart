@@ -9,19 +9,17 @@ import '../third_party/reddit_api/model/comment.dart';
 import '../third_party/reddit_api/model/post.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `setup_the_logger`
-
 void debugPost({required Post post}) =>
-    RustLib.instance.api.crateApiSimpleDebugPost(post: post);
+    RustLib.instance.api.crateApiRedditApiDebugPost(post: post);
 
 void debugComment({required Comment comment}) =>
-    RustLib.instance.api.crateApiSimpleDebugComment(comment: comment);
+    RustLib.instance.api.crateApiRedditApiDebugComment(comment: comment);
 
 class RedditAPI {
   const RedditAPI();
 
   static Client client() =>
-      RustLib.instance.api.crateApiSimpleRedditApiClient();
+      RustLib.instance.api.crateApiRedditApiRedditApiClient();
 
   @override
   int get hashCode => 0;

@@ -32,6 +32,7 @@ abstract class DataSettings with _$DataSettings {
     @Setting(widget: ImageLoadingSelect)
     @Default(ImageLoading.always)
     ImageLoading loadImages,
+    @Setting() @Default(Resolution.source) Resolution preferredQuality,
   }) = _DataSettings;
   factory DataSettings.fromJson(Map<String, dynamic> json) =>
       _$DataSettingsFromJson(json);

@@ -10,7 +10,7 @@ import 'package:crabir/flair.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
-import 'package:crabir/src/rust/api/simple.dart';
+import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -99,7 +99,6 @@ class RedditPostCard extends StatelessWidget {
         GalleryView(post: post),
       Kind.image when showMedia => ImageContent(
           post: post,
-          maxLines: maxLines ?? 2,
         ),
       Kind.link || Kind.unknown => Container(),
       Kind.selftext || _ => HtmlWithConditionalFade(

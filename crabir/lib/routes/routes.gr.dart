@@ -99,6 +99,22 @@ class FeedRouteArgs {
 }
 
 /// generated route for
+/// [FiltersSettingsView]
+class FiltersSettingsRoute extends PageRouteInfo<void> {
+  const FiltersSettingsRoute({List<PageRouteInfo>? children})
+      : super(FiltersSettingsRoute.name, initialChildren: children);
+
+  static const String name = 'FiltersSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const FiltersSettingsView();
+    },
+  );
+}
+
+/// generated route for
 /// [FullScreenGalleryView]
 class FullScreenGalleryRoute extends PageRouteInfo<FullScreenGalleryRouteArgs> {
   FullScreenGalleryRoute({
@@ -510,12 +526,25 @@ class SubscriptionsTabRoute extends PageRouteInfo<void> {
 class ThreadRoute extends PageRouteInfo<ThreadRouteArgs> {
   ThreadRoute({
     Key? key,
-    required String permalink,
+    String? subreddit,
+    String? postID,
+    String? postTitle,
     Post? post,
     List<PageRouteInfo>? children,
   }) : super(
           ThreadRoute.name,
-          args: ThreadRouteArgs(key: key, permalink: permalink, post: post),
+          args: ThreadRouteArgs(
+            key: key,
+            subreddit: subreddit,
+            postID: postID,
+            postTitle: postTitle,
+            post: post,
+          ),
+          rawPathParams: {
+            'subreddit': subreddit,
+            'id': postID,
+            'title': postTitle,
+          },
           initialChildren: children,
         );
 
@@ -524,24 +553,47 @@ class ThreadRoute extends PageRouteInfo<ThreadRouteArgs> {
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<ThreadRouteArgs>();
-      return Thread(key: args.key, permalink: args.permalink, post: args.post);
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<ThreadRouteArgs>(
+        orElse: () => ThreadRouteArgs(
+          subreddit: pathParams.optString('subreddit'),
+          postID: pathParams.optString('id'),
+          postTitle: pathParams.optString('title'),
+        ),
+      );
+      return Thread(
+        key: args.key,
+        subreddit: args.subreddit,
+        postID: args.postID,
+        postTitle: args.postTitle,
+        post: args.post,
+      );
     },
   );
 }
 
 class ThreadRouteArgs {
-  const ThreadRouteArgs({this.key, required this.permalink, this.post});
+  const ThreadRouteArgs({
+    this.key,
+    this.subreddit,
+    this.postID,
+    this.postTitle,
+    this.post,
+  });
 
   final Key? key;
 
-  final String permalink;
+  final String? subreddit;
+
+  final String? postID;
+
+  final String? postTitle;
 
   final Post? post;
 
   @override
   String toString() {
-    return 'ThreadRouteArgs{key: $key, permalink: $permalink, post: $post}';
+    return 'ThreadRouteArgs{key: $key, subreddit: $subreddit, postID: $postID, postTitle: $postTitle, post: $post}';
   }
 
   @override
@@ -549,12 +601,19 @@ class ThreadRouteArgs {
     if (identical(this, other)) return true;
     if (other is! ThreadRouteArgs) return false;
     return key == other.key &&
-        permalink == other.permalink &&
+        subreddit == other.subreddit &&
+        postID == other.postID &&
+        postTitle == other.postTitle &&
         post == other.post;
   }
 
   @override
-  int get hashCode => key.hashCode ^ permalink.hashCode ^ post.hashCode;
+  int get hashCode =>
+      key.hashCode ^
+      subreddit.hashCode ^
+      postID.hashCode ^
+      postTitle.hashCode ^
+      post.hashCode;
 }
 
 /// generated route for

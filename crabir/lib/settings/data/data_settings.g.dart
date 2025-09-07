@@ -24,6 +24,9 @@ _DataSettings _$DataSettingsFromJson(Map<String, dynamic> json) =>
       loadImages:
           $enumDecodeNullable(_$ImageLoadingEnumMap, json['loadImages']) ??
               ImageLoading.always,
+      preferredQuality:
+          $enumDecodeNullable(_$ResolutionEnumMap, json['preferredQuality']) ??
+              Resolution.source,
     );
 
 Map<String, dynamic> _$DataSettingsToJson(_DataSettings instance) =>
@@ -35,6 +38,7 @@ Map<String, dynamic> _$DataSettingsToJson(_DataSettings instance) =>
       'minimumQuality': _$ResolutionEnumMap[instance.minimumQuality]!,
       'maximumQuality': _$ResolutionEnumMap[instance.maximumQuality]!,
       'loadImages': _$ImageLoadingEnumMap[instance.loadImages]!,
+      'preferredQuality': _$ResolutionEnumMap[instance.preferredQuality]!,
     };
 
 const _$ImageLoadingEnumMap = {

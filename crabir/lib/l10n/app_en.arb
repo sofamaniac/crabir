@@ -108,5 +108,8 @@
   "data_minimumQuality": "Minimum quality",
   "data_maximumQuality": "Maximum quality",
 
-  "data_loadImages": "Load images"
+  "data_loadImages": "Load images",
+  "data_preferredQuality": "Image Quality",
+
+  "filters_blurNSFW": "Blur images in NSFW posts"
 }

@@ -240,11 +240,13 @@ abstract class Post implements RustOpaqueInterface, Votable {
   ///flutter_rust_bridge:sync,getter
   bool get isCrosspost;
 
+  ///flutter_rust_bridge:sync,getter
   Kind get kind;
 
   @override
   Future<void> save({required Client client});
 
+  ///flutter_rust_bridge:sync,getter
   Thumbnail? get thumbnail;
 
   @override
@@ -256,6 +258,9 @@ abstract class Post implements RustOpaqueInterface, Votable {
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PostID>>
 abstract class PostId implements RustOpaqueInterface {
+  /// flutter_rust_bridge:sync
+  String asString();
+
   static Future<PostId> default_() =>
       RustLib.instance.api.redditApiModelPostPostIdDefault();
 }

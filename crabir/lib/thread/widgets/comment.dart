@@ -7,7 +7,7 @@ import 'package:crabir/html_view.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
-import 'package:crabir/src/rust/api/simple.dart';
+import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/author.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
@@ -98,6 +98,7 @@ class _CommentViewState extends State<CommentView>
     return GestureDetector(
       onLongPress: widget.onLongPress,
       onTap: onTap,
+      behavior: HitTestBehavior.translucent,
       child: AnimatedSize(
         duration: Duration(milliseconds: 200),
         alignment: Alignment.topCenter,
@@ -110,7 +111,12 @@ class _CommentViewState extends State<CommentView>
                 topRow(settings),
                 StyledHtml(
                   htmlContent: comment.bodyHtml,
-                  onLinkTap: defaultLinkHandler,
+                  onLinkTap: (url, attributes, element) => defaultLinkHandler(
+                    context.router,
+                    url,
+                    attributes,
+                    element,
+                  ),
                   showImages: settings.showCommentsImage,
                 ),
                 if (showBottomBar) bottomBar(),

@@ -35,7 +35,6 @@ class Footer extends StatelessWidget {
             onPressed: () => navigateToSubscriptionsTab(
               context,
               ThreadRoute(
-                permalink: post.permalink,
                 post: post,
               ),
             ),

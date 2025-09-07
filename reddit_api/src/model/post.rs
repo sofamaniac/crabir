@@ -35,6 +35,13 @@ pub enum Kind {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PostID(String);
 
+impl PostID {
+    /// flutter_rust_bridge:sync
+    pub fn as_string(&self) -> String {
+        self.0.clone()
+    }
+}
+
 #[serde_as]
 #[derive(
     Default, Debug, Clone, PartialEq, Serialize, Deserialize, CloneGetters, Getters, Setters,

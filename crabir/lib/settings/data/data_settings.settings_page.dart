@@ -43,6 +43,9 @@ class DataSettingsCubit extends HydratedCubit<DataSettings> {
 
   void updateLoadImages(ImageLoading value) =>
       emit(state.copyWith(loadImages: value));
+
+  void updatePreferredQuality(Resolution value) =>
+      emit(state.copyWith(preferredQuality: value));
 }
 
 // SettingsPage for DataSettings

@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';
+import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:flutter/material.dart';
@@ -32,18 +33,37 @@ class SettingsView extends StatelessWidget {
             leading: Icon(Icons.storage),
             title: Text("Data and Storage"),
             onTap: () => AutoRouter.of(context).navigate(DataSettingsRoute()),
-          )
+          ),
+          ListTile(
+            leading: Icon(Icons.filter),
+            title: Text("Content filters"),
+            onTap: () =>
+                AutoRouter.of(context).navigate(FiltersSettingsRoute()),
+          ),
         ],
       ),
     );
   }
 }
 
-List<BlocProvider> initSettingsBlocs() {
-  return [
-    BlocProvider(create: (context) => ThemeBloc()),
-    BlocProvider(create: (context) => CommentsSettingsCubit()),
-    BlocProvider(create: (context) => PostsSettingsCubit()),
-    BlocProvider(create: (context) => DataSettingsCubit()),
-  ];
+class SettingsBlocsProviders extends StatelessWidget {
+  final Widget child;
+  const SettingsBlocsProviders({
+    super.key,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => ThemeBloc()),
+        BlocProvider(create: (_) => CommentsSettingsCubit()),
+        BlocProvider(create: (_) => PostsSettingsCubit()),
+        BlocProvider(create: (_) => DataSettingsCubit()),
+        BlocProvider(create: (_) => FiltersSettingsCubit()),
+      ],
+      child: child,
+    );
+  }
 }

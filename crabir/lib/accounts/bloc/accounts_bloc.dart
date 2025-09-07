@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:crabir/accounts/login.dart';
 import 'package:crabir/accounts/user_account.dart';
-import 'package:crabir/src/rust/api/simple.dart';
+import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

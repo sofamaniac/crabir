@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:app_links/app_links.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/accounts/widgets/account_selector.dart';
@@ -6,6 +9,7 @@ import 'package:crabir/network_status.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';
+import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
@@ -15,10 +19,12 @@ import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/frb_generated.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:http/http.dart' as http;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:crabir/l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Future<void> main() async {
   await RustLib.init();
@@ -43,21 +49,33 @@ Future<void> main() async {
   runApp(Crabir());
 }
 
+void _handleRedditLink(StackRouter router, String url) async {
+  final uri = Uri.parse(url);
+  if (uri.host.contains('reddit.com') || uri.host == 'redd.it') {
+    // Navigate using AutoRoute
+    final Uri destination;
+    if (uri.pathSegments.contains("s")) {
+      destination = await _resolveRedditShortlink(uri);
+    } else {
+      destination = uri;
+    }
+    router.pushPath(destination.toString());
+  } else {
+    // Open in external browser
+    launchUrl(uri);
+  }
+}
+
 class Crabir extends StatelessWidget {
   const Crabir({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => AccountsBloc()..add(Initialize())),
-        //...initSettingsBlocs(),
-        BlocProvider(create: (context) => ThemeBloc()),
-        BlocProvider(create: (context) => CommentsSettingsCubit()),
-        BlocProvider(create: (context) => PostsSettingsCubit()),
-        BlocProvider(create: (context) => DataSettingsCubit()),
-      ],
-      child: TopLevel(),
+    return BlocProvider(
+      create: (context) => AccountsBloc()..add(Initialize()),
+      child: SettingsBlocsProviders(
+        child: TopLevel(),
+      ),
     );
   }
 }
@@ -88,8 +106,33 @@ class TopLevel extends StatelessWidget {
         ),
         cardTheme: CardThemeData(color: theme.cardBackground),
       ),
-      routerConfig: _appRouter.config(),
+      routerConfig: _appRouter.config(deepLinkTransformer: (deepLink) {
+        if (deepLink.path.contains('s')) {
+          // continue with the platform link
+          return _resolveRedditShortlink(deepLink);
+        } else {
+          return SynchronousFuture(deepLink);
+        }
+      }),
     );
+  }
+}
+
+/// Reddit share links (e.g. https://reddit.com/python/s/SOME_ID) are simple redirect.
+Future<Uri> _resolveRedditShortlink(Uri uri) async {
+  print("Resolving shortlink");
+  final client = http.Client();
+  try {
+    final req = http.Request('GET', uri)..followRedirects = false;
+    final resp = await client.send(req);
+
+    final location = resp.headers['location'];
+    if (location != null && location.isNotEmpty) {
+      return uri.resolve(location);
+    }
+    return uri; // no redirect
+  } finally {
+    client.close();
   }
 }
 
@@ -104,6 +147,34 @@ class MainScreenView extends StatefulWidget {
 class _MainScreenViewState extends State<MainScreenView> {
   bool addListener = true;
   bool showingDialog = false;
+  StreamSubscription<Uri?>? _linkSub;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final router =
+        AutoRouter.of(context); // you can also pass router via constructor
+
+    // Subscribe once
+    _linkSub = AppLinks().uriLinkStream.listen((uri) {
+      print("HANDLING LINK");
+      _handleRedditLink(router, uri.toString());
+    });
+
+    // Handle initial link if app was cold-started
+    AppLinks().getInitialLink().then((uri) {
+      if (uri != null) {
+        _handleRedditLink(router, uri.toString());
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _linkSub?.cancel();
+    super.dispose();
+  }
 
   bool showAccountSelectionDialogue(int index) {
     final account = context.read<AccountsBloc>().state.account;
@@ -188,7 +259,6 @@ class _MainScreenViewState extends State<MainScreenView> {
 
               final route = rootRoutes[index];
               if (route != null) {
-                print("REPLACEING ROUTE");
                 tabsRouter.stackRouterOfIndex(index)!.popUntilRoot();
                 tabsRouter.stackRouterOfIndex(index)?.replaceAll([route]);
               }

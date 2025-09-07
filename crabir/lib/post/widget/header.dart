@@ -35,8 +35,7 @@ class Header extends StatelessWidget {
     );
     if (settings.clickableCommunity) {
       return InkWell(
-        onTap: () => navigateToSubscriptionsTab(
-          context,
+        onTap: () => context.router.root.navigate(
           FeedRoute(
             feed: Feed.subreddit(name),
           ),

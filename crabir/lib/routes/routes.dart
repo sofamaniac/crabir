@@ -7,6 +7,7 @@ import 'package:crabir/post/widget/gallery.dart';
 import 'package:crabir/search_posts/widgets/search.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';
+import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
@@ -83,11 +84,13 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: CommentsSettingsRoute.page),
         AutoRoute(page: PostsSettingsRoute.page),
         AutoRoute(page: DataSettingsRoute.page),
+        AutoRoute(page: FiltersSettingsRoute.page),
       ];
 }
 
 /// Route with swipe to go back
 final threadRoute = CustomRoute(
+  path: "/r/:subreddit/comments/:id/:title",
   page: ThreadRoute.page,
   customRouteBuilder: <T>(
     BuildContext context,
@@ -104,7 +107,6 @@ final threadRoute = CustomRoute(
     } else {
       return PageRouteBuilder<T>(
         fullscreenDialog: page.fullscreenDialog,
-        // this is important
         settings: page,
         pageBuilder: (_, __, ___) => child,
       );

@@ -13,21 +13,12 @@ pub struct Gallery {
 
 impl Gallery {
     /// flutter_rust_bridge:sync
-    pub fn get(&self, index: u32) -> Source {
-        // TODO: support for resolution, and obfuscation
+    pub fn get(&self, index: u32) -> Option<GalleryMedia> {
         let id = &self.gallery_data.items[index as usize];
-        if let MediaMetadata::Media(GalleryMedia { source, .. }) =
-            self.media_metadata.get(&id.media_id).unwrap()
-        {
-            source.clone()
+        if let Some(MediaMetadata::Media(media)) = self.media_metadata.get(&id.media_id) {
+            Some(media.clone())
         } else {
-            Source::Image {
-                source: Image {
-                    u: "none".to_string(),
-                    x: 0,
-                    y: 0,
-                },
-            }
+            None
         }
     }
 
@@ -66,16 +57,17 @@ pub struct MediaId {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "status")]
+/// flutter_rust_bridge:non_opaque
 pub struct GalleryMedia {
     #[serde(rename = "m")]
     /// A string like "image/jpg", or "image/gif"
     pub media_type: String,
     #[serde(rename = "s", flatten)]
-    source: Source,
+    pub source: Source,
     #[serde(rename = "p")]
-    previews: Vec<Image>,
+    pub previews: Vec<Image>,
     #[serde(rename = "o", default)]
-    obfuscated: Vec<Image>,
+    pub obfuscated: Vec<Image>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

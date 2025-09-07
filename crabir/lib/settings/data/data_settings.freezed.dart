@@ -31,6 +31,8 @@ mixin _$DataSettings {
   @Category(name: "Images")
   @Setting(widget: ImageLoadingSelect)
   ImageLoading get loadImages;
+  @Setting()
+  Resolution get preferredQuality;
 
   /// Create a copy of DataSettings
   /// with the given fields replaced by the non-null parameter values.
@@ -61,17 +63,27 @@ mixin _$DataSettings {
             (identical(other.maximumQuality, maximumQuality) ||
                 other.maximumQuality == maximumQuality) &&
             (identical(other.loadImages, loadImages) ||
-                other.loadImages == loadImages));
+                other.loadImages == loadImages) &&
+            (identical(other.preferredQuality, preferredQuality) ||
+                other.preferredQuality == preferredQuality));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, mobileDataSaver, wifiDataSaver,
-      autoplay, videoQuality, minimumQuality, maximumQuality, loadImages);
+  int get hashCode => Object.hash(
+      runtimeType,
+      mobileDataSaver,
+      wifiDataSaver,
+      autoplay,
+      videoQuality,
+      minimumQuality,
+      maximumQuality,
+      loadImages,
+      preferredQuality);
 
   @override
   String toString() {
-    return 'DataSettings(mobileDataSaver: $mobileDataSaver, wifiDataSaver: $wifiDataSaver, autoplay: $autoplay, videoQuality: $videoQuality, minimumQuality: $minimumQuality, maximumQuality: $maximumQuality, loadImages: $loadImages)';
+    return 'DataSettings(mobileDataSaver: $mobileDataSaver, wifiDataSaver: $wifiDataSaver, autoplay: $autoplay, videoQuality: $videoQuality, minimumQuality: $minimumQuality, maximumQuality: $maximumQuality, loadImages: $loadImages, preferredQuality: $preferredQuality)';
   }
 }
 
@@ -94,7 +106,8 @@ abstract mixin class $DataSettingsCopyWith<$Res> {
       @Setting() Resolution maximumQuality,
       @Category(name: "Images")
       @Setting(widget: ImageLoadingSelect)
-      ImageLoading loadImages});
+      ImageLoading loadImages,
+      @Setting() Resolution preferredQuality});
 }
 
 /// @nodoc
@@ -116,6 +129,7 @@ class _$DataSettingsCopyWithImpl<$Res> implements $DataSettingsCopyWith<$Res> {
     Object? minimumQuality = null,
     Object? maximumQuality = null,
     Object? loadImages = null,
+    Object? preferredQuality = null,
   }) {
     return _then(_self.copyWith(
       mobileDataSaver: null == mobileDataSaver
@@ -146,6 +160,10 @@ class _$DataSettingsCopyWithImpl<$Res> implements $DataSettingsCopyWith<$Res> {
           ? _self.loadImages
           : loadImages // ignore: cast_nullable_to_non_nullable
               as ImageLoading,
+      preferredQuality: null == preferredQuality
+          ? _self.preferredQuality
+          : preferredQuality // ignore: cast_nullable_to_non_nullable
+              as Resolution,
     ));
   }
 }
@@ -256,7 +274,8 @@ extension DataSettingsPatterns on DataSettings {
             @Setting() Resolution maximumQuality,
             @Category(name: "Images")
             @Setting(widget: ImageLoadingSelect)
-            ImageLoading loadImages)?
+            ImageLoading loadImages,
+            @Setting() Resolution preferredQuality)?
         $default, {
     required TResult orElse(),
   }) {
@@ -270,7 +289,8 @@ extension DataSettingsPatterns on DataSettings {
             _that.videoQuality,
             _that.minimumQuality,
             _that.maximumQuality,
-            _that.loadImages);
+            _that.loadImages,
+            _that.preferredQuality);
       case _:
         return orElse();
     }
@@ -304,7 +324,8 @@ extension DataSettingsPatterns on DataSettings {
             @Setting() Resolution maximumQuality,
             @Category(name: "Images")
             @Setting(widget: ImageLoadingSelect)
-            ImageLoading loadImages)
+            ImageLoading loadImages,
+            @Setting() Resolution preferredQuality)
         $default,
   ) {
     final _that = this;
@@ -317,7 +338,8 @@ extension DataSettingsPatterns on DataSettings {
             _that.videoQuality,
             _that.minimumQuality,
             _that.maximumQuality,
-            _that.loadImages);
+            _that.loadImages,
+            _that.preferredQuality);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -350,7 +372,8 @@ extension DataSettingsPatterns on DataSettings {
             @Setting() Resolution maximumQuality,
             @Category(name: "Images")
             @Setting(widget: ImageLoadingSelect)
-            ImageLoading loadImages)?
+            ImageLoading loadImages,
+            @Setting() Resolution preferredQuality)?
         $default,
   ) {
     final _that = this;
@@ -363,7 +386,8 @@ extension DataSettingsPatterns on DataSettings {
             _that.videoQuality,
             _that.minimumQuality,
             _that.maximumQuality,
-            _that.loadImages);
+            _that.loadImages,
+            _that.preferredQuality);
       case _:
         return null;
     }
@@ -386,7 +410,8 @@ class _DataSettings extends DataSettings {
       @Setting() this.maximumQuality = Resolution.source,
       @Category(name: "Images")
       @Setting(widget: ImageLoadingSelect)
-      this.loadImages = ImageLoading.always})
+      this.loadImages = ImageLoading.always,
+      @Setting() this.preferredQuality = Resolution.source})
       : super._();
   factory _DataSettings.fromJson(Map<String, dynamic> json) =>
       _$DataSettingsFromJson(json);
@@ -422,6 +447,10 @@ class _DataSettings extends DataSettings {
   @Category(name: "Images")
   @Setting(widget: ImageLoadingSelect)
   final ImageLoading loadImages;
+  @override
+  @JsonKey()
+  @Setting()
+  final Resolution preferredQuality;
 
   /// Create a copy of DataSettings
   /// with the given fields replaced by the non-null parameter values.
@@ -456,17 +485,27 @@ class _DataSettings extends DataSettings {
             (identical(other.maximumQuality, maximumQuality) ||
                 other.maximumQuality == maximumQuality) &&
             (identical(other.loadImages, loadImages) ||
-                other.loadImages == loadImages));
+                other.loadImages == loadImages) &&
+            (identical(other.preferredQuality, preferredQuality) ||
+                other.preferredQuality == preferredQuality));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, mobileDataSaver, wifiDataSaver,
-      autoplay, videoQuality, minimumQuality, maximumQuality, loadImages);
+  int get hashCode => Object.hash(
+      runtimeType,
+      mobileDataSaver,
+      wifiDataSaver,
+      autoplay,
+      videoQuality,
+      minimumQuality,
+      maximumQuality,
+      loadImages,
+      preferredQuality);
 
   @override
   String toString() {
-    return 'DataSettings(mobileDataSaver: $mobileDataSaver, wifiDataSaver: $wifiDataSaver, autoplay: $autoplay, videoQuality: $videoQuality, minimumQuality: $minimumQuality, maximumQuality: $maximumQuality, loadImages: $loadImages)';
+    return 'DataSettings(mobileDataSaver: $mobileDataSaver, wifiDataSaver: $wifiDataSaver, autoplay: $autoplay, videoQuality: $videoQuality, minimumQuality: $minimumQuality, maximumQuality: $maximumQuality, loadImages: $loadImages, preferredQuality: $preferredQuality)';
   }
 }
 
@@ -491,7 +530,8 @@ abstract mixin class _$DataSettingsCopyWith<$Res>
       @Setting() Resolution maximumQuality,
       @Category(name: "Images")
       @Setting(widget: ImageLoadingSelect)
-      ImageLoading loadImages});
+      ImageLoading loadImages,
+      @Setting() Resolution preferredQuality});
 }
 
 /// @nodoc
@@ -514,6 +554,7 @@ class __$DataSettingsCopyWithImpl<$Res>
     Object? minimumQuality = null,
     Object? maximumQuality = null,
     Object? loadImages = null,
+    Object? preferredQuality = null,
   }) {
     return _then(_DataSettings(
       mobileDataSaver: null == mobileDataSaver
@@ -544,6 +585,10 @@ class __$DataSettingsCopyWithImpl<$Res>
           ? _self.loadImages
           : loadImages // ignore: cast_nullable_to_non_nullable
               as ImageLoading,
+      preferredQuality: null == preferredQuality
+          ? _self.preferredQuality
+          : preferredQuality // ignore: cast_nullable_to_non_nullable
+              as Resolution,
     ));
   }
 }

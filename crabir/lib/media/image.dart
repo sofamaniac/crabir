@@ -16,17 +16,27 @@ class ImageThumbnail extends StatelessWidget {
     this.height,
   });
 
-  static ImageThumbnail redditImage(
+  factory ImageThumbnail.redditImage(
     RedditImage image, {
     Resolution resolution = Resolution.source,
     bool blur = false,
   }) {
+    final variants = image.variants.nsfw ?? image.variants.obfuscated;
+    final List<ImageBase> resolutions;
+    final ImageBase source;
+    if (variants != null && blur) {
+      resolutions = variants.resolutions;
+      source = variants.source;
+    } else {
+      resolutions = image.resolutions;
+      source = image.source;
+    }
     final length = image.resolutions.length;
     final ImageBase imageBase = switch (resolution) {
-      Resolution.source => image.source,
-      Resolution.high => image.resolutions[length - 2],
-      Resolution.medium => image.resolutions[(length / 2).toInt()],
-      Resolution.low => image.resolutions[0],
+      Resolution.source => source,
+      Resolution.high => resolutions[length - 2],
+      Resolution.medium => resolutions[(length / 2).toInt()],
+      Resolution.low => resolutions[0],
     };
     return ImageThumbnail(
       imageUrl: imageBase.url,
@@ -47,12 +57,13 @@ class ImageThumbnail extends StatelessWidget {
 
   static ImageThumbnail fromGalleryImage(
     gallery.Image image, {
-    int maxLines = 2,
+    String? placeholderUrl,
   }) {
     return ImageThumbnail(
       imageUrl: image.u,
       width: image.x,
       height: image.y,
+      placeholderUrl: placeholderUrl,
     );
   }
 

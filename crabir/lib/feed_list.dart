@@ -32,7 +32,7 @@ class SubredditTile extends StatelessWidget {
         }
         navigateToSubscriptionsTab(context, destination);
       },
-      leading: SubredditIcon(icon: sub.icon, radius: 16),
+      leading: SubredditIcon(icon: sub.icon, radius: 12),
       title: Text(
         sub.other.displayNamePrefixed,
         style: Theme.of(context).textTheme.bodyMedium,
@@ -69,7 +69,7 @@ class MultiRedditTile extends StatelessWidget {
         navigateToSubscriptionsTab(context, destination);
       },
       leading: CircleAvatar(
-        radius: 16,
+        radius: 12,
         foregroundImage: NetworkImage(multi.iconUrl),
       ),
       title: Text(

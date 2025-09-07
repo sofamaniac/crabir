@@ -132,10 +132,6 @@ class $className extends StatelessWidget {
   String widget(ParameterElement param, Element element) {
     final setting = TypeChecker.fromRuntime(Setting).firstAnnotationOf(param);
     if (setting == null) {
-      // throw InvalidGenerationSourceError(
-      //   'Constructor parameter `${param.name}` in `${element.name}` must have a @Setting annotation.',
-      //   element: param,
-      // );
       return 'ListTile(title: Text("TODO: ${param.name}")),';
     }
     String tempTitle = "";

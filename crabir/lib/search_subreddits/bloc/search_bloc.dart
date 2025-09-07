@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:crabir/src/rust/api/simple.dart';
+import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart';

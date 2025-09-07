@@ -7,7 +7,7 @@ import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
-import 'package:crabir/src/rust/api/simple.dart';
+import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
@@ -180,7 +180,9 @@ class _FeedViewBodyState extends State<FeedViewBody>
         );
       },
       onTap: () => context.router.navigate(
-        ThreadRoute(permalink: post.permalink, post: post),
+        ThreadRoute(
+          post: post,
+        ),
       ),
     );
   }

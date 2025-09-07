@@ -4,7 +4,7 @@ import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/sort.dart';
-import 'package:crabir/src/rust/api/simple.dart';
+import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -30,9 +30,18 @@ final commentSorts = [
 
 @RoutePage(name: "ThreadRoute")
 class Thread extends StatelessWidget {
-  final String permalink;
   final Post? post;
-  const Thread({super.key, required this.permalink, this.post});
+  final String permalink;
+
+  /// requires either `subreddit, postID, postTitle` to be set or `post`.
+  Thread({
+    super.key,
+    @PathParam("subreddit") String? subreddit,
+    @PathParam("id") String? postID,
+    @PathParam("title") String? postTitle,
+    this.post,
+  }) : permalink =
+            post?.permalink ?? "/r/$subreddit/comments/$postID/$postTitle";
 
   Widget appBar(BuildContext context, ThreadBloc bloc) {
     return SliverAppBar(
