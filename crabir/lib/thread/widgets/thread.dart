@@ -13,6 +13,7 @@ import 'package:crabir/thread/widgets/comment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:crabir/l10n/app_localizations.dart';
 
 part 'thread_entry.dart';
 part 'comments_list.dart';

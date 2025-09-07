@@ -28,6 +28,17 @@
   "loginButtonLabel": "Add an account",
   "logoutButtonLabel": "Logout",
 
+  "loadMoreComments": "{n, plural, =1{Load 1 comment} other{Load {n} comments}}",
+  "@loadMoreComments": {
+    "description": "Label for load more button",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+
   "postSearchBar": "Search posts",
   "subredditsSearchBar": "Search communities",
 

@@ -238,6 +238,12 @@ abstract class AppLocalizations {
   /// **'Logout'**
   String get logoutButtonLabel;
 
+  /// Label for load more button
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{Load 1 comment} other{Load {n} comments}}'**
+  String loadMoreComments(int n);
+
   /// No description provided for @postSearchBar.
   ///
   /// In en, this message translates to:

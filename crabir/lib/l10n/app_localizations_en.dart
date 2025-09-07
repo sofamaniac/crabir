@@ -81,6 +81,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logoutButtonLabel => 'Logout';
 
   @override
+  String loadMoreComments(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Load $n comments',
+      one: 'Load 1 comment',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get postSearchBar => 'Search posts';
 
   @override

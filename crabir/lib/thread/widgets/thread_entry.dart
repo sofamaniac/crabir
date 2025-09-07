@@ -8,6 +8,7 @@ class ThreadEntry extends StatelessWidget {
   Widget build(BuildContext context) {
     final thread = context.watch<ThreadBloc>();
     final theme = context.watch<ThemeBloc>().state;
+    final locales = AppLocalizations.of(context);
     final inner = switch (comment) {
       Thing_Comment(field0: final comment) => IndentedBox(
           depth: comment.depth,
@@ -25,7 +26,7 @@ class ThreadEntry extends StatelessWidget {
           child: TextButton(
             onPressed: () => thread.add(LoadMore(comment as Thing_More)),
             child: Text(
-              "Load more comments ($count)",
+              locales.loadMoreComments(count),
               style: TextStyle(color: theme.primaryColor),
             ),
           ),
