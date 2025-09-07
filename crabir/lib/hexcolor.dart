@@ -39,7 +39,7 @@ extension StringToColorNull on String? {
 extension HexColor on Color {
   /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
   static Color fromHex(String hexString) {
-    final _log = Logger("HexColor");
+    final log = Logger("HexColor");
     if (hexString.isEmpty) {
       return Colors.black;
     }
@@ -49,7 +49,7 @@ extension HexColor on Color {
     try {
       return Color(int.parse(buffer.toString(), radix: 16));
     } catch (e) {
-      _log.warning("Failed to parse $hexString ($e)");
+      log.warning("Failed to parse $hexString ($e)");
       return Color(0x00000000);
     }
   }

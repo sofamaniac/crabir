@@ -7,10 +7,6 @@ import 'package:crabir/accounts/widgets/account_selector.dart';
 import 'package:crabir/drawer/drawer.dart';
 import 'package:crabir/network_status.dart';
 import 'package:crabir/routes/routes.dart';
-import 'package:crabir/settings/comments/comments_settings.dart';
-import 'package:crabir/settings/data/data_settings.dart';
-import 'package:crabir/settings/filters/filters_settings.dart';
-import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/tabs_index.dart';
@@ -120,7 +116,6 @@ class TopLevel extends StatelessWidget {
 
 /// Reddit share links (e.g. https://reddit.com/python/s/SOME_ID) are simple redirect.
 Future<Uri> _resolveRedditShortlink(Uri uri) async {
-  print("Resolving shortlink");
   final client = http.Client();
   try {
     final req = http.Request('GET', uri)..followRedirects = false;
@@ -158,7 +153,6 @@ class _MainScreenViewState extends State<MainScreenView> {
 
     // Subscribe once
     _linkSub = AppLinks().uriLinkStream.listen((uri) {
-      print("HANDLING LINK");
       _handleRedditLink(router, uri.toString());
     });
 
