@@ -66,6 +66,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sortRandom => 'Random';
 
   @override
+  String get feedHome => 'Home';
+
+  @override
+  String get feedAll => 'All';
+
+  @override
+  String get feedPopular => 'Popular';
+
+  @override
   String get loginButtonLabel => 'Add an account';
 
   @override

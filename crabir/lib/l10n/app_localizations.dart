@@ -208,6 +208,24 @@ abstract class AppLocalizations {
   /// **'Random'**
   String get sortRandom;
 
+  /// No description provided for @feedHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get feedHome;
+
+  /// No description provided for @feedAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get feedAll;
+
+  /// No description provided for @feedPopular.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular'**
+  String get feedPopular;
+
   /// No description provided for @loginButtonLabel.
   ///
   /// In en, this message translates to:

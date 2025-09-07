@@ -21,6 +21,10 @@
   "sortLive": "Live",
   "sortRandom": "Random",
 
+  "feedHome": "Home",
+  "feedAll" : "All",
+  "feedPopular": "Popular",
+
   "loginButtonLabel": "Add an account",
   "logoutButtonLabel": "Logout",
 
