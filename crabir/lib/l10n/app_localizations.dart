@@ -274,6 +274,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1 {{count}s} other {{count}s}}'**
   String secondsAgo(int count);
 
+  /// No description provided for @comments.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get comments;
+
   /// Label for load more button
   ///
   /// In en, this message translates to:

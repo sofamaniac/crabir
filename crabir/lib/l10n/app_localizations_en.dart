@@ -147,6 +147,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get comments => 'Comments';
+
+  @override
   String loadMoreComments(int n) {
     String _temp0 = intl.Intl.pluralLogic(
       n,

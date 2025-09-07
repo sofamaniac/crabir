@@ -45,12 +45,12 @@ class Thread extends StatelessWidget {
             post?.permalink ?? "/r/$subreddit/comments/$postID/$postTitle";
 
   Widget appBar(BuildContext context, ThreadBloc bloc) {
+    final locales = AppLocalizations.of(context);
     return SliverAppBar(
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // TODO: localization
-          Text("Comments"),
+          Text(locales.comments),
           Text(
             (bloc.state.sort ??
                     bloc.state.post?.suggestedSort ??
