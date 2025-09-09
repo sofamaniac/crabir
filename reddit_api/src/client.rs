@@ -1,7 +1,8 @@
 use crate::model::feed::{self, Feed};
 use crate::model::flair::Flair;
 use crate::model::multi::{Multi, MultiStream};
-use crate::model::{Fullname, Post, comment};
+use crate::model::subreddit::{Subreddit, SubredditInfo};
+use crate::model::{Fullname, Post, comment, subreddit};
 use crate::result::Result;
 use crate::search::{PostSearchSort, SearchPost, SearchSubreddit, SubredditSearchSort};
 use crate::streamable::Streamable;
@@ -22,6 +23,7 @@ use serde::{
     Deserialize,
     de::{DeserializeOwned, Error as _},
 };
+use std::sync::RwLock;
 use uuid::Uuid;
 
 use crate::{
@@ -35,8 +37,8 @@ const CLIENT_ID: &str = dotenv_codegen::dotenv!("REDDIT_API_KEY");
 #[derive(Clone, Debug)]
 pub struct Client {
     http: reqwest::Client,
-    refresh_token: Arc<Mutex<Option<String>>>,
-    current_access_token: Arc<Mutex<Option<String>>>,
+    refresh_token: Arc<RwLock<Option<String>>>,
+    current_access_token: Arc<RwLock<Option<String>>>,
 }
 
 impl Default for Client {
@@ -96,8 +98,8 @@ impl Client {
     pub fn new_anonymous() -> Self {
         Self {
             http: Self::new_reqwest_client(),
-            refresh_token: Arc::new(Mutex::new(None)),
-            current_access_token: Arc::new(Mutex::new(None)),
+            refresh_token: Arc::new(RwLock::new(None)),
+            current_access_token: Arc::new(RwLock::new(None)),
         }
     }
     /// Create a new client that is authenticated
@@ -105,8 +107,8 @@ impl Client {
     pub fn from_refresh_token(refresh_token: String) -> Self {
         Self {
             http: Self::new_reqwest_client(),
-            refresh_token: Arc::new(Mutex::new(Some(refresh_token))),
-            current_access_token: Arc::new(Mutex::new(Some(String::new()))),
+            refresh_token: Arc::new(RwLock::new(Some(refresh_token))),
+            current_access_token: Arc::new(RwLock::new(Some(String::new()))),
         }
     }
 
@@ -116,8 +118,8 @@ impl Client {
 
     /// Authenticate the current client
     pub async fn authenticate(&self, refresh_token: String) {
-        *self.refresh_token.lock().await = Some(refresh_token);
-        *self.current_access_token.lock().await = Some(String::new());
+        *self.refresh_token.write().unwrap() = Some(refresh_token);
+        *self.current_access_token.write().unwrap() = Some(String::new());
     }
 }
 
@@ -179,9 +181,9 @@ pub(crate) async fn parse_response<T: DeserializeOwned>(response: reqwest::Respo
                     error!("Error while parsing {e}");
                     error!(
                         "Context column ({} to {}): {}",
-                        e.column().saturating_sub(2000),
+                        e.column().saturating_sub(1000),
                         e.column().saturating_add(1000),
-                        &text[e.column().saturating_sub(2000)..e.column().saturating_add(1000)]
+                        &text[e.column().saturating_sub(1000)..e.column().saturating_add(1000)]
                     );
                     Err(Error::Parsing {
                         source: serde_json::Error::custom(format!(
@@ -198,6 +200,14 @@ pub(crate) async fn parse_response<T: DeserializeOwned>(response: reqwest::Respo
     }
 }
 
+pub(crate) async fn parse_thing<T>(response: reqwest::Response) -> Result<T>
+where
+    T: TryFrom<Thing, Error = Error>,
+{
+    let thing: Thing = parse_response(response).await?;
+    thing.try_into()
+}
+
 impl Client {
     pub(crate) fn get(&self, url: impl IntoUrl) -> RequestBuilder {
         self.http.get(url).query(&[("raw_json", "1")])
@@ -212,7 +222,8 @@ impl Client {
         struct Claims {
             exp: f64,
         }
-        if let Some(token) = &*self.current_access_token.lock().await {
+        let token = self.current_access_token.read().unwrap().clone();
+        if let Some(token) = token {
             let parts: Vec<&str> = token.splitn(3, '.').collect();
             // The token is not valid
             if parts.len() < 3 {
@@ -269,7 +280,7 @@ impl Client {
         }
         let response = self.http.execute(request).await?;
         let response: Response = parse_response(response).await?;
-        *self.current_access_token.lock().await = Some(response.access_token);
+        *self.current_access_token.write().unwrap() = Some(response.access_token);
         info!("[CLIENT] Anonymous token created.");
         Ok(())
     }
@@ -281,7 +292,8 @@ impl Client {
             access_token: String,
         }
         info!("[CLIENT] Refreshing token");
-        let refresh_token = match &*self.refresh_token.lock().await {
+        let refresh_token = self.refresh_token.read().unwrap().clone();
+        let refresh_token = match refresh_token {
             None => return Ok(()),
             Some(token) => token.clone(),
         };
@@ -301,13 +313,13 @@ impl Client {
         debug!("{request:#?}");
         let response = self.http.execute(request).await?;
         let response: Response = parse_response(response).await?;
-        *self.current_access_token.lock().await = Some(response.access_token);
+        *self.current_access_token.write().unwrap() = Some(response.access_token);
         info!("[CLIENT] Token has been refreshed.");
         Ok(())
     }
 
     pub async fn logout(&self) -> Result<()> {
-        let access_token = (*self.current_access_token.lock().await).clone();
+        let access_token = self.current_access_token.read().unwrap().clone();
         if let Some(access_token) = access_token {
             let url = self
                 .base_url()
@@ -342,7 +354,8 @@ impl Client {
             self.refresh_token().await?;
         }
         let request = if self.is_access_token_valid().await {
-            if let Some(access_token) = &*self.current_access_token.lock().await {
+            let access_token = self.current_access_token.read().unwrap().clone();
+            if let Some(access_token) = access_token {
                 request.bearer_auth(access_token)
             } else {
                 request.basic_auth::<&str, &str>(CLIENT_ID, None)
@@ -351,11 +364,10 @@ impl Client {
             request
         };
         debug!("Executing {request:#?}");
-        let res = self
-            .http
-            .execute(request.build().expect("Building request should not fail"))
-            .await?;
-        debug!("Done with request.");
+        let request = request.build().expect("Building request should not fail");
+        let url = request.url().clone();
+        let res = self.http.clone().execute(request).await?;
+        debug!("Done with request. {url:#?}");
         res.error_for_status().map_err(Into::into)
     }
 
@@ -494,7 +506,7 @@ impl Client {
     /// Get the list of all subreddits the current user is subscribed to.
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
-    pub async fn subsriptions(&self) -> Result<Vec<crate::model::subreddit::Subreddit>> {
+    pub async fn subscriptions(&self) -> Result<Vec<crate::model::subreddit::Subreddit>> {
         let base_url = self.base_url();
         let url = base_url
             .join("subreddits/mine/subscriber.json")
@@ -671,5 +683,16 @@ impl Client {
     ///flutter_rust_bridge:sync
     pub fn search_subreddits(&self, query: String, sort: SubredditSearchSort) -> Streamable {
         Streamable::new(Box::new(SearchSubreddit::new(self.clone(), query, sort)))
+    }
+
+    /// Get info on subreddit at 'r/`subreddit`/about'.
+    pub async fn subreddit_about(&self, subreddit: String) -> Result<Subreddit> {
+        let url = self
+            .base_url()
+            .join(&format!("r/{subreddit}/about.json"))
+            .expect("Should not fail.");
+        let request = self.get(url);
+        let response = self.execute(request).await?;
+        parse_thing(response).await
     }
 }
