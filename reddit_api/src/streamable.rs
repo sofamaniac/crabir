@@ -1,3 +1,4 @@
+use flutter_rust_bridge::{DartFnFuture, frb};
 use futures::lock::Mutex;
 
 use crate::{
@@ -18,16 +19,43 @@ pub(crate) mod stream {
     }
 }
 
+struct CallbackHandler {
+    // The closures are `Send + Sync` so the whole struct can be too.
+    callbacks: Vec<Box<dyn Fn(Vec<Thing>) -> DartFnFuture<()> + Send + Sync>>,
+}
+
+impl CallbackHandler {
+    fn new() -> Self {
+        Self {
+            callbacks: Vec::new(),
+        }
+    }
+
+    fn push<F>(&mut self, f: F)
+    where
+        F: Fn(Vec<Thing>) -> DartFnFuture<()> + Send + Sync + 'static,
+    {
+        self.callbacks.push(Box::new(f));
+    }
+
+    async fn run_all(&self, input: Vec<Thing>) {
+        for cb in &self.callbacks {
+            cb(input.clone()).await;
+        }
+    }
+}
+
 pub trait IntoStream: IntoStreamPrivate<Output = Thing> + Send + Sync {}
 
 impl<T: IntoStreamPrivate<Output = Thing> + Send + Sync> IntoStream for T {}
 
-/// flutter_rust_bridge:opaque
+#[frb(opaque)]
 pub struct Streamable {
     listing: Box<dyn IntoStream>,
     things: Vec<Thing>,
     done: Mutex<bool>,
     stream: Mutex<BoxStream<'static, Result<Thing>>>,
+    callbacks: CallbackHandler,
 }
 
 impl Streamable {
@@ -37,14 +65,15 @@ impl Streamable {
             listing,
             things: Vec::new(),
             done: false.into(),
+            callbacks: CallbackHandler::new(),
         }
     }
 
     pub async fn refresh(&mut self) {
+        self.things.clear();
+        self.update_listeners().await;
         let mut stream = self.stream.lock().await;
         *stream = self.listing.to_stream();
-        //let mut things = self.things.lock().await;
-        self.things.clear();
         let mut done = self.done.lock().await;
         *done = false;
     }
@@ -60,10 +89,12 @@ impl Streamable {
         if let Some(next) = stream.next().await {
             //let mut things = self.things.lock().await;
             self.things.push(next?);
+            self.update_listeners().await;
             Ok(true)
         } else {
             let mut done = self.done.lock().await;
             *done = true;
+            self.update_listeners().await;
             Ok(false)
         }
     }
@@ -128,5 +159,16 @@ impl Streamable {
             _ => (),
         };
         Ok(())
+    }
+
+    pub fn add_listener(
+        &mut self,
+        callback: impl Fn(Vec<Thing>) -> DartFnFuture<()> + Send + Sync + 'static,
+    ) {
+        self.callbacks.push(callback);
+    }
+
+    async fn update_listeners(&self) {
+        self.callbacks.run_all(self.things.clone()).await;
     }
 }

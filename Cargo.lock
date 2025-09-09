@@ -1359,6 +1359,7 @@ dependencies = [
  "dotenv",
  "dotenv_codegen",
  "env_logger",
+ "flutter_rust_bridge",
  "futures",
  "getset",
  "log",
