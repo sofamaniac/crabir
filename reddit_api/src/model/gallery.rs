@@ -75,6 +75,8 @@ pub struct GalleryMedia {
 pub enum MediaMetadata {
     #[serde(rename = "valid")]
     Media(GalleryMedia),
+    #[serde(rename = "failed")]
+    Failed,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
