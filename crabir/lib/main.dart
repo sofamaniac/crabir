@@ -5,6 +5,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/accounts/widgets/account_selector.dart';
 import 'package:crabir/drawer/drawer.dart';
+import 'package:crabir/media/media.dart';
 import 'package:crabir/network_status.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/settings.dart';
@@ -245,8 +246,13 @@ class _MainScreenViewState extends State<MainScreenView> {
           }
         }
 
+        void disableVideoOnChange() {
+          AnimatedContentController.currentlyPlaying.value = null;
+        }
+
         if (addListener) {
           tabController.addListener(listener);
+          tabController.addListener(disableVideoOnChange);
           addListener = false;
         }
 
