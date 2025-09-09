@@ -1,4 +1,3 @@
-pub mod media;
 pub mod reddit_api;
 
 #[flutter_rust_bridge::frb(init)]
