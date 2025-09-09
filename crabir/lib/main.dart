@@ -144,19 +144,22 @@ class _MainScreenViewState extends State<MainScreenView> {
   bool showingDialog = false;
   StreamSubscription<Uri?>? _linkSub;
 
+  // Scaffold key to control the drawers
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  Widget? _endDrawer; // dynamic end drawer
+
   @override
   void initState() {
     super.initState();
 
-    final router =
-        AutoRouter.of(context); // you can also pass router via constructor
+    final router = AutoRouter.of(context);
 
-    // Subscribe once
+    // Subscribe to app links
     _linkSub = AppLinks().uriLinkStream.listen((uri) {
       _handleRedditLink(router, uri.toString());
     });
 
-    // Handle initial link if app was cold-started
+    // Handle initial link
     AppLinks().getInitialLink().then((uri) {
       if (uri != null) {
         _handleRedditLink(router, uri.toString());
@@ -177,17 +180,13 @@ class _MainScreenViewState extends State<MainScreenView> {
   }
 
   void _showLoginDialog(BuildContext context) async {
-    if (showingDialog) {
-      return;
-    }
+    if (showingDialog) return;
     showingDialog = true;
     await showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text("Login Required"),
-        content: AccountSelector(
-          showCurrentAccount: false,
-        ),
+        content: AccountSelector(showCurrentAccount: false),
         actions: [
           TextButton(
             child: const Text("Cancel"),
@@ -199,10 +198,27 @@ class _MainScreenViewState extends State<MainScreenView> {
     showingDialog = false;
   }
 
+  // -------- Dynamic End Drawer API --------
+  void setEndDrawer(Widget? drawer) {
+    setState(() => _endDrawer = drawer);
+  }
+
+  void openEndDrawer(Widget drawer) {
+    setEndDrawer(drawer);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _scaffoldKey.currentState?.openEndDrawer(),
+    );
+  }
+
+  void closeEndDrawer() {
+    _scaffoldKey.currentState?.closeEndDrawer();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<ThemeBloc>().state;
     final _ = context.watch<AccountsBloc>().state.account;
+
     final routes = <PageRouteInfo>[
       NamedRoute(homeRouteName),
       SearchSubredditsRoute(),
@@ -210,19 +226,19 @@ class _MainScreenViewState extends State<MainScreenView> {
       InboxRoute(),
       UserRoute(),
     ];
+
     return AutoTabsRouter.tabBar(
       homeIndex: 0,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       routes: routes,
       builder: (context, child, tabController) {
+        // -------- Tab change listener --------
         void listener() {
           final index = tabController.index;
           if (showAccountSelectionDialogue(index) &&
               tabController.indexIsChanging &&
               tabController.index > tabController.previousIndex) {
-            // reset to previous tab
             tabController.index = tabController.previousIndex;
-
             WidgetsBinding.instance.addPostFrameCallback(
               (_) => _showLoginDialog(context),
             );
@@ -235,38 +251,207 @@ class _MainScreenViewState extends State<MainScreenView> {
         }
 
         final tabsRouter = AutoTabsRouter.of(context);
-        return Scaffold(
-          backgroundColor: theme.background,
-          body: child,
-          drawer: AppDrawer(),
-          bottomNavigationBar: TabBar(
-            labelColor: Theme.of(context).primaryTextTheme.bodyLarge!.color,
-            indicatorColor: theme.primaryColor,
-            controller: tabController,
-            onTap: (index) {
-              tabsRouter.setActiveIndex(index);
-              final rootRoutes = {
-                subscriptionsIndex: const SubscriptionsTabRoute(),
-                searchIndex: const SearchSubredditsRoute(),
-                profileIndex: UserRoute(),
-              };
 
-              final route = rootRoutes[index];
-              if (route != null) {
-                tabsRouter.stackRouterOfIndex(index)!.popUntilRoot();
-                tabsRouter.stackRouterOfIndex(index)?.replaceAll([route]);
-              }
-            },
-            tabs: [
-              Tab(icon: Icon(Icons.home)),
-              Tab(icon: Icon(Icons.search)),
-              Tab(icon: Icon(Icons.list)),
-              Tab(icon: Icon(Icons.mail)),
-              Tab(icon: Icon(Icons.person)),
-            ],
+        // -------- Single Scaffold with dynamic end drawer --------
+        return DrawerHost(
+          setEndDrawer: setEndDrawer,
+          openEndDrawer: openEndDrawer,
+          closeEndDrawer: closeEndDrawer,
+          child: Scaffold(
+            key: _scaffoldKey,
+            backgroundColor: theme.background,
+            drawer: const AppDrawer(), // global left drawer
+            endDrawer: _endDrawer, // dynamic per-screen right drawer
+            body: child,
+            bottomNavigationBar: TabBar(
+              labelColor: Theme.of(context).primaryTextTheme.bodyLarge!.color,
+              indicatorColor: theme.primaryColor,
+              controller: tabController,
+              onTap: (index) {
+                tabsRouter.setActiveIndex(index);
+                final rootRoutes = {
+                  subscriptionsIndex: const SubscriptionsTabRoute(),
+                  searchIndex: const SearchSubredditsRoute(),
+                  profileIndex: UserRoute(),
+                };
+                final route = rootRoutes[index];
+                if (route != null) {
+                  tabsRouter.stackRouterOfIndex(index)!.popUntilRoot();
+                  tabsRouter.stackRouterOfIndex(index)?.replaceAll([route]);
+                }
+              },
+              tabs: const [
+                Tab(icon: Icon(Icons.home)),
+                Tab(icon: Icon(Icons.search)),
+                Tab(icon: Icon(Icons.list)),
+                Tab(icon: Icon(Icons.mail)),
+                Tab(icon: Icon(Icons.person)),
+              ],
+            ),
           ),
         );
       },
     );
   }
 }
+
+// -------- DrawerHost InheritedWidget --------
+class DrawerHost extends InheritedWidget {
+  final void Function(Widget?) setEndDrawer;
+  final void Function(Widget) openEndDrawer;
+  final VoidCallback closeEndDrawer;
+
+  const DrawerHost({
+    super.key,
+    required this.setEndDrawer,
+    required this.openEndDrawer,
+    required this.closeEndDrawer,
+    required super.child,
+  });
+
+  static DrawerHost of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<DrawerHost>()!;
+
+  @override
+  bool updateShouldNotify(DrawerHost oldWidget) => false;
+}
+
+// @RoutePage()
+// class MainScreenView extends StatefulWidget {
+//   const MainScreenView({super.key});
+//
+//   @override
+//   State<MainScreenView> createState() => _MainScreenViewState();
+// }
+//
+// class _MainScreenViewState extends State<MainScreenView> {
+//   bool addListener = true;
+//   bool showingDialog = false;
+//   StreamSubscription<Uri?>? _linkSub;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//
+//     final router =
+//         AutoRouter.of(context); // you can also pass router via constructor
+//
+//     // Subscribe once
+//     _linkSub = AppLinks().uriLinkStream.listen((uri) {
+//       _handleRedditLink(router, uri.toString());
+//     });
+//
+//     // Handle initial link if app was cold-started
+//     AppLinks().getInitialLink().then((uri) {
+//       if (uri != null) {
+//         _handleRedditLink(router, uri.toString());
+//       }
+//     });
+//   }
+//
+//   @override
+//   void dispose() {
+//     _linkSub?.cancel();
+//     super.dispose();
+//   }
+//
+//   bool showAccountSelectionDialogue(int index) {
+//     final account = context.read<AccountsBloc>().state.account;
+//     return (account == null || account.isAnonymous) &&
+//         (index == profileIndex || index == inboxIndex);
+//   }
+//
+//   void _showLoginDialog(BuildContext context) async {
+//     if (showingDialog) {
+//       return;
+//     }
+//     showingDialog = true;
+//     await showDialog(
+//       context: context,
+//       builder: (ctx) => AlertDialog(
+//         title: const Text("Login Required"),
+//         content: AccountSelector(
+//           showCurrentAccount: false,
+//         ),
+//         actions: [
+//           TextButton(
+//             child: const Text("Cancel"),
+//             onPressed: () => Navigator.of(ctx).pop(),
+//           ),
+//         ],
+//       ),
+//     );
+//     showingDialog = false;
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final theme = context.watch<ThemeBloc>().state;
+//     final _ = context.watch<AccountsBloc>().state.account;
+//     final routes = <PageRouteInfo>[
+//       NamedRoute(homeRouteName),
+//       SearchSubredditsRoute(),
+//       SubscriptionsTabRoute(),
+//       InboxRoute(),
+//       UserRoute(),
+//     ];
+//     return AutoTabsRouter.tabBar(
+//       homeIndex: 0,
+//       physics: NeverScrollableScrollPhysics(),
+//       routes: routes,
+//       builder: (context, child, tabController) {
+//         void listener() {
+//           final index = tabController.index;
+//           if (showAccountSelectionDialogue(index) &&
+//               tabController.indexIsChanging &&
+//               tabController.index > tabController.previousIndex) {
+//             // reset to previous tab
+//             tabController.index = tabController.previousIndex;
+//
+//             WidgetsBinding.instance.addPostFrameCallback(
+//               (_) => _showLoginDialog(context),
+//             );
+//           }
+//         }
+//
+//         if (addListener) {
+//           tabController.addListener(listener);
+//           addListener = false;
+//         }
+//
+//         final tabsRouter = AutoTabsRouter.of(context);
+//         return Scaffold(
+//           backgroundColor: theme.background,
+//           body: child,
+//           drawer: AppDrawer(),
+//           bottomNavigationBar: TabBar(
+//             labelColor: Theme.of(context).primaryTextTheme.bodyLarge!.color,
+//             indicatorColor: theme.primaryColor,
+//             controller: tabController,
+//             onTap: (index) {
+//               tabsRouter.setActiveIndex(index);
+//               final rootRoutes = {
+//                 subscriptionsIndex: const SubscriptionsTabRoute(),
+//                 searchIndex: const SearchSubredditsRoute(),
+//                 profileIndex: UserRoute(),
+//               };
+//
+//               final route = rootRoutes[index];
+//               if (route != null) {
+//                 tabsRouter.stackRouterOfIndex(index)!.popUntilRoot();
+//                 tabsRouter.stackRouterOfIndex(index)?.replaceAll([route]);
+//               }
+//             },
+//             tabs: [
+//               Tab(icon: Icon(Icons.home)),
+//               Tab(icon: Icon(Icons.search)),
+//               Tab(icon: Icon(Icons.list)),
+//               Tab(icon: Icon(Icons.mail)),
+//               Tab(icon: Icon(Icons.person)),
+//             ],
+//           ),
+//         );
+//       },
+//     );
+//   }
+// }

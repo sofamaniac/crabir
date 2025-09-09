@@ -1,18 +1,26 @@
+import 'dart:ui';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/scroll_aware_fab.dart';
 import 'package:crabir/feed/sort_menu.dart';
 import 'package:crabir/feed/top_bar.dart';
+import 'package:crabir/html_view.dart';
 import 'package:crabir/loading_indicator.dart';
+import 'package:crabir/main.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart'
+    hide Icon, SubredditIcon;
 import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
     as reddit_stream;
 import 'package:crabir/stream/things_view.dart';
+import 'package:crabir/subreddit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -60,6 +68,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
   late final ScrollController _scrollController;
   late reddit_stream.Streamable _stream;
   String? currentUser;
+  Subreddit? subredditAbout;
 
   @override
   bool get wantKeepAlive => true;
@@ -69,12 +78,24 @@ class _FeedViewBodyState extends State<FeedViewBody>
     super.initState();
     _initializeSort();
     _scrollController = ScrollController();
+    _loadAbout();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadAbout() async {
+    switch (widget.feed) {
+      case Feed_Subreddit(field0: final subreddit):
+        subredditAbout =
+            await RedditAPI.client().subredditAbout(subreddit: subreddit);
+        if (!mounted) return;
+        setState(() {});
+      default:
+    }
   }
 
   void _initializeSort() {
@@ -86,6 +107,35 @@ class _FeedViewBodyState extends State<FeedViewBody>
     );
   }
 
+  Widget _compactAppBar() {
+    final title = FeedTitle(feed: widget.feed, sort: sort!);
+    return SliverAppBar(
+      floating: true,
+      title: title,
+      backgroundColor:
+          subredditAbout != null ? Colors.transparent : Colors.black,
+      actions: [
+        IconButton(
+          icon: Icon(Icons.search),
+          onPressed: () {
+            context.router.navigate(SearchSubredditsRoute());
+          },
+        ),
+        SortMenu(
+          onSelect: (sort) {
+            setState(() {
+              this.sort = sort;
+              _stream = RedditAPI.client().feedStream(
+                feed: widget.feed,
+                sort: sort,
+              );
+            });
+          },
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -93,9 +143,11 @@ class _FeedViewBodyState extends State<FeedViewBody>
     final account = context.watch<AccountsBloc>().state;
 
     if (sort == null) {
-      return Center(child: LoadingIndicator());
-    } else if (currentUser != account.account?.username) {
-      // reset stream when changing user.
+      return const Center(child: LoadingIndicator());
+    }
+
+    // Reset stream when changing user
+    if (currentUser != account.account?.username) {
       currentUser = account.account?.username;
       if (currentUser != null) {
         setState(() {
@@ -106,50 +158,40 @@ class _FeedViewBodyState extends State<FeedViewBody>
         });
       }
     }
+
+    // Update end drawer after build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      DrawerHost.of(context).setEndDrawer(endDrawer());
+    });
+
     return switch (account.status) {
       Uninit() => Container(),
       Failure(:final message) =>
         Center(child: Text("Failure in Account Manager: $message")),
       Loaded() => Stack(
           children: [
+            // NestedScrollView with sliver-safe body
             NestedScrollView(
               controller: _scrollController,
-              headerSliverBuilder: (context, __) => [
-                SliverAppBar(
-                  floating: true,
-                  title: FeedTitle(feed: widget.feed, sort: sort!),
-                  actions: [
-                    IconButton(
-                      icon: Icon(Icons.search),
-                      onPressed: () {
-                        context.router.navigate(SearchSubredditsRoute());
-                      },
-                    ),
-                    SortMenu(
-                      onSelect: (sort) {
-                        setState(() {
-                          this.sort = sort;
-                          _stream = RedditAPI.client().feedStream(
-                            feed: widget.feed,
-                            sort: sort,
-                          );
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ],
               floatHeaderSlivers: true,
+              headerSliverBuilder: (context, __) => [
+                _compactAppBar(), // your SliverAppBar
+              ],
               body: ThingsScaffold(
                 stream: _stream,
                 postView: postView,
+                subredditInfo: subredditAbout != null
+                    ? SubredditInfoView(infos: subredditAbout!)
+                    : null,
               ),
             ),
+
+            // Floating action button overlay
             Positioned(
               bottom: 16,
               right: 16,
               child: AnimatedSwitcher(
-                duration: Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 200),
                 child: ScrollAwareFab(
                   scrollController: _scrollController,
                 ),
@@ -157,7 +199,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
             ),
           ],
         ),
-      _ => Center(child: LoadingIndicator())
+      _ => const Center(child: LoadingIndicator()),
     };
   }
 
@@ -185,5 +227,109 @@ class _FeedViewBodyState extends State<FeedViewBody>
         ),
       ),
     );
+  }
+
+  Widget? endDrawer() {
+    if (subredditAbout != null) {
+      return Drawer(
+        child: StyledHtml(
+          htmlContent: subredditAbout?.descriptionHtml ?? "",
+        ),
+      );
+    } else {
+      return null;
+    }
+  }
+}
+
+class SubredditInfoView extends StatelessWidget {
+  final Subreddit infos;
+
+  const SubredditInfoView({super.key, required this.infos});
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget icon;
+    icon = SubredditIcon(
+      icon: infos.other.icon,
+      radius: 40,
+    );
+    return SizedBox(
+      height: 200,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          _banner(),
+          Positioned(
+            left: 16,
+            bottom: 16,
+            right: 16,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                icon,
+                const SizedBox(width: 12),
+                // Fade/scale content based on shrink
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        infos.other.displayName,
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(color: Colors.white),
+                      ),
+                      Text(
+                        "${infos.other.subscribers} members · ${infos.activeUserCount} online",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: Colors.white70),
+                      ),
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(Icons.check_circle, size: 18),
+                            label: const Text("Joined"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          OutlinedButton(
+                            onPressed: () {},
+                            child: const Icon(Icons.more_vert),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _banner() {
+    if (infos.bannerBackgroundImage != null) {
+      return Align(
+        alignment: Alignment.topCenter,
+        child: CachedNetworkImage(
+          imageUrl: infos.bannerBackgroundImage!,
+          fit: BoxFit.fitWidth,
+          width: double.infinity,
+        ),
+      );
+    } else {
+      return Container();
+    }
   }
 }

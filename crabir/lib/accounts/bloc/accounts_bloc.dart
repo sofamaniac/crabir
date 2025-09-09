@@ -118,7 +118,7 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
     }
     log.info("Requesting subscriptions for ${_currentAccount!.username}");
     try {
-      List<Subreddit> subreddits = await RedditAPI.client().subsriptions();
+      List<Subreddit> subreddits = await RedditAPI.client().subscriptions();
       subreddits.sort(
         (a, b) => a.other.displayName.toLowerCase().compareTo(
               b.other.displayName.toLowerCase(),

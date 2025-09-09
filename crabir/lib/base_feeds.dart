@@ -41,7 +41,7 @@ List<BaseFeed> baseFeeds(BuildContext context, {bool closeDrawer = true}) {
         locales.feedHistory,
         Icons.history,
         closeDrawer: closeDrawer,
-        // TODO:
+        // TODO: history feed
         route: FeedRoute(feed: Feed.popular()),
       ),
     ],

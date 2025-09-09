@@ -90,10 +90,13 @@ abstract class Client implements RustOpaqueInterface {
   Streamable searchSubreddits(
       {required String query, required SubredditSearchSort sort});
 
+  /// Get info on subreddit at 'r/`subreddit`/about'.
+  Future<Subreddit> subredditAbout({required String subreddit});
+
   /// Get the list of all subreddits the current user is subscribed to.
   /// # Errors
   /// Returns an error if the http client fails or if the parsing of the response fails.
-  Future<List<Subreddit>> subsriptions();
+  Future<List<Subreddit>> subscriptions();
 
   /// Unsave a saveable item (i.e. a [`Post`] or a [`comment::Comment`]).
   /// # Errors
