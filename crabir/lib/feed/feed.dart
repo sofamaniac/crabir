@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
@@ -107,7 +105,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
     );
   }
 
-  Widget _compactAppBar() {
+  Widget _appBar() {
     final title = FeedTitle(feed: widget.feed, sort: sort!);
     return SliverAppBar(
       floating: true,
@@ -131,6 +129,33 @@ class _FeedViewBodyState extends State<FeedViewBody>
               );
             });
           },
+        ),
+        _moreOptions(),
+      ],
+    );
+  }
+
+  Widget _moreOptions() {
+    return MenuAnchor(
+      builder: (BuildContext context, controller, _) {
+        return IconButton(
+          icon: const Icon(Icons.more_vert),
+          onPressed: () {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
+          },
+        );
+      },
+      menuChildren: [
+        MenuItemButton(onPressed: _stream.refresh, child: Text("Refresh")),
+        MenuItemButton(
+          onPressed: () {
+            context.router.navigate(SettingsRoute());
+          },
+          child: Text("Settings"),
         ),
       ],
     );
@@ -175,14 +200,21 @@ class _FeedViewBodyState extends State<FeedViewBody>
               controller: _scrollController,
               floatHeaderSlivers: true,
               headerSliverBuilder: (context, __) => [
-                _compactAppBar(), // your SliverAppBar
+                _appBar(), // your SliverAppBar
               ],
-              body: ThingsScaffold(
-                stream: _stream,
-                postView: postView,
-                subredditInfo: subredditAbout != null
-                    ? SubredditInfoView(infos: subredditAbout!)
-                    : null,
+              body: RefreshIndicator(
+                onRefresh: _stream.refresh,
+                child: Scrollbar(
+                  child: ThingsScaffold(
+                    // Ensure rebuild when sort changes.
+                    key: ValueKey(sort),
+                    stream: _stream,
+                    postView: postView,
+                    subredditInfo: subredditAbout != null
+                        ? SubredditInfoView(infos: subredditAbout!)
+                        : null,
+                  ),
+                ),
               ),
             ),
 
@@ -254,82 +286,93 @@ class SubredditInfoView extends StatelessWidget {
       icon: infos.other.icon,
       radius: 40,
     );
-    return SizedBox(
-      height: 200,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          _banner(),
-          Positioned(
-            left: 16,
-            bottom: 16,
-            right: 16,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                icon,
-                const SizedBox(width: 12),
-                // Fade/scale content based on shrink
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        infos.other.displayName,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall
-                            ?.copyWith(color: Colors.white),
-                      ),
-                      Text(
-                        "${infos.other.subscribers} members · ${infos.activeUserCount} online",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(color: Colors.white70),
-                      ),
-                      Row(
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: () {},
-                            icon: const Icon(Icons.check_circle, size: 18),
-                            label: const Text("Joined"),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          OutlinedButton(
-                            onPressed: () {},
-                            child: const Icon(Icons.more_vert),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+    return Column(
+      children: [
+        // banner and icon
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            _banner(),
+            Positioned(
+              left: 16,
+              top: 50,
+              child: icon,
             ),
+          ],
+        ),
+        // Space for avatar overlap
+        const SizedBox(height: 40 + 8),
+
+        // Username + subtitle
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      infos.other.displayName,
+                      style: Theme.of(context).textTheme.titleLarge,
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.check_circle),
+                    label: const Text("Joined"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      padding: EdgeInsetsGeometry.all(8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                  IconButton.outlined(
+                    onPressed: () {},
+                    icon: const Icon(Icons.more_vert),
+                  ),
+                ],
+              ),
+              Text(
+                "${infos.other.subscribers} members · ${infos.activeUserCount} online",
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: Colors.white70),
+              ),
+              if (infos.publicDescriptionHtml != null)
+                StyledHtml(htmlContent: infos.publicDescriptionHtml!),
+              Divider(),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _banner() {
-    if (infos.bannerBackgroundImage != null) {
+    if (infos.bannerBackgroundImage != null &&
+        infos.bannerBackgroundImage!.isNotEmpty) {
       return Align(
         alignment: Alignment.topCenter,
         child: CachedNetworkImage(
           imageUrl: infos.bannerBackgroundImage!,
-          fit: BoxFit.fitWidth,
+          fit: BoxFit.cover,
+          height: 100,
           width: double.infinity,
         ),
       );
     } else {
-      return Container();
+      return SizedBox(
+        height: 100,
+        width: double.infinity,
+      );
     }
   }
 }

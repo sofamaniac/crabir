@@ -37,6 +37,7 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
   Future<void> _loadMore() async {
     if (_loadingMore) return;
     _loadingMore = true;
+    if (mounted) setState(() {});
     await widget.stream.next(); // load more items
     items = widget.stream.getAll();
     if (mounted) setState(() {});
@@ -46,8 +47,7 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
   @override
   Widget build(BuildContext context) {
     final itemCount = items.length;
-    final totalSliverItems =
-        (itemCount + 1) * 2 - 1; // double count for separators
+    final totalSliverItems = itemCount * 2 + 1; // double count for separators
     return CustomScrollView(
       slivers: [
         // Optional subreddit info at the top
@@ -82,29 +82,20 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
                 WidgetsBinding.instance.addPostFrameCallback(
                   (_) => _loadMore(),
                 );
-                return Center(child: LoadingIndicator());
-                // return _loadingMore
-                //     ? const Padding(
-                //         padding: EdgeInsets.all(16),
-                //         child: Center(child: CircularProgressIndicator()),
-                //       )
-                //     : const SizedBox.shrink();
-                // return FutureBuilder(
-                //   future: _loadMore(),
-                //   builder: (context, snapshot) {
-                //     if (snapshot.connectionState == ConnectionState.waiting) {
-                //       return const Center(child: CircularProgressIndicator());
-                //     } else if (snapshot.hasError) {
-                //       return Center(child: Text("Error: ${snapshot.error}"));
-                //     } else {
-                //       return const Center(child: Text("Nothing more to show"));
-                //     }
-                //   },
-                // );
+                return _loadingMore
+                    ? const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Center(child: LoadingIndicator()),
+                      )
+                    : const SizedBox.shrink();
               }
             },
             childCount: totalSliverItems,
           ),
+        ),
+        // Ensure space at the bottom to avoid obstruction of the last element by the bottom bar.
+        SliverToBoxAdapter(
+          child: SizedBox(height: kBottomNavigationBarHeight),
         ),
       ],
     );
