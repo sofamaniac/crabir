@@ -34,16 +34,25 @@ class VideoContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final media = post.secureMedia;
+    final preview = post.preview?.images[0];
     return switch (media) {
-      Media_RedditVideo() => AnimatedContent.fromRedditVideo(media: media),
-      Media_Oembed() => AnimatedContent.fromMediaOEmbed(media: media),
-      null when post.preview?.images[0].variants.mp4 != null =>
-        AnimatedContent.fromVariantInner(
-          mp4: post.preview!.images[0].variants.mp4!,
+      Media_RedditVideo() => AnimatedContent.fromRedditVideo(
+          media: media,
+          placeholderUrl: preview?.resolutions[0].url,
         ),
-      null when post.preview?.images[0].variants.gif != null =>
+      Media_Oembed() => AnimatedContent.fromMediaOEmbed(
+          media: media,
+          placeholderUrl: preview?.resolutions[0].url,
+        ),
+      null when preview?.variants.mp4 != null =>
         AnimatedContent.fromVariantInner(
-          mp4: post.preview!.images[0].variants.gif!,
+          mp4: preview!.variants.mp4!,
+          placeholderUrl: preview.resolutions[0].url,
+        ),
+      null when preview?.variants.gif != null =>
+        AnimatedContent.fromVariantInner(
+          mp4: preview!.variants.gif!,
+          placeholderUrl: preview.resolutions[0].url,
         ),
       _ => Center(child: Text("Error while loading video")),
     };

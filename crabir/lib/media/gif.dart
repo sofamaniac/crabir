@@ -10,6 +10,7 @@ class AnimatedContent extends StatefulWidget {
   final int height;
   final String? placeholderUrl;
   final Resolution preferredResolution;
+  final Widget? cartouche;
 
   /// If provided, overrides global feed logic.
   /// Useful for carousels where PageView knows the active page.
@@ -23,15 +24,16 @@ class AnimatedContent extends StatefulWidget {
     this.placeholderUrl,
     this.preferredResolution = Resolution.source,
     this.shouldPlay,
+    this.cartouche,
   });
 
-  // convenience constructors…
   AnimatedContent.fromVariantInner({
     super.key,
     required VariantInner mp4,
     this.placeholderUrl,
     this.preferredResolution = Resolution.source,
     this.shouldPlay,
+    this.cartouche,
   })  : url = mp4.source.url,
         width = mp4.source.width,
         height = mp4.source.height;
@@ -42,6 +44,7 @@ class AnimatedContent extends StatefulWidget {
     this.placeholderUrl,
     this.preferredResolution = Resolution.source,
     this.shouldPlay,
+    this.cartouche,
   })  : url = media.oembed.providerUrl,
         width = media.oembed.width,
         height = media.oembed.height;
@@ -52,6 +55,10 @@ class AnimatedContent extends StatefulWidget {
     this.placeholderUrl,
     this.preferredResolution = Resolution.source,
     this.shouldPlay,
+    this.cartouche = const Cartouche(
+      "video",
+      background: Colors.orange,
+    ),
   })  : url = media.field0.dashUrl,
         width = media.field0.width,
         height = media.field0.height;
@@ -241,13 +248,32 @@ class _AnimatedContentState extends State<AnimatedContent> {
   }
 
   Widget placeholder() {
-    return Center(
-      child: AspectRatio(
-        aspectRatio: widget.width / widget.height.toDouble(),
-        child: widget.placeholderUrl != null
-            ? Image.network(widget.placeholderUrl!)
-            : const LoadingIndicator(),
-      ),
+    return Stack(
+      children: [
+        if (widget.placeholderUrl != null)
+          Center(
+            child: AspectRatio(
+              aspectRatio: widget.width / widget.height.toDouble(),
+              child: Image.network(
+                widget.placeholderUrl!,
+                fit: BoxFit.cover,
+              ),
+            ),
+          )
+        else
+          const LoadingIndicator(),
+        if (widget.cartouche != null)
+          Positioned(
+            top: 8,
+            right: 8,
+            child: widget.cartouche!,
+          ),
+        Positioned(
+          bottom: 8,
+          right: 8,
+          child: CircularProgressIndicator(color: Colors.white),
+        )
+      ],
     );
   }
 
