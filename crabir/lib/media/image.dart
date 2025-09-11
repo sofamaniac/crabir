@@ -100,23 +100,15 @@ class FullscreenImageView extends StatelessWidget {
   final String imageUrl;
   final String? title;
   const FullscreenImageView({super.key, required this.imageUrl, this.title});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.black,
-      body: Dismissible(
-        key: UniqueKey(),
-        direction: DismissDirection.vertical,
-        onDismissed: (_) => context.pop(),
-        child: PhotoViewGestureDetectorScope(
-          axis: Axis.vertical,
-          child: PhotoView(
-            imageProvider: NetworkImage(imageUrl),
-            minScale: PhotoViewComputedScale.contained * 1.0,
-            maxScale: PhotoViewComputedScale.contained * 5.0,
-          ),
-        ),
+    return FullscreenMediaView(
+      builder: (onTap) => PhotoView(
+        imageProvider: CachedNetworkImageProvider(imageUrl),
+        minScale: PhotoViewComputedScale.contained * 1.0,
+        maxScale: PhotoViewComputedScale.contained * 5.0,
+        onTapDown: onTap,
       ),
     );
   }
