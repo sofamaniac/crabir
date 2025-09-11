@@ -15,20 +15,13 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Streamable>>
 abstract class Streamable implements RustOpaqueInterface {
-  Future<void> addListener(
-      {required FutureOr<void> Function(List<Thing>) callback});
-
-  /// flutter_rust_bridge:sync
   List<Thing> getAll();
 
-  /// flutter_rust_bridge:getter,sync
   int get length;
 
   /// Returns true if there are still elements remaining.
-  /// flutter_rust_bridge:
   Future<bool> next();
 
-  /// flutter_rust_bridge:sync
   Thing? nth({required int n});
 
   Future<void> refresh();

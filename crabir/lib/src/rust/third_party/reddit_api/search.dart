@@ -15,7 +15,6 @@ part 'search.freezed.dart';
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SearchPost>>
 abstract class SearchPost implements RustOpaqueInterface {
-  ///flutter_rust_bridge:sync
   factory SearchPost(
           {required Client client,
           String? subreddit,
@@ -32,7 +31,6 @@ abstract class SearchPost implements RustOpaqueInterface {
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SearchSubreddit>>
 abstract class SearchSubreddit implements RustOpaqueInterface {
-  ///flutter_rust_bridge:sync
   factory SearchSubreddit(
           {required Client client,
           required String query,

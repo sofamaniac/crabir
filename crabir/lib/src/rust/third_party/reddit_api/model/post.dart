@@ -237,16 +237,13 @@ abstract class Post implements RustOpaqueInterface, Votable {
 
   Future<int?> getWls();
 
-  ///flutter_rust_bridge:sync,getter
   bool get isCrosspost;
 
-  ///flutter_rust_bridge:sync,getter
   Kind get kind;
 
   @override
   Future<void> save({required Client client});
 
-  ///flutter_rust_bridge:sync,getter
   Thumbnail? get thumbnail;
 
   @override
@@ -258,8 +255,7 @@ abstract class Post implements RustOpaqueInterface, Votable {
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PostID>>
 abstract class PostId implements RustOpaqueInterface {
-  /// flutter_rust_bridge:sync
-  String asString();
+  String get asString;
 
   static Future<PostId> default_() =>
       RustLib.instance.api.redditApiModelPostPostIdDefault();
@@ -372,7 +368,6 @@ class MediaEmbed {
           height == other.height;
 }
 
-/// flutter_rust_bridge:non_opaque
 class Oembed {
   final String providerUrl;
   final String title;
@@ -459,7 +454,6 @@ class Preview {
           enabled == other.enabled;
 }
 
-/// flutter_rust_bridge:non_opaque
 class RedditImage {
   final ImageBase source;
   final List<ImageBase> resolutions;
@@ -491,7 +485,6 @@ class RedditImage {
           id == other.id;
 }
 
-/// flutter_rust_bridge:non_opaque
 class RedditVideo {
   final int bitrateKbps;
   final int width;
@@ -672,7 +665,6 @@ class ThumbnailURL {
           width == other.width;
 }
 
-/// flutter_rust_bridge:non_opaque
 class VariantInner {
   final ImageBase source;
   final List<ImageBase> resolutions;
@@ -697,7 +689,6 @@ class VariantInner {
           resolutions == other.resolutions;
 }
 
-/// flutter_rust_bridge:non_opaque
 class Variants {
   final VariantInner? gif;
   final VariantInner? mp4;

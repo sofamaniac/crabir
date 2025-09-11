@@ -1,6 +1,6 @@
-use crate::result::Result;
 pub use chrono::{DateTime, Local, Utc};
-use getset::{CloneGetters, CopyGetters, Getters, Setters};
+use flutter_rust_bridge::frb;
+use getset::{CloneGetters, Getters, Setters};
 
 use crate::model::author;
 use crate::model::author::AuthorInfo;
@@ -36,7 +36,7 @@ pub enum Kind {
 pub struct PostID(String);
 
 impl PostID {
-    /// flutter_rust_bridge:sync
+    #[frb(sync, getter)]
     pub fn as_string(&self) -> String {
         self.0.clone()
     }
@@ -224,7 +224,7 @@ pub struct Post {
 
 impl Post {
     #[must_use]
-    ///flutter_rust_bridge:sync,getter
+    #[frb(sync, getter)]
     pub fn thumbnail(&self) -> Option<Thumbnail> {
         if let ThumbnailOption {
             url: Some(url),
@@ -256,7 +256,7 @@ impl Post {
     }
 
     #[must_use]
-    ///flutter_rust_bridge:sync,getter
+    #[frb(sync, getter)]
     pub fn kind(&self) -> Kind {
         if self.is_video {
             Kind::Video
@@ -283,7 +283,7 @@ impl Post {
         }
     }
 
-    ///flutter_rust_bridge:sync,getter
+    #[frb(sync, getter)]
     pub fn is_crosspost(&self) -> bool {
         !self.crosspost_parent_list.is_empty()
     }
@@ -365,7 +365,7 @@ pub struct ThumbnailURL {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 #[serde(untagged)]
-/// flutter_rust_bridge:non_opaque
+#[frb(non_opaque)]
 pub enum SecureMedia {
     RedditVideo(RedditVideo),
     Oembed {
@@ -377,7 +377,7 @@ pub enum SecureMedia {
 
 #[serde_as]
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-/// flutter_rust_bridge:non_opaque
+#[frb(non_opaque)]
 pub struct RedditVideo {
     pub bitrate_kbps: u32,
     pub width: u32,
@@ -395,6 +395,7 @@ pub struct RedditVideo {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[frb(non_opaque)]
 pub struct SecureMediaEmbed {
     pub content: String,
     pub width: u32,
@@ -413,7 +414,6 @@ pub struct Preview {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-/// flutter_rust_bridge:non_opaque
 pub struct RedditImage {
     pub source: ImageBase,
     pub resolutions: Vec<ImageBase>,
@@ -429,7 +429,6 @@ pub struct ImageBase {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-/// flutter_rust_bridge:non_opaque
 pub struct Variants {
     pub gif: Option<VariantInner>,
     pub mp4: Option<VariantInner>,
@@ -438,14 +437,13 @@ pub struct Variants {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-/// flutter_rust_bridge:non_opaque
 pub struct VariantInner {
     pub source: ImageBase,
     pub resolutions: Vec<ImageBase>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
-/// flutter_rust_bridge:non_opaque
+#[frb(non_opaque)]
 pub enum Media {
     #[serde(rename = "reddit_video")]
     RedditVideo(RedditVideo),
@@ -458,7 +456,7 @@ pub enum Media {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-/// flutter_rust_bridge:non_opaque
+#[frb(non_opaque)]
 pub struct Oembed {
     pub provider_url: String,
     pub title: String,

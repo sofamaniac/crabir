@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use crate::utils;
 use crate::utils::{response_or_default, response_or_none_string};
 use crate::{error::Error, model::flair::Flair};
+use flutter_rust_bridge::frb;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
@@ -345,7 +346,8 @@ pub struct Subreddit {
     )]
     pub allow_predictions_tournament: bool,
 }
-/// flutter_rust_bridge:non_opaque
+
+#[frb(non_opaque)]
 pub enum SubredditIcon {
     Image(Icon),
     Color(String),
@@ -359,7 +361,7 @@ pub struct Icon {
 
 impl Common {
     #[must_use]
-    /// flutter_rust_bridge:getter,sync
+    #[frb(sync, getter)]
     pub fn icon(&self) -> SubredditIcon {
         if let Some(url) = &self.icon_img {
             SubredditIcon::Image(Icon {
@@ -394,7 +396,7 @@ impl Common {
 
 impl Subreddit {
     #[must_use]
-    /// flutter_rust_bridge:getter,sync
+    #[frb(sync, getter)]
     pub fn icon(&self) -> SubredditIcon {
         self.other.icon()
     }
@@ -402,7 +404,7 @@ impl Subreddit {
 
 impl Details {
     #[must_use]
-    /// flutter_rust_bridge:getter,sync
+    #[frb(sync, getter)]
     pub fn icon(&self) -> SubredditIcon {
         self.other.icon()
     }

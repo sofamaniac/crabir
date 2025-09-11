@@ -16,13 +16,10 @@ abstract class Gallery implements RustOpaqueInterface {
   static Future<Gallery> default_() =>
       RustLib.instance.api.redditApiModelGalleryGalleryDefault();
 
-  /// flutter_rust_bridge:sync
   GalleryMedia? get_({required int index});
 
-  /// flutter_rust_bridge:sync,getter
   double get aspectRatio;
 
-  /// flutter_rust_bridge:sync,getter
   int get length;
 }
 
@@ -62,7 +59,6 @@ class AnimatedImage {
           mp4 == other.mp4;
 }
 
-/// flutter_rust_bridge:non_opaque
 class GalleryMedia {
   /// A string like "image/jpg", or "image/gif"
   final String mediaType;

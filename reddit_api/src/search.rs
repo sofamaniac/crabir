@@ -1,3 +1,4 @@
+use flutter_rust_bridge::frb;
 use futures::StreamExt;
 use reqwest::Url;
 use uuid::Uuid;
@@ -17,7 +18,7 @@ pub struct SearchPost {
 }
 
 impl SearchPost {
-    ///flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn new(
         client: Client,
         subreddit: Option<String>,
@@ -69,7 +70,7 @@ impl IntoStreamPrivate for SearchPost {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-/// flutter_rust_bridge:non_opaque
+#[frb(non_opaque)]
 pub enum PostSearchSort {
     Relevance(Timeframe),
     Hot,
@@ -123,7 +124,7 @@ pub struct SearchSubreddit {
 }
 
 impl SearchSubreddit {
-    ///flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn new(client: Client, query: String, sort: SubredditSearchSort) -> Self {
         Self {
             client,

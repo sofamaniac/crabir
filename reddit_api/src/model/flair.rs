@@ -1,6 +1,8 @@
+use flutter_rust_bridge::frb;
 use serde::{Deserialize, Serialize};
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[frb(non_opaque)]
 pub struct Flair {
     pub css_class: Option<String>,
     #[serde(default)]
@@ -17,7 +19,7 @@ pub struct Flair {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "e")]
-/// flutter_rust_bridge:non_opaque
+#[frb(non_opaque)]
 pub enum Richtext {
     #[serde(rename = "text")]
     Text { t: String },

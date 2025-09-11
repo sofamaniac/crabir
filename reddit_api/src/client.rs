@@ -12,6 +12,7 @@ use std::sync::Arc;
 use base64::Engine;
 use base64::prelude::BASE64_URL_SAFE_NO_PAD;
 use chrono::{DateTime, Utc};
+use flutter_rust_bridge::frb;
 use futures::Stream;
 use futures::{TryStreamExt, stream};
 use log::{debug, error, info};
@@ -371,7 +372,7 @@ impl Client {
         res.error_for_status().map_err(Into::into)
     }
 
-    /// flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn feed_stream(&self, feed: &Feed, sort: &feed::FeedSort) -> Streamable {
         let base_url = self.base_url();
         Streamable::new(feed::FeedStream::new(
@@ -532,7 +533,7 @@ impl Client {
             .collect())
     }
 
-    ///flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn multi_posts(&self, multi: &Multi, sort: &feed::FeedSort) -> Streamable {
         let base_url = self.base_url();
         Streamable::new(MultiStream::new(
@@ -663,7 +664,7 @@ impl Client {
         Ok(result.json.data.things)
     }
 
-    ///flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn search_post(
         &self,
         subreddit: Option<String>,
@@ -680,7 +681,7 @@ impl Client {
         )))
     }
 
-    ///flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn search_subreddits(&self, query: String, sort: SubredditSearchSort) -> Streamable {
         Streamable::new(Box::new(SearchSubreddit::new(self.clone(), query, sort)))
     }

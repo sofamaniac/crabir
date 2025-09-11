@@ -34,7 +34,6 @@ abstract class Client implements RustOpaqueInterface {
   static Future<Client> default_() =>
       RustLib.instance.api.redditApiClientClientDefault();
 
-  /// flutter_rust_bridge:sync
   Streamable feedStream({required Feed feed, required FeedSort sort});
 
   /// Create a new client that is authenticated
@@ -59,7 +58,6 @@ abstract class Client implements RustOpaqueInterface {
 
   Future<void> logout();
 
-  ///flutter_rust_bridge:sync
   Streamable multiPosts({required Multi multi, required FeedSort sort});
 
   /// Get the list of multireddits the current user is subscribed to.
@@ -79,14 +77,12 @@ abstract class Client implements RustOpaqueInterface {
   /// Returns an error if the request failed.
   Future<void> save({required Fullname thing});
 
-  ///flutter_rust_bridge:sync
   Streamable searchPost(
       {String? subreddit,
       Flair? flair,
       String? query,
       required PostSearchSort sort});
 
-  ///flutter_rust_bridge:sync
   Streamable searchSubreddits(
       {required String query, required SubredditSearchSort sort});
 
@@ -103,37 +99,28 @@ abstract class Client implements RustOpaqueInterface {
   /// Returns an error if the request failed.
   Future<void> unsave({required Fullname thing});
 
-  /// flutter_rust_bridge:
   Future<UserInfo> userAbout({required String username});
 
-  /// flutter_rust_bridge:sync
   Streamable userComments(
       {required String username, required UserStreamSort sort});
 
-  /// flutter_rust_bridge:sync
   Streamable userDownvoted({required String username});
 
-  /// flutter_rust_bridge:sync
   Streamable userGilded({required String username});
 
-  /// flutter_rust_bridge:sync
   Streamable userHidden({required String username});
 
-  /// flutter_rust_bridge:sync
   Streamable userOverview(
       {required String username, required UserStreamSort sort});
 
   /// Get saved items ( both [`Post`] and [`Comment`] ) for the specified user.
   /// # Errors
   /// Fails if api request fails.
-  /// flutter_rust_bridge:sync
   Streamable userSaved({required String username});
 
-  /// flutter_rust_bridge:sync
   Streamable userSubmitted(
       {required String username, required UserStreamSort sort});
 
-  /// flutter_rust_bridge:sync
   Streamable userUpvoted({required String username});
 
   /// Vote on a votable item (i.e. a [`Post`] or a [`comment::Comment`]).

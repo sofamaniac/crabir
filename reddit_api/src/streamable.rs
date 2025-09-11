@@ -1,4 +1,4 @@
-use flutter_rust_bridge::{DartFnFuture, frb};
+use flutter_rust_bridge::frb;
 use futures::lock::Mutex;
 
 use crate::{
@@ -14,34 +14,7 @@ pub(crate) mod stream {
     use futures::stream::BoxStream;
     pub trait IntoStreamPrivate {
         type Output;
-        //fn to_stream(self) -> impl Stream<Item = Result<Self::Output>> + Unpin;
         fn to_stream(&self) -> BoxStream<'static, Result<Self::Output>>;
-    }
-}
-
-struct CallbackHandler {
-    // The closures are `Send + Sync` so the whole struct can be too.
-    callbacks: Vec<Box<dyn Fn(Vec<Thing>) -> DartFnFuture<()> + Send + Sync>>,
-}
-
-impl CallbackHandler {
-    fn new() -> Self {
-        Self {
-            callbacks: Vec::new(),
-        }
-    }
-
-    fn push<F>(&mut self, f: F)
-    where
-        F: Fn(Vec<Thing>) -> DartFnFuture<()> + Send + Sync + 'static,
-    {
-        self.callbacks.push(Box::new(f));
-    }
-
-    async fn run_all(&self, input: Vec<Thing>) {
-        for cb in &self.callbacks {
-            cb(input.clone()).await;
-        }
     }
 }
 
@@ -53,9 +26,8 @@ impl<T: IntoStreamPrivate<Output = Thing> + Send + Sync> IntoStream for T {}
 pub struct Streamable {
     listing: Box<dyn IntoStream>,
     things: Vec<Thing>,
-    done: Mutex<bool>,
+    done: bool,
     stream: Mutex<BoxStream<'static, Result<Thing>>>,
-    callbacks: CallbackHandler,
 }
 
 impl Streamable {
@@ -64,54 +36,45 @@ impl Streamable {
             stream: listing.to_stream().into(),
             listing,
             things: Vec::new(),
-            done: false.into(),
-            callbacks: CallbackHandler::new(),
+            done: false,
         }
     }
 
     pub async fn refresh(&mut self) {
         self.things.clear();
-        self.update_listeners().await;
         let mut stream = self.stream.lock().await;
         *stream = self.listing.to_stream();
-        let mut done = self.done.lock().await;
-        *done = false;
+        self.done = false;
     }
 
     /// Returns true if there are still elements remaining.
-    /// flutter_rust_bridge:
     pub async fn next(&mut self) -> Result<bool> {
         // Calling stream.next() after its completions is an error.
-        if *self.done.lock().await {
+        if self.done {
             return Ok(false);
         }
         let mut stream = self.stream.lock().await;
         if let Some(next) = stream.next().await {
-            //let mut things = self.things.lock().await;
             self.things.push(next?);
-            self.update_listeners().await;
             Ok(true)
         } else {
-            let mut done = self.done.lock().await;
-            *done = true;
-            self.update_listeners().await;
+            self.done = true;
             Ok(false)
         }
     }
 
-    /// flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn nth(&self, n: u32) -> Option<Thing> {
         self.things.get(n as usize).cloned()
     }
 
-    /// flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn get_all(&self) -> Vec<Thing> {
         self.things.clone()
     }
 
-    /// flutter_rust_bridge:getter,sync
+    #[frb(sync, getter)]
     pub fn get_length(&self) -> u32 {
-        //self.things.lock().await.len() as u32
         self.things.len() as u32
     }
 
@@ -159,16 +122,5 @@ impl Streamable {
             _ => (),
         };
         Ok(())
-    }
-
-    pub fn add_listener(
-        &mut self,
-        callback: impl Fn(Vec<Thing>) -> DartFnFuture<()> + Send + Sync + 'static,
-    ) {
-        self.callbacks.push(callback);
-    }
-
-    async fn update_listeners(&self) {
-        self.callbacks.run_all(self.things.clone()).await;
     }
 }

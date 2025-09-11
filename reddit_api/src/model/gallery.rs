@@ -1,6 +1,7 @@
 use core::f32;
 use std::collections::HashMap;
 
+use flutter_rust_bridge::frb;
 use serde::{Deserialize, Serialize};
 
 use super::post::ImageBase;
@@ -12,7 +13,7 @@ pub struct Gallery {
 }
 
 impl Gallery {
-    /// flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn get(&self, index: u32) -> Option<GalleryMedia> {
         let id = &self.gallery_data.items[index as usize];
         if let Some(MediaMetadata::Media(media)) = self.media_metadata.get(&id.media_id) {
@@ -22,7 +23,7 @@ impl Gallery {
         }
     }
 
-    /// flutter_rust_bridge:sync,getter
+    #[frb(sync, getter)]
     pub fn get_aspect_ratio(&self) -> f32 {
         let mut aspect_ratio = f32::INFINITY;
         for image in self.media_metadata.values() {
@@ -37,7 +38,7 @@ impl Gallery {
         aspect_ratio
     }
 
-    /// flutter_rust_bridge:sync,getter
+    #[frb(sync, getter)]
     pub fn get_length(&self) -> u32 {
         self.gallery_data.items.len() as u32
     }
@@ -57,7 +58,7 @@ pub struct MediaId {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "status")]
-/// flutter_rust_bridge:non_opaque
+#[frb(non_opaque)]
 pub struct GalleryMedia {
     #[serde(rename = "m")]
     /// A string like "image/jpg", or "image/gif"
@@ -105,7 +106,7 @@ impl From<Image> for ImageBase {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "e")]
-/// flutter_rust_bridge:non_opaque
+#[frb(non_opaque)]
 pub enum Source {
     Image {
         #[serde(rename = "s")]

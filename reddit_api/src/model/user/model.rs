@@ -1,3 +1,4 @@
+use flutter_rust_bridge::frb;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -6,7 +7,7 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-/// flutter_rust_bridge:non_opaque
+#[frb(non_opaque)]
 pub enum UserStreamSort {
     Hot,
     Top(Timeframe),

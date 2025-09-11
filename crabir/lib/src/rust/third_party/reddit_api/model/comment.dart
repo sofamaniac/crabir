@@ -157,12 +157,10 @@ abstract class Comment implements RustOpaqueInterface, Votable {
   static Future<Comment> default_() =>
       RustLib.instance.api.redditApiModelCommentCommentDefault();
 
-  /// flutter_rust_bridge:sync
   /// If `more` is a `Thing::More`, if it exists in `Self::replies` or in the replies of one of
   /// its children, will replace it with `new_things`.
   void replaceMore({required Thing more, required List<Thing> newThings});
 
-  /// flutter_rust_bridge:sync
   List<Thing> replies();
 
   @override

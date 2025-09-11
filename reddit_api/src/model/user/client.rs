@@ -1,3 +1,4 @@
+use flutter_rust_bridge::frb;
 use futures::Stream;
 
 use crate::{
@@ -42,7 +43,7 @@ impl Client {
     /// Get saved items ( both [`Post`] and [`Comment`] ) for the specified user.
     /// # Errors
     /// Fails if api request fails.
-    /// flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn user_saved(&self, username: String) -> Streamable {
         Streamable::new(UserStream::new(
             self.clone(),
@@ -51,7 +52,7 @@ impl Client {
         ))
     }
 
-    /// flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn user_overview(&self, username: String, sort: UserStreamSort) -> Streamable {
         Streamable::new(UserStreamSorted::new(
             self.clone(),
@@ -60,7 +61,7 @@ impl Client {
             String::from("overview"),
         ))
     }
-    /// flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn user_submitted(&self, username: String, sort: UserStreamSort) -> Streamable {
         Streamable::new(UserStreamSorted::new(
             self.clone(),
@@ -69,7 +70,7 @@ impl Client {
             String::from("submitted"),
         ))
     }
-    /// flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn user_comments(&self, username: String, sort: UserStreamSort) -> Streamable {
         Streamable::new(UserStreamSorted::new(
             self.clone(),
@@ -78,7 +79,7 @@ impl Client {
             String::from("comments"),
         ))
     }
-    /// flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn user_upvoted(&self, username: String) -> Streamable {
         Streamable::new(UserStream::new(
             self.clone(),
@@ -86,7 +87,7 @@ impl Client {
             String::from("upvoted"),
         ))
     }
-    /// flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn user_downvoted(&self, username: String) -> Streamable {
         Streamable::new(UserStream::new(
             self.clone(),
@@ -94,7 +95,7 @@ impl Client {
             String::from("downvoted"),
         ))
     }
-    /// flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn user_hidden(&self, username: String) -> Streamable {
         Streamable::new(UserStream::new(
             self.clone(),
@@ -102,7 +103,7 @@ impl Client {
             String::from("hidden"),
         ))
     }
-    /// flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn user_gilded(&self, username: String) -> Streamable {
         Streamable::new(UserStream::new(
             self.clone(),
@@ -111,7 +112,6 @@ impl Client {
         ))
     }
 
-    /// flutter_rust_bridge:
     pub async fn user_about(&self, username: String) -> Result<UserInfo> {
         let url = self
             .base_url()

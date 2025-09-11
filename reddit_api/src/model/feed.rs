@@ -1,6 +1,7 @@
 use crate::client::Client;
 use crate::result::Result;
 use crate::streamable::stream::IntoStreamPrivate;
+use flutter_rust_bridge::frb;
 pub use futures::{Stream, StreamExt};
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
@@ -9,7 +10,7 @@ use super::{Thing, Timeframe};
 
 /// All the kind of available feeds on reddit
 #[derive(Debug, Default, PartialEq, Eq, Clone)]
-/// flutter_rust_bridge:non_opaque
+#[frb(non_opaque)]
 pub enum Feed {
     #[default]
     /// Home feed of the current user
@@ -23,7 +24,7 @@ pub enum Feed {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
-/// flutter_rust_bridge:non_opaque,json_serializable
+#[frb(non_opaque, json_serializable)]
 pub enum FeedSort {
     Best,
     Hot,

@@ -1,4 +1,5 @@
 use comment::Comment;
+use flutter_rust_bridge::frb;
 use multi::Multi;
 pub use post::Post;
 use serde::{Deserialize, Serialize};
@@ -34,7 +35,7 @@ impl AsRef<str> for Fullname {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag = "kind", content = "data")]
 #[allow(clippy::large_enum_variant)]
-/// flutter_rust_bridge:non_opaque
+#[frb(non_opaque)]
 pub enum Thing {
     #[serde(rename = "Listing")]
     Listing(Listing),
@@ -128,6 +129,7 @@ pub struct Listing {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
+#[frb(non_opaque)]
 pub enum Timeframe {
     Hour,
     Day,

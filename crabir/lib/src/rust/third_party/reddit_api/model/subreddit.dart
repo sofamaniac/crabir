@@ -149,7 +149,6 @@ abstract class Common implements RustOpaqueInterface {
   static Future<Common> default_() =>
       RustLib.instance.api.redditApiModelSubredditCommonDefault();
 
-  /// flutter_rust_bridge:getter,sync
   SubredditIcon get icon;
 }
 
@@ -182,7 +181,6 @@ abstract class Details implements RustOpaqueInterface {
   static Future<Details> default_() =>
       RustLib.instance.api.redditApiModelSubredditDetailsDefault();
 
-  /// flutter_rust_bridge:getter,sync
   SubredditIcon get icon;
 }
 
@@ -425,7 +423,6 @@ abstract class Subreddit implements RustOpaqueInterface {
   static Future<Subreddit> default_() =>
       RustLib.instance.api.redditApiModelSubredditSubredditDefault();
 
-  /// flutter_rust_bridge:getter,sync
   SubredditIcon get icon;
 }
 

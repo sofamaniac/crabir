@@ -1,6 +1,7 @@
 use chrono::DateTime;
 use chrono::Local;
 use chrono::Utc;
+use flutter_rust_bridge::frb;
 use log::debug;
 use serde::Deserialize;
 use serde::Serialize;
@@ -114,7 +115,7 @@ pub struct Comment {
 }
 
 impl Comment {
-    /// flutter_rust_bridge:sync
+    #[frb(sync)]
     pub fn replies(&mut self) -> Vec<Thing> {
         if self.parsed_replies.is_empty() {
             self.parsed_replies = match &self.replies {
@@ -128,9 +129,9 @@ impl Comment {
         self.parsed_replies.clone()
     }
 
-    /// flutter_rust_bridge:sync
     /// If `more` is a `Thing::More`, if it exists in `Self::replies` or in the replies of one of
     /// its children, will replace it with `new_things`.
+    #[frb(sync)]
     pub fn replace_more(&mut self, more: &Thing, new_things: &[Thing]) {
         if let Thing::More { .. } = more {
             // Ensure replies where parsed.
