@@ -15,7 +15,7 @@ void navigateToSubscriptionsTab(BuildContext context, destination) {
 class SubredditTile extends StatelessWidget {
   final subreddit.Subreddit sub;
 
-  /// If set to `true`, calls `Navigator.pop()` before navigating to the destination
+  /// If set to `true`, closes drawer of closest scaffold before navigating to the destination
   final bool closeDrawer;
 
   const SubredditTile(this.sub, {super.key, this.closeDrawer = false});
@@ -28,7 +28,7 @@ class SubredditTile extends StatelessWidget {
           initialSort: FeedSort.best(),
         );
         if (closeDrawer) {
-          Navigator.pop(context);
+          Scaffold.of(context).closeDrawer();
         }
         navigateToSubscriptionsTab(context, destination);
       },

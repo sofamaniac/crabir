@@ -149,7 +149,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
     if (_isCarouselMode) return;
 
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 200), () {
+    _debounceTimer = Timer(const Duration(milliseconds: 100), () {
       final screenSize = MediaQuery.of(context).size;
       final bottomBarHeight = kBottomNavigationBarHeight;
       final screenCenterY = (screenSize.height - bottomBarHeight) / 2;
