@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:crabir/bool_to_vote.dart';
 import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/feed_list.dart';

@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
+import 'package:crabir/bool_to_vote.dart';
 import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/flair.dart';
@@ -154,19 +155,20 @@ class _CommentViewState extends State<CommentView>
     final likeColor = Theme.of(context).colorScheme.primary;
     final dislikeColor = Colors.cyanAccent;
     final settings = context.watch<CommentsSettingsCubit>().state;
+    final likes = ValueNotifier(widget.comment.likes.toVoteDirection());
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.max,
       children: [
         VoteButton.like(
-          initialValue: widget.comment.likes,
+          likes: likes,
           colorActive: likeColor,
           onChange: (target) async {
             await vote(target, settings.hideButtonAfterAction);
           },
         ),
         VoteButton.dislike(
-          initialValue: widget.comment.likes,
+          likes: likes,
           colorActive: dislikeColor,
           onChange: (target) async {
             await vote(target, settings.hideButtonAfterAction);

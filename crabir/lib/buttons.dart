@@ -1,9 +1,8 @@
-import 'package:crabir/bool_to_vote.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:flutter/material.dart';
 
-class VoteButton extends StatefulWidget {
-  final bool? initialValue;
+class VoteButton extends StatelessWidget {
+  final ValueNotifier<VoteDirection> likes;
   final void Function(VoteDirection)? onChange;
   final VoteDirection action;
   final IconData iconNeutral;
@@ -11,58 +10,53 @@ class VoteButton extends StatefulWidget {
   final Color colorActive;
   const VoteButton({
     super.key,
-    required this.initialValue,
+    required this.likes,
     required this.action,
     required this.iconNeutral,
     required this.iconActive,
     required this.colorActive,
     this.onChange,
   });
+
   const VoteButton.like({
     super.key,
-    required this.initialValue,
+    required this.likes,
     required this.colorActive,
     this.onChange,
   })  : iconNeutral = Icons.thumb_up_outlined,
         iconActive = Icons.thumb_up,
         action = VoteDirection.up;
+
   const VoteButton.dislike({
     super.key,
-    required this.initialValue,
+    required this.likes,
     required this.colorActive,
     this.onChange,
   })  : iconNeutral = Icons.thumb_down_outlined,
         iconActive = Icons.thumb_down,
         action = VoteDirection.down;
-  @override
-  State<VoteButton> createState() => _VoteButtonState();
-}
-
-class _VoteButtonState extends State<VoteButton> {
-  late bool active;
-
-  @override
-  void initState() {
-    super.initState();
-    active = widget.initialValue.toVoteDirection() == widget.action;
-  }
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(
-        active ? widget.iconActive : widget.iconNeutral,
-        color: active ? widget.colorActive : Colors.grey,
-      ),
-      onPressed: () {
-        if (active) {
-          widget.onChange?.call(VoteDirection.neutral);
-        } else {
-          widget.onChange?.call(widget.action);
-        }
-        setState(() {
-          active = !active;
-        });
+    return ValueListenableBuilder(
+      valueListenable: likes,
+      builder: (context, value, child) {
+        final active = value == action;
+        return IconButton(
+          icon: Icon(
+            active ? iconActive : iconNeutral,
+            color: active ? colorActive : Colors.grey,
+          ),
+          onPressed: () {
+            if (active) {
+              onChange?.call(VoteDirection.neutral);
+              likes.value = VoteDirection.neutral;
+            } else {
+              onChange?.call(action);
+              likes.value = action;
+            }
+          },
+        );
       },
     );
   }

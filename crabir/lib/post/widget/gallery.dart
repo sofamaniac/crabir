@@ -185,7 +185,10 @@ class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          VoteButton.like(initialValue: null, colorActive: theme.primaryColor),
+          VoteButton.like(
+            likes: ValueNotifier(VoteDirection.neutral),
+            colorActive: theme.primaryColor,
+          ),
           IconButton(
             icon: const Icon(Icons.favorite_border, color: Colors.white),
             onPressed: () {},

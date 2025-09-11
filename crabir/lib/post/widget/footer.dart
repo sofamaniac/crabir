@@ -11,18 +11,19 @@ class Footer extends StatelessWidget {
     final likeColor = theme.primaryColor;
     final dislikeColor = Colors.cyanAccent;
     final settings = context.read<PostsSettingsCubit>().state;
+    final likes = ValueNotifier(post.likes.toVoteDirection());
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         VoteButton.like(
-          initialValue: post.likes,
+          likes: likes,
           colorActive: likeColor,
-          onChange: onLike?.call,
+          onChange: onLike,
         ),
         VoteButton.dislike(
-          initialValue: post.likes,
+          likes: likes,
           colorActive: dislikeColor,
-          onChange: onLike?.call,
+          onChange: onLike,
         ),
         SaveButton(
           initialValue: post.saved,
