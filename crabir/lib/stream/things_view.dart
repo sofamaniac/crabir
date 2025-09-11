@@ -49,6 +49,7 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
     final itemCount = items.length;
     final totalSliverItems = itemCount * 2 + 1; // double count for separators
     return CustomScrollView(
+      key: PageStorageKey(widget.stream),
       slivers: [
         // Optional subreddit info at the top
         if (widget.subredditInfo != null)

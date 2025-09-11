@@ -3,6 +3,7 @@ import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/widget/post.dart';
 import 'package:crabir/routes/routes.dart';
+import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -87,38 +88,60 @@ class _UserViewState extends State<_UserView> {
                 }
               }).toList(),
               builder: (context, child, tabController) {
-                return NestedScrollView(
-                  headerSliverBuilder: (_, __) => [
-                    SliverAppBar.large(
-                      //floating: true,
-                      flexibleSpace: FlexibleSpaceBar(
-                        background: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircleAvatar(
-                              radius: 40,
-                              backgroundImage: NetworkImage(infos.iconImg),
+                return SafeArea(
+                  child: NestedScrollView(
+                    floatHeaderSlivers: true,
+                    headerSliverBuilder:
+                        (BuildContext context, bool innerBoxIsScrolled) {
+                      // These are the slivers that show up in the "outer" scroll view.
+                      return <Widget>[
+                        // FIXME: All the tabs share the same scrollcontroller therefore scrolling one scrolls the others
+                        // the NestedScrollView page of the docs offers a solution
+                        // but it does not work.
+                        SliverAppBar.large(
+                          flexibleSpace: FlexibleSpaceBar(
+                            background: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // TODO: add banner
+                                CircleAvatar(
+                                  radius: 40,
+                                  backgroundImage: NetworkImage(infos.iconImg),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  infos.name,
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              infos.name,
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          ],
+                          ),
+                          pinned: false,
+                          floating: false,
                         ),
-                      ),
-                      pinned: false,
-                      bottom: TabBar(
-                        isScrollable: true,
-                        tabAlignment: TabAlignment.start,
-                        tabs: tabs.map((tab) => Text(tab.name())).toList(),
-                        controller: tabController,
-                      ),
-                    )
-                  ],
-                  floatHeaderSlivers: true,
-                  body: child,
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: _TabBarDelegate(
+                            TabBar(
+                              isScrollable: true,
+                              tabAlignment: TabAlignment.start,
+                              tabs:
+                                  tabs.map((tab) => Text(tab.name())).toList(),
+                              controller: tabController,
+                            ),
+                          ),
+                        ),
+                      ];
+                    },
+                    body: Builder(
+                      builder: (context) {
+                        return child;
+                      },
+                    ),
+                  ),
                 );
               },
             );
@@ -127,4 +150,34 @@ class _UserViewState extends State<_UserView> {
           }
         });
   }
+}
+
+/// Custom delegate to pin the TabBar
+class _TabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar tabBar;
+  _TabBarDelegate(this.tabBar);
+
+  @override
+  double get minExtent => tabBar.preferredSize.height;
+  @override
+  double get maxExtent => tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    final theme = context.watch<ThemeBloc>().state;
+    return SizedBox(
+      height: tabBar.preferredSize.height,
+      child: ColoredBox(
+        color: theme.background,
+        child: tabBar,
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(_TabBarDelegate oldDelegate) => false;
 }
