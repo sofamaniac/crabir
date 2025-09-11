@@ -1,4 +1,4 @@
-{ pkgs, lib, config, inputs, ... }:
+{ pkgs, devenv, lib, config, inputs, ... }:
 
 {
   # https://devenv.sh/basics/
@@ -23,7 +23,7 @@
   # https://devenv.sh/languages/
   languages.rust = {
     enable = true;
-    channel = "nightly";
+    channel = "stable";
     targets = [ 
       "aarch64-linux-android"
       "i686-linux-android"
@@ -44,6 +44,9 @@
   '';
 
   enterShell = ''
+    export ENV_FILE="$DEVENV_ROOT/.env"
+    export FLUTTER_DIR="$DEVENV_ROOT/crabir"
+    export FRB_DIR="$DEVENV_ROOT/crabir_dir"
     hello
     git --version
   '';
@@ -60,8 +63,18 @@
     git --version | grep --color=auto "${pkgs.git.version}"
   '';
 
-  scripts.frun.exec = ''
-    flutter run --dart-define-from-file ../.env
+  scripts.run.exec = ''
+    pushd $FLUTTER_DIR
+    flutter_rust_bridge_codegen generate
+    flutter run --dart-define-from-file $ENV_FILE
+    popd
+  '';
+
+  scripts.build.exec = ''
+    pushd $FLUTTER_DIR
+    flutter_rust_bridge_codegen generate
+    flutter build apk --dart-define-from-file $ENV_FILE
+    popd
   '';
 
   # https://devenv.sh/git-hooks/
