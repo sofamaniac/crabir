@@ -63,24 +63,21 @@ class _GalleryViewState extends State<_GalleryView> {
   @override
   Widget build(BuildContext context) {
     final aspectRatio = widget.gallery.aspectRatio;
-    final controller = PageController(initialPage: 0);
-    controller.addListener(() {
-      setState(() {
-        _currentPage = controller.page?.round() ?? 0;
-      });
-    });
     return Stack(
       children: [
         AspectRatio(
           aspectRatio: aspectRatio,
-          child: GestureDetector(
-            onTap: () {
+          child: _GalleryPageViewer(
+            key: ValueKey(widget.gallery.length),
+            gallery: widget.gallery,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+            },
+            onTap: (_, __, ___) {
               _openFullScreen(_currentPage);
             },
-            child: _GalleryPageViewer(
-              gallery: widget.gallery,
-              controller: controller,
-            ),
           ),
         ),
         Positioned(
@@ -122,17 +119,16 @@ class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = PageController(initialPage: widget.initialPage);
-    controller.addListener(() {
-      setState(() {
-        _currentPage = controller.page?.round() ?? 0;
-      });
-    });
     return FullscreenMediaView(
       builder: (onTap) => _GalleryPageViewer(
         gallery: widget.gallery,
-        controller: controller,
         onTap: onTap,
+        initialPage: widget.initialPage,
+        onPageChanged: (index) {
+          setState(() {
+            _currentPage = index;
+          });
+        },
       ),
       trailing: Text(
         '${_currentPage + 1} / ${widget.gallery.length}',
@@ -144,16 +140,20 @@ class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
 
 class _GalleryPageViewer extends StatefulWidget {
   final Gallery gallery;
-  final PageController controller;
+  final void Function(int index)? onPageChanged;
+  // TODO: use
+  final int initialPage;
   final void Function(
     BuildContext,
     TapDownDetails,
     PhotoViewControllerValue,
   )? onTap;
   const _GalleryPageViewer({
+    super.key,
     required this.gallery,
-    required this.controller,
     this.onTap,
+    this.onPageChanged,
+    this.initialPage = 0,
   });
   @override
   State<_GalleryPageViewer> createState() => _GalleryPageViewerState();
@@ -161,21 +161,36 @@ class _GalleryPageViewer extends StatefulWidget {
 
 class _GalleryPageViewerState extends State<_GalleryPageViewer> {
   int _currentPage = 0;
+  late final PageController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = PageController(initialPage: widget.initialPage);
+    // Ensure first frame jumps to the correct page, without that it jumps to
+    // the last page when scrolling into view.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.jumpToPage(_currentPage);
+    });
+  }
 
   @override
   void dispose() {
-    widget.controller.dispose();
+    controller.dispose();
     super.dispose();
   }
 
   void _onPageChange(int index) {
-    setState(() {
-      _currentPage = widget.controller.page?.round() ?? 0;
-    });
+    _currentPage = index;
+    widget.onPageChanged?.call(index);
   }
 
   Widget toWidget(
-      GalleryMedia content, Resolution resolution, bool obfuscate, int index) {
+    GalleryMedia content,
+    Resolution resolution,
+    bool obfuscate,
+    int index,
+  ) {
     final List<Image> resolutions;
     if (obfuscate) {
       resolutions = content.obfuscated;
@@ -211,12 +226,12 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
 
   @override
   Widget build(BuildContext context) {
-    final settings = context.watch<DataSettingsCubit>().state;
     return PhotoViewGallery.builder(
-      pageController: widget.controller,
+      pageController: controller,
       onPageChanged: _onPageChange,
       itemCount: widget.gallery.length,
       builder: (context, index) {
+        final settings = context.watch<DataSettingsCubit>().state;
         final image = widget.gallery.get_(index: index)!;
         // TODO: handle resolution
         final Widget imageWidget = toWidget(
