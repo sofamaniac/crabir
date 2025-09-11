@@ -199,7 +199,6 @@ class _MainScreenViewState extends State<MainScreenView> {
     showingDialog = false;
   }
 
-  // -------- Dynamic End Drawer API --------
   void setEndDrawer(Widget? drawer) {
     setState(() => _endDrawer = drawer);
   }
@@ -233,7 +232,6 @@ class _MainScreenViewState extends State<MainScreenView> {
       physics: const NeverScrollableScrollPhysics(),
       routes: routes,
       builder: (context, child, tabController) {
-        // -------- Tab change listener --------
         void listener() {
           final index = tabController.index;
           if (showAccountSelectionDialogue(index) &&
@@ -258,7 +256,6 @@ class _MainScreenViewState extends State<MainScreenView> {
 
         final tabsRouter = AutoTabsRouter.of(context);
 
-        // -------- Single Scaffold with dynamic end drawer --------
         return DrawerHost(
           setEndDrawer: setEndDrawer,
           openEndDrawer: openEndDrawer,
@@ -266,8 +263,8 @@ class _MainScreenViewState extends State<MainScreenView> {
           child: Scaffold(
             key: _scaffoldKey,
             backgroundColor: theme.background,
-            drawer: const AppDrawer(), // global left drawer
-            endDrawer: _endDrawer, // dynamic per-screen right drawer
+            drawer: const AppDrawer(),
+            endDrawer: _endDrawer,
             body: child,
             bottomNavigationBar: TabBar(
               labelColor: Theme.of(context).primaryTextTheme.bodyLarge!.color,
@@ -275,6 +272,7 @@ class _MainScreenViewState extends State<MainScreenView> {
               controller: tabController,
               onTap: (index) {
                 tabsRouter.setActiveIndex(index);
+                // routes to reset to when taping on their tab icon.
                 final rootRoutes = {
                   subscriptionsIndex: const SubscriptionsTabRoute(),
                   searchIndex: const SearchSubredditsRoute(),
