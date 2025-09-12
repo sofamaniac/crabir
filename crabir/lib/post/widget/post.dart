@@ -3,7 +3,7 @@ import 'package:crabir/bool_to_vote.dart';
 import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/feed_list.dart';
-import 'package:crabir/post/widget/gallery.dart';
+import 'package:crabir/gallery/gallery.dart';
 import 'package:crabir/post/widget/html_with_fade.dart';
 import 'package:crabir/post/widget/image.dart';
 import 'package:crabir/post/widget/video.dart';

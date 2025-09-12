@@ -30,31 +30,36 @@ class YoutubeContent extends StatelessWidget {
 
 class VideoContent extends StatelessWidget {
   final Post post;
-  const VideoContent({super.key, required this.post});
+  final Resolution resolution;
+  const VideoContent(
+      {super.key, required this.post, this.resolution = Resolution.source});
   @override
   Widget build(BuildContext context) {
     final media = post.secureMedia;
     final preview = post.preview?.images[0];
-    return switch (media) {
-      Media_RedditVideo() => AnimatedContent.fromRedditVideo(
+    switch (media) {
+      case Media_RedditVideo():
+        return AnimatedContent.fromRedditVideo(
           media: media,
           placeholderUrl: preview?.resolutions[0].url,
-        ),
-      Media_Oembed() => AnimatedContent.fromMediaOEmbed(
+        );
+      case Media_Oembed():
+        return AnimatedContent.fromMediaOEmbed(
           media: media,
           placeholderUrl: preview?.resolutions[0].url,
-        ),
-      null when preview?.variants.mp4 != null =>
-        AnimatedContent.fromVariantInner(
-          mp4: preview!.variants.mp4!,
+        );
+      case null when preview?.variants.mp4 != null:
+        return AnimatedContent.fromVariantInner(
+          mp4: preview!.variants.mp4!.withResolution(resolution),
           placeholderUrl: preview.resolutions[0].url,
-        ),
-      null when preview?.variants.gif != null =>
-        AnimatedContent.fromVariantInner(
-          mp4: preview!.variants.gif!,
+        );
+      case null when preview?.variants.gif != null:
+        return AnimatedContent.fromVariantInner(
+          mp4: preview!.variants.gif!.withResolution(resolution),
           placeholderUrl: preview.resolutions[0].url,
-        ),
-      _ => Center(child: Text("Error while loading video")),
-    };
+        );
+      default:
+        return Center(child: Text("Error while loading video"));
+    }
   }
 }

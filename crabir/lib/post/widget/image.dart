@@ -41,18 +41,28 @@ class _ImageContentState extends State<ImageContent> {
         ),
       );
     } else {
+      final resolution =
+          context.read<DataSettingsCubit>().state.preferredQuality;
+
       if (widget.post.preview!.images[0].variants.mp4 != null) {
-        // TODO: resolution
-        return VideoContent(post: widget.post);
+        return VideoContent(
+          post: widget.post,
+          resolution: resolution,
+        );
       }
-      final settings = context.read<DataSettingsCubit>().state;
       final RedditImage image = widget.post.preview!.images[0];
       return InkWell(
         onTap: () {
           if (!obfuscate) {
             context.router.navigate(
-              // TODO: resolution
-              FullscreenImageRoute(imageUrl: image.source.url),
+              FullscreenImageRoute(
+                imageUrl: image
+                    .withResolution(
+                      resolution,
+                      false,
+                    )
+                    .url,
+              ),
             );
           } else {
             setState(() {
@@ -63,7 +73,7 @@ class _ImageContentState extends State<ImageContent> {
         child: ImageThumbnail.redditImage(
           image,
           blur: obfuscate,
-          resolution: settings.preferredQuality,
+          resolution: resolution,
         ),
       );
     }
