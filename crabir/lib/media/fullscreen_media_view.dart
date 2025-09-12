@@ -3,7 +3,13 @@ part of 'media.dart';
 class FullscreenMediaView extends StatefulWidget {
   final Widget Function(PhotoViewImageTapDownCallback) builder;
   final Widget? trailing;
-  const FullscreenMediaView({super.key, required this.builder, this.trailing});
+  final String? title;
+  const FullscreenMediaView({
+    super.key,
+    required this.builder,
+    this.trailing,
+    this.title,
+  });
 
   @override
   State<FullscreenMediaView> createState() => _FullscreenMediaViewState();
@@ -19,7 +25,7 @@ class _FullscreenMediaViewState extends State<FullscreenMediaView> {
       body: Stack(
         children: [
           Dismissible(
-            key: UniqueKey(),
+            key: Key("_FullscreenMediaViewState"),
             direction: DismissDirection.vertical,
             onDismissed: (_) => context.pop(),
             child: PhotoViewGestureDetectorScope(
@@ -48,24 +54,30 @@ class _FullscreenMediaViewState extends State<FullscreenMediaView> {
     final theme = context.watch<ThemeBloc>().state;
     final bar = SafeArea(
       top: false,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          VoteButton.like(
-            likes: ValueNotifier(VoteDirection.neutral),
-            colorActive: theme.primaryColor,
-          ),
-          IconButton(
-            icon: const Icon(Icons.favorite_border, color: Colors.white),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.share, color: Colors.white),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.download, color: Colors.white),
-            onPressed: () {},
+          if (widget.title != null) Text(widget.title!),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              VoteButton.like(
+                likes: ValueNotifier(VoteDirection.neutral),
+                colorActive: theme.primaryColor,
+              ),
+              IconButton(
+                icon: const Icon(Icons.favorite_border, color: Colors.white),
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: const Icon(Icons.share, color: Colors.white),
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: const Icon(Icons.download, color: Colors.white),
+                onPressed: () {},
+              ),
+            ],
           ),
         ],
       ),

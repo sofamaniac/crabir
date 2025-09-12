@@ -11,6 +11,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
+part 'full_screen_gallery_view.dart';
+
 class GalleryView extends StatelessWidget {
   final Post post;
   final void Function(VoteDirection)? onVote;
@@ -27,6 +29,8 @@ class GalleryView extends StatelessWidget {
       if (gallery != null) {
         return _GalleryView(
           gallery: gallery,
+          onVote: onVote,
+          onSave: onSave,
         );
       } else {
         return Text("Error: Gallery and is Crosspost but no gallery on parent");
@@ -68,7 +72,6 @@ class _GalleryViewState extends State<_GalleryView> {
         AspectRatio(
           aspectRatio: aspectRatio,
           child: _GalleryPageViewer(
-            key: ValueKey(widget.gallery.length),
             gallery: widget.gallery,
             onPageChanged: (index) {
               setState(() {
@@ -94,66 +97,22 @@ class _GalleryViewState extends State<_GalleryView> {
   }
 }
 
-@RoutePage()
-class FullScreenGalleryView extends StatefulWidget {
-  final Gallery gallery;
-  final int initialPage;
-
-  const FullScreenGalleryView({
-    super.key,
-    required this.gallery,
-    required this.initialPage,
-  });
-
-  @override
-  State<FullScreenGalleryView> createState() => _FullScreenGalleryViewState();
-}
-
-class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
-  late int _currentPage;
-  @override
-  void initState() {
-    super.initState();
-    _currentPage = widget.initialPage;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FullscreenMediaView(
-      builder: (onTap) => _GalleryPageViewer(
-        gallery: widget.gallery,
-        onTap: onTap,
-        initialPage: widget.initialPage,
-        onPageChanged: (index) {
-          setState(() {
-            _currentPage = index;
-          });
-        },
-      ),
-      trailing: Text(
-        '${_currentPage + 1} / ${widget.gallery.length}',
-        style: TextStyle(color: Colors.white),
-      ),
-    );
-  }
-}
-
 class _GalleryPageViewer extends StatefulWidget {
   final Gallery gallery;
   final void Function(int index)? onPageChanged;
-  // TODO: use
   final int initialPage;
+  final PageController? controller;
   final void Function(
     BuildContext,
     TapDownDetails,
     PhotoViewControllerValue,
   )? onTap;
   const _GalleryPageViewer({
-    super.key,
     required this.gallery,
     this.onTap,
     this.onPageChanged,
     this.initialPage = 0,
+    this.controller,
   });
   @override
   State<_GalleryPageViewer> createState() => _GalleryPageViewerState();
@@ -161,22 +120,25 @@ class _GalleryPageViewer extends StatefulWidget {
 
 class _GalleryPageViewerState extends State<_GalleryPageViewer> {
   int _currentPage = 0;
-  late final PageController controller;
+  late final PageController _controller;
 
   @override
   void initState() {
     super.initState();
-    controller = PageController(initialPage: widget.initialPage);
-    // Ensure first frame jumps to the correct page, without that it jumps to
-    // the last page when scrolling into view.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.jumpToPage(_currentPage);
-    });
+    _controller = PageController(initialPage: widget.initialPage);
+
+    if (widget.controller == null) {
+      // Ensure first frame jumps to the correct page, without that it jumps to
+      // the last page when scrolling into view.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _controller.jumpToPage(_currentPage);
+      });
+    }
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -197,11 +159,7 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
     } else {
       resolutions = content.previews;
     }
-    final placeholder = switch (resolution) {
-      Resolution.source || Resolution.high => resolutions.last,
-      Resolution.medium => resolutions[(resolutions.length / 2).toInt()],
-      Resolution.low => resolutions.first,
-    };
+    final placeholder = resolutions.withResolution(resolution);
     switch (content.source) {
       case Source_AnimatedImage(:final source):
         // In galleries video do not have alternate resolutions.
@@ -214,7 +172,10 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
         );
       case Source_Image(:final source):
         if (resolution case Resolution.source) {
-          return ImageThumbnail.fromGalleryImage(source);
+          return ImageThumbnail.fromGalleryImage(
+            source,
+            placeholderUrl: placeholder.u,
+          );
         } else {
           return ImageThumbnail.fromGalleryImage(
             placeholder,
@@ -227,20 +188,18 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
   @override
   Widget build(BuildContext context) {
     return PhotoViewGallery.builder(
-      pageController: controller,
+      pageController: widget.controller ?? _controller,
       onPageChanged: _onPageChange,
       itemCount: widget.gallery.length,
       builder: (context, index) {
         final settings = context.watch<DataSettingsCubit>().state;
         final image = widget.gallery.get_(index: index)!;
-        // TODO: handle resolution
         final Widget imageWidget = toWidget(
           image,
           settings.preferredQuality,
           false,
           index,
         );
-        // TODO: display title if any
         return PhotoViewGalleryPageOptions.customChild(
           child: imageWidget,
           onTapDown: widget.onTap,

@@ -21,6 +21,8 @@ abstract class Gallery implements RustOpaqueInterface {
   double get aspectRatio;
 
   int get length;
+
+  String? getTitle({required int index});
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<GalleryData>>

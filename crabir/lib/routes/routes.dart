@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/feed/feed.dart';
 import 'package:crabir/feed/multi.dart';
+import 'package:crabir/gallery/gallery.dart';
 import 'package:crabir/main.dart';
 import 'package:crabir/media/media.dart';
-import 'package:crabir/post/widget/gallery.dart';
 import 'package:crabir/search_posts/widgets/search.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';

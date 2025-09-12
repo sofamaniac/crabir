@@ -21,23 +21,7 @@ class ImageThumbnail extends StatelessWidget {
     Resolution resolution = Resolution.source,
     bool blur = false,
   }) {
-    final variants = image.variants.nsfw ?? image.variants.obfuscated;
-    final List<ImageBase> resolutions;
-    final ImageBase source;
-    if (variants != null && blur) {
-      resolutions = variants.resolutions;
-      source = variants.source;
-    } else {
-      resolutions = image.resolutions;
-      source = image.source;
-    }
-    final length = image.resolutions.length;
-    final ImageBase imageBase = switch (resolution) {
-      Resolution.source => source,
-      Resolution.high => resolutions[length - 2],
-      Resolution.medium => resolutions[(length / 2).toInt()],
-      Resolution.low => resolutions[0],
-    };
+    final imageBase = image.withResolution(resolution, blur);
     return ImageThumbnail(
       imageUrl: imageBase.url,
       width: imageBase.width,

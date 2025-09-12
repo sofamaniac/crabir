@@ -23,6 +23,11 @@ impl Gallery {
         }
     }
 
+    #[frb(sync)]
+    pub fn get_title(&self, index: u32) -> Option<String> {
+        self.gallery_data.items[index as usize].caption.clone()
+    }
+
     #[frb(sync, getter)]
     pub fn get_aspect_ratio(&self) -> f32 {
         let mut aspect_ratio = f32::INFINITY;
