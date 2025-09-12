@@ -1,5 +1,0 @@
-[toolchain]
-channel = "nightly"
-components = [ "rustfmt", "rustc-dev", "rust-analyzer", "clippy", "cargo" ]
-targets = [ "aarch64-linux-android", "i686-linux-android", "x86_64-linux-android", "armv7-linux-androideabi" ]
-

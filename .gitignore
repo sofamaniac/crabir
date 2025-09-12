@@ -6,6 +6,7 @@ frb_generated*
 .env
 .gradle/
 .android/
+todo
 
 # Devenv
 .devenv*

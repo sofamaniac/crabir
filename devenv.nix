@@ -38,17 +38,10 @@
   # https://devenv.sh/services/
   # services.postgres.enable = true;
 
-  # https://devenv.sh/scripts/
-  scripts.hello.exec = ''
-    echo hello from $GREET
-  '';
-
   enterShell = ''
     export ENV_FILE="$DEVENV_ROOT/.env"
     export FLUTTER_DIR="$DEVENV_ROOT/crabir"
     export FRB_DIR="$DEVENV_ROOT/crabir_dir"
-    hello
-    git --version
   '';
 
   # https://devenv.sh/tasks/
