@@ -153,7 +153,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get comments => 'Comments';
+  String get comments => 'comments';
+
+  @override
+  String commentsNumbered(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n comments',
+      one: '1 comment',
+    );
+    return '$_temp0';
+  }
 
   @override
   String loadMoreComments(int n) {

@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/loading_indicator.dart';
-import 'package:crabir/post/widget/post.dart';
+import 'package:crabir/post/post.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/search_posts/bloc/search_bloc.dart';
 import 'package:crabir/search_posts/widgets/sort_menu.dart';

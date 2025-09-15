@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/media/media.dart';
-import 'package:crabir/post/widget/video.dart';
+import 'package:crabir/post/parts/video.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';

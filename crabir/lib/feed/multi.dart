@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/feed/sort_display.dart';
 import 'package:crabir/feed/sort_menu.dart';
-import 'package:crabir/post/widget/post.dart';
+import 'package:crabir/post/post.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';

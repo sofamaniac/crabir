@@ -96,7 +96,18 @@
     }
   },
 
-  "comments": "Comments",
+  "comments": "comments",
+
+  "commentsNumbered": "{n, plural, =1{1 comment} other {{n} comments}}",
+  "@commentsNumbered": {
+    "description": "comments",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
   "loadMoreComments": "{n, plural, =1{Load 1 comment} other{Load {n} comments}}",
   "@loadMoreComments": {
     "description": "Label for load more button",

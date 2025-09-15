@@ -7,7 +7,7 @@ import 'package:crabir/feed/top_bar.dart';
 import 'package:crabir/html_view.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/main.dart';
-import 'package:crabir/post/widget/post.dart';
+import 'package:crabir/post/post.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';

@@ -1,4 +1,4 @@
-part of 'post.dart';
+part of '../post.dart';
 
 class Header extends StatelessWidget {
   final Post post;
@@ -35,7 +35,7 @@ class Header extends StatelessWidget {
     );
     if (settings.clickableCommunity) {
       return InkWell(
-        onTap: () => context.router.root.navigate(
+        onTap: () => context.pushRoute(
           FeedRoute(
             feed: Feed.subreddit(name),
           ),
@@ -77,7 +77,7 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
+    return SeparatedRow(
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         _subreddit(context),
@@ -86,12 +86,9 @@ class Header extends StatelessWidget {
             quarterTurns: 1,
             child: Icon(Icons.alt_route, color: Colors.greenAccent),
           ),
-        const Text(' • '),
         _author(context),
-        const Text(' • '),
         Text(post.createdUtc.timeSince(context), style: _labelStyle(context)),
         if (_showDomain()) ...[
-          const Text(' • '),
           Text(
             post.domain,
             style: _labelStyle(context),

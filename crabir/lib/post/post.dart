@@ -1,12 +1,14 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crabir/bool_to_vote.dart';
 import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/feed_list.dart';
 import 'package:crabir/gallery/gallery.dart';
-import 'package:crabir/post/widget/html_with_fade.dart';
-import 'package:crabir/post/widget/image.dart';
-import 'package:crabir/post/widget/video.dart';
+import 'package:crabir/l10n/app_localizations.dart';
+import 'package:crabir/post/parts/html_with_fade.dart';
+import 'package:crabir/post/parts/image.dart';
+import 'package:crabir/post/parts/video.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
@@ -21,22 +23,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-part 'title.dart';
-part 'header.dart';
-part 'footer.dart';
-
-final horizontalPadding = 16.0;
-
-class NsfwTag extends StatelessWidget {
-  const NsfwTag({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Cartouche(
-      "NSFW",
-      background: Colors.red,
-    );
-  }
-}
+part 'parts/title.dart';
+part 'parts/header.dart';
+part 'parts/footer.dart';
+part 'parts/score.dart';
+part 'parts/tags.dart';
+part 'parts/separated_row.dart';
+part 'parts/thumbnail.dart';
+part 'dense_card.dart';
 
 class RedditPostCard extends StatelessWidget {
   final Post post;
@@ -61,7 +55,8 @@ class RedditPostCard extends StatelessWidget {
   });
 
   Widget wrap(Widget widget) {
-    return Padding(padding: EdgeInsets.symmetric(horizontal: 4), child: widget);
+    return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16), child: widget);
   }
 
   bool showThumbnail() {
@@ -73,10 +68,21 @@ class RedditPostCard extends StatelessWidget {
   }
 
   Widget title(BuildContext context) {
-    return PostTitle(
-      post: post,
-      showThumbnail: showThumbnail(),
+    final title = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        PostTitle(post: post),
+        flair(context),
+        PostScore(post: post),
+      ],
     );
+    if (showThumbnail()) {
+      return Thumbnail(
+        post: post,
+        child: title,
+      );
+    }
+    return title;
   }
 
   Widget _contentWrap(Widget widget) {
@@ -93,14 +99,16 @@ class RedditPostCard extends StatelessWidget {
 
   Widget content(BuildContext context) {
     final widget = switch (post.kind) {
-      Kind.meta => Text("meta"),
-      Kind.video => VideoContent(post: post),
+      // Media types
+      Kind.video when showMedia => VideoContent(post: post),
       Kind.youtubeVideo when showMedia => YoutubeContent(post: post),
       (Kind.mediaGallery || Kind.gallery) when showMedia =>
         GalleryView(post: post),
       Kind.image when showMedia => ImageContent(
           post: post,
         ),
+      // Text types
+      Kind.meta => Text("meta"),
       Kind.link || Kind.unknown => Container(),
       Kind.selftext || _ => HtmlWithConditionalFade(
           htmlContent: post.selftextHtml ?? "",
@@ -109,6 +117,37 @@ class RedditPostCard extends StatelessWidget {
     };
 
     return _contentWrap(widget);
+  }
+
+  Widget flair(BuildContext context) {
+    final settings = context.read<PostsSettingsCubit>().state;
+    final Widget flairWidget;
+    if (settings.tapFlairToSearch) {
+      flairWidget = InkWell(
+        onTap: () => context.router.root.navigate(
+          SearchPostsRoute(
+            // provide key to differentiate the pages
+            // but prevents rebuilding when clicking the same flair again
+            key: ValueKey("${post.subreddit.subreddit}-${post.linkFlair}"),
+            subreddit: post.subreddit.subreddit,
+            flair: post.linkFlair,
+          ),
+        ),
+        child: FlairView(flair: post.linkFlair),
+      );
+    } else {
+      flairWidget = FlairView(flair: post.linkFlair);
+    }
+
+    if (post.spoiler) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 8,
+        children: [SpoilerTag(), flairWidget],
+      );
+    } else {
+      return flairWidget;
+    }
   }
 
   @override
@@ -128,45 +167,6 @@ class RedditPostCard extends StatelessWidget {
             onSave: onSave,
           ),
         ),
-      ],
-    );
-    final theme = context.watch<ThemeBloc>().state;
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      color: theme.background,
-      elevation: 1,
-      child: InkWell(
-        onTap: onTap,
-        child: contentWidget,
-      ),
-    );
-  }
-}
-
-class DenseCard extends RedditPostCard {
-  const DenseCard(
-      {super.key, required super.post, super.onSave, super.onLike, super.onTap})
-      : super(showMedia: false);
-  @override
-  Widget build(BuildContext context) {
-    final contentWidget = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      spacing: 8,
-      children: [
-        wrap(
-          PostTitle(
-            post: post,
-            showThumbnail: showThumbnail(),
-          ),
-        ),
-        wrap(
-          Header(
-            post: post,
-            showSubredditIcon: false,
-          ),
-        ),
-        //content(context),
       ],
     );
     final theme = context.watch<ThemeBloc>().state;

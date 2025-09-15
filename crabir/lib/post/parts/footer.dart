@@ -1,4 +1,4 @@
-part of 'post.dart';
+part of '../post.dart';
 
 class Footer extends StatelessWidget {
   final Post post;

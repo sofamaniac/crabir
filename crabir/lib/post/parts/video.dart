@@ -49,13 +49,13 @@ class VideoContent extends StatelessWidget {
           placeholderUrl: preview?.resolutions[0].url,
         );
       case null when preview?.variants.mp4 != null:
-        return AnimatedContent.fromVariantInner(
-          mp4: preview!.variants.mp4!.withResolution(resolution),
+        return AnimatedContent.fromImageBase(
+          image: preview!.variants.mp4!.withResolution(resolution),
           placeholderUrl: preview.resolutions[0].url,
         );
       case null when preview?.variants.gif != null:
-        return AnimatedContent.fromVariantInner(
-          mp4: preview!.variants.gif!.withResolution(resolution),
+        return AnimatedContent.fromImageBase(
+          image: preview!.variants.gif!.withResolution(resolution),
           placeholderUrl: preview.resolutions[0].url,
         );
       default:

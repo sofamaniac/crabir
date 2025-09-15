@@ -289,8 +289,14 @@ abstract class AppLocalizations {
   /// No description provided for @comments.
   ///
   /// In en, this message translates to:
-  /// **'Comments'**
+  /// **'comments'**
   String get comments;
+
+  /// comments
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{1 comment} other {{n} comments}}'**
+  String commentsNumbered(int n);
 
   /// Label for load more button
   ///

@@ -1,6 +1,8 @@
 import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:crabir/loading_indicator.dart';
-import 'package:crabir/post/widget/post.dart';
+import 'package:crabir/post/post.dart';
+import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/sort.dart';
@@ -170,7 +172,17 @@ class _PostView extends RedditPostCard {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: DenseCard(post: post.crosspostParentList.first),
+                child: DenseCard(
+                  post: post.crosspostParentList.first,
+                  onTap: () {
+                    context.pushRoute(
+                      ThreadRoute(
+                        key: ValueKey(post.id),
+                        post: post.crosspostParentList.first,
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           )
