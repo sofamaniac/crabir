@@ -63,7 +63,7 @@ dependencies:
   hydrated_bloc: ^10.1.1
   json_annotation: ^4.9.0
   path_provider: ^2.1.5
-  connectivity_plus: ^6.1.5
+  connectivity_plus: ^7.0.0
 
 dev_dependencies:
   flutter_test:
