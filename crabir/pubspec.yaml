@@ -64,6 +64,7 @@ dependencies:
   json_annotation: ^4.9.0
   path_provider: ^2.1.5
   connectivity_plus: ^6.1.5
+  visibility_detector: ^0.4.0+2
 
 dev_dependencies:
   flutter_test:
