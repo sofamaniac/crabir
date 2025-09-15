@@ -165,6 +165,9 @@ class _CommentViewState extends State<CommentView>
           colorActive: likeColor,
           onChange: (target) async {
             await vote(target, settings.hideButtonAfterAction);
+            if (settings.hideButtonAfterAction) {
+              showBottomBar = false;
+            }
           },
         ),
         VoteButton.dislike(
@@ -172,6 +175,9 @@ class _CommentViewState extends State<CommentView>
           colorActive: dislikeColor,
           onChange: (target) async {
             await vote(target, settings.hideButtonAfterAction);
+            if (settings.hideButtonAfterAction) {
+              showBottomBar = false;
+            }
           },
         ),
         if (settings.showSaveButton)
@@ -179,6 +185,9 @@ class _CommentViewState extends State<CommentView>
             initialValue: widget.comment.saved,
             onChange: (target) async {
               await save(target, settings.hideButtonAfterAction);
+              if (settings.hideButtonAfterAction) {
+                showBottomBar = false;
+              }
             },
           ),
         IconButton(
