@@ -19,5 +19,5 @@ jobs:
       - name: Install devenv.sh
         run: nix profile install nixpkgs#devenv
       - name: Try Building
-        working-directory: ./crabir
-        run: devenv shell -- flutter build apk --debug
+        working-directory: /
+        run: devenv shell -- build
