@@ -168,7 +168,6 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
           width: source.x,
           height: source.y,
           placeholderUrl: placeholder.u,
-          shouldPlay: index == _currentPage,
         );
       case Source_Image(:final source):
         if (resolution case Resolution.source) {

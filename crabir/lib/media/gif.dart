@@ -12,10 +12,6 @@ class AnimatedContent extends StatefulWidget {
   final Resolution preferredResolution;
   final Widget? cartouche;
 
-  /// If provided, overrides global feed logic.
-  /// Useful for carousels where PageView knows the active page.
-  final bool? shouldPlay;
-
   const AnimatedContent({
     super.key,
     required this.url,
@@ -23,7 +19,6 @@ class AnimatedContent extends StatefulWidget {
     required this.height,
     this.placeholderUrl,
     this.preferredResolution = Resolution.source,
-    this.shouldPlay,
     this.cartouche,
   });
 
@@ -32,7 +27,6 @@ class AnimatedContent extends StatefulWidget {
     required ImageBase image,
     this.placeholderUrl,
     this.preferredResolution = Resolution.source,
-    this.shouldPlay,
     this.cartouche,
   })  : url = image.url,
         width = image.width,
@@ -43,7 +37,6 @@ class AnimatedContent extends StatefulWidget {
     required VariantInner mp4,
     this.placeholderUrl,
     this.preferredResolution = Resolution.source,
-    this.shouldPlay,
     this.cartouche,
   })  : url = mp4.source.url,
         width = mp4.source.width,
@@ -54,7 +47,6 @@ class AnimatedContent extends StatefulWidget {
     required Media_Oembed media,
     this.placeholderUrl,
     this.preferredResolution = Resolution.source,
-    this.shouldPlay,
     this.cartouche,
   })  : url = media.oembed.providerUrl,
         width = media.oembed.width,
@@ -65,7 +57,6 @@ class AnimatedContent extends StatefulWidget {
     required Media_RedditVideo media,
     this.placeholderUrl,
     this.preferredResolution = Resolution.source,
-    this.shouldPlay,
     this.cartouche = const Cartouche(
       "video",
       background: Colors.orange,
@@ -81,7 +72,7 @@ class AnimatedContent extends StatefulWidget {
 class _AnimatedContentState extends State<AnimatedContent> {
   late VideoPlayerController _controller;
   bool _showControls = false;
-  bool _muted = false;
+  bool _muted = true;
   bool _canAutoplay = false;
   double _visibilityFraction = 0;
 
@@ -92,6 +83,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
     super.initState();
     _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url));
     _controller.setLooping(true);
+    _controller.setVolume(0);
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => _controller.initialize(),
     );
@@ -164,6 +156,52 @@ class _AnimatedContentState extends State<AnimatedContent> {
     );
   }
 
+  Widget _controls(BuildContext context, VideoPlayerValue value) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.black45,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: Icon(
+              value.isPlaying ? Icons.pause : Icons.play_arrow,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              if (value.isPlaying) {
+                _controller.pause();
+              } else {
+                _controller.play();
+              }
+              setState(() {});
+            },
+          ),
+          Expanded(
+            child: Slider(
+              value: value.position.inSeconds.toDouble(),
+              max: value.duration.inSeconds.toDouble(),
+              onChanged: (newValue) {
+                _controller.seekTo(Duration(seconds: newValue.toInt()));
+              },
+              activeColor: Colors.redAccent,
+              inactiveColor: Colors.white30,
+            ),
+          ),
+          IconButton(
+            icon: Icon(
+              _muted ? Icons.volume_off : Icons.volume_up,
+              color: Colors.white,
+            ),
+            onPressed: _toggleMute,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -203,53 +241,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
               valueListenable: _controller,
               builder: (context, value, _) {
                 if (_showControls) {
-                  return Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black45,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        // Play/Pause
-                        IconButton(
-                          icon: Icon(
-                            value.isPlaying ? Icons.pause : Icons.play_arrow,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            if (value.isPlaying) {
-                              _controller.pause();
-                            } else {
-                              _controller.play();
-                            }
-                            setState(() {});
-                          },
-                        ),
-                        // Scrubber
-                        Expanded(
-                          child: Slider(
-                            value: value.position.inSeconds.toDouble(),
-                            max: value.duration.inSeconds.toDouble(),
-                            onChanged: (newValue) {
-                              _controller
-                                  .seekTo(Duration(seconds: newValue.toInt()));
-                            },
-                            activeColor: Colors.redAccent,
-                            inactiveColor: Colors.white30,
-                          ),
-                        ),
-                        // Mute/Unmute
-                        IconButton(
-                          icon: Icon(
-                            _muted ? Icons.volume_off : Icons.volume_up,
-                            color: Colors.white,
-                          ),
-                          onPressed: _toggleMute,
-                        ),
-                      ],
-                    ),
-                  );
+                  return _controls(context, value);
                 } else {
                   // Remaining time overlay
                   final remaining = value.duration - value.position;
