@@ -64,7 +64,8 @@ abstract class Post implements RustOpaqueInterface, Votable {
 
   Future<String?> getDiscussionType();
 
-  Future<String?> getDistinguished();
+  /// flutter_rust_bridge:getter,sync
+  String? get distinguished;
 
   /// flutter_rust_bridge:getter,sync
   String get domain;
@@ -233,7 +234,8 @@ abstract class Post implements RustOpaqueInterface, Votable {
 
   Future<String?> getViewCount();
 
-  Future<bool> getVisited();
+  /// flutter_rust_bridge:getter,sync
+  bool get visited;
 
   Future<int?> getWls();
 

@@ -90,6 +90,7 @@ pub struct Post {
     /// flutter_rust_bridge:getter,sync
     #[getset(set = "pub(crate)")]
     likes: Option<bool>,
+    /// flutter_rust_bridge:getter,sync
     visited: bool,
 
     // Score
@@ -210,6 +211,7 @@ pub struct Post {
     can_gild: bool,
     treatment_tags: Vec<Option<String>>,
     num_reports: Option<u32>,
+    /// flutter_rust_bridge:getter,sync
     distinguished: Option<String>,
     is_robot_indexable: bool,
     num_duplicates: Option<u32>,

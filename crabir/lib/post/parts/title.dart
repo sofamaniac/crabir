@@ -8,42 +8,15 @@ class PostTitle extends StatelessWidget {
     required this.post,
   });
 
-  Widget thumbnail() {
-    if (post.thumbnail != null) {
-      return Expanded(
-        flex: 1,
-        child: AspectRatio(
-          aspectRatio: 1.0,
-          child: ClipRect(
-            child: Image.network(post.thumbnail!.url, fit: BoxFit.cover),
-          ),
-        ),
-      );
-    } else {
-      return Expanded(
-        flex: 1,
-        child: AspectRatio(
-          aspectRatio: 1.0,
-          child: ClipRect(
-            child: ColoredBox(
-              color: Colors.grey,
-              child: Center(
-                child: Icon(Icons.link),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<ThemeBloc>().state;
     final Color titleColor;
     // TODO: add if post read.
-    if (post.pinned) {
+    if (post.pinned || post.distinguished == "moderator") {
       titleColor = theme.announcement;
+    } else if (post.visited) {
+      titleColor = theme.readPost;
     } else {
       titleColor = theme.postTitle;
     }
