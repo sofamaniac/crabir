@@ -40,7 +40,7 @@ extension RedditImageGetResolution on RedditImage {
 }
 
 extension VariantGetResolution on VariantInner {
-  withResolution(Resolution resolution) {
+  ImageBase withResolution(Resolution resolution) {
     switch (resolution) {
       case Resolution.source:
         return source;
