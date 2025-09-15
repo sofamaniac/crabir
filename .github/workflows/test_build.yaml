@@ -19,5 +19,4 @@ jobs:
       - name: Install devenv.sh
         run: nix profile install nixpkgs#devenv
       - name: Try Building
-        working-directory: /
-        run: devenv shell -- build
+        run: devenv shell build
