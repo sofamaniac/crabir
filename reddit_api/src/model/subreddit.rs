@@ -184,10 +184,20 @@ pub struct Subreddit {
     #[serde(rename = "allow_galleries", deserialize_with = "response_or_default")]
     pub allow_galleries: bool,
 
-    #[serde(rename = "active_user_count", deserialize_with = "response_or_default")]
+    #[serde(
+        rename = "active_user_count",
+        deserialize_with = "response_or_default",
+        default
+    )]
+    #[deprecated(note = "Reddit seems to have remove it from it responses")]
     pub active_user_count: u32,
-    #[serde(rename = "accounts_active", deserialize_with = "response_or_default")]
-    pub accounts_active: Option<u32>,
+    #[serde(
+        rename = "accounts_active",
+        deserialize_with = "response_or_default",
+        default
+    )]
+    #[deprecated(note = "Reddit seems to have remove it from it responses")]
+    pub accounts_active: u32,
     #[serde(rename = "public_traffic", deserialize_with = "response_or_default")]
     pub public_traffic: bool,
     #[serde(rename = "hide_ads", deserialize_with = "response_or_default")]
@@ -291,11 +301,6 @@ pub struct Subreddit {
         deserialize_with = "response_or_default"
     )]
     pub can_assign_link_flair: bool,
-    #[serde(
-        rename = "accounts_active_is_fuzzed",
-        deserialize_with = "response_or_default"
-    )]
-    pub accounts_active_is_fuzzed: bool,
     #[serde(
         rename = "allow_prediction_contributors",
         deserialize_with = "response_or_default"

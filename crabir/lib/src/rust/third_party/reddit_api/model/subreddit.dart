@@ -186,9 +186,7 @@ abstract class Details implements RustOpaqueInterface {
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Subreddit>>
 abstract class Subreddit implements RustOpaqueInterface {
-  int? get accountsActive;
-
-  bool get accountsActiveIsFuzzed;
+  int get accountsActive;
 
   int get activeUserCount;
 
@@ -302,9 +300,7 @@ abstract class Subreddit implements RustOpaqueInterface {
 
   int? get wls;
 
-  set accountsActive(int? accountsActive);
-
-  set accountsActiveIsFuzzed(bool accountsActiveIsFuzzed);
+  set accountsActive(int accountsActive);
 
   set activeUserCount(int activeUserCount);
 
