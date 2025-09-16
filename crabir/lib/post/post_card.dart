@@ -78,6 +78,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
   Widget title() {
     final title = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 4,
       children: [
         PostTitle(post: widget.post),
         PostFlair(post: widget.post),
@@ -85,9 +86,11 @@ class _RedditPostCardState extends State<RedditPostCard> {
       ],
     );
     if (widget.post.kind.showThumbnail(widget.showMedia)) {
-      return Thumbnail(
-        post: widget.post,
-        child: title,
+      return wrapPostElement(
+        Thumbnail(
+          post: widget.post,
+          child: title,
+        ),
       );
     }
     return wrapPostElement(title);

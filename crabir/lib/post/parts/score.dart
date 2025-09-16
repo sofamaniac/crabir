@@ -29,7 +29,10 @@ class PostScore extends StatelessWidget {
           ),
           if (post.over18) ...[
             spacer,
-            WidgetSpan(child: NsfwTag()),
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: NsfwTag(),
+            ),
           ],
         ],
       ),
