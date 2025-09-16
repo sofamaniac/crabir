@@ -8,7 +8,8 @@ import 'package:crabir/sort.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart'
+    hide Thumbnail;
 import 'package:crabir/thread/bloc/thread_bloc.dart';
 import 'package:crabir/thread/widgets/comment.dart';
 import 'package:flutter/material.dart';
@@ -142,52 +143,55 @@ int depth(Thing comment) {
   };
 }
 
-class _PostView extends RedditPostCard {
+class _PostView extends StatelessWidget {
+  final Post post;
   const _PostView({
-    required super.post,
-  }) : super(showMedia: false);
+    required this.post,
+  });
 
-  @override
-  bool showThumbnail() {
-    return super.showThumbnail() && post.crosspostParentList.isEmpty;
+  Widget title(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        PostTitle(post: post),
+        PostFlair(post: post),
+        PostScore(post: post),
+      ],
+    );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final contentWidget = Column(
+  Widget nestedCard(BuildContext context) {
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       spacing: 8,
       children: [
-        wrap(Header(post: post)),
-        wrap(title(context)),
-        if (post.crosspostParentList.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.white54),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DenseCard(
-                  post: post.crosspostParentList.first,
-                  onTap: () {
-                    context.pushRoute(
-                      ThreadRoute(
-                        key: ValueKey(post.id),
-                        post: post.crosspostParentList.first,
-                      ),
-                    );
-                  },
-                ),
+        wrapPostElement(Header(post: post)),
+        wrapPostElement(title(context)),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.white54),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: DenseCard(
+                post: post.crosspostParentList.first,
+                onTap: () {
+                  context.pushRoute(
+                    ThreadRoute(
+                      key: ValueKey(post.id),
+                      post: post.crosspostParentList.first,
+                    ),
+                  );
+                },
               ),
             ),
-          )
-        else
-          content(context),
-        wrap(
+          ),
+        ),
+        wrapPostElement(
           Footer(
             post: post,
             onLike: (direction) async {
@@ -204,15 +208,32 @@ class _PostView extends RedditPostCard {
         ),
       ],
     );
-    final theme = context.watch<ThemeBloc>().state;
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      color: theme.background,
-      elevation: 1,
-      child: InkWell(
-        onTap: onTap,
-        child: contentWidget,
-      ),
-    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (post.crosspostParentList.isNotEmpty) {
+      final contentWidget = nestedCard(context);
+      final theme = context.watch<ThemeBloc>().state;
+      return Card(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        color: theme.background,
+        elevation: 1,
+        child: InkWell(
+          onTap: () => context.pushRoute(
+            ThreadRoute(
+              post: post.crosspostParentList.first,
+            ),
+          ),
+          child: contentWidget,
+        ),
+      );
+    } else {
+      return RedditPostCard(
+        post: post,
+        maxLines: null,
+        showMedia: false,
+      );
+    }
   }
 }

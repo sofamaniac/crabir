@@ -205,10 +205,10 @@ Widget _postView(BuildContext context, Post post) {
   return RedditPostCard(
     maxLines: 5,
     post: post,
-    onLike: (direction) async {
+    onLikeCallback: (direction) async {
       state.add(Vote(direction: direction, name: post.name));
     },
-    onSave: (save) async {
+    onSaveCallback: (save) async {
       state.add(Save(save: save, name: post.name));
     },
     onTap: () => context.router.navigate(

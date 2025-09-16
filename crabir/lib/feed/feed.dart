@@ -239,14 +239,14 @@ class _FeedViewBodyState extends State<FeedViewBody>
     return RedditPostCard(
       maxLines: 5,
       post: post,
-      onLike: (direction) async {
+      onLikeCallback: (direction) async {
         await _stream.vote(
           name: post.name,
           direction: direction,
           client: RedditAPI.client(),
         );
       },
-      onSave: (save) async {
+      onSaveCallback: (save) async {
         await _stream.save(
           name: post.name,
           save: save,

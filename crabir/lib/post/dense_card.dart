@@ -1,13 +1,22 @@
 part of 'post.dart';
 
-class DenseCard extends RedditPostCard {
+class DenseCard extends StatelessWidget {
+  final Post post;
+  final SaveCallback? onSaveCallback;
+  final LikeCallback? onLikeCallback;
+  final VoidCallback? onTap;
   const DenseCard({
     super.key,
-    required super.post,
-    super.onSave,
-    super.onLike,
-    super.onTap,
-  }) : super(showMedia: false);
+    required this.post,
+    this.onSaveCallback,
+    this.onLikeCallback,
+    this.onTap,
+  });
+  Widget wrap(Widget widget) {
+    return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16), child: widget);
+  }
+
   @override
   Widget build(BuildContext context) {
     final contentWidget = Thumbnail(

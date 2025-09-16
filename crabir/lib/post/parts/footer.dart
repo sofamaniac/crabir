@@ -2,8 +2,8 @@ part of '../post.dart';
 
 class Footer extends StatelessWidget {
   final Post post;
-  final Future<void> Function(bool)? onSave;
-  final Future<void> Function(VoteDirection)? onLike;
+  final SaveCallback? onSave;
+  final LikeCallback? onLike;
   const Footer({super.key, required this.post, this.onLike, this.onSave});
   @override
   Widget build(BuildContext context) {
@@ -18,16 +18,29 @@ class Footer extends StatelessWidget {
         VoteButton.like(
           likes: likes,
           colorActive: likeColor,
-          onChange: onLike,
+          onChange: (dir) async {
+            await post.vote(direction: dir, client: RedditAPI.client());
+            onLike?.call(dir);
+          },
         ),
         VoteButton.dislike(
           likes: likes,
           colorActive: dislikeColor,
-          onChange: onLike,
+          onChange: (dir) async {
+            await post.vote(direction: dir, client: RedditAPI.client());
+            onLike?.call(dir);
+          },
         ),
         SaveButton(
           initialValue: post.saved,
-          onChange: onSave?.call,
+          onChange: (save) async {
+            if (save) {
+              await post.save(client: RedditAPI.client());
+            } else {
+              await post.unsave(client: RedditAPI.client());
+            }
+            onSave?.call(save);
+          },
         ),
         if (settings.showCommentsButton)
           IconButton(

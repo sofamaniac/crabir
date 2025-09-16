@@ -82,27 +82,6 @@ impl Thing {
             Thing::More { .. } => None,
         }
     }
-
-    // pub(crate) fn likes(&mut self, direction: crate::client::VoteDirection) {
-    //     let likes: Option<bool> = direction.into();
-    //     match self {
-    //         Thing::Comment(comment) => comment.likes = likes,
-    //         Thing::Post(post) => {
-    //             let _ = post.set_likes(likes);
-    //         }
-    //         _ => (),
-    //     }
-    // }
-    //
-    // pub(crate) fn save(&mut self, save: bool) {
-    //     match self {
-    //         Thing::Comment(comment) => comment.saved = save,
-    //         Thing::Post(post) => {
-    //             let _ = post.set_saved(save);
-    //         }
-    //         _ => (),
-    //     }
-    // }
 }
 
 impl TryFrom<Thing> for Listing {

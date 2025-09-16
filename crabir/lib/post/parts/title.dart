@@ -12,7 +12,6 @@ class PostTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.watch<ThemeBloc>().state;
     final Color titleColor;
-    // TODO: add if post read.
     if (post.pinned || post.distinguished == "moderator") {
       titleColor = theme.announcement;
     } else if (post.visited) {

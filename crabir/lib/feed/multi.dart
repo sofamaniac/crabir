@@ -83,14 +83,14 @@ class _MultiViewBodyState extends State<MultiViewBody>
           return RedditPostCard(
             maxLines: 5,
             post: post,
-            onLike: (direction) async {
+            onLikeCallback: (direction) async {
               await stream.vote(
                 name: post.name,
                 direction: direction,
                 client: RedditAPI.client(),
               );
             },
-            onSave: (save) async {
+            onSaveCallback: (save) async {
               await stream.save(
                 name: post.name,
                 save: save,
