@@ -214,9 +214,9 @@ class _AnimatedContentState extends State<AnimatedContent> {
               key: ValueKey(widget.url),
               child: AspectRatio(
                 aspectRatio: widget.width / widget.height.toDouble(),
-                // Show placeholder until we start playing the video
+                // // Show placeholder until we start playing the video
                 child: (_controller.value.isInitialized &&
-                        _visibilityFraction == 100)
+                        _visibilityFraction == 1)
                     ? VideoPlayer(_controller)
                     : placeholder(),
               ),
@@ -224,8 +224,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
                 setState(() {
                   _visibilityFraction = visibilityInfo.visibleFraction;
                 });
-                var visiblePercentage = visibilityInfo.visibleFraction * 100;
-                if (visiblePercentage == 100 && _canAutoplay) {
+                if (_visibilityFraction == 1 && _canAutoplay) {
                   _controller.play();
                 } else {
                   _controller.pause();
