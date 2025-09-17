@@ -140,9 +140,9 @@ class _CommentViewState extends State<CommentView>
 
   Future<void> save(bool target, bool hideButtonAfterAction) async {
     if (target) {
-      await RedditAPI.client().unsave(thing: widget.comment.name);
+      await widget.comment.unsave(client: RedditAPI.client());
     } else {
-      await RedditAPI.client().save(thing: widget.comment.name);
+      await widget.comment.save(client: RedditAPI.client());
     }
     setState(() {
       if (hideButtonAfterAction) {
