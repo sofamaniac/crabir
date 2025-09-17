@@ -72,31 +72,41 @@ class _SortSelection extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildOption(context, "Best", const FeedSort.best()),
-                _buildOption(context, "Hot", const FeedSort.hot()),
-                _buildOption(context, "Rising", const FeedSort.rising()),
+                _buildOption(context, const FeedSort.best()),
+                _buildOption(context, const FeedSort.hot()),
+                _buildOption(context, const FeedSort.rising()),
                 const Divider(),
                 ExpansionTile(
                   title: const Text("New"),
                   children: Timeframe.values
-                      .map((t) => _buildOption(context,
-                          "New – ${t.label(context)}", FeedSort.new_(t)))
+                      .map(
+                        (t) => _buildOption(
+                          context,
+                          FeedSort.new_(t),
+                        ),
+                      )
                       .toList(),
                 ),
                 ExpansionTile(
                   title: const Text("Top"),
                   children: Timeframe.values
-                      .map((t) => _buildOption(context,
-                          "Top – ${t.label(context)}", FeedSort.top(t)))
+                      .map(
+                        (t) => _buildOption(
+                          context,
+                          FeedSort.top(t),
+                        ),
+                      )
                       .toList(),
                 ),
                 ExpansionTile(
                   title: const Text("Controversial"),
                   children: Timeframe.values
-                      .map((t) => _buildOption(
+                      .map(
+                        (t) => _buildOption(
                           context,
-                          "Controversial – ${t.label(context)}",
-                          FeedSort.controversial(t)))
+                          FeedSort.controversial(t),
+                        ),
+                      )
                       .toList(),
                 ),
               ],
@@ -107,9 +117,9 @@ class _SortSelection extends StatelessWidget {
     );
   }
 
-  Widget _buildOption(BuildContext context, String label, FeedSort sort) {
+  Widget _buildOption(BuildContext context, FeedSort sort) {
     return ListTile(
-      title: Text(label),
+      title: Text(sort.label(context)),
       onTap: () => Navigator.of(context).pop(sort),
     );
   }
