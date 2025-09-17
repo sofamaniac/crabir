@@ -49,7 +49,13 @@ abstract class Listing implements RustOpaqueInterface {
 }
 
 abstract class Votable {
+  Future<void> name();
+
   Future<void> save({required Client client});
+
+  Future<void> setLikes({bool? likes});
+
+  Future<void> setSaved({required bool saved});
 
   Future<void> unsave({required Client client});
 

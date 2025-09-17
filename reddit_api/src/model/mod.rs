@@ -6,10 +6,7 @@ use serde::{Deserialize, Serialize};
 use subreddit::Subreddit;
 use user::model::User;
 
-use crate::{
-    client::{Client, VoteDirection},
-    error::Error,
-};
+use crate::{client::VoteDirection, error::Error};
 
 pub mod author;
 pub mod comment;
@@ -72,11 +69,11 @@ impl Thing {
     pub fn name(&self) -> Option<Fullname> {
         match self {
             Thing::Listing(_) => None,
-            Thing::Comment(comment) => Some(comment.name.clone()),
+            Thing::Comment(comment) => Some(comment.get_name()),
             Thing::User(user) => Some(user.name()),
             Thing::Post(post) => Some(post.get_name()),
             Thing::Message => todo!(),
-            Thing::Subreddit(subreddit) => Some(subreddit.other.name.clone()),
+            Thing::Subreddit(subreddit) => Some(subreddit.other().get_name()),
             Thing::Award => None,
             Thing::Multi(multi) => Some(multi.name.clone()),
             Thing::More { .. } => None,
@@ -130,13 +127,28 @@ impl Timeframe {
         }
     }
 }
-
 pub trait Votable {
+    fn name(&self) -> &Fullname;
+    fn set_likes(&mut self, likes: Option<bool>);
+    fn set_saved(&mut self, saved: bool);
     async fn vote(
         &mut self,
         direction: VoteDirection,
-        client: &Client,
-    ) -> crate::result::Result<()>;
-    async fn save(&mut self, client: &Client) -> crate::result::Result<()>;
-    async fn unsave(&mut self, client: &Client) -> crate::result::Result<()>;
+        client: &crate::client::Client,
+    ) -> crate::result::Result<()> {
+        client.vote(self.name(), direction).await?;
+        self.set_likes(direction.into());
+        Ok(())
+    }
+
+    async fn save(&mut self, client: &crate::client::Client) -> crate::result::Result<()> {
+        client.save(self.name()).await?;
+        self.set_saved(true);
+        Ok(())
+    }
+    async fn unsave(&mut self, client: &crate::client::Client) -> crate::result::Result<()> {
+        client.unsave(self.name()).await?;
+        self.set_saved(false);
+        Ok(())
+    }
 }

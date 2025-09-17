@@ -23,228 +23,287 @@ abstract class Post implements RustOpaqueInterface, Votable {
   static Future<Post> default_() =>
       RustLib.instance.api.redditApiModelPostPostDefault();
 
-  Future<List<String?>> getAllAwardings();
+  /// flutter_rust_bridge:sync,getter
+  List<String?> get allAwardings;
 
-  Future<bool> getAllowLiveComments();
+  /// flutter_rust_bridge:sync,getter
+  bool get allowLiveComments;
 
-  Future<double?> getApprovedAtUtc();
+  /// flutter_rust_bridge:sync,getter
+  double? get approvedAtUtc;
 
-  Future<String?> getApprovedBy();
+  /// flutter_rust_bridge:sync,getter
+  String? get approvedBy;
 
-  Future<bool> getArchived();
+  /// flutter_rust_bridge:sync,getter
+  bool get archived;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   AuthorInfo? get author;
 
-  Future<List<String?>> getAwarders();
+  /// flutter_rust_bridge:sync,getter
+  List<String?> get awarders;
 
-  Future<double?> getBannedAtUtc();
+  /// flutter_rust_bridge:sync,getter
+  double? get bannedAtUtc;
 
-  Future<bool> getCanGild();
+  /// flutter_rust_bridge:sync,getter
+  bool get canGild;
 
-  Future<bool> getCanModPost();
+  /// flutter_rust_bridge:sync,getter
+  bool get canModPost;
 
-  Future<String?> getCategory();
+  /// flutter_rust_bridge:sync,getter
+  String? get category;
 
-  Future<bool> getClicked();
+  /// flutter_rust_bridge:sync,getter
+  bool get clicked;
 
-  Future<List<String>> getContentCategories();
+  /// flutter_rust_bridge:sync,getter
+  List<String> get contentCategories;
 
-  Future<bool> getContestMode();
+  /// flutter_rust_bridge:sync,getter
+  bool get contestMode;
 
   /// Date of creation in logged in user locale
-  Future<DateTime> getCreated();
+  /// flutter_rust_bridge:sync,getter
+  DateTime get created;
 
   /// Date of creation in UTC
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   DateTime get createdUtc;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   List<Post> get crosspostParentList;
 
-  Future<String?> getDiscussionType();
+  /// flutter_rust_bridge:sync,getter
+  String? get discussionType;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   String? get distinguished;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   String get domain;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   int get downs;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   double? get edited;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   Gallery? get gallery;
 
-  Future<int> getGilded();
+  /// flutter_rust_bridge:sync,getter
+  int get gilded;
 
-  Future<Gildings> getGildings();
+  /// flutter_rust_bridge:sync,getter
+  Gildings get gildings;
 
-  Future<bool> getHidden();
+  /// flutter_rust_bridge:sync,getter
+  bool get hidden;
 
-  Future<bool> getHideScore();
+  /// flutter_rust_bridge:sync,getter
+  bool get hideScore;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   PostId get id;
 
-  Future<bool> getIsCreatedFromAdsUi();
+  /// flutter_rust_bridge:sync,getter
+  bool get isCreatedFromAdsUi;
 
-  Future<bool> getIsCrosspostable();
+  /// flutter_rust_bridge:sync,getter
+  bool get isCrosspostable;
 
-  Future<bool> getIsGallery();
+  /// flutter_rust_bridge:sync,getter
+  bool get isGallery;
 
-  Future<bool> getIsMeta();
+  /// flutter_rust_bridge:sync,getter
+  bool get isMeta;
 
-  Future<bool> getIsOriginalContent();
+  /// flutter_rust_bridge:sync,getter
+  bool get isOriginalContent;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   bool get isRedditMediaDomain;
 
-  Future<bool> getIsRobotIndexable();
+  /// flutter_rust_bridge:sync,getter
+  bool get isRobotIndexable;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   bool get isSelf;
 
-  Future<bool> getIsVideo();
+  /// flutter_rust_bridge:sync,getter
+  bool get isVideo;
 
   /// Some(true) if upvoted, Some(false) if downvoted, None otherwise
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   bool? get likes;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   Flair get linkFlair;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   bool get locked;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   Media? get media;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   MediaEmbed? get mediaEmbed;
 
-  Future<bool> getMediaOnly();
+  /// flutter_rust_bridge:sync,getter
+  bool get mediaOnly;
 
-  Future<String?> getModNote();
+  /// flutter_rust_bridge:sync,getter
+  String? get modNote;
 
-  Future<String?> getModReasonBy();
+  /// flutter_rust_bridge:sync,getter
+  String? get modReasonBy;
 
-  Future<String?> getModReasonTitle();
+  /// flutter_rust_bridge:sync,getter
+  String? get modReasonTitle;
 
-  Future<List<String?>> getModReports();
+  /// flutter_rust_bridge:sync,getter
+  List<String?> get modReports;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
+  @override
   Fullname get name;
 
-  Future<bool> getNoFollow();
+  /// flutter_rust_bridge:sync,getter
+  bool get noFollow;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   int get numComments;
 
-  Future<int?> getNumCrossposts();
+  /// flutter_rust_bridge:sync,getter
+  int? get numCrossposts;
 
-  Future<int?> getNumDuplicates();
+  /// flutter_rust_bridge:sync,getter
+  int? get numDuplicates;
 
-  Future<int?> getNumReports();
+  /// flutter_rust_bridge:sync,getter
+  int? get numReports;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   bool get over18;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   String get permalink;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   bool get pinned;
 
-  Future<String?> getPostHint();
+  /// flutter_rust_bridge:sync,getter
+  String? get postHint;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   Preview? get preview;
 
-  Future<int?> getPwls();
+  /// flutter_rust_bridge:sync,getter
+  int? get pwls;
 
-  Future<bool> getQuarantine();
+  /// flutter_rust_bridge:sync,getter
+  bool get quarantine;
 
-  Future<String?> getRemovalReason();
+  /// flutter_rust_bridge:sync,getter
+  String? get removalReason;
 
-  Future<String?> getRemovedBy();
+  /// flutter_rust_bridge:sync,getter
+  String? get removedBy;
 
-  Future<String?> getRemovedByCategory();
+  /// flutter_rust_bridge:sync,getter
+  String? get removedByCategory;
 
-  Future<List<String>> getReportReasons();
+  /// flutter_rust_bridge:sync,getter
+  List<String> get reportReasons;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   bool get saved;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   int get score;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   Media? get secureMedia;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   SecureMediaEmbed? get secureMediaEmbed;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   String? get selftext;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   String? get selftextHtml;
 
-  Future<bool> getSendReplies();
+  /// flutter_rust_bridge:sync,getter
+  bool get sendReplies;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   bool get spoiler;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   bool get stickied;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   SubredditInfo get subreddit;
 
   /// Suggested sort for comments
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   CommentSort? get suggestedSort;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   String get title;
 
-  Future<String?> getTopAwardedType();
+  /// flutter_rust_bridge:sync,getter
+  String? get topAwardedType;
 
-  Future<int?> getTotalAwardsReceived();
+  /// flutter_rust_bridge:sync,getter
+  int? get totalAwardsReceived;
 
-  Future<List<String?>> getTreatmentTags();
+  /// flutter_rust_bridge:sync,getter
+  List<String?> get treatmentTags;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   int get ups;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   double get upvoteRatio;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   String get url;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   String? get urlOverriddenByDest;
 
-  Future<List<String?>> getUserReports();
+  /// flutter_rust_bridge:sync,getter
+  List<String?> get userReports;
 
-  Future<String?> getViewCount();
+  /// flutter_rust_bridge:sync,getter
+  String? get viewCount;
 
-  /// flutter_rust_bridge:getter,sync
+  /// flutter_rust_bridge:sync,getter
   bool get visited;
 
-  Future<int?> getWls();
+  /// flutter_rust_bridge:sync,getter
+  int? get wls;
 
   bool get isCrosspost;
 
   Kind get kind;
 
   @override
+  Future<void> name();
+
+  @override
   Future<void> save({required Client client});
+
+  @override
+  Future<void> setLikes({bool? likes});
+
+  @override
+  Future<void> setSaved({required bool saved});
 
   Thumbnail? get thumbnail;
 

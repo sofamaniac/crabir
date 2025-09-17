@@ -117,6 +117,10 @@ impl Client {
         Url::parse("https://oauth.reddit.com/").expect("Should not panic.")
     }
 
+    pub(crate) fn join_url(&self, url: &str) -> Url {
+        self.base_url().join(url).expect("Should not fail.")
+    }
+
     /// Authenticate the current client
     pub async fn authenticate(&self, refresh_token: String) {
         *self.refresh_token.write().unwrap() = Some(refresh_token);
@@ -322,10 +326,7 @@ impl Client {
     pub async fn logout(&self) -> Result<()> {
         let access_token = self.current_access_token.read().unwrap().clone();
         if let Some(access_token) = access_token {
-            let url = self
-                .base_url()
-                .join("api/v1/revoke_token")
-                .expect("Should not fail");
+            let url = self.join_url("api/v1/revoke_token");
             let request = self
                 .http
                 .post(url)
@@ -387,8 +388,7 @@ impl Client {
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
     pub async fn logged_user_info(&self) -> Result<UserInfo> {
-        let base_url = self.base_url();
-        let url = base_url.join("api/v1/me.json").expect("Should not fail");
+        let url = self.join_url("api/v1/me.json");
         let request = self.get(url);
         let response = self.execute(request).await?;
         let json = parse_response(response).await?;
@@ -508,21 +508,46 @@ impl Client {
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
     pub async fn subscriptions(&self) -> Result<Vec<crate::model::subreddit::Subreddit>> {
-        let base_url = self.base_url();
-        let url = base_url
-            .join("subreddits/mine/subscriber.json")
-            .expect("Should not fail.");
+        let url = self.join_url("subreddits/mine/subscriber.json");
         self.collect_paged(&url, &[]).await
+    }
+
+    /// Subscribe to a subreddit
+    /// # Errors
+    /// Returns an error if the http client fails or if the parsing of the response fails.
+    pub async fn subscribe(&self, name: Fullname) -> Result<()> {
+        let url = self.join_url("api/subscribe");
+        let request = self.post(url);
+        let request = request.query(&[
+            ("action", "sub"),
+            ("action_source", "onboarding"),
+            ("skip_initial_defaults", "true"),
+            ("sr", name.as_ref()),
+        ]);
+        self.execute(request).await?;
+        Ok(())
+    }
+
+    /// Unsubscribe to a subreddit
+    /// # Errors
+    /// Returns an error if the http client fails or if the parsing of the response fails.
+    pub async fn unsubscribe(&self, name: Fullname) -> Result<()> {
+        let url = self.join_url("api/subscribe");
+        let request = self.post(url);
+        let request = request.query(&[
+            ("action", "unsub"),
+            ("action_source", "onboarding"),
+            ("sr", name.as_ref()),
+        ]);
+        self.execute(request).await?;
+        Ok(())
     }
 
     /// Get the list of multireddits the current user is subscribed to.
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
     pub async fn multis(&self) -> Result<Vec<crate::model::multi::Multi>> {
-        let base_url = self.base_url();
-        let url = base_url
-            .join("api/multi/mine.json")
-            .expect("Should not fail.");
+        let url = self.join_url("api/multi/mine.json");
         let request = self.get(url);
         //let request = self.get(url).query(&[("expand_srs", "true")]);
         let result = self.execute(request).await?;
@@ -547,14 +572,14 @@ impl Client {
     /// Vote on a votable item (i.e. a [`Post`] or a [`comment::Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
-    pub async fn vote(&self, fullname: &Fullname, direction: VoteDirection) -> Result<()> {
+    pub(crate) async fn vote(&self, fullname: &Fullname, direction: VoteDirection) -> Result<()> {
         let dir = match direction {
             VoteDirection::Up => 1,
             VoteDirection::Down => -1,
             VoteDirection::Neutral => 0,
         };
 
-        let url = self.base_url().join("api/vote").expect("Should not fail.");
+        let url = self.join_url("api/vote");
         let request = self.post(url);
         let request = request.query(&[("id", fullname.as_ref()), ("dir", &format!("{dir}"))]);
         let _ = self.execute(request).await?;
@@ -564,8 +589,8 @@ impl Client {
     /// Save a saveable item (i.e. a [`Post`] or a [`comment::Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
-    pub async fn save(&self, thing: &Fullname) -> Result<()> {
-        let url = self.base_url().join("api/save").expect("Should not fail.");
+    pub(crate) async fn save(&self, thing: &Fullname) -> Result<()> {
+        let url = self.join_url("api/save");
         let request = self.post(url);
         let request = request.query(&[("id", &thing)]);
         let _ = self.execute(request).await?;
@@ -575,11 +600,8 @@ impl Client {
     /// Unsave a saveable item (i.e. a [`Post`] or a [`comment::Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
-    pub async fn unsave(&self, thing: &Fullname) -> Result<()> {
-        let url = self
-            .base_url()
-            .join("api/unsave")
-            .expect("Should not fail.");
+    pub(crate) async fn unsave(&self, thing: &Fullname) -> Result<()> {
+        let url = self.join_url("api/unsave");
         let request = self.post(url);
         let request = request.query(&[("id", &thing)]);
         let _ = self.execute(request).await?;
@@ -595,10 +617,7 @@ impl Client {
         permalink: String,
         sort: Option<comment::CommentSort>,
     ) -> Result<(Post, Vec<Thing>)> {
-        let url = self
-            .base_url()
-            .join(&format!("{permalink}.json"))
-            .expect("Should not fail.");
+        let url = self.join_url(&format!("{permalink}.json"));
         let request = self.get(url);
         let request = if let Some(sort) = sort {
             request.query(&[("sort", sort.as_url())])
@@ -645,10 +664,7 @@ impl Client {
         struct Data {
             things: Vec<Thing>,
         }
-        let url = self
-            .base_url()
-            .join("api/morechildren.json")
-            .expect("Should not fail.");
+        let url = self.join_url("api/morechildren.json");
         let request = self.get(url).query(&[
             ("api_type", "json"),
             ("children", &children.join(",")),
@@ -688,10 +704,7 @@ impl Client {
 
     /// Get info on subreddit at 'r/`subreddit`/about'.
     pub async fn subreddit_about(&self, subreddit: String) -> Result<Subreddit> {
-        let url = self
-            .base_url()
-            .join(&format!("r/{subreddit}/about.json"))
-            .expect("Should not fail.");
+        let url = self.join_url(&format!("r/{subreddit}/about.json"));
         let request = self.get(url);
         let response = self.execute(request).await?;
         parse_thing(response).await

@@ -18,144 +18,116 @@ import 'user/model.dart';
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Comment>>
 abstract class Comment implements RustOpaqueInterface, Votable {
-  bool get archived;
-
-  AuthorInfo? get author;
-
-  String get body;
-
-  String get bodyHtml;
-
-  bool get canGild;
-
-  bool get canModPost;
-
-  bool get collapsed;
-
-  int get controversiality;
-
-  DateTime get created;
-
-  DateTime get createdUtc;
-
-  int get depth;
-
-  String? get distinguished;
-
-  int get downs;
-
-  double? get edited;
-
-  int get gilded;
-
-  String get id;
-
-  bool get isSubmitter;
-
-  bool? get likes;
-
-  String get linkId;
-
-  bool get locked;
-
-  Fullname get name;
-
-  bool get noFollow;
-
-  String get parentId;
-
-  String get permalink;
-
-  bool get saved;
-
-  int get score;
-
-  bool get scoreHidden;
-
-  bool get sendReplies;
-
-  bool get stickied;
-
-  String get subreddit;
-
-  String get subredditId;
-
-  String get subredditNamePrefixed;
-
-  String get subredditType;
-
-  int get ups;
-
-  set archived(bool archived);
-
-  set author(AuthorInfo? author);
-
-  set body(String body);
-
-  set bodyHtml(String bodyHtml);
-
-  set canGild(bool canGild);
-
-  set canModPost(bool canModPost);
-
-  set collapsed(bool collapsed);
-
-  set controversiality(int controversiality);
-
-  set created(DateTime created);
-
-  set createdUtc(DateTime createdUtc);
-
-  set depth(int depth);
-
-  set distinguished(String? distinguished);
-
-  set downs(int downs);
-
-  set edited(double? edited);
-
-  set gilded(int gilded);
-
-  set id(String id);
-
-  set isSubmitter(bool isSubmitter);
-
-  set likes(bool? likes);
-
-  set linkId(String linkId);
-
-  set locked(bool locked);
-
-  set name(Fullname name);
-
-  set noFollow(bool noFollow);
-
-  set parentId(String parentId);
-
-  set permalink(String permalink);
-
-  set saved(bool saved);
-
-  set score(int score);
-
-  set scoreHidden(bool scoreHidden);
-
-  set sendReplies(bool sendReplies);
-
-  set stickied(bool stickied);
-
-  set subreddit(String subreddit);
-
-  set subredditId(String subredditId);
-
-  set subredditNamePrefixed(String subredditNamePrefixed);
-
-  set subredditType(String subredditType);
-
-  set ups(int ups);
-
   static Future<Comment> default_() =>
       RustLib.instance.api.redditApiModelCommentCommentDefault();
+
+  /// flutter_rust_bridge:sync,getter
+  bool get archived;
+
+  /// flutter_rust_bridge:sync,getter
+  AuthorInfo? get author;
+
+  /// flutter_rust_bridge:sync,getter
+  String get body;
+
+  /// flutter_rust_bridge:sync,getter
+  String get bodyHtml;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get canGild;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get canModPost;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get collapsed;
+
+  /// flutter_rust_bridge:sync,getter
+  int get controversiality;
+
+  /// Date of creation in logged-in user locale
+  /// flutter_rust_bridge:sync,getter
+  DateTime get created;
+
+  /// Date of creation in UTC
+  /// flutter_rust_bridge:sync,getter
+  DateTime get createdUtc;
+
+  /// flutter_rust_bridge:sync,getter
+  int get depth;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get distinguished;
+
+  /// flutter_rust_bridge:sync,getter
+  int get downs;
+
+  /// flutter_rust_bridge:sync,getter
+  double? get edited;
+
+  /// flutter_rust_bridge:sync,getter
+  int get gilded;
+
+  /// flutter_rust_bridge:sync,getter
+  String get id;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get isSubmitter;
+
+  /// flutter_rust_bridge:sync,getter
+  bool? get likes;
+
+  /// flutter_rust_bridge:sync,getter
+  String get linkId;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get locked;
+
+  /// flutter_rust_bridge:sync,getter
+  @override
+  Fullname get name;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get noFollow;
+
+  /// flutter_rust_bridge:sync,getter
+  String get parentId;
+
+  /// flutter_rust_bridge:sync,getter
+  String get permalink;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get saved;
+
+  /// flutter_rust_bridge:sync,getter
+  int get score;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get scoreHidden;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get sendReplies;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get stickied;
+
+  /// flutter_rust_bridge:sync,getter
+  String get subreddit;
+
+  /// flutter_rust_bridge:sync,getter
+  String get subredditId;
+
+  /// flutter_rust_bridge:sync,getter
+  String get subredditNamePrefixed;
+
+  /// flutter_rust_bridge:sync,getter
+  String get subredditType;
+
+  /// flutter_rust_bridge:sync,getter
+  int get ups;
+
+  @override
+  Future<void> name();
 
   /// If `more` is a `Thing::More`, if it exists in `Self::replies` or in the replies of one of
   /// its children, will replace it with `new_things`.
@@ -165,6 +137,12 @@ abstract class Comment implements RustOpaqueInterface, Votable {
 
   @override
   Future<void> save({required Client client});
+
+  @override
+  Future<void> setLikes({bool? likes});
+
+  @override
+  Future<void> setSaved({required bool saved});
 
   @override
   Future<void> unsave({required Client client});

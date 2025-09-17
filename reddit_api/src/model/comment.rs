@@ -1,7 +1,9 @@
 use chrono::DateTime;
 use chrono::Local;
 use chrono::Utc;
+use flutter_getter::FlutterGetters;
 use flutter_rust_bridge::frb;
+use getset::Getters;
 use log::debug;
 use serde::Deserialize;
 use serde::Serialize;
@@ -28,27 +30,30 @@ impl TryFrom<Thing> for Comment {
 }
 
 #[serde_as]
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Getters, FlutterGetters, PartialEq, Serialize, Deserialize)]
+#[getset(get = "pub(crate)")]
 pub struct Comment {
     // SUBREDDIT
-    pub subreddit_id: String,
-    pub subreddit_name_prefixed: String,
-    pub subreddit_type: String,
-    pub subreddit: String,
+    subreddit_id: String,
+    subreddit_name_prefixed: String,
+    subreddit_type: String,
+    subreddit: String,
     #[serde(
         flatten,
         serialize_with = "author::serialize_author_option",
         deserialize_with = "author::author_option"
     )]
-    pub author: Option<AuthorInfo>,
-    pub saved: bool,
-    pub likes: Option<bool>,
-    pub id: String,
+    author: Option<AuthorInfo>,
+    saved: bool,
+    likes: Option<bool>,
+    id: String,
     #[serde(deserialize_with = "utils::response_or_none")]
     /// Should be a listing if present
     /// Because they can be deeply nested we use a `Value` that is
     /// deserialize only when needed and only one level at a time.
     /// We have to do that, because otherwise parsing sometimes overflows the stack.
+    #[getset(skip)]
+    #[flutter_getter(skip)]
     replies: Option<Value>,
 
     // pub approved_at_utc: Value,
@@ -60,57 +65,59 @@ pub struct Comment {
     // pub user_reports: Vec<Value>,
     // pub banned_at_utc: Value,
     // pub mod_reason_title: Value,
-    pub gilded: i32,
-    pub archived: bool,
+    gilded: i32,
+    archived: bool,
     // pub collapsed_reason_code: Value,
-    pub no_follow: bool,
-    pub can_mod_post: bool,
+    no_follow: bool,
+    can_mod_post: bool,
     /// Date of creation in UTC
     #[serde_as(as = "serde_with::TimestampSecondsWithFrac<f64>")]
-    pub created_utc: DateTime<Utc>,
+    created_utc: DateTime<Utc>,
     /// Date of creation in logged-in user locale
     #[serde_as(as = "serde_with::TimestampSecondsWithFrac<f64>")]
-    pub created: DateTime<Local>,
-    pub send_replies: bool,
-    pub parent_id: String,
-    pub score: i32,
+    created: DateTime<Local>,
+    send_replies: bool,
+    parent_id: String,
+    score: i32,
     // pub approved_by: Value,
     // pub mod_note: Value,
     // pub all_awardings: Vec<Value>,
-    pub collapsed: bool,
-    pub body: String,
+    collapsed: bool,
+    body: String,
     #[serde(deserialize_with = "utils::response_or_none")]
-    pub edited: Option<f64>,
+    edited: Option<f64>,
     // pub top_awarded_type: Value,
-    pub name: Fullname,
-    pub is_submitter: bool,
-    pub downs: i32,
-    pub body_html: String,
+    name: Fullname,
+    is_submitter: bool,
+    downs: i32,
+    body_html: String,
     // pub removal_reason: Value,
     // pub collapsed_reason: Value,
     #[serde(default)]
-    pub distinguished: Option<String>,
+    distinguished: Option<String>,
     // pub associated_award: Value,
-    pub stickied: bool,
-    pub can_gild: bool,
+    stickied: bool,
+    can_gild: bool,
     // pub gildings: Gildings,
     // pub unrepliable_reason: Value,
-    pub score_hidden: bool,
-    pub permalink: String,
-    pub locked: bool,
+    score_hidden: bool,
+    permalink: String,
+    locked: bool,
     // pub report_reasons: Value,
     // pub treatment_tags: Vec<Value>,
-    pub link_id: String,
-    pub controversiality: i32,
+    link_id: String,
+    controversiality: i32,
     // Depth is absent when requesting the user's overview.
     #[serde(default)]
-    pub depth: i32,
+    depth: i32,
     // pub collapsed_because_crowd_control: Value,
     // pub mod_reports: Vec<Value>,
     // pub num_reports: Value,
-    pub ups: i32,
+    ups: i32,
 
     #[serde(skip)]
+    #[getset(skip)]
+    #[flutter_getter(skip)]
     parsed_replies: Vec<Thing>,
 }
 
@@ -152,20 +159,16 @@ impl Comment {
 }
 
 impl Votable for Comment {
-    async fn vote(
-        &mut self,
-        direction: crate::client::VoteDirection,
-        client: &crate::client::Client,
-    ) -> crate::result::Result<()> {
-        todo!()
+    fn name(&self) -> &Fullname {
+        &self.name
     }
 
-    async fn save(&mut self, client: &crate::client::Client) -> crate::result::Result<()> {
-        todo!()
+    fn set_likes(&mut self, likes: Option<bool>) {
+        self.likes = likes;
     }
 
-    async fn unsave(&mut self, client: &crate::client::Client) -> crate::result::Result<()> {
-        todo!()
+    fn set_saved(&mut self, saved: bool) {
+        self.saved = saved;
     }
 }
 

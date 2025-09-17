@@ -72,11 +72,6 @@ abstract class Client implements RustOpaqueInterface {
   /// Create a new access token for a logged out user
   Future<void> newLoggedOutUserToken();
 
-  /// Save a saveable item (i.e. a [`Post`] or a [`comment::Comment`]).
-  /// # Errors
-  /// Returns an error if the request failed.
-  Future<void> save({required Fullname thing});
-
   Streamable searchPost(
       {String? subreddit,
       Flair? flair,
@@ -89,15 +84,20 @@ abstract class Client implements RustOpaqueInterface {
   /// Get info on subreddit at 'r/`subreddit`/about'.
   Future<Subreddit> subredditAbout({required String subreddit});
 
+  /// Subscribe to a subreddit
+  /// # Errors
+  /// Returns an error if the http client fails or if the parsing of the response fails.
+  Future<void> subscribe({required Fullname name});
+
   /// Get the list of all subreddits the current user is subscribed to.
   /// # Errors
   /// Returns an error if the http client fails or if the parsing of the response fails.
   Future<List<Subreddit>> subscriptions();
 
-  /// Unsave a saveable item (i.e. a [`Post`] or a [`comment::Comment`]).
+  /// Unsubscribe to a subreddit
   /// # Errors
-  /// Returns an error if the request failed.
-  Future<void> unsave({required Fullname thing});
+  /// Returns an error if the http client fails or if the parsing of the response fails.
+  Future<void> unsubscribe({required Fullname name});
 
   Future<UserInfo> userAbout({required String username});
 
@@ -122,12 +122,6 @@ abstract class Client implements RustOpaqueInterface {
       {required String username, required UserStreamSort sort});
 
   Streamable userUpvoted({required String username});
-
-  /// Vote on a votable item (i.e. a [`Post`] or a [`comment::Comment`]).
-  /// # Errors
-  /// Returns an error if the request failed.
-  Future<void> vote(
-      {required Fullname fullname, required VoteDirection direction});
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Pager>>

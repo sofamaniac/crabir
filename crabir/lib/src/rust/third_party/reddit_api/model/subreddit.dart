@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../../frb_generated.dart';
+import '../client.dart';
 import '../model.dart';
 import 'flair.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -14,412 +15,318 @@ part 'subreddit.freezed.dart';
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Common>>
 abstract class Common implements RustOpaqueInterface {
-  bool get acceptFollowers;
-
-  List<String> get allowedMediaInComments;
-
-  String? get bannerImg;
-
-  Int64List? get bannerSize;
-
-  double get created;
-
-  double get createdUtc;
-
-  bool get disableContributorRequests;
-
-  String get displayName;
-
-  String get displayNamePrefixed;
-
-  bool get freeFormReports;
-
-  String? get headerImg;
-
-  Int64List? get headerSize;
-
-  String? get keyColor;
-
-  bool get linkFlairEnabled;
-
-  String? get linkFlairPosition;
-
-  Fullname get name;
-
-  String? get primaryColor;
-
-  String? get publicDescription;
-
-  bool get quarantine;
-
-  bool get restrictCommenting;
-
-  bool get restrictPosting;
-
-  bool get showMedia;
-
-  String? get submitLinkLabel;
-
-  String? get submitTextLabel;
-
-  String? get subredditType;
-
-  PlatformInt64 get subscribers;
-
-  String? get title;
-
-  String get url;
-
-  bool get userIsBanned;
-
-  bool get userIsContributor;
-
-  bool get userIsModerator;
-
-  bool get userIsMuted;
-
-  bool get userIsSubscriber;
-
-  set acceptFollowers(bool acceptFollowers);
-
-  set allowedMediaInComments(List<String> allowedMediaInComments);
-
-  set bannerImg(String? bannerImg);
-
-  set bannerSize(Int64List? bannerSize);
-
-  set created(double created);
-
-  set createdUtc(double createdUtc);
-
-  set disableContributorRequests(bool disableContributorRequests);
-
-  set displayName(String displayName);
-
-  set displayNamePrefixed(String displayNamePrefixed);
-
-  set freeFormReports(bool freeFormReports);
-
-  set headerImg(String? headerImg);
-
-  set headerSize(Int64List? headerSize);
-
-  set keyColor(String? keyColor);
-
-  set linkFlairEnabled(bool linkFlairEnabled);
-
-  set linkFlairPosition(String? linkFlairPosition);
-
-  set name(Fullname name);
-
-  set primaryColor(String? primaryColor);
-
-  set publicDescription(String? publicDescription);
-
-  set quarantine(bool quarantine);
-
-  set restrictCommenting(bool restrictCommenting);
-
-  set restrictPosting(bool restrictPosting);
-
-  set showMedia(bool showMedia);
-
-  set submitLinkLabel(String? submitLinkLabel);
-
-  set submitTextLabel(String? submitTextLabel);
-
-  set subredditType(String? subredditType);
-
-  set subscribers(PlatformInt64 subscribers);
-
-  set title(String? title);
-
-  set url(String url);
-
-  set userIsBanned(bool userIsBanned);
-
-  set userIsContributor(bool userIsContributor);
-
-  set userIsModerator(bool userIsModerator);
-
-  set userIsMuted(bool userIsMuted);
-
-  set userIsSubscriber(bool userIsSubscriber);
-
   static Future<Common> default_() =>
       RustLib.instance.api.redditApiModelSubredditCommonDefault();
+
+  /// flutter_rust_bridge:sync,getter
+  bool get acceptFollowers;
+
+  /// flutter_rust_bridge:sync,getter
+  List<String> get allowedMediaInComments;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get bannerImg;
+
+  /// flutter_rust_bridge:sync,getter
+  Int64List? get bannerSize;
+
+  /// flutter_rust_bridge:sync,getter
+  double get created;
+
+  /// flutter_rust_bridge:sync,getter
+  double get createdUtc;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get disableContributorRequests;
+
+  /// flutter_rust_bridge:sync,getter
+  String get displayName;
+
+  /// flutter_rust_bridge:sync,getter
+  String get displayNamePrefixed;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get freeFormReports;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get headerImg;
+
+  /// flutter_rust_bridge:sync,getter
+  Int64List? get headerSize;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get keyColor;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get linkFlairEnabled;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get linkFlairPosition;
+
+  /// flutter_rust_bridge:sync,getter
+  Fullname get name;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get primaryColor;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get publicDescription;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get quarantine;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get restrictCommenting;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get restrictPosting;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get showMedia;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get submitLinkLabel;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get submitTextLabel;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get subredditType;
+
+  /// flutter_rust_bridge:sync,getter
+  PlatformInt64 get subscribers;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get title;
+
+  /// flutter_rust_bridge:sync,getter
+  String get url;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get userIsBanned;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get userIsContributor;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get userIsModerator;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get userIsMuted;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get userIsSubscriber;
 
   SubredditIcon get icon;
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Details>>
 abstract class Details implements RustOpaqueInterface {
-  bool get defaultSet;
-
-  String? get description;
-
-  String? get iconColor;
-
-  Common get other;
-
-  bool get over18;
-
-  List<String> get previousNames;
-
-  set defaultSet(bool defaultSet);
-
-  set description(String? description);
-
-  set iconColor(String? iconColor);
-
-  set other(Common other);
-
-  set over18(bool over18);
-
-  set previousNames(List<String> previousNames);
-
   static Future<Details> default_() =>
       RustLib.instance.api.redditApiModelSubredditDetailsDefault();
+
+  /// flutter_rust_bridge:sync,getter
+  bool get defaultSet;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get description;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get iconColor;
+
+  /// flutter_rust_bridge:sync,getter
+  Common get other;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get over18;
+
+  /// flutter_rust_bridge:sync,getter
+  List<String> get previousNames;
 
   SubredditIcon get icon;
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Subreddit>>
 abstract class Subreddit implements RustOpaqueInterface {
-  int get accountsActive;
-
-  int get activeUserCount;
-
-  String? get advertiserCategory;
-
-  bool get allOriginalContent;
-
-  bool get allowDiscovery;
-
-  bool get allowGalleries;
-
-  bool get allowImages;
-
-  bool get allowPolls;
-
-  bool get allowPredictionContributors;
-
-  bool get allowPredictions;
-
-  bool get allowPredictionsTournament;
-
-  bool get allowTalks;
-
-  bool get allowVideogifs;
-
-  bool get allowVideos;
-
-  String? get bannerBackgroundColor;
-
-  String? get bannerBackgroundImage;
-
-  bool get canAssignLinkFlair;
-
-  bool get canAssignUserFlair;
-
-  bool get collapseDeletedComments;
-
-  CommentContributionSettings get commentContributionSettings;
-
-  PlatformInt64? get commentScoreHideMins;
-
-  bool get communityReviewed;
-
-  String? get description;
-
-  String? get descriptionHtml;
-
-  Int64List? get emojisCustomSize;
-
-  bool get emojisEnabled;
-
-  bool get hasMenuWidget;
-
-  String? get headerTitle;
-
-  bool get hideAds;
-
-  String get id;
-
-  bool? get isCrosspostableSubreddit;
-
-  bool? get isEnrolledInNewModmail;
-
-  String? get lang;
-
-  String? get mobileBannerImage;
-
-  String? get notificationLevel;
-
-  bool get originalContentTagEnabled;
-
-  Common get other;
-
-  bool get over18;
-
-  PlatformInt64 get predictionLeaderboardEntryType;
-
-  String? get publicDescriptionHtml;
-
-  bool get publicTraffic;
-
-  bool get shouldArchivePosts;
-
-  bool get shouldShowMediaInCommentsSetting;
-
-  bool get showMediaPreview;
-
-  bool get spoilersEnabled;
-
-  String? get submissionType;
-
-  String? get submitText;
-
-  String? get submitTextHtml;
-
-  String? get suggestedCommentSort;
-
-  bool? get userCanFlairInSr;
-
-  Flair get userFlair;
-
-  bool get userFlairEnabledInSr;
-
-  bool get userHasFavorited;
-
-  bool? get userSrFlairEnabled;
-
-  bool get userSrThemeEnabled;
-
-  bool? get wikiEnabled;
-
-  int? get wls;
-
-  set accountsActive(int accountsActive);
-
-  set activeUserCount(int activeUserCount);
-
-  set advertiserCategory(String? advertiserCategory);
-
-  set allOriginalContent(bool allOriginalContent);
-
-  set allowDiscovery(bool allowDiscovery);
-
-  set allowGalleries(bool allowGalleries);
-
-  set allowImages(bool allowImages);
-
-  set allowPolls(bool allowPolls);
-
-  set allowPredictionContributors(bool allowPredictionContributors);
-
-  set allowPredictions(bool allowPredictions);
-
-  set allowPredictionsTournament(bool allowPredictionsTournament);
-
-  set allowTalks(bool allowTalks);
-
-  set allowVideogifs(bool allowVideogifs);
-
-  set allowVideos(bool allowVideos);
-
-  set bannerBackgroundColor(String? bannerBackgroundColor);
-
-  set bannerBackgroundImage(String? bannerBackgroundImage);
-
-  set canAssignLinkFlair(bool canAssignLinkFlair);
-
-  set canAssignUserFlair(bool canAssignUserFlair);
-
-  set collapseDeletedComments(bool collapseDeletedComments);
-
-  set commentContributionSettings(
-      CommentContributionSettings commentContributionSettings);
-
-  set commentScoreHideMins(PlatformInt64? commentScoreHideMins);
-
-  set communityReviewed(bool communityReviewed);
-
-  set description(String? description);
-
-  set descriptionHtml(String? descriptionHtml);
-
-  set emojisCustomSize(Int64List? emojisCustomSize);
-
-  set emojisEnabled(bool emojisEnabled);
-
-  set hasMenuWidget(bool hasMenuWidget);
-
-  set headerTitle(String? headerTitle);
-
-  set hideAds(bool hideAds);
-
-  set id(String id);
-
-  set isCrosspostableSubreddit(bool? isCrosspostableSubreddit);
-
-  set isEnrolledInNewModmail(bool? isEnrolledInNewModmail);
-
-  set lang(String? lang);
-
-  set mobileBannerImage(String? mobileBannerImage);
-
-  set notificationLevel(String? notificationLevel);
-
-  set originalContentTagEnabled(bool originalContentTagEnabled);
-
-  set other(Common other);
-
-  set over18(bool over18);
-
-  set predictionLeaderboardEntryType(
-      PlatformInt64 predictionLeaderboardEntryType);
-
-  set publicDescriptionHtml(String? publicDescriptionHtml);
-
-  set publicTraffic(bool publicTraffic);
-
-  set shouldArchivePosts(bool shouldArchivePosts);
-
-  set shouldShowMediaInCommentsSetting(bool shouldShowMediaInCommentsSetting);
-
-  set showMediaPreview(bool showMediaPreview);
-
-  set spoilersEnabled(bool spoilersEnabled);
-
-  set submissionType(String? submissionType);
-
-  set submitText(String? submitText);
-
-  set submitTextHtml(String? submitTextHtml);
-
-  set suggestedCommentSort(String? suggestedCommentSort);
-
-  set userCanFlairInSr(bool? userCanFlairInSr);
-
-  set userFlair(Flair userFlair);
-
-  set userFlairEnabledInSr(bool userFlairEnabledInSr);
-
-  set userHasFavorited(bool userHasFavorited);
-
-  set userSrFlairEnabled(bool? userSrFlairEnabled);
-
-  set userSrThemeEnabled(bool userSrThemeEnabled);
-
-  set wikiEnabled(bool? wikiEnabled);
-
-  set wls(int? wls);
-
   static Future<Subreddit> default_() =>
       RustLib.instance.api.redditApiModelSubredditSubredditDefault();
 
+  /// flutter_rust_bridge:sync,getter
+  int get accountsActive;
+
+  /// flutter_rust_bridge:sync,getter
+  int get activeUserCount;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get advertiserCategory;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get allOriginalContent;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get allowDiscovery;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get allowGalleries;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get allowImages;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get allowPolls;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get allowPredictionContributors;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get allowPredictions;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get allowPredictionsTournament;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get allowTalks;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get allowVideogifs;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get allowVideos;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get bannerBackgroundColor;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get bannerBackgroundImage;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get canAssignLinkFlair;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get canAssignUserFlair;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get collapseDeletedComments;
+
+  /// flutter_rust_bridge:sync,getter
+  CommentContributionSettings get commentContributionSettings;
+
+  /// flutter_rust_bridge:sync,getter
+  PlatformInt64? get commentScoreHideMins;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get communityReviewed;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get description;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get descriptionHtml;
+
+  /// flutter_rust_bridge:sync,getter
+  Int64List? get emojisCustomSize;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get emojisEnabled;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get hasMenuWidget;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get headerTitle;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get hideAds;
+
+  /// flutter_rust_bridge:sync,getter
+  String get id;
+
+  /// flutter_rust_bridge:sync,getter
+  bool? get isCrosspostableSubreddit;
+
+  /// flutter_rust_bridge:sync,getter
+  bool? get isEnrolledInNewModmail;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get lang;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get mobileBannerImage;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get notificationLevel;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get originalContentTagEnabled;
+
+  /// flutter_rust_bridge:sync,getter
+  Common get other;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get over18;
+
+  /// flutter_rust_bridge:sync,getter
+  PlatformInt64 get predictionLeaderboardEntryType;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get publicDescriptionHtml;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get publicTraffic;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get shouldArchivePosts;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get shouldShowMediaInCommentsSetting;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get showMediaPreview;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get spoilersEnabled;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get submissionType;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get submitText;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get submitTextHtml;
+
+  /// flutter_rust_bridge:sync,getter
+  String? get suggestedCommentSort;
+
+  /// flutter_rust_bridge:sync,getter
+  bool? get userCanFlairInSr;
+
+  /// flutter_rust_bridge:sync,getter
+  Flair get userFlair;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get userFlairEnabledInSr;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get userHasFavorited;
+
+  /// flutter_rust_bridge:sync,getter
+  bool? get userSrFlairEnabled;
+
+  /// flutter_rust_bridge:sync,getter
+  bool get userSrThemeEnabled;
+
+  /// flutter_rust_bridge:sync,getter
+  bool? get wikiEnabled;
+
+  /// flutter_rust_bridge:sync,getter
+  int? get wls;
+
   SubredditIcon get icon;
+
+  Future<void> subscribe({required Client client});
+
+  Future<void> unsubscribe({required Client client});
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SubredditID>>
@@ -452,6 +359,24 @@ abstract class SubredditInfo implements RustOpaqueInterface {
 
   static Future<SubredditInfo> default_() =>
       RustLib.instance.api.redditApiModelSubredditSubredditInfoDefault();
+
+  /// flutter_rust_bridge:sync,getter
+  Details? get details;
+
+  /// The subreddit's name (e.g. "awww")
+  /// flutter_rust_bridge:sync,getter
+  String get subreddit;
+
+  /// flutter_rust_bridge:sync,getter
+  SubredditId get subredditId;
+
+  /// The subreddit's name prefixed with "r/"
+  /// flutter_rust_bridge:sync,getter
+  String get subredditNamePrefixed;
+
+  /// The number of subscribers of the subreddit
+  /// flutter_rust_bridge:sync,getter
+  int get subscribers;
 }
 
 class CommentContributionSettings {

@@ -1,12 +1,13 @@
 pub use chrono::{DateTime, Local, Utc};
+use flutter_getter::FlutterGetters;
 use flutter_rust_bridge::frb;
-use getset::{CloneGetters, Getters, Setters};
+use getset::{Getters, Setters};
 
+use crate::error::Error;
 use crate::model::author;
 use crate::model::author::AuthorInfo;
 use crate::model::flair::Flair;
 use crate::utils;
-use crate::{client::VoteDirection, error::Error};
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, with_prefix};
 
@@ -44,35 +45,24 @@ impl PostID {
 
 #[serde_as]
 #[derive(
-    Default, Debug, Clone, PartialEq, Serialize, Deserialize, CloneGetters, Getters, Setters,
+    Default, Debug, Clone, PartialEq, Serialize, Deserialize, FlutterGetters, Getters, Setters,
 )]
-#[getset(get_clone = "pub with_prefix", get = "pub(crate)")]
+#[getset(get = "pub(crate)")]
 pub struct Post {
-    /// flutter_rust_bridge:getter,sync
     name: Fullname,
-    /// flutter_rust_bridge:getter,sync
     id: PostID,
     user_reports: Vec<Option<String>>,
     gilded: u32,
-    /// flutter_rust_bridge:getter,sync
     title: String,
-    /// flutter_rust_bridge:getter,sync
     domain: String,
-    /// flutter_rust_bridge:getter,sync
     url: String,
-    /// flutter_rust_bridge:getter,sync
     permalink: String,
-    /// flutter_rust_bridge:getter,sync
     url_overridden_by_dest: Option<String>,
-    /// flutter_rust_bridge:getter,sync
     selftext: Option<String>,
-    /// flutter_rust_bridge:getter,sync
     selftext_html: Option<String>,
-    /// flutter_rust_bridge:getter,sync
     num_comments: u32,
 
     /// Date of creation in UTC
-    /// flutter_rust_bridge:getter,sync
     #[serde_as(as = "serde_with::TimestampSecondsWithFrac<f64>")]
     created_utc: DateTime<Utc>,
     /// Date of creation in logged in user locale
@@ -83,32 +73,25 @@ pub struct Post {
     // User relationship
     clicked: bool,
     hidden: bool,
-    /// flutter_rust_bridge:getter,sync
     #[getset(set = "pub(crate)")]
     saved: bool,
     /// Some(true) if upvoted, Some(false) if downvoted, None otherwise
-    /// flutter_rust_bridge:getter,sync
     #[getset(set = "pub(crate)")]
     likes: Option<bool>,
-    /// flutter_rust_bridge:getter,sync
     visited: bool,
 
     // Score
-    /// flutter_rust_bridge:getter,sync
     downs: u32,
-    /// flutter_rust_bridge:getter,sync
     upvote_ratio: f64,
-    /// flutter_rust_bridge:getter,sync
     ups: u32,
-    /// flutter_rust_bridge:getter,sync
     score: i32,
 
     #[serde(flatten, with = "prefix_link_flair")]
-    /// flutter_rust_bridge:getter,sync
     link_flair: Flair,
 
     #[serde(flatten)]
     #[getset(skip)]
+    #[flutter_getter(skip)]
     thumbnail: ThumbnailOption,
 
     #[serde(
@@ -116,28 +99,21 @@ pub struct Post {
         serialize_with = "author::serialize_author_option",
         deserialize_with = "author::author_option"
     )]
-    /// flutter_rust_bridge:getter,sync
     author: Option<AuthorInfo>,
 
     #[serde(flatten)]
-    /// flutter_rust_bridge:getter,sync
     subreddit: SubredditInfo,
 
     // Media
     #[serde(deserialize_with = "utils::response_or_none")]
-    /// flutter_rust_bridge:getter,sync
     media: Option<Media>,
     #[serde(deserialize_with = "utils::response_or_none")]
-    /// flutter_rust_bridge:getter,sync
     media_embed: Option<MediaEmbed>,
     #[serde(deserialize_with = "utils::response_or_none")]
-    /// flutter_rust_bridge:getter,sync
     secure_media: Option<Media>,
     #[serde(deserialize_with = "utils::response_or_none")]
-    /// flutter_rust_bridge:getter,sync
     secure_media_embed: Option<SecureMediaEmbed>,
     #[serde(flatten)]
-    /// flutter_rust_bridge:getter,sync
     gallery: Option<Gallery>,
 
     // Moderation
@@ -160,10 +136,8 @@ pub struct Post {
 
     // Post kind
     post_hint: Option<String>,
-    /// flutter_rust_bridge:getter,sync
     is_self: bool,
     is_original_content: bool,
-    /// flutter_rust_bridge:getter,sync
     is_reddit_media_domain: bool,
     is_meta: bool,
     is_created_from_ads_ui: bool,
@@ -174,23 +148,15 @@ pub struct Post {
     is_gallery: bool,
 
     // Post properties
-    /// flutter_rust_bridge:getter,sync
     pinned: bool,
-    /// flutter_rust_bridge:getter,sync
     over_18: bool,
-    /// flutter_rust_bridge:getter,sync
     preview: Option<Preview>,
-    /// flutter_rust_bridge:getter,sync
     spoiler: bool,
-    /// flutter_rust_bridge:getter,sync
     locked: bool,
-    /// flutter_rust_bridge:getter,sync
     stickied: bool,
     #[serde(deserialize_with = "utils::response_or_none")]
-    /// flutter_rust_bridge:getter,sync
     edited: Option<f64>,
     /// Suggested sort for comments
-    /// flutter_rust_bridge:getter,sync
     suggested_sort: Option<CommentSort>,
     view_count: Option<String>,
     archived: bool,
@@ -211,7 +177,6 @@ pub struct Post {
     can_gild: bool,
     treatment_tags: Vec<Option<String>>,
     num_reports: Option<u32>,
-    /// flutter_rust_bridge:getter,sync
     distinguished: Option<String>,
     is_robot_indexable: bool,
     num_duplicates: Option<u32>,
@@ -220,7 +185,6 @@ pub struct Post {
     contest_mode: bool,
     num_crossposts: Option<u32>,
     #[serde(default)]
-    /// flutter_rust_bridge:getter,sync
     crosspost_parent_list: Vec<Post>,
 }
 
@@ -292,25 +256,16 @@ impl Post {
 }
 
 impl Votable for Post {
-    async fn vote(
-        &mut self,
-        direction: VoteDirection,
-        client: &crate::client::Client,
-    ) -> crate::result::Result<()> {
-        client.vote(&self.name, direction).await?;
-        self.likes = direction.into();
-        Ok(())
+    fn name(&self) -> &Fullname {
+        &self.name
     }
 
-    async fn save(&mut self, client: &crate::client::Client) -> crate::result::Result<()> {
-        client.save(&self.name).await?;
-        self.saved = true;
-        Ok(())
+    fn set_likes(&mut self, likes: Option<bool>) {
+        self.likes = likes;
     }
-    async fn unsave(&mut self, client: &crate::client::Client) -> crate::result::Result<()> {
-        client.unsave(&self.name).await?;
-        self.saved = false;
-        Ok(())
+
+    fn set_saved(&mut self, saved: bool) {
+        self.saved = saved;
     }
 }
 
