@@ -40,9 +40,37 @@ class FlairView extends StatelessWidget {
     return (rMax + 0.05) / (rMin + 0.05);
   }
 
-  /// Add a border around the text if the contrast between `backdgoundColor` and the `textColor`
-  /// is not high enough
-  InlineSpan coloredText(
+  Widget coloredText(
+    BuildContext context,
+    String text, {
+    required Color backgroundColor,
+    required Color textColor,
+  }) {
+    final textStyle = Theme.of(context)
+        .textTheme
+        .labelSmall
+        ?.copyWith(backgroundColor: backgroundColor, color: textColor);
+    if (_colorRatio(textColor, backgroundColor) > 4.5) {
+      return Text(
+        text,
+        style: textStyle,
+        semanticsLabel: "flair",
+      );
+    } else {
+      final backgroundLuminance = _luminance(backgroundColor);
+      return Text(
+        text,
+        style: textStyle?.copyWith(
+          color: backgroundLuminance > 0.5 ? Colors.black : Colors.white,
+        ),
+        semanticsLabel: "flair",
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+      );
+    }
+  }
+
+  InlineSpan coloredRichtext(
     BuildContext context,
     String text, {
     required Color backgroundColor,
@@ -80,7 +108,7 @@ class FlairView extends StatelessWidget {
     final height = Theme.of(context).textTheme.labelSmall?.height ?? 1;
     final imageHeight = height * fontSize;
     return switch (richtext) {
-      Richtext_Text(t: var text) => coloredText(
+      Richtext_Text(t: var text) => coloredRichtext(
           context,
           text,
           textColor: textColor,
@@ -111,15 +139,11 @@ class FlairView extends StatelessWidget {
     Widget textWidget = Container();
     if (flair.richtext.isEmpty) {
       if (flair.text?.isNotEmpty == true) {
-        textWidget = Text(
+        textWidget = coloredText(
+          context,
           flair.text!,
-          style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                backgroundColor: backgroundColor,
-                color: foregroundColor,
-              ),
-          semanticsLabel: "Flair",
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
+          backgroundColor: backgroundColor,
+          textColor: foregroundColor,
         );
       }
     } else {
