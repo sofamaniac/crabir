@@ -6,7 +6,6 @@ import 'package:crabir/feed/sort_menu.dart';
 import 'package:crabir/feed/top_bar.dart';
 import 'package:crabir/html_view.dart';
 import 'package:crabir/loading_indicator.dart';
-import 'package:crabir/main.dart';
 import 'package:crabir/post/post.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
@@ -278,16 +277,29 @@ class _FeedViewBodyState extends State<FeedViewBody>
   }
 }
 
-class SubredditInfoView extends StatelessWidget {
+class SubredditInfoView extends StatefulWidget {
   final Subreddit infos;
 
   const SubredditInfoView({super.key, required this.infos});
 
   @override
+  State<SubredditInfoView> createState() => _SubredditInfoViewState();
+}
+
+class _SubredditInfoViewState extends State<SubredditInfoView> {
+  late bool subscribed;
+
+  @override
+  void initState() {
+    super.initState();
+    subscribed = widget.infos.other.userIsSubscriber;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Widget icon;
     icon = SubredditIcon(
-      icon: infos.other.icon,
+      icon: widget.infos.other.icon,
       radius: 40,
     );
     return Column(
@@ -317,23 +329,42 @@ class SubredditInfoView extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      infos.other.displayName,
+                      widget.infos.other.displayName,
                       style: Theme.of(context).textTheme.titleLarge,
                       overflow: TextOverflow.clip,
                     ),
                   ),
                   ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.check_circle),
-                    label: const Text("Joined"),
+                    onPressed: () async {
+                      if (subscribed) {
+                        await widget.infos
+                            .unsubscribe(client: RedditAPI.client());
+                      } else {
+                        await widget.infos
+                            .subscribe(client: RedditAPI.client());
+                      }
+                      setState(() {
+                        subscribed = widget.infos.other.userIsSubscriber;
+                      });
+                    },
+                    icon: Icon(
+                        subscribed ? Icons.check_circle : Icons.add_circle),
+                    label: subscribed
+                        // TODO: localize
+                        ? Text("Joined")
+                        : Text("Join"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
+                      backgroundColor:
+                          subscribed ? Colors.green : Colors.transparent,
+                      foregroundColor:
+                          Theme.of(context).textTheme.bodySmall?.color,
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       padding: EdgeInsetsGeometry.all(8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
+                        side: BorderSide(
+                            color: subscribed ? Colors.green : Colors.grey),
                       ),
                     ),
                   ),
@@ -344,14 +375,15 @@ class SubredditInfoView extends StatelessWidget {
                 ],
               ),
               Text(
-                "${infos.other.subscribers} members · ${infos.activeUserCount} online",
+                // TODO: localize
+                "${widget.infos.other.subscribers} members",
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium
                     ?.copyWith(color: Colors.white70),
               ),
-              if (infos.publicDescriptionHtml != null)
-                StyledHtml(htmlContent: infos.publicDescriptionHtml!),
+              if (widget.infos.publicDescriptionHtml != null)
+                StyledHtml(htmlContent: widget.infos.publicDescriptionHtml!),
               Divider(),
             ],
           ),
@@ -361,12 +393,12 @@ class SubredditInfoView extends StatelessWidget {
   }
 
   Widget _banner() {
-    if (infos.bannerBackgroundImage != null &&
-        infos.bannerBackgroundImage!.isNotEmpty) {
+    if (widget.infos.bannerBackgroundImage != null &&
+        widget.infos.bannerBackgroundImage!.isNotEmpty) {
       return Align(
         alignment: Alignment.topCenter,
         child: CachedNetworkImage(
-          imageUrl: infos.bannerBackgroundImage!,
+          imageUrl: widget.infos.bannerBackgroundImage!,
           fit: BoxFit.cover,
           height: 100,
           width: double.infinity,
