@@ -7,6 +7,18 @@ enum Resolution {
   low,
 }
 
+extension ResolutionLabel on Resolution {
+  String label(BuildContext context) {
+    final locales = AppLocalizations.of(context);
+    return switch (this) {
+      Resolution.source => locales.resolutionSource,
+      Resolution.high => locales.resolutionHigh,
+      Resolution.medium => locales.resolutionMedium,
+      Resolution.low => locales.resolutionLow,
+    };
+  }
+}
+
 extension FromResolution<T> on List<T> {
   T withResolution(Resolution resolution) {
     final log = Logger("FromResolution");

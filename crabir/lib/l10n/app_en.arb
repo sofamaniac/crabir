@@ -30,6 +30,11 @@
   "loginButtonLabel": "Add an account",
   "logoutButtonLabel": "Logout",
 
+  "resolutionSource": "Source",
+  "resolutionHigh": "High",
+  "resolutionMedium": "Medium",
+  "resolutionLow": "Low",
+
   "yearsAgo": "{count, plural, =1 {{count}y} other {{count}y}}",
   "@yearsAgo": {
     "description": "Number of years ago, abbreviated (e.g., '1y', '2y')",

@@ -250,6 +250,30 @@ abstract class AppLocalizations {
   /// **'Logout'**
   String get logoutButtonLabel;
 
+  /// No description provided for @resolutionSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get resolutionSource;
+
+  /// No description provided for @resolutionHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get resolutionHigh;
+
+  /// No description provided for @resolutionMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get resolutionMedium;
+
+  /// No description provided for @resolutionLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get resolutionLow;
+
   /// Number of years ago, abbreviated (e.g., '1y', '2y')
   ///
   /// In en, this message translates to:

@@ -87,6 +87,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logoutButtonLabel => 'Logout';
 
   @override
+  String get resolutionSource => 'Source';
+
+  @override
+  String get resolutionHigh => 'High';
+
+  @override
+  String get resolutionMedium => 'Medium';
+
+  @override
+  String get resolutionLow => 'Low';
+
+  @override
   String yearsAgo(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
