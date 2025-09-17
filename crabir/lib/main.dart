@@ -9,6 +9,7 @@ import 'package:crabir/media/media.dart';
 import 'package:crabir/network_status.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/settings.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/tabs_index.dart';
 import 'package:flutter/foundation.dart';
@@ -140,22 +141,18 @@ class MainScreenView extends StatefulWidget {
   State<MainScreenView> createState() => _MainScreenViewState();
 }
 
-class _MainScreenViewState extends State<MainScreenView> {
+class _MainScreenViewState extends State<MainScreenView>
+    with SingleTickerProviderStateMixin {
   bool addListener = true;
   bool showingDialog = false;
   StreamSubscription<Uri?>? _linkSub;
-
-  // Scaffold key to control the drawers
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  Widget? _endDrawer; // dynamic end drawer
 
   @override
   void initState() {
     super.initState();
 
-    final router = AutoRouter.of(context);
-
     // Subscribe to app links
+    final router = AutoRouter.of(context);
     _linkSub = AppLinks().uriLinkStream.listen((uri) {
       _handleRedditLink(router, uri.toString());
     });
@@ -199,19 +196,57 @@ class _MainScreenViewState extends State<MainScreenView> {
     showingDialog = false;
   }
 
-  void setEndDrawer(Widget? drawer) {
-    setState(() => _endDrawer = drawer);
-  }
+  Widget bottomBar(
+    TabsRouter tabsRouter,
+    TabController tabsController,
+    CrabirTheme theme,
+  ) {
+    void listener() {
+      final index = tabsController.index;
+      if (showAccountSelectionDialogue(index) &&
+          tabsController.indexIsChanging &&
+          tabsController.index > tabsController.previousIndex) {
+        tabsController.index = tabsController.previousIndex;
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _showLoginDialog(context),
+        );
+      }
+    }
 
-  void openEndDrawer(Widget drawer) {
-    setEndDrawer(drawer);
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _scaffoldKey.currentState?.openEndDrawer(),
+    void disableVideoOnChange() {
+      AnimatedContentController.currentlyPlaying.value = null;
+    }
+
+    if (addListener) {
+      tabsController.addListener(listener);
+      tabsController.addListener(disableVideoOnChange);
+      addListener = false;
+    }
+    return TabBar(
+      controller: tabsController,
+      labelColor: Theme.of(context).primaryTextTheme.bodyLarge!.color,
+      indicatorColor: theme.primaryColor,
+      onTap: (index) {
+        tabsRouter.setActiveIndex(index);
+        // routes to reset to when taping on their tab icon.
+        final rootRoutes = {
+          subscriptionsIndex: const SubscriptionsTabRoute(),
+          searchIndex: const SearchSubredditsRoute(),
+          profileIndex: UserRoute(),
+        };
+        final route = rootRoutes[index];
+        if (route != null) {
+          tabsRouter.stackRouterOfIndex(index)?.replaceAll([route]);
+        }
+      },
+      tabs: const [
+        Tab(icon: Icon(Icons.home)),
+        Tab(icon: Icon(Icons.search)),
+        Tab(icon: Icon(Icons.list)),
+        Tab(icon: Icon(Icons.mail)),
+        Tab(icon: Icon(Icons.person)),
+      ],
     );
-  }
-
-  void closeEndDrawer() {
-    _scaffoldKey.currentState?.closeEndDrawer();
   }
 
   @override
@@ -232,89 +267,24 @@ class _MainScreenViewState extends State<MainScreenView> {
       physics: const NeverScrollableScrollPhysics(),
       routes: routes,
       builder: (context, child, tabController) {
-        void listener() {
-          final index = tabController.index;
-          if (showAccountSelectionDialogue(index) &&
-              tabController.indexIsChanging &&
-              tabController.index > tabController.previousIndex) {
-            tabController.index = tabController.previousIndex;
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) => _showLoginDialog(context),
-            );
-          }
-        }
-
-        void disableVideoOnChange() {
-          AnimatedContentController.currentlyPlaying.value = null;
-        }
-
-        if (addListener) {
-          tabController.addListener(listener);
-          tabController.addListener(disableVideoOnChange);
-          addListener = false;
-        }
-
         final tabsRouter = AutoTabsRouter.of(context);
 
-        return DrawerHost(
-          setEndDrawer: setEndDrawer,
-          openEndDrawer: openEndDrawer,
-          closeEndDrawer: closeEndDrawer,
+        return PopScope(
+          canPop: tabsRouter.activeIndex == 0,
+          onPopInvokedWithResult: (_, __) async {
+            if (tabsRouter.activeIndex != 0) {
+              // If not on the home tab, go back to home tab
+              tabsRouter.setActiveIndex(0);
+            }
+          },
           child: Scaffold(
-            key: _scaffoldKey,
             backgroundColor: theme.background,
             drawer: const AppDrawer(),
-            endDrawer: _endDrawer,
             body: child,
-            bottomNavigationBar: TabBar(
-              labelColor: Theme.of(context).primaryTextTheme.bodyLarge!.color,
-              indicatorColor: theme.primaryColor,
-              controller: tabController,
-              onTap: (index) {
-                tabsRouter.setActiveIndex(index);
-                // routes to reset to when taping on their tab icon.
-                final rootRoutes = {
-                  subscriptionsIndex: const SubscriptionsTabRoute(),
-                  searchIndex: const SearchSubredditsRoute(),
-                  profileIndex: UserRoute(),
-                };
-                final route = rootRoutes[index];
-                if (route != null) {
-                  tabsRouter.stackRouterOfIndex(index)?.replaceAll([route]);
-                }
-              },
-              tabs: const [
-                Tab(icon: Icon(Icons.home)),
-                Tab(icon: Icon(Icons.search)),
-                Tab(icon: Icon(Icons.list)),
-                Tab(icon: Icon(Icons.mail)),
-                Tab(icon: Icon(Icons.person)),
-              ],
-            ),
+            bottomNavigationBar: bottomBar(tabsRouter, tabController, theme),
           ),
         );
       },
     );
   }
-}
-
-// -------- DrawerHost InheritedWidget --------
-class DrawerHost extends InheritedWidget {
-  final void Function(Widget?) setEndDrawer;
-  final void Function(Widget) openEndDrawer;
-  final VoidCallback closeEndDrawer;
-
-  const DrawerHost({
-    super.key,
-    required this.setEndDrawer,
-    required this.openEndDrawer,
-    required this.closeEndDrawer,
-    required super.child,
-  });
-
-  static DrawerHost of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<DrawerHost>()!;
-
-  @override
-  bool updateShouldNotify(DrawerHost oldWidget) => false;
 }

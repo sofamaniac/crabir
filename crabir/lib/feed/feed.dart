@@ -109,6 +109,13 @@ class _FeedViewBodyState extends State<FeedViewBody>
     final title = FeedTitle(feed: widget.feed, sort: sort!);
     return SliverAppBar(
       floating: true,
+      leading: IconButton(
+        icon: const Icon(Icons.menu),
+        onPressed: () {
+          Scaffold.of(context).openDrawer();
+          // rootScaffoldKey.currentState?.openDrawer();
+        },
+      ),
       title: title,
       backgroundColor:
           subredditAbout != null ? Colors.transparent : Colors.black,
@@ -184,52 +191,49 @@ class _FeedViewBodyState extends State<FeedViewBody>
       }
     }
 
-    // Update end drawer after build
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      DrawerHost.of(context).setEndDrawer(endDrawer());
-    });
-
     return switch (account.status) {
       Uninit() => Container(),
       Failure(:final message) =>
         Center(child: Text("Failure in Account Manager: $message")),
-      Loaded() => Stack(
-          children: [
-            // NestedScrollView with sliver-safe body
-            NestedScrollView(
-              controller: _scrollController,
-              floatHeaderSlivers: true,
-              headerSliverBuilder: (context, __) => [
-                _appBar(), // your SliverAppBar
-              ],
-              body: RefreshIndicator(
-                onRefresh: _stream.refresh,
-                child: Scrollbar(
-                  child: ThingsScaffold(
-                    // Ensure rebuild when sort changes.
-                    key: ValueKey(sort),
-                    stream: _stream,
-                    postView: postView,
-                    subredditInfo: subredditAbout != null
-                        ? SubredditInfoView(infos: subredditAbout!)
-                        : null,
+      Loaded() => Scaffold(
+          endDrawer: endDrawer(),
+          body: Stack(
+            children: [
+              NestedScrollView(
+                controller: _scrollController,
+                floatHeaderSlivers: true,
+                headerSliverBuilder: (context, __) => [
+                  _appBar(), // your SliverAppBar
+                ],
+                body: RefreshIndicator(
+                  onRefresh: _stream.refresh,
+                  child: Scrollbar(
+                    child: ThingsScaffold(
+                      // Ensure rebuild when sort changes.
+                      key: ValueKey(sort),
+                      stream: _stream,
+                      postView: postView,
+                      subredditInfo: subredditAbout != null
+                          ? SubredditInfoView(infos: subredditAbout!)
+                          : null,
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // Floating action button overlay
-            Positioned(
-              bottom: 16,
-              right: 16,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                child: ScrollAwareFab(
-                  scrollController: _scrollController,
+              // Floating action button overlay
+              Positioned(
+                bottom: 16,
+                right: 16,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: ScrollAwareFab(
+                    scrollController: _scrollController,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       _ => const Center(child: LoadingIndicator()),
     };

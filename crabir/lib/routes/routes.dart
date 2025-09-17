@@ -34,7 +34,7 @@ class AppRouter extends RootStackRouter {
   @override
   List<AutoRoute> get routes => [
         AutoRoute(
-          path: "/",
+          initial: true,
           page: MainScreenRoute.page,
           children: [
             NamedRouteDef(
@@ -46,7 +46,6 @@ class AppRouter extends RootStackRouter {
               ),
               initial: true,
             ),
-            RedirectRoute(path: "", redirectTo: homeRoutePath),
             AutoRoute(
               page: ProfilePageRoute.page,
               children: [

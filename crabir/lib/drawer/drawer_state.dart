@@ -17,7 +17,6 @@ class AccountView extends StatelessWidget {
 
 class DrawerState extends State<AppDrawer> {
   bool _isSelectingAccount = false;
-
   bool get isSelectingAccount => _isSelectingAccount;
 
   Logger log = Logger("DrawerModel");
