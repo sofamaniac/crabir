@@ -2,13 +2,15 @@ import 'dart:math';
 
 import 'package:crabir/bordered_text.dart';
 import 'package:crabir/hexcolor.dart';
+import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 
 class FlairView extends StatelessWidget {
   final Flair flair;
-  final Logger log = Logger("PostFlair");
+  final Logger log = Logger("FlairView");
   FlairView({super.key, required this.flair});
 
   /// Compute the luminance of a color according to https://www.w3.org/WAI/WCAG22/Techniques/general/G18.html
@@ -41,41 +43,49 @@ class FlairView extends StatelessWidget {
 
   /// Add a border around the text if the contrast between `backdgoundColor` and the `textColor`
   /// is not high enough
-  Widget coloredText(BuildContext context, String text, Color backgroundColor,
-      Color textColor) {
+  InlineSpan coloredText(
+    BuildContext context,
+    String text, {
+    required Color backgroundColor,
+    required Color textColor,
+  }) {
     final textStyle = Theme.of(context)
         .textTheme
         .labelSmall
         ?.copyWith(backgroundColor: backgroundColor, color: textColor);
     if (_colorRatio(textColor, backgroundColor) > 4.5) {
-      return Text(
-        text,
+      return TextSpan(
+        text: text,
         style: textStyle,
         semanticsLabel: "flair",
       );
     } else {
-      return BorderedText(
+      final backgroundLuminance = _luminance(backgroundColor);
+      return TextSpan(
         text: text,
-        borderColor: Colors.black,
-        style: textStyle,
-        semanticLabel: "flair",
+        style: textStyle?.copyWith(
+          color: backgroundLuminance > 0.5 ? Colors.black : Colors.white,
+        ),
+        semanticsLabel: "flair",
       );
     }
   }
 
-  InlineSpan richtext(BuildContext context, Richtext richtext,
-      Color backgroundColor, Color textColor) {
+  InlineSpan richtext(
+    BuildContext context,
+    Richtext richtext,
+    Color backgroundColor,
+    Color textColor,
+  ) {
     final fontSize = Theme.of(context).textTheme.labelSmall?.fontSize ?? 15;
     final height = Theme.of(context).textTheme.labelSmall?.height ?? 1;
     final imageHeight = height * fontSize;
     return switch (richtext) {
-      Richtext_Text(t: var text) => TextSpan(
-          text: text,
-          style: TextStyle(
-            color: textColor,
-            backgroundColor: backgroundColor,
-            fontWeight: FontWeight.bold,
-          ),
+      Richtext_Text(t: var text) => coloredText(
+          context,
+          text,
+          textColor: textColor,
+          backgroundColor: backgroundColor,
         ),
       Richtext_Emoji(a: var text, u: var url) => WidgetSpan(
           child: Image.network(url, semanticLabel: text, height: imageHeight),
@@ -90,19 +100,24 @@ class FlairView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor =
-        flair.backgroundColor.stringToColor(defaultColor: Colors.transparent);
+    final theme = context.watch<ThemeBloc>().state;
+    // default to background color for luminance computation (should be the same as a transparent background)
+    final backgroundColor = flair.backgroundColor.stringToColor(
+      defaultColor: theme.cardBackground,
+    );
     final foregroundColor = flair.textColor.stringToColor(
-        defaultColor:
-            Theme.of(context).textTheme.labelSmall?.foreground?.color ??
-                Colors.grey);
+      defaultColor: Theme.of(context).textTheme.labelSmall?.foreground?.color ??
+          Colors.grey,
+    );
     Widget textWidget = Container();
     if (flair.richtext.isEmpty) {
       if (flair.text?.isNotEmpty == true) {
         textWidget = Text(
           flair.text!,
           style: Theme.of(context).textTheme.labelSmall!.copyWith(
-              backgroundColor: backgroundColor, color: foregroundColor),
+                backgroundColor: backgroundColor,
+                color: foregroundColor,
+              ),
           semanticsLabel: "Flair",
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
