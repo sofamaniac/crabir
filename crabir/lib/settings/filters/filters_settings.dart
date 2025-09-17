@@ -17,6 +17,7 @@ abstract class FiltersSettings with _$FiltersSettings {
   factory FiltersSettings({
     @Setting(icon: "Icons.blur_on") @Default(false) bool blurNSFW,
   }) = _FiltersSettings;
+
   factory FiltersSettings.fromJson(Map<String, dynamic> json) =>
       _$FiltersSettingsFromJson(json);
 }

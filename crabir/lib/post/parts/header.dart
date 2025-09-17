@@ -3,10 +3,12 @@ part of '../post.dart';
 class Header extends StatelessWidget {
   final Post post;
   final bool showSubredditIcon;
+  final VoidCallback? onSubredditTap;
   const Header({
     super.key,
     required this.post,
     this.showSubredditIcon = true,
+    this.onSubredditTap,
   });
 
   bool _showDomain() {
@@ -34,12 +36,15 @@ class Header extends StatelessWidget {
       ],
     );
     if (settings.clickableCommunity) {
+      final onTap = onSubredditTap ??
+          () => context.router.navigate(
+                FeedRoute(
+                  key: ValueKey(name),
+                  feed: Feed.subreddit(name),
+                ),
+              );
       return InkWell(
-        onTap: () => context.pushRoute(
-          FeedRoute(
-            feed: Feed.subreddit(name),
-          ),
-        ),
+        onTap: onTap,
         child: subreddit,
       );
     } else {

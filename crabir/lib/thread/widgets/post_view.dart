@@ -23,7 +23,11 @@ class _PostView extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       spacing: 8,
       children: [
-        wrapPostElement(Header(post: post)),
+        wrapPostElement(
+          Header(
+            post: post,
+          ),
+        ),
         wrapPostElement(title(context)),
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -37,7 +41,7 @@ class _PostView extends StatelessWidget {
               child: DenseCard(
                 post: post.crosspostParentList.first,
                 onTap: () {
-                  context.pushRoute(
+                  context.router.navigate(
                     ThreadRoute(
                       key: ValueKey(post.id),
                       post: post.crosspostParentList.first,
