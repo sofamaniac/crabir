@@ -12,11 +12,11 @@ use serde_with::serde_as;
 
 use super::Fullname;
 use super::Thing;
-use super::Votable;
 use super::author;
 use super::author::AuthorInfo;
 use crate::error::Error;
 use crate::utils;
+use crate::votable::{Votable, private::PrivateVotable};
 
 impl TryFrom<Thing> for Comment {
     type Error = Error;
@@ -44,7 +44,9 @@ pub struct Comment {
         deserialize_with = "author::author_option"
     )]
     author: Option<AuthorInfo>,
+    #[getset(skip)]
     saved: bool,
+    #[getset(skip)]
     likes: Option<bool>,
     id: String,
     #[serde(deserialize_with = "utils::response_or_none")]
@@ -87,6 +89,7 @@ pub struct Comment {
     #[serde(deserialize_with = "utils::response_or_none")]
     edited: Option<f64>,
     // pub top_awarded_type: Value,
+    #[getset(skip)]
     name: Fullname,
     is_submitter: bool,
     downs: i32,
@@ -158,7 +161,7 @@ impl Comment {
     }
 }
 
-impl Votable for Comment {
+impl PrivateVotable for Comment {
     fn name(&self) -> &Fullname {
         &self.name
     }
@@ -171,6 +174,7 @@ impl Votable for Comment {
         self.saved = saved;
     }
 }
+impl Votable for Comment {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]

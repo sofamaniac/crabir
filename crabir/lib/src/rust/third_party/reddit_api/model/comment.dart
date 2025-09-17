@@ -6,6 +6,7 @@
 import '../../../frb_generated.dart';
 import '../client.dart';
 import '../model.dart';
+import '../votable.dart';
 import 'author.dart';
 import 'flair.dart';
 import 'multi.dart';
@@ -14,7 +15,7 @@ import 'post.dart';
 import 'subreddit.dart';
 import 'user/model.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `try_from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `name`, `set_likes`, `set_saved`, `try_from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Comment>>
 abstract class Comment implements RustOpaqueInterface, Votable {
@@ -84,7 +85,6 @@ abstract class Comment implements RustOpaqueInterface, Votable {
   bool get locked;
 
   /// flutter_rust_bridge:sync,getter
-  @override
   Fullname get name;
 
   /// flutter_rust_bridge:sync,getter
@@ -126,9 +126,6 @@ abstract class Comment implements RustOpaqueInterface, Votable {
   /// flutter_rust_bridge:sync,getter
   int get ups;
 
-  @override
-  Future<void> name();
-
   /// If `more` is a `Thing::More`, if it exists in `Self::replies` or in the replies of one of
   /// its children, will replace it with `new_things`.
   void replaceMore({required Thing more, required List<Thing> newThings});
@@ -137,12 +134,6 @@ abstract class Comment implements RustOpaqueInterface, Votable {
 
   @override
   Future<void> save({required Client client});
-
-  @override
-  Future<void> setLikes({bool? likes});
-
-  @override
-  Future<void> setSaved({required bool saved});
 
   @override
   Future<void> unsave({required Client client});

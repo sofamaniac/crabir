@@ -11,3 +11,4 @@ pub mod result;
 pub mod search;
 pub mod streamable;
 mod utils;
+pub mod votable;

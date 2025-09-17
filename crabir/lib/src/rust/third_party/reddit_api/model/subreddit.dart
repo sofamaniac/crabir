@@ -337,26 +337,6 @@ abstract class SubredditId implements RustOpaqueInterface {
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SubredditInfo>>
 abstract class SubredditInfo implements RustOpaqueInterface {
-  Details? get details;
-
-  String get subreddit;
-
-  SubredditId get subredditId;
-
-  String get subredditNamePrefixed;
-
-  int get subscribers;
-
-  set details(Details? details);
-
-  set subreddit(String subreddit);
-
-  set subredditId(SubredditId subredditId);
-
-  set subredditNamePrefixed(String subredditNamePrefixed);
-
-  set subscribers(int subscribers);
-
   static Future<SubredditInfo> default_() =>
       RustLib.instance.api.redditApiModelSubredditSubredditInfoDefault();
 

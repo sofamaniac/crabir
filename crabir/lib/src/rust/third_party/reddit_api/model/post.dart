@@ -6,6 +6,7 @@
 import '../../../frb_generated.dart';
 import '../client.dart';
 import '../model.dart';
+import '../votable.dart';
 import 'author.dart';
 import 'comment.dart';
 import 'flair.dart';
@@ -16,7 +17,7 @@ import 'subreddit.dart';
 part 'post.freezed.dart';
 
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `SecureMedia`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `try_from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `name`, `set_likes`, `set_saved`, `try_from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Post>>
 abstract class Post implements RustOpaqueInterface, Votable {
@@ -168,7 +169,6 @@ abstract class Post implements RustOpaqueInterface, Votable {
   List<String?> get modReports;
 
   /// flutter_rust_bridge:sync,getter
-  @override
   Fullname get name;
 
   /// flutter_rust_bridge:sync,getter
@@ -294,16 +294,7 @@ abstract class Post implements RustOpaqueInterface, Votable {
   Kind get kind;
 
   @override
-  Future<void> name();
-
-  @override
   Future<void> save({required Client client});
-
-  @override
-  Future<void> setLikes({bool? likes});
-
-  @override
-  Future<void> setSaved({required bool saved});
 
   Thumbnail? get thumbnail;
 

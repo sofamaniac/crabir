@@ -3,15 +3,15 @@ use flutter_getter::FlutterGetters;
 use flutter_rust_bridge::frb;
 use getset::{Getters, Setters};
 
-use crate::error::Error;
 use crate::model::author;
 use crate::model::author::AuthorInfo;
 use crate::model::flair::Flair;
 use crate::utils;
+use crate::votable::Votable;
+use crate::{error::Error, votable::private::PrivateVotable};
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, with_prefix};
 
-use super::Votable;
 use super::{Fullname, Thing, comment::CommentSort, gallery::Gallery, subreddit::SubredditInfo};
 
 with_prefix!(prefix_link_flair "link_flair_");
@@ -49,6 +49,7 @@ impl PostID {
 )]
 #[getset(get = "pub(crate)")]
 pub struct Post {
+    #[getset(skip)]
     name: Fullname,
     id: PostID,
     user_reports: Vec<Option<String>>,
@@ -73,10 +74,10 @@ pub struct Post {
     // User relationship
     clicked: bool,
     hidden: bool,
-    #[getset(set = "pub(crate)")]
+    #[getset(skip)]
     saved: bool,
     /// Some(true) if upvoted, Some(false) if downvoted, None otherwise
-    #[getset(set = "pub(crate)")]
+    #[getset(skip)]
     likes: Option<bool>,
     visited: bool,
 
@@ -255,7 +256,7 @@ impl Post {
     }
 }
 
-impl Votable for Post {
+impl PrivateVotable for Post {
     fn name(&self) -> &Fullname {
         &self.name
     }
@@ -268,6 +269,7 @@ impl Votable for Post {
         self.saved = saved;
     }
 }
+impl Votable for Post {}
 
 fn is_image_url(url: &str) -> bool {
     const EXTENSIONS: [&str; 5] = ["jpg", "jpeg", "png", "svg", "gif"];

@@ -3,8 +3,9 @@ use futures::lock::Mutex;
 
 use crate::{
     client::{Client, VoteDirection},
-    model::{Fullname, Thing, Votable as _},
+    model::{Fullname, Thing},
     result::Result,
+    votable::Votable as _,
 };
 use futures::{StreamExt, stream::BoxStream};
 use stream::IntoStreamPrivate;

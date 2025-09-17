@@ -27,18 +27,18 @@ pub struct SubredditID(String);
 pub struct SubredditInfo {
     /// The subreddit's name (e.g. "awww")
     #[serde(rename = "subreddit")]
-    pub subreddit: String,
+    subreddit: String,
     #[serde(rename = "subreddit_id")]
-    pub subreddit_id: SubredditID,
+    subreddit_id: SubredditID,
     /// The subreddit's name prefixed with "r/"
     #[serde(rename = "subreddit_name_prefixed")]
-    pub subreddit_name_prefixed: String,
+    subreddit_name_prefixed: String,
     /// The number of subscribers of the subreddit
     #[serde(rename = "subreddit_subscribers")]
-    pub subscribers: u32,
+    subscribers: u32,
 
     #[serde(rename = "sr_detail")]
-    pub details: Option<Details>,
+    details: Option<Details>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Getters, FlutterGetters, Serialize, Deserialize)]
