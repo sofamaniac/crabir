@@ -15,6 +15,7 @@ import 'package:crabir/tabs_index.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/frb_generated.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
@@ -45,6 +46,23 @@ Future<void> main() async {
   await NetworkStatus.init();
 
   runApp(Crabir());
+}
+
+bool _defaultOnNavigationNotification(NavigationNotification _) {
+  switch (WidgetsBinding.instance.lifecycleState) {
+    case null:
+    case AppLifecycleState.detached:
+    case AppLifecycleState.inactive:
+      // Avoid updating the engine when the app isn't ready.
+      return true;
+    case AppLifecycleState.resumed:
+    case AppLifecycleState.hidden:
+    case AppLifecycleState.paused:
+      SystemNavigator.setFrameworkHandlesBack(true);
+
+      /// This must be `true` instead of `notification.canHandlePop`, otherwise application closes on back gesture.
+      return true;
+  }
 }
 
 void _handleRedditLink(StackRouter router, String url) async {
@@ -85,6 +103,9 @@ class TopLevel extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.watch<ThemeBloc>().state;
     return MaterialApp.router(
+      // required to go back to home screen before exiting the app
+      // because flutter is broken.
+      onNavigationNotification: _defaultOnNavigationNotification,
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
