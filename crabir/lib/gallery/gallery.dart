@@ -3,6 +3,7 @@ import 'package:crabir/cartouche.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/data/data_settings.dart';
+import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart' hide Image;
@@ -20,9 +21,14 @@ class GalleryView extends StatelessWidget {
   const GalleryView({super.key, required this.post, this.onVote, this.onSave});
   @override
   Widget build(BuildContext context) {
+    final bool obfuscate = post.spoiler ||
+        (context.read<FiltersSettingsCubit>().state.blurNSFW && post.over18);
     if (post.gallery != null) {
       return _GalleryView(
         gallery: post.gallery!,
+        onVote: onVote,
+        onSave: onSave,
+        obfuscate: obfuscate,
       );
     } else if (post.isCrosspost) {
       final gallery = post.crosspostParentList[0].gallery;
@@ -31,6 +37,7 @@ class GalleryView extends StatelessWidget {
           gallery: gallery,
           onVote: onVote,
           onSave: onSave,
+          obfuscate: obfuscate,
         );
       } else {
         return Text("Error: Gallery and is Crosspost but no gallery on parent");
@@ -45,8 +52,14 @@ class _GalleryView extends StatefulWidget {
   final Gallery gallery;
   final void Function(VoteDirection)? onVote;
   final void Function(bool)? onSave;
+  final bool obfuscate;
 
-  const _GalleryView({required this.gallery, this.onVote, this.onSave});
+  const _GalleryView({
+    required this.gallery,
+    required this.obfuscate,
+    this.onVote,
+    this.onSave,
+  });
 
   @override
   State<_GalleryView> createState() => _GalleryViewState();
@@ -54,8 +67,21 @@ class _GalleryView extends StatefulWidget {
 
 class _GalleryViewState extends State<_GalleryView> {
   int _currentPage = 0;
+  late final bool obfuscate;
+
+  @override
+  void initState() {
+    super.initState();
+    obfuscate = widget.obfuscate;
+  }
 
   void _openFullScreen(int initialPage) {
+    if (obfuscate) {
+      setState(() {
+        obfuscate = false;
+      });
+      return;
+    }
     context.router.navigate(
       FullScreenGalleryRoute(
         gallery: widget.gallery,
@@ -73,6 +99,7 @@ class _GalleryViewState extends State<_GalleryView> {
           aspectRatio: aspectRatio,
           child: _GalleryPageViewer(
             gallery: widget.gallery,
+            obfuscate: obfuscate,
             onPageChanged: (index) {
               setState(() {
                 _currentPage = index;
@@ -102,6 +129,7 @@ class _GalleryPageViewer extends StatefulWidget {
   final void Function(int index)? onPageChanged;
   final int initialPage;
   final PageController? controller;
+  final bool obfuscate;
   final void Function(
     BuildContext,
     TapDownDetails,
@@ -112,6 +140,7 @@ class _GalleryPageViewer extends StatefulWidget {
     this.onTap,
     this.onPageChanged,
     this.initialPage = 0,
+    this.obfuscate = false,
     this.controller,
   });
   @override
@@ -121,11 +150,13 @@ class _GalleryPageViewer extends StatefulWidget {
 class _GalleryPageViewerState extends State<_GalleryPageViewer> {
   int _currentPage = 0;
   late final PageController _controller;
+  late bool obfuscate;
 
   @override
   void initState() {
     super.initState();
     _controller = PageController(initialPage: widget.initialPage);
+    obfuscate = widget.obfuscate;
 
     if (widget.controller == null) {
       // Ensure first frame jumps to the correct page, without that it jumps to
