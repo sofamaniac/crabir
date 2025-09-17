@@ -15,12 +15,6 @@ _DataSettings _$DataSettingsFromJson(Map<String, dynamic> json) =>
       videoQuality:
           $enumDecodeNullable(_$ResolutionEnumMap, json['videoQuality']) ??
               Resolution.source,
-      minimumQuality:
-          $enumDecodeNullable(_$ResolutionEnumMap, json['minimumQuality']) ??
-              Resolution.source,
-      maximumQuality:
-          $enumDecodeNullable(_$ResolutionEnumMap, json['maximumQuality']) ??
-              Resolution.source,
       loadImages:
           $enumDecodeNullable(_$ImageLoadingEnumMap, json['loadImages']) ??
               ImageLoading.always,
@@ -35,8 +29,6 @@ Map<String, dynamic> _$DataSettingsToJson(_DataSettings instance) =>
       'wifiDataSaver': instance.wifiDataSaver,
       'autoplay': _$ImageLoadingEnumMap[instance.autoplay]!,
       'videoQuality': _$ResolutionEnumMap[instance.videoQuality]!,
-      'minimumQuality': _$ResolutionEnumMap[instance.minimumQuality]!,
-      'maximumQuality': _$ResolutionEnumMap[instance.maximumQuality]!,
       'loadImages': _$ImageLoadingEnumMap[instance.loadImages]!,
       'preferredQuality': _$ResolutionEnumMap[instance.preferredQuality]!,
     };

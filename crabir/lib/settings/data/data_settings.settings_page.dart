@@ -35,12 +35,6 @@ class DataSettingsCubit extends HydratedCubit<DataSettings> {
   void updateVideoQuality(Resolution value) =>
       emit(state.copyWith(videoQuality: value));
 
-  void updateMinimumQuality(Resolution value) =>
-      emit(state.copyWith(minimumQuality: value));
-
-  void updateMaximumQuality(Resolution value) =>
-      emit(state.copyWith(maximumQuality: value));
-
   void updateLoadImages(ImageLoading value) =>
       emit(state.copyWith(loadImages: value));
 
@@ -85,6 +79,13 @@ class DataSettingsView extends StatelessWidget {
           onChanged: (val) =>
               context.read<DataSettingsCubit>().updateAutoplay(val),
         ),
+        ResolutionSelect(
+          title: Text(locales.data_videoQuality),
+          subtitle: null,
+          value: settings.videoQuality,
+          onChanged: (val) =>
+              context.read<DataSettingsCubit>().updateVideoQuality(val),
+        ),
         Divider(),
         Text("Images"),
         ImageLoadingSelect(
@@ -93,6 +94,13 @@ class DataSettingsView extends StatelessWidget {
           value: settings.loadImages,
           onChanged: (val) =>
               context.read<DataSettingsCubit>().updateLoadImages(val),
+        ),
+        ResolutionSelect(
+          title: Text(locales.data_preferredQuality),
+          subtitle: null,
+          value: settings.preferredQuality,
+          onChanged: (val) =>
+              context.read<DataSettingsCubit>().updatePreferredQuality(val),
         ),
       ],
     ));

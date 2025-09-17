@@ -22,16 +22,12 @@ mixin _$DataSettings {
   @Category(name: "Videos")
   @Setting(widget: ImageLoadingSelect)
   ImageLoading get autoplay;
-  @Setting()
+  @Setting(widget: ResolutionSelect)
   Resolution get videoQuality;
-  @Setting()
-  Resolution get minimumQuality;
-  @Setting()
-  Resolution get maximumQuality;
   @Category(name: "Images")
   @Setting(widget: ImageLoadingSelect)
   ImageLoading get loadImages;
-  @Setting()
+  @Setting(widget: ResolutionSelect)
   Resolution get preferredQuality;
 
   /// Create a copy of DataSettings
@@ -58,10 +54,6 @@ mixin _$DataSettings {
                 other.autoplay == autoplay) &&
             (identical(other.videoQuality, videoQuality) ||
                 other.videoQuality == videoQuality) &&
-            (identical(other.minimumQuality, minimumQuality) ||
-                other.minimumQuality == minimumQuality) &&
-            (identical(other.maximumQuality, maximumQuality) ||
-                other.maximumQuality == maximumQuality) &&
             (identical(other.loadImages, loadImages) ||
                 other.loadImages == loadImages) &&
             (identical(other.preferredQuality, preferredQuality) ||
@@ -70,20 +62,12 @@ mixin _$DataSettings {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      mobileDataSaver,
-      wifiDataSaver,
-      autoplay,
-      videoQuality,
-      minimumQuality,
-      maximumQuality,
-      loadImages,
-      preferredQuality);
+  int get hashCode => Object.hash(runtimeType, mobileDataSaver, wifiDataSaver,
+      autoplay, videoQuality, loadImages, preferredQuality);
 
   @override
   String toString() {
-    return 'DataSettings(mobileDataSaver: $mobileDataSaver, wifiDataSaver: $wifiDataSaver, autoplay: $autoplay, videoQuality: $videoQuality, minimumQuality: $minimumQuality, maximumQuality: $maximumQuality, loadImages: $loadImages, preferredQuality: $preferredQuality)';
+    return 'DataSettings(mobileDataSaver: $mobileDataSaver, wifiDataSaver: $wifiDataSaver, autoplay: $autoplay, videoQuality: $videoQuality, loadImages: $loadImages, preferredQuality: $preferredQuality)';
   }
 }
 
@@ -101,13 +85,11 @@ abstract mixin class $DataSettingsCopyWith<$Res> {
       @Category(name: "Videos")
       @Setting(widget: ImageLoadingSelect)
       ImageLoading autoplay,
-      @Setting() Resolution videoQuality,
-      @Setting() Resolution minimumQuality,
-      @Setting() Resolution maximumQuality,
+      @Setting(widget: ResolutionSelect) Resolution videoQuality,
       @Category(name: "Images")
       @Setting(widget: ImageLoadingSelect)
       ImageLoading loadImages,
-      @Setting() Resolution preferredQuality});
+      @Setting(widget: ResolutionSelect) Resolution preferredQuality});
 }
 
 /// @nodoc
@@ -126,8 +108,6 @@ class _$DataSettingsCopyWithImpl<$Res> implements $DataSettingsCopyWith<$Res> {
     Object? wifiDataSaver = null,
     Object? autoplay = null,
     Object? videoQuality = null,
-    Object? minimumQuality = null,
-    Object? maximumQuality = null,
     Object? loadImages = null,
     Object? preferredQuality = null,
   }) {
@@ -147,14 +127,6 @@ class _$DataSettingsCopyWithImpl<$Res> implements $DataSettingsCopyWith<$Res> {
       videoQuality: null == videoQuality
           ? _self.videoQuality
           : videoQuality // ignore: cast_nullable_to_non_nullable
-              as Resolution,
-      minimumQuality: null == minimumQuality
-          ? _self.minimumQuality
-          : minimumQuality // ignore: cast_nullable_to_non_nullable
-              as Resolution,
-      maximumQuality: null == maximumQuality
-          ? _self.maximumQuality
-          : maximumQuality // ignore: cast_nullable_to_non_nullable
               as Resolution,
       loadImages: null == loadImages
           ? _self.loadImages
@@ -269,13 +241,11 @@ extension DataSettingsPatterns on DataSettings {
             @Category(name: "Videos")
             @Setting(widget: ImageLoadingSelect)
             ImageLoading autoplay,
-            @Setting() Resolution videoQuality,
-            @Setting() Resolution minimumQuality,
-            @Setting() Resolution maximumQuality,
+            @Setting(widget: ResolutionSelect) Resolution videoQuality,
             @Category(name: "Images")
             @Setting(widget: ImageLoadingSelect)
             ImageLoading loadImages,
-            @Setting() Resolution preferredQuality)?
+            @Setting(widget: ResolutionSelect) Resolution preferredQuality)?
         $default, {
     required TResult orElse(),
   }) {
@@ -287,8 +257,6 @@ extension DataSettingsPatterns on DataSettings {
             _that.wifiDataSaver,
             _that.autoplay,
             _that.videoQuality,
-            _that.minimumQuality,
-            _that.maximumQuality,
             _that.loadImages,
             _that.preferredQuality);
       case _:
@@ -319,13 +287,11 @@ extension DataSettingsPatterns on DataSettings {
             @Category(name: "Videos")
             @Setting(widget: ImageLoadingSelect)
             ImageLoading autoplay,
-            @Setting() Resolution videoQuality,
-            @Setting() Resolution minimumQuality,
-            @Setting() Resolution maximumQuality,
+            @Setting(widget: ResolutionSelect) Resolution videoQuality,
             @Category(name: "Images")
             @Setting(widget: ImageLoadingSelect)
             ImageLoading loadImages,
-            @Setting() Resolution preferredQuality)
+            @Setting(widget: ResolutionSelect) Resolution preferredQuality)
         $default,
   ) {
     final _that = this;
@@ -336,8 +302,6 @@ extension DataSettingsPatterns on DataSettings {
             _that.wifiDataSaver,
             _that.autoplay,
             _that.videoQuality,
-            _that.minimumQuality,
-            _that.maximumQuality,
             _that.loadImages,
             _that.preferredQuality);
       case _:
@@ -367,13 +331,11 @@ extension DataSettingsPatterns on DataSettings {
             @Category(name: "Videos")
             @Setting(widget: ImageLoadingSelect)
             ImageLoading autoplay,
-            @Setting() Resolution videoQuality,
-            @Setting() Resolution minimumQuality,
-            @Setting() Resolution maximumQuality,
+            @Setting(widget: ResolutionSelect) Resolution videoQuality,
             @Category(name: "Images")
             @Setting(widget: ImageLoadingSelect)
             ImageLoading loadImages,
-            @Setting() Resolution preferredQuality)?
+            @Setting(widget: ResolutionSelect) Resolution preferredQuality)?
         $default,
   ) {
     final _that = this;
@@ -384,8 +346,6 @@ extension DataSettingsPatterns on DataSettings {
             _that.wifiDataSaver,
             _that.autoplay,
             _that.videoQuality,
-            _that.minimumQuality,
-            _that.maximumQuality,
             _that.loadImages,
             _that.preferredQuality);
       case _:
@@ -405,13 +365,12 @@ class _DataSettings extends DataSettings {
       @Category(name: "Videos")
       @Setting(widget: ImageLoadingSelect)
       this.autoplay = ImageLoading.always,
-      @Setting() this.videoQuality = Resolution.source,
-      @Setting() this.minimumQuality = Resolution.source,
-      @Setting() this.maximumQuality = Resolution.source,
+      @Setting(widget: ResolutionSelect) this.videoQuality = Resolution.source,
       @Category(name: "Images")
       @Setting(widget: ImageLoadingSelect)
       this.loadImages = ImageLoading.always,
-      @Setting() this.preferredQuality = Resolution.source})
+      @Setting(widget: ResolutionSelect)
+      this.preferredQuality = Resolution.source})
       : super._();
   factory _DataSettings.fromJson(Map<String, dynamic> json) =>
       _$DataSettingsFromJson(json);
@@ -432,16 +391,8 @@ class _DataSettings extends DataSettings {
   final ImageLoading autoplay;
   @override
   @JsonKey()
-  @Setting()
+  @Setting(widget: ResolutionSelect)
   final Resolution videoQuality;
-  @override
-  @JsonKey()
-  @Setting()
-  final Resolution minimumQuality;
-  @override
-  @JsonKey()
-  @Setting()
-  final Resolution maximumQuality;
   @override
   @JsonKey()
   @Category(name: "Images")
@@ -449,7 +400,7 @@ class _DataSettings extends DataSettings {
   final ImageLoading loadImages;
   @override
   @JsonKey()
-  @Setting()
+  @Setting(widget: ResolutionSelect)
   final Resolution preferredQuality;
 
   /// Create a copy of DataSettings
@@ -480,10 +431,6 @@ class _DataSettings extends DataSettings {
                 other.autoplay == autoplay) &&
             (identical(other.videoQuality, videoQuality) ||
                 other.videoQuality == videoQuality) &&
-            (identical(other.minimumQuality, minimumQuality) ||
-                other.minimumQuality == minimumQuality) &&
-            (identical(other.maximumQuality, maximumQuality) ||
-                other.maximumQuality == maximumQuality) &&
             (identical(other.loadImages, loadImages) ||
                 other.loadImages == loadImages) &&
             (identical(other.preferredQuality, preferredQuality) ||
@@ -492,20 +439,12 @@ class _DataSettings extends DataSettings {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      mobileDataSaver,
-      wifiDataSaver,
-      autoplay,
-      videoQuality,
-      minimumQuality,
-      maximumQuality,
-      loadImages,
-      preferredQuality);
+  int get hashCode => Object.hash(runtimeType, mobileDataSaver, wifiDataSaver,
+      autoplay, videoQuality, loadImages, preferredQuality);
 
   @override
   String toString() {
-    return 'DataSettings(mobileDataSaver: $mobileDataSaver, wifiDataSaver: $wifiDataSaver, autoplay: $autoplay, videoQuality: $videoQuality, minimumQuality: $minimumQuality, maximumQuality: $maximumQuality, loadImages: $loadImages, preferredQuality: $preferredQuality)';
+    return 'DataSettings(mobileDataSaver: $mobileDataSaver, wifiDataSaver: $wifiDataSaver, autoplay: $autoplay, videoQuality: $videoQuality, loadImages: $loadImages, preferredQuality: $preferredQuality)';
   }
 }
 
@@ -525,13 +464,11 @@ abstract mixin class _$DataSettingsCopyWith<$Res>
       @Category(name: "Videos")
       @Setting(widget: ImageLoadingSelect)
       ImageLoading autoplay,
-      @Setting() Resolution videoQuality,
-      @Setting() Resolution minimumQuality,
-      @Setting() Resolution maximumQuality,
+      @Setting(widget: ResolutionSelect) Resolution videoQuality,
       @Category(name: "Images")
       @Setting(widget: ImageLoadingSelect)
       ImageLoading loadImages,
-      @Setting() Resolution preferredQuality});
+      @Setting(widget: ResolutionSelect) Resolution preferredQuality});
 }
 
 /// @nodoc
@@ -551,8 +488,6 @@ class __$DataSettingsCopyWithImpl<$Res>
     Object? wifiDataSaver = null,
     Object? autoplay = null,
     Object? videoQuality = null,
-    Object? minimumQuality = null,
-    Object? maximumQuality = null,
     Object? loadImages = null,
     Object? preferredQuality = null,
   }) {
@@ -572,14 +507,6 @@ class __$DataSettingsCopyWithImpl<$Res>
       videoQuality: null == videoQuality
           ? _self.videoQuality
           : videoQuality // ignore: cast_nullable_to_non_nullable
-              as Resolution,
-      minimumQuality: null == minimumQuality
-          ? _self.minimumQuality
-          : minimumQuality // ignore: cast_nullable_to_non_nullable
-              as Resolution,
-      maximumQuality: null == maximumQuality
-          ? _self.maximumQuality
-          : maximumQuality // ignore: cast_nullable_to_non_nullable
               as Resolution,
       loadImages: null == loadImages
           ? _self.loadImages

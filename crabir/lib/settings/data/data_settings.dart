@@ -25,14 +25,16 @@ abstract class DataSettings with _$DataSettings {
     @Setting(widget: ImageLoadingSelect)
     @Default(ImageLoading.always)
     ImageLoading autoplay,
-    @Setting() @Default(Resolution.source) Resolution videoQuality,
-    @Setting() @Default(Resolution.source) Resolution minimumQuality,
-    @Setting() @Default(Resolution.source) Resolution maximumQuality,
+    @Setting(widget: ResolutionSelect)
+    @Default(Resolution.source)
+    Resolution videoQuality,
     @Category(name: "Images")
     @Setting(widget: ImageLoadingSelect)
     @Default(ImageLoading.always)
     ImageLoading loadImages,
-    @Setting() @Default(Resolution.source) Resolution preferredQuality,
+    @Setting(widget: ResolutionSelect)
+    @Default(Resolution.source)
+    Resolution preferredQuality,
   }) = _DataSettings;
   factory DataSettings.fromJson(Map<String, dynamic> json) =>
       _$DataSettingsFromJson(json);
@@ -74,38 +76,57 @@ class ImageLoadingSelect extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: ImageLoading.values.map((mode) {
-        return RadioListTile<ImageLoading>(
-          value: mode,
-          groupValue: value,
-          onChanged: (newValue) {
-            if (newValue != null) onChanged(newValue);
-          },
-          title: Text(_label(mode)),
-          secondary: Icon(_icon(mode)),
-        );
-      }).toList(),
+    return ListTile(
+      title: title,
+      subtitle: subtitle,
+      trailing: DropdownMenu(
+        dropdownMenuEntries: ImageLoading.values
+            .map(
+              (mode) => DropdownMenuEntry(
+                value: mode,
+                leadingIcon: Icon(_icon(mode)),
+                label: _label(mode),
+              ),
+            )
+            .toList(),
+        onSelected: (mode) => onChanged(mode!),
+        initialSelection: value,
+      ),
     );
   }
 }
 
-class ResoltuionSelect extends StatelessWidget {
+class ResolutionSelect extends StatelessWidget {
   final Widget title;
   final Widget? subtitle;
   final Resolution value;
   final void Function(Resolution) onChanged;
-  const ResoltuionSelect({
+  const ResolutionSelect({
     super.key,
     required this.title,
-    this.subtitle,
     required this.onChanged,
     required this.value,
+    this.subtitle,
   });
+
   @override
   Widget build(BuildContext context) {
-    return Text("TODO");
+    return ListTile(
+      title: title,
+      subtitle: subtitle,
+      trailing: DropdownMenu(
+        dropdownMenuEntries: Resolution.values
+            .map(
+              (res) => DropdownMenuEntry(
+                value: res,
+                label: res.label(context),
+              ),
+            )
+            .toList(),
+        onSelected: (res) => onChanged(res!),
+        initialSelection: value,
+      ),
+    );
   }
 }
 
