@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:crabir/bordered_text.dart';
 import 'package:crabir/hexcolor.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
