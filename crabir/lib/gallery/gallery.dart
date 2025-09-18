@@ -67,7 +67,7 @@ class _GalleryView extends StatefulWidget {
 
 class _GalleryViewState extends State<_GalleryView> {
   int _currentPage = 0;
-  late final bool obfuscate;
+  late bool obfuscate;
 
   @override
   void initState() {
@@ -137,10 +137,10 @@ class _GalleryPageViewer extends StatefulWidget {
   )? onTap;
   const _GalleryPageViewer({
     required this.gallery,
+    required this.obfuscate,
     this.onTap,
     this.onPageChanged,
     this.initialPage = 0,
-    this.obfuscate = false,
     this.controller,
   });
   @override
@@ -150,13 +150,11 @@ class _GalleryPageViewer extends StatefulWidget {
 class _GalleryPageViewerState extends State<_GalleryPageViewer> {
   int _currentPage = 0;
   late final PageController _controller;
-  late bool obfuscate;
 
   @override
   void initState() {
     super.initState();
     _controller = PageController(initialPage: widget.initialPage);
-    obfuscate = widget.obfuscate;
 
     if (widget.controller == null) {
       // Ensure first frame jumps to the correct page, without that it jumps to
@@ -184,13 +182,8 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
     bool obfuscate,
     int index,
   ) {
-    final List<Image> resolutions;
-    if (obfuscate) {
-      resolutions = content.obfuscated;
-    } else {
-      resolutions = content.previews;
-    }
-    final placeholder = resolutions.withResolution(resolution);
+    final image = content.withResolution(resolution, obfuscate);
+    final placeholder = content.withResolution(Resolution.low, obfuscate);
     switch (content.source) {
       case Source_AnimatedImage(:final source):
         // In galleries video do not have alternate resolutions.
@@ -200,18 +193,11 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
           height: source.y,
           placeholderUrl: placeholder.u,
         );
-      case Source_Image(:final source):
-        if (resolution case Resolution.source) {
-          return ImageThumbnail.fromGalleryImage(
-            source,
-            placeholderUrl: placeholder.u,
-          );
-        } else {
-          return ImageThumbnail.fromGalleryImage(
-            placeholder,
-            placeholderUrl: resolutions.first.u,
-          );
-        }
+      case Source_Image():
+        return ImageThumbnail.fromGalleryImage(
+          image,
+          placeholderUrl: placeholder.u,
+        );
     }
   }
 
@@ -227,7 +213,7 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
         final Widget imageWidget = toWidget(
           image,
           settings.preferredQuality,
-          false,
+          widget.obfuscate,
           index,
         );
         return PhotoViewGalleryPageOptions.customChild(

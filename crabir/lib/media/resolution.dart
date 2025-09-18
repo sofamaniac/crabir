@@ -61,3 +61,26 @@ extension VariantGetResolution on VariantInner {
     }
   }
 }
+
+extension GalleryMediaResolution on gallery.GalleryMedia {
+  gallery.Image withResolution(Resolution resolution, bool blur) {
+    final List<gallery.Image> previews;
+    if (blur) {
+      previews = obfuscated;
+    } else {
+      previews = this.previews;
+    }
+    switch (source) {
+      case gallery.Source_Image(:final source):
+        if (resolution == Resolution.source && blur) {
+          return obfuscated.last;
+        } else if (resolution == Resolution.source) {
+          return source;
+        } else {
+          return previews.withResolution(resolution);
+        }
+      case gallery.Source_AnimatedImage():
+        return previews.withResolution(resolution);
+    }
+  }
+}
