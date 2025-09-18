@@ -186,6 +186,14 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
     final placeholder = content.withResolution(Resolution.low, obfuscate);
     switch (content.source) {
       case Source_AnimatedImage(:final source):
+        if (obfuscate) {
+          return ImageThumbnail(
+            imageUrl: image.u,
+            width: image.x,
+            height: image.y,
+            placeholderUrl: placeholder.u,
+          );
+        }
         // In galleries video do not have alternate resolutions.
         return AnimatedContent(
           url: source.mp4,

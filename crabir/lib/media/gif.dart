@@ -9,8 +9,8 @@ class AnimatedContent extends StatefulWidget {
   final int width;
   final int height;
   final String? placeholderUrl;
-  final Resolution preferredResolution;
   final Widget? cartouche;
+  final bool ignoreAutoplay;
 
   const AnimatedContent({
     super.key,
@@ -18,36 +18,46 @@ class AnimatedContent extends StatefulWidget {
     required this.width,
     required this.height,
     this.placeholderUrl,
-    this.preferredResolution = Resolution.source,
     this.cartouche,
+    this.ignoreAutoplay = false,
   });
 
   AnimatedContent.fromImageBase({
     super.key,
     required ImageBase image,
     this.placeholderUrl,
-    this.preferredResolution = Resolution.source,
     this.cartouche,
+    this.ignoreAutoplay = false,
   })  : url = image.url,
         width = image.width,
         height = image.height;
 
-  AnimatedContent.fromVariantInner({
-    super.key,
+  factory AnimatedContent.fromVariantInner({
     required VariantInner mp4,
-    this.placeholderUrl,
-    this.preferredResolution = Resolution.source,
-    this.cartouche,
-  })  : url = mp4.source.url,
-        width = mp4.source.width,
-        height = mp4.source.height;
+    required VariantInner placeholder,
+    Resolution preferredResolution = Resolution.source,
+    bool ignoreAutoplay = false,
+  }) {
+    final ImageBase media;
+    if (preferredResolution == Resolution.source) {
+      media = mp4.source;
+    } else {
+      media = mp4.resolutions.withResolution(preferredResolution);
+    }
+    return AnimatedContent(
+      url: media.url,
+      placeholderUrl: placeholder.withResolution(Resolution.low).url,
+      width: media.width,
+      height: media.height,
+    );
+  }
 
   AnimatedContent.fromMediaOEmbed({
     super.key,
     required Media_Oembed media,
     this.placeholderUrl,
-    this.preferredResolution = Resolution.source,
     this.cartouche,
+    this.ignoreAutoplay = false,
   })  : url = media.oembed.providerUrl,
         width = media.oembed.width,
         height = media.oembed.height;
@@ -56,11 +66,11 @@ class AnimatedContent extends StatefulWidget {
     super.key,
     required Media_RedditVideo media,
     this.placeholderUrl,
-    this.preferredResolution = Resolution.source,
     this.cartouche = const Cartouche(
       "video",
       background: Colors.orange,
     ),
+    this.ignoreAutoplay = false,
   })  : url = media.field0.dashUrl,
         width = media.field0.width,
         height = media.field0.height;
