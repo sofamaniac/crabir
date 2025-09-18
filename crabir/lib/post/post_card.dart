@@ -65,11 +65,12 @@ class _RedditPostCardState extends State<RedditPostCard> {
         ),
       // Text types
       Kind.meta => Text("meta"),
-      Kind.link || Kind.unknown => Container(),
-      Kind.selftext || _ => HtmlWithConditionalFade(
+      Kind.selftext || _ when !widget.post.spoiler => HtmlWithConditionalFade(
           htmlContent: widget.post.selftextHtml ?? "",
           maxLines: widget.maxLines,
         ),
+      Kind.link || Kind.unknown => SizedBox.shrink(),
+      _ => SizedBox.shrink(),
     };
 
     return _contentWrap(res);
