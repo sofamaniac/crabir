@@ -59,6 +59,7 @@ extension ThingPatterns on Thing {
     TResult Function(Thing_Award value)? award,
     TResult Function(Thing_Multi value)? multi,
     TResult Function(Thing_More value)? more,
+    TResult Function(Thing_Wikipage value)? wikipage,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -81,6 +82,8 @@ extension ThingPatterns on Thing {
         return multi(_that);
       case Thing_More() when more != null:
         return more(_that);
+      case Thing_Wikipage() when wikipage != null:
+        return wikipage(_that);
       case _:
         return orElse();
     }
@@ -110,6 +113,7 @@ extension ThingPatterns on Thing {
     required TResult Function(Thing_Award value) award,
     required TResult Function(Thing_Multi value) multi,
     required TResult Function(Thing_More value) more,
+    required TResult Function(Thing_Wikipage value) wikipage,
   }) {
     final _that = this;
     switch (_that) {
@@ -131,6 +135,8 @@ extension ThingPatterns on Thing {
         return multi(_that);
       case Thing_More():
         return more(_that);
+      case Thing_Wikipage():
+        return wikipage(_that);
     }
   }
 
@@ -157,6 +163,7 @@ extension ThingPatterns on Thing {
     TResult? Function(Thing_Award value)? award,
     TResult? Function(Thing_Multi value)? multi,
     TResult? Function(Thing_More value)? more,
+    TResult? Function(Thing_Wikipage value)? wikipage,
   }) {
     final _that = this;
     switch (_that) {
@@ -178,6 +185,8 @@ extension ThingPatterns on Thing {
         return multi(_that);
       case Thing_More() when more != null:
         return more(_that);
+      case Thing_Wikipage() when wikipage != null:
+        return wikipage(_that);
       case _:
         return null;
     }
@@ -208,6 +217,7 @@ extension ThingPatterns on Thing {
     TResult Function(String id, Fullname name, int count, int depth,
             List<String> children)?
         more,
+    TResult Function(String contentHtml)? wikipage,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -231,6 +241,8 @@ extension ThingPatterns on Thing {
       case Thing_More() when more != null:
         return more(
             _that.id, _that.name, _that.count, _that.depth, _that.children);
+      case Thing_Wikipage() when wikipage != null:
+        return wikipage(_that.contentHtml);
       case _:
         return orElse();
     }
@@ -262,6 +274,7 @@ extension ThingPatterns on Thing {
     required TResult Function(String id, Fullname name, int count, int depth,
             List<String> children)
         more,
+    required TResult Function(String contentHtml) wikipage,
   }) {
     final _that = this;
     switch (_that) {
@@ -284,6 +297,8 @@ extension ThingPatterns on Thing {
       case Thing_More():
         return more(
             _that.id, _that.name, _that.count, _that.depth, _that.children);
+      case Thing_Wikipage():
+        return wikipage(_that.contentHtml);
     }
   }
 
@@ -312,6 +327,7 @@ extension ThingPatterns on Thing {
     TResult? Function(String id, Fullname name, int count, int depth,
             List<String> children)?
         more,
+    TResult? Function(String contentHtml)? wikipage,
   }) {
     final _that = this;
     switch (_that) {
@@ -334,6 +350,8 @@ extension ThingPatterns on Thing {
       case Thing_More() when more != null:
         return more(
             _that.id, _that.name, _that.count, _that.depth, _that.children);
+      case Thing_Wikipage() when wikipage != null:
+        return wikipage(_that.contentHtml);
       case _:
         return null;
     }
@@ -863,6 +881,71 @@ class _$Thing_MoreCopyWithImpl<$Res> implements $Thing_MoreCopyWith<$Res> {
           ? _self._children
           : children // ignore: cast_nullable_to_non_nullable
               as List<String>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class Thing_Wikipage extends Thing {
+  const Thing_Wikipage({required this.contentHtml}) : super._();
+
+  final String contentHtml;
+
+  /// Create a copy of Thing
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $Thing_WikipageCopyWith<Thing_Wikipage> get copyWith =>
+      _$Thing_WikipageCopyWithImpl<Thing_Wikipage>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is Thing_Wikipage &&
+            (identical(other.contentHtml, contentHtml) ||
+                other.contentHtml == contentHtml));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, contentHtml);
+
+  @override
+  String toString() {
+    return 'Thing.wikipage(contentHtml: $contentHtml)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $Thing_WikipageCopyWith<$Res>
+    implements $ThingCopyWith<$Res> {
+  factory $Thing_WikipageCopyWith(
+          Thing_Wikipage value, $Res Function(Thing_Wikipage) _then) =
+      _$Thing_WikipageCopyWithImpl;
+  @useResult
+  $Res call({String contentHtml});
+}
+
+/// @nodoc
+class _$Thing_WikipageCopyWithImpl<$Res>
+    implements $Thing_WikipageCopyWith<$Res> {
+  _$Thing_WikipageCopyWithImpl(this._self, this._then);
+
+  final Thing_Wikipage _self;
+  final $Res Function(Thing_Wikipage) _then;
+
+  /// Create a copy of Thing
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? contentHtml = null,
+  }) {
+    return _then(Thing_Wikipage(
+      contentHtml: null == contentHtml
+          ? _self.contentHtml
+          : contentHtml // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }

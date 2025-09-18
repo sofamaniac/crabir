@@ -12,6 +12,7 @@ import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/rule.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart'
     hide Icon, SubredditIcon;
 import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
@@ -266,11 +267,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
 
   Widget? endDrawer() {
     if (subredditAbout != null) {
-      return Drawer(
-        child: StyledHtml(
-          htmlContent: subredditAbout?.descriptionHtml ?? "",
-        ),
-      );
+      return Drawer(child: RightSide(infos: subredditAbout!));
     } else {
       return null;
     }
@@ -334,7 +331,8 @@ class _SubredditInfoViewState extends State<SubredditInfoView> {
                       overflow: TextOverflow.clip,
                     ),
                   ),
-                  ElevatedButton.icon(
+                  JoinButton(
+                    subscribed: subscribed,
                     onPressed: () async {
                       if (subscribed) {
                         await widget.infos
@@ -347,31 +345,8 @@ class _SubredditInfoViewState extends State<SubredditInfoView> {
                         subscribed = widget.infos.other.userIsSubscriber;
                       });
                     },
-                    icon: Icon(
-                        subscribed ? Icons.check_circle : Icons.add_circle),
-                    label: subscribed
-                        // TODO: localize
-                        ? Text("Joined")
-                        : Text("Join"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          subscribed ? Colors.green : Colors.transparent,
-                      foregroundColor:
-                          Theme.of(context).textTheme.bodySmall?.color,
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      padding: EdgeInsetsGeometry.all(8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                        side: BorderSide(
-                            color: subscribed ? Colors.green : Colors.grey),
-                      ),
-                    ),
                   ),
-                  IconButton.outlined(
-                    onPressed: () {},
-                    icon: const Icon(Icons.more_vert),
-                  ),
+                  MoreOptionButton(subreddit: widget.infos),
                 ],
               ),
               Text(
@@ -384,10 +359,10 @@ class _SubredditInfoViewState extends State<SubredditInfoView> {
               ),
               if (widget.infos.publicDescriptionHtml != null)
                 StyledHtml(htmlContent: widget.infos.publicDescriptionHtml!),
-              Divider(),
             ],
           ),
         ),
+        Divider(),
       ],
     );
   }
@@ -410,5 +385,250 @@ class _SubredditInfoViewState extends State<SubredditInfoView> {
         width: double.infinity,
       );
     }
+  }
+}
+
+class JoinButton extends StatelessWidget {
+  final bool subscribed;
+  final VoidCallback onPressed;
+
+  const JoinButton(
+      {super.key, required this.subscribed, required this.onPressed});
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(subscribed ? Icons.check_circle : Icons.add_circle),
+      label: subscribed
+          // TODO: localize
+          ? Text("Joined")
+          : Text("Join"),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: subscribed ? Colors.green : Colors.transparent,
+        foregroundColor: Theme.of(context).textTheme.bodySmall?.color,
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        padding: EdgeInsetsGeometry.all(8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+          side: BorderSide(color: subscribed ? Colors.green : Colors.grey),
+        ),
+      ),
+    );
+  }
+}
+
+class FavButton extends StatelessWidget {
+  final bool favorite;
+  final VoidCallback onPressed;
+
+  const FavButton({super.key, required this.favorite, required this.onPressed});
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(favorite ? Icons.check_circle : Icons.add_circle),
+      // TODO: localize
+      label: Text("Favorite"),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: favorite ? Colors.yellow : Colors.transparent,
+        foregroundColor: Theme.of(context).textTheme.bodySmall?.color,
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        padding: EdgeInsetsGeometry.all(8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+          side: BorderSide(color: favorite ? Colors.yellow : Colors.grey),
+        ),
+      ),
+    );
+  }
+}
+
+class RulesView extends StatefulWidget {
+  final Subreddit subreddit;
+
+  const RulesView({super.key, required this.subreddit});
+
+  @override
+  State<StatefulWidget> createState() => _RulesViewState();
+}
+
+class _RulesViewState extends State<RulesView> {
+  List<Rule> rules = [];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      rules = await RedditAPI.client()
+          .rules(name: widget.subreddit.other.displayName);
+      setState(() {});
+    });
+  }
+
+  String kindToText(String kind) {
+    return switch (kind) {
+      "all" => "Post and Comment",
+      "link" => "Post",
+      _ => "TODO: $kind"
+    };
+  }
+
+  Widget ruleView(BuildContext context, Rule rule) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(rule.shortName, style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          kindToText(rule.kind),
+          style: Theme.of(context).textTheme.labelMedium,
+        ),
+        SizedBox(height: 8),
+        StyledHtml(htmlContent: rule.descriptionHtml),
+      ],
+    );
+  }
+
+  Widget rulesView() {
+    return ListView.builder(
+      itemCount: rules.length,
+      itemBuilder: (context, index) => ruleView(context, rules[index]),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+        title: Text("Rules"),
+        content:
+            rules.isEmpty ? Center(child: LoadingIndicator()) : rulesView(),
+        actions: [
+          InkWell(child: Text("Got it"), onTap: () => Navigator.pop(context)),
+        ]);
+  }
+}
+
+class MoreOptionButton extends StatelessWidget {
+  final Subreddit subreddit;
+
+  const MoreOptionButton({super.key, required this.subreddit});
+
+  Widget dialog(BuildContext context) {
+    return SimpleDialog(
+      children: [
+        ListTile(leading: Icon(Icons.create), title: Text("Create post")),
+        ListTile(leading: Icon(Icons.label), title: Text("Change user flair")),
+        ListTile(leading: Icon(Icons.person_outline), title: Text("View mods")),
+        ListTile(leading: Icon(Icons.mail), title: Text("Contact mods")),
+        ListTile(leading: Icon(Icons.public), title: Text("View wiki")),
+        ListTile(
+          leading: Icon(Icons.list),
+          title: Text("View rules"),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => RulesView(subreddit: subreddit),
+            );
+          },
+        ),
+        ListTile(leading: Icon(Icons.share), title: Text("Share community")),
+        ListTile(
+            leading: Icon(Icons.format_list_bulleted_add),
+            title: Text("Add to custom feed")),
+        ListTile(
+            leading: Icon(Icons.add_to_home_screen),
+            title: Text("Add to home screen")),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton.outlined(
+      onPressed: () {
+        showDialog(context: context, builder: dialog);
+      },
+      icon: const Icon(Icons.more_vert),
+    );
+  }
+}
+
+class RightSide extends StatelessWidget {
+  final Subreddit infos;
+
+  const RightSide({super.key, required this.infos});
+
+  Widget infoView(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        spacing: 8,
+        children: [
+          Row(
+            spacing: 16,
+            children: [
+              SubredditIcon(
+                icon: infos.other.icon,
+                radius: 40,
+              ),
+              Column(
+                children: [
+                  Text(
+                    infos.other.displayName,
+                    style: Theme.of(context).textTheme.titleLarge,
+                    overflow: TextOverflow.clip,
+                  ),
+                  Text(
+                    // TODO: localize
+                    "${infos.other.subscribers} members",
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: Colors.white70),
+                  ),
+                  Text("Edit flair"),
+                ],
+              ),
+            ],
+          ),
+          Row(
+            spacing: 16,
+            children: [
+              JoinButton(
+                subscribed: infos.other.userIsSubscriber,
+                onPressed: () {/* TODO: manage state */},
+              ),
+              FavButton(
+                favorite: infos.userHasFavorited,
+                onPressed: () {/* TODO: manage state */},
+              ),
+              // TODO:
+              MoreOptionButton(subreddit: infos),
+            ],
+          ),
+          if (infos.publicDescriptionHtml != null)
+            StyledHtml(htmlContent: infos.publicDescriptionHtml!),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: ListView(children: [
+        // TODO:
+        Text("Search post"),
+        Divider(),
+        infoView(context),
+        Divider(),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: StyledHtml(htmlContent: infos.descriptionHtml ?? ""),
+        ),
+      ]),
+    );
   }
 }

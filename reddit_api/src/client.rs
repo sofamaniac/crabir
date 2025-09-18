@@ -1,6 +1,7 @@
 use crate::model::feed::{self, Feed};
 use crate::model::flair::Flair;
 use crate::model::multi::{Multi, MultiStream};
+use crate::model::rule::Rule;
 use crate::model::subreddit::Subreddit;
 use crate::model::{Fullname, Post, comment};
 use crate::result::Result;
@@ -415,7 +416,6 @@ impl Client {
                         Ok(thing) => match thing {
                             Thing::Listing(listing) => {
                                 pager.after(listing.after.clone());
-                                debug!("{pager:?}");
                                 if listing.after.clone()?.is_empty() {
                                     return None;
                                 }
@@ -541,6 +541,35 @@ impl Client {
         ]);
         self.execute(request).await?;
         Ok(())
+    }
+
+    /// Get html of wiki index of subreddit `name` (e.g: unixporn).
+    /// # Errors
+    /// Returns an error if the http client fails or if the parsing of the response fails.
+    pub async fn wiki(&self, name: String) -> Result<String> {
+        let url = self.join_url(&format!("r/{name}/wiki.json"));
+        let request = self.get(url);
+        let result = self.execute(request).await?;
+        if let Thing::Wikipage { content_html } = parse_response(result).await? {
+            Ok(content_html)
+        } else {
+            Err(Error::InvalidThing)
+        }
+    }
+
+    /// Get the rules of a subreddit by its display name (e.g.: unixporn).
+    /// # Errors
+    /// Returns an error if the http client fails or if the parsing of the response fails.
+    pub async fn rules(&self, name: String) -> Result<Vec<Rule>> {
+        #[derive(Deserialize)]
+        struct Response {
+            rules: Vec<Rule>,
+        }
+        let url = self.join_url(&format!("r/{name}/about/rules.json"));
+        let request = self.get(url);
+        let result = self.execute(request).await?;
+        let Response { rules } = parse_response(result).await?;
+        Ok(rules)
     }
 
     /// Get the list of multireddits the current user is subscribed to.

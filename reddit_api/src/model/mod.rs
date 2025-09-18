@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use subreddit::Subreddit;
 use user::model::User;
 
-use crate::{client::VoteDirection, error::Error};
+use crate::error::Error;
 
 pub mod author;
 pub mod comment;
@@ -15,6 +15,7 @@ pub mod flair;
 pub mod gallery;
 pub mod multi;
 pub mod post;
+pub mod rule;
 pub mod subreddit;
 pub mod user;
 
@@ -62,6 +63,9 @@ pub enum Thing {
         depth: u32,
         children: Vec<String>,
     },
+
+    #[serde(rename = "wikipage")]
+    Wikipage { content_html: String },
 }
 
 impl Thing {
@@ -77,6 +81,7 @@ impl Thing {
             Thing::Award => None,
             Thing::Multi(multi) => Some(multi.name.clone()),
             Thing::More { .. } => None,
+            Thing::Wikipage { .. } => None,
         }
     }
 }

@@ -84,6 +84,9 @@ sealed class Thing with _$Thing {
     required int depth,
     required List<String> children,
   }) = Thing_More;
+  const factory Thing.wikipage({
+    required String contentHtml,
+  }) = Thing_Wikipage;
 
   /// flutter_rust_bridge:getter,sync
   Fullname? get name => RustLib.instance.api.redditApiModelThingName(

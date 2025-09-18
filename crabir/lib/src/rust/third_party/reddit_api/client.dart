@@ -11,6 +11,7 @@ import 'model/feed.dart';
 import 'model/flair.dart';
 import 'model/multi.dart';
 import 'model/post.dart';
+import 'model/rule.dart';
 import 'model/subreddit.dart';
 import 'model/user/model.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -72,6 +73,11 @@ abstract class Client implements RustOpaqueInterface {
   /// Create a new access token for a logged out user
   Future<void> newLoggedOutUserToken();
 
+  /// Get the rules of a subreddit by its display name (e.g.: unixporn).
+  /// # Errors
+  /// Returns an error if the http client fails or if the parsing of the response fails.
+  Future<List<Rule>> rules({required String name});
+
   Streamable searchPost(
       {String? subreddit,
       Flair? flair,
@@ -122,6 +128,11 @@ abstract class Client implements RustOpaqueInterface {
       {required String username, required UserStreamSort sort});
 
   Streamable userUpvoted({required String username});
+
+  /// Get html of wiki index of subreddit `name` (e.g: unixporn).
+  /// # Errors
+  /// Returns an error if the http client fails or if the parsing of the response fails.
+  Future<String> wiki({required String name});
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Pager>>
