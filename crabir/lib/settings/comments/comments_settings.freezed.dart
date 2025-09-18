@@ -28,8 +28,9 @@ mixin _$CommentsSettings {
   bool
       get showUserAvatar; // TODO: I don't understand how `flutter_html` renders images.
   @Setting()
-  bool
-      get showCommentsImage; //@Default() MediaPreviewSize postMediaPreviewSize,
+  bool get showCommentsImage;
+  @Setting(widget: MediaPreviewSizeSelect)
+  MediaPreviewSize get postMediaPreviewSize;
   @Setting()
   bool get buttonsAlwaysVisible;
   @Setting()
@@ -110,6 +111,8 @@ mixin _$CommentsSettings {
                 other.showUserAvatar == showUserAvatar) &&
             (identical(other.showCommentsImage, showCommentsImage) ||
                 other.showCommentsImage == showCommentsImage) &&
+            (identical(other.postMediaPreviewSize, postMediaPreviewSize) ||
+                other.postMediaPreviewSize == postMediaPreviewSize) &&
             (identical(other.buttonsAlwaysVisible, buttonsAlwaysVisible) ||
                 other.buttonsAlwaysVisible == buttonsAlwaysVisible) &&
             (identical(other.hideButtonAfterAction, hideButtonAfterAction) ||
@@ -166,6 +169,7 @@ mixin _$CommentsSettings {
         showNavigationBar,
         showUserAvatar,
         showCommentsImage,
+        postMediaPreviewSize,
         buttonsAlwaysVisible,
         hideButtonAfterAction,
         collapseAutoMod,
@@ -192,7 +196,7 @@ mixin _$CommentsSettings {
 
   @override
   String toString() {
-    return 'CommentsSettings(defaultSort: $defaultSort, useSuggestedSort: $useSuggestedSort, showNavigationBar: $showNavigationBar, showUserAvatar: $showUserAvatar, showCommentsImage: $showCommentsImage, buttonsAlwaysVisible: $buttonsAlwaysVisible, hideButtonAfterAction: $hideButtonAfterAction, collapseAutoMod: $collapseAutoMod, collapseDisruptiveComment: $collapseDisruptiveComment, showPostUpvotePercentage: $showPostUpvotePercentage, highlightMyUsername: $highlightMyUsername, showFloatingButton: $showFloatingButton, showAwards: $showAwards, clickableAwards: $clickableAwards, showUserFlair: $showUserFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, clickToCollapse: $clickToCollapse, hideTextCollapsed: $hideTextCollapsed, loadCollapsed: $loadCollapsed, animateCollapse: $animateCollapse, clickableUsername: $clickableUsername, highlightNewComments: $highlightNewComments, volumeRockerNavigation: $volumeRockerNavigation, animateNavigation: $animateNavigation, showSaveButton: $showSaveButton, swipeToClose: $swipeToClose)';
+    return 'CommentsSettings(defaultSort: $defaultSort, useSuggestedSort: $useSuggestedSort, showNavigationBar: $showNavigationBar, showUserAvatar: $showUserAvatar, showCommentsImage: $showCommentsImage, postMediaPreviewSize: $postMediaPreviewSize, buttonsAlwaysVisible: $buttonsAlwaysVisible, hideButtonAfterAction: $hideButtonAfterAction, collapseAutoMod: $collapseAutoMod, collapseDisruptiveComment: $collapseDisruptiveComment, showPostUpvotePercentage: $showPostUpvotePercentage, highlightMyUsername: $highlightMyUsername, showFloatingButton: $showFloatingButton, showAwards: $showAwards, clickableAwards: $clickableAwards, showUserFlair: $showUserFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, clickToCollapse: $clickToCollapse, hideTextCollapsed: $hideTextCollapsed, loadCollapsed: $loadCollapsed, animateCollapse: $animateCollapse, clickableUsername: $clickableUsername, highlightNewComments: $highlightNewComments, volumeRockerNavigation: $volumeRockerNavigation, animateNavigation: $animateNavigation, showSaveButton: $showSaveButton, swipeToClose: $swipeToClose)';
   }
 }
 
@@ -208,6 +212,8 @@ abstract mixin class $CommentsSettingsCopyWith<$Res> {
       @Category(name: "Appearance") @Setting() bool showNavigationBar,
       @Setting() bool showUserAvatar,
       @Setting() bool showCommentsImage,
+      @Setting(widget: MediaPreviewSizeSelect)
+      MediaPreviewSize postMediaPreviewSize,
       @Setting() bool buttonsAlwaysVisible,
       @Setting() bool hideButtonAfterAction,
       @Setting() bool collapseAutoMod,
@@ -250,6 +256,7 @@ class _$CommentsSettingsCopyWithImpl<$Res>
     Object? showNavigationBar = null,
     Object? showUserAvatar = null,
     Object? showCommentsImage = null,
+    Object? postMediaPreviewSize = null,
     Object? buttonsAlwaysVisible = null,
     Object? hideButtonAfterAction = null,
     Object? collapseAutoMod = null,
@@ -294,6 +301,10 @@ class _$CommentsSettingsCopyWithImpl<$Res>
           ? _self.showCommentsImage
           : showCommentsImage // ignore: cast_nullable_to_non_nullable
               as bool,
+      postMediaPreviewSize: null == postMediaPreviewSize
+          ? _self.postMediaPreviewSize
+          : postMediaPreviewSize // ignore: cast_nullable_to_non_nullable
+              as MediaPreviewSize,
       buttonsAlwaysVisible: null == buttonsAlwaysVisible
           ? _self.buttonsAlwaysVisible
           : buttonsAlwaysVisible // ignore: cast_nullable_to_non_nullable
@@ -485,6 +496,8 @@ extension CommentsSettingsPatterns on CommentsSettings {
             @Category(name: "Appearance") @Setting() bool showNavigationBar,
             @Setting() bool showUserAvatar,
             @Setting() bool showCommentsImage,
+            @Setting(widget: MediaPreviewSizeSelect)
+            MediaPreviewSize postMediaPreviewSize,
             @Setting() bool buttonsAlwaysVisible,
             @Setting() bool hideButtonAfterAction,
             @Setting() bool collapseAutoMod,
@@ -519,6 +532,7 @@ extension CommentsSettingsPatterns on CommentsSettings {
             _that.showNavigationBar,
             _that.showUserAvatar,
             _that.showCommentsImage,
+            _that.postMediaPreviewSize,
             _that.buttonsAlwaysVisible,
             _that.hideButtonAfterAction,
             _that.collapseAutoMod,
@@ -567,6 +581,8 @@ extension CommentsSettingsPatterns on CommentsSettings {
             @Category(name: "Appearance") @Setting() bool showNavigationBar,
             @Setting() bool showUserAvatar,
             @Setting() bool showCommentsImage,
+            @Setting(widget: MediaPreviewSizeSelect)
+            MediaPreviewSize postMediaPreviewSize,
             @Setting() bool buttonsAlwaysVisible,
             @Setting() bool hideButtonAfterAction,
             @Setting() bool collapseAutoMod,
@@ -600,6 +616,7 @@ extension CommentsSettingsPatterns on CommentsSettings {
             _that.showNavigationBar,
             _that.showUserAvatar,
             _that.showCommentsImage,
+            _that.postMediaPreviewSize,
             _that.buttonsAlwaysVisible,
             _that.hideButtonAfterAction,
             _that.collapseAutoMod,
@@ -647,6 +664,8 @@ extension CommentsSettingsPatterns on CommentsSettings {
             @Category(name: "Appearance") @Setting() bool showNavigationBar,
             @Setting() bool showUserAvatar,
             @Setting() bool showCommentsImage,
+            @Setting(widget: MediaPreviewSizeSelect)
+            MediaPreviewSize postMediaPreviewSize,
             @Setting() bool buttonsAlwaysVisible,
             @Setting() bool hideButtonAfterAction,
             @Setting() bool collapseAutoMod,
@@ -680,6 +699,7 @@ extension CommentsSettingsPatterns on CommentsSettings {
             _that.showNavigationBar,
             _that.showUserAvatar,
             _that.showCommentsImage,
+            _that.postMediaPreviewSize,
             _that.buttonsAlwaysVisible,
             _that.hideButtonAfterAction,
             _that.collapseAutoMod,
@@ -718,6 +738,8 @@ class _CommentsSetttings extends CommentsSettings {
       @Category(name: "Appearance") @Setting() this.showNavigationBar = true,
       @Setting() this.showUserAvatar = true,
       @Setting() this.showCommentsImage = true,
+      @Setting(widget: MediaPreviewSizeSelect)
+      this.postMediaPreviewSize = MediaPreviewSize.thumbnail,
       @Setting() this.buttonsAlwaysVisible = false,
       @Setting() this.hideButtonAfterAction = true,
       @Setting() this.collapseAutoMod = true,
@@ -767,7 +789,10 @@ class _CommentsSetttings extends CommentsSettings {
   @JsonKey()
   @Setting()
   final bool showCommentsImage;
-//@Default() MediaPreviewSize postMediaPreviewSize,
+  @override
+  @JsonKey()
+  @Setting(widget: MediaPreviewSizeSelect)
+  final MediaPreviewSize postMediaPreviewSize;
   @override
   @JsonKey()
   @Setting()
@@ -912,6 +937,8 @@ class _CommentsSetttings extends CommentsSettings {
                 other.showUserAvatar == showUserAvatar) &&
             (identical(other.showCommentsImage, showCommentsImage) ||
                 other.showCommentsImage == showCommentsImage) &&
+            (identical(other.postMediaPreviewSize, postMediaPreviewSize) ||
+                other.postMediaPreviewSize == postMediaPreviewSize) &&
             (identical(other.buttonsAlwaysVisible, buttonsAlwaysVisible) ||
                 other.buttonsAlwaysVisible == buttonsAlwaysVisible) &&
             (identical(other.hideButtonAfterAction, hideButtonAfterAction) ||
@@ -968,6 +995,7 @@ class _CommentsSetttings extends CommentsSettings {
         showNavigationBar,
         showUserAvatar,
         showCommentsImage,
+        postMediaPreviewSize,
         buttonsAlwaysVisible,
         hideButtonAfterAction,
         collapseAutoMod,
@@ -994,7 +1022,7 @@ class _CommentsSetttings extends CommentsSettings {
 
   @override
   String toString() {
-    return 'CommentsSettings(defaultSort: $defaultSort, useSuggestedSort: $useSuggestedSort, showNavigationBar: $showNavigationBar, showUserAvatar: $showUserAvatar, showCommentsImage: $showCommentsImage, buttonsAlwaysVisible: $buttonsAlwaysVisible, hideButtonAfterAction: $hideButtonAfterAction, collapseAutoMod: $collapseAutoMod, collapseDisruptiveComment: $collapseDisruptiveComment, showPostUpvotePercentage: $showPostUpvotePercentage, highlightMyUsername: $highlightMyUsername, showFloatingButton: $showFloatingButton, showAwards: $showAwards, clickableAwards: $clickableAwards, showUserFlair: $showUserFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, clickToCollapse: $clickToCollapse, hideTextCollapsed: $hideTextCollapsed, loadCollapsed: $loadCollapsed, animateCollapse: $animateCollapse, clickableUsername: $clickableUsername, highlightNewComments: $highlightNewComments, volumeRockerNavigation: $volumeRockerNavigation, animateNavigation: $animateNavigation, showSaveButton: $showSaveButton, swipeToClose: $swipeToClose)';
+    return 'CommentsSettings(defaultSort: $defaultSort, useSuggestedSort: $useSuggestedSort, showNavigationBar: $showNavigationBar, showUserAvatar: $showUserAvatar, showCommentsImage: $showCommentsImage, postMediaPreviewSize: $postMediaPreviewSize, buttonsAlwaysVisible: $buttonsAlwaysVisible, hideButtonAfterAction: $hideButtonAfterAction, collapseAutoMod: $collapseAutoMod, collapseDisruptiveComment: $collapseDisruptiveComment, showPostUpvotePercentage: $showPostUpvotePercentage, highlightMyUsername: $highlightMyUsername, showFloatingButton: $showFloatingButton, showAwards: $showAwards, clickableAwards: $clickableAwards, showUserFlair: $showUserFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, clickToCollapse: $clickToCollapse, hideTextCollapsed: $hideTextCollapsed, loadCollapsed: $loadCollapsed, animateCollapse: $animateCollapse, clickableUsername: $clickableUsername, highlightNewComments: $highlightNewComments, volumeRockerNavigation: $volumeRockerNavigation, animateNavigation: $animateNavigation, showSaveButton: $showSaveButton, swipeToClose: $swipeToClose)';
   }
 }
 
@@ -1012,6 +1040,8 @@ abstract mixin class _$CommentsSetttingsCopyWith<$Res>
       @Category(name: "Appearance") @Setting() bool showNavigationBar,
       @Setting() bool showUserAvatar,
       @Setting() bool showCommentsImage,
+      @Setting(widget: MediaPreviewSizeSelect)
+      MediaPreviewSize postMediaPreviewSize,
       @Setting() bool buttonsAlwaysVisible,
       @Setting() bool hideButtonAfterAction,
       @Setting() bool collapseAutoMod,
@@ -1054,6 +1084,7 @@ class __$CommentsSetttingsCopyWithImpl<$Res>
     Object? showNavigationBar = null,
     Object? showUserAvatar = null,
     Object? showCommentsImage = null,
+    Object? postMediaPreviewSize = null,
     Object? buttonsAlwaysVisible = null,
     Object? hideButtonAfterAction = null,
     Object? collapseAutoMod = null,
@@ -1098,6 +1129,10 @@ class __$CommentsSetttingsCopyWithImpl<$Res>
           ? _self.showCommentsImage
           : showCommentsImage // ignore: cast_nullable_to_non_nullable
               as bool,
+      postMediaPreviewSize: null == postMediaPreviewSize
+          ? _self.postMediaPreviewSize
+          : postMediaPreviewSize // ignore: cast_nullable_to_non_nullable
+              as MediaPreviewSize,
       buttonsAlwaysVisible: null == buttonsAlwaysVisible
           ? _self.buttonsAlwaysVisible
           : buttonsAlwaysVisible // ignore: cast_nullable_to_non_nullable

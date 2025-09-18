@@ -32,7 +32,9 @@ abstract class CommentsSettings with _$CommentsSettings {
     @Setting() @Default(true) bool showUserAvatar,
     // TODO: I don't understand how `flutter_html` renders images.
     @Setting() @Default(true) bool showCommentsImage,
-    //@Default() MediaPreviewSize postMediaPreviewSize,
+    @Setting(widget: MediaPreviewSizeSelect)
+    @Default(MediaPreviewSize.thumbnail)
+    MediaPreviewSize postMediaPreviewSize,
     @Setting() @Default(false) bool buttonsAlwaysVisible,
     @Setting() @Default(true) bool hideButtonAfterAction,
     // TODO:
@@ -84,4 +86,53 @@ abstract class CommentsSettings with _$CommentsSettings {
   }) = _CommentsSetttings;
   factory CommentsSettings.fromJson(Map<String, dynamic> json) =>
       _$CommentsSetttingsFromJson(json);
+}
+
+enum MediaPreviewSize {
+  none,
+  thumbnail,
+  fullPreview;
+
+  String label(BuildContext context) {
+    final locales = AppLocalizations.of(context);
+    return switch (this) {
+      MediaPreviewSize.none => locales.mediaPreviewSizeNone,
+      MediaPreviewSize.thumbnail => locales.mediaPreviewSizeThumbnail,
+      MediaPreviewSize.fullPreview => locales.mediaPreviewSizeFull,
+    };
+  }
+}
+
+class MediaPreviewSizeSelect extends StatelessWidget {
+  final Widget title;
+  final Widget? subtitle;
+  final MediaPreviewSize value;
+  final void Function(MediaPreviewSize) onChanged;
+  const MediaPreviewSizeSelect({
+    super.key,
+    required this.title,
+    required this.onChanged,
+    required this.value,
+    this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: title,
+      subtitle: subtitle,
+      trailing: DropdownMenu(
+        dropdownMenuEntries: MediaPreviewSize.values
+            .map(
+              (res) => DropdownMenuEntry(
+                value: res,
+                label: res.label(context),
+              ),
+            )
+            .toList(),
+        onSelected: (res) => onChanged(res!),
+        initialSelection: value,
+      ),
+    );
+  }
 }

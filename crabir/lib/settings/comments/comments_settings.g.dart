@@ -15,6 +15,9 @@ _CommentsSetttings _$CommentsSetttingsFromJson(Map<String, dynamic> json) =>
       showNavigationBar: json['showNavigationBar'] as bool? ?? true,
       showUserAvatar: json['showUserAvatar'] as bool? ?? true,
       showCommentsImage: json['showCommentsImage'] as bool? ?? true,
+      postMediaPreviewSize: $enumDecodeNullable(
+              _$MediaPreviewSizeEnumMap, json['postMediaPreviewSize']) ??
+          MediaPreviewSize.thumbnail,
       buttonsAlwaysVisible: json['buttonsAlwaysVisible'] as bool? ?? false,
       hideButtonAfterAction: json['hideButtonAfterAction'] as bool? ?? true,
       collapseAutoMod: json['collapseAutoMod'] as bool? ?? true,
@@ -48,6 +51,8 @@ Map<String, dynamic> _$CommentsSetttingsToJson(_CommentsSetttings instance) =>
       'showNavigationBar': instance.showNavigationBar,
       'showUserAvatar': instance.showUserAvatar,
       'showCommentsImage': instance.showCommentsImage,
+      'postMediaPreviewSize':
+          _$MediaPreviewSizeEnumMap[instance.postMediaPreviewSize]!,
       'buttonsAlwaysVisible': instance.buttonsAlwaysVisible,
       'hideButtonAfterAction': instance.hideButtonAfterAction,
       'collapseAutoMod': instance.collapseAutoMod,
@@ -81,4 +86,10 @@ const _$CommentSortEnumMap = {
   CommentSort.random: 'random',
   CommentSort.qa: 'qa',
   CommentSort.live: 'live',
+};
+
+const _$MediaPreviewSizeEnumMap = {
+  MediaPreviewSize.none: 'none',
+  MediaPreviewSize.thumbnail: 'thumbnail',
+  MediaPreviewSize.fullPreview: 'fullPreview',
 };

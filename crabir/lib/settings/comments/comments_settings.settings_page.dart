@@ -38,6 +38,9 @@ class CommentsSettingsCubit extends HydratedCubit<CommentsSettings> {
   void updateShowCommentsImage(bool value) =>
       emit(state.copyWith(showCommentsImage: value));
 
+  void updatePostMediaPreviewSize(MediaPreviewSize value) =>
+      emit(state.copyWith(postMediaPreviewSize: value));
+
   void updateButtonsAlwaysVisible(bool value) =>
       emit(state.copyWith(buttonsAlwaysVisible: value));
 
@@ -155,6 +158,14 @@ class CommentsSettingsView extends StatelessWidget {
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
               .updateShowCommentsImage(val!),
+        ),
+        MediaPreviewSizeSelect(
+          title: Text(locales.comments_postMediaPreviewSize),
+          subtitle: null,
+          value: settings.postMediaPreviewSize,
+          onChanged: (val) => context
+              .read<CommentsSettingsCubit>()
+              .updatePostMediaPreviewSize(val),
         ),
         CheckboxListTile(
           title: Text(locales.comments_buttonsAlwaysVisible),

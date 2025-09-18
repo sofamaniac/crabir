@@ -35,6 +35,10 @@
   "resolutionMedium": "Medium",
   "resolutionLow": "Low",
 
+  "mediaPreviewSizeNone": "None",
+  "mediaPreviewSizeThumbnail": "Thumbnail",
+  "mediaPreviewSizeFull": "Full Size",
+
   "yearsAgo": "{count, plural, =1 {{count}y} other {{count}y}}",
   "@yearsAgo": {
     "description": "Number of years ago, abbreviated (e.g., '1y', '2y')",

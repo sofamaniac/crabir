@@ -90,10 +90,17 @@ class _PostView extends StatelessWidget {
         ),
       );
     } else {
+      final settings = context.watch<CommentsSettingsCubit>().state;
+      final showMedia =
+          settings.postMediaPreviewSize == MediaPreviewSize.fullPreview;
+      final showThumbnail =
+          settings.postMediaPreviewSize == MediaPreviewSize.thumbnail;
       return RedditPostCard(
         post: post,
         maxLines: null,
-        showMedia: false,
+        showMedia: showMedia,
+        enableThumbnail: showThumbnail,
+        ignoreSelftextSpoiler: true,
       );
     }
   }

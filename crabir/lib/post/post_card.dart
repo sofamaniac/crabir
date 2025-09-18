@@ -16,8 +16,14 @@ class RedditPostCard extends StatefulWidget {
   final int? maxLines;
 
   /// Whether to show media in full size.
-  /// If set to false, show a thumbnail instead.
+  /// If set to false, show a thumbnail instead (when `enableThumbnail` is true).
   final bool showMedia;
+
+  /// Enable thumbnail
+  final bool enableThumbnail;
+
+  /// If set to true, show the selftext even if the post is marked as spoiler
+  final bool ignoreSelftextSpoiler;
 
   const RedditPostCard({
     super.key,
@@ -27,6 +33,8 @@ class RedditPostCard extends StatefulWidget {
     this.onTap,
     this.maxLines,
     this.showMedia = true,
+    this.enableThumbnail = true,
+    this.ignoreSelftextSpoiler = false,
   });
 
   @override
@@ -65,7 +73,9 @@ class _RedditPostCardState extends State<RedditPostCard> {
         ),
       // Text types
       Kind.meta => Text("meta"),
-      Kind.selftext || _ when !widget.post.spoiler => HtmlWithConditionalFade(
+      Kind.selftext ||
+      _ when (!widget.post.spoiler || widget.ignoreSelftextSpoiler) =>
+        HtmlWithConditionalFade(
           htmlContent: widget.post.selftextHtml ?? "",
           maxLines: widget.maxLines,
         ),
@@ -86,7 +96,8 @@ class _RedditPostCardState extends State<RedditPostCard> {
         PostScore(post: widget.post),
       ],
     );
-    if (widget.post.kind.showThumbnail(widget.showMedia)) {
+    if (widget.enableThumbnail &&
+        widget.post.kind.showThumbnail(widget.showMedia)) {
       return wrapPostElement(
         Thumbnail(
           post: widget.post,
