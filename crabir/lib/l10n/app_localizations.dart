@@ -274,6 +274,42 @@ abstract class AppLocalizations {
   /// **'Low'**
   String get resolutionLow;
 
+  /// No description provided for @mediaPreviewSizeNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get mediaPreviewSizeNone;
+
+  /// No description provided for @mediaPreviewSizeThumbnail.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnail'**
+  String get mediaPreviewSizeThumbnail;
+
+  /// No description provided for @mediaPreviewSizeFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Size'**
+  String get mediaPreviewSizeFull;
+
+  /// No description provided for @shareLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Link'**
+  String get shareLink;
+
+  /// No description provided for @shareLinkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Title + Link'**
+  String get shareLinkTitle;
+
+  /// No description provided for @sharePost.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Post'**
+  String get sharePost;
+
   /// Number of years ago, abbreviated (e.g., '1y', '2y')
   ///
   /// In en, this message translates to:

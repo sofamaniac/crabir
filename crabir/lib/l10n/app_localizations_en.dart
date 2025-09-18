@@ -99,6 +99,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resolutionLow => 'Low';
 
   @override
+  String get mediaPreviewSizeNone => 'None';
+
+  @override
+  String get mediaPreviewSizeThumbnail => 'Thumbnail';
+
+  @override
+  String get mediaPreviewSizeFull => 'Full Size';
+
+  @override
+  String get shareLink => 'Share Link';
+
+  @override
+  String get shareLinkTitle => 'Share Title + Link';
+
+  @override
+  String get sharePost => 'Share Post';
+
+  @override
   String yearsAgo(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

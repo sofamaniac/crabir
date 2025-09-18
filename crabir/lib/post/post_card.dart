@@ -60,7 +60,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
     await widget.onLikeCallback?.call(dir);
   }
 
-  Widget content(BuildContext context) {
+  Widget? content(BuildContext context) {
     final res = switch (widget.post.kind) {
       // Media types
       Kind.video when widget.showMedia => VideoContent(post: widget.post),
@@ -73,17 +73,21 @@ class _RedditPostCardState extends State<RedditPostCard> {
         ),
       // Text types
       Kind.meta => Text("meta"),
-      Kind.selftext ||
-      _ when (!widget.post.spoiler || widget.ignoreSelftextSpoiler) =>
+      Kind.selftext
+          when (!widget.post.spoiler || widget.ignoreSelftextSpoiler) =>
         HtmlWithConditionalFade(
           htmlContent: widget.post.selftextHtml ?? "",
           maxLines: widget.maxLines,
         ),
-      Kind.link || Kind.unknown => SizedBox.shrink(),
-      _ => SizedBox.shrink(),
+      Kind.link || Kind.unknown => null,
+      _ => null,
     };
 
-    return _contentWrap(res);
+    if (res != null) {
+      return _contentWrap(res);
+    } else {
+      return res;
+    }
   }
 
   Widget title() {
@@ -110,6 +114,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
 
   @override
   Widget build(BuildContext context) {
+    final child = content(context);
     final contentWidget = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -117,7 +122,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
       children: [
         wrapPostElement(Header(post: widget.post)),
         title(),
-        content(context),
+        if (child != null) child,
         wrapPostElement(
           Footer(
             post: widget.post,

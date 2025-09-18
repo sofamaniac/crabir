@@ -39,6 +39,10 @@
   "mediaPreviewSizeThumbnail": "Thumbnail",
   "mediaPreviewSizeFull": "Full Size",
 
+  "shareLink": "Share Link",
+  "shareLinkTitle": "Share Title + Link",
+  "sharePost": "Share Post",
+
   "yearsAgo": "{count, plural, =1 {{count}y} other {{count}y}}",
   "@yearsAgo": {
     "description": "Number of years ago, abbreviated (e.g., '1y', '2y')",

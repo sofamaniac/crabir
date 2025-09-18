@@ -21,6 +21,7 @@ import 'package:crabir/subreddit.dart';
 import 'package:crabir/time_ellapsed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 part 'parts/title.dart';
@@ -31,6 +32,7 @@ part 'parts/tags.dart';
 part 'parts/post_flair.dart';
 part 'parts/separated_row.dart';
 part 'parts/thumbnail.dart';
+part 'parts/share_button.dart';
 part 'dense_card.dart';
 part 'post_card.dart';
 

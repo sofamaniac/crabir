@@ -64,14 +64,8 @@ class Footer extends StatelessWidget {
               await launchUrl(url);
             },
           ),
-        if (settings.showShareButton)
-          IconButton(
-            icon: const Icon(Icons.share),
-            tooltip: 'Share',
-            onPressed: () {
-              debugPost(post: post);
-            },
-          ),
+        if (settings.showShareButton) ShareButton(post: post),
+        // TODO: add missing buttons
       ],
     );
   }
