@@ -7,8 +7,11 @@ plugins {
 
 android {
     namespace = "com.example.crabir"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    //compileSdk = flutter.compileSdkVersion
+    // ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
+    compileSdk = 35
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

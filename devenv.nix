@@ -10,10 +10,10 @@
 
      ndk = {
       enable = true;
-      version = [ "26.3.11579264" ];
+      version = [ "27.0.12077973" "26.3.11579264" ];
     };
     
-    buildTools.version = [ "34.0.0" ];
+    buildTools.version = [ "34.0.0" "35.0.0" ];
     platforms.version = [ "33" "34" "35" ];
   };
 
