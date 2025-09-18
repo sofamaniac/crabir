@@ -234,13 +234,8 @@ class _MainScreenViewState extends State<MainScreenView>
       }
     }
 
-    void disableVideoOnChange() {
-      AnimatedContentController.currentlyPlaying.value = null;
-    }
-
     if (addListener) {
       tabsController.addListener(listener);
-      tabsController.addListener(disableVideoOnChange);
       addListener = false;
     }
     return TabBar(

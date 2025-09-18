@@ -1,7 +1,22 @@
 part of 'media.dart';
 
 class AnimatedContentController {
-  static ValueNotifier<String?> currentlyPlaying = ValueNotifier(null);
+  static ValueNotifier<List<String>> queue = ValueNotifier([]);
+  static void addToQueue(String url) {
+    if (!queue.value.contains(url)) {
+      queue.value = [...queue.value, url];
+    }
+  }
+
+  static void removeFromQueue(String url) {
+    if (queue.value.contains(url)) {
+      queue.value = queue.value.where((item) => item != url).toList();
+    }
+  }
+
+  static void clearQueue() {
+    queue.value = [];
+  }
 }
 
 class AnimatedContent extends StatefulWidget {
@@ -81,6 +96,7 @@ class AnimatedContent extends StatefulWidget {
 
 class _AnimatedContentState extends State<AnimatedContent> {
   late VideoPlayerController _controller;
+  late final VoidCallback _queueListener;
   bool _showControls = false;
   bool _muted = true;
   bool _canAutoplay = false;
@@ -101,6 +117,14 @@ class _AnimatedContentState extends State<AnimatedContent> {
     ImageLoading setting = context.read<DataSettingsCubit>().state.autoplay;
 
     _canAutoplay = NetworkStatus.canAutoplay(setting);
+    _queueListener = () {
+      if (_visibilityFraction == 1 &&
+          AnimatedContentController.queue.value.first == widget.url &&
+          !_controller.value.isPlaying) {
+        _controller.play();
+        setState(() {});
+      }
+    };
   }
 
   void _toggleControls() {
@@ -157,11 +181,12 @@ class _AnimatedContentState extends State<AnimatedContent> {
             right: 8,
             child: widget.cartouche!,
           ),
-        Positioned(
-          bottom: 8,
-          right: 8,
-          child: CircularProgressIndicator(color: Colors.white),
-        )
+        if (!_controller.value.isInitialized)
+          Positioned(
+            bottom: 8,
+            right: 8,
+            child: CircularProgressIndicator(color: Colors.white),
+          )
       ],
     );
   }
@@ -225,8 +250,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
               child: AspectRatio(
                 aspectRatio: widget.width / widget.height.toDouble(),
                 // // Show placeholder until we start playing the video
-                child: (_controller.value.isInitialized &&
-                        _visibilityFraction == 1)
+                child: (_controller.value.isPlaying)
                     ? VideoPlayer(_controller)
                     : placeholder(),
               ),
@@ -234,11 +258,20 @@ class _AnimatedContentState extends State<AnimatedContent> {
                 setState(() {
                   _visibilityFraction = visibilityInfo.visibleFraction;
                 });
-                if (_visibilityFraction == 1 && _canAutoplay) {
-                  _controller.play();
-                } else {
+                final bool inQueue =
+                    AnimatedContentController.queue.value.contains(widget.url);
+                if (_visibilityFraction > 0.5 && _canAutoplay && !inQueue) {
+                  AnimatedContentController.queue.addListener(_queueListener);
+                  AnimatedContentController.addToQueue(widget.url);
+                } else if ((inQueue && _visibilityFraction < 0.4) ||
+                    (_controller.value.isPlaying &&
+                        _visibilityFraction < 0.8)) {
                   _controller.pause();
+                  AnimatedContentController.queue
+                      .removeListener(_queueListener);
+                  AnimatedContentController.removeFromQueue(widget.url);
                 }
+                _queueListener();
               },
             ),
           ),
