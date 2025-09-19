@@ -7,20 +7,75 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 @RoutePage(name: "CrabirThemeEditorPage")
-class CrabirThemeEditor extends StatelessWidget {
+class CrabirThemeEditor extends StatefulWidget {
   const CrabirThemeEditor({super.key});
 
   @override
+  State<CrabirThemeEditor> createState() => _CrabirThemeEditorState();
+}
+
+class _CrabirThemeEditorState extends State<CrabirThemeEditor> {
+  late Brightness currentBrightness;
+
+  @override
+  void initState() {
+    super.initState();
+    currentBrightness = switch (context.read<ThemeBloc>().state.mode) {
+      ThemeMode.dark => Brightness.dark,
+      ThemeMode.light => Brightness.light,
+      ThemeMode.system => Theme.of(context).brightness,
+    };
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("TODO")),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: ThemeField.values.length,
-        itemBuilder: (context, index) {
-          final field = ThemeField.values[index];
-          return _ColorField(field: field);
-        },
+    final themeBuilder = currentBrightness == Brightness.dark
+        ? ColorScheme.dark
+        : ColorScheme.light;
+    final themeBloc = context.watch<ThemeBloc>().state;
+    final currentTheme = switch (currentBrightness) {
+      Brightness.dark => themeBloc.dark,
+      Brightness.light => themeBloc.light,
+    };
+    return Theme(
+      data: ThemeData(
+        useMaterial3: true,
+        colorScheme: themeBuilder(
+          primary: currentTheme.primaryColor,
+          surface: currentTheme.background,
+          secondary: currentTheme.highlight,
+        ),
+        cardTheme: CardThemeData(color: currentTheme.cardBackground),
+      ),
+      child: MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(platformBrightness: currentBrightness),
+        child: Scaffold(
+          appBar: AppBar(
+            title: DropdownMenu(
+              initialSelection: currentBrightness,
+              dropdownMenuEntries: [
+                DropdownMenuEntry(value: Brightness.dark, label: "Dark theme"),
+                DropdownMenuEntry(
+                    value: Brightness.light, label: "Light theme"),
+              ],
+              onSelected: (brightness) => setState(() {
+                currentBrightness = brightness ?? currentBrightness;
+              }),
+            ),
+          ),
+          body: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: ThemeField.values.length,
+            itemBuilder: (context, index) {
+              final field = ThemeField.values[index];
+              return _ColorField(
+                field: field,
+                brightness: currentBrightness,
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -28,15 +83,19 @@ class CrabirThemeEditor extends StatelessWidget {
 
 class _ColorField extends StatelessWidget {
   final ThemeField field;
+  final Brightness brightness;
 
-  const _ColorField({required this.field});
+  const _ColorField({required this.field, required this.brightness});
 
   @override
   Widget build(BuildContext context) {
     final label = field.label(context);
-    final color = CrabirTheme.of(context).fromField(field);
     final bloc = context.watch<ThemeBloc>();
-    final brightness = MediaQuery.of(context).platformBrightness;
+    final theme = switch (brightness) {
+      Brightness.dark => bloc.state.dark,
+      Brightness.light => bloc.state.light,
+    };
+    final color = theme.fromField(field);
     return ListTile(
       //leading: CircleAvatar(backgroundColor: color),
       leading: Container(
@@ -46,7 +105,7 @@ class _ColorField extends StatelessWidget {
           shape: BoxShape.circle,
           color: color,
           border: Border.all(
-            color: Theme.of(context).dividerColor, // or Colors.white, etc.
+            color: Colors.grey, // or Colors.white, etc.
             width: 1,
           ),
         ),
