@@ -1,3 +1,4 @@
+import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/settings/theme/color_converter.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,24 @@ enum ThemeField {
   readPost,
   announcement,
   contentText,
-  linkColor,
+  linkColor;
+
+  String label(BuildContext context) {
+    final locales = AppLocalizations.of(context);
+    return switch (this) {
+      ThemeField.background => locales.themeBackround,
+      ThemeField.cardBackground => locales.themeCardBackground,
+      ThemeField.toolBarBackground => locales.themeToolbarBackground,
+      ThemeField.toolBarText => locales.themeToolbarText,
+      ThemeField.primaryColor => locales.themePrimaryColor,
+      ThemeField.highlight => locales.themeHighlight,
+      ThemeField.postTitle => locales.themePostTitle,
+      ThemeField.readPost => locales.themeReadPost,
+      ThemeField.announcement => locales.themeAnnouncement,
+      ThemeField.contentText => locales.themeContentText,
+      ThemeField.linkColor => locales.themeLinkColor,
+    };
+  }
 }
 
 @freezed
@@ -54,6 +72,39 @@ abstract class CrabirTheme with _$CrabirTheme {
     return switch (brightness) {
       Brightness.dark => state.dark,
       Brightness.light => state.light,
+    };
+  }
+
+  CrabirTheme updateColor({required ThemeField field, required Color color}) {
+    final newTheme = switch (field) {
+      ThemeField.background => copyWith(background: color),
+      ThemeField.cardBackground => copyWith(cardBackground: color),
+      ThemeField.toolBarBackground => copyWith(toolBarBackground: color),
+      ThemeField.toolBarText => copyWith(toolBarText: color),
+      ThemeField.primaryColor => copyWith(primaryColor: color),
+      ThemeField.highlight => copyWith(highlight: color),
+      ThemeField.postTitle => copyWith(postTitle: color),
+      ThemeField.readPost => copyWith(readPost: color),
+      ThemeField.announcement => copyWith(announcement: color),
+      ThemeField.contentText => copyWith(contentText: color),
+      ThemeField.linkColor => copyWith(linkColor: color),
+    };
+    return newTheme;
+  }
+
+  Color fromField(ThemeField field) {
+    return switch (field) {
+      ThemeField.background => background,
+      ThemeField.cardBackground => cardBackground,
+      ThemeField.toolBarBackground => toolBarBackground,
+      ThemeField.toolBarText => toolBarText,
+      ThemeField.primaryColor => primaryColor,
+      ThemeField.highlight => highlight,
+      ThemeField.postTitle => postTitle,
+      ThemeField.readPost => readPost,
+      ThemeField.announcement => announcement,
+      ThemeField.contentText => contentText,
+      ThemeField.linkColor => linkColor,
     };
   }
 }

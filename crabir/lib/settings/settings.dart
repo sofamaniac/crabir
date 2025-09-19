@@ -19,6 +19,11 @@ class SettingsView extends StatelessWidget {
       body: ListView(
         children: [
           ListTile(
+            leading: Icon(Icons.palette_outlined),
+            title: Text("Theme"),
+            onTap: () => context.router.navigate(CrabirThemeEditorPage()),
+          ),
+          ListTile(
             leading: Icon(Icons.article),
             title: Text("Posts"),
             onTap: () => context.router.navigate(PostsSettingsRoute()),

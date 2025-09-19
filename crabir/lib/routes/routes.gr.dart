@@ -27,6 +27,22 @@ class CommentsSettingsRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [CrabirThemeEditor]
+class CrabirThemeEditorPage extends PageRouteInfo<void> {
+  const CrabirThemeEditorPage({List<PageRouteInfo>? children})
+      : super(CrabirThemeEditorPage.name, initialChildren: children);
+
+  static const String name = 'CrabirThemeEditorPage';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const CrabirThemeEditor();
+    },
+  );
+}
+
+/// generated route for
 /// [DataSettingsView]
 class DataSettingsRoute extends PageRouteInfo<void> {
   const DataSettingsRoute({List<PageRouteInfo>? children})

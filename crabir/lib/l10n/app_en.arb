@@ -43,6 +43,18 @@
   "shareLinkTitle": "Share Title + Link",
   "sharePost": "Share Post",
 
+  "themeBackround": "Background",
+  "themeCardBackground": "Card background",
+  "themeToolbarBackground": "Toolbar background",
+  "themeToolbarText": "Toolbar text",
+  "themePrimaryColor": "Primary color",
+  "themeHighlight": "Highlight",
+  "themePostTitle": "Post title",
+  "themeReadPost": "Read post title",
+  "themeAnnouncement": "Announcement",
+  "themeContentText": "Context Text",
+  "themeLinkColor": "Link color",
+
   "yearsAgo": "{count, plural, =1 {{count}y} other {{count}y}}",
   "@yearsAgo": {
     "description": "Number of years ago, abbreviated (e.g., '1y', '2y')",

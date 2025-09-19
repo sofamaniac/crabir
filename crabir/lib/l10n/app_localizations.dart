@@ -310,6 +310,72 @@ abstract class AppLocalizations {
   /// **'Share Post'**
   String get sharePost;
 
+  /// No description provided for @themeBackround.
+  ///
+  /// In en, this message translates to:
+  /// **'Background'**
+  String get themeBackround;
+
+  /// No description provided for @themeCardBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Card background'**
+  String get themeCardBackground;
+
+  /// No description provided for @themeToolbarBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Toolbar background'**
+  String get themeToolbarBackground;
+
+  /// No description provided for @themeToolbarText.
+  ///
+  /// In en, this message translates to:
+  /// **'Toolbar text'**
+  String get themeToolbarText;
+
+  /// No description provided for @themePrimaryColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary color'**
+  String get themePrimaryColor;
+
+  /// No description provided for @themeHighlight.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlight'**
+  String get themeHighlight;
+
+  /// No description provided for @themePostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Post title'**
+  String get themePostTitle;
+
+  /// No description provided for @themeReadPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Read post title'**
+  String get themeReadPost;
+
+  /// No description provided for @themeAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement'**
+  String get themeAnnouncement;
+
+  /// No description provided for @themeContentText.
+  ///
+  /// In en, this message translates to:
+  /// **'Context Text'**
+  String get themeContentText;
+
+  /// No description provided for @themeLinkColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Link color'**
+  String get themeLinkColor;
+
   /// Number of years ago, abbreviated (e.g., '1y', '2y')
   ///
   /// In en, this message translates to:

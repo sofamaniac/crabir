@@ -31,24 +31,11 @@ class ThemeBloc extends HydratedBloc<ThemeEvent, ThemeState> {
   ThemeState? fromJson(Map<String, dynamic> json) => ThemeState.fromJson(json);
 
   Future<void> _updateColor(SetColor event, Emitter<ThemeState> emit) async {
-    final color = event.color;
     final theme = switch (event.brightness) {
       Brightness.dark => state.dark,
       Brightness.light => state.light,
     };
-    final newTheme = switch (event.field) {
-      ThemeField.background => theme.copyWith(background: color),
-      ThemeField.cardBackground => theme.copyWith(cardBackground: color),
-      ThemeField.toolBarBackground => theme.copyWith(toolBarBackground: color),
-      ThemeField.toolBarText => theme.copyWith(toolBarText: color),
-      ThemeField.primaryColor => theme.copyWith(primaryColor: color),
-      ThemeField.highlight => theme.copyWith(highlight: color),
-      ThemeField.postTitle => theme.copyWith(postTitle: color),
-      ThemeField.readPost => theme.copyWith(readPost: color),
-      ThemeField.announcement => theme.copyWith(announcement: color),
-      ThemeField.contentText => theme.copyWith(contentText: color),
-      ThemeField.linkColor => theme.copyWith(linkColor: color),
-    };
+    final newTheme = theme.updateColor(field: event.field, color: event.color);
     final newState = switch (event.brightness) {
       Brightness.dark => state.copyWith(dark: newTheme),
       Brightness.light => state.copyWith(light: newTheme),

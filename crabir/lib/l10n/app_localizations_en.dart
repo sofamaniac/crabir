@@ -117,6 +117,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sharePost => 'Share Post';
 
   @override
+  String get themeBackround => 'Background';
+
+  @override
+  String get themeCardBackground => 'Card background';
+
+  @override
+  String get themeToolbarBackground => 'Toolbar background';
+
+  @override
+  String get themeToolbarText => 'Toolbar text';
+
+  @override
+  String get themePrimaryColor => 'Primary color';
+
+  @override
+  String get themeHighlight => 'Highlight';
+
+  @override
+  String get themePostTitle => 'Post title';
+
+  @override
+  String get themeReadPost => 'Read post title';
+
+  @override
+  String get themeAnnouncement => 'Announcement';
+
+  @override
+  String get themeContentText => 'Context Text';
+
+  @override
+  String get themeLinkColor => 'Link color';
+
+  @override
   String yearsAgo(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
