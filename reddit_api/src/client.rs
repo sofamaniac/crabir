@@ -131,11 +131,21 @@ impl Client {
 
 const MAX_LIMIT: u64 = 100;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct Pager {
     after: Option<String>,
     before: Option<String>,
     limit: u64,
+}
+
+impl Default for Pager {
+    fn default() -> Self {
+        Self {
+            after: Some(String::new()),
+            before: None,
+            limit: 100,
+        }
+    }
 }
 
 impl Pager {
@@ -404,26 +414,29 @@ impl Client {
     ) -> impl Stream<Item = Result<Listing>> {
         stream::unfold(
             (url, pager.unwrap_or_default()),
-            move |(url, mut pager)| async move {
+            move |(base_url, mut pager)| async move {
+                if pager.after.is_none() {
+                    return None;
+                }
                 let client = self.clone();
-                let url = pager.add_to_url(url.clone());
+                let url = pager.add_to_url(base_url.clone());
                 let request = client.get(url.clone());
                 let request = request.query(query_params);
                 let response = client.execute(request).await;
                 match response {
-                    Err(e) => Some((Err(e), (url, Pager::default()))),
+                    Err(e) => Some((Err(e), (base_url, Pager::default()))),
                     Ok(response) => match parse_response::<Thing>(response).await {
                         Ok(thing) => match thing {
                             Thing::Listing(listing) => {
-                                pager.after(listing.after.clone());
-                                if listing.after.clone()?.is_empty() {
-                                    return None;
-                                }
-                                Some((Ok(listing), (url, pager)))
+                                let pager = Pager {
+                                    after: listing.after.clone(),
+                                    ..pager
+                                };
+                                Some((Ok(listing), (base_url, pager)))
                             }
                             _ => Some((Err(Error::InvalidThing), (url, Pager::default()))),
                         },
-                        Err(e) => Some((Err(e), (url, Pager::default()))),
+                        Err(e) => Some((Err(e), (base_url, Pager::default()))),
                     },
                 }
             },
@@ -509,7 +522,11 @@ impl Client {
     /// Returns an error if the http client fails or if the parsing of the response fails.
     pub async fn subscriptions(&self) -> Result<Vec<crate::model::subreddit::Subreddit>> {
         let url = self.join_url("subreddits/mine/subscriber.json");
-        self.collect_paged(&url, &[]).await
+        let result: Vec<Subreddit> = self.collect_paged(&url, &[]).await?;
+        for subreddit in &result {
+            log::debug!("Subreddit {}", subreddit.other().display_name());
+        }
+        return Ok(result);
     }
 
     /// Subscribe to a subreddit
