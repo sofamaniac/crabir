@@ -315,6 +315,8 @@ class _AnimatedContentState extends State<AnimatedContent> {
                     alignment: Alignment.bottomRight,
                     child: Cartouche(
                       '$minutes:$seconds',
+                      background: Colors.black54,
+                      foreground: Colors.white,
                     ),
                   );
                 }
