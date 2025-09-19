@@ -9,6 +9,7 @@ import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/post.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -107,6 +108,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
 
   Widget _appBar() {
     final title = FeedTitle(feed: widget.feed, sort: sort!);
+    final theme = CrabirTheme.of(context);
     return SliverAppBar(
       floating: true,
       leading: IconButton(
@@ -117,8 +119,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
         },
       ),
       title: title,
-      backgroundColor:
-          subredditAbout != null ? Colors.transparent : Colors.black,
+      backgroundColor: theme.toolBarBackground,
       actions: [
         IconButton(
           icon: Icon(Icons.search),

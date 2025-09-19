@@ -34,6 +34,13 @@ class StyledHtml extends StatelessWidget {
         .replaceAll('</p>', '<br>')
         .replaceAll('\n\n', '<br>');
     final theme = CrabirTheme.of(context);
+    final brightness = Theme.of(context).brightness;
+
+    final quoteBackground = switch (brightness) {
+      Brightness.light => Colors.grey.shade200,
+      Brightness.dark => Colors.grey.shade900
+    };
+
     final style = {
       // Style for divider
       "hr": Style(
@@ -46,7 +53,7 @@ class StyledHtml extends StatelessWidget {
       "a": Style(color: theme.linkColor),
       'blockquote': Style(
         margin: Margins.symmetric(horizontal: 0, vertical: 8),
-        backgroundColor: Colors.grey.shade900,
+        backgroundColor: quoteBackground,
         padding: HtmlPaddings.all(12),
         border: Border(
           left: BorderSide(

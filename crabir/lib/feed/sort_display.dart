@@ -1,4 +1,6 @@
 import 'package:crabir/l10n/app_localizations.dart';
+import 'package:crabir/main.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/sort.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
@@ -45,9 +47,13 @@ class SortDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = CrabirTheme.of(context);
     return Text(
       sort.labelWithTimeframe(context),
-      style: Theme.of(context).textTheme.labelSmall,
+      style: Theme.of(context)
+          .textTheme
+          .labelSmall
+          ?.copyWith(color: theme.toolBarText.withAlpha(128)),
     );
   }
 }

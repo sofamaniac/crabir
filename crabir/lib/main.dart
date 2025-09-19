@@ -100,7 +100,6 @@ class TopLevel extends StatelessWidget {
   TopLevel({super.key});
   @override
   Widget build(BuildContext context) {
-    final theme = CrabirTheme.of(context);
     final themeBloc = context.watch<ThemeBloc>().state;
     return MaterialApp.router(
       // required to go back to home screen before exiting the app
@@ -114,16 +113,25 @@ class TopLevel extends StatelessWidget {
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       themeMode: themeBloc.mode,
-      theme: ThemeData.light(useMaterial3: true),
       darkTheme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.dark(
-          primary: theme.primaryColor,
-          surface: theme.background,
-          secondary: theme.highlight,
+          primary: themeBloc.dark.primaryColor,
+          surface: themeBloc.dark.background,
+          secondary: themeBloc.dark.highlight,
           outlineVariant: Colors.white24,
         ),
-        cardTheme: CardThemeData(color: theme.cardBackground),
+        cardTheme: CardThemeData(color: themeBloc.dark.cardBackground),
+      ),
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.light(
+          primary: themeBloc.light.primaryColor,
+          surface: themeBloc.light.background,
+          secondary: themeBloc.light.highlight,
+          outlineVariant: Colors.black26,
+        ),
+        cardTheme: CardThemeData(color: themeBloc.light.cardBackground),
       ),
       routerConfig: _appRouter.config(deepLinkTransformer: (deepLink) {
         if (deepLink.path.contains('s')) {
@@ -240,7 +248,7 @@ class _MainScreenViewState extends State<MainScreenView>
     }
     return TabBar(
       controller: tabsController,
-      labelColor: Theme.of(context).primaryTextTheme.bodyLarge!.color,
+      //labelColor: Theme.of(context).primaryTextTheme.bodyLarge!.color,
       indicatorColor: theme.primaryColor,
       onTap: (index) {
         tabsRouter.setActiveIndex(index);
