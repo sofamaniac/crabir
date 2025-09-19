@@ -94,7 +94,7 @@ class _PostView extends StatelessWidget {
       final showMedia =
           settings.postMediaPreviewSize == MediaPreviewSize.fullPreview;
       final showThumbnail =
-          settings.postMediaPreviewSize == MediaPreviewSize.thumbnail;
+          settings.postMediaPreviewSize != MediaPreviewSize.none;
       return RedditPostCard(
         post: post,
         maxLines: null,
