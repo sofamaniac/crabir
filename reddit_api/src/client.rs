@@ -414,10 +414,9 @@ impl Client {
     ) -> impl Stream<Item = Result<Listing>> {
         stream::unfold(
             (url, pager.unwrap_or_default()),
-            move |(base_url, mut pager)| async move {
-                if pager.after.is_none() {
-                    return None;
-                }
+            move |(base_url, pager)| async move {
+                // Return None if after is None
+                pager.after.as_ref()?;
                 let client = self.clone();
                 let url = pager.add_to_url(base_url.clone());
                 let request = client.get(url.clone());
@@ -523,10 +522,7 @@ impl Client {
     pub async fn subscriptions(&self) -> Result<Vec<crate::model::subreddit::Subreddit>> {
         let url = self.join_url("subreddits/mine/subscriber.json");
         let result: Vec<Subreddit> = self.collect_paged(&url, &[]).await?;
-        for subreddit in &result {
-            log::debug!("Subreddit {}", subreddit.other().display_name());
-        }
-        return Ok(result);
+        Ok(result)
     }
 
     /// Subscribe to a subreddit
