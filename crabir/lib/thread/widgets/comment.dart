@@ -56,7 +56,7 @@ class _CommentViewState extends State<CommentView>
           isSubmitter: comment.isSubmitter,
           distinguished: comment.distinguished,
         ),
-        Expanded(child: FlairView(flair: comment.author!.flair)),
+        if (comment.author != null) FlairView(flair: comment.author!.flair),
         Spacer(),
         Text(
           "${comment.scoreHidden ? "?" : comment.score} · ${comment.createdUtc.timeSince(context)}",
@@ -209,10 +209,8 @@ class _Username extends StatelessWidget {
 
   Widget _username(
       CommentsSettings settings, String? currentUser, Color foreground) {
-    final username = author?.username;
-    if (username == currentUser &&
-        username != null &&
-        settings.highlightMyUsername) {
+    final username = author?.username ?? "u/[deleted]";
+    if (username == currentUser && settings.highlightMyUsername) {
       return Cartouche(
         username,
         background: foreground,
@@ -220,19 +218,19 @@ class _Username extends StatelessWidget {
       );
     } else if (isSubmitter) {
       return Cartouche(
-        username!,
+        username,
         background: Colors.cyan,
         foreground: Colors.white,
       );
     } else if (distinguished == "moderator") {
       return Cartouche(
-        username!,
+        username,
         background: Colors.green,
         foreground: Colors.white,
       );
     } else {
       return Text(
-        username ?? "u/[deleted]",
+        username,
         style: TextStyle(color: foreground, fontSize: 12),
       );
     }
