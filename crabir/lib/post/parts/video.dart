@@ -1,5 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/media/media.dart';
+import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -77,21 +79,51 @@ class _VideoContentState extends State<VideoContent> {
         return AnimatedContent.fromRedditVideo(
           media: media,
           placeholderUrl: preview?.resolutions[0].url,
+          goFullScreen: () => context.router.navigate(
+            FullscreenVideoRoute(
+              videoUrl: media.field0.dashUrl,
+              width: media.field0.width,
+              height: media.field0.height,
+            ),
+          ),
         );
       case Media_Oembed():
         return AnimatedContent.fromMediaOEmbed(
           media: media,
           placeholderUrl: preview?.resolutions[0].url,
+          goFullScreen: () => context.router.navigate(
+            FullscreenVideoRoute(
+              videoUrl: media.oembed.providerUrl,
+              width: media.oembed.width,
+              height: media.oembed.height,
+            ),
+          ),
         );
       case null when preview?.variants.mp4 != null:
+        final image = preview!.variants.mp4!.withResolution(widget.resolution);
         return AnimatedContent.fromImageBase(
-          image: preview!.variants.mp4!.withResolution(widget.resolution),
+          image: image,
           placeholderUrl: preview.resolutions[0].url,
+          goFullScreen: () => context.router.navigate(
+            FullscreenVideoRoute(
+              videoUrl: image.url,
+              width: image.width,
+              height: image.height,
+            ),
+          ),
         );
       case null when preview?.variants.gif != null:
+        final image = preview!.variants.gif!.withResolution(widget.resolution);
         return AnimatedContent.fromImageBase(
-          image: preview!.variants.gif!.withResolution(widget.resolution),
+          image: image,
           placeholderUrl: preview.resolutions[0].url,
+          goFullScreen: () => context.router.navigate(
+            FullscreenVideoRoute(
+              videoUrl: image.url,
+              width: image.width,
+              height: image.height,
+            ),
+          ),
         );
       default:
         return Center(child: Text("Error while loading video"));

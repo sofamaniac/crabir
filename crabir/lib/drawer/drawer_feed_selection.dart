@@ -66,10 +66,11 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
             ),
             Divider(),
             ...account.subscriptions.map(
-              (sub) => SubredditTile(
-                sub,
-                closeDrawer: true,
-              ),
+              (sub) {
+                return SubredditTile(
+                  sub,
+                );
+              },
             ),
             Divider(),
             ListTile(

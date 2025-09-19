@@ -1,3 +1,4 @@
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
@@ -68,6 +69,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
   late reddit_stream.Streamable _stream;
   String? currentUser;
   Subreddit? subredditAbout;
+  int _forceRebuild = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -131,6 +133,7 @@ class _FeedViewBodyState extends State<FeedViewBody>
           onSelect: (sort) {
             setState(() {
               this.sort = sort;
+              _forceRebuild += 1;
               _stream = RedditAPI.client().feedStream(
                 feed: widget.feed,
                 sort: sort,
@@ -207,11 +210,15 @@ class _FeedViewBodyState extends State<FeedViewBody>
                   _appBar(), // your SliverAppBar
                 ],
                 body: RefreshIndicator(
-                  onRefresh: _stream.refresh,
+                  onRefresh: () async {
+                    await _stream.refresh();
+                    setState(() {
+                      _forceRebuild += 1;
+                    });
+                  },
                   child: Scrollbar(
                     child: ThingsScaffold(
-                      // Ensure rebuild when sort changes.
-                      key: ValueKey(sort),
+                      key: ValueKey(_forceRebuild),
                       stream: _stream,
                       postView: postView,
                       subredditInfo: subredditAbout != null

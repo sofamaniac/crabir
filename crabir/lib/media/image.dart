@@ -92,7 +92,32 @@ class FullscreenImageView extends StatelessWidget {
         imageProvider: CachedNetworkImageProvider(imageUrl),
         minScale: PhotoViewComputedScale.contained * 1.0,
         maxScale: PhotoViewComputedScale.contained * 5.0,
-        onTapDown: onTap,
+        onTapDown: (_, __, ___) => onTap(),
+      ),
+    );
+  }
+}
+
+@RoutePage()
+class FullscreenVideoView extends StatelessWidget {
+  final String videoUrl;
+  final String? title;
+  final int width;
+  final int height;
+  const FullscreenVideoView(
+      {super.key,
+      required this.videoUrl,
+      required this.width,
+      required this.height,
+      this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return FullscreenMediaView(
+      builder: (onTap) => AnimatedContent(
+        url: videoUrl,
+        width: width,
+        height: height,
       ),
     );
   }

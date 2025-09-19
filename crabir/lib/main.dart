@@ -123,7 +123,7 @@ class TopLevel extends StatelessWidget {
           outlineVariant: Colors.white24,
         ),
         cardTheme: CardThemeData(
-          color: themeBloc.light.cardBackground,
+          color: themeBloc.dark.cardBackground,
           shadowColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.zero, // square corners

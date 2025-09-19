@@ -77,6 +77,7 @@ class AppRouter extends RootStackRouter {
         ),
         threadRoute,
         AutoRoute(page: FullscreenImageRoute.page),
+        AutoRoute(page: FullscreenVideoRoute.page),
         AutoRoute(page: FullScreenGalleryRoute.page),
 
         // Settings

@@ -26,6 +26,7 @@ class AnimatedContent extends StatefulWidget {
   final String? placeholderUrl;
   final Widget? cartouche;
   final bool ignoreAutoplay;
+  final VoidCallback? goFullScreen;
 
   const AnimatedContent({
     super.key,
@@ -35,6 +36,7 @@ class AnimatedContent extends StatefulWidget {
     this.placeholderUrl,
     this.cartouche,
     this.ignoreAutoplay = false,
+    this.goFullScreen,
   });
 
   AnimatedContent.fromImageBase({
@@ -43,6 +45,7 @@ class AnimatedContent extends StatefulWidget {
     this.placeholderUrl,
     this.cartouche,
     this.ignoreAutoplay = false,
+    this.goFullScreen,
   })  : url = image.url,
         width = image.width,
         height = image.height;
@@ -52,6 +55,7 @@ class AnimatedContent extends StatefulWidget {
     required VariantInner placeholder,
     Resolution preferredResolution = Resolution.source,
     bool ignoreAutoplay = false,
+    VoidCallback? goFullScreen,
   }) {
     final ImageBase media;
     if (preferredResolution == Resolution.source) {
@@ -64,6 +68,7 @@ class AnimatedContent extends StatefulWidget {
       placeholderUrl: placeholder.withResolution(Resolution.low).url,
       width: media.width,
       height: media.height,
+      goFullScreen: goFullScreen,
     );
   }
 
@@ -73,6 +78,7 @@ class AnimatedContent extends StatefulWidget {
     this.placeholderUrl,
     this.cartouche,
     this.ignoreAutoplay = false,
+    this.goFullScreen,
   })  : url = media.oembed.providerUrl,
         width = media.oembed.width,
         height = media.oembed.height;
@@ -86,6 +92,7 @@ class AnimatedContent extends StatefulWidget {
       background: Colors.orange,
     ),
     this.ignoreAutoplay = false,
+    this.goFullScreen,
   })  : url = media.field0.dashUrl,
         width = media.field0.width,
         height = media.field0.height;
@@ -236,6 +243,11 @@ class _AnimatedContentState extends State<AnimatedContent> {
             ),
             onPressed: _toggleMute,
           ),
+          if (widget.goFullScreen != null)
+            IconButton(
+              icon: Icon(Icons.fullscreen),
+              onPressed: widget.goFullScreen?.call,
+            )
         ],
       ),
     );

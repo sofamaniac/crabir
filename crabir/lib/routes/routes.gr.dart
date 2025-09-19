@@ -259,6 +259,89 @@ class FullscreenImageRouteArgs {
 }
 
 /// generated route for
+/// [FullscreenVideoView]
+class FullscreenVideoRoute extends PageRouteInfo<FullscreenVideoRouteArgs> {
+  FullscreenVideoRoute({
+    Key? key,
+    required String videoUrl,
+    required int width,
+    required int height,
+    String? title,
+    List<PageRouteInfo>? children,
+  }) : super(
+          FullscreenVideoRoute.name,
+          args: FullscreenVideoRouteArgs(
+            key: key,
+            videoUrl: videoUrl,
+            width: width,
+            height: height,
+            title: title,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'FullscreenVideoRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<FullscreenVideoRouteArgs>();
+      return FullscreenVideoView(
+        key: args.key,
+        videoUrl: args.videoUrl,
+        width: args.width,
+        height: args.height,
+        title: args.title,
+      );
+    },
+  );
+}
+
+class FullscreenVideoRouteArgs {
+  const FullscreenVideoRouteArgs({
+    this.key,
+    required this.videoUrl,
+    required this.width,
+    required this.height,
+    this.title,
+  });
+
+  final Key? key;
+
+  final String videoUrl;
+
+  final int width;
+
+  final int height;
+
+  final String? title;
+
+  @override
+  String toString() {
+    return 'FullscreenVideoRouteArgs{key: $key, videoUrl: $videoUrl, width: $width, height: $height, title: $title}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! FullscreenVideoRouteArgs) return false;
+    return key == other.key &&
+        videoUrl == other.videoUrl &&
+        width == other.width &&
+        height == other.height &&
+        title == other.title;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      videoUrl.hashCode ^
+      width.hashCode ^
+      height.hashCode ^
+      title.hashCode;
+}
+
+/// generated route for
 /// [InboxView]
 class InboxRoute extends PageRouteInfo<void> {
   const InboxRoute({List<PageRouteInfo>? children})

@@ -86,7 +86,7 @@ class StyledHtml extends StatelessWidget {
       data: htmlContent,
       onLinkTap: onLinkTap,
       extensions: [
-        RedditImageExtension(),
+        if (showImages) RedditImageExtension(),
         TextExtension(),
       ],
     );

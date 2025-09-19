@@ -48,6 +48,12 @@ class ShareButton extends StatelessWidget {
                       SharePlus.instance.share(params);
                     },
                   ),
+                  if (kDebugMode)
+                    ListTile(
+                      leading: Icon(Icons.bug_report),
+                      title: Text("Print post debug info"),
+                      onTap: () => debugPost(post: post),
+                    )
                 ],
               ),
             );

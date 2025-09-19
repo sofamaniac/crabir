@@ -105,7 +105,7 @@ class _GalleryViewState extends State<_GalleryView> {
                 _currentPage = index;
               });
             },
-            onTap: (_, __, ___) {
+            onTap: () {
               _openFullScreen(_currentPage);
             },
           ),
@@ -130,11 +130,7 @@ class _GalleryPageViewer extends StatefulWidget {
   final int initialPage;
   final PageController? controller;
   final bool obfuscate;
-  final void Function(
-    BuildContext,
-    TapDownDetails,
-    PhotoViewControllerValue,
-  )? onTap;
+  final VoidCallback? onTap;
   const _GalleryPageViewer({
     required this.gallery,
     required this.obfuscate,
@@ -176,7 +172,7 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
     widget.onPageChanged?.call(index);
   }
 
-  Widget toWidget(
+  PhotoViewGalleryPageOptions toWidget(
     GalleryMedia content,
     Resolution resolution,
     bool obfuscate,
@@ -184,10 +180,11 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
   ) {
     final image = content.withResolution(resolution, obfuscate);
     final placeholder = content.withResolution(Resolution.low, obfuscate);
+    final Widget imageWidget;
     switch (content.source) {
       case Source_AnimatedImage(:final source):
         if (obfuscate) {
-          return ImageThumbnail(
+          imageWidget = ImageThumbnail(
             imageUrl: image.u,
             width: image.x,
             height: image.y,
@@ -195,18 +192,33 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
           );
         }
         // In galleries video do not have alternate resolutions.
-        return AnimatedContent(
-          url: source.mp4,
-          width: source.x,
-          height: source.y,
-          placeholderUrl: placeholder.u,
+        return PhotoViewGalleryPageOptions.customChild(
+          child: AnimatedContent(
+            url: source.mp4,
+            width: source.x,
+            height: source.y,
+            placeholderUrl: placeholder.u,
+            goFullScreen: () {
+              print("GO FULLSCREEN");
+              widget.onTap?.call();
+            },
+          ),
+          onTapDown: (_, __, ___) => widget.onTap?.call(),
+          minScale: PhotoViewComputedScale.contained * 1.0,
+          maxScale: PhotoViewComputedScale.contained * 1.0,
         );
       case Source_Image():
-        return ImageThumbnail.fromGalleryImage(
+        imageWidget = ImageThumbnail.fromGalleryImage(
           image,
           placeholderUrl: placeholder.u,
         );
     }
+    return PhotoViewGalleryPageOptions.customChild(
+      child: imageWidget,
+      onTapDown: (_, __, ___) => widget.onTap?.call(),
+      minScale: PhotoViewComputedScale.contained * 1.0,
+      maxScale: PhotoViewComputedScale.contained * 5.0,
+    );
   }
 
   @override
@@ -217,19 +229,19 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
       itemCount: widget.gallery.length,
       builder: (context, index) {
         final settings = context.watch<DataSettingsCubit>().state;
-        final image = widget.gallery.get_(index: index)!;
-        final Widget imageWidget = toWidget(
-          image,
-          settings.preferredQuality,
-          widget.obfuscate,
-          index,
-        );
-        return PhotoViewGalleryPageOptions.customChild(
-          child: imageWidget,
-          onTapDown: widget.onTap,
-          minScale: PhotoViewComputedScale.contained * 1.0,
-          maxScale: PhotoViewComputedScale.contained * 5.0,
-        );
+        final image = widget.gallery.get_(index: index);
+        if (image == null) {
+          return PhotoViewGalleryPageOptions.customChild(
+            child: Text("Image not found"),
+          );
+        } else {
+          return toWidget(
+            image,
+            settings.preferredQuality,
+            widget.obfuscate,
+            index,
+          );
+        }
       },
     );
   }

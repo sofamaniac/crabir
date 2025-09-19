@@ -1,7 +1,7 @@
 part of 'media.dart';
 
 class FullscreenMediaView extends StatefulWidget {
-  final Widget Function(PhotoViewImageTapDownCallback) builder;
+  final Widget Function(VoidCallback) builder;
   final Widget? trailing;
   final String? title;
   const FullscreenMediaView({
@@ -40,11 +40,7 @@ class _FullscreenMediaViewState extends State<FullscreenMediaView> {
     );
   }
 
-  void _toggleBars(
-    BuildContext context,
-    TapDownDetails _,
-    PhotoViewControllerValue __,
-  ) {
+  void _toggleBars() {
     setState(() {
       _showBars = !_showBars;
     });

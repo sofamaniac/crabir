@@ -132,10 +132,8 @@ class _RedditPostCardState extends State<RedditPostCard> {
         ),
       ],
     );
-    final theme = CrabirTheme.of(context);
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
-      color: theme.background,
       elevation: 1,
       child: InkWell(
         onTap: widget.onTap,
