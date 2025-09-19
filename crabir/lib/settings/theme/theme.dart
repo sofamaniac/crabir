@@ -1,5 +1,7 @@
 import 'package:crabir/settings/theme/color_converter.dart';
+import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'theme.freezed.dart';
@@ -45,4 +47,13 @@ abstract class CrabirTheme with _$CrabirTheme {
 
   factory CrabirTheme.fromJson(Map<String, dynamic> json) =>
       _$CrabirThemeFromJson(json);
+
+  static CrabirTheme of(BuildContext context) {
+    final state = context.watch<ThemeBloc>().state;
+    final brightness = MediaQuery.of(context).platformBrightness;
+    return switch (brightness) {
+      Brightness.dark => state.dark,
+      Brightness.light => state.light,
+    };
+  }
 }

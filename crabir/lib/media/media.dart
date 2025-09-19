@@ -9,7 +9,7 @@ import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/network_status.dart';
 import 'package:crabir/settings/data/data_settings.dart';
-import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';

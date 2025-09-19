@@ -16,6 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$ThemeEvent {
   ThemeField get field;
   Color get color;
+  Brightness get brightness;
 
   /// Create a copy of ThemeEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -30,16 +31,21 @@ mixin _$ThemeEvent {
         (other.runtimeType == runtimeType &&
             other is ThemeEvent &&
             (identical(other.field, field) || other.field == field) &&
-            const DeepCollectionEquality().equals(other.color, color));
+            const DeepCollectionEquality().equals(other.color, color) &&
+            const DeepCollectionEquality()
+                .equals(other.brightness, brightness));
   }
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, field, const DeepCollectionEquality().hash(color));
+      runtimeType,
+      field,
+      const DeepCollectionEquality().hash(color),
+      const DeepCollectionEquality().hash(brightness));
 
   @override
   String toString() {
-    return 'ThemeEvent(field: $field, color: $color)';
+    return 'ThemeEvent(field: $field, color: $color, brightness: $brightness)';
   }
 }
 
@@ -49,7 +55,7 @@ abstract mixin class $ThemeEventCopyWith<$Res> {
           ThemeEvent value, $Res Function(ThemeEvent) _then) =
       _$ThemeEventCopyWithImpl;
   @useResult
-  $Res call({ThemeField field, Color color});
+  $Res call({ThemeField field, Color color, Brightness brightness});
 }
 
 /// @nodoc
@@ -66,6 +72,7 @@ class _$ThemeEventCopyWithImpl<$Res> implements $ThemeEventCopyWith<$Res> {
   $Res call({
     Object? field = null,
     Object? color = freezed,
+    Object? brightness = freezed,
   }) {
     return _then(_self.copyWith(
       field: null == field
@@ -76,6 +83,10 @@ class _$ThemeEventCopyWithImpl<$Res> implements $ThemeEventCopyWith<$Res> {
           ? _self.color
           : color // ignore: cast_nullable_to_non_nullable
               as Color,
+      brightness: freezed == brightness
+          ? _self.brightness
+          : brightness // ignore: cast_nullable_to_non_nullable
+              as Brightness,
     ));
   }
 }
@@ -173,13 +184,14 @@ extension ThemeEventPatterns on ThemeEvent {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(ThemeField field, Color color)? setColor,
+    TResult Function(ThemeField field, Color color, Brightness brightness)?
+        setColor,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case SetColor() when setColor != null:
-        return setColor(_that.field, _that.color);
+        return setColor(_that.field, _that.color, _that.brightness);
       case _:
         return orElse();
     }
@@ -200,12 +212,14 @@ extension ThemeEventPatterns on ThemeEvent {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(ThemeField field, Color color) setColor,
+    required TResult Function(
+            ThemeField field, Color color, Brightness brightness)
+        setColor,
   }) {
     final _that = this;
     switch (_that) {
       case SetColor():
-        return setColor(_that.field, _that.color);
+        return setColor(_that.field, _that.color, _that.brightness);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -225,12 +239,13 @@ extension ThemeEventPatterns on ThemeEvent {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(ThemeField field, Color color)? setColor,
+    TResult? Function(ThemeField field, Color color, Brightness brightness)?
+        setColor,
   }) {
     final _that = this;
     switch (_that) {
       case SetColor() when setColor != null:
-        return setColor(_that.field, _that.color);
+        return setColor(_that.field, _that.color, _that.brightness);
       case _:
         return null;
     }
@@ -240,12 +255,15 @@ extension ThemeEventPatterns on ThemeEvent {
 /// @nodoc
 
 class SetColor implements ThemeEvent {
-  SetColor({required this.field, required this.color});
+  SetColor(
+      {required this.field, required this.color, required this.brightness});
 
   @override
   final ThemeField field;
   @override
   final Color color;
+  @override
+  final Brightness brightness;
 
   /// Create a copy of ThemeEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -261,16 +279,21 @@ class SetColor implements ThemeEvent {
         (other.runtimeType == runtimeType &&
             other is SetColor &&
             (identical(other.field, field) || other.field == field) &&
-            const DeepCollectionEquality().equals(other.color, color));
+            const DeepCollectionEquality().equals(other.color, color) &&
+            const DeepCollectionEquality()
+                .equals(other.brightness, brightness));
   }
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, field, const DeepCollectionEquality().hash(color));
+      runtimeType,
+      field,
+      const DeepCollectionEquality().hash(color),
+      const DeepCollectionEquality().hash(brightness));
 
   @override
   String toString() {
-    return 'ThemeEvent.setColor(field: $field, color: $color)';
+    return 'ThemeEvent.setColor(field: $field, color: $color, brightness: $brightness)';
   }
 }
 
@@ -281,7 +304,7 @@ abstract mixin class $SetColorCopyWith<$Res>
       _$SetColorCopyWithImpl;
   @override
   @useResult
-  $Res call({ThemeField field, Color color});
+  $Res call({ThemeField field, Color color, Brightness brightness});
 }
 
 /// @nodoc
@@ -298,6 +321,7 @@ class _$SetColorCopyWithImpl<$Res> implements $SetColorCopyWith<$Res> {
   $Res call({
     Object? field = null,
     Object? color = freezed,
+    Object? brightness = freezed,
   }) {
     return _then(SetColor(
       field: null == field
@@ -308,6 +332,10 @@ class _$SetColorCopyWithImpl<$Res> implements $SetColorCopyWith<$Res> {
           ? _self.color
           : color // ignore: cast_nullable_to_non_nullable
               as Color,
+      brightness: freezed == brightness
+          ? _self.brightness
+          : brightness // ignore: cast_nullable_to_non_nullable
+              as Brightness,
     ));
   }
 }

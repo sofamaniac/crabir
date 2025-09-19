@@ -18,7 +18,7 @@ class Header extends StatelessWidget {
   }
 
   Widget _subreddit(BuildContext context) {
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     final settings = context.read<PostsSettingsCubit>().state;
     final icon = post.subreddit.details?.icon;
     final name = post.subreddit.subreddit;

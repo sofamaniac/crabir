@@ -7,7 +7,7 @@ class ThreadEntry extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final thread = context.watch<ThreadBloc>();
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     final locales = AppLocalizations.of(context);
     final inner = switch (comment) {
       Thing_Comment(field0: final comment) => IndentedBox(

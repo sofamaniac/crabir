@@ -3,7 +3,7 @@ import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/post.dart';
 import 'package:crabir/routes/routes.dart';
-import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -168,7 +168,7 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     return SizedBox(
       height: tabBar.preferredSize.height,
       child: ColoredBox(

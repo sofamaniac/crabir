@@ -10,5 +10,6 @@ abstract class ThemeEvent with _$ThemeEvent {
   factory ThemeEvent.setColor({
     required ThemeField field,
     required Color color,
+    required Brightness brightness,
   }) = SetColor;
 }

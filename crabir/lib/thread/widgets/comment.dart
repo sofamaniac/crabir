@@ -7,7 +7,7 @@ import 'package:crabir/flair.dart';
 import 'package:crabir/html_view.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
-import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/author.dart';
@@ -242,7 +242,7 @@ class _Username extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = context.read<CommentsSettingsCubit>().state;
     final currentUser = context.read<AccountsBloc>().state.account?.username;
-    final theme = context.read<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     return InkWell(
       onTap: () {
         if (author?.username != null && settings.clickableUsername) {

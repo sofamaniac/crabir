@@ -12,7 +12,7 @@ import 'package:crabir/post/parts/video.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
-import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';

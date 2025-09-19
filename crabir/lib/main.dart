@@ -5,12 +5,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/accounts/widgets/account_selector.dart';
 import 'package:crabir/drawer/drawer.dart';
-import 'package:crabir/media/media.dart';
 import 'package:crabir/network_status.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
-import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/tabs_index.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -101,7 +99,7 @@ class TopLevel extends StatelessWidget {
   TopLevel({super.key});
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     return MaterialApp.router(
       // required to go back to home screen before exiting the app
       // because flutter is broken.
@@ -267,7 +265,7 @@ class _MainScreenViewState extends State<MainScreenView>
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     final _ = context.watch<AccountsBloc>().state.account;
 
     final routes = <PageRouteInfo>[

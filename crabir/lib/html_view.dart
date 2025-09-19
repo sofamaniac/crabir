@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -34,7 +33,7 @@ class StyledHtml extends StatelessWidget {
         .replaceAll('<p>', '')
         .replaceAll('</p>', '<br>')
         .replaceAll('\n\n', '<br>');
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     final style = {
       // Style for divider
       "hr": Style(

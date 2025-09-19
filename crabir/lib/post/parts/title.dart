@@ -10,7 +10,7 @@ class PostTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     final Color titleColor;
     if (post.pinned || post.distinguished == "moderator") {
       titleColor = theme.announcement;

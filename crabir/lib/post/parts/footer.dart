@@ -7,7 +7,7 @@ class Footer extends StatelessWidget {
   const Footer({super.key, required this.post, this.onLike, this.onSave});
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     final likeColor = theme.primaryColor;
     final dislikeColor = Colors.cyanAccent;
     final settings = context.read<PostsSettingsCubit>().state;

@@ -1,6 +1,5 @@
-import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class ScrollAwareFab extends StatefulWidget {
@@ -44,7 +43,7 @@ class _ScrollAwareFabState extends State<ScrollAwareFab> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     return AnimatedSlide(
       duration: const Duration(milliseconds: 200),
       offset: _visible ? Offset.zero : const Offset(0, 2),

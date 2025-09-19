@@ -1,10 +1,9 @@
 import 'dart:math';
 
 import 'package:crabir/hexcolor.dart';
-import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 
 class FlairView extends StatelessWidget {
@@ -127,7 +126,7 @@ class FlairView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     // default to background color for luminance computation (should be the same as a transparent background)
     final backgroundColor = flair.backgroundColor.stringToColor(
       defaultColor: theme.cardBackground,

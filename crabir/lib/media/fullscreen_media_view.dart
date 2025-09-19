@@ -51,7 +51,7 @@ class _FullscreenMediaViewState extends State<FullscreenMediaView> {
   }
 
   Widget _bottomBar() {
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     final bar = SafeArea(
       top: false,
       child: Column(

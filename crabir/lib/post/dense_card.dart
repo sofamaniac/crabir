@@ -41,7 +41,7 @@ class DenseCard extends StatelessWidget {
         ],
       ),
     );
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
       color: theme.background,

@@ -99,7 +99,7 @@ class _LikeTextState extends State<LikeText>
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     final color = switch (widget.likes) {
       true => theme.primaryColor,
       false => Colors.cyan,
