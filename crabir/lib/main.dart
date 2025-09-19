@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:app_links/app_links.dart';
 import 'package:auto_route/auto_route.dart';
@@ -121,7 +122,13 @@ class TopLevel extends StatelessWidget {
           secondary: themeBloc.dark.highlight,
           outlineVariant: Colors.white24,
         ),
-        cardTheme: CardThemeData(color: themeBloc.dark.cardBackground),
+        cardTheme: CardThemeData(
+          color: themeBloc.light.cardBackground,
+          shadowColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero, // square corners
+          ),
+        ),
       ),
       theme: ThemeData(
         useMaterial3: true,
@@ -131,7 +138,12 @@ class TopLevel extends StatelessWidget {
           secondary: themeBloc.light.highlight,
           outlineVariant: Colors.black26,
         ),
-        cardTheme: CardThemeData(color: themeBloc.light.cardBackground),
+        cardTheme: CardThemeData(
+          color: themeBloc.light.cardBackground,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero, // square corners
+          ),
+        ),
       ),
       routerConfig: _appRouter.config(deepLinkTransformer: (deepLink) {
         if (deepLink.path.contains('s')) {
@@ -246,29 +258,34 @@ class _MainScreenViewState extends State<MainScreenView>
       tabsController.addListener(listener);
       addListener = false;
     }
-    return TabBar(
-      controller: tabsController,
-      //labelColor: Theme.of(context).primaryTextTheme.bodyLarge!.color,
-      indicatorColor: theme.primaryColor,
+    return BottomNavigationBar(
+      currentIndex: tabsController.index,
+      backgroundColor: theme.toolBarBackground,
+      selectedItemColor: theme.primaryColor,
+      unselectedItemColor: theme.toolBarText.withAlpha(120),
+      showUnselectedLabels: false,
+      showSelectedLabels: false,
+      type: BottomNavigationBarType.fixed, // so all items show
       onTap: (index) {
-        tabsRouter.setActiveIndex(index);
-        // routes to reset to when taping on their tab icon.
+        tabsController.animateTo(index);
+
+        // optional: reset route stack like you had before
         final rootRoutes = {
-          subscriptionsIndex: const SubscriptionsTabRoute(),
-          searchIndex: const SearchSubredditsRoute(),
-          profileIndex: UserRoute(),
+          0: const SubscriptionsTabRoute(),
+          1: const SearchSubredditsRoute(),
+          4: UserRoute(),
         };
         final route = rootRoutes[index];
         if (route != null) {
-          tabsRouter.stackRouterOfIndex(index)?.replaceAll([route]);
+          context.tabsRouter.stackRouterOfIndex(index)?.replaceAll([route]);
         }
       },
-      tabs: const [
-        Tab(icon: Icon(Icons.home)),
-        Tab(icon: Icon(Icons.search)),
-        Tab(icon: Icon(Icons.list)),
-        Tab(icon: Icon(Icons.mail)),
-        Tab(icon: Icon(Icons.person)),
+      items: const [
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+        BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
+        BottomNavigationBarItem(icon: Icon(Icons.list), label: "Lists"),
+        BottomNavigationBarItem(icon: Icon(Icons.mail), label: "Messages"),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
       ],
     );
   }
@@ -277,6 +294,21 @@ class _MainScreenViewState extends State<MainScreenView>
   Widget build(BuildContext context) {
     final theme = CrabirTheme.of(context);
     final _ = context.watch<AccountsBloc>().state.account;
+
+    // Change system navigation bar background color.
+    if (Platform.isAndroid) {
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          systemNavigationBarColor: theme.toolBarBackground,
+          systemNavigationBarIconBrightness: switch (
+              context.read<ThemeBloc>().state.mode) {
+            ThemeMode.dark => Brightness.dark,
+            ThemeMode.light => Brightness.light,
+            ThemeMode.system => MediaQuery.of(context).platformBrightness,
+          },
+        ),
+      );
+    }
 
     final routes = <PageRouteInfo>[
       NamedRoute(homeRouteName),

@@ -47,7 +47,7 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
   @override
   Widget build(BuildContext context) {
     final itemCount = items.length;
-    final totalSliverItems = itemCount * 2 + 1; // double count for separators
+    final totalSliverItems = itemCount + 1; // double count for separators
     return CustomScrollView(
       key: PageStorageKey(widget.stream),
       slivers: [
@@ -59,14 +59,8 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
         SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) {
-              if (index.isOdd) {
-                // Divider between items
-                return const Divider(height: 1);
-              }
-
-              final dataIndex = index ~/ 2;
-              if (dataIndex < itemCount) {
-                final thing = items[dataIndex];
+              if (index < itemCount) {
+                final thing = items[index];
 
                 switch (thing) {
                   case Thing_Post(field0: final post):
