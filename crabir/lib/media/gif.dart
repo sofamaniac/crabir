@@ -118,7 +118,6 @@ class _AnimatedContentState extends State<AnimatedContent> {
 
     _canAutoplay = NetworkStatus.canAutoplay(setting);
     _queueListener = () {
-      print("$_visibilityFraction");
       if (_visibilityFraction == 1 &&
           AnimatedContentController.queue.value.first == widget.url &&
           !_controller.value.isPlaying) {
