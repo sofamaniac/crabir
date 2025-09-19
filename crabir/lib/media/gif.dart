@@ -118,6 +118,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
 
     _canAutoplay = NetworkStatus.canAutoplay(setting);
     _queueListener = () {
+      print("$_visibilityFraction");
       if (_visibilityFraction == 1 &&
           AnimatedContentController.queue.value.first == widget.url &&
           !_controller.value.isPlaying) {
@@ -150,6 +151,10 @@ class _AnimatedContentState extends State<AnimatedContent> {
   void dispose() {
     _hideControlsTimer?.cancel();
     _controller.dispose();
+
+    // Ensure we're not in the queue anymore
+    AnimatedContentController.queue.removeListener(_queueListener);
+    AnimatedContentController.removeFromQueue(widget.url);
     super.dispose();
   }
 
