@@ -49,31 +49,15 @@ class _CommentViewState extends State<CommentView>
   Widget topRow(CommentsSettings settings) {
     final comment = widget.comment;
     return Row(
+      spacing: 8,
       children: [
-        Expanded(
-          child: RichText(
-            text: TextSpan(
-              children: [
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.bottom,
-                  child: _Username(
-                    author: comment.author,
-                    isSubmitter: comment.isSubmitter,
-                    distinguished: comment.distinguished,
-                  ),
-                ),
-                if (comment.author?.flair != null &&
-                    settings.showUserFlair) ...[
-                  const WidgetSpan(child: SizedBox(width: 8)),
-                  WidgetSpan(
-                    alignment: PlaceholderAlignment.middle,
-                    child: FlairView(flair: comment.author!.flair),
-                  ),
-                ],
-              ],
-            ),
-          ),
+        _Username(
+          author: comment.author,
+          isSubmitter: comment.isSubmitter,
+          distinguished: comment.distinguished,
         ),
+        Expanded(child: FlairView(flair: comment.author!.flair)),
+        Spacer(),
         Text(
           "${comment.scoreHidden ? "?" : comment.score} · ${comment.createdUtc.timeSince(context)}",
           style: Theme.of(context).textTheme.labelMedium,
@@ -247,9 +231,9 @@ class _Username extends StatelessWidget {
         foreground: Colors.white,
       );
     } else {
-      return Cartouche(
+      return Text(
         username ?? "u/[deleted]",
-        foreground: foreground,
+        style: TextStyle(color: foreground, fontSize: 12),
       );
     }
   }
