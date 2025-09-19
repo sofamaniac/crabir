@@ -16,6 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$ThemeState {
   CrabirTheme get dark;
   CrabirTheme get light;
+  ThemeMode get mode;
 
   /// Create a copy of ThemeState
   /// with the given fields replaced by the non-null parameter values.
@@ -33,16 +34,17 @@ mixin _$ThemeState {
         (other.runtimeType == runtimeType &&
             other is ThemeState &&
             (identical(other.dark, dark) || other.dark == dark) &&
-            (identical(other.light, light) || other.light == light));
+            (identical(other.light, light) || other.light == light) &&
+            (identical(other.mode, mode) || other.mode == mode));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, dark, light);
+  int get hashCode => Object.hash(runtimeType, dark, light, mode);
 
   @override
   String toString() {
-    return 'ThemeState(dark: $dark, light: $light)';
+    return 'ThemeState(dark: $dark, light: $light, mode: $mode)';
   }
 }
 
@@ -52,7 +54,7 @@ abstract mixin class $ThemeStateCopyWith<$Res> {
           ThemeState value, $Res Function(ThemeState) _then) =
       _$ThemeStateCopyWithImpl;
   @useResult
-  $Res call({CrabirTheme dark, CrabirTheme light});
+  $Res call({CrabirTheme dark, CrabirTheme light, ThemeMode mode});
 
   $CrabirThemeCopyWith<$Res> get dark;
   $CrabirThemeCopyWith<$Res> get light;
@@ -72,6 +74,7 @@ class _$ThemeStateCopyWithImpl<$Res> implements $ThemeStateCopyWith<$Res> {
   $Res call({
     Object? dark = null,
     Object? light = null,
+    Object? mode = null,
   }) {
     return _then(_self.copyWith(
       dark: null == dark
@@ -82,6 +85,10 @@ class _$ThemeStateCopyWithImpl<$Res> implements $ThemeStateCopyWith<$Res> {
           ? _self.light
           : light // ignore: cast_nullable_to_non_nullable
               as CrabirTheme,
+      mode: null == mode
+          ? _self.mode
+          : mode // ignore: cast_nullable_to_non_nullable
+              as ThemeMode,
     ));
   }
 
@@ -199,13 +206,14 @@ extension ThemeStatePatterns on ThemeState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(CrabirTheme dark, CrabirTheme light)? $default, {
+    TResult Function(CrabirTheme dark, CrabirTheme light, ThemeMode mode)?
+        $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _ThemeState() when $default != null:
-        return $default(_that.dark, _that.light);
+        return $default(_that.dark, _that.light, _that.mode);
       case _:
         return orElse();
     }
@@ -226,12 +234,13 @@ extension ThemeStatePatterns on ThemeState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(CrabirTheme dark, CrabirTheme light) $default,
+    TResult Function(CrabirTheme dark, CrabirTheme light, ThemeMode mode)
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ThemeState():
-        return $default(_that.dark, _that.light);
+        return $default(_that.dark, _that.light, _that.mode);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -251,12 +260,13 @@ extension ThemeStatePatterns on ThemeState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(CrabirTheme dark, CrabirTheme light)? $default,
+    TResult? Function(CrabirTheme dark, CrabirTheme light, ThemeMode mode)?
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ThemeState() when $default != null:
-        return $default(_that.dark, _that.light);
+        return $default(_that.dark, _that.light, _that.mode);
       case _:
         return null;
     }
@@ -266,7 +276,8 @@ extension ThemeStatePatterns on ThemeState {
 /// @nodoc
 @JsonSerializable()
 class _ThemeState extends ThemeState {
-  _ThemeState({required this.dark, required this.light}) : super._();
+  _ThemeState({required this.dark, required this.light, required this.mode})
+      : super._();
   factory _ThemeState.fromJson(Map<String, dynamic> json) =>
       _$ThemeStateFromJson(json);
 
@@ -274,6 +285,8 @@ class _ThemeState extends ThemeState {
   final CrabirTheme dark;
   @override
   final CrabirTheme light;
+  @override
+  final ThemeMode mode;
 
   /// Create a copy of ThemeState
   /// with the given fields replaced by the non-null parameter values.
@@ -296,16 +309,17 @@ class _ThemeState extends ThemeState {
         (other.runtimeType == runtimeType &&
             other is _ThemeState &&
             (identical(other.dark, dark) || other.dark == dark) &&
-            (identical(other.light, light) || other.light == light));
+            (identical(other.light, light) || other.light == light) &&
+            (identical(other.mode, mode) || other.mode == mode));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, dark, light);
+  int get hashCode => Object.hash(runtimeType, dark, light, mode);
 
   @override
   String toString() {
-    return 'ThemeState(dark: $dark, light: $light)';
+    return 'ThemeState(dark: $dark, light: $light, mode: $mode)';
   }
 }
 
@@ -317,7 +331,7 @@ abstract mixin class _$ThemeStateCopyWith<$Res>
       __$ThemeStateCopyWithImpl;
   @override
   @useResult
-  $Res call({CrabirTheme dark, CrabirTheme light});
+  $Res call({CrabirTheme dark, CrabirTheme light, ThemeMode mode});
 
   @override
   $CrabirThemeCopyWith<$Res> get dark;
@@ -339,6 +353,7 @@ class __$ThemeStateCopyWithImpl<$Res> implements _$ThemeStateCopyWith<$Res> {
   $Res call({
     Object? dark = null,
     Object? light = null,
+    Object? mode = null,
   }) {
     return _then(_ThemeState(
       dark: null == dark
@@ -349,6 +364,10 @@ class __$ThemeStateCopyWithImpl<$Res> implements _$ThemeStateCopyWith<$Res> {
           ? _self.light
           : light // ignore: cast_nullable_to_non_nullable
               as CrabirTheme,
+      mode: null == mode
+          ? _self.mode
+          : mode // ignore: cast_nullable_to_non_nullable
+              as ThemeMode,
     ));
   }
 

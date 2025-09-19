@@ -1,7 +1,6 @@
-import 'dart:ui';
-
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/settings/theme/theme_event.dart';
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
@@ -14,14 +13,21 @@ abstract class ThemeState with _$ThemeState {
   factory ThemeState({
     required CrabirTheme dark,
     required CrabirTheme light,
+    required ThemeMode mode,
   }) = _ThemeState;
   factory ThemeState.fromJson(Map<String, dynamic> json) =>
       _$ThemeStateFromJson(json);
 }
 
 class ThemeBloc extends HydratedBloc<ThemeEvent, ThemeState> {
-  ThemeBloc() : super(ThemeState(dark: CrabirTheme(), light: CrabirTheme())) {
+  ThemeBloc()
+      : super(ThemeState(
+          dark: CrabirTheme(),
+          light: CrabirTheme.light(),
+          mode: ThemeMode.system,
+        )) {
     on<SetColor>(_updateColor);
+    on<SetMode>(_setMode);
   }
 
   @override
@@ -41,5 +47,9 @@ class ThemeBloc extends HydratedBloc<ThemeEvent, ThemeState> {
       Brightness.light => state.copyWith(light: newTheme),
     };
     emit(newState);
+  }
+
+  Future<void> _setMode(SetMode event, Emitter<ThemeState> emit) async {
+    emit(state.copyWith(mode: event.mode));
   }
 }

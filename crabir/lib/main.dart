@@ -9,6 +9,7 @@ import 'package:crabir/network_status.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
+import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/tabs_index.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -100,6 +101,7 @@ class TopLevel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = CrabirTheme.of(context);
+    final themeBloc = context.watch<ThemeBloc>().state;
     return MaterialApp.router(
       // required to go back to home screen before exiting the app
       // because flutter is broken.
@@ -111,7 +113,7 @@ class TopLevel extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      themeMode: ThemeMode.system,
+      themeMode: themeBloc.mode,
       theme: ThemeData.light(useMaterial3: true),
       darkTheme: ThemeData(
         useMaterial3: true,

@@ -30,6 +30,7 @@ class AccountSelector extends StatelessWidget {
                 onTap: () async {
                   bloc.add(SelectAccount(index));
                   onTapCallback?.call();
+                  Scaffold.of(context).closeDrawer();
                 },
                 leading: CircleAvatar(
                   radius: 24,

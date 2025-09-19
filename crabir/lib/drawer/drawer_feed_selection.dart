@@ -31,10 +31,31 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
             ...baseFeeds(context, closeDrawer: true),
             Divider(),
             ListTile(
-                title: Text("Settings"),
-                onTap: () {
-                  context.router.navigate(SettingsRoute());
-                }),
+              leading: Icon(Icons.settings),
+              title: Text("Settings"),
+              onTap: () {
+                context.router.navigate(SettingsRoute());
+              },
+              trailing: IconButton(
+                onPressed: () {
+                  final bloc = context.read<ThemeBloc>();
+                  final mode = bloc.state.mode;
+                  final brightness = switch (mode) {
+                    ThemeMode.dark => Brightness.dark,
+                    ThemeMode.light => Brightness.light,
+                    ThemeMode.system =>
+                      MediaQuery.of(context).platformBrightness,
+                  };
+                  final newMode = switch (brightness) {
+                    Brightness.light => ThemeMode.dark,
+                    Brightness.dark => ThemeMode.light,
+                  };
+                  bloc.add(SetMode(mode: newMode));
+                },
+                icon: Icon(Icons.light),
+              ),
+            ),
+
             //...userOptions.map((option) => ListTile(title: Text(option))),
             Divider(),
             ...account.multis.map(

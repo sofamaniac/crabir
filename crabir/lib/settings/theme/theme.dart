@@ -63,16 +63,37 @@ abstract class CrabirTheme with _$CrabirTheme {
     @ColorConverter() @Default(Color(0xFF4B91E2)) Color linkColor,
   }) = _CrabirTheme;
 
+  factory CrabirTheme.light() => CrabirTheme(
+        background: Colors.white,
+        cardBackground: const Color(0xFFF5F5F5),
+        toolBarBackground: Colors.white,
+        toolBarText: Colors.black,
+        primaryColor: Colors.deepOrange,
+        highlight: Colors.red,
+        postTitle: Colors.black87,
+        readPost: Colors.grey,
+        announcement: Colors.green,
+        contentText: Colors.black87,
+        linkColor: Colors.blue,
+      );
+
   factory CrabirTheme.fromJson(Map<String, dynamic> json) =>
       _$CrabirThemeFromJson(json);
 
   static CrabirTheme of(BuildContext context) {
     final state = context.watch<ThemeBloc>().state;
-    final brightness = MediaQuery.of(context).platformBrightness;
-    return switch (brightness) {
-      Brightness.dark => state.dark,
-      Brightness.light => state.light,
-    };
+    switch (state.mode) {
+      case ThemeMode.dark:
+        return state.dark;
+      case ThemeMode.light:
+        return state.light;
+      case ThemeMode.system:
+        final brightness = MediaQuery.of(context).platformBrightness;
+        return switch (brightness) {
+          Brightness.dark => state.dark,
+          Brightness.light => state.light,
+        };
+    }
   }
 
   CrabirTheme updateColor({required ThemeField field, required Color color}) {
