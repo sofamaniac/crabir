@@ -12,6 +12,7 @@ import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/author.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
+import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/time_ellapsed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -56,7 +57,8 @@ class _CommentViewState extends State<CommentView>
           isSubmitter: comment.isSubmitter,
           distinguished: comment.distinguished,
         ),
-        if (comment.author != null) FlairView(flair: comment.author!.flair),
+        if (comment.author != null)
+          Flexible(child: FlairView(flair: comment.author!.flair)),
         Spacer(),
         Text(
           "${comment.scoreHidden ? "?" : comment.score} · ${comment.createdUtc.timeSince(context)}",
@@ -87,26 +89,24 @@ class _CommentViewState extends State<CommentView>
       child: AnimatedSize(
         duration: Duration(milliseconds: 200),
         alignment: Alignment.topCenter,
-        child: Card(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                topRow(settings),
-                StyledHtml(
-                  htmlContent: comment.bodyHtml,
-                  onLinkTap: (url, attributes, element) => defaultLinkHandler(
-                    context.router,
-                    url,
-                    attributes,
-                    element,
-                  ),
-                  showImages: settings.showCommentsImage,
+        child: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              topRow(settings),
+              StyledHtml(
+                htmlContent: comment.bodyHtml,
+                onLinkTap: (url, attributes, element) => defaultLinkHandler(
+                  context.router,
+                  url,
+                  attributes,
+                  element,
                 ),
-                if (showBottomBar) bottomBar(),
-              ],
-            ),
+                showImages: settings.showCommentsImage,
+              ),
+              if (showBottomBar) bottomBar(),
+            ],
           ),
         ),
       ),
@@ -183,14 +183,13 @@ class _CommentViewState extends State<CommentView>
           },
           icon: Icon(Icons.reply_rounded),
         ),
-        IconButton(
+        ShareButton(
+          comment: widget.comment,
           onPressed: () {
-            // TODO: share comment
             if (settings.hideButtonAfterAction) {
               showBottomBar = false;
             }
           },
-          icon: Icon(Icons.share),
         ),
       ],
     );

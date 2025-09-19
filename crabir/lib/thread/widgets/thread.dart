@@ -16,11 +16,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crabir/l10n/app_localizations.dart';
+import 'package:share_plus/share_plus.dart';
 
 part 'thread_entry.dart';
 part 'comments_list.dart';
 part 'indented_box.dart';
 part 'post_view.dart';
+part 'share_button.dart';
 
 final commentSorts = [
   CommentSort.confidence,
@@ -105,8 +107,6 @@ class Thread extends StatelessWidget {
         builder: (BuildContext context, ThreadState state) {
           final post = this.post ?? state.post;
           return Scaffold(
-            backgroundColor: Theme.of(context)
-                .scaffoldBackgroundColor, // Ensure the background is opaque
             body: NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                 appBar(context, context.read()),

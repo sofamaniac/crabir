@@ -310,6 +310,12 @@ abstract class AppLocalizations {
   /// **'Share Post'**
   String get sharePost;
 
+  /// No description provided for @shareText.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Text'**
+  String get shareText;
+
   /// No description provided for @themeBackround.
   ///
   /// In en, this message translates to:

@@ -117,6 +117,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sharePost => 'Share Post';
 
   @override
+  String get shareText => 'Share Text';
+
+  @override
   String get themeBackround => 'Background';
 
   @override
