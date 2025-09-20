@@ -19,7 +19,7 @@ import 'package:crabir/stream/things_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class FeedViewBodyNew extends StatefulWidget {
+class CommonFeedView extends StatefulWidget {
   final reddit_stream.Streamable Function(FeedSort) newStream;
   final Widget Function(FeedSort) title;
   final Subreddit? subredditAbout;
@@ -27,7 +27,7 @@ class FeedViewBodyNew extends StatefulWidget {
   final void Function(FeedSort) onSortChanged;
   final Widget? endDrawer;
 
-  const FeedViewBodyNew({
+  const CommonFeedView({
     super.key,
     required this.newStream,
     required this.title,
@@ -38,10 +38,10 @@ class FeedViewBodyNew extends StatefulWidget {
   });
 
   @override
-  State<FeedViewBodyNew> createState() => _FeedViewBodyNewState();
+  State<CommonFeedView> createState() => _CommonFeedViewState();
 }
 
-class _FeedViewBodyNewState extends State<FeedViewBodyNew>
+class _CommonFeedViewState extends State<CommonFeedView>
     with AutomaticKeepAliveClientMixin {
   FeedSort? sort;
 
