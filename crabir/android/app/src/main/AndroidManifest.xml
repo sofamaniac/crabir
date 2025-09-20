@@ -30,9 +30,9 @@
               <action android:name="android.intent.action.VIEW"/>
               <category android:name="android.intent.category.DEFAULT"/>
               <category android:name="android.intent.category.BROWSABLE"/>
-              <data android:scheme="https" android:host="reddit.com" />
-              <data android:scheme="https" android:host="www.reddit.com" />
-              <data android:scheme="https" android:host="redd.it" />
+              <data android:scheme="https" android:host="reddit.com" android:pathPrefix="/r/" />
+              <data android:scheme="https" android:host="www.reddit.com" android:pathPrefix="/r/" />
+              <data android:scheme="https" android:host="redd.it" android:pathPrefix="/r/" />
             </intent-filter>
 
         </activity>

@@ -75,7 +75,14 @@ void _handleRedditLink(StackRouter router, String url) async {
     } else {
       destination = uri;
     }
-    router.pushPath(destination.toString());
+    try {
+      router.pushPath(destination.toString());
+    } catch (_) {
+      Logger("Crabir").warning(
+        "Failed to navigate to $uri, opening in browser",
+      );
+      launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+    }
   } else {
     // Open in external browser
     launchUrl(uri);
@@ -238,6 +245,7 @@ class _MainScreenViewState extends State<MainScreenView>
   }
 
   Widget bottomBar(
+    BuildContext context,
     TabsRouter tabsRouter,
     TabController tabsController,
     CrabirTheme theme,
@@ -267,12 +275,12 @@ class _MainScreenViewState extends State<MainScreenView>
       showSelectedLabels: false,
       type: BottomNavigationBarType.fixed, // so all items show
       onTap: (index) {
-        tabsController.animateTo(index);
+        AutoTabsRouter.of(context).setActiveIndex(index);
+        //tabsController.animateTo(index);
 
-        // optional: reset route stack like you had before
         final rootRoutes = {
-          0: const SubscriptionsTabRoute(),
           1: const SearchSubredditsRoute(),
+          2: const SubscriptionsTabRoute(),
           4: UserRoute(),
         };
         final route = rootRoutes[index];
@@ -337,7 +345,8 @@ class _MainScreenViewState extends State<MainScreenView>
             backgroundColor: theme.background,
             drawer: const AppDrawer(),
             body: child,
-            bottomNavigationBar: bottomBar(tabsRouter, tabController, theme),
+            bottomNavigationBar:
+                bottomBar(context, tabsRouter, tabController, theme),
           ),
         );
       },
