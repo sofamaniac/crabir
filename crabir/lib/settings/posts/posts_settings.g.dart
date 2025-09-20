@@ -7,11 +7,16 @@ part of 'posts_settings.dart';
 // **************************************************************************
 
 RememberedSort _$RememberedSortFromJson(Map<String, dynamic> json) =>
-    RememberedSort();
+    RememberedSort(
+      data: (json['data'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(k, FeedSort.fromJson(e as Map<String, dynamic>)),
+          ) ??
+          const {},
+    );
 
 Map<String, dynamic> _$RememberedSortToJson(RememberedSort instance) =>
     <String, dynamic>{
-      '_data': instance._data,
+      'data': instance.data,
     };
 
 _PostsSettings _$PostsSettingsFromJson(Map<String, dynamic> json) =>

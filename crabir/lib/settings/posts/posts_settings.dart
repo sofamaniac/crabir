@@ -126,46 +126,44 @@ abstract class PostsSettings with _$PostsSettings {
 
 @JsonSerializable()
 class RememberedSort {
-  @JsonKey(includeFromJson: true, includeToJson: true)
-  final Map<String, FeedSort> _data;
-  const RememberedSort({Map<String, FeedSort> initial = const {}})
-      : _data = initial;
+  final Map<String, FeedSort> data;
+  const RememberedSort({this.data = const {}});
 
   factory RememberedSort.fromJson(Map<String, dynamic> json) =>
       _$RememberedSortFromJson(json);
 
+  Map<String, dynamic> toJson() => _$RememberedSortToJson(this);
+
   RememberedSort addFeed(Feed feed, FeedSort sort) {
-    Map<String, FeedSort> newData = Map.from(_data);
+    Map<String, FeedSort> newData = Map.from(data);
     newData[_feedToString(feed)] = sort;
-    return RememberedSort(initial: newData);
+    return RememberedSort(data: newData);
   }
 
   RememberedSort addMulti(Multi multi, FeedSort sort) {
-    Map<String, FeedSort> newData = Map.from(_data);
+    Map<String, FeedSort> newData = Map.from(data);
     newData[_multiToString(multi)] = sort;
-    return RememberedSort(initial: newData);
+    return RememberedSort(data: newData);
   }
 
   RememberedSort removeSort(String feed) {
-    Map<String, FeedSort> newData = Map.from(_data);
+    Map<String, FeedSort> newData = Map.from(data);
     newData.remove(feed);
-    return RememberedSort(initial: newData);
+    return RememberedSort(data: newData);
   }
 
   FeedSort? containsFeed(Feed feed) {
-    return _data[_feedToString(feed)];
+    return data[_feedToString(feed)];
   }
 
   FeedSort? containsMulti(Multi multi) {
-    return _data[_multiToString(multi)];
+    return data[_multiToString(multi)];
   }
 
   Iterable<(String, FeedSort)> inOrder() {
-    final keys = _data.keys.sorted();
-    return keys.map((k) => (k, _data[k]!));
+    final keys = data.keys.sorted();
+    return keys.map((k) => (k, data[k]!));
   }
-
-  Map<String, dynamic> toJson() => _$RememberedSortToJson(this);
 
   String _feedToString(Feed feed) {
     return switch (feed) {
