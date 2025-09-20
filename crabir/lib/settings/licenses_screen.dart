@@ -13,6 +13,8 @@ class RustLicense {
   final String? version;
   final String? license;
   final String? repository;
+  @JsonKey(name: "license_files")
+  final List<String> licenseFiles;
   final String? authors;
 
   RustLicense({
@@ -21,6 +23,7 @@ class RustLicense {
     required this.license,
     required this.repository,
     required this.authors,
+    required this.licenseFiles,
   });
 
   factory RustLicense.fromJson(Map<String, dynamic> json) =>
@@ -38,11 +41,22 @@ Future<void> registerRustLicenses() async {
 
   for (final license in licenses) {
     // Register with Flutter's LicenseRegistry
-    LicenseRegistry.addLicense(() async* {
-      yield LicenseEntryWithLineBreaks(
-        [license.package], // package names
-        '${license.package} ${license.version} by ${license.authors}\n\nLicense: ${license.license}',
-      );
-    });
+    for (final file in license.licenseFiles) {
+      final content = await rootBundle.loadString(file);
+      LicenseRegistry.addLicense(() async* {
+        yield LicenseEntryWithLineBreaks(
+          [license.package], // package names
+          content,
+        );
+      });
+    }
+    if (license.licenseFiles.isEmpty) {
+      LicenseRegistry.addLicense(() async* {
+        yield LicenseEntryWithLineBreaks(
+          [license.package], // package names
+          "${license.package} version ${license.version}\nLicense: ${license.license}",
+        );
+      });
+    }
   }
 }

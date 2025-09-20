@@ -12,4 +12,7 @@ RustLicense _$RustLicenseFromJson(Map<String, dynamic> json) => RustLicense(
       license: json['license'] as String?,
       repository: json['repository'] as String?,
       authors: json['authors'] as String?,
+      licenseFiles: (json['license_files'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
     );
