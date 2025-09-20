@@ -8,6 +8,7 @@ import 'package:crabir/accounts/widgets/account_selector.dart';
 import 'package:crabir/drawer/drawer.dart';
 import 'package:crabir/network_status.dart';
 import 'package:crabir/routes/routes.dart';
+import 'package:crabir/settings/licenses_screen.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
@@ -27,6 +28,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 Future<void> main() async {
   await RustLib.init();
+
   Logger.root.level = Level.ALL; // defaults to Level.INFO
   Logger.root.onRecord.listen((record) {
     debugPrint('${record.level.name}: ${record.time}: ${record.message}');
@@ -41,6 +43,9 @@ Future<void> main() async {
             (await getApplicationDocumentsDirectory()).path,
           ),
   );
+
+  // Add licenses rust libraries to list
+  await registerRustLicenses();
 
   // Initializing `NetworkStatus`
   await NetworkStatus.init();
