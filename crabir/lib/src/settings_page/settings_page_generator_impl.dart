@@ -15,13 +15,16 @@ class CubitGenerator {
     buffer.write('''
 // HydratedCubit for ${classElement.name}
 class $cubitName extends HydratedCubit<${classElement.name}> {
+  final Logger log = Logger("$cubitName");
   $cubitName() : super(${classElement.name}());
 
   @override
   ${classElement.name}? fromJson(Map<String, dynamic> json) {
     try {
+      log.info("Successfully restored $cubitName");
       return ${classElement.name}.fromJson(json);
-    } catch (_) {
+    } catch (err) {
+      log.severe("Failed to resotre $cubitName: \$err");
       return ${classElement.name}();
     }
   }

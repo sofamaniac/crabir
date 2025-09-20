@@ -10,7 +10,9 @@ RememberedSort _$RememberedSortFromJson(Map<String, dynamic> json) =>
     RememberedSort();
 
 Map<String, dynamic> _$RememberedSortToJson(RememberedSort instance) =>
-    <String, dynamic>{};
+    <String, dynamic>{
+      '_data': instance._data,
+    };
 
 _PostsSettings _$PostsSettingsFromJson(Map<String, dynamic> json) =>
     _PostsSettings(

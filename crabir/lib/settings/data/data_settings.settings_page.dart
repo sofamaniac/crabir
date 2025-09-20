@@ -10,13 +10,16 @@ part of "data_settings.dart";
 
 // HydratedCubit for DataSettings
 class DataSettingsCubit extends HydratedCubit<DataSettings> {
+  final Logger log = Logger("DataSettingsCubit");
   DataSettingsCubit() : super(DataSettings());
 
   @override
   DataSettings? fromJson(Map<String, dynamic> json) {
     try {
+      log.info("Successfully restored DataSettingsCubit");
       return DataSettings.fromJson(json);
-    } catch (_) {
+    } catch (err) {
+      log.severe("Failed to resotre DataSettingsCubit: $err");
       return DataSettings();
     }
   }

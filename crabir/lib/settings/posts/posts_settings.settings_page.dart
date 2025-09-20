@@ -10,13 +10,16 @@ part of "posts_settings.dart";
 
 // HydratedCubit for PostsSettings
 class PostsSettingsCubit extends HydratedCubit<PostsSettings> {
+  final Logger log = Logger("PostsSettingsCubit");
   PostsSettingsCubit() : super(PostsSettings());
 
   @override
   PostsSettings? fromJson(Map<String, dynamic> json) {
     try {
+      log.info("Successfully restored PostsSettingsCubit");
       return PostsSettings.fromJson(json);
-    } catch (_) {
+    } catch (err) {
+      log.severe("Failed to resotre PostsSettingsCubit: $err");
       return PostsSettings();
     }
   }

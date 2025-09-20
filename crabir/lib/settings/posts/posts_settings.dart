@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:logging/logging.dart';
 
 part 'posts_settings.freezed.dart';
 part 'posts_settings.g.dart';
@@ -125,6 +126,7 @@ abstract class PostsSettings with _$PostsSettings {
 
 @JsonSerializable()
 class RememberedSort {
+  @JsonKey(includeFromJson: true, includeToJson: true)
   final Map<String, FeedSort> _data;
   const RememberedSort({Map<String, FeedSort> initial = const {}})
       : _data = initial;

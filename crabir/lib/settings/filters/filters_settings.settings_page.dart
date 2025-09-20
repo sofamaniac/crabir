@@ -10,13 +10,16 @@ part of "filters_settings.dart";
 
 // HydratedCubit for FiltersSettings
 class FiltersSettingsCubit extends HydratedCubit<FiltersSettings> {
+  final Logger log = Logger("FiltersSettingsCubit");
   FiltersSettingsCubit() : super(FiltersSettings());
 
   @override
   FiltersSettings? fromJson(Map<String, dynamic> json) {
     try {
+      log.info("Successfully restored FiltersSettingsCubit");
       return FiltersSettings.fromJson(json);
-    } catch (_) {
+    } catch (err) {
+      log.severe("Failed to resotre FiltersSettingsCubit: $err");
       return FiltersSettings();
     }
   }

@@ -10,13 +10,16 @@ part of "comments_settings.dart";
 
 // HydratedCubit for CommentsSettings
 class CommentsSettingsCubit extends HydratedCubit<CommentsSettings> {
+  final Logger log = Logger("CommentsSettingsCubit");
   CommentsSettingsCubit() : super(CommentsSettings());
 
   @override
   CommentsSettings? fromJson(Map<String, dynamic> json) {
     try {
+      log.info("Successfully restored CommentsSettingsCubit");
       return CommentsSettings.fromJson(json);
-    } catch (_) {
+    } catch (err) {
+      log.severe("Failed to resotre CommentsSettingsCubit: $err");
       return CommentsSettings();
     }
   }
