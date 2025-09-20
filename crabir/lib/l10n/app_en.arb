@@ -196,6 +196,7 @@
   "posts_defaultSort": "Default sort",
   "posts_rememberSortByCommunity": "Remember by Community",
   "posts_rememberSortByCommunityDescription": "Each community will remember the last sort you selected.",
+  "posts_rememberedSorts": "Manage Sorts",
 
   "posts_showAwards": "Show awards",
   "posts_clickableAwards": "Clickable awards",

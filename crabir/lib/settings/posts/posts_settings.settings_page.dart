@@ -32,6 +32,9 @@ class PostsSettingsCubit extends HydratedCubit<PostsSettings> {
   void updateRememberSortByCommunity(bool value) =>
       emit(state.copyWith(rememberSortByCommunity: value));
 
+  void updateRememberedSorts(RememberedSort value) =>
+      emit(state.copyWith(rememberedSorts: value));
+
   void updateShowAwards(bool value) => emit(state.copyWith(showAwards: value));
 
   void updateClickableAwards(bool value) =>
@@ -108,6 +111,13 @@ class PostsSettingsView extends StatelessWidget {
           onChanged: (val) => context
               .read<PostsSettingsCubit>()
               .updateRememberSortByCommunity(val!),
+        ),
+        ManageSortButton(
+          title: Text(locales.posts_rememberedSorts),
+          subtitle: null,
+          value: settings.rememberedSorts,
+          onChanged: (val) =>
+              context.read<PostsSettingsCubit>().updateRememberedSorts(val),
         ),
         Divider(),
         Text("Awards"),

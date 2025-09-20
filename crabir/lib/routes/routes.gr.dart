@@ -374,12 +374,28 @@ class MainScreenRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ManageSortView]
+class ManageSortRoute extends PageRouteInfo<void> {
+  const ManageSortRoute({List<PageRouteInfo>? children})
+      : super(ManageSortRoute.name, initialChildren: children);
+
+  static const String name = 'ManageSortRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ManageSortView();
+    },
+  );
+}
+
+/// generated route for
 /// [MultiView]
 class MultiRoute extends PageRouteInfo<MultiRouteArgs> {
   MultiRoute({
     Key? key,
     required Multi multi,
-    required FeedSort initialSort,
+    FeedSort? initialSort,
     List<PageRouteInfo>? children,
   }) : super(
           MultiRoute.name,
@@ -404,17 +420,13 @@ class MultiRoute extends PageRouteInfo<MultiRouteArgs> {
 }
 
 class MultiRouteArgs {
-  const MultiRouteArgs({
-    this.key,
-    required this.multi,
-    required this.initialSort,
-  });
+  const MultiRouteArgs({this.key, required this.multi, this.initialSort});
 
   final Key? key;
 
   final Multi multi;
 
-  final FeedSort initialSort;
+  final FeedSort? initialSort;
 
   @override
   String toString() {

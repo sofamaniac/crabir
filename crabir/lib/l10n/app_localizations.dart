@@ -652,6 +652,12 @@ abstract class AppLocalizations {
   /// **'Each community will remember the last sort you selected.'**
   String get posts_rememberSortByCommunityDescription;
 
+  /// No description provided for @posts_rememberedSorts.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Sorts'**
+  String get posts_rememberedSorts;
+
   /// No description provided for @posts_showAwards.
   ///
   /// In en, this message translates to:

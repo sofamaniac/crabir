@@ -56,7 +56,6 @@ class MultiRedditTile extends StatelessWidget {
       onTap: () {
         final destination = MultiRoute(
           multi: multi,
-          initialSort: FeedSort.best(),
         );
         if (closeDrawer) {
           Navigator.pop(context);

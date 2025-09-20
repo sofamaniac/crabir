@@ -1,22 +1,93 @@
-import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
+import 'package:crabir/l10n/app_localizations.dart';
+import 'package:crabir/routes/routes.dart';
 import 'package:crabir/sort.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/settings_page/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:crabir/l10n/app_localizations.dart';
 
 part 'posts_settings.freezed.dart';
-part 'posts_settings.settings_page.dart';
 part 'posts_settings.g.dart';
+part 'posts_settings.settings_page.dart';
+
+final _multiPrefix = "_MULTI_";
+
+class ManageSortButton extends StatelessWidget {
+  final Widget title;
+  final Widget? subtitle;
+  final void Function(RememberedSort) onChanged;
+  final RememberedSort value;
+  const ManageSortButton({
+    super.key,
+    required this.title,
+    this.subtitle,
+    required this.onChanged,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text("Manage Sorts"),
+      onTap: () => context.router.navigate(ManageSortRoute()),
+    );
+  }
+}
+
+@RoutePage()
+class ManageSortView extends StatelessWidget {
+  const ManageSortView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final settings = context.watch<PostsSettingsCubit>();
+    final data = settings.state.rememberedSorts;
+    final feeds = data.inOrder().toList();
+    final locales = AppLocalizations.of(context);
+    return Scaffold(
+      body: ListView.builder(
+        itemCount: feeds.length,
+        itemBuilder: (context, index) {
+          final (feed, sort) = feeds[index];
+          final Widget title = switch (feed) {
+            "_HOME" => Text(locales.feedHome),
+            "_ALL" => Text(locales.feedAll),
+            "_POPULAR" => Text(locales.feedPopular),
+            _ when feed.startsWith(_multiPrefix) => RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(text: feed.substring(_multiPrefix.length)),
+                    TextSpan(text: "feed")
+                  ],
+                ),
+              ),
+            _ => Text(feed),
+          };
+          return ListTile(
+            title: title,
+            subtitle: Text(sort.labelWithTimeframe(context)),
+            trailing: IconButton(
+              onPressed: () {
+                settings.updateRememberedSorts(data.removeSort(feed));
+              },
+              icon: Icon(Icons.remove),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
 
 @freezed
 @SettingsPage(prefix: "posts_", useFieldName: true)
 abstract class PostsSettings with _$PostsSettings {
-  PostsSettings._();
   factory PostsSettings({
     @Setting(widget: _SortSelection)
     @Default(FeedSort.best())
@@ -25,7 +96,9 @@ abstract class PostsSettings with _$PostsSettings {
     @Default(FeedSort.hot())
     FeedSort defaultSort,
     @Setting(hasDescription: true) @Default(true) bool rememberSortByCommunity,
-    // TODO: manage saved sort
+    @Setting(widget: ManageSortButton)
+    @Default(RememberedSort())
+    RememberedSort rememberedSorts,
     @Category(name: "Awards") @Setting() @Default(true) bool showAwards,
     @Setting() @Default(true) bool clickableAwards,
     @Category(name: "Flairs") @Setting() @Default(true) bool showPostFlair,
@@ -47,6 +120,63 @@ abstract class PostsSettings with _$PostsSettings {
   }) = _PostsSettings;
   factory PostsSettings.fromJson(Map<String, dynamic> json) =>
       _$PostsSettingsFromJson(json);
+  PostsSettings._();
+}
+
+@JsonSerializable()
+class RememberedSort {
+  final Map<String, FeedSort> _data;
+  const RememberedSort({Map<String, FeedSort> initial = const {}})
+      : _data = initial;
+
+  factory RememberedSort.fromJson(Map<String, dynamic> json) =>
+      _$RememberedSortFromJson(json);
+
+  RememberedSort addFeed(Feed feed, FeedSort sort) {
+    Map<String, FeedSort> newData = Map.from(_data);
+    newData[_feedToString(feed)] = sort;
+    return RememberedSort(initial: newData);
+  }
+
+  RememberedSort addMulti(Multi multi, FeedSort sort) {
+    Map<String, FeedSort> newData = Map.from(_data);
+    newData[_multiToString(multi)] = sort;
+    return RememberedSort(initial: newData);
+  }
+
+  RememberedSort removeSort(String feed) {
+    Map<String, FeedSort> newData = Map.from(_data);
+    newData.remove(feed);
+    return RememberedSort(initial: newData);
+  }
+
+  FeedSort? containsFeed(Feed feed) {
+    return _data[_feedToString(feed)];
+  }
+
+  FeedSort? containsMulti(Multi multi) {
+    return _data[_multiToString(multi)];
+  }
+
+  Iterable<(String, FeedSort)> inOrder() {
+    final keys = _data.keys.sorted();
+    return keys.map((k) => (k, _data[k]!));
+  }
+
+  Map<String, dynamic> toJson() => _$RememberedSortToJson(this);
+
+  String _feedToString(Feed feed) {
+    return switch (feed) {
+      Feed_Home() => "_HOME",
+      Feed_All() => "_ALL",
+      Feed_Popular() => "_POPULAR",
+      Feed_Subreddit(field0: final subreddit) => subreddit,
+    };
+  }
+
+  String _multiToString(Multi multi) {
+    return "$_multiPrefix${multi.displayName}";
+  }
 }
 
 class _SortSelection extends StatelessWidget {
@@ -61,6 +191,27 @@ class _SortSelection extends StatelessWidget {
     required this.title,
     this.subtitle,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: title,
+      subtitle: Text(value.label(context)),
+      onTap: () async {
+        final sort = await _showFeedSortDialog(context);
+        if (sort != null) {
+          onChanged(sort);
+        }
+      },
+    );
+  }
+
+  Widget _buildOption(BuildContext context, FeedSort sort) {
+    return ListTile(
+      title: Text(sort.label(context)),
+      onTap: () => Navigator.of(context).pop(sort),
+    );
+  }
 
   Future<FeedSort?> _showFeedSortDialog(BuildContext context) async {
     return showDialog<FeedSort>(
@@ -113,27 +264,6 @@ class _SortSelection extends StatelessWidget {
             ),
           ),
         );
-      },
-    );
-  }
-
-  Widget _buildOption(BuildContext context, FeedSort sort) {
-    return ListTile(
-      title: Text(sort.label(context)),
-      onTap: () => Navigator.of(context).pop(sort),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: title,
-      subtitle: Text(value.label(context)),
-      onTap: () async {
-        final sort = await _showFeedSortDialog(context);
-        if (sort != null) {
-          onChanged(sort);
-        }
       },
     );
   }

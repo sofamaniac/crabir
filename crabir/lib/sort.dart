@@ -55,6 +55,27 @@ extension FeedSortLabel on FeedSort {
     };
   }
 
+  String labelWithTimeframe(BuildContext context) {
+    final sort = label(context);
+    final timeframe = _getTimeframe();
+    if (timeframe != null) {
+      final time = timeframe.label(context);
+      return "$sort · $time";
+    } else {
+      return sort;
+    }
+  }
+
+  Timeframe? _getTimeframe() {
+    return switch (this) {
+      FeedSort_Top(field0: final timeframe) ||
+      FeedSort_New(field0: final timeframe) ||
+      FeedSort_Controversial(field0: final timeframe) =>
+        timeframe,
+      _ => null
+    };
+  }
+
   IconData icon() {
     return switch (this) {
       FeedSort_Best() => Icons.rocket,

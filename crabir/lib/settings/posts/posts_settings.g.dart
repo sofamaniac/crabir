@@ -6,6 +6,12 @@ part of 'posts_settings.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+RememberedSort _$RememberedSortFromJson(Map<String, dynamic> json) =>
+    RememberedSort();
+
+Map<String, dynamic> _$RememberedSortToJson(RememberedSort instance) =>
+    <String, dynamic>{};
+
 _PostsSettings _$PostsSettingsFromJson(Map<String, dynamic> json) =>
     _PostsSettings(
       defaultHomeSort: json['defaultHomeSort'] == null
@@ -15,6 +21,10 @@ _PostsSettings _$PostsSettingsFromJson(Map<String, dynamic> json) =>
           ? const FeedSort.hot()
           : FeedSort.fromJson(json['defaultSort'] as Map<String, dynamic>),
       rememberSortByCommunity: json['rememberSortByCommunity'] as bool? ?? true,
+      rememberedSorts: json['rememberedSorts'] == null
+          ? const RememberedSort()
+          : RememberedSort.fromJson(
+              json['rememberedSorts'] as Map<String, dynamic>),
       showAwards: json['showAwards'] as bool? ?? true,
       clickableAwards: json['clickableAwards'] as bool? ?? true,
       showPostFlair: json['showPostFlair'] as bool? ?? true,
@@ -37,6 +47,7 @@ Map<String, dynamic> _$PostsSettingsToJson(_PostsSettings instance) =>
       'defaultHomeSort': instance.defaultHomeSort,
       'defaultSort': instance.defaultSort,
       'rememberSortByCommunity': instance.rememberSortByCommunity,
+      'rememberedSorts': instance.rememberedSorts,
       'showAwards': instance.showAwards,
       'clickableAwards': instance.clickableAwards,
       'showPostFlair': instance.showPostFlair,

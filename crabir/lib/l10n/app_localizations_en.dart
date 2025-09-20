@@ -355,6 +355,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Each community will remember the last sort you selected.';
 
   @override
+  String get posts_rememberedSorts => 'Manage Sorts';
+
+  @override
   String get posts_showAwards => 'Show awards';
 
   @override

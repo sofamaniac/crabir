@@ -85,6 +85,7 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: CrabirThemeEditorPage.page),
         AutoRoute(page: CommentsSettingsRoute.page),
         AutoRoute(page: PostsSettingsRoute.page),
+        AutoRoute(page: ManageSortRoute.page),
         AutoRoute(page: DataSettingsRoute.page),
         AutoRoute(page: FiltersSettingsRoute.page),
       ];
