@@ -310,14 +310,20 @@ class _MainScreenViewState extends State<MainScreenView>
 
     // Change system navigation bar background color.
     if (Platform.isAndroid) {
+      final brightness = switch (context.read<ThemeBloc>().state.mode) {
+        ThemeMode.dark => Brightness.dark,
+        ThemeMode.light => Brightness.light,
+        ThemeMode.system => MediaQuery.of(context).platformBrightness,
+      };
       SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(
           systemNavigationBarColor: theme.toolBarBackground,
-          systemNavigationBarIconBrightness: switch (
-              context.read<ThemeBloc>().state.mode) {
-            ThemeMode.dark => Brightness.dark,
-            ThemeMode.light => Brightness.light,
-            ThemeMode.system => MediaQuery.of(context).platformBrightness,
+          systemNavigationBarIconBrightness: brightness,
+          statusBarColor: theme.toolBarBackground,
+          statusBarBrightness: brightness,
+          statusBarIconBrightness: switch (brightness) {
+            Brightness.light => Brightness.dark,
+            Brightness.dark => Brightness.light,
           },
         ),
       );
@@ -347,12 +353,14 @@ class _MainScreenViewState extends State<MainScreenView>
               tabsRouter.setActiveIndex(0);
             }
           },
-          child: Scaffold(
-            backgroundColor: theme.background,
-            drawer: const AppDrawer(),
-            body: child,
-            bottomNavigationBar:
-                bottomBar(context, tabsRouter, tabController, theme),
+          child: SafeArea(
+            child: Scaffold(
+              backgroundColor: theme.background,
+              drawer: const AppDrawer(),
+              body: child,
+              bottomNavigationBar:
+                  bottomBar(context, tabsRouter, tabController, theme),
+            ),
           ),
         );
       },
