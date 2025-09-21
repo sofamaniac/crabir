@@ -10,6 +10,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/user/model.dart';
 import 'package:crabir/stream/things_view.dart';
 import 'package:crabir/thread/widgets/comment.dart';
+import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
@@ -89,15 +90,14 @@ class _UserViewState extends State<_UserView> {
               }).toList(),
               builder: (context, child, tabController) {
                 return SafeArea(
-                  child: NestedScrollView(
+                  child: ExtendedNestedScrollView(
+                    onlyOneScrollInBody: true,
                     floatHeaderSlivers: true,
-                    headerSliverBuilder:
-                        (BuildContext context, bool innerBoxIsScrolled) {
-                      // These are the slivers that show up in the "outer" scroll view.
+                    headerSliverBuilder: (
+                      BuildContext context,
+                      bool innerBoxIsScrolled,
+                    ) {
                       return <Widget>[
-                        // FIXME: All the tabs share the same scrollcontroller therefore scrolling one scrolls the others
-                        // the NestedScrollView page of the docs offers a solution
-                        // but it does not work.
                         SliverAppBar.large(
                           flexibleSpace: FlexibleSpaceBar(
                             background: Column(
@@ -136,11 +136,7 @@ class _UserViewState extends State<_UserView> {
                         ),
                       ];
                     },
-                    body: Builder(
-                      builder: (context) {
-                        return child;
-                      },
-                    ),
+                    body: child,
                   ),
                 );
               },

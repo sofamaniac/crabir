@@ -12,15 +12,18 @@ class ThingsScaffold extends StatefulWidget {
   final Widget Function(BuildContext, Post)? postView;
 
   final Widget? subredditInfo;
+  final String? name;
 
   /// Function to use do build a `Comment` view.
   final Widget Function(BuildContext, Comment)? commentView;
+
   const ThingsScaffold({
     super.key,
     this.postView,
     this.commentView,
     required this.stream,
     this.subredditInfo,
+    this.name,
   });
 
   final reddit_stream.Streamable stream;
@@ -47,9 +50,9 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
   @override
   Widget build(BuildContext context) {
     final itemCount = items.length;
-    final totalSliverItems = itemCount + 1; // double count for separators
+    final totalSliverItems = itemCount + 1;
     return CustomScrollView(
-      key: PageStorageKey(widget.stream),
+      key: widget.key,
       slivers: [
         // Optional subreddit info at the top
         if (widget.subredditInfo != null)

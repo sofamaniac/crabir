@@ -101,12 +101,16 @@ final currentUserRoute = AutoRoute(
       .toList(),
 );
 
-Widget _scaffold(reddit_stream.Streamable stream) {
+Widget _scaffold(
+  BuildContext context,
+  reddit_stream.Streamable stream,
+  String key,
+) {
   return ThingsScaffold(
-    stream: stream,
-    postView: _postView,
-    commentView: _commentView,
-  );
+      stream: stream,
+      postView: _postView,
+      commentView: _commentView,
+      key: PageStorageKey(key));
 }
 
 Widget _postView(BuildContext context, Post post) {
@@ -140,7 +144,9 @@ class UserOverviewView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _scaffold(
+      context,
       RedditAPI.client().userOverview(username: username, sort: sort),
+      "userOverview",
     );
   }
 }
@@ -177,7 +183,9 @@ class UserPostsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _scaffold(
+      context,
       RedditAPI.client().userSubmitted(username: username, sort: sort),
+      "userPosts",
     );
   }
 }
@@ -195,7 +203,9 @@ class UserCommentsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _scaffold(
+      context,
       RedditAPI.client().userComments(username: username, sort: sort),
+      "userComments",
     );
   }
 }
@@ -211,7 +221,9 @@ class UserSavedView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _scaffold(
+      context,
       RedditAPI.client().userSaved(username: username),
+      "userSaved",
     );
   }
 }
@@ -227,7 +239,9 @@ class UserUpvotedView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _scaffold(
+      context,
       RedditAPI.client().userUpvoted(username: username),
+      "userUps",
     );
   }
 }
@@ -243,7 +257,9 @@ class UserDownvotedView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _scaffold(
+      context,
       RedditAPI.client().userDownvoted(username: username),
+      "userDowns",
     );
   }
 }
@@ -261,7 +277,9 @@ class UserHiddenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _scaffold(
+      context,
       RedditAPI.client().userHidden(username: username),
+      "userHidden",
     );
   }
 }
