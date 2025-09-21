@@ -11,35 +11,36 @@ LICENSES_DIR := $(FLUTTER_APP_DIR)/assets/rust-licenses
 STAMP_FILE := $(LICENSES_DIR)/.stamp
 LOCKFILE := Cargo.lock
 
-# Default target
 .PHONY: all
 all: build
 
-# Generate license text files + enrich JSON
+.PHONY: licenses
 licenses: $(LOCKFILE)
-	mkdir -p $(LICENSES_DIR)
-	pushd $(RUST_CRATE_DIR)
-	cargo license --json --output ../$(LICENSES_JSON)
-	cargo licenses collect --path ../$(LICENSES_DIR)
-	popd
 	pushd $(LICENSES_PACKER_DIR)
 	cargo run
 	popd
 
-# Combined target to generate all license assets
-.PHONY: licenses
-
-# Flutter Rust Bridge codegen
 .PHONY: frb
-frb:
+frb: $(RUST_CRATE_DIR)
 	pushd $(FLUTTER_APP_DIR)
 	flutter_rust_bridge_codegen generate
 	popd
 
-# Flutter build (ensures licenses and FRB are up to date)
+.PHONY: dart_build
+dart_build:
+	pushd $(FLUTTER_APP_DIR)
+	dart run build_runner build -d
+	popd
+
 .PHONY: build
-build: licenses frb
+build: licenses frb dart_build
 	pushd $(FLUTTER_APP_DIR)
 	flutter build apk --dart-define-from-file $(ENV_FILE)
+	popd
+
+.PHONY: run
+run: frb dart_build
+	pushd $(FLUTTER_APP_DIR)
+	flutter run --dart-define-from-file $(ENV_FILE)
 	popd
 
