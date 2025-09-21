@@ -60,11 +60,6 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
 
   Future<void> _save(Save event, Emitter<PostSearchState> emit) async {
     try {
-      await _streamable?.save(
-        name: event.name,
-        save: event.save,
-        client: RedditAPI.client(),
-      );
       await _filter(emit);
     } catch (_) {
       emit(state.copyWith(status: StreamStatus.failure));
@@ -73,11 +68,6 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
 
   Future<void> _vote(Vote vote, Emitter<PostSearchState> emit) async {
     try {
-      await _streamable?.vote(
-        name: vote.name,
-        direction: vote.direction,
-        client: RedditAPI.client(),
-      );
       await _filter(emit);
     } catch (_) {
       emit(state.copyWith(status: StreamStatus.failure));

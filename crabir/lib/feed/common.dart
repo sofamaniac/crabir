@@ -8,7 +8,6 @@ import 'package:crabir/post/post.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
-import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart'
@@ -167,23 +166,13 @@ class _CommonFeedViewState extends State<CommonFeedView>
                 headerSliverBuilder: (context, __) => [
                   _appBar(), // your SliverAppBar
                 ],
-                body: RefreshIndicator(
-                  onRefresh: () async {
-                    await _stream.refresh();
-                    setState(() {
-                      _forceRebuild += 1;
-                    });
-                  },
-                  child: Scrollbar(
-                    child: ThingsScaffold(
-                      key: ValueKey(_forceRebuild),
-                      stream: _stream,
-                      postView: postView,
-                      subredditInfo: widget.subredditAbout != null
-                          ? SubredditInfoView(infos: widget.subredditAbout!)
-                          : null,
-                    ),
-                  ),
+                body: ThingsScaffold(
+                  key: ValueKey(_forceRebuild),
+                  stream: _stream,
+                  postView: postView,
+                  subredditInfo: widget.subredditAbout != null
+                      ? SubredditInfoView(infos: widget.subredditAbout!)
+                      : null,
                 ),
               ),
 
@@ -209,20 +198,6 @@ class _CommonFeedViewState extends State<CommonFeedView>
     return RedditPostCard(
       maxLines: 5,
       post: post,
-      onLikeCallback: (direction) async {
-        await _stream.vote(
-          name: post.name,
-          direction: direction,
-          client: RedditAPI.client(),
-        );
-      },
-      onSaveCallback: (save) async {
-        await _stream.save(
-          name: post.name,
-          save: save,
-          client: RedditAPI.client(),
-        );
-      },
       onTap: () => context.router.navigate(
         ThreadRoute(
           post: post,

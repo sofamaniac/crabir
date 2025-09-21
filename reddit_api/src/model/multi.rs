@@ -89,7 +89,7 @@ impl MultiStream {
 }
 
 impl IntoStreamPrivate for MultiStream {
-    type Output = Thing;
+    type Output = Vec<Thing>;
 
     fn to_stream(&self) -> futures::stream::BoxStream<'static, Result<Self::Output>> {
         self.client

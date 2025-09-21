@@ -91,7 +91,7 @@ impl FeedStream {
 }
 
 impl IntoStreamPrivate for FeedStream {
-    type Output = Thing;
+    type Output = Vec<Thing>;
 
     fn to_stream(&self) -> futures::stream::BoxStream<'static, Result<Self::Output>> {
         let query_parameters = vec![("sr_detail".to_owned(), "true".to_owned())];

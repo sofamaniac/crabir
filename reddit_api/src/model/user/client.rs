@@ -18,7 +18,7 @@ impl Client {
         self,
         endpoint: String,
         pager: Option<Pager>,
-    ) -> impl Stream<Item = Result<Thing>> {
+    ) -> impl Stream<Item = Result<Vec<Thing>>> {
         let url = self
             .base_url()
             .join(&endpoint)
@@ -30,7 +30,7 @@ impl Client {
         endpoint: String,
         sort: UserStreamSort,
         pager: Option<Pager>,
-    ) -> impl Stream<Item = Result<Thing>> {
+    ) -> impl Stream<Item = Result<Vec<Thing>>> {
         let mut url = self
             .base_url()
             .join(&endpoint)

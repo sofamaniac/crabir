@@ -26,8 +26,8 @@ impl UserStream {
     }
 }
 impl IntoStreamPrivate for UserStream {
-    type Output = Thing;
-    fn to_stream(&self) -> BoxStream<'static, Result<Thing>> {
+    type Output = Vec<Thing>;
+    fn to_stream(&self) -> BoxStream<'static, Result<Vec<Thing>>> {
         let client = self.client.clone();
         client.user_stream(self.url(), None).boxed()
     }
@@ -69,8 +69,8 @@ impl UserStreamSorted {
     }
 }
 impl IntoStreamPrivate for UserStreamSorted {
-    type Output = Thing;
-    fn to_stream(&self) -> BoxStream<'static, Result<Thing>> {
+    type Output = Vec<Thing>;
+    fn to_stream(&self) -> BoxStream<'static, Result<Vec<Thing>>> {
         let client = self.client.clone();
         client
             .sorted_user_stream(self.url(), self.sort, None)

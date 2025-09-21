@@ -447,7 +447,7 @@ impl Client {
         url: Url,
         pager: Option<Pager>,
         query_params: Q,
-    ) -> impl Stream<Item = Result<Thing>>
+    ) -> impl Stream<Item = Result<Vec<Thing>>>
     where
         Q: Serialize + Clone,
     {
@@ -456,7 +456,6 @@ impl Client {
             pager: Pager,
             query_params: Q,
             seen: HashSet<Fullname>,
-            buffer: Vec<Thing>,
             done: bool,
         }
 
@@ -465,19 +464,13 @@ impl Client {
             pager: pager.unwrap_or_default(),
             query_params,
             seen: HashSet::new(),
-            buffer: Vec::new(),
             done: false,
         };
         stream::unfold(init, move |mut acc| {
             let client = self.clone();
             let query_params = acc.query_params.clone();
             async move {
-                if let Some(thing) = acc.buffer.pop() {
-                    if let Some(name) = thing.name() {
-                        acc.seen.insert(name);
-                    }
-                    Some((Ok(thing), acc))
-                } else if !acc.done {
+                if !acc.done {
                     let url = acc.pager.add_to_url(acc.url.clone());
                     let request = client.get(url.clone());
                     let request = request.query(&query_params);
@@ -490,7 +483,7 @@ impl Client {
                                     acc.pager.after(listing.after.clone());
                                     acc.done = listing.after.is_none()
                                         || listing.after.is_some_and(|after| after.is_empty());
-                                    acc.buffer = listing
+                                    let buffer: Vec<Thing> = listing
                                         .children
                                         .into_iter()
                                         .filter(|thing| {
@@ -499,9 +492,8 @@ impl Client {
                                                 .is_none_or(|name| !acc.seen.contains(&name))
                                         })
                                         .collect();
-                                    acc.buffer.reverse();
 
-                                    acc.buffer.pop().map(|thing| (Ok(thing), acc))
+                                    Some((Ok(buffer), acc))
                                 }
                                 _ => Some((Err(Error::InvalidThing), acc)),
                             },

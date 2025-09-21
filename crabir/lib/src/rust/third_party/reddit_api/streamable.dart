@@ -4,7 +4,6 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
-import 'client.dart';
 import 'model.dart';
 import 'model/comment.dart';
 import 'model/multi.dart';
@@ -15,22 +14,14 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Streamable>>
 abstract class Streamable implements RustOpaqueInterface {
-  List<Thing> getAll();
+  List<List<Thing>> getAll();
 
   int get length;
 
   /// Returns true if there are still elements remaining.
   Future<bool> next();
 
-  Thing? nth({required int n});
+  List<Thing>? nth({required int n});
 
   Future<void> refresh();
-
-  Future<void> save(
-      {required Fullname name, required bool save, required Client client});
-
-  Future<void> vote(
-      {required Fullname name,
-      required VoteDirection direction,
-      required Client client});
 }
