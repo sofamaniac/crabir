@@ -21,9 +21,9 @@ licenses: $(LOCKFILE)
 	popd
 
 .PHONY: frb
-frb: $(RUST_CRATE_DIR)/src
+frb: $(RUST_CRATE_DIR)
 	pushd $(FLUTTER_APP_DIR)
-	flutter_rust_bridge_codegen generate
+	flutter_rust_bridge_codegen generate --no-build-runner
 	popd
 
 .PHONY: dart_build
