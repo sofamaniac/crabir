@@ -306,7 +306,7 @@ class _MainScreenViewState extends State<MainScreenView>
   @override
   Widget build(BuildContext context) {
     final theme = CrabirTheme.of(context);
-    final _ = context.watch<AccountsBloc>().state.account;
+    final account = context.watch<AccountsBloc>().state.account;
 
     // Change system navigation bar background color.
     if (Platform.isAndroid) {
@@ -332,6 +332,7 @@ class _MainScreenViewState extends State<MainScreenView>
     ];
 
     return AutoTabsRouter.tabBar(
+      key: ValueKey(account?.id),
       homeIndex: 0,
       physics: const NeverScrollableScrollPhysics(),
       routes: routes,
