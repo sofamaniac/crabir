@@ -1362,7 +1362,7 @@
   },
   {
     "name": "serde",
-    "version": "1.0.219",
+    "version": "1.0.225",
     "license": "Apache-2.0 OR MIT",
     "repository": "https://github.com/serde-rs/serde",
     "license_files": [
@@ -1371,8 +1371,18 @@
     ]
   },
   {
+    "name": "serde_core",
+    "version": "1.0.225",
+    "license": "Apache-2.0 OR MIT",
+    "repository": "https://github.com/serde-rs/serde",
+    "license_files": [
+      "assets/rust-licenses/serde_core-LICENSE-MIT",
+      "assets/rust-licenses/serde_core-LICENSE-APACHE"
+    ]
+  },
+  {
     "name": "serde_derive",
-    "version": "1.0.219",
+    "version": "1.0.225",
     "license": "Apache-2.0 OR MIT",
     "repository": "https://github.com/serde-rs/serde",
     "license_files": [
@@ -1382,7 +1392,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.140",
+    "version": "1.0.145",
     "license": "Apache-2.0 OR MIT",
     "repository": "https://github.com/serde-rs/json",
     "license_files": [

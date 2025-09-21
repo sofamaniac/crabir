@@ -36,7 +36,6 @@ fn main() {
             let parts: Vec<_> = file_name.split("-LICENSE").collect();
             if parts[0] == dep_name {
                 let path: PathBuf = file.path().iter().skip_while(|s| *s != "assets").collect();
-                println!("{path:?}");
                 files.push(path.to_string_lossy().into_owned());
             }
         }

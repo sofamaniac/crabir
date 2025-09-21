@@ -63,13 +63,6 @@
     popd
   '';
 
-  scripts.build.exec = ''
-    pushd $FLUTTER_DIR
-    flutter_rust_bridge_codegen generate
-    flutter build apk --dart-define-from-file $ENV_FILE
-    popd
-  '';
-
   # https://devenv.sh/git-hooks/
   # git-hooks.hooks.shellcheck.enable = true;
 
