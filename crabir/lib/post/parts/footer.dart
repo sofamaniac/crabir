@@ -45,6 +45,7 @@ class Footer extends StatelessWidget {
         if (settings.showCommentsButton)
           IconButton(
             icon: const Icon(Icons.comment),
+            color: Colors.grey,
             tooltip: 'Comments',
             onPressed: () => navigateToSubscriptionsTab(
               context,
@@ -56,6 +57,7 @@ class Footer extends StatelessWidget {
         if (settings.showOpenInAppButton)
           IconButton(
             icon: const Icon(Icons.exit_to_app),
+            color: Colors.grey,
             tooltip: 'Open in',
             onPressed: () async {
               final url = Uri.parse(

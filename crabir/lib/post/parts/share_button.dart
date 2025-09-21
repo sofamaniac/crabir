@@ -9,6 +9,7 @@ class ShareButton extends StatelessWidget {
     final locales = AppLocalizations.of(context);
     return IconButton(
       icon: const Icon(Icons.share),
+      color: Colors.grey,
       onPressed: () {
         showModalBottomSheet(
           context: context,
