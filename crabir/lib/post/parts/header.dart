@@ -20,20 +20,12 @@ class Header extends StatelessWidget {
   Widget _subreddit(BuildContext context) {
     final theme = CrabirTheme.of(context);
     final settings = context.read<PostsSettingsCubit>().state;
-    final icon = post.subreddit.details?.icon;
     final name = post.subreddit.subreddit;
-    final subreddit = Row(
-      mainAxisSize: MainAxisSize.min,
-      spacing: 8,
-      children: [
-        if (icon != null && showSubredditIcon) SubredditIcon(icon: icon),
-        Text(
-          name,
-          style: _labelStyle(context).copyWith(
-            color: theme.highlight,
-          ),
-        ),
-      ],
+    final subreddit = Text(
+      name,
+      style: _labelStyle(context).copyWith(
+        color: theme.highlight,
+      ),
     );
     if (settings.clickableCommunity) {
       final onTap = onSubredditTap ??
@@ -82,23 +74,39 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SeparatedRow(
-      crossAxisAlignment: WrapCrossAlignment.center,
+    final icon = post.subreddit.details?.icon;
+    final settings = context.watch<PostsSettingsCubit>().state;
+    return Row(
+      spacing: 8,
       children: [
-        _subreddit(context),
-        if (post.isCrosspost)
-          const RotatedBox(
-            quarterTurns: 1,
-            child: Icon(Icons.alt_route, color: Colors.greenAccent),
+        if (icon != null && showSubredditIcon)
+          SubredditIcon(
+            icon: icon,
+            subredditName: post.subreddit.subreddit,
+            clickable: settings.clickableCommunity,
           ),
-        _author(context),
-        Text(post.createdUtc.timeSince(context), style: _labelStyle(context)),
-        if (_showDomain()) ...[
-          Text(
-            post.domain,
-            style: _labelStyle(context),
+        Expanded(
+          child: SeparatedRow(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              _subreddit(context),
+              if (post.isCrosspost)
+                const RotatedBox(
+                  quarterTurns: 1,
+                  child: Icon(Icons.alt_route, color: Colors.greenAccent),
+                ),
+              _author(context),
+              Text(post.createdUtc.timeSince(context),
+                  style: _labelStyle(context)),
+              if (_showDomain()) ...[
+                Text(
+                  post.domain,
+                  style: _labelStyle(context),
+                ),
+              ],
+            ],
           ),
-        ],
+        ),
       ],
     );
   }
