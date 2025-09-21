@@ -57,8 +57,9 @@ class _FullscreenMediaViewState extends State<FullscreenMediaView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
+              // TODO: buttons in fullscreen media view
               VoteButton.like(
-                likes: ValueNotifier(VoteDirection.neutral),
+                likes: VoteDirection.neutral,
                 colorActive: theme.primaryColor,
               ),
               IconButton(

@@ -142,7 +142,7 @@ class _CommentViewState extends State<CommentView>
     final likeColor = Theme.of(context).colorScheme.primary;
     final dislikeColor = Colors.cyanAccent;
     final settings = context.watch<CommentsSettingsCubit>().state;
-    final likes = ValueNotifier(widget.comment.likes.toVoteDirection());
+    final likes = widget.comment.likes.toVoteDirection();
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.max,

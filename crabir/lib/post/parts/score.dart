@@ -83,17 +83,22 @@ class _LikeTextState extends State<LikeText>
           currentSize = baseSize * widget.scaling;
           _scale = widget.scaling;
         });
-
-        // Shrink back after a short delay
-        Future.delayed(const Duration(milliseconds: 100), () {
-          if (mounted) {
-            setState(() {
-              currentSize = baseSize;
-              _scale = 1;
-            });
-          }
+      } else if (likes == false) {
+        setState(() {
+          currentSize = baseSize / widget.scaling;
+          _scale = 1 / widget.scaling;
         });
       }
+
+      // Shrink back after a short delay
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted) {
+          setState(() {
+            currentSize = baseSize;
+            _scale = 1;
+          });
+        }
+      });
     }
   }
 
@@ -110,16 +115,6 @@ class _LikeTextState extends State<LikeText>
       false => -1,
       _ => 0,
     };
-    // return AnimatedDefaultTextStyle(
-    //   duration: const Duration(milliseconds: 200),
-    //   curve: Curves.easeOut,
-    //   style: TextStyle(
-    //     fontSize: currentSize,
-    //     fontWeight: FontWeight.bold,
-    //     color: color,
-    //   ),
-    //   child: Text("${widget.score + scoreOffset}"),
-    // );
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 1.0, end: _scale),
       duration: const Duration(milliseconds: 200),

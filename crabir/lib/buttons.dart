@@ -1,13 +1,14 @@
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:flutter/material.dart';
 
-class VoteButton extends StatelessWidget {
-  final ValueNotifier<VoteDirection> likes;
+class VoteButton extends StatefulWidget {
+  final VoteDirection likes;
   final void Function(VoteDirection)? onChange;
   final VoteDirection action;
   final IconData iconNeutral;
   final IconData iconActive;
   final Color colorActive;
+  final double translation;
   const VoteButton({
     super.key,
     required this.likes,
@@ -16,6 +17,7 @@ class VoteButton extends StatelessWidget {
     required this.iconActive,
     required this.colorActive,
     this.onChange,
+    this.translation = 0,
   });
 
   const VoteButton.like({
@@ -25,6 +27,7 @@ class VoteButton extends StatelessWidget {
     this.onChange,
   })  : iconNeutral = Icons.thumb_up_outlined,
         iconActive = Icons.thumb_up,
+        translation = -5,
         action = VoteDirection.up;
 
   const VoteButton.dislike({
@@ -34,30 +37,65 @@ class VoteButton extends StatelessWidget {
     this.onChange,
   })  : iconNeutral = Icons.thumb_down_outlined,
         iconActive = Icons.thumb_down,
+        translation = 5,
         action = VoteDirection.down;
 
   @override
+  State<VoteButton> createState() => _VoteButtonState();
+}
+
+class _VoteButtonState extends State<VoteButton>
+    with SingleTickerProviderStateMixin {
+  double _currentPosition = 0;
+
+  final int duration = 100;
+  @override
+  void didUpdateWidget(covariant VoteButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final likes = widget.likes;
+    final oldLikes = oldWidget.likes;
+
+    // Trigger animation only when liked changes from false → true
+    if (likes != oldLikes) {
+      if (likes == widget.action) {
+        // Grow temporarily
+        setState(() {
+          _currentPosition = widget.translation;
+        });
+
+        // Shrink back after a short delay
+        Future.delayed(Duration(milliseconds: duration), () {
+          if (mounted) {
+            setState(() {
+              _currentPosition = 0;
+            });
+          }
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: likes,
-      builder: (context, value, child) {
-        final active = value == action;
-        return IconButton(
-          icon: Icon(
-            active ? iconActive : iconNeutral,
-            color: active ? colorActive : Colors.grey,
-          ),
-          onPressed: () {
-            if (active) {
-              onChange?.call(VoteDirection.neutral);
-              likes.value = VoteDirection.neutral;
-            } else {
-              onChange?.call(action);
-              likes.value = action;
-            }
-          },
-        );
-      },
+    final active = widget.likes == widget.action;
+
+    return AnimatedContainer(
+      duration: Duration(milliseconds: duration),
+      curve: Curves.elasticOut,
+      transform: Matrix4.identity()..translate(0.0, _currentPosition),
+      child: IconButton(
+        icon: Icon(
+          active ? widget.iconActive : widget.iconNeutral,
+          color: active ? widget.colorActive : Colors.grey,
+        ),
+        onPressed: () {
+          if (active) {
+            widget.onChange?.call(VoteDirection.neutral);
+          } else {
+            widget.onChange?.call(widget.action);
+          }
+        },
+      ),
     );
   }
 }
@@ -78,6 +116,8 @@ class SaveButton extends StatefulWidget {
 
 class _SaveButtonState extends State<SaveButton> {
   late bool active;
+  double _scale = 1;
+  static const int duration = 100;
 
   @override
   void initState() {
@@ -87,17 +127,39 @@ class _SaveButtonState extends State<SaveButton> {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(
-        active ? Icons.bookmark : Icons.bookmark_outline,
-        color: active ? Colors.yellow : Colors.grey,
-      ),
-      onPressed: () {
-        setState(() {
-          active = !active;
-        });
-        widget.onChange?.call(active);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 1.0, end: _scale),
+      duration: const Duration(milliseconds: duration),
+      curve: Curves.easeOut,
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: value,
+          alignment: Alignment.center,
+          child: child,
+        );
       },
+      child: IconButton(
+        icon: Icon(
+          active ? Icons.bookmark : Icons.bookmark_outline,
+          color: active ? Colors.yellow : Colors.grey,
+        ),
+        onPressed: () {
+          setState(() {
+            active = !active;
+            if (active) {
+              _scale = 1.2;
+            }
+          });
+          widget.onChange?.call(active);
+          Future.delayed(const Duration(milliseconds: duration), () {
+            if (mounted) {
+              setState(() {
+                _scale = 1;
+              });
+            }
+          });
+        },
+      ),
     );
   }
 }
