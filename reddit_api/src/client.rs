@@ -494,11 +494,9 @@ impl Client {
                                         .children
                                         .into_iter()
                                         .filter(|thing| {
-                                            if let Some(name) = thing.name() {
-                                                !acc.seen.contains(&name)
-                                            } else {
-                                                true
-                                            }
+                                            thing
+                                                .name()
+                                                .is_none_or(|name| !acc.seen.contains(&name))
                                         })
                                         .collect();
                                     acc.buffer.reverse();
