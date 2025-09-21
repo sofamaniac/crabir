@@ -68,83 +68,91 @@ class _UserViewState extends State<_UserView> {
     final currentUser = state.account?.username;
     final tabs = _tabs(currentUser);
     return FutureBuilder(
-        future: _userFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: LoadingIndicator());
-          } else if (snapshot.hasError) {
-            return Text("Error while fetching user info");
-          } else if (snapshot.hasData) {
-            final infos = snapshot.data!;
-            return AutoTabsRouter.tabBar(
-              homeIndex: 0,
-              routes: tabs.map((tab) {
-                if (tab case UserTabs.about) {
-                  return UserAboutRoute(
-                    username: widget.username,
-                    about: infos,
-                  );
-                } else {
-                  return tab.route(widget.username);
-                }
-              }).toList(),
-              builder: (context, child, tabController) {
-                return SafeArea(
-                  child: ExtendedNestedScrollView(
-                    onlyOneScrollInBody: true,
-                    floatHeaderSlivers: true,
-                    headerSliverBuilder: (
-                      BuildContext context,
-                      bool innerBoxIsScrolled,
-                    ) {
-                      return <Widget>[
-                        SliverAppBar.large(
-                          flexibleSpace: FlexibleSpaceBar(
-                            background: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // TODO: add banner
-                                CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage: NetworkImage(infos.iconImg),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  infos.name,
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          pinned: false,
-                          floating: false,
-                        ),
-                        SliverPersistentHeader(
-                          pinned: true,
-                          delegate: _TabBarDelegate(
-                            TabBar(
-                              isScrollable: true,
-                              tabAlignment: TabAlignment.start,
-                              tabs:
-                                  tabs.map((tab) => Text(tab.name())).toList(),
-                              controller: tabController,
-                            ),
-                          ),
-                        ),
-                      ];
-                    },
-                    body: child,
-                  ),
+      future: _userFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: LoadingIndicator());
+        } else if (snapshot.hasError) {
+          return Text("Error while fetching user info");
+        } else if (snapshot.hasData) {
+          final infos = snapshot.data!;
+          return AutoTabsRouter.tabBar(
+            homeIndex: 0,
+            routes: tabs.map((tab) {
+              if (tab case UserTabs.about) {
+                return UserAboutRoute(
+                  username: widget.username,
+                  about: infos,
                 );
-              },
-            );
-          } else {
-            return Text("Nothing to show.");
-          }
-        });
+              } else {
+                return tab.route(widget.username);
+              }
+            }).toList(),
+            builder: (context, child, tabController) {
+              return SafeArea(
+                child: ExtendedNestedScrollView(
+                  onlyOneScrollInBody: true,
+                  floatHeaderSlivers: true,
+                  headerSliverBuilder: (
+                    BuildContext context,
+                    bool innerBoxIsScrolled,
+                  ) =>
+                      topBar(
+                    infos,
+                    tabController,
+                    tabs,
+                  ),
+                  body: child,
+                ),
+              );
+            },
+          );
+        } else {
+          return Text("Nothing to show.");
+        }
+      },
+    );
+  }
+
+  List<Widget> topBar(
+      UserInfo infos, TabController tabController, List<UserTabs> tabs) {
+    return <Widget>[
+      SliverAppBar.large(
+        flexibleSpace: FlexibleSpaceBar(
+          background: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // TODO: add banner
+              CircleAvatar(
+                radius: 40,
+                backgroundImage: NetworkImage(infos.iconImg),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                infos.name,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+        pinned: false,
+        floating: false,
+      ),
+      SliverPersistentHeader(
+        pinned: true,
+        delegate: _TabBarDelegate(
+          TabBar(
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            tabs: tabs.map((tab) => Text(tab.name())).toList(),
+            controller: tabController,
+          ),
+        ),
+      ),
+    ];
   }
 }
 
