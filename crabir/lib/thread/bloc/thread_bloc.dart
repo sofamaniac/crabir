@@ -17,30 +17,27 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   final Set<String> _hidden = {};
   final HashMap<String, List<Thing>> _moreLoaded = HashMap();
   List<Thing> _comments = [];
-  bool _loaded = false;
   late final Post _post;
   final String permalink;
   CommentSort? _sort;
   final Logger log = Logger("ThreadBloc");
 
   ThreadBloc(this.permalink) : super(ThreadState()) {
-    on<Load>(_initialize);
+    on<Load>(_fetchComments);
     on<Collapse>(_collapse);
     on<LoadMore>(_loadMore);
     on<Refresh>(_refresh);
     on<SetSort>(_setSort);
   }
 
-  Future<void> _initialize(Load _, Emitter<ThreadState> emit) async {
-    if (_loaded) {
-      return;
-    }
-
+  Future<void> _fetchComments(Load _, Emitter<ThreadState> emit) async {
     try {
-      final things = await RedditAPI.client().comments(permalink: permalink);
+      final things = await RedditAPI.client().comments(
+        permalink: permalink,
+        sort: _sort,
+      );
       _post = things.$1;
       _comments = things.$2;
-      _loaded = true;
       log.info("(${_comments.length}) comments and post loaded");
       emit(state.copyWith(post: _post, flatComments: flatten(_comments)));
     } catch (e) {
@@ -52,24 +49,17 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   Future<void> _setSort(SetSort sort, Emitter<ThreadState> emit) async {
     if (_sort == sort.sort) return;
     _sort = sort.sort;
-    await _refresh(Refresh(), emit);
+    emit(
+      state.copyWith(
+        sort: _sort,
+        status: Status.unloaded,
+        flatComments: [],
+      ),
+    );
   }
 
   Future<void> _refresh(Refresh _, Emitter<ThreadState> emit) async {
-    emit(state.copyWith(status: Status.unloaded));
-    try {
-      final things = await RedditAPI.client().comments(
-        permalink: permalink,
-        sort: _sort,
-      );
-      _comments = things.$2;
-      _loaded = true;
-      log.info("comments (${_comments.length}) refreshed");
-      emit(state.copyWith(sort: _sort, flatComments: flatten(_comments)));
-    } catch (e) {
-      log.severe("Error while refreshing comments: $e");
-      emit(state.copyWith(status: Status.failure));
-    }
+    emit(state.copyWith(status: Status.unloaded, flatComments: []));
   }
 
   Future<void> _collapse(Collapse event, Emitter<ThreadState> emit) async {

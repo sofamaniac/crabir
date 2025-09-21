@@ -90,9 +90,12 @@ class _CommentViewState extends State<CommentView>
         duration: Duration(milliseconds: 200),
         alignment: Alignment.topCenter,
         child: Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            spacing: 8,
             children: [
               topRow(settings),
               StyledHtml(

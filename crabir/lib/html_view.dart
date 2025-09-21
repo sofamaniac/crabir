@@ -30,8 +30,8 @@ class StyledHtml extends StatelessWidget {
   Widget build(BuildContext context) {
     final htmlContent = this
         .htmlContent
-        .replaceAll('<p>', '')
-        .replaceAll('</p>', '<br>')
+        // .replaceAll('<p>', '')
+        // .replaceAll('</p>', '<br>')
         .replaceAll('\n\n', '<br>');
     final theme = CrabirTheme.of(context);
     final brightness = Theme.of(context).brightness;
@@ -79,12 +79,16 @@ class StyledHtml extends StatelessWidget {
           Unit.auto,
         ),
       ),
+      "p": Style(
+        margin: Margins.zero,
+      )
     };
     style.addAll(additionalStyles);
     return Html(
       style: style,
       data: htmlContent,
       onLinkTap: onLinkTap,
+      shrinkWrap: true,
       extensions: [
         if (showImages) RedditImageExtension(),
         TextExtension(),

@@ -1,6 +1,10 @@
 part of 'thread_bloc.dart';
 
-enum Status { unloaded, success, failure }
+enum Status {
+  unloaded,
+  success,
+  failure,
+}
 
 @freezed
 abstract class ThreadState with _$ThreadState {

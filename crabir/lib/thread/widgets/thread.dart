@@ -119,12 +119,12 @@ class Thread extends StatelessWidget {
                 child: CustomScrollView(
                   slivers: [
                     if (post != null)
-                      SliverToBoxAdapter(child: _PostView(post: post))
-                    else
+                      SliverToBoxAdapter(child: _PostView(post: post)),
+                    CommentsList(),
+                    if (state.status case Status.unloaded)
                       SliverToBoxAdapter(
                         child: Center(child: LoadingIndicator()),
                       ),
-                    CommentsList(),
                   ],
                 ),
               ),
