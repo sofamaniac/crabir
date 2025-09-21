@@ -103,6 +103,7 @@ class Header extends StatelessWidget {
                   post.domain,
                   style: _labelStyle(context),
                 ),
+                if (post.locked) Icon(Icons.lock),
               ],
             ],
           ),
