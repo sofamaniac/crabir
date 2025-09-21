@@ -19,7 +19,7 @@ pub mod rule;
 pub mod subreddit;
 pub mod user;
 
-#[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Represent the kind and the ID of a thing.
 /// For example a post has a fullname of the form "t3_xxxx".
 pub struct Fullname(String);

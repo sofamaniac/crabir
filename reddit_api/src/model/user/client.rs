@@ -14,23 +14,23 @@ use super::{
 };
 
 impl Client {
-    pub(super) fn user_stream<T: TryFrom<Thing>>(
+    pub(super) fn user_stream(
         self,
         endpoint: String,
         pager: Option<Pager>,
-    ) -> impl Stream<Item = Result<T>> {
+    ) -> impl Stream<Item = Result<Thing>> {
         let url = self
             .base_url()
             .join(&endpoint)
             .expect("Should not fail to build url.");
         self.clone().stream_vec(url, pager, ())
     }
-    pub(super) fn sorted_user_stream<T: TryFrom<Thing>>(
+    pub(super) fn sorted_user_stream(
         self,
         endpoint: String,
         sort: UserStreamSort,
         pager: Option<Pager>,
-    ) -> impl Stream<Item = Result<T>> {
+    ) -> impl Stream<Item = Result<Thing>> {
         let mut url = self
             .base_url()
             .join(&endpoint)

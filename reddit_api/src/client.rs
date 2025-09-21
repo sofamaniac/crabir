@@ -7,7 +7,7 @@ use crate::model::{Fullname, Post, comment};
 use crate::result::Result;
 use crate::search::{PostSearchSort, SearchPost, SearchSubreddit, SubredditSearchSort};
 use crate::streamable::Streamable;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
 use base64::Engine;
@@ -442,62 +442,79 @@ impl Client {
         )
     }
 
-    pub(crate) fn stream_vec<T, Q>(
+    pub(crate) fn stream_vec<Q>(
         self,
         url: Url,
         pager: Option<Pager>,
         query_params: Q,
-    ) -> impl Stream<Item = Result<T>>
+    ) -> impl Stream<Item = Result<Thing>>
     where
-        T: TryFrom<Thing>,
         Q: Serialize + Clone,
     {
-        stream::unfold(
-            (url, pager.unwrap_or_default(), Vec::new(), false),
-            move |(url, mut pager, mut buffer, done)| {
-                let client = self.clone();
-                let query_params = query_params.clone();
-                async move {
-                    if let Some(thing) = buffer.pop() {
-                        Some((Ok(thing), (url, pager, buffer, done)))
-                    } else if !done {
-                        let url = pager.add_to_url(url.clone());
-                        let request = client.get(url.clone());
-                        let request = request.query(&query_params);
-                        let response = client.execute(request).await;
-                        match response {
-                            Err(e) => Some((Err(e), (url, Pager::default(), buffer, done))),
-                            Ok(response) => match parse_response::<Thing>(response).await {
-                                Ok(thing) => match thing {
-                                    Thing::Listing(listing) => {
-                                        pager.after(listing.after.clone());
-                                        let done = listing.after.is_none()
-                                            || listing.after.is_some_and(|after| after.is_empty());
-                                        buffer = listing
-                                            .children
-                                            .into_iter()
-                                            .filter_map(|item| item.try_into().ok())
-                                            .collect();
-                                        buffer.reverse();
+        struct Util<Q: Serialize + Clone> {
+            url: Url,
+            pager: Pager,
+            query_params: Q,
+            seen: HashSet<Fullname>,
+            buffer: Vec<Thing>,
+            done: bool,
+        }
 
-                                        buffer
-                                            .pop()
-                                            .map(|thing| (Ok(thing), (url, pager, buffer, done)))
-                                    }
-                                    _ => Some((
-                                        Err(Error::InvalidThing),
-                                        (url, Pager::default(), buffer, done),
-                                    )),
-                                },
-                                Err(e) => Some((Err(e), (url, Pager::default(), buffer, done))),
-                            },
-                        }
-                    } else {
-                        None
+        let init = Util {
+            url,
+            pager: pager.unwrap_or_default(),
+            query_params,
+            seen: HashSet::new(),
+            buffer: Vec::new(),
+            done: false,
+        };
+        stream::unfold(init, move |mut acc| {
+            let client = self.clone();
+            let query_params = acc.query_params.clone();
+            async move {
+                if let Some(thing) = acc.buffer.pop() {
+                    if let Some(name) = thing.name() {
+                        acc.seen.insert(name);
                     }
+                    Some((Ok(thing), acc))
+                } else if !acc.done {
+                    let url = acc.pager.add_to_url(acc.url.clone());
+                    let request = client.get(url.clone());
+                    let request = request.query(&query_params);
+                    let response = client.execute(request).await;
+                    match response {
+                        Err(e) => Some((Err(e), acc)),
+                        Ok(response) => match parse_response::<Thing>(response).await {
+                            Ok(thing) => match thing {
+                                Thing::Listing(listing) => {
+                                    acc.pager.after(listing.after.clone());
+                                    acc.done = listing.after.is_none()
+                                        || listing.after.is_some_and(|after| after.is_empty());
+                                    acc.buffer = listing
+                                        .children
+                                        .into_iter()
+                                        .filter(|thing| {
+                                            if let Some(name) = thing.name() {
+                                                !acc.seen.contains(&name)
+                                            } else {
+                                                true
+                                            }
+                                        })
+                                        .collect();
+                                    acc.buffer.reverse();
+
+                                    acc.buffer.pop().map(|thing| (Ok(thing), acc))
+                                }
+                                _ => Some((Err(Error::InvalidThing), acc)),
+                            },
+                            Err(e) => Some((Err(e), acc)),
+                        },
+                    }
+                } else {
+                    None
                 }
-            },
-        )
+            }
+        })
     }
 
     /// Try to collect everything from a paged request. Will continue until there is no
