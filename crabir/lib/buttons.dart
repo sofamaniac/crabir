@@ -46,56 +46,59 @@ class VoteButton extends StatefulWidget {
 
 class _VoteButtonState extends State<VoteButton>
     with SingleTickerProviderStateMixin {
-  double _currentPosition = 0;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
+
+    _animation = TweenSequence([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0, end: widget.translation)
+            .chain(CurveTween(curve: Curves.bounceInOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: widget.translation, end: 0)
+            .chain(CurveTween(curve: Curves.bounceInOut)),
+        weight: 50,
+      ),
+    ]).animate(_controller);
+  }
 
   final int duration = 100;
-  @override
-  void didUpdateWidget(covariant VoteButton oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    final likes = widget.likes;
-    final oldLikes = oldWidget.likes;
-
-    // Trigger animation only when liked changes from false → true
-    if (likes != oldLikes) {
-      if (likes == widget.action) {
-        // Grow temporarily
-        setState(() {
-          _currentPosition = widget.translation;
-        });
-
-        // Shrink back after a short delay
-        Future.delayed(Duration(milliseconds: duration), () {
-          if (mounted) {
-            setState(() {
-              _currentPosition = 0;
-            });
-          }
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final active = widget.likes == widget.action;
 
-    return AnimatedContainer(
-      duration: Duration(milliseconds: duration),
-      curve: Curves.elasticOut,
-      transform: Matrix4.identity()..translate(0.0, _currentPosition),
-      child: IconButton(
-        icon: Icon(
-          active ? widget.iconActive : widget.iconNeutral,
-          color: active ? widget.colorActive : Colors.grey,
-        ),
-        onPressed: () {
-          if (active) {
-            widget.onChange?.call(VoteDirection.neutral);
-          } else {
-            widget.onChange?.call(widget.action);
-          }
-        },
-      ),
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _animation.value),
+          child: IconButton(
+            icon: Icon(
+              active ? widget.iconActive : widget.iconNeutral,
+              color: active ? widget.colorActive : Colors.grey,
+            ),
+            onPressed: () {
+              if (active) {
+                widget.onChange?.call(VoteDirection.neutral);
+              } else {
+                widget.onChange?.call(widget.action);
+                _controller.forward(from: 0);
+              }
+            },
+          ),
+        );
+      },
     );
   }
 }
@@ -114,52 +117,59 @@ class SaveButton extends StatefulWidget {
   State<SaveButton> createState() => _SaveButtonState();
 }
 
-class _SaveButtonState extends State<SaveButton> {
+class _SaveButtonState extends State<SaveButton>
+    with SingleTickerProviderStateMixin {
   late bool active;
-  double _scale = 1;
-  static const int duration = 100;
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
     active = widget.initialValue;
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
+
+    _animation = TweenSequence([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1, end: 1.5)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.5, end: 1)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 50,
+      ),
+    ]).animate(_controller);
   }
 
   @override
   Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 1.0, end: _scale),
-      duration: const Duration(milliseconds: duration),
-      curve: Curves.easeOut,
-      builder: (context, value, child) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
         return Transform.scale(
-          scale: value,
-          alignment: Alignment.center,
-          child: child,
+          scale: _animation.value,
+          child: IconButton(
+            icon: Icon(
+              active ? Icons.bookmark : Icons.bookmark_outline,
+              color: active ? Colors.yellow : Colors.grey,
+            ),
+            onPressed: () {
+              setState(() {
+                active = !active;
+              });
+              widget.onChange?.call(active);
+              if (active) {
+                _controller.forward(from: 0);
+              }
+            },
+          ),
         );
       },
-      child: IconButton(
-        icon: Icon(
-          active ? Icons.bookmark : Icons.bookmark_outline,
-          color: active ? Colors.yellow : Colors.grey,
-        ),
-        onPressed: () {
-          setState(() {
-            active = !active;
-            if (active) {
-              _scale = 1.2;
-            }
-          });
-          widget.onChange?.call(active);
-          Future.delayed(const Duration(milliseconds: duration), () {
-            if (mounted) {
-              setState(() {
-                _scale = 1;
-              });
-            }
-          });
-        },
-      ),
     );
   }
 }
