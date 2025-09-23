@@ -1,6 +1,6 @@
 target/
 .direnv/
-lib/src/rust/*
+crabir/lib/src/rust/
 rust/src/frb_generated*
 frb_generated*
 .env
