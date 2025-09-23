@@ -39,7 +39,13 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       _post = things.$1;
       _comments = things.$2;
       log.info("(${_comments.length}) comments and post loaded");
-      emit(state.copyWith(post: _post, flatComments: flatten(_comments)));
+      emit(
+        state.copyWith(
+          status: Status.success,
+          post: _post,
+          flatComments: flatten(_comments),
+        ),
+      );
     } catch (e) {
       log.severe("Error during initial load: $e");
       emit(state.copyWith(status: Status.failure));
