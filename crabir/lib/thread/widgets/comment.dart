@@ -63,25 +63,26 @@ class _CommentViewState extends State<CommentView>
           Flexible(child: FlairView(flair: comment.author!.flair)),
         Spacer(),
         SeparatedRow(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            separatorStyle:
-                Theme.of(context).textTheme.labelMedium!.copyWith(color: color),
-            children: [
-              LikeText(
-                score: comment.score,
-                likes: comment.likes,
-                hidden: comment.scoreHidden,
-                style: Theme.of(context).textTheme.labelMedium!,
-                scaling: 1.5,
-              ),
-              Text(
-                comment.createdUtc.timeSince(context),
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium!
-                    .copyWith(color: color),
-              ),
-            ]),
+          crossAxisAlignment: WrapCrossAlignment.center,
+          separatorStyle:
+              Theme.of(context).textTheme.labelMedium!.copyWith(color: color),
+          children: [
+            LikeText(
+              score: comment.score,
+              likes: comment.likes,
+              hidden: comment.scoreHidden,
+              style: Theme.of(context).textTheme.labelMedium!,
+              scaling: 1.5,
+            ),
+            Text(
+              comment.createdUtc.timeSince(context),
+              style: Theme.of(context)
+                  .textTheme
+                  .labelMedium!
+                  .copyWith(color: color),
+            ),
+          ],
+        ),
       ],
     );
   }

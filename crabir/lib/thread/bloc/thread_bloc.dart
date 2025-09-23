@@ -79,7 +79,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
         _reveal(reply);
       }
     }
-    emit(state.copyWith(collapsed: _collapsed, hidden: _hidden));
+    emit(state.copyWith(collapsed: {..._collapsed}, hidden: {..._hidden}));
   }
 
   void _hide(Thing comment) {
