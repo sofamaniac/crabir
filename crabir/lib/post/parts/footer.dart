@@ -88,24 +88,36 @@ class MoreOptionButton extends StatelessWidget {
           ListTile(
             leading: icon != null ? SubredditIcon(icon: icon) : null,
             title: Text("Mute ${post.subreddit.subreddit}"),
-            onTap: () => filters.hideSubreddit(post.subreddit.subreddit),
+            onTap: () {
+              filters.hideSubreddit(post.subreddit.subreddit);
+              Navigator.pop(context);
+            },
           ),
           ListTile(
             leading: Icon(Icons.link),
             title: Text("Mute ${post.domain}"),
-            onTap: () => filters.hideDomain(post.domain),
+            onTap: () {
+              filters.hideDomain(post.domain);
+              Navigator.pop(context);
+            },
           ),
           if (post.author != null)
             ListTile(
               leading: Icon(Icons.person),
               title: Text("Mute ${post.author!.username}"),
-              onTap: () => filters.hideUser(post.author!.username),
+              onTap: () {
+                filters.hideUser(post.author!.username);
+                Navigator.pop(context);
+              },
             ),
           if (post.linkFlair.text != null && post.linkFlair.text!.isNotEmpty)
             ListTile(
               leading: Icon(Icons.label_outlined),
               title: Text("Mute ${post.linkFlair.text!}"),
-              onTap: () => filters.hideFlair(post.linkFlair.text!),
+              onTap: () {
+                filters.hideFlair(post.linkFlair.text!);
+                Navigator.pop(context);
+              },
             ),
         ],
       ),
@@ -113,35 +125,85 @@ class MoreOptionButton extends StatelessWidget {
   }
 
   Dialog dialog(BuildContext context) {
+    final settings = context.read<PostsSettingsCubit>().state;
     return Dialog(
-      elevation: 1,
-      child: ListView(
-        shrinkWrap: true,
-        children: [
-          Text("Go to subreddit"),
-          // When crosspost
-          Text("View original post"),
-          Text("Go to user"),
-          Text("search flair"),
-          // Optional
-          Text("mark read / unread"),
-          // Optional
-          Text("hide"),
-          Text("Report"),
-          ListTile(
-            leading: Icon(Icons.volume_mute),
-            title: Text("Mute..."),
-            trailing: Icon(Icons.more),
-            onTap: () {
-              Navigator.pop(context);
-              showDialog(context: context, builder: muteDialog);
-            },
-          ),
-          // Optional
-          Text("share"),
-          Text("copy"),
-          Text("add to custom feed")
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            ListTile(
+              leading: Icon(Icons.reddit),
+              title: Text("Go to ${post.subreddit.subreddit}"),
+              onTap: () {
+                Navigator.pop(context);
+                context.router.navigate(
+                  FeedRoute(
+                    feed: Feed.subreddit(post.subreddit.subreddit),
+                  ),
+                );
+              },
+            ),
+            if (post.isCrosspost)
+              ListTile(
+                leading: Icon(Icons.link),
+                title: Text("Go to original post"),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.router.push(
+                    ThreadRoute(post: post.crosspostParentList.first),
+                  );
+                },
+              ),
+            Text("Go to user"),
+            if (post.author?.username != null)
+              ListTile(
+                leading: Icon(Icons.person),
+                title: Text("See ${post.author!.username}'s info"),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.router
+                      .navigate(UserRoute(username: post.author!.username));
+                },
+              ),
+            if (post.linkFlair.text != null)
+              ListTile(
+                leading: Icon(Icons.label_outline),
+                title: Text("Search ${post.linkFlair.text} posts"),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.router.navigate(
+                    SearchPostsRoute(flair: post.linkFlair),
+                  );
+                },
+              ),
+            // Optional
+            if (!settings.showMarkAsReadButton) Text("mark read / unread"),
+            // Optional
+            if (!settings.showHideButton) Text("hide"),
+            Text("Report"),
+            ListTile(
+              leading: Icon(Icons.volume_off),
+              title: Text("Mute..."),
+              trailing: Icon(Icons.arrow_right),
+              onTap: () {
+                Navigator.pop(context);
+                showDialog(context: context, builder: muteDialog);
+              },
+            ),
+            if (!settings.showShareButton)
+              ListTile(
+                leading: Icon(Icons.share),
+                title: Text("Share..."),
+                onTap: () {
+                  Navigator.pop(context);
+                  shareModelBottomSheet(context, post);
+                },
+              ),
+            Text("copy"),
+            Text("add to custom feed")
+          ],
+        ),
       ),
     );
   }
