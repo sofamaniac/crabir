@@ -74,7 +74,8 @@ class _RedditPostCardState extends State<RedditPostCard> {
       // Text types
       Kind.meta => Text("meta"),
       Kind.selftext
-          when (!widget.post.spoiler || widget.ignoreSelftextSpoiler) =>
+          when (!widget.post.spoiler || widget.ignoreSelftextSpoiler) &&
+              widget.post.selftextHtml != null =>
         HtmlWithConditionalFade(
           htmlContent: widget.post.selftextHtml ?? "",
           maxLines: widget.maxLines,
