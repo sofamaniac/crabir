@@ -5,12 +5,14 @@ class DenseCard extends StatelessWidget {
   final SaveCallback? onSaveCallback;
   final LikeCallback? onLikeCallback;
   final VoidCallback? onTap;
+  final double? elevation;
   const DenseCard({
     super.key,
     required this.post,
     this.onSaveCallback,
     this.onLikeCallback,
     this.onTap,
+    this.elevation,
   });
   Widget wrap(Widget widget) {
     return Padding(
@@ -45,7 +47,7 @@ class DenseCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
       color: theme.background,
-      elevation: 1,
+      elevation: elevation,
       child: InkWell(
         onTap: onTap,
         child: contentWidget,

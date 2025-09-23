@@ -40,8 +40,10 @@ class _PostView extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: DenseCard(
                 post: post.crosspostParentList.first,
+                // Disable shadow
+                elevation: 0,
                 onTap: () {
-                  context.router.navigate(
+                  context.router.push(
                     ThreadRoute(
                       key: ValueKey(post.id),
                       post: post.crosspostParentList.first,
