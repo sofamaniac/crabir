@@ -106,26 +106,28 @@ class Thread extends StatelessWidget {
       child: BlocBuilder<ThreadBloc, ThreadState>(
         builder: (BuildContext context, ThreadState state) {
           final post = this.post ?? state.post;
-          return Scaffold(
-            body: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                appBar(context, context.read()),
-              ],
-              floatHeaderSlivers: true,
-              body: RefreshIndicator(
-                onRefresh: () async {
-                  context.read<ThreadBloc>().add(Refresh());
-                },
-                child: CustomScrollView(
-                  slivers: [
-                    if (post != null)
-                      SliverToBoxAdapter(child: _PostView(post: post)),
-                    CommentsList(),
-                    if (state.status case Status.unloaded)
-                      SliverToBoxAdapter(
-                        child: Center(child: LoadingIndicator()),
-                      ),
-                  ],
+          return SafeArea(
+            child: Scaffold(
+              body: NestedScrollView(
+                headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                  appBar(context, context.read()),
+                ],
+                floatHeaderSlivers: true,
+                body: RefreshIndicator(
+                  onRefresh: () async {
+                    context.read<ThreadBloc>().add(Refresh());
+                  },
+                  child: CustomScrollView(
+                    slivers: [
+                      if (post != null)
+                        SliverToBoxAdapter(child: _PostView(post: post)),
+                      CommentsList(),
+                      if (state.status case Status.unloaded)
+                        SliverToBoxAdapter(
+                          child: Center(child: LoadingIndicator()),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
