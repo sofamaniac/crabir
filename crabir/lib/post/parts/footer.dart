@@ -150,6 +150,7 @@ class MoreOptionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: Icon(Icons.more_vert),
+      color: Colors.grey,
       onPressed: () => showDialog(context: context, builder: dialog),
     );
   }
