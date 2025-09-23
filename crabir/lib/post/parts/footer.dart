@@ -67,7 +67,6 @@ class Footer extends StatelessWidget {
             },
           ),
         if (settings.showShareButton) ShareButton(post: post),
-        // TODO: add missing buttons
         MoreOptionButton(post: post),
       ],
     );
@@ -177,9 +176,7 @@ class MoreOptionButton extends StatelessWidget {
                   );
                 },
               ),
-            // Optional
             if (!settings.showMarkAsReadButton) Text("mark read / unread"),
-            // Optional
             if (!settings.showHideButton) Text("hide"),
             Text("Report"),
             ListTile(

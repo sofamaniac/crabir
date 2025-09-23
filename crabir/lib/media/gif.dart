@@ -104,6 +104,8 @@ class AnimatedContent extends StatefulWidget {
 class _AnimatedContentState extends State<AnimatedContent> {
   late VideoPlayerController _controller;
   late final VoidCallback _queueListener;
+  late final double aspectRatio =
+      widget.width.toDouble() / widget.height.toDouble();
   bool _showControls = false;
   bool _muted = true;
   bool _canAutoplay = false;
@@ -176,7 +178,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
         if (widget.placeholderUrl != null)
           Center(
             child: AspectRatio(
-              aspectRatio: widget.width / widget.height.toDouble(),
+              aspectRatio: aspectRatio,
               child: CachedNetworkImage(
                 imageUrl: widget.placeholderUrl!,
                 fit: BoxFit.cover,
@@ -264,7 +266,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
             child: VisibilityDetector(
               key: ValueKey(widget.url),
               child: AspectRatio(
-                aspectRatio: widget.width / widget.height.toDouble(),
+                aspectRatio: aspectRatio,
                 // // Show placeholder until we start playing the video
                 child: (_controller.value.isPlaying)
                     ? VideoPlayer(_controller)
