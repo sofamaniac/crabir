@@ -65,6 +65,7 @@ class _CommentViewState extends State<CommentView>
           LikeText(
             score: comment.score,
             likes: comment.likes,
+            hidden: comment.scoreHidden,
             style: Theme.of(context).textTheme.labelMedium!,
             scaling: 1.5,
           ),
