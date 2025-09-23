@@ -1,4 +1,4 @@
-part of '../post.dart';
+import 'package:flutter/material.dart';
 
 class SeparatedRow extends StatelessWidget {
   final Widget separator;

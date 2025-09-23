@@ -26,6 +26,23 @@ class FiltersSettingsCubit extends HydratedCubit<FiltersSettings> {
 
   @override
   Map<String, dynamic>? toJson(FiltersSettings state) => state.toJson();
+  void updateManageHiddenCommunities(() value) =>
+      emit(state.copyWith(manageHiddenCommunities: value));
+
+  void updateManageHiddenDomains(() value) =>
+      emit(state.copyWith(manageHiddenDomains: value));
+
+  void updateManageHiddenUsers(() value) =>
+      emit(state.copyWith(manageHiddenUsers: value));
+
+  void updateManageHiddenFlairs(() value) =>
+      emit(state.copyWith(manageHiddenFlairs: value));
+
+  void updateShowNSFW(bool value) => emit(state.copyWith(showNSFW: value));
+
+  void updateShowImageInNSFW(bool value) =>
+      emit(state.copyWith(showImageInNSFW: value));
+
   void updateBlurNSFW(bool value) => emit(state.copyWith(blurNSFW: value));
 }
 
@@ -41,8 +58,64 @@ class FiltersSettingsView extends StatelessWidget {
     return Scaffold(
         body: ListView(
       children: [
+        Divider(),
+        Text("Muting options"),
+        SubredditsFilterButton(
+          title: Text(locales.filters_manageHiddenCommunities),
+          leading: null,
+          subtitle: Text(locales.filters_manageHiddenCommunitiesDescription),
+          value: settings.manageHiddenCommunities,
+          onChanged: (val) => context
+              .read<FiltersSettingsCubit>()
+              .updateManageHiddenCommunities(val),
+        ),
+        DomainsFilterButton(
+          title: Text(locales.filters_manageHiddenDomains),
+          leading: null,
+          subtitle: Text(locales.filters_manageHiddenDomainsDescription),
+          value: settings.manageHiddenDomains,
+          onChanged: (val) => context
+              .read<FiltersSettingsCubit>()
+              .updateManageHiddenDomains(val),
+        ),
+        UserFilterButton(
+          title: Text(locales.filters_manageHiddenUsers),
+          leading: null,
+          subtitle: Text(locales.filters_manageHiddenUsersDescription),
+          value: settings.manageHiddenUsers,
+          onChanged: (val) =>
+              context.read<FiltersSettingsCubit>().updateManageHiddenUsers(val),
+        ),
+        FlairFilterButton(
+          title: Text(locales.filters_manageHiddenFlairs),
+          leading: null,
+          subtitle: Text(locales.filters_manageHiddenFlairsDescription),
+          value: settings.manageHiddenFlairs,
+          onChanged: (val) => context
+              .read<FiltersSettingsCubit>()
+              .updateManageHiddenFlairs(val),
+        ),
+        Divider(),
+        Text("More options"),
+        CheckboxListTile(
+          title: Text(locales.filters_showNSFW),
+          secondary: null,
+          subtitle: Text(locales.filters_showNSFWDescription),
+          value: settings.showNSFW,
+          onChanged: (val) =>
+              context.read<FiltersSettingsCubit>().updateShowNSFW(val!),
+        ),
+        CheckboxListTile(
+          title: Text(locales.filters_showImageInNSFW),
+          secondary: Icon(Icons.image),
+          subtitle: null,
+          value: settings.showImageInNSFW,
+          onChanged: (val) =>
+              context.read<FiltersSettingsCubit>().updateShowImageInNSFW(val!),
+        ),
         CheckboxListTile(
           title: Text(locales.filters_blurNSFW),
+          secondary: Icon(Icons.blur_on),
           subtitle: null,
           value: settings.blurNSFW,
           onChanged: (val) =>

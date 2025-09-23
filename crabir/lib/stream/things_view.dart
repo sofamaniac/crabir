@@ -1,9 +1,11 @@
+import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
     as reddit_stream;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class ThingsScaffold extends StatefulWidget {
@@ -34,8 +36,7 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
     getNextPageKey: (state) => state.lastPageIsEmpty ? null : state.hasNextPage,
     fetchPage: (pageKey) async {
       if (await widget.stream.next()) {
-        final length = widget.stream.length;
-        return widget.stream.nth(n: length - 1)!;
+        return widget.stream.last();
       } else {
         return [];
       }
@@ -55,6 +56,7 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
       builder: (context, state, fetchNextPage) {
         return RefreshIndicator(
           onRefresh: () async {
+            await widget.stream.refresh();
             _pagingController.refresh();
           },
           child: Scrollbar(
@@ -76,6 +78,11 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
 
                       switch (thing) {
                         case Thing_Post(field0: final post):
+                          if (context
+                              .read<GlobalFiltersCubit>()
+                              .shouldHidePost(post)) {
+                            return const SizedBox.shrink();
+                          }
                           return widget.postView?.call(context, post) ??
                               const SizedBox.shrink();
                         case Thing_Comment(field0: final comment):

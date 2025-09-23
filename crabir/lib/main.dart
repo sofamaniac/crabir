@@ -141,6 +141,10 @@ class TopLevel extends StatelessWidget {
             borderRadius: BorderRadius.zero, // square corners
           ),
         ),
+        dialogTheme: const DialogThemeData(
+          backgroundColor: Color(0xFF1E1E1E),
+          shape: RoundedRectangleBorder(),
+        ),
       ),
       theme: ThemeData(
         useMaterial3: true,

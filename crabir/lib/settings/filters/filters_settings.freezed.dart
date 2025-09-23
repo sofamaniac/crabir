@@ -14,6 +14,20 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$FiltersSettings {
+  @Category(name: "Muting options")
+  @Setting(widget: SubredditsFilterButton, hasDescription: true)
+  () get manageHiddenCommunities;
+  @Setting(widget: DomainsFilterButton, hasDescription: true)
+  () get manageHiddenDomains;
+  @Setting(widget: UserFilterButton, hasDescription: true)
+  () get manageHiddenUsers;
+  @Setting(widget: FlairFilterButton, hasDescription: true)
+  () get manageHiddenFlairs;
+  @Category(name: "More options")
+  @Setting(hasDescription: true)
+  bool get showNSFW;
+  @Setting(icon: "Icons.image")
+  bool get showImageInNSFW;
   @Setting(icon: "Icons.blur_on")
   bool get blurNSFW;
 
@@ -33,17 +47,38 @@ mixin _$FiltersSettings {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is FiltersSettings &&
+            (identical(
+                    other.manageHiddenCommunities, manageHiddenCommunities) ||
+                other.manageHiddenCommunities == manageHiddenCommunities) &&
+            (identical(other.manageHiddenDomains, manageHiddenDomains) ||
+                other.manageHiddenDomains == manageHiddenDomains) &&
+            (identical(other.manageHiddenUsers, manageHiddenUsers) ||
+                other.manageHiddenUsers == manageHiddenUsers) &&
+            (identical(other.manageHiddenFlairs, manageHiddenFlairs) ||
+                other.manageHiddenFlairs == manageHiddenFlairs) &&
+            (identical(other.showNSFW, showNSFW) ||
+                other.showNSFW == showNSFW) &&
+            (identical(other.showImageInNSFW, showImageInNSFW) ||
+                other.showImageInNSFW == showImageInNSFW) &&
             (identical(other.blurNSFW, blurNSFW) ||
                 other.blurNSFW == blurNSFW));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, blurNSFW);
+  int get hashCode => Object.hash(
+      runtimeType,
+      manageHiddenCommunities,
+      manageHiddenDomains,
+      manageHiddenUsers,
+      manageHiddenFlairs,
+      showNSFW,
+      showImageInNSFW,
+      blurNSFW);
 
   @override
   String toString() {
-    return 'FiltersSettings(blurNSFW: $blurNSFW)';
+    return 'FiltersSettings(manageHiddenCommunities: $manageHiddenCommunities, manageHiddenDomains: $manageHiddenDomains, manageHiddenUsers: $manageHiddenUsers, manageHiddenFlairs: $manageHiddenFlairs, showNSFW: $showNSFW, showImageInNSFW: $showImageInNSFW, blurNSFW: $blurNSFW)';
   }
 }
 
@@ -53,7 +88,21 @@ abstract mixin class $FiltersSettingsCopyWith<$Res> {
           FiltersSettings value, $Res Function(FiltersSettings) _then) =
       _$FiltersSettingsCopyWithImpl;
   @useResult
-  $Res call({@Setting(icon: "Icons.blur_on") bool blurNSFW});
+  $Res call(
+      {@Category(name: "Muting options")
+      @Setting(widget: SubredditsFilterButton, hasDescription: true)
+      () manageHiddenCommunities,
+      @Setting(widget: DomainsFilterButton, hasDescription: true)
+      () manageHiddenDomains,
+      @Setting(widget: UserFilterButton, hasDescription: true)
+      () manageHiddenUsers,
+      @Setting(widget: FlairFilterButton, hasDescription: true)
+      () manageHiddenFlairs,
+      @Category(name: "More options")
+      @Setting(hasDescription: true)
+      bool showNSFW,
+      @Setting(icon: "Icons.image") bool showImageInNSFW,
+      @Setting(icon: "Icons.blur_on") bool blurNSFW});
 }
 
 /// @nodoc
@@ -69,9 +118,39 @@ class _$FiltersSettingsCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? manageHiddenCommunities = null,
+    Object? manageHiddenDomains = null,
+    Object? manageHiddenUsers = null,
+    Object? manageHiddenFlairs = null,
+    Object? showNSFW = null,
+    Object? showImageInNSFW = null,
     Object? blurNSFW = null,
   }) {
     return _then(_self.copyWith(
+      manageHiddenCommunities: null == manageHiddenCommunities
+          ? _self.manageHiddenCommunities
+          : manageHiddenCommunities // ignore: cast_nullable_to_non_nullable
+              as (),
+      manageHiddenDomains: null == manageHiddenDomains
+          ? _self.manageHiddenDomains
+          : manageHiddenDomains // ignore: cast_nullable_to_non_nullable
+              as (),
+      manageHiddenUsers: null == manageHiddenUsers
+          ? _self.manageHiddenUsers
+          : manageHiddenUsers // ignore: cast_nullable_to_non_nullable
+              as (),
+      manageHiddenFlairs: null == manageHiddenFlairs
+          ? _self.manageHiddenFlairs
+          : manageHiddenFlairs // ignore: cast_nullable_to_non_nullable
+              as (),
+      showNSFW: null == showNSFW
+          ? _self.showNSFW
+          : showNSFW // ignore: cast_nullable_to_non_nullable
+              as bool,
+      showImageInNSFW: null == showImageInNSFW
+          ? _self.showImageInNSFW
+          : showImageInNSFW // ignore: cast_nullable_to_non_nullable
+              as bool,
       blurNSFW: null == blurNSFW
           ? _self.blurNSFW
           : blurNSFW // ignore: cast_nullable_to_non_nullable
@@ -173,13 +252,35 @@ extension FiltersSettingsPatterns on FiltersSettings {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(@Setting(icon: "Icons.blur_on") bool blurNSFW)? $default, {
+    TResult Function(
+            @Category(name: "Muting options")
+            @Setting(widget: SubredditsFilterButton, hasDescription: true)
+            () manageHiddenCommunities,
+            @Setting(widget: DomainsFilterButton, hasDescription: true)
+            () manageHiddenDomains,
+            @Setting(widget: UserFilterButton, hasDescription: true)
+            () manageHiddenUsers,
+            @Setting(widget: FlairFilterButton, hasDescription: true)
+            () manageHiddenFlairs,
+            @Category(name: "More options")
+            @Setting(hasDescription: true)
+            bool showNSFW,
+            @Setting(icon: "Icons.image") bool showImageInNSFW,
+            @Setting(icon: "Icons.blur_on") bool blurNSFW)?
+        $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _FiltersSettings() when $default != null:
-        return $default(_that.blurNSFW);
+        return $default(
+            _that.manageHiddenCommunities,
+            _that.manageHiddenDomains,
+            _that.manageHiddenUsers,
+            _that.manageHiddenFlairs,
+            _that.showNSFW,
+            _that.showImageInNSFW,
+            _that.blurNSFW);
       case _:
         return orElse();
     }
@@ -200,12 +301,34 @@ extension FiltersSettingsPatterns on FiltersSettings {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(@Setting(icon: "Icons.blur_on") bool blurNSFW) $default,
+    TResult Function(
+            @Category(name: "Muting options")
+            @Setting(widget: SubredditsFilterButton, hasDescription: true)
+            () manageHiddenCommunities,
+            @Setting(widget: DomainsFilterButton, hasDescription: true)
+            () manageHiddenDomains,
+            @Setting(widget: UserFilterButton, hasDescription: true)
+            () manageHiddenUsers,
+            @Setting(widget: FlairFilterButton, hasDescription: true)
+            () manageHiddenFlairs,
+            @Category(name: "More options")
+            @Setting(hasDescription: true)
+            bool showNSFW,
+            @Setting(icon: "Icons.image") bool showImageInNSFW,
+            @Setting(icon: "Icons.blur_on") bool blurNSFW)
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _FiltersSettings():
-        return $default(_that.blurNSFW);
+        return $default(
+            _that.manageHiddenCommunities,
+            _that.manageHiddenDomains,
+            _that.manageHiddenUsers,
+            _that.manageHiddenFlairs,
+            _that.showNSFW,
+            _that.showImageInNSFW,
+            _that.blurNSFW);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -225,12 +348,34 @@ extension FiltersSettingsPatterns on FiltersSettings {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(@Setting(icon: "Icons.blur_on") bool blurNSFW)? $default,
+    TResult? Function(
+            @Category(name: "Muting options")
+            @Setting(widget: SubredditsFilterButton, hasDescription: true)
+            () manageHiddenCommunities,
+            @Setting(widget: DomainsFilterButton, hasDescription: true)
+            () manageHiddenDomains,
+            @Setting(widget: UserFilterButton, hasDescription: true)
+            () manageHiddenUsers,
+            @Setting(widget: FlairFilterButton, hasDescription: true)
+            () manageHiddenFlairs,
+            @Category(name: "More options")
+            @Setting(hasDescription: true)
+            bool showNSFW,
+            @Setting(icon: "Icons.image") bool showImageInNSFW,
+            @Setting(icon: "Icons.blur_on") bool blurNSFW)?
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _FiltersSettings() when $default != null:
-        return $default(_that.blurNSFW);
+        return $default(
+            _that.manageHiddenCommunities,
+            _that.manageHiddenDomains,
+            _that.manageHiddenUsers,
+            _that.manageHiddenFlairs,
+            _that.showNSFW,
+            _that.showImageInNSFW,
+            _that.blurNSFW);
       case _:
         return null;
     }
@@ -240,11 +385,51 @@ extension FiltersSettingsPatterns on FiltersSettings {
 /// @nodoc
 @JsonSerializable()
 class _FiltersSettings extends FiltersSettings {
-  _FiltersSettings({@Setting(icon: "Icons.blur_on") this.blurNSFW = false})
+  _FiltersSettings(
+      {@Category(name: "Muting options")
+      @Setting(widget: SubredditsFilterButton, hasDescription: true)
+      this.manageHiddenCommunities = const (),
+      @Setting(widget: DomainsFilterButton, hasDescription: true)
+      this.manageHiddenDomains = const (),
+      @Setting(widget: UserFilterButton, hasDescription: true)
+      this.manageHiddenUsers = const (),
+      @Setting(widget: FlairFilterButton, hasDescription: true)
+      this.manageHiddenFlairs = const (),
+      @Category(name: "More options")
+      @Setting(hasDescription: true)
+      this.showNSFW = false,
+      @Setting(icon: "Icons.image") this.showImageInNSFW = true,
+      @Setting(icon: "Icons.blur_on") this.blurNSFW = false})
       : super._();
   factory _FiltersSettings.fromJson(Map<String, dynamic> json) =>
       _$FiltersSettingsFromJson(json);
 
+  @override
+  @JsonKey()
+  @Category(name: "Muting options")
+  @Setting(widget: SubredditsFilterButton, hasDescription: true)
+  final () manageHiddenCommunities;
+  @override
+  @JsonKey()
+  @Setting(widget: DomainsFilterButton, hasDescription: true)
+  final () manageHiddenDomains;
+  @override
+  @JsonKey()
+  @Setting(widget: UserFilterButton, hasDescription: true)
+  final () manageHiddenUsers;
+  @override
+  @JsonKey()
+  @Setting(widget: FlairFilterButton, hasDescription: true)
+  final () manageHiddenFlairs;
+  @override
+  @JsonKey()
+  @Category(name: "More options")
+  @Setting(hasDescription: true)
+  final bool showNSFW;
+  @override
+  @JsonKey()
+  @Setting(icon: "Icons.image")
+  final bool showImageInNSFW;
   @override
   @JsonKey()
   @Setting(icon: "Icons.blur_on")
@@ -270,17 +455,38 @@ class _FiltersSettings extends FiltersSettings {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _FiltersSettings &&
+            (identical(
+                    other.manageHiddenCommunities, manageHiddenCommunities) ||
+                other.manageHiddenCommunities == manageHiddenCommunities) &&
+            (identical(other.manageHiddenDomains, manageHiddenDomains) ||
+                other.manageHiddenDomains == manageHiddenDomains) &&
+            (identical(other.manageHiddenUsers, manageHiddenUsers) ||
+                other.manageHiddenUsers == manageHiddenUsers) &&
+            (identical(other.manageHiddenFlairs, manageHiddenFlairs) ||
+                other.manageHiddenFlairs == manageHiddenFlairs) &&
+            (identical(other.showNSFW, showNSFW) ||
+                other.showNSFW == showNSFW) &&
+            (identical(other.showImageInNSFW, showImageInNSFW) ||
+                other.showImageInNSFW == showImageInNSFW) &&
             (identical(other.blurNSFW, blurNSFW) ||
                 other.blurNSFW == blurNSFW));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, blurNSFW);
+  int get hashCode => Object.hash(
+      runtimeType,
+      manageHiddenCommunities,
+      manageHiddenDomains,
+      manageHiddenUsers,
+      manageHiddenFlairs,
+      showNSFW,
+      showImageInNSFW,
+      blurNSFW);
 
   @override
   String toString() {
-    return 'FiltersSettings(blurNSFW: $blurNSFW)';
+    return 'FiltersSettings(manageHiddenCommunities: $manageHiddenCommunities, manageHiddenDomains: $manageHiddenDomains, manageHiddenUsers: $manageHiddenUsers, manageHiddenFlairs: $manageHiddenFlairs, showNSFW: $showNSFW, showImageInNSFW: $showImageInNSFW, blurNSFW: $blurNSFW)';
   }
 }
 
@@ -292,7 +498,21 @@ abstract mixin class _$FiltersSettingsCopyWith<$Res>
       __$FiltersSettingsCopyWithImpl;
   @override
   @useResult
-  $Res call({@Setting(icon: "Icons.blur_on") bool blurNSFW});
+  $Res call(
+      {@Category(name: "Muting options")
+      @Setting(widget: SubredditsFilterButton, hasDescription: true)
+      () manageHiddenCommunities,
+      @Setting(widget: DomainsFilterButton, hasDescription: true)
+      () manageHiddenDomains,
+      @Setting(widget: UserFilterButton, hasDescription: true)
+      () manageHiddenUsers,
+      @Setting(widget: FlairFilterButton, hasDescription: true)
+      () manageHiddenFlairs,
+      @Category(name: "More options")
+      @Setting(hasDescription: true)
+      bool showNSFW,
+      @Setting(icon: "Icons.image") bool showImageInNSFW,
+      @Setting(icon: "Icons.blur_on") bool blurNSFW});
 }
 
 /// @nodoc
@@ -308,9 +528,39 @@ class __$FiltersSettingsCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
+    Object? manageHiddenCommunities = null,
+    Object? manageHiddenDomains = null,
+    Object? manageHiddenUsers = null,
+    Object? manageHiddenFlairs = null,
+    Object? showNSFW = null,
+    Object? showImageInNSFW = null,
     Object? blurNSFW = null,
   }) {
     return _then(_FiltersSettings(
+      manageHiddenCommunities: null == manageHiddenCommunities
+          ? _self.manageHiddenCommunities
+          : manageHiddenCommunities // ignore: cast_nullable_to_non_nullable
+              as (),
+      manageHiddenDomains: null == manageHiddenDomains
+          ? _self.manageHiddenDomains
+          : manageHiddenDomains // ignore: cast_nullable_to_non_nullable
+              as (),
+      manageHiddenUsers: null == manageHiddenUsers
+          ? _self.manageHiddenUsers
+          : manageHiddenUsers // ignore: cast_nullable_to_non_nullable
+              as (),
+      manageHiddenFlairs: null == manageHiddenFlairs
+          ? _self.manageHiddenFlairs
+          : manageHiddenFlairs // ignore: cast_nullable_to_non_nullable
+              as (),
+      showNSFW: null == showNSFW
+          ? _self.showNSFW
+          : showNSFW // ignore: cast_nullable_to_non_nullable
+              as bool,
+      showImageInNSFW: null == showImageInNSFW
+          ? _self.showImageInNSFW
+          : showImageInNSFW // ignore: cast_nullable_to_non_nullable
+              as bool,
       blurNSFW: null == blurNSFW
           ? _self.blurNSFW
           : blurNSFW // ignore: cast_nullable_to_non_nullable

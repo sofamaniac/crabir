@@ -164,10 +164,12 @@ class $className extends StatelessWidget {
     final widgetType = setting.getField('widget')?.toTypeValue();
     final hasDescription =
         setting.getField("hasDescription")?.toBoolValue() ?? false;
+    final iconData = setting.getField("icon")?.toStringValue();
 
     if (widgetType != null) {
       return '$widgetType('
           'title: Text(locales.$titleKey),'
+          'leading: ${iconData != null ? "Icon($iconData)" : "null"},'
           'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
           'value: settings.${param.name},'
           'onChanged: (val) => context.read<$cubitName>().update${param.name.toPascalCase()}(val),'
@@ -175,12 +177,16 @@ class $className extends StatelessWidget {
     } else if (param.type.isDartCoreBool) {
       return 'CheckboxListTile('
           'title: Text(locales.$titleKey),'
+          'secondary: ${iconData != null ? "Icon($iconData)" : "null"},'
           'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
           'value: settings.${param.name},'
           'onChanged: (val) => context.read<$cubitName>().update${param.name.toPascalCase()}(val!),'
           '),';
     }
-    return "";
+    return 'ListTile(title: Text("TODO: ${param.name}"),'
+        'leading: ${iconData != null ? "Icon($iconData)" : "null"},'
+        'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
+        '),';
   }
 }
 

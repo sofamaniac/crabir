@@ -6,6 +6,7 @@ import 'package:crabir/feed/sort_menu.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/post.dart';
 import 'package:crabir/routes/routes.dart';
+import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
@@ -198,11 +199,14 @@ class _CommonFeedViewState extends State<CommonFeedView>
     return RedditPostCard(
       maxLines: 5,
       post: post,
-      onTap: () => context.router.navigate(
-        ThreadRoute(
-          post: post,
-        ),
-      ),
+      onTap: () {
+        context.read<ReadPosts>().mark(post.id.asString);
+        context.router.navigate(
+          ThreadRoute(
+            post: post,
+          ),
+        );
+      },
     );
   }
 }

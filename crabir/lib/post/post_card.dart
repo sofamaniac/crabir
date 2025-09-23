@@ -123,12 +123,10 @@ class _RedditPostCardState extends State<RedditPostCard> {
         wrapPostElement(Header(post: widget.post)),
         title(),
         if (child != null) child,
-        wrapPostElement(
-          Footer(
-            post: widget.post,
-            onLike: _onLike,
-            onSave: _onSave,
-          ),
+        Footer(
+          post: widget.post,
+          onLike: _onLike,
+          onSave: _onSave,
         ),
       ],
     );

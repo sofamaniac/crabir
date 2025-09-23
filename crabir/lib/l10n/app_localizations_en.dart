@@ -433,5 +433,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get data_preferredQuality => 'Image Quality';
 
   @override
+  String get filters_manageHiddenCommunities => 'Communities';
+
+  @override
+  String get filters_manageHiddenCommunitiesDescription =>
+      'Hide posts from these communities';
+
+  @override
+  String get filters_manageHiddenDomains => 'Domains';
+
+  @override
+  String get filters_manageHiddenDomainsDescription =>
+      'Hide posts from these domains';
+
+  @override
+  String get filters_manageHiddenUsers => 'Users';
+
+  @override
+  String get filters_manageHiddenUsersDescription =>
+      'Hide posts from these users';
+
+  @override
+  String get filters_manageHiddenFlairs => 'Flairs';
+
+  @override
+  String get filters_manageHiddenFlairsDescription =>
+      'Hide posts with these flairs';
+
+  @override
+  String get filters_showNSFW => 'Show NSFW';
+
+  @override
+  String get filters_showNSFWDescription =>
+      'Show content labeled Not Safe For Work';
+
+  @override
+  String get filters_showImageInNSFW => 'Show images in NSFW posts';
+
+  @override
   String get filters_blurNSFW => 'Blur images in NSFW posts';
 }

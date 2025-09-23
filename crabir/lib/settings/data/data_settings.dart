@@ -45,6 +45,7 @@ class ImageLoadingSelect extends StatelessWidget {
   final Widget title;
   final Widget? subtitle;
   final ImageLoading value;
+  final Widget? leading;
   final void Function(ImageLoading) onChanged;
   const ImageLoadingSelect({
     super.key,
@@ -52,6 +53,7 @@ class ImageLoadingSelect extends StatelessWidget {
     this.subtitle,
     required this.onChanged,
     required this.value,
+    this.leading,
   });
   String _label(ImageLoading mode) {
     switch (mode) {
@@ -78,6 +80,7 @@ class ImageLoadingSelect extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      leading: leading,
       title: title,
       subtitle: subtitle,
       trailing: DropdownMenu(
@@ -101,6 +104,7 @@ class ResolutionSelect extends StatelessWidget {
   final Widget title;
   final Widget? subtitle;
   final Resolution value;
+  final Widget? leading;
   final void Function(Resolution) onChanged;
   const ResolutionSelect({
     super.key,
@@ -108,12 +112,14 @@ class ResolutionSelect extends StatelessWidget {
     required this.onChanged,
     required this.value,
     this.subtitle,
+    this.leading,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: title,
+      leading: leading,
       subtitle: subtitle,
       trailing: DropdownMenu(
         dropdownMenuEntries: Resolution.values

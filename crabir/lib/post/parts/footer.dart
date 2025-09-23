@@ -13,7 +13,7 @@ class Footer extends StatelessWidget {
     final settings = context.read<PostsSettingsCubit>().state;
     final likes = post.likes.toVoteDirection();
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         VoteButton.like(
           likes: likes,
@@ -68,7 +68,89 @@ class Footer extends StatelessWidget {
           ),
         if (settings.showShareButton) ShareButton(post: post),
         // TODO: add missing buttons
+        MoreOptionButton(post: post),
       ],
+    );
+  }
+}
+
+class MoreOptionButton extends StatelessWidget {
+  final Post post;
+  const MoreOptionButton({super.key, required this.post});
+
+  Dialog muteDialog(BuildContext context) {
+    final icon = post.subreddit.details?.icon;
+    final filters = context.read<GlobalFiltersCubit>();
+    return Dialog(
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          ListTile(
+            leading: icon != null ? SubredditIcon(icon: icon) : null,
+            title: Text("Mute ${post.subreddit.subreddit}"),
+            onTap: () => filters.hideSubreddit(post.subreddit.subreddit),
+          ),
+          ListTile(
+            leading: Icon(Icons.link),
+            title: Text("Mute ${post.domain}"),
+            onTap: () => filters.hideDomain(post.domain),
+          ),
+          if (post.author != null)
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text("Mute ${post.author!.username}"),
+              onTap: () => filters.hideUser(post.author!.username),
+            ),
+          if (post.linkFlair.text != null && post.linkFlair.text!.isNotEmpty)
+            ListTile(
+              leading: Icon(Icons.label_outlined),
+              title: Text("Mute ${post.linkFlair.text!}"),
+              onTap: () => filters.hideFlair(post.linkFlair.text!),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Dialog dialog(BuildContext context) {
+    return Dialog(
+      elevation: 1,
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          Text("Go to subreddit"),
+          // When crosspost
+          Text("View original post"),
+          Text("Go to user"),
+          Text("search flair"),
+          // Optional
+          Text("mark read / unread"),
+          // Optional
+          Text("hide"),
+          Text("Report"),
+          ListTile(
+            leading: Icon(Icons.volume_mute),
+            title: Text("Mute..."),
+            trailing: Icon(Icons.more),
+            onTap: () {
+              Navigator.pop(context);
+              showDialog(context: context, builder: muteDialog);
+            },
+          ),
+          // Optional
+          Text("share"),
+          Text("copy"),
+          Text("add to custom feed")
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.more_vert),
+      onPressed: () => showDialog(context: context, builder: dialog),
     );
   }
 }

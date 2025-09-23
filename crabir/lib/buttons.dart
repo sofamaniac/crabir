@@ -1,3 +1,4 @@
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:flutter/material.dart';
 
@@ -170,6 +171,107 @@ class _SaveButtonState extends State<SaveButton>
           ),
         );
       },
+    );
+  }
+}
+
+class LikeText extends StatefulWidget {
+  final int score;
+  final bool? likes;
+  final TextStyle style;
+  final double scaling;
+
+  /// Replace score by '?'
+  final bool hidden;
+
+  const LikeText({
+    super.key,
+    required this.score,
+    required this.likes,
+    required this.style,
+    required this.scaling,
+    this.hidden = false,
+  });
+
+  @override
+  State<LikeText> createState() => _LikeTextState();
+}
+
+class _LikeTextState extends State<LikeText>
+    with SingleTickerProviderStateMixin {
+  late double currentSize;
+  double _scale = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    currentSize = widget.style.fontSize ?? 24;
+  }
+
+  @override
+  void didUpdateWidget(covariant LikeText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final likes = widget.likes;
+    final oldLikes = oldWidget.likes;
+    final baseSize = widget.style.fontSize ?? 24;
+
+    // Trigger animation only when liked changes from false → true
+    if (likes != oldLikes) {
+      if (likes == true) {
+        // Grow temporarily
+        setState(() {
+          currentSize = baseSize * widget.scaling;
+          _scale = widget.scaling;
+        });
+      } else if (likes == false) {
+        setState(() {
+          currentSize = baseSize / widget.scaling;
+          _scale = 1 / widget.scaling;
+        });
+      }
+
+      // Shrink back after a short delay
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted) {
+          setState(() {
+            currentSize = baseSize;
+            _scale = 1;
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = CrabirTheme.of(context);
+    final color = switch (widget.likes) {
+      true => theme.primaryColor,
+      false => Colors.cyan,
+      _ => null
+    };
+    final scoreOffset = switch (widget.likes) {
+      true => 1,
+      false => -1,
+      _ => 0,
+    };
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 1.0, end: _scale),
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: value,
+          alignment: Alignment.center,
+          child: child,
+        );
+      },
+      child: Text(
+        widget.hidden ? "?" : "${widget.score + scoreOffset}",
+        style: widget.style.copyWith(
+          color: color,
+        ),
+      ),
     );
   }
 }

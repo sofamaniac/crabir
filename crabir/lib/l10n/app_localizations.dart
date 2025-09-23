@@ -808,6 +808,72 @@ abstract class AppLocalizations {
   /// **'Image Quality'**
   String get data_preferredQuality;
 
+  /// No description provided for @filters_manageHiddenCommunities.
+  ///
+  /// In en, this message translates to:
+  /// **'Communities'**
+  String get filters_manageHiddenCommunities;
+
+  /// No description provided for @filters_manageHiddenCommunitiesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide posts from these communities'**
+  String get filters_manageHiddenCommunitiesDescription;
+
+  /// No description provided for @filters_manageHiddenDomains.
+  ///
+  /// In en, this message translates to:
+  /// **'Domains'**
+  String get filters_manageHiddenDomains;
+
+  /// No description provided for @filters_manageHiddenDomainsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide posts from these domains'**
+  String get filters_manageHiddenDomainsDescription;
+
+  /// No description provided for @filters_manageHiddenUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Users'**
+  String get filters_manageHiddenUsers;
+
+  /// No description provided for @filters_manageHiddenUsersDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide posts from these users'**
+  String get filters_manageHiddenUsersDescription;
+
+  /// No description provided for @filters_manageHiddenFlairs.
+  ///
+  /// In en, this message translates to:
+  /// **'Flairs'**
+  String get filters_manageHiddenFlairs;
+
+  /// No description provided for @filters_manageHiddenFlairsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide posts with these flairs'**
+  String get filters_manageHiddenFlairsDescription;
+
+  /// No description provided for @filters_showNSFW.
+  ///
+  /// In en, this message translates to:
+  /// **'Show NSFW'**
+  String get filters_showNSFW;
+
+  /// No description provided for @filters_showNSFWDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Show content labeled Not Safe For Work'**
+  String get filters_showNSFWDescription;
+
+  /// No description provided for @filters_showImageInNSFW.
+  ///
+  /// In en, this message translates to:
+  /// **'Show images in NSFW posts'**
+  String get filters_showImageInNSFW;
+
   /// No description provided for @filters_blurNSFW.
   ///
   /// In en, this message translates to:

@@ -4,6 +4,7 @@ class _CommentsSortSelection extends StatelessWidget {
   final CommentSort value;
   final Widget title;
   final Widget? subtitle;
+  final Widget? leading;
   final void Function(CommentSort) onChanged;
 
   const _CommentsSortSelection({
@@ -11,6 +12,7 @@ class _CommentsSortSelection extends StatelessWidget {
     required this.onChanged,
     required this.title,
     this.subtitle,
+    this.leading,
   });
 
   Future<CommentSort?> _showSelectionDialogue(BuildContext context) async {
@@ -34,6 +36,7 @@ class _CommentsSortSelection extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: title,
+      leading: leading,
       subtitle: Text(value.label(context)),
       onTap: () async {
         final sort = await _showSelectionDialogue(context);

@@ -67,6 +67,8 @@ class SettingsBlocsProviders extends StatelessWidget {
         BlocProvider(create: (_) => PostsSettingsCubit()),
         BlocProvider(create: (_) => DataSettingsCubit()),
         BlocProvider(create: (_) => FiltersSettingsCubit()),
+        BlocProvider(create: (_) => ReadPosts()),
+        BlocProvider(create: (_) => GlobalFiltersCubit()),
       ],
       child: child,
     );

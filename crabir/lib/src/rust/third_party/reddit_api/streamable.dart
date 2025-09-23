@@ -14,9 +14,11 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Streamable>>
 abstract class Streamable implements RustOpaqueInterface {
-  List<List<Thing>> getAll();
+  List<Thing> getAll();
 
   int get length;
+
+  List<Thing> last();
 
   /// Returns true if there are still elements remaining.
   Future<bool> next();

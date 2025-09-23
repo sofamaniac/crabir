@@ -29,6 +29,7 @@ frb: $(RUST_CRATE_DIR)
 .PHONY: dart_build
 dart_build:
 	pushd $(FLUTTER_APP_DIR)
+	flutter gen-l10n
 	dart run build_runner build -d
 	popd
 
@@ -38,9 +39,14 @@ build: licenses frb dart_build
 	flutter build apk --dart-define-from-file $(ENV_FILE)
 	popd
 
-.PHONY: run
-run: frb dart_build
+.PHONY: debug
+debug: frb dart_build
 	pushd $(FLUTTER_APP_DIR)
 	flutter run --dart-define-from-file $(ENV_FILE)
 	popd
 
+.PHONY: release
+release: frb dart_build
+	pushd $(FLUTTER_APP_DIR)
+	flutter run --release --dart-define-from-file $(ENV_FILE)
+	popd

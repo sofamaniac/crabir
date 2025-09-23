@@ -146,31 +146,31 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
     final posts = (_streamable!.getAll())
         .whereType<Thing_Post>()
         .map((post) => post.field0);
-    if (posts.length < 20 && !_hasReachedMax) {
-      try {
-        while (await _streamable!.next() && _streamable!.length < 20) {}
-        _hasReachedMax = !await _streamable!.next();
-        final posts = (_streamable!.getAll())
-            .whereType<Thing_Post>()
-            .map((post) => post.field0);
-        emit(
-          state.copyWith(
-            hasReachedMax: _hasReachedMax,
-            items: posts.toList(),
-            query: query,
-          ),
-        );
-      } catch (e) {
-        emit(state.copyWith(status: StreamStatus.failure));
-      }
-    } else {
-      emit(
-        state.copyWith(
-          hasReachedMax: _hasReachedMax,
-          items: posts.toList(),
-          query: query,
-        ),
-      );
-    }
+    // if (posts.length < 20 && !_hasReachedMax) {
+    //   try {
+    //     while (await _streamable!.next() && _streamable!.length < 20) {}
+    //     _hasReachedMax = !await _streamable!.next();
+    //     final posts = (_streamable!.getAll())
+    //         .whereType<Thing_Post>()
+    //         .map((post) => post.field0);
+    //     emit(
+    //       state.copyWith(
+    //         hasReachedMax: _hasReachedMax,
+    //         items: posts.toList(),
+    //         query: query,
+    //       ),
+    //     );
+    //   } catch (e) {
+    //     emit(state.copyWith(status: StreamStatus.failure));
+    //   }
+    // } else {
+    emit(
+      state.copyWith(
+        hasReachedMax: _hasReachedMax,
+        items: posts.toList(),
+        query: query,
+      ),
+    );
+    //}
   }
 }

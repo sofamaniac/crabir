@@ -60,17 +60,22 @@ impl Streamable {
     }
 
     #[frb(sync)]
+    pub fn last(&self) -> Vec<Thing> {
+        self.pages.last().cloned().unwrap_or_default()
+    }
+
+    #[frb(sync)]
     pub fn nth(&self, n: u32) -> Option<Vec<Thing>> {
         self.pages.get(n as usize).cloned()
     }
 
     #[frb(sync)]
-    pub fn get_all(&self) -> Vec<Vec<Thing>> {
-        self.pages.clone()
+    pub fn get_all(&self) -> Vec<Thing> {
+        self.pages.iter().cloned().flatten().collect()
     }
 
     #[frb(sync, getter)]
     pub fn get_length(&self) -> u32 {
-        self.pages.len() as u32
+        self.pages.iter().fold(0usize, |acc, r| acc + r.len()) as u32
     }
 }

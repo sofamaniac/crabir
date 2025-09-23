@@ -233,5 +233,16 @@
   "data_loadImages": "Load images",
   "data_preferredQuality": "Image Quality",
 
+  "filters_manageHiddenCommunities": "Communities",
+  "filters_manageHiddenCommunitiesDescription": "Hide posts from these communities",
+  "filters_manageHiddenDomains": "Domains",
+  "filters_manageHiddenDomainsDescription": "Hide posts from these domains",
+  "filters_manageHiddenUsers": "Users",
+  "filters_manageHiddenUsersDescription": "Hide posts from these users",
+  "filters_manageHiddenFlairs": "Flairs",
+  "filters_manageHiddenFlairsDescription": "Hide posts with these flairs",
+  "filters_showNSFW": "Show NSFW",
+  "filters_showNSFWDescription": "Show content labeled Not Safe For Work",
+  "filters_showImageInNSFW": "Show images in NSFW posts",
   "filters_blurNSFW": "Blur images in NSFW posts"
 }

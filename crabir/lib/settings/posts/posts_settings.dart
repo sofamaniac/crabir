@@ -22,6 +22,7 @@ final _multiPrefix = "_MULTI_";
 class ManageSortButton extends StatelessWidget {
   final Widget title;
   final Widget? subtitle;
+  final Widget? leading;
   final void Function(RememberedSort) onChanged;
   final RememberedSort value;
   const ManageSortButton({
@@ -30,12 +31,14 @@ class ManageSortButton extends StatelessWidget {
     this.subtitle,
     required this.onChanged,
     required this.value,
+    this.leading,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: Text("Manage Sorts"),
+      leading: leading,
       onTap: () => context.router.navigate(ManageSortRoute()),
     );
   }
@@ -183,6 +186,7 @@ class _SortSelection extends StatelessWidget {
   final Widget title;
   final Widget? subtitle;
   final FeedSort value;
+  final Widget? leading;
   final void Function(FeedSort) onChanged;
 
   const _SortSelection({
@@ -190,12 +194,14 @@ class _SortSelection extends StatelessWidget {
     required this.onChanged,
     required this.title,
     this.subtitle,
+    this.leading,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: title,
+      leading: leading,
       subtitle: Text(value.label(context)),
       onTap: () async {
         final sort = await _showFeedSortDialog(context);

@@ -124,6 +124,7 @@ class CommentsSettingsView extends StatelessWidget {
       children: [
         _CommentsSortSelection(
           title: Text(locales.comments_defaultSort),
+          leading: null,
           subtitle: null,
           value: settings.defaultSort,
           onChanged: (val) =>
@@ -131,6 +132,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_useSuggestedSort),
+          secondary: null,
           subtitle: null,
           value: settings.useSuggestedSort,
           onChanged: (val) => context
@@ -141,6 +143,7 @@ class CommentsSettingsView extends StatelessWidget {
         Text("Appearance"),
         CheckboxListTile(
           title: Text(locales.comments_showNavigationBar),
+          secondary: null,
           subtitle: null,
           value: settings.showNavigationBar,
           onChanged: (val) => context
@@ -149,6 +152,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_showUserAvatar),
+          secondary: null,
           subtitle: null,
           value: settings.showUserAvatar,
           onChanged: (val) =>
@@ -156,6 +160,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_showCommentsImage),
+          secondary: null,
           subtitle: null,
           value: settings.showCommentsImage,
           onChanged: (val) => context
@@ -164,6 +169,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         MediaPreviewSizeSelect(
           title: Text(locales.comments_postMediaPreviewSize),
+          leading: null,
           subtitle: null,
           value: settings.postMediaPreviewSize,
           onChanged: (val) => context
@@ -172,6 +178,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_buttonsAlwaysVisible),
+          secondary: null,
           subtitle: null,
           value: settings.buttonsAlwaysVisible,
           onChanged: (val) => context
@@ -180,6 +187,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_hideButtonAfterAction),
+          secondary: null,
           subtitle: null,
           value: settings.hideButtonAfterAction,
           onChanged: (val) => context
@@ -188,6 +196,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_collapseAutoMod),
+          secondary: null,
           subtitle: null,
           value: settings.collapseAutoMod,
           onChanged: (val) =>
@@ -195,6 +204,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_collapseDisruptiveComment),
+          secondary: null,
           subtitle: null,
           value: settings.collapseDisruptiveComment,
           onChanged: (val) => context
@@ -203,6 +213,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_showPostUpvotePercentage),
+          secondary: null,
           subtitle: null,
           value: settings.showPostUpvotePercentage,
           onChanged: (val) => context
@@ -211,6 +222,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_highlightMyUsername),
+          secondary: null,
           subtitle: null,
           value: settings.highlightMyUsername,
           onChanged: (val) => context
@@ -219,6 +231,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_showFloatingButton),
+          secondary: null,
           subtitle: null,
           value: settings.showFloatingButton,
           onChanged: (val) => context
@@ -229,6 +242,7 @@ class CommentsSettingsView extends StatelessWidget {
         Text("Awards"),
         CheckboxListTile(
           title: Text(locales.comments_showAwards),
+          secondary: null,
           subtitle: null,
           value: settings.showAwards,
           onChanged: (val) =>
@@ -236,6 +250,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_clickableAwards),
+          secondary: null,
           subtitle: null,
           value: settings.clickableAwards,
           onChanged: (val) =>
@@ -245,6 +260,7 @@ class CommentsSettingsView extends StatelessWidget {
         Text("Flairs"),
         CheckboxListTile(
           title: Text(locales.comments_showUserFlair),
+          secondary: null,
           subtitle: null,
           value: settings.showUserFlair,
           onChanged: (val) =>
@@ -252,6 +268,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_showFlairColors),
+          secondary: null,
           subtitle: null,
           value: settings.showFlairColors,
           onChanged: (val) =>
@@ -259,6 +276,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_showFlairEmojis),
+          secondary: null,
           subtitle: null,
           value: settings.showFlairEmojis,
           onChanged: (val) =>
@@ -268,6 +286,7 @@ class CommentsSettingsView extends StatelessWidget {
         Text("Behavior"),
         CheckboxListTile(
           title: Text(locales.comments_clickToCollapse),
+          secondary: null,
           subtitle: null,
           value: settings.clickToCollapse,
           onChanged: (val) =>
@@ -275,6 +294,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_hideTextCollapsed),
+          secondary: null,
           subtitle: null,
           value: settings.hideTextCollapsed,
           onChanged: (val) => context
@@ -283,6 +303,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_loadCollapsed),
+          secondary: null,
           subtitle: null,
           value: settings.loadCollapsed,
           onChanged: (val) =>
@@ -290,6 +311,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_animateCollapse),
+          secondary: null,
           subtitle: null,
           value: settings.animateCollapse,
           onChanged: (val) =>
@@ -297,6 +319,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_clickableUsername),
+          secondary: null,
           subtitle: null,
           value: settings.clickableUsername,
           onChanged: (val) => context
@@ -307,6 +330,7 @@ class CommentsSettingsView extends StatelessWidget {
         Text("Navigation"),
         CheckboxListTile(
           title: Text(locales.comments_highlightNewComments),
+          secondary: null,
           subtitle: null,
           value: settings.highlightNewComments,
           onChanged: (val) => context
@@ -315,6 +339,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_volumeRockerNavigation),
+          secondary: null,
           subtitle: null,
           value: settings.volumeRockerNavigation,
           onChanged: (val) => context
@@ -323,6 +348,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_animateNavigation),
+          secondary: null,
           subtitle: null,
           value: settings.animateNavigation,
           onChanged: (val) => context
@@ -333,6 +359,7 @@ class CommentsSettingsView extends StatelessWidget {
         Text("Visible buttons"),
         CheckboxListTile(
           title: Text(locales.comments_showSaveButton),
+          secondary: null,
           subtitle: null,
           value: settings.showSaveButton,
           onChanged: (val) =>
@@ -342,6 +369,7 @@ class CommentsSettingsView extends StatelessWidget {
         Text("Gestures"),
         CheckboxListTile(
           title: Text(locales.comments_swipeToClose),
+          secondary: null,
           subtitle: null,
           value: settings.swipeToClose,
           onChanged: (val) =>

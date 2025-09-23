@@ -108,6 +108,7 @@ class MediaPreviewSizeSelect extends StatelessWidget {
   final Widget title;
   final Widget? subtitle;
   final MediaPreviewSize value;
+  final Widget? leading;
   final void Function(MediaPreviewSize) onChanged;
   const MediaPreviewSizeSelect({
     super.key,
@@ -115,12 +116,14 @@ class MediaPreviewSizeSelect extends StatelessWidget {
     required this.onChanged,
     required this.value,
     this.subtitle,
+    this.leading,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: title,
+      leading: leading,
       subtitle: subtitle,
       trailing: DropdownMenu(
         dropdownMenuEntries: MediaPreviewSize.values

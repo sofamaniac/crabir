@@ -6,6 +6,7 @@ import 'package:crabir/cartouche.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/html_view.dart';
 import 'package:crabir/routes/routes.dart';
+import 'package:crabir/separated_row.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
@@ -60,10 +61,18 @@ class _CommentViewState extends State<CommentView>
         if (comment.author != null)
           Flexible(child: FlairView(flair: comment.author!.flair)),
         Spacer(),
-        Text(
-          "${comment.scoreHidden ? "?" : comment.score} · ${comment.createdUtc.timeSince(context)}",
-          style: Theme.of(context).textTheme.labelMedium,
-        ),
+        SeparatedRow(children: [
+          LikeText(
+            score: comment.score,
+            likes: comment.likes,
+            style: Theme.of(context).textTheme.labelMedium!,
+            scaling: 1.5,
+          ),
+          Text(
+            comment.createdUtc.timeSince(context),
+            style: Theme.of(context).textTheme.labelMedium,
+          ),
+        ]),
       ],
     );
   }
@@ -178,6 +187,7 @@ class _CommentViewState extends State<CommentView>
             },
           ),
         IconButton(
+          color: Colors.grey,
           onPressed: () {
             // TODO: reply to comment
             if (settings.hideButtonAfterAction) {
