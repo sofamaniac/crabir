@@ -276,7 +276,7 @@ class _MainScreenViewState extends State<MainScreenView>
       addListener = false;
     }
     return BottomNavigationBar(
-      currentIndex: tabsController.index,
+      currentIndex: tabsRouter.activeIndex,
       backgroundColor: theme.toolBarBackground,
       selectedItemColor: theme.primaryColor,
       unselectedItemColor: theme.toolBarText.withAlpha(120),
@@ -284,7 +284,7 @@ class _MainScreenViewState extends State<MainScreenView>
       showSelectedLabels: false,
       type: BottomNavigationBarType.fixed, // so all items show
       onTap: (index) {
-        AutoTabsRouter.of(context).setActiveIndex(index);
+        tabsRouter.setActiveIndex(index);
         //tabsController.animateTo(index);
 
         final rootRoutes = {
@@ -294,7 +294,7 @@ class _MainScreenViewState extends State<MainScreenView>
         };
         final route = rootRoutes[index];
         if (route != null) {
-          context.tabsRouter.stackRouterOfIndex(index)?.replaceAll([route]);
+          tabsRouter.stackRouterOfIndex(index)?.replaceAll([route]);
         }
       },
       items: const [
@@ -310,7 +310,7 @@ class _MainScreenViewState extends State<MainScreenView>
   @override
   Widget build(BuildContext context) {
     final theme = CrabirTheme.of(context);
-    final account = context.watch<AccountsBloc>().state.account;
+    //final account = context.watch<AccountsBloc>().state.account;
 
     // Change system navigation bar background color.
     if (Platform.isAndroid) {
@@ -342,7 +342,7 @@ class _MainScreenViewState extends State<MainScreenView>
     ];
 
     return AutoTabsRouter.tabBar(
-      key: ValueKey(account?.id),
+      //key: ValueKey(account?.id),
       homeIndex: 0,
       physics: const NeverScrollableScrollPhysics(),
       routes: routes,
@@ -360,7 +360,11 @@ class _MainScreenViewState extends State<MainScreenView>
           child: SafeArea(
             child: Scaffold(
               backgroundColor: theme.background,
-              drawer: const AppDrawer(),
+              drawer: AppDrawer(
+                onAccountChanged: () {
+                  tabsRouter.setActiveIndex(0);
+                },
+              ),
               body: child,
               bottomNavigationBar:
                   bottomBar(context, tabsRouter, tabController, theme),

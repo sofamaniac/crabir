@@ -199,7 +199,6 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
             height: source.y,
             placeholderUrl: placeholder.u,
             goFullScreen: () {
-              print("GO FULLSCREEN");
               widget.onTap?.call();
             },
           ),

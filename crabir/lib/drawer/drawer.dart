@@ -16,7 +16,8 @@ part 'drawer_state.dart';
 part 'drawer_feed_selection.dart';
 
 class AppDrawer extends StatefulWidget {
-  const AppDrawer({super.key});
+  final VoidCallback? onAccountChanged;
+  const AppDrawer({super.key, this.onAccountChanged});
   @override
   State<StatefulWidget> createState() => DrawerState();
 }

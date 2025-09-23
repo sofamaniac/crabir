@@ -69,14 +69,18 @@ class DrawerState extends State<AppDrawer> {
         mainAxisSize: MainAxisSize.min,
         children: [
           currentAccountView(context),
-          isSelectingAccount
-              ? Expanded(
-                  child: AccountSelector(
-                    showCurrentAccount: false,
-                    onTapCallback: () => changeMode(isSelectingAccount: false),
-                  ),
-                )
-              : DrawerFeedSelection()
+          if (isSelectingAccount)
+            Expanded(
+              child: AccountSelector(
+                showCurrentAccount: false,
+                onTapCallback: () {
+                  changeMode(isSelectingAccount: false);
+                  widget.onAccountChanged?.call();
+                },
+              ),
+            )
+          else
+            DrawerFeedSelection()
         ],
       ),
     );

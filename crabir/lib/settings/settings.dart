@@ -45,6 +45,14 @@ class SettingsView extends StatelessWidget {
             onTap: () =>
                 AutoRouter.of(context).navigate(FiltersSettingsRoute()),
           ),
+          ListTile(
+            onTap: () => showLicensePage(context: context),
+            title: Text(
+              "Licenses",
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            leading: Icon(Icons.info_outline),
+          ),
         ],
       ),
     );

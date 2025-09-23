@@ -20,6 +20,7 @@ class _SubscriptionsTabState extends State<SubscriptionsTab> {
     return Scaffold(
       appBar: AppBar(
         title: SearchBar(
+          hintText: "Search community",
           onChanged: (input) => setState(() {
             filter = input;
           }),
@@ -43,31 +44,28 @@ class _SubscriptonsList extends StatelessWidget {
     } else if (account.status case Unloaded()) {
       bloc.add(LoadSubscriptions());
     } else if (account.status case Loaded()) {
-      return Flexible(
-        fit: FlexFit.loose,
-        child: ListView(
-          children: [
-            ...baseFeeds(context, closeDrawer: false).where(
-              (feed) => feed.title.toLowerCase().contains(filter.toLowerCase()),
-            ),
-            ...account.multis
-                .where(
-                  (multi) => multi.displayName
-                      .toLowerCase()
-                      .contains(filter.toLowerCase()),
-                )
-                .map((multi) => MultiRedditTile(multi)),
-            ...account.subscriptions
-                .where(
-                  (sub) => sub.other.displayName
-                      .toLowerCase()
-                      .contains(filter.toLowerCase()),
-                )
-                .map(
-                  (sub) => SubredditTile(sub),
-                ),
-          ],
-        ),
+      return ListView(
+        children: [
+          ...baseFeeds(context, closeDrawer: false).where(
+            (feed) => feed.title.toLowerCase().contains(filter.toLowerCase()),
+          ),
+          ...account.multis
+              .where(
+                (multi) => multi.displayName
+                    .toLowerCase()
+                    .contains(filter.toLowerCase()),
+              )
+              .map((multi) => MultiRedditTile(multi)),
+          ...account.subscriptions
+              .where(
+                (sub) => sub.other.displayName
+                    .toLowerCase()
+                    .contains(filter.toLowerCase()),
+              )
+              .map(
+                (sub) => SubredditTile(sub),
+              ),
+        ],
       );
     }
     return LoadingIndicator();
