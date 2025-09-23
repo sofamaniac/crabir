@@ -26,15 +26,24 @@ class StyledHtml extends StatelessWidget {
     this.showImages = true,
   });
 
-  @override
-  Widget build(BuildContext context) {
+  String sanitize(String htmlContent) {
     final htmlContent = this
         .htmlContent
-        // .replaceAll('<p>', '')
-        // .replaceAll('</p>', '<br>')
+        .replaceAll('<p>', '')
+        .replaceAll('</p>', '')
         .replaceAll('\n\n', '<br>');
+    // Remove last <br>
+    //final position = htmlContent.lastIndexOf("<br>");
+    //return htmlContent.replaceFirst("<br>", "", position);
+    return htmlContent;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = CrabirTheme.of(context);
     final brightness = Theme.of(context).brightness;
+
+    final htmlContent = sanitize(this.htmlContent);
 
     final quoteBackground = switch (brightness) {
       Brightness.light => Colors.grey.shade200,
@@ -79,9 +88,6 @@ class StyledHtml extends StatelessWidget {
           Unit.auto,
         ),
       ),
-      "p": Style(
-        margin: Margins.zero,
-      )
     };
     style.addAll(additionalStyles);
     return Html(
