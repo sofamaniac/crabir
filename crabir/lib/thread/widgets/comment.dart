@@ -11,6 +11,7 @@ import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/author.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/thread/widgets/thread.dart';
@@ -23,12 +24,15 @@ class CommentView extends StatefulWidget {
   final bool animateBottomBar;
   final VoidCallback? onLongPress;
   final VoidCallback? onTap;
+  // Display the number of replies in the header
+  final bool showRepliesNumber;
   const CommentView({
     super.key,
     required this.comment,
     this.animateBottomBar = true,
     this.onLongPress,
     this.onTap,
+    this.showRepliesNumber = false,
   });
   @override
   createState() => _CommentViewState();
@@ -67,6 +71,12 @@ class _CommentViewState extends State<CommentView>
           separatorStyle:
               Theme.of(context).textTheme.labelMedium!.copyWith(color: color),
           children: [
+            if (widget.showRepliesNumber)
+              Cartouche(
+                "+${numReplies(comment)}",
+                foreground: Colors.white,
+                background: Colors.lightGreen,
+              ),
             LikeText(
               score: comment.score,
               likes: comment.likes,
@@ -217,6 +227,22 @@ class _CommentViewState extends State<CommentView>
         ),
       ],
     );
+  }
+}
+
+int numReplies(Comment comment) {
+  if (comment.replies().isEmpty) {
+    return 0;
+  } else {
+    int acc = 0;
+    for (final reply in comment.replies()) {
+      acc += switch (reply) {
+        Thing_Comment(field0: final comment) => numReplies(comment),
+        Thing_More(:final count) => count,
+        _ => 0,
+      };
+    }
+    return acc;
   }
 }
 

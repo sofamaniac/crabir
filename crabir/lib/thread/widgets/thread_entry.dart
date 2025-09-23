@@ -13,15 +13,19 @@ class ThreadEntry extends StatelessWidget {
         return (state.hidden.contains(id), state.collapsed.contains(id));
       },
       builder: (context, state) {
+        final settings = CommentsSettings.of(context);
         final (hidden, collapsed) = state;
         final theme = CrabirTheme.of(context);
         final locales = AppLocalizations.of(context);
         final inner = switch (thing) {
           _ when hidden => SizedBox.shrink(),
-          Thing_Comment(field0: final comment) when collapsed => IndentedBox(
+          Thing_Comment(field0: final comment)
+              when collapsed && !settings.hideTextCollapsed =>
+            IndentedBox(
               depth: comment.depth,
               child: CommentView(
                 comment: comment,
+                showRepliesNumber: true,
                 onLongPress: () {
                   thread.add(Collapse(comment));
                   HapticFeedback.selectionClick();
