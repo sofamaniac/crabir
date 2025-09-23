@@ -23,22 +23,15 @@ class Header extends StatelessWidget {
     final name = post.subreddit.subreddit;
     final subreddit = Text(
       name,
-      style: _labelStyle(context).copyWith(
-        color: theme.highlight,
-      ),
+      style: _labelStyle(context).copyWith(color: theme.highlight),
     );
     if (settings.clickableCommunity) {
-      final onTap = onSubredditTap ??
+      final onTap =
+          onSubredditTap ??
           () => context.router.navigate(
-                FeedRoute(
-                  key: ValueKey(name),
-                  feed: Feed.subreddit(name),
-                ),
-              );
-      return InkWell(
-        onTap: onTap,
-        child: subreddit,
-      );
+            FeedRoute(key: ValueKey(name), feed: Feed.subreddit(name)),
+          );
+      return InkWell(onTap: onTap, child: subreddit);
     } else {
       return subreddit;
     }
@@ -67,9 +60,9 @@ class Header extends StatelessWidget {
 
   TextStyle _labelStyle(BuildContext context) {
     return Theme.of(context).textTheme.labelSmall!.copyWith(
-          fontWeight: FontWeight.normal,
-          color: CrabirTheme.of(context).alternativeText,
-        );
+      fontWeight: FontWeight.normal,
+      color: CrabirTheme.of(context).alternativeText,
+    );
   }
 
   @override
@@ -98,13 +91,12 @@ class Header extends StatelessWidget {
                   child: Icon(Icons.alt_route, color: Colors.greenAccent),
                 ),
               _author(context),
-              Text(post.createdUtc.timeSince(context),
-                  style: _labelStyle(context)),
+              Text(
+                post.createdUtc.timeSince(context),
+                style: _labelStyle(context),
+              ),
               if (_showDomain()) ...[
-                Text(
-                  post.domain,
-                  style: _labelStyle(context),
-                ),
+                Text(post.domain, style: _labelStyle(context)),
                 if (post.locked)
                   Icon(
                     Icons.lock_sharp,
