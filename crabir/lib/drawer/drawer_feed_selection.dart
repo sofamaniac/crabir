@@ -18,6 +18,7 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
   Widget build(BuildContext context) {
     final bloc = context.watch<AccountsBloc>();
     final account = bloc.state;
+    final theme = CrabirTheme.of(context);
 
     if (account.status case Uninit()) {
       bloc.add(Initialize());
@@ -61,7 +62,10 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
             ...account.multis.map(
               (multi) => MultiRedditTile(
                 multi,
-                closeDrawer: true,
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: theme.alternativeText,
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
             ),
             Divider(),
@@ -69,6 +73,10 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
               (sub) {
                 return SubredditTile(
                   sub,
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: theme.alternativeText,
+                        fontWeight: FontWeight.bold,
+                      ),
                 );
               },
             ),

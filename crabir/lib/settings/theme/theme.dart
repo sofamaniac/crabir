@@ -53,6 +53,7 @@ abstract class CrabirTheme with _$CrabirTheme {
 
     /// Buttons and widgets
     @ColorConverter() @Default(Color(0xffff6e40)) Color primaryColor,
+    @ColorConverter() @Default(Color(0xFFB7B8BC)) Color alternativeText,
 
     /// Communities and usernames
     @ColorConverter() @Default(Color(0xffff0000)) Color highlight,
@@ -61,6 +62,7 @@ abstract class CrabirTheme with _$CrabirTheme {
     @ColorConverter() @Default(Color(0xFF00FF00)) Color announcement,
     @ColorConverter() @Default(Color(0xFFF5F6F8)) Color contentText,
     @ColorConverter() @Default(Color(0xFF4B91E2)) Color linkColor,
+    @ColorConverter() @Default(Color(0xFF9580FF)) downvoteContent,
   }) = _CrabirTheme;
 
   factory CrabirTheme.light() => CrabirTheme(
@@ -75,6 +77,7 @@ abstract class CrabirTheme with _$CrabirTheme {
         announcement: Colors.green,
         contentText: Colors.black87,
         linkColor: Colors.blue,
+        downvoteContent: const Color(0XFF9580FF),
       );
 
   factory CrabirTheme.fromJson(Map<String, dynamic> json) =>

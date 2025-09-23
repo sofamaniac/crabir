@@ -1,6 +1,7 @@
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class VoteButton extends StatefulWidget {
   final VoteDirection likes;
@@ -78,6 +79,7 @@ class _VoteButtonState extends State<VoteButton>
   @override
   Widget build(BuildContext context) {
     final active = widget.likes == widget.action;
+    final theme = CrabirTheme.of(context);
 
     return AnimatedBuilder(
       animation: _animation,
@@ -87,7 +89,7 @@ class _VoteButtonState extends State<VoteButton>
           child: IconButton(
             icon: Icon(
               active ? widget.iconActive : widget.iconNeutral,
-              color: active ? widget.colorActive : Colors.grey,
+              color: active ? widget.colorActive : theme.alternativeText,
             ),
             onPressed: () {
               if (active) {
@@ -149,6 +151,7 @@ class _SaveButtonState extends State<SaveButton>
 
   @override
   Widget build(BuildContext context) {
+    final theme = CrabirTheme.of(context);
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
@@ -157,7 +160,7 @@ class _SaveButtonState extends State<SaveButton>
           child: IconButton(
             icon: Icon(
               active ? Icons.bookmark : Icons.bookmark_outline,
-              color: active ? Colors.yellow : Colors.grey,
+              color: active ? Colors.yellow : theme.alternativeText,
             ),
             onPressed: () {
               setState(() {
@@ -247,8 +250,8 @@ class _LikeTextState extends State<LikeText>
     final theme = CrabirTheme.of(context);
     final color = switch (widget.likes) {
       true => theme.primaryColor,
-      false => Colors.cyan,
-      _ => null
+      false => theme.downvoteContent,
+      _ => theme.alternativeText,
     };
     final scoreOffset = switch (widget.likes) {
       true => 1,
@@ -267,7 +270,9 @@ class _LikeTextState extends State<LikeText>
         );
       },
       child: Text(
-        widget.hidden ? "?" : "${widget.score + scoreOffset}",
+        widget.hidden
+            ? "?"
+            : NumberFormat.compact().format(widget.score + scoreOffset),
         style: widget.style.copyWith(
           color: color,
         ),

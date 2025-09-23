@@ -39,6 +39,9 @@ abstract class DataSettings with _$DataSettings {
   }) = _DataSettings;
   factory DataSettings.fromJson(Map<String, dynamic> json) =>
       _$DataSettingsFromJson(json);
+
+  factory DataSettings.of(BuildContext context) =>
+      context.watch<DataSettingsCubit>().state;
 }
 
 class ImageLoadingSelect extends StatelessWidget {

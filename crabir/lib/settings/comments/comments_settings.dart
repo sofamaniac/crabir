@@ -87,6 +87,15 @@ abstract class CommentsSettings with _$CommentsSettings {
   }) = _CommentsSetttings;
   factory CommentsSettings.fromJson(Map<String, dynamic> json) =>
       _$CommentsSetttingsFromJson(json);
+
+  factory CommentsSettings.of(BuildContext context) =>
+      context.watch<CommentsSettingsCubit>().state;
+}
+
+extension CommentsSettingsFromContext on CommentsSettings {
+  CommentsSettings of(BuildContext context) {
+    return context.watch<CommentsSettingsCubit>().state;
+  }
 }
 
 enum MediaPreviewSize {

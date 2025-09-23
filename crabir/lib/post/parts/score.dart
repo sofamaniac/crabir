@@ -7,6 +7,7 @@ class PostScore extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final locales = AppLocalizations.of(context);
+    final color = CrabirTheme.of(context).alternativeText;
     final spacer = const WidgetSpan(child: SizedBox(width: 8));
     return RichText(
       text: TextSpan(
@@ -21,11 +22,17 @@ class PostScore extends StatelessWidget {
             ),
           ),
           spacer,
-          TextSpan(text: '•', style: Theme.of(context).textTheme.bodySmall),
+          TextSpan(
+              text: '•',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall!
+                  .copyWith(color: color)),
           spacer,
           TextSpan(
             text: locales.commentsNumbered(post.numComments),
-            style: Theme.of(context).textTheme.bodySmall,
+            style:
+                Theme.of(context).textTheme.bodySmall!.copyWith(color: color),
           ),
           if (post.over18) ...[
             spacer,

@@ -6,6 +6,7 @@ import 'package:crabir/base_feeds.dart';
 import 'package:crabir/feed_list.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/routes/routes.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/settings/theme/theme_event.dart';
 import 'package:flutter/material.dart';

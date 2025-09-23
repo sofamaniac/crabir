@@ -59,7 +59,7 @@ class StyledHtml extends StatelessWidget {
         height: Height(1), // control thickness
         backgroundColor: Colors.grey, // ensure it's visible
       ),
-      "a": Style(color: theme.linkColor),
+      "a": Style(color: theme.linkColor, textDecorationColor: theme.linkColor),
       'blockquote': Style(
         margin: Margins.symmetric(horizontal: 0, vertical: 8),
         backgroundColor: quoteBackground,

@@ -14,8 +14,14 @@ void navigateToSubscriptionsTab(BuildContext context, destination) {
 /// Widget to display a subreddit in a list
 class SubredditTile extends StatelessWidget {
   final subreddit.Subreddit sub;
+  final TextStyle? style;
 
-  const SubredditTile(this.sub, {super.key});
+  const SubredditTile(
+    this.sub, {
+    super.key,
+    this.style,
+  });
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -30,7 +36,9 @@ class SubredditTile extends StatelessWidget {
       leading: SubredditIcon(icon: sub.icon, radius: 12),
       title: Text(
         sub.other.displayNamePrefixed,
-        style: Theme.of(context).textTheme.bodyMedium,
+        // style:
+        //     Theme.of(context).textTheme.bodyMedium!.copyWith(color: textColor),
+        style: style,
         maxLines: 1,
       ),
     );
@@ -40,14 +48,12 @@ class SubredditTile extends StatelessWidget {
 /// Widget to display a multireddit in a list
 class MultiRedditTile extends StatelessWidget {
   final Multi multi;
-
-  /// If set to `true`, calls `Navigator.pop()` before navigating to the destination
-  final bool closeDrawer;
+  final TextStyle? style;
 
   const MultiRedditTile(
     this.multi, {
     super.key,
-    this.closeDrawer = false,
+    this.style,
   });
 
   @override
@@ -57,9 +63,7 @@ class MultiRedditTile extends StatelessWidget {
         final destination = MultiRoute(
           multi: multi,
         );
-        if (closeDrawer) {
-          Navigator.pop(context);
-        }
+        Navigator.pop(context);
         navigateToSubscriptionsTab(context, destination);
       },
       leading: CircleAvatar(
@@ -68,7 +72,7 @@ class MultiRedditTile extends StatelessWidget {
       ),
       title: Text(
         multi.displayName,
-        style: Theme.of(context).textTheme.bodyMedium,
+        style: style,
         maxLines: 1,
       ),
     );

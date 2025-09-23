@@ -66,10 +66,10 @@ class Header extends StatelessWidget {
   }
 
   TextStyle _labelStyle(BuildContext context) {
-    return Theme.of(context)
-        .textTheme
-        .labelSmall!
-        .copyWith(fontWeight: FontWeight.normal);
+    return Theme.of(context).textTheme.labelSmall!.copyWith(
+          fontWeight: FontWeight.normal,
+          color: CrabirTheme.of(context).alternativeText,
+        );
   }
 
   @override
@@ -87,7 +87,9 @@ class Header extends StatelessWidget {
           ),
         Expanded(
           child: SeparatedRow(
+            spacing: 2,
             crossAxisAlignment: WrapCrossAlignment.center,
+            separatorStyle: _labelStyle(context),
             children: [
               _subreddit(context),
               if (post.isCrosspost)
@@ -103,7 +105,12 @@ class Header extends StatelessWidget {
                   post.domain,
                   style: _labelStyle(context),
                 ),
-                if (post.locked) Icon(Icons.lock),
+                if (post.locked)
+                  Icon(
+                    Icons.lock_sharp,
+                    size: _labelStyle(context).fontSize,
+                    color: _labelStyle(context).color,
+                  ),
               ],
             ],
           ),

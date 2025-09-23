@@ -42,6 +42,9 @@ abstract class FiltersSettings with _$FiltersSettings {
 
   factory FiltersSettings.fromJson(Map<String, dynamic> json) =>
       _$FiltersSettingsFromJson(json);
+
+  factory FiltersSettings.of(BuildContext context) =>
+      context.watch<FiltersSettingsCubit>().state;
 }
 
 class ReadPosts extends HydratedCubit<HashSet<String>> {
@@ -63,6 +66,11 @@ class GlobalFilters {
   List<String> flairs = [];
   List<String> subreddits = [];
   List<String> domains = [];
+
+  GlobalFilters();
+
+  factory GlobalFilters.of(BuildContext context) =>
+      context.watch<GlobalFiltersCubit>().state;
 }
 
 class GlobalFiltersCubit extends HydratedCubit<GlobalFilters> {

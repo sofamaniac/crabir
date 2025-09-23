@@ -9,7 +9,7 @@ class Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CrabirTheme.of(context);
     final likeColor = theme.primaryColor;
-    final dislikeColor = Colors.cyanAccent;
+    final dislikeColor = theme.downvoteContent;
     final settings = context.read<PostsSettingsCubit>().state;
     final likes = post.likes.toVoteDirection();
     return Row(
@@ -45,7 +45,7 @@ class Footer extends StatelessWidget {
         if (settings.showCommentsButton)
           IconButton(
             icon: const Icon(Icons.comment),
-            color: Colors.grey,
+            color: theme.alternativeText,
             tooltip: 'Comments',
             onPressed: () => navigateToSubscriptionsTab(
               context,
@@ -57,7 +57,7 @@ class Footer extends StatelessWidget {
         if (settings.showOpenInAppButton)
           IconButton(
             icon: const Icon(Icons.exit_to_app),
-            color: Colors.grey,
+            color: theme.alternativeText,
             tooltip: 'Open in',
             onPressed: () async {
               final url = Uri.parse(
@@ -207,9 +207,10 @@ class MoreOptionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = CrabirTheme.of(context);
     return IconButton(
       icon: Icon(Icons.more_vert),
-      color: Colors.grey,
+      color: theme.alternativeText,
       onPressed: () => showDialog(context: context, builder: dialog),
     );
   }

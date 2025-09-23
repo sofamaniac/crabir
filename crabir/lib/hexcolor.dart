@@ -14,8 +14,8 @@ extension StringToColor on String {
         "black" => Colors.black,
         "transparent" => Colors.transparent,
         "light" => Colors.white,
-        "dark" => Colors.black,
-        "gray" => Colors.grey,
+        "dark" => Colors.grey,
+        "gray" => Colors.grey[850]!,
         "" => defaultColor,
         _ => () {
             log.warning("Unknown color \"$this\"");

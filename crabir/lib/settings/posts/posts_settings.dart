@@ -124,6 +124,8 @@ abstract class PostsSettings with _$PostsSettings {
   }) = _PostsSettings;
   factory PostsSettings.fromJson(Map<String, dynamic> json) =>
       _$PostsSettingsFromJson(json);
+  factory PostsSettings.of(BuildContext context) =>
+      context.watch<PostsSettingsCubit>().state;
   PostsSettings._();
 }
 

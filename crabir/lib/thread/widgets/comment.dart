@@ -50,6 +50,7 @@ class _CommentViewState extends State<CommentView>
 
   Widget topRow(CommentsSettings settings) {
     final comment = widget.comment;
+    final color = CrabirTheme.of(context).alternativeText;
     return Row(
       spacing: 8,
       children: [
@@ -61,19 +62,26 @@ class _CommentViewState extends State<CommentView>
         if (comment.author != null)
           Flexible(child: FlairView(flair: comment.author!.flair)),
         Spacer(),
-        SeparatedRow(children: [
-          LikeText(
-            score: comment.score,
-            likes: comment.likes,
-            hidden: comment.scoreHidden,
-            style: Theme.of(context).textTheme.labelMedium!,
-            scaling: 1.5,
-          ),
-          Text(
-            comment.createdUtc.timeSince(context),
-            style: Theme.of(context).textTheme.labelMedium,
-          ),
-        ]),
+        SeparatedRow(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            separatorStyle:
+                Theme.of(context).textTheme.labelMedium!.copyWith(color: color),
+            children: [
+              LikeText(
+                score: comment.score,
+                likes: comment.likes,
+                hidden: comment.scoreHidden,
+                style: Theme.of(context).textTheme.labelMedium!,
+                scaling: 1.5,
+              ),
+              Text(
+                comment.createdUtc.timeSince(context),
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium!
+                    .copyWith(color: color),
+              ),
+            ]),
       ],
     );
   }
@@ -149,9 +157,10 @@ class _CommentViewState extends State<CommentView>
   }
 
   Widget bottomBar() {
-    final likeColor = Theme.of(context).colorScheme.primary;
-    final dislikeColor = Colors.cyanAccent;
-    final settings = context.watch<CommentsSettingsCubit>().state;
+    final theme = CrabirTheme.of(context);
+    final likeColor = theme.primaryColor;
+    final dislikeColor = theme.downvoteContent;
+    final settings = CommentsSettings.of(context);
     final likes = widget.comment.likes.toVoteDirection();
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -188,7 +197,7 @@ class _CommentViewState extends State<CommentView>
             },
           ),
         IconButton(
-          color: Colors.grey,
+          color: theme.alternativeText,
           onPressed: () {
             // TODO: reply to comment
             if (settings.hideButtonAfterAction) {
@@ -262,7 +271,7 @@ class _Username extends StatelessWidget {
           );
         }
       },
-      child: _username(settings, currentUser, theme.primaryColor),
+      child: _username(settings, currentUser, theme.highlight),
     );
   }
 }
