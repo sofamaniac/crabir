@@ -37,8 +37,14 @@ class StyledHtml extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = CrabirTheme.of(context);
+    final brightness = Theme.of(context).brightness;
 
     final htmlContent = sanitize(this.htmlContent);
+
+    final quoteBackground = switch (brightness) {
+      Brightness.light => Colors.grey.shade200,
+      Brightness.dark => Colors.grey.shade900
+    };
 
     final style = {
       // Style for divider
@@ -52,7 +58,7 @@ class StyledHtml extends StatelessWidget {
       "a": Style(color: theme.linkColor, textDecorationColor: theme.linkColor),
       'blockquote': Style(
         margin: Margins.symmetric(horizontal: 0, vertical: 8),
-        backgroundColor: theme.secondaryText,
+        backgroundColor: quoteBackground,
         padding: HtmlPaddings.all(12),
         border: Border(
           left: BorderSide(
