@@ -89,7 +89,7 @@ class _VoteButtonState extends State<VoteButton>
           child: IconButton(
             icon: Icon(
               active ? widget.iconActive : widget.iconNeutral,
-              color: active ? widget.colorActive : theme.alternativeText,
+              color: active ? widget.colorActive : theme.secondaryText,
             ),
             onPressed: () {
               if (active) {
@@ -160,7 +160,7 @@ class _SaveButtonState extends State<SaveButton>
           child: IconButton(
             icon: Icon(
               active ? Icons.bookmark : Icons.bookmark_outline,
-              color: active ? Colors.yellow : theme.alternativeText,
+              color: active ? Colors.yellow : theme.secondaryText,
             ),
             onPressed: () {
               setState(() {
@@ -251,7 +251,7 @@ class _LikeTextState extends State<LikeText>
     final color = switch (widget.likes) {
       true => theme.primaryColor,
       false => theme.downvoteContent,
-      _ => theme.alternativeText,
+      _ => theme.secondaryText,
     };
     final scoreOffset = switch (widget.likes) {
       true => 1,

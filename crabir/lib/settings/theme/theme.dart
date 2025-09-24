@@ -21,7 +21,9 @@ enum ThemeField {
   readPost,
   announcement,
   contentText,
-  linkColor;
+  linkColor,
+  secondaryText,
+  downvote;
 
   String label(BuildContext context) {
     final locales = AppLocalizations.of(context);
@@ -37,6 +39,8 @@ enum ThemeField {
       ThemeField.announcement => locales.themeAnnouncement,
       ThemeField.contentText => locales.themeContentText,
       ThemeField.linkColor => locales.themeLinkColor,
+      ThemeField.secondaryText => locales.themeSecondaryText,
+      ThemeField.downvote => locales.themeDownvote,
     };
   }
 }
@@ -53,7 +57,7 @@ abstract class CrabirTheme with _$CrabirTheme {
 
     /// Buttons and widgets
     @ColorConverter() @Default(Color(0xffff6e40)) Color primaryColor,
-    @ColorConverter() @Default(Color(0xFFB7B8BC)) Color alternativeText,
+    @ColorConverter() @Default(Color(0xFFB7B8BC)) Color secondaryText,
 
     /// Communities and usernames
     @ColorConverter() @Default(Color(0xffff0000)) Color highlight,
@@ -112,6 +116,8 @@ abstract class CrabirTheme with _$CrabirTheme {
       ThemeField.announcement => copyWith(announcement: color),
       ThemeField.contentText => copyWith(contentText: color),
       ThemeField.linkColor => copyWith(linkColor: color),
+      ThemeField.secondaryText => copyWith(secondaryText: color),
+      ThemeField.downvote => copyWith(downvoteContent: color),
     };
     return newTheme;
   }
@@ -129,6 +135,8 @@ abstract class CrabirTheme with _$CrabirTheme {
       ThemeField.announcement => announcement,
       ThemeField.contentText => contentText,
       ThemeField.linkColor => linkColor,
+      ThemeField.secondaryText => secondaryText,
+      ThemeField.downvote => downvoteContent,
     };
   }
 }

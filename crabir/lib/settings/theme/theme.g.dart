@@ -23,9 +23,9 @@ _CrabirTheme _$CrabirThemeFromJson(Map<String, dynamic> json) => _CrabirTheme(
       primaryColor: json['primaryColor'] == null
           ? const Color(0xffff6e40)
           : const ColorConverter().fromJson(json['primaryColor'] as String),
-      alternativeText: json['alternativeText'] == null
+      secondaryText: json['secondaryText'] == null
           ? const Color(0xFFB7B8BC)
-          : const ColorConverter().fromJson(json['alternativeText'] as String),
+          : const ColorConverter().fromJson(json['secondaryText'] as String),
       highlight: json['highlight'] == null
           ? const Color(0xffff0000)
           : const ColorConverter().fromJson(json['highlight'] as String),
@@ -57,8 +57,7 @@ Map<String, dynamic> _$CrabirThemeToJson(_CrabirTheme instance) =>
           const ColorConverter().toJson(instance.toolBarBackground),
       'toolBarText': const ColorConverter().toJson(instance.toolBarText),
       'primaryColor': const ColorConverter().toJson(instance.primaryColor),
-      'alternativeText':
-          const ColorConverter().toJson(instance.alternativeText),
+      'secondaryText': const ColorConverter().toJson(instance.secondaryText),
       'highlight': const ColorConverter().toJson(instance.highlight),
       'postTitle': const ColorConverter().toJson(instance.postTitle),
       'readPost': const ColorConverter().toJson(instance.readPost),

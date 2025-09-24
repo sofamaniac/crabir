@@ -7,7 +7,7 @@ class PostScore extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final locales = AppLocalizations.of(context);
-    final color = CrabirTheme.of(context).alternativeText;
+    final color = CrabirTheme.of(context).secondaryText;
     final spacer = const WidgetSpan(child: SizedBox(width: 8));
     return RichText(
       text: TextSpan(

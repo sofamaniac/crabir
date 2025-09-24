@@ -382,6 +382,18 @@ abstract class AppLocalizations {
   /// **'Link color'**
   String get themeLinkColor;
 
+  /// No description provided for @themeSecondaryText.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary text color'**
+  String get themeSecondaryText;
+
+  /// No description provided for @themeDownvote.
+  ///
+  /// In en, this message translates to:
+  /// **'Downvote color'**
+  String get themeDownvote;
+
   /// Number of years ago, abbreviated (e.g., '1y', '2y')
   ///
   /// In en, this message translates to:

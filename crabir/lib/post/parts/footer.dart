@@ -45,7 +45,7 @@ class Footer extends StatelessWidget {
         if (settings.showCommentsButton)
           IconButton(
             icon: const Icon(Icons.comment),
-            color: theme.alternativeText,
+            color: theme.secondaryText,
             tooltip: 'Comments',
             onPressed: () => navigateToSubscriptionsTab(
               context,
@@ -57,7 +57,7 @@ class Footer extends StatelessWidget {
         if (settings.showOpenInAppButton)
           IconButton(
             icon: const Icon(Icons.exit_to_app),
-            color: theme.alternativeText,
+            color: theme.secondaryText,
             tooltip: 'Open in',
             onPressed: () async {
               final url = Uri.parse(
@@ -210,7 +210,7 @@ class MoreOptionButton extends StatelessWidget {
     final theme = CrabirTheme.of(context);
     return IconButton(
       icon: Icon(Icons.more_vert),
-      color: theme.alternativeText,
+      color: theme.secondaryText,
       onPressed: () => showDialog(context: context, builder: dialog),
     );
   }

@@ -54,7 +54,7 @@ class _CommentViewState extends State<CommentView>
 
   Widget topRow(CommentsSettings settings) {
     final comment = widget.comment;
-    final color = CrabirTheme.of(context).alternativeText;
+    final color = CrabirTheme.of(context).secondaryText;
     return Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -211,7 +211,7 @@ class _CommentViewState extends State<CommentView>
             },
           ),
         IconButton(
-          color: theme.alternativeText,
+          color: theme.secondaryText,
           onPressed: () {
             // TODO: reply to comment
             if (settings.hideButtonAfterAction) {

@@ -61,7 +61,7 @@ class ShareButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.share),
-      color: CrabirTheme.of(context).alternativeText,
+      color: CrabirTheme.of(context).secondaryText,
       onPressed: () {
         shareModelBottomSheet(context, post);
       },

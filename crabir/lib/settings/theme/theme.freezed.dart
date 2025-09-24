@@ -28,7 +28,7 @@ mixin _$CrabirTheme {
   @ColorConverter()
   Color get primaryColor;
   @ColorConverter()
-  Color get alternativeText;
+  Color get secondaryText;
 
   /// Communities and usernames
   @ColorConverter()
@@ -72,7 +72,7 @@ mixin _$CrabirTheme {
             const DeepCollectionEquality()
                 .equals(other.primaryColor, primaryColor) &&
             const DeepCollectionEquality()
-                .equals(other.alternativeText, alternativeText) &&
+                .equals(other.secondaryText, secondaryText) &&
             const DeepCollectionEquality().equals(other.highlight, highlight) &&
             const DeepCollectionEquality().equals(other.postTitle, postTitle) &&
             const DeepCollectionEquality().equals(other.readPost, readPost) &&
@@ -94,7 +94,7 @@ mixin _$CrabirTheme {
       const DeepCollectionEquality().hash(toolBarBackground),
       const DeepCollectionEquality().hash(toolBarText),
       const DeepCollectionEquality().hash(primaryColor),
-      const DeepCollectionEquality().hash(alternativeText),
+      const DeepCollectionEquality().hash(secondaryText),
       const DeepCollectionEquality().hash(highlight),
       const DeepCollectionEquality().hash(postTitle),
       const DeepCollectionEquality().hash(readPost),
@@ -105,7 +105,7 @@ mixin _$CrabirTheme {
 
   @override
   String toString() {
-    return 'CrabirTheme(background: $background, cardBackground: $cardBackground, toolBarBackground: $toolBarBackground, toolBarText: $toolBarText, primaryColor: $primaryColor, alternativeText: $alternativeText, highlight: $highlight, postTitle: $postTitle, readPost: $readPost, announcement: $announcement, contentText: $contentText, linkColor: $linkColor, downvoteContent: $downvoteContent)';
+    return 'CrabirTheme(background: $background, cardBackground: $cardBackground, toolBarBackground: $toolBarBackground, toolBarText: $toolBarText, primaryColor: $primaryColor, secondaryText: $secondaryText, highlight: $highlight, postTitle: $postTitle, readPost: $readPost, announcement: $announcement, contentText: $contentText, linkColor: $linkColor, downvoteContent: $downvoteContent)';
   }
 }
 
@@ -121,7 +121,7 @@ abstract mixin class $CrabirThemeCopyWith<$Res> {
       @ColorConverter() Color toolBarBackground,
       @ColorConverter() Color toolBarText,
       @ColorConverter() Color primaryColor,
-      @ColorConverter() Color alternativeText,
+      @ColorConverter() Color secondaryText,
       @ColorConverter() Color highlight,
       @ColorConverter() Color postTitle,
       @ColorConverter() Color readPost,
@@ -148,7 +148,7 @@ class _$CrabirThemeCopyWithImpl<$Res> implements $CrabirThemeCopyWith<$Res> {
     Object? toolBarBackground = freezed,
     Object? toolBarText = freezed,
     Object? primaryColor = freezed,
-    Object? alternativeText = freezed,
+    Object? secondaryText = freezed,
     Object? highlight = freezed,
     Object? postTitle = freezed,
     Object? readPost = freezed,
@@ -178,9 +178,9 @@ class _$CrabirThemeCopyWithImpl<$Res> implements $CrabirThemeCopyWith<$Res> {
           ? _self.primaryColor
           : primaryColor // ignore: cast_nullable_to_non_nullable
               as Color,
-      alternativeText: freezed == alternativeText
-          ? _self.alternativeText
-          : alternativeText // ignore: cast_nullable_to_non_nullable
+      secondaryText: freezed == secondaryText
+          ? _self.secondaryText
+          : secondaryText // ignore: cast_nullable_to_non_nullable
               as Color,
       highlight: freezed == highlight
           ? _self.highlight
@@ -313,7 +313,7 @@ extension CrabirThemePatterns on CrabirTheme {
             @ColorConverter() Color toolBarBackground,
             @ColorConverter() Color toolBarText,
             @ColorConverter() Color primaryColor,
-            @ColorConverter() Color alternativeText,
+            @ColorConverter() Color secondaryText,
             @ColorConverter() Color highlight,
             @ColorConverter() Color postTitle,
             @ColorConverter() Color readPost,
@@ -333,7 +333,7 @@ extension CrabirThemePatterns on CrabirTheme {
             _that.toolBarBackground,
             _that.toolBarText,
             _that.primaryColor,
-            _that.alternativeText,
+            _that.secondaryText,
             _that.highlight,
             _that.postTitle,
             _that.readPost,
@@ -367,7 +367,7 @@ extension CrabirThemePatterns on CrabirTheme {
             @ColorConverter() Color toolBarBackground,
             @ColorConverter() Color toolBarText,
             @ColorConverter() Color primaryColor,
-            @ColorConverter() Color alternativeText,
+            @ColorConverter() Color secondaryText,
             @ColorConverter() Color highlight,
             @ColorConverter() Color postTitle,
             @ColorConverter() Color readPost,
@@ -386,7 +386,7 @@ extension CrabirThemePatterns on CrabirTheme {
             _that.toolBarBackground,
             _that.toolBarText,
             _that.primaryColor,
-            _that.alternativeText,
+            _that.secondaryText,
             _that.highlight,
             _that.postTitle,
             _that.readPost,
@@ -419,7 +419,7 @@ extension CrabirThemePatterns on CrabirTheme {
             @ColorConverter() Color toolBarBackground,
             @ColorConverter() Color toolBarText,
             @ColorConverter() Color primaryColor,
-            @ColorConverter() Color alternativeText,
+            @ColorConverter() Color secondaryText,
             @ColorConverter() Color highlight,
             @ColorConverter() Color postTitle,
             @ColorConverter() Color readPost,
@@ -438,7 +438,7 @@ extension CrabirThemePatterns on CrabirTheme {
             _that.toolBarBackground,
             _that.toolBarText,
             _that.primaryColor,
-            _that.alternativeText,
+            _that.secondaryText,
             _that.highlight,
             _that.postTitle,
             _that.readPost,
@@ -461,7 +461,7 @@ class _CrabirTheme extends CrabirTheme {
       @ColorConverter() this.toolBarBackground = Colors.black,
       @ColorConverter() this.toolBarText = Colors.white,
       @ColorConverter() this.primaryColor = const Color(0xffff6e40),
-      @ColorConverter() this.alternativeText = const Color(0xFFB7B8BC),
+      @ColorConverter() this.secondaryText = const Color(0xFFB7B8BC),
       @ColorConverter() this.highlight = const Color(0xffff0000),
       @ColorConverter() this.postTitle = const Color(0xFFF5F6F8),
       @ColorConverter() this.readPost = const Color(0xFFB7B8BC),
@@ -499,7 +499,7 @@ class _CrabirTheme extends CrabirTheme {
   @override
   @JsonKey()
   @ColorConverter()
-  final Color alternativeText;
+  final Color secondaryText;
 
   /// Communities and usernames
   @override
@@ -562,7 +562,7 @@ class _CrabirTheme extends CrabirTheme {
             const DeepCollectionEquality()
                 .equals(other.primaryColor, primaryColor) &&
             const DeepCollectionEquality()
-                .equals(other.alternativeText, alternativeText) &&
+                .equals(other.secondaryText, secondaryText) &&
             const DeepCollectionEquality().equals(other.highlight, highlight) &&
             const DeepCollectionEquality().equals(other.postTitle, postTitle) &&
             const DeepCollectionEquality().equals(other.readPost, readPost) &&
@@ -584,7 +584,7 @@ class _CrabirTheme extends CrabirTheme {
       const DeepCollectionEquality().hash(toolBarBackground),
       const DeepCollectionEquality().hash(toolBarText),
       const DeepCollectionEquality().hash(primaryColor),
-      const DeepCollectionEquality().hash(alternativeText),
+      const DeepCollectionEquality().hash(secondaryText),
       const DeepCollectionEquality().hash(highlight),
       const DeepCollectionEquality().hash(postTitle),
       const DeepCollectionEquality().hash(readPost),
@@ -595,7 +595,7 @@ class _CrabirTheme extends CrabirTheme {
 
   @override
   String toString() {
-    return 'CrabirTheme(background: $background, cardBackground: $cardBackground, toolBarBackground: $toolBarBackground, toolBarText: $toolBarText, primaryColor: $primaryColor, alternativeText: $alternativeText, highlight: $highlight, postTitle: $postTitle, readPost: $readPost, announcement: $announcement, contentText: $contentText, linkColor: $linkColor, downvoteContent: $downvoteContent)';
+    return 'CrabirTheme(background: $background, cardBackground: $cardBackground, toolBarBackground: $toolBarBackground, toolBarText: $toolBarText, primaryColor: $primaryColor, secondaryText: $secondaryText, highlight: $highlight, postTitle: $postTitle, readPost: $readPost, announcement: $announcement, contentText: $contentText, linkColor: $linkColor, downvoteContent: $downvoteContent)';
   }
 }
 
@@ -613,7 +613,7 @@ abstract mixin class _$CrabirThemeCopyWith<$Res>
       @ColorConverter() Color toolBarBackground,
       @ColorConverter() Color toolBarText,
       @ColorConverter() Color primaryColor,
-      @ColorConverter() Color alternativeText,
+      @ColorConverter() Color secondaryText,
       @ColorConverter() Color highlight,
       @ColorConverter() Color postTitle,
       @ColorConverter() Color readPost,
@@ -640,7 +640,7 @@ class __$CrabirThemeCopyWithImpl<$Res> implements _$CrabirThemeCopyWith<$Res> {
     Object? toolBarBackground = freezed,
     Object? toolBarText = freezed,
     Object? primaryColor = freezed,
-    Object? alternativeText = freezed,
+    Object? secondaryText = freezed,
     Object? highlight = freezed,
     Object? postTitle = freezed,
     Object? readPost = freezed,
@@ -670,9 +670,9 @@ class __$CrabirThemeCopyWithImpl<$Res> implements _$CrabirThemeCopyWith<$Res> {
           ? _self.primaryColor
           : primaryColor // ignore: cast_nullable_to_non_nullable
               as Color,
-      alternativeText: freezed == alternativeText
-          ? _self.alternativeText
-          : alternativeText // ignore: cast_nullable_to_non_nullable
+      secondaryText: freezed == secondaryText
+          ? _self.secondaryText
+          : secondaryText // ignore: cast_nullable_to_non_nullable
               as Color,
       highlight: freezed == highlight
           ? _self.highlight

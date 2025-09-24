@@ -63,7 +63,7 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
               (multi) => MultiRedditTile(
                 multi,
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: theme.alternativeText,
+                      color: theme.secondaryText,
                       fontWeight: FontWeight.bold,
                     ),
               ),
@@ -74,7 +74,7 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
                 return SubredditTile(
                   sub,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: theme.alternativeText,
+                        color: theme.secondaryText,
                         fontWeight: FontWeight.bold,
                       ),
                 );

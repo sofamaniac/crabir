@@ -153,6 +153,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themeLinkColor => 'Link color';
 
   @override
+  String get themeSecondaryText => 'Secondary text color';
+
+  @override
+  String get themeDownvote => 'Downvote color';
+
+  @override
   String yearsAgo(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
