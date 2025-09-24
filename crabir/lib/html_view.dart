@@ -15,7 +15,6 @@ class StyledHtml extends StatelessWidget {
   final OnTap? onLinkTap;
 
   /// Whether to show images or not.
-  /// TODO: showImages
   final bool showImages;
 
   const StyledHtml({
@@ -32,9 +31,6 @@ class StyledHtml extends StatelessWidget {
         .replaceAll('<p>', '')
         .replaceAll('</p>', '')
         .replaceAll('\n\n', '<br>');
-    // Remove last <br>
-    //final position = htmlContent.lastIndexOf("<br>");
-    //return htmlContent.replaceFirst("<br>", "", position);
     return htmlContent;
   }
 

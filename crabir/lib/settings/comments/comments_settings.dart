@@ -31,7 +31,6 @@ abstract class CommentsSettings with _$CommentsSettings {
     bool showNavigationBar,
     // TODO: (requires an additional api call)
     @Setting() @Default(true) bool showUserAvatar,
-    // TODO: I don't understand how `flutter_html` renders images.
     @Setting() @Default(true) bool showCommentsImage,
     @Setting(widget: MediaPreviewSizeSelect)
     @Default(MediaPreviewSize.thumbnail)
