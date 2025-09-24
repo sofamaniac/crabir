@@ -6,8 +6,8 @@ use uuid::Uuid;
 use crate::{
     client::Client,
     model::{Thing, Timeframe, flair::Flair},
+    paging_handler::stream::IntoStreamPrivate,
     result::Result,
-    streamable::stream::IntoStreamPrivate,
 };
 
 pub struct SearchPost {

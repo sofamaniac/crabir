@@ -1,8 +1,8 @@
 //! This file contains the streams for each tabs of a user profile.
-// Copyright (c) 2025 sofamaniac. All Rights Reserved.
+// Copyright (c) 2025 Antoine Grimod. All Rights Reserved.
 
 use super::model::UserStreamSort;
-use crate::streamable::stream::IntoStreamPrivate;
+use crate::paging_handler::stream::IntoStreamPrivate;
 use crate::{client::Client, model::Thing, result::Result};
 use futures::stream::BoxStream;
 pub use futures::{Stream, StreamExt};

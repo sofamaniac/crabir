@@ -13,14 +13,14 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart'
     hide Icon;
-import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
+import 'package:crabir/src/rust/third_party/reddit_api/paging_handler.dart'
     as reddit_stream;
 import 'package:crabir/stream/things_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CommonFeedView extends StatefulWidget {
-  final reddit_stream.Streamable Function(FeedSort) newStream;
+  final reddit_stream.PagingHandler Function(FeedSort) newStream;
   final Widget Function(FeedSort) title;
   final Subreddit? subredditAbout;
   final FeedSort? initialSort;
@@ -46,7 +46,7 @@ class _CommonFeedViewState extends State<CommonFeedView>
   FeedSort? sort;
 
   late final ScrollController _scrollController;
-  late reddit_stream.Streamable _stream;
+  late reddit_stream.PagingHandler _stream;
   String? currentUser;
   int _forceRebuild = 0;
 

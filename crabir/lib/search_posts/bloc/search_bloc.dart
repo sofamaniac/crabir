@@ -5,7 +5,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/search.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
+import 'package:crabir/src/rust/third_party/reddit_api/paging_handler.dart'
     as reddit_api;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -45,7 +45,7 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
 
   PostSearchSort _sort;
 
-  reddit_api.Streamable? _streamable;
+  reddit_api.PagingHandler? _streamable;
 
   /// true if `streamable` has reached its end
   bool _hasReachedMax = false;

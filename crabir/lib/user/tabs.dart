@@ -103,7 +103,7 @@ final currentUserRoute = AutoRoute(
 
 Widget _scaffold(
   BuildContext context,
-  reddit_stream.Streamable stream,
+  reddit_stream.PagingHandler stream,
   String key,
 ) {
   return ThingsScaffold(

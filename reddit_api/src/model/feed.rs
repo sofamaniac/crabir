@@ -1,6 +1,6 @@
 use crate::client::Client;
+use crate::paging_handler::stream::IntoStreamPrivate;
 use crate::result::Result;
-use crate::streamable::stream::IntoStreamPrivate;
 use flutter_rust_bridge::frb;
 pub use futures::{Stream, StreamExt};
 use reqwest::Url;

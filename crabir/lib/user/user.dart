@@ -14,7 +14,7 @@ import 'package:crabir/thread/widgets/comment.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
+import 'package:crabir/src/rust/third_party/reddit_api/paging_handler.dart'
     as reddit_stream;
 
 part 'tabs.dart';

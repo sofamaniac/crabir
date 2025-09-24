@@ -2,7 +2,7 @@ import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
+import 'package:crabir/src/rust/third_party/reddit_api/paging_handler.dart'
     as reddit_stream;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,7 +14,7 @@ class ThingsScaffold extends StatefulWidget {
 
   final Widget? subredditInfo;
   final String? name;
-  final reddit_stream.Streamable stream;
+  final reddit_stream.PagingHandler stream;
 
   /// Function to use do build a `Comment` view.
   final Widget Function(BuildContext, Comment)? commentView;

@@ -53,14 +53,16 @@ class _RedditPostCardState extends State<RedditPostCard> {
   }
 
   Widget? media(BuildContext context) {
+    if (!widget.showMedia) {
+      return null;
+    }
     return switch (widget.post.kind) {
       // Media types
-      Kind.video when widget.showMedia => VideoContent(post: widget.post),
-      Kind.youtubeVideo when widget.showMedia =>
-        YoutubeContent(post: widget.post),
-      (Kind.mediaGallery || Kind.gallery) when widget.showMedia =>
-        GalleryView(post: widget.post),
-      Kind.image when widget.showMedia => ImageContent(
+      Kind.video => VideoContent(post: widget.post),
+      Kind.streamableVideo => StreamableVideo(post: widget.post),
+      Kind.youtubeVideo => YoutubeContent(post: widget.post),
+      (Kind.mediaGallery || Kind.gallery) => GalleryView(post: widget.post),
+      Kind.image => ImageContent(
           post: widget.post,
         ),
       _ => null,

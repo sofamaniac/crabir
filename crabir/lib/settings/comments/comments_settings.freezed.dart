@@ -25,8 +25,7 @@ mixin _$CommentsSettings {
   @Setting()
   bool get showNavigationBar; // TODO: (requires an additional api call)
   @Setting()
-  bool
-      get showUserAvatar; // TODO: I don't understand how `flutter_html` renders images.
+  bool get showUserAvatar;
   @Setting()
   bool get showCommentsImage;
   @Setting(widget: MediaPreviewSizeSelect)
@@ -784,7 +783,6 @@ class _CommentsSetttings extends CommentsSettings {
   @JsonKey()
   @Setting()
   final bool showUserAvatar;
-// TODO: I don't understand how `flutter_html` renders images.
   @override
   @JsonKey()
   @Setting()

@@ -6,6 +6,7 @@ import 'package:crabir/cartouche.dart';
 import 'package:crabir/feed_list.dart';
 import 'package:crabir/gallery/gallery.dart';
 import 'package:crabir/l10n/app_localizations.dart';
+import 'package:crabir/media/media.dart';
 import 'package:crabir/post/parts/html_with_fade.dart';
 import 'package:crabir/post/parts/image.dart';
 import 'package:crabir/post/parts/video.dart';

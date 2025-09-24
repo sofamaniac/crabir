@@ -4,9 +4,9 @@ use crate::model::multi::{Multi, MultiStream};
 use crate::model::rule::Rule;
 use crate::model::subreddit::Subreddit;
 use crate::model::{Fullname, Post, comment};
+use crate::paging_handler::PagingHandler;
 use crate::result::Result;
 use crate::search::{PostSearchSort, SearchPost, SearchSubreddit, SubredditSearchSort};
-use crate::streamable::Streamable;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
@@ -385,9 +385,9 @@ impl Client {
     }
 
     #[frb(sync)]
-    pub fn feed_stream(&self, feed: &Feed, sort: &feed::FeedSort) -> Streamable {
+    pub fn feed_stream(&self, feed: &Feed, sort: &feed::FeedSort) -> PagingHandler {
         let base_url = self.base_url();
-        Streamable::new(feed::FeedStream::new(
+        PagingHandler::new(feed::FeedStream::new(
             self.clone(),
             feed.clone(),
             *sort,
@@ -608,9 +608,9 @@ impl Client {
     }
 
     #[frb(sync)]
-    pub fn multi_posts(&self, multi: &Multi, sort: &feed::FeedSort) -> Streamable {
+    pub fn multi_posts(&self, multi: &Multi, sort: &feed::FeedSort) -> PagingHandler {
         let base_url = self.base_url();
-        Streamable::new(MultiStream::new(
+        PagingHandler::new(MultiStream::new(
             self.clone(),
             multi.clone(),
             *sort,
@@ -736,8 +736,8 @@ impl Client {
         flair: Option<Flair>,
         query: Option<String>,
         sort: PostSearchSort,
-    ) -> Streamable {
-        Streamable::new(Box::new(SearchPost::new(
+    ) -> PagingHandler {
+        PagingHandler::new(Box::new(SearchPost::new(
             self.clone(),
             subreddit,
             flair,
@@ -747,8 +747,8 @@ impl Client {
     }
 
     #[frb(sync)]
-    pub fn search_subreddits(&self, query: String, sort: SubredditSearchSort) -> Streamable {
-        Streamable::new(Box::new(SearchSubreddit::new(self.clone(), query, sort)))
+    pub fn search_subreddits(&self, query: String, sort: SubredditSearchSort) -> PagingHandler {
+        PagingHandler::new(Box::new(SearchSubreddit::new(self.clone(), query, sort)))
     }
 
     /// Get info on subreddit at 'r/`subreddit`/about'.

@@ -25,6 +25,8 @@ pub enum Kind {
     Video,
     /// Video hosted on Youtube
     YoutubeVideo,
+    /// Video hosted on Streamable
+    StreamableVideo,
     /// Gallery present in `Post::Gallery`
     Gallery,
     /// Gallery at `Post::url`
@@ -214,9 +216,13 @@ impl Post {
     }
 
     fn video_kind(&self) -> Kind {
-        const DOMAINS: [&str; 2] = ["youtube.com", "youtu.be"];
-        if DOMAINS.contains(&self.domain.as_str()) {
+        const YOUTUBE: [&str; 2] = ["youtube.com", "youtu.be"];
+        const STREAMABLE: [&str; 1] = ["streamable.com"];
+        let domain = self.domain.as_str();
+        if YOUTUBE.contains(&domain) {
             Kind::YoutubeVideo
+        } else if STREAMABLE.contains(&domain) {
+            Kind::StreamableVideo
         } else {
             Kind::Video
         }
