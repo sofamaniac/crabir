@@ -56,6 +56,8 @@ class _CommentViewState extends State<CommentView>
     final comment = widget.comment;
     final color = CrabirTheme.of(context).alternativeText;
     return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       spacing: 8,
       children: [
         _Username(
@@ -68,6 +70,7 @@ class _CommentViewState extends State<CommentView>
         Spacer(),
         SeparatedRow(
           crossAxisAlignment: WrapCrossAlignment.center,
+          alignment: WrapAlignment.end,
           separatorStyle:
               Theme.of(context).textTheme.labelMedium!.copyWith(color: color),
           children: [

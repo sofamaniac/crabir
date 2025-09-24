@@ -5,6 +5,7 @@ class SeparatedRow extends StatelessWidget {
   final TextStyle? separatorStyle;
   final List<Widget> children;
   final WrapCrossAlignment crossAxisAlignment;
+  final WrapAlignment alignment;
   final double spacing;
   const SeparatedRow({
     super.key,
@@ -13,6 +14,7 @@ class SeparatedRow extends StatelessWidget {
     this.separatorStyle,
     this.spacing = 0.0,
     this.crossAxisAlignment = WrapCrossAlignment.start,
+    this.alignment = WrapAlignment.start,
   });
 
   @override
@@ -26,6 +28,7 @@ class SeparatedRow extends StatelessWidget {
     elements.removeLast();
     return Wrap(
       crossAxisAlignment: crossAxisAlignment,
+      alignment: alignment,
       spacing: spacing,
       children: elements,
     );
