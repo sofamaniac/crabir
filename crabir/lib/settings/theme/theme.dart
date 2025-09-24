@@ -62,7 +62,7 @@ abstract class CrabirTheme with _$CrabirTheme {
     @ColorConverter() @Default(Color(0xFF00FF00)) Color announcement,
     @ColorConverter() @Default(Color(0xFFF5F6F8)) Color contentText,
     @ColorConverter() @Default(Color(0xFF4B91E2)) Color linkColor,
-    @ColorConverter() @Default(Color(0xFF9580FF)) downvoteContent,
+    @ColorConverter() @Default(Color(0xFF9580FF)) Color downvoteContent,
   }) = _CrabirTheme;
 
   factory CrabirTheme.light() => CrabirTheme(

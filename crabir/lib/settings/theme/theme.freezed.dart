@@ -44,7 +44,7 @@ mixin _$CrabirTheme {
   @ColorConverter()
   Color get linkColor;
   @ColorConverter()
-  dynamic get downvoteContent;
+  Color get downvoteContent;
 
   /// Create a copy of CrabirTheme
   /// with the given fields replaced by the non-null parameter values.
@@ -128,7 +128,7 @@ abstract mixin class $CrabirThemeCopyWith<$Res> {
       @ColorConverter() Color announcement,
       @ColorConverter() Color contentText,
       @ColorConverter() Color linkColor,
-      @ColorConverter() dynamic downvoteContent});
+      @ColorConverter() Color downvoteContent});
 }
 
 /// @nodoc
@@ -209,7 +209,7 @@ class _$CrabirThemeCopyWithImpl<$Res> implements $CrabirThemeCopyWith<$Res> {
       downvoteContent: freezed == downvoteContent
           ? _self.downvoteContent
           : downvoteContent // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as Color,
     ));
   }
 }
@@ -320,7 +320,7 @@ extension CrabirThemePatterns on CrabirTheme {
             @ColorConverter() Color announcement,
             @ColorConverter() Color contentText,
             @ColorConverter() Color linkColor,
-            @ColorConverter() dynamic downvoteContent)?
+            @ColorConverter() Color downvoteContent)?
         $default, {
     required TResult orElse(),
   }) {
@@ -374,7 +374,7 @@ extension CrabirThemePatterns on CrabirTheme {
             @ColorConverter() Color announcement,
             @ColorConverter() Color contentText,
             @ColorConverter() Color linkColor,
-            @ColorConverter() dynamic downvoteContent)
+            @ColorConverter() Color downvoteContent)
         $default,
   ) {
     final _that = this;
@@ -426,7 +426,7 @@ extension CrabirThemePatterns on CrabirTheme {
             @ColorConverter() Color announcement,
             @ColorConverter() Color contentText,
             @ColorConverter() Color linkColor,
-            @ColorConverter() dynamic downvoteContent)?
+            @ColorConverter() Color downvoteContent)?
         $default,
   ) {
     final _that = this;
@@ -529,7 +529,7 @@ class _CrabirTheme extends CrabirTheme {
   @override
   @JsonKey()
   @ColorConverter()
-  final dynamic downvoteContent;
+  final Color downvoteContent;
 
   /// Create a copy of CrabirTheme
   /// with the given fields replaced by the non-null parameter values.
@@ -620,7 +620,7 @@ abstract mixin class _$CrabirThemeCopyWith<$Res>
       @ColorConverter() Color announcement,
       @ColorConverter() Color contentText,
       @ColorConverter() Color linkColor,
-      @ColorConverter() dynamic downvoteContent});
+      @ColorConverter() Color downvoteContent});
 }
 
 /// @nodoc
@@ -701,7 +701,7 @@ class __$CrabirThemeCopyWithImpl<$Res> implements _$CrabirThemeCopyWith<$Res> {
       downvoteContent: freezed == downvoteContent
           ? _self.downvoteContent
           : downvoteContent // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as Color,
     ));
   }
 }

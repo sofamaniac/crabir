@@ -44,7 +44,9 @@ _CrabirTheme _$CrabirThemeFromJson(Map<String, dynamic> json) => _CrabirTheme(
       linkColor: json['linkColor'] == null
           ? const Color(0xFF4B91E2)
           : const ColorConverter().fromJson(json['linkColor'] as String),
-      downvoteContent: json['downvoteContent'] ?? const Color(0xFF9580FF),
+      downvoteContent: json['downvoteContent'] == null
+          ? const Color(0xFF9580FF)
+          : const ColorConverter().fromJson(json['downvoteContent'] as String),
     );
 
 Map<String, dynamic> _$CrabirThemeToJson(_CrabirTheme instance) =>
@@ -63,5 +65,6 @@ Map<String, dynamic> _$CrabirThemeToJson(_CrabirTheme instance) =>
       'announcement': const ColorConverter().toJson(instance.announcement),
       'contentText': const ColorConverter().toJson(instance.contentText),
       'linkColor': const ColorConverter().toJson(instance.linkColor),
-      'downvoteContent': instance.downvoteContent,
+      'downvoteContent':
+          const ColorConverter().toJson(instance.downvoteContent),
     };
