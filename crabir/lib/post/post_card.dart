@@ -42,14 +42,6 @@ class RedditPostCard extends StatefulWidget {
 }
 
 class _RedditPostCardState extends State<RedditPostCard> {
-  Widget _contentWrap(Widget widget) {
-    if (this.widget.post.kind.isMedia()) {
-      return widget;
-    } else {
-      return wrapPostElement(widget);
-    }
-  }
-
   Future<void> _onSave(bool save) async {
     setState(() {});
     await widget.onSaveCallback?.call(save);
@@ -60,8 +52,8 @@ class _RedditPostCardState extends State<RedditPostCard> {
     await widget.onLikeCallback?.call(dir);
   }
 
-  Widget? content(BuildContext context) {
-    final res = switch (widget.post.kind) {
+  Widget? media(BuildContext context) {
+    return switch (widget.post.kind) {
       // Media types
       Kind.video when widget.showMedia => VideoContent(post: widget.post),
       Kind.youtubeVideo when widget.showMedia =>
@@ -71,24 +63,41 @@ class _RedditPostCardState extends State<RedditPostCard> {
       Kind.image when widget.showMedia => ImageContent(
           post: widget.post,
         ),
-      // Text types
-      Kind.meta => Text("meta"),
-      Kind.selftext
-          when (!widget.post.spoiler || widget.ignoreSelftextSpoiler) &&
-              widget.post.selftextHtml != null =>
+      _ => null,
+    };
+  }
+
+  Widget? selftext(BuildContext context) {
+    if ((!widget.post.spoiler || widget.ignoreSelftextSpoiler) &&
+        widget.post.selftextHtml != null) {
+      return wrapPostElement(
         HtmlWithConditionalFade(
           htmlContent: widget.post.selftextHtml ?? "",
           maxLines: widget.maxLines,
         ),
-      Kind.link || Kind.unknown => null,
-      _ => null,
-    };
-
-    if (res != null) {
-      return _contentWrap(res);
+      );
     } else {
-      return res;
+      return null;
     }
+  }
+
+  Widget? content(BuildContext context) {
+    final media = this.media(context);
+    final selftext = this.selftext(context);
+
+    if (media == null && selftext == null) {
+      return null;
+    }
+
+    return Column(
+      spacing: 8,
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        if (media != null) media,
+        if (selftext != null) selftext,
+      ],
+    );
   }
 
   Widget title() {
