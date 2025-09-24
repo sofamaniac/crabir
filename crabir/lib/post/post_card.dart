@@ -93,6 +93,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
       spacing: 8,
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (media != null) media,
         if (selftext != null) selftext,
