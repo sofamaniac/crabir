@@ -37,14 +37,8 @@ class StyledHtml extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = CrabirTheme.of(context);
-    final brightness = Theme.of(context).brightness;
 
     final htmlContent = sanitize(this.htmlContent);
-
-    final quoteBackground = switch (brightness) {
-      Brightness.light => Colors.grey.shade200,
-      Brightness.dark => Colors.grey.shade900
-    };
 
     final style = {
       // Style for divider
@@ -53,12 +47,12 @@ class StyledHtml extends StatelessWidget {
 
         padding: HtmlPaddings.zero,
         height: Height(1), // control thickness
-        backgroundColor: Colors.grey, // ensure it's visible
+        backgroundColor: theme.secondaryText, // ensure it's visible
       ),
       "a": Style(color: theme.linkColor, textDecorationColor: theme.linkColor),
       'blockquote': Style(
         margin: Margins.symmetric(horizontal: 0, vertical: 8),
-        backgroundColor: quoteBackground,
+        backgroundColor: theme.secondaryText,
         padding: HtmlPaddings.all(12),
         border: Border(
           left: BorderSide(
@@ -93,6 +87,14 @@ class StyledHtml extends StatelessWidget {
       shrinkWrap: true,
       extensions: [
         if (showImages) RedditImageExtension(),
+        if (!showImages)
+          ImageExtension(builder: (context) {
+            final src = context.attributes['src'] ?? '';
+            // Replace image with its link text
+            return Html(
+              data: '<a href="$src">$src</a>',
+            );
+          }),
         TextExtension(),
       ],
     );
