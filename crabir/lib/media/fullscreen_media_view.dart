@@ -16,26 +16,28 @@ class FullscreenMediaView extends StatefulWidget {
 }
 
 class _FullscreenMediaViewState extends State<FullscreenMediaView> {
-  bool _showBars = false;
+  bool _showBars = true;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          Dismissible(
-            key: Key("_FullscreenMediaViewState"),
-            direction: DismissDirection.vertical,
-            onDismissed: (_) => context.pop(),
-            child: PhotoViewGestureDetectorScope(
-              axis: Axis.vertical,
-              child: widget.builder(_toggleBars),
+    return SafeArea(
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        backgroundColor: Colors.black,
+        body: Stack(
+          children: [
+            Dismissible(
+              key: Key("_FullscreenMediaViewState"),
+              direction: DismissDirection.vertical,
+              onDismissed: (_) => context.pop(),
+              child: PhotoViewGestureDetectorScope(
+                axis: Axis.vertical,
+                child: widget.builder(_toggleBars),
+              ),
             ),
-          ),
-          _topBar(),
-          _bottomBar(),
-        ],
+            _topBar(),
+            _bottomBar(),
+          ],
+        ),
       ),
     );
   }
