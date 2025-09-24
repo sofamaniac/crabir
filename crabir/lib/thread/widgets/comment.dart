@@ -69,6 +69,7 @@ class _CommentViewState extends State<CommentView>
           Flexible(child: FlairView(flair: comment.author!.flair)),
         Spacer(),
         SeparatedRow(
+          spacing: 2,
           crossAxisAlignment: WrapCrossAlignment.center,
           alignment: WrapAlignment.end,
           separatorStyle:

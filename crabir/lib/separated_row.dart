@@ -12,7 +12,7 @@ class SeparatedRow extends StatelessWidget {
     required this.children,
     this.separator = '•',
     this.separatorStyle,
-    this.spacing = 0.0,
+    this.spacing = 2.0,
     this.crossAxisAlignment = WrapCrossAlignment.start,
     this.alignment = WrapAlignment.start,
   });
