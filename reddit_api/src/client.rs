@@ -488,9 +488,9 @@ impl Client {
                                         .children
                                         .into_iter()
                                         .filter(|thing| {
-                                            thing
-                                                .name()
-                                                .is_none_or(|name| !acc.seen.contains(&name))
+                                            // Keep things that either do not have a name
+                                            // or that were not already seen
+                                            thing.name().is_none_or(|name| acc.seen.insert(name))
                                         })
                                         .collect();
 
