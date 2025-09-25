@@ -28,6 +28,22 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     on<LoadMore>(_loadMore);
     on<Refresh>(_refresh);
     on<SetSort>(_setSort);
+    on<OpenComment>(_openComment);
+    on<CloseComment>(_closeComment);
+  }
+
+  Future<void> _openComment(
+    OpenComment event,
+    Emitter<ThreadState> emit,
+  ) async {
+    emit(state.copyWith(expandedComment: event.comment));
+  }
+
+  Future<void> _closeComment(
+    CloseComment _,
+    Emitter<ThreadState> emit,
+  ) async {
+    emit(state.copyWith(expandedComment: null));
   }
 
   Future<void> _fetchComments(Load _, Emitter<ThreadState> emit) async {

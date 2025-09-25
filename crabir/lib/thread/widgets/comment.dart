@@ -14,6 +14,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/author.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
+import 'package:crabir/thread/bloc/thread_bloc.dart';
 import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/time_ellapsed.dart';
 import 'package:flutter/material.dart';
@@ -83,6 +84,13 @@ class _CommentViewState extends State<CommentView>
                     showEmoji: settings.showFlairEmojis,
                   ),
                 ),
+              if (comment.locked) Icon(Icons.lock, color: color),
+              if (comment.stickied)
+                Text("stickied",
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelMedium!
+                        .copyWith(color: Colors.green))
             ],
           ),
         ),
@@ -124,44 +132,44 @@ class _CommentViewState extends State<CommentView>
     super.build(context);
     final comment = widget.comment;
     final settings = context.watch<CommentsSettingsCubit>().state;
-    final showBottomBar = this.showBottomBar || settings.buttonsAlwaysVisible;
-    final VoidCallback? onTap = widget.onTap ??
-        (widget.animateBottomBar
-            ? () => setState(
-                  () {
-                    this.showBottomBar = !this.showBottomBar;
-                  },
-                )
-            : null);
+    final threadBloc = context.watch<ThreadBloc>();
+    final openComment = threadBloc.state.expandedComment;
+    final showBottomBar =
+        openComment == comment.id || settings.buttonsAlwaysVisible;
     return GestureDetector(
       onLongPress: widget.onLongPress,
-      onTap: onTap,
+      onTap: () {
+        widget.onTap?.call();
+        if (openComment == comment.id) {
+          threadBloc.add(CloseComment());
+        } else {
+          threadBloc.add(OpenComment(comment.id));
+        }
+      },
       behavior: HitTestBehavior.translucent,
-      child: AnimatedSize(
-        duration: Duration(milliseconds: 200),
-        alignment: Alignment.topCenter,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            spacing: 8,
-            children: [
-              topRow(settings),
-              StyledHtml(
-                htmlContent: comment.bodyHtml,
-                onLinkTap: (url, attributes, element) => defaultLinkHandler(
-                  context.router,
-                  url,
-                  attributes,
-                  element,
-                ),
-                showImages: settings.showCommentsImage,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 8,
+          children: [
+            topRow(settings),
+            StyledHtml(
+              htmlContent: comment.bodyHtml,
+              onLinkTap: (url, attributes, element) => defaultLinkHandler(
+                context.router,
+                url,
+                attributes,
+                element,
               ),
-              if (showBottomBar) bottomBar(),
-            ],
-          ),
+              showImages: settings.showCommentsImage,
+            ),
+            AnimatedSwitcher(
+              duration: Duration(milliseconds: 200),
+              child: showBottomBar ? bottomBar() : SizedBox.shrink(),
+            ),
+          ],
         ),
       ),
     );
