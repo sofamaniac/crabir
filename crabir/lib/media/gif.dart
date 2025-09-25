@@ -224,7 +224,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
               } else {
                 _controller.play();
               }
-              setState(() {});
+              if (mounted) setState(() {});
             },
           ),
           Expanded(
@@ -273,9 +273,11 @@ class _AnimatedContentState extends State<AnimatedContent> {
                     : placeholder(),
               ),
               onVisibilityChanged: (visibilityInfo) {
-                setState(() {
-                  _visibilityFraction = visibilityInfo.visibleFraction;
-                });
+                if (mounted) {
+                  setState(() {
+                    _visibilityFraction = visibilityInfo.visibleFraction;
+                  });
+                }
                 final bool inQueue =
                     AnimatedContentController.queue.value.contains(widget.url);
                 if (_visibilityFraction > 0.5 && _canAutoplay && !inQueue) {
