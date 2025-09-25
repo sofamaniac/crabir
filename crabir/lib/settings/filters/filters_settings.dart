@@ -50,8 +50,9 @@ abstract class FiltersSettings with _$FiltersSettings {
 class ReadPosts extends HydratedCubit<HashSet<String>> {
   ReadPosts() : super(HashSet());
 
-  void mark(String postId) => state.add(postId);
-  bool isRead(String postId) => state.contains(postId);
+  void mark(PostId postId) => state.add(postId.asString);
+  void unmark(PostId postId) => state.remove(postId.asString);
+  bool isRead(PostId postId) => state.contains(postId.asString);
 
   @override
   HashSet<String> fromJson(Map<String, dynamic> json) =>
@@ -59,6 +60,10 @@ class ReadPosts extends HydratedCubit<HashSet<String>> {
 
   @override
   Map<String, HashSet<String>> toJson(HashSet<String> state) => {'read': state};
+
+  factory ReadPosts.of(BuildContext context) {
+    return context.watch<ReadPosts>();
+  }
 }
 
 class GlobalFilters {

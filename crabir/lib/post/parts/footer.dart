@@ -10,7 +10,7 @@ class Footer extends StatelessWidget {
     final theme = CrabirTheme.of(context);
     final likeColor = theme.primaryColor;
     final dislikeColor = theme.downvoteContent;
-    final settings = context.read<PostsSettingsCubit>().state;
+    final settings = context.watch<PostsSettingsCubit>().state;
     final likes = post.likes.toVoteDirection();
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -66,7 +66,9 @@ class Footer extends StatelessWidget {
               await launchUrl(url);
             },
           ),
-        if (settings.showShareButton) ShareButton(post: post),
+        if (settings.showMarkAsReadButton) ReadButton(post: post, short: true),
+        if (settings.showShareButton) ShareButton(post: post, short: true),
+        if (settings.showHideButton) HideButton(post: post, short: true),
         MoreOptionButton(post: post),
       ],
     );
@@ -154,7 +156,6 @@ class MoreOptionButton extends StatelessWidget {
                   );
                 },
               ),
-            Text("Go to user"),
             if (post.author?.username != null)
               ListTile(
                 leading: Icon(Icons.person),
@@ -176,8 +177,13 @@ class MoreOptionButton extends StatelessWidget {
                   );
                 },
               ),
-            if (!settings.showMarkAsReadButton) Text("mark read / unread"),
-            if (!settings.showHideButton) Text("hide"),
+            if (!settings.showMarkAsReadButton)
+              ReadButton(post: post, short: false),
+            if (!settings.showHideButton)
+              HideButton(
+                post: post,
+                short: false,
+              ),
             Text("Report"),
             ListTile(
               leading: Icon(Icons.volume_off),
@@ -189,14 +195,7 @@ class MoreOptionButton extends StatelessWidget {
               },
             ),
             if (!settings.showShareButton)
-              ListTile(
-                leading: Icon(Icons.share),
-                title: Text("Share..."),
-                onTap: () {
-                  Navigator.pop(context);
-                  shareModelBottomSheet(context, post);
-                },
-              ),
+              ShareButton(post: post, short: false),
             Text("copy"),
             Text("add to custom feed")
           ],
@@ -213,5 +212,117 @@ class MoreOptionButton extends StatelessWidget {
       color: theme.secondaryText,
       onPressed: () => showDialog(context: context, builder: dialog),
     );
+  }
+}
+
+abstract class LongShortButton extends StatelessWidget {
+  final Post post;
+  final bool short;
+
+  const LongShortButton({super.key, required this.post, required this.short});
+
+  Widget icon(BuildContext context);
+  String label(BuildContext context);
+  void onTap(BuildContext context);
+
+  Widget long(BuildContext context) {
+    return ListTile(
+      leading: icon(context),
+      title: Text(label(context)),
+      onTap: () => onTap(context),
+    );
+  }
+
+  Widget _short(BuildContext context) {
+    final readPosts = ReadPosts.of(context);
+    final theme = CrabirTheme.of(context);
+    return IconButton(
+      color: theme.secondaryText,
+      onPressed: () {
+        if (readPosts.isRead(post.id)) {
+          readPosts.unmark(post.id);
+        } else {
+          readPosts.mark(post.id);
+        }
+      },
+      icon: icon(context),
+      tooltip: label(context),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (short) {
+      return _short(context);
+    } else {
+      return long(context);
+    }
+  }
+}
+
+class ReadButton extends LongShortButton {
+  const ReadButton({super.key, required super.post, required super.short});
+
+  @override
+  onTap(BuildContext context) {
+    final readPosts = ReadPosts.of(context);
+    if (readPosts.isRead(post.id)) {
+      readPosts.unmark(post.id);
+    } else {
+      readPosts.mark(post.id);
+    }
+  }
+
+  @override
+  Widget icon(BuildContext context) {
+    final readPosts = ReadPosts.of(context);
+    if (readPosts.isRead(post.id)) {
+      return Icon(Icons.mark_chat_unread);
+    } else {
+      return Icon(Icons.mark_chat_read);
+    }
+  }
+
+  @override
+  String label(BuildContext context) {
+    final readPosts = ReadPosts.of(context);
+    final locales = AppLocalizations.of(context);
+    if (readPosts.isRead(post.id)) {
+      return locales.markUnread;
+    } else {
+      return locales.markRead;
+    }
+  }
+}
+
+class HideButton extends LongShortButton {
+  const HideButton({super.key, required super.post, required super.short});
+
+  @override
+  onTap(BuildContext context) async {
+    if (post.hidden) {
+      await post.unhide(client: RedditAPI.client());
+    } else {
+      await post.hide_(client: RedditAPI.client());
+    }
+  }
+
+  @override
+  String label(BuildContext context) {
+    final locales = AppLocalizations.of(context);
+    if (post.hidden) {
+      return locales.unhidePost;
+    } else {
+      return locales.hidePost;
+    }
+  }
+
+  @override
+  Widget icon(BuildContext context) {
+    if (post.hidden) {
+      return Icon(Icons.add);
+    } else {
+      return Icon(Icons.close);
+    }
   }
 }

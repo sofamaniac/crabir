@@ -316,6 +316,36 @@ abstract class AppLocalizations {
   /// **'Share Text'**
   String get shareText;
 
+  /// No description provided for @shareButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Share...'**
+  String get shareButtonLabel;
+
+  /// No description provided for @markRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark post as read'**
+  String get markRead;
+
+  /// No description provided for @markUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark post as unread'**
+  String get markUnread;
+
+  /// No description provided for @hidePost.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide post'**
+  String get hidePost;
+
+  /// No description provided for @unhidePost.
+  ///
+  /// In en, this message translates to:
+  /// **'Unhide post'**
+  String get unhidePost;
+
   /// No description provided for @themeBackround.
   ///
   /// In en, this message translates to:

@@ -43,6 +43,12 @@
   "shareLinkTitle": "Share Title + Link",
   "sharePost": "Share Post",
   "shareText": "Share Text",
+  "shareButtonLabel": "Share...",
+
+  "markRead": "Mark post as read",
+  "markUnread": "Mark post as unread",
+  "hidePost": "Hide post",
+  "unhidePost": "Unhide post",
 
   "themeBackround": "Background",
   "themeCardBackground": "Card background",

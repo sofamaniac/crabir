@@ -1,8 +1,10 @@
+use crate::result::Result;
 pub use chrono::{DateTime, Local, Utc};
 use flutter_getter::FlutterGetters;
 use flutter_rust_bridge::frb;
 use getset::{Getters, Setters};
 
+use crate::client::Client;
 use crate::model::author;
 use crate::model::author::AuthorInfo;
 use crate::model::flair::Flair;
@@ -259,6 +261,24 @@ impl Post {
     #[frb(sync, getter)]
     pub fn is_crosspost(&self) -> bool {
         !self.crosspost_parent_list.is_empty()
+    }
+
+    /// Hide a post
+    /// # Error
+    /// Fails when the underlying request fails.
+    pub async fn hide(&mut self, client: Client) -> Result<()> {
+        client.hide(self).await?;
+        self.hidden = true;
+        Ok(())
+    }
+
+    /// Unhide a post
+    /// # Error
+    /// Fails when the underlying request fails.
+    pub async fn unhide(&mut self, client: Client) -> Result<()> {
+        client.unhide(self).await?;
+        self.hidden = false;
+        Ok(())
     }
 }
 

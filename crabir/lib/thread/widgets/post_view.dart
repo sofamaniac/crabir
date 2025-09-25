@@ -103,6 +103,7 @@ class _PostView extends StatelessWidget {
         showMedia: showMedia,
         enableThumbnail: showThumbnail,
         ignoreSelftextSpoiler: true,
+        ignoreRead: true,
       );
     }
   }

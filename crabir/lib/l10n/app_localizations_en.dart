@@ -120,6 +120,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareText => 'Share Text';
 
   @override
+  String get shareButtonLabel => 'Share...';
+
+  @override
+  String get markRead => 'Mark post as read';
+
+  @override
+  String get markUnread => 'Mark post as unread';
+
+  @override
+  String get hidePost => 'Hide post';
+
+  @override
+  String get unhidePost => 'Unhide post';
+
+  @override
   String get themeBackround => 'Background';
 
   @override

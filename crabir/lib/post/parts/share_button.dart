@@ -53,18 +53,24 @@ shareModelBottomSheet(BuildContext context, Post post) {
   );
 }
 
-class ShareButton extends StatelessWidget {
-  final Post post;
-  const ShareButton({super.key, required this.post});
+class ShareButton extends LongShortButton {
+  const ShareButton({super.key, required super.post, required super.short});
 
   @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.share),
-      color: CrabirTheme.of(context).secondaryText,
-      onPressed: () {
-        shareModelBottomSheet(context, post);
-      },
-    );
+  String label(BuildContext context) {
+    return AppLocalizations.of(context).shareButtonLabel;
+  }
+
+  @override
+  void onTap(BuildContext context) {
+    if (!short) {
+      Navigator.pop(context);
+    }
+    shareModelBottomSheet(context, post);
+  }
+
+  @override
+  Widget icon(BuildContext context) {
+    return Icon(Icons.share);
   }
 }

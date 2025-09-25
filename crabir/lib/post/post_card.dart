@@ -25,6 +25,9 @@ class RedditPostCard extends StatefulWidget {
   /// If set to true, show the selftext even if the post is marked as spoiler
   final bool ignoreSelftextSpoiler;
 
+  /// Set to true to not change title color when post is read
+  final bool ignoreRead;
+
   const RedditPostCard({
     super.key,
     required this.post,
@@ -35,6 +38,7 @@ class RedditPostCard extends StatefulWidget {
     this.showMedia = true,
     this.enableThumbnail = true,
     this.ignoreSelftextSpoiler = false,
+    this.ignoreRead = false,
   });
 
   @override
@@ -108,7 +112,10 @@ class _RedditPostCardState extends State<RedditPostCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 4,
       children: [
-        PostTitle(post: widget.post),
+        PostTitle(
+          post: widget.post,
+          ignoredRead: widget.ignoreRead,
+        ),
         PostFlair(post: widget.post),
         PostScore(post: widget.post),
       ],

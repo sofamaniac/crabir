@@ -115,6 +115,7 @@ class TopLevel extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeBloc = context.watch<ThemeBloc>().state;
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       // required to go back to home screen before exiting the app
       // because flutter is broken.
       onNavigationNotification: _defaultOnNavigationNotification,

@@ -7,6 +7,7 @@ use crate::model::{Fullname, Post, comment};
 use crate::paging_handler::PagingHandler;
 use crate::result::Result;
 use crate::search::{PostSearchSort, SearchPost, SearchSubreddit, SubredditSearchSort};
+use crate::votable::private::PrivateVotable;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
@@ -653,6 +654,28 @@ impl Client {
         let url = self.join_url("api/unsave");
         let request = self.post(url);
         let request = request.query(&[("id", &thing)]);
+        let _ = self.execute(request).await?;
+        Ok(())
+    }
+
+    /// Hide a [`Post`]
+    /// # Errors
+    /// Returns an error if the request failed.
+    pub(crate) async fn hide(&self, post: &Post) -> Result<()> {
+        let url = self.join_url("api/hide");
+        let request = self.post(url);
+        let request = request.query(&[("id", &post.name().as_ref())]);
+        let _ = self.execute(request).await?;
+        Ok(())
+    }
+
+    /// Unhide a [`Post`]
+    /// # Errors
+    /// Returns an error if the request failed.
+    pub(crate) async fn unhide(&self, post: &Post) -> Result<()> {
+        let url = self.join_url("api/unhide");
+        let request = self.post(url);
+        let request = request.query(&[("id", &post.name().as_ref())]);
         let _ = self.execute(request).await?;
         Ok(())
     }

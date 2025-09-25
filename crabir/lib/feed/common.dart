@@ -200,7 +200,7 @@ class _CommonFeedViewState extends State<CommonFeedView>
       maxLines: 5,
       post: post,
       onTap: () {
-        context.read<ReadPosts>().mark(post.id.asString);
+        context.read<ReadPosts>().mark(post.id);
         context.router.navigate(
           ThreadRoute(
             post: post,
