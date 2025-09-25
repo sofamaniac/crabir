@@ -96,7 +96,7 @@ class PostsSettingsView extends StatelessWidget {
       children: [
         _SortSelection(
           title: Text(locales.posts_defaultHomeSort),
-          leading: null,
+          leading: Icon(null),
           subtitle: null,
           value: settings.defaultHomeSort,
           onChanged: (val) =>
@@ -104,7 +104,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         _SortSelection(
           title: Text(locales.posts_defaultSort),
-          leading: null,
+          leading: Icon(null),
           subtitle: null,
           value: settings.defaultSort,
           onChanged: (val) =>
@@ -112,7 +112,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_rememberSortByCommunity),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: Text(locales.posts_rememberSortByCommunityDescription),
           value: settings.rememberSortByCommunity,
           onChanged: (val) => context
@@ -121,7 +121,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         ManageSortButton(
           title: Text(locales.posts_rememberedSorts),
-          leading: null,
+          leading: Icon(null),
           subtitle: null,
           value: settings.rememberedSorts,
           onChanged: (val) =>
@@ -131,7 +131,7 @@ class PostsSettingsView extends StatelessWidget {
         Text("Awards"),
         CheckboxListTile(
           title: Text(locales.posts_showAwards),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showAwards,
           onChanged: (val) =>
@@ -139,7 +139,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_clickableAwards),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.clickableAwards,
           onChanged: (val) =>
@@ -149,7 +149,7 @@ class PostsSettingsView extends StatelessWidget {
         Text("Flairs"),
         CheckboxListTile(
           title: Text(locales.posts_showPostFlair),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showPostFlair,
           onChanged: (val) =>
@@ -157,7 +157,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_showFlairColors),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showFlairColors,
           onChanged: (val) =>
@@ -165,7 +165,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_showFlairEmojis),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showFlairEmojis,
           onChanged: (val) =>
@@ -173,7 +173,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_tapFlairToSearch),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.tapFlairToSearch,
           onChanged: (val) =>
@@ -183,7 +183,7 @@ class PostsSettingsView extends StatelessWidget {
         Text("Post info"),
         CheckboxListTile(
           title: Text(locales.posts_showAuthor),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showAuthor,
           onChanged: (val) =>
@@ -191,7 +191,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_clickableCommunity),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.clickableCommunity,
           onChanged: (val) =>
@@ -199,7 +199,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_clickableUser),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.clickableUser,
           onChanged: (val) =>
@@ -209,7 +209,7 @@ class PostsSettingsView extends StatelessWidget {
         Text("Visible buttons"),
         CheckboxListTile(
           title: Text(locales.posts_showFloatingButton),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showFloatingButton,
           onChanged: (val) =>
@@ -217,7 +217,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_showHideButton),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showHideButton,
           onChanged: (val) =>
@@ -225,7 +225,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_showMarkAsReadButton),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showMarkAsReadButton,
           onChanged: (val) => context
@@ -234,7 +234,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_showShareButton),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showShareButton,
           onChanged: (val) =>
@@ -242,7 +242,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_showCommentsButton),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showCommentsButton,
           onChanged: (val) =>
@@ -250,7 +250,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_showOpenInAppButton),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showOpenInAppButton,
           onChanged: (val) => context

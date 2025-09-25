@@ -61,7 +61,7 @@ class DataSettingsView extends StatelessWidget {
         Text("Data Saver"),
         CheckboxListTile(
           title: Text(locales.data_mobileDataSaver),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: Text(locales.data_mobileDataSaverDescription),
           value: settings.mobileDataSaver,
           onChanged: (val) =>
@@ -69,7 +69,7 @@ class DataSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.data_wifiDataSaver),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: Text(locales.data_wifiDataSaverDescription),
           value: settings.wifiDataSaver,
           onChanged: (val) =>
@@ -79,7 +79,7 @@ class DataSettingsView extends StatelessWidget {
         Text("Videos"),
         ImageLoadingSelect(
           title: Text(locales.data_autoplay),
-          leading: null,
+          leading: Icon(null),
           subtitle: null,
           value: settings.autoplay,
           onChanged: (val) =>
@@ -87,7 +87,7 @@ class DataSettingsView extends StatelessWidget {
         ),
         ResolutionSelect(
           title: Text(locales.data_videoQuality),
-          leading: null,
+          leading: Icon(null),
           subtitle: null,
           value: settings.videoQuality,
           onChanged: (val) =>
@@ -97,7 +97,7 @@ class DataSettingsView extends StatelessWidget {
         Text("Images"),
         ImageLoadingSelect(
           title: Text(locales.data_loadImages),
-          leading: null,
+          leading: Icon(null),
           subtitle: null,
           value: settings.loadImages,
           onChanged: (val) =>
@@ -105,7 +105,7 @@ class DataSettingsView extends StatelessWidget {
         ),
         ResolutionSelect(
           title: Text(locales.data_preferredQuality),
-          leading: null,
+          leading: Icon(null),
           subtitle: null,
           value: settings.preferredQuality,
           onChanged: (val) =>

@@ -62,7 +62,7 @@ class FiltersSettingsView extends StatelessWidget {
         Text("Muting options"),
         SubredditsFilterButton(
           title: Text(locales.filters_manageHiddenCommunities),
-          leading: null,
+          leading: Icon(null),
           subtitle: Text(locales.filters_manageHiddenCommunitiesDescription),
           value: settings.manageHiddenCommunities,
           onChanged: (val) => context
@@ -71,7 +71,7 @@ class FiltersSettingsView extends StatelessWidget {
         ),
         DomainsFilterButton(
           title: Text(locales.filters_manageHiddenDomains),
-          leading: null,
+          leading: Icon(null),
           subtitle: Text(locales.filters_manageHiddenDomainsDescription),
           value: settings.manageHiddenDomains,
           onChanged: (val) => context
@@ -80,7 +80,7 @@ class FiltersSettingsView extends StatelessWidget {
         ),
         UserFilterButton(
           title: Text(locales.filters_manageHiddenUsers),
-          leading: null,
+          leading: Icon(null),
           subtitle: Text(locales.filters_manageHiddenUsersDescription),
           value: settings.manageHiddenUsers,
           onChanged: (val) =>
@@ -88,7 +88,7 @@ class FiltersSettingsView extends StatelessWidget {
         ),
         FlairFilterButton(
           title: Text(locales.filters_manageHiddenFlairs),
-          leading: null,
+          leading: Icon(null),
           subtitle: Text(locales.filters_manageHiddenFlairsDescription),
           value: settings.manageHiddenFlairs,
           onChanged: (val) => context
@@ -99,7 +99,7 @@ class FiltersSettingsView extends StatelessWidget {
         Text("More options"),
         CheckboxListTile(
           title: Text(locales.filters_showNSFW),
-          secondary: null,
+          secondary: Icon(null),
           subtitle: Text(locales.filters_showNSFWDescription),
           value: settings.showNSFW,
           onChanged: (val) =>

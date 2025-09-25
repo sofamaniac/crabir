@@ -169,7 +169,7 @@ class $className extends StatelessWidget {
     if (widgetType != null) {
       return '$widgetType('
           'title: Text(locales.$titleKey),'
-          'leading: ${iconData != null ? "Icon($iconData)" : "null"},'
+          'leading: Icon($iconData),'
           'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
           'value: settings.${param.name},'
           'onChanged: (val) => context.read<$cubitName>().update${param.name.toPascalCase()}(val),'
@@ -177,7 +177,7 @@ class $className extends StatelessWidget {
     } else if (param.type.isDartCoreBool) {
       return 'CheckboxListTile('
           'title: Text(locales.$titleKey),'
-          'secondary: ${iconData != null ? "Icon($iconData)" : "null"},'
+          'secondary: Icon($iconData),'
           'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
           'value: settings.${param.name},'
           'onChanged: (val) => context.read<$cubitName>().update${param.name.toPascalCase()}(val!),'
