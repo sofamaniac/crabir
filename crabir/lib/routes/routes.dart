@@ -4,6 +4,7 @@ import 'package:crabir/feed/multi.dart';
 import 'package:crabir/gallery/gallery.dart';
 import 'package:crabir/main.dart';
 import 'package:crabir/media/media.dart';
+import 'package:crabir/routes/fixed_swipe_page_route.dart';
 import 'package:crabir/search_posts/widgets/search.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';
@@ -20,9 +21,9 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/user/model.dart';
 import 'package:crabir/subscriptions_tab.dart';
 import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/user/user.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:swipeable_page_route/swipeable_page_route.dart';
 import 'package:crabir/search_subreddits/widgets/search.dart';
 
 part 'routes.gr.dart';
@@ -101,11 +102,10 @@ final threadRoute = CustomRoute(
     AutoRoutePage<T> page,
   ) {
     if (context.read<CommentsSettingsCubit>().state.swipeToClose) {
-      return SwipeablePageRoute(
+      return FixedSwipePageRoute<T>(
+        builder: (_) => child,
         settings: page,
-        builder: (BuildContext context) {
-          return child;
-        },
+        fullscreenDialog: page.fullscreenDialog,
       );
     } else {
       return PageRouteBuilder<T>(
