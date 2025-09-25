@@ -124,21 +124,8 @@ class FlairView extends StatelessWidget {
     } else {
       foregroundColor = fg;
     }
-    Widget textWidget = Container();
-    if (flair.richtext.isEmpty) {
-      if (flair.text?.isNotEmpty == true) {
-        textWidget = RichText(
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-          text: coloredRichtext(
-            context,
-            flair.text!,
-            backgroundColor: backgroundColor,
-            textColor: foregroundColor,
-          ),
-        );
-      }
-    } else {
+    Widget? textWidget;
+    if (flair.richtext.isNotEmpty) {
       textWidget = RichText(
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
@@ -155,9 +142,20 @@ class FlairView extends StatelessWidget {
               .toList(),
         ),
       );
+    } else if (flair.text?.isNotEmpty == true) {
+      textWidget = RichText(
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+        text: coloredRichtext(
+          context,
+          flair.text!,
+          backgroundColor: backgroundColor,
+          textColor: foregroundColor,
+        ),
+      );
     }
-    if (textWidget is Container) {
-      return Container();
+    if (textWidget == null) {
+      return SizedBox.shrink();
     }
     final double horizontalPadding =
         (showColor && flair.backgroundColor != "transparent") ? 6 : 0;
