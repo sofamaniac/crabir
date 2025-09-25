@@ -724,11 +724,11 @@ abstract class AppLocalizations {
   /// **'Show flair colors'**
   String get posts_showFlairColors;
 
-  /// No description provided for @posts_showEmojis.
+  /// No description provided for @posts_showFlairEmojis.
   ///
   /// In en, this message translates to:
   /// **'Show emojis'**
-  String get posts_showEmojis;
+  String get posts_showFlairEmojis;
 
   /// No description provided for @posts_tapFlairToSearch.
   ///

@@ -49,7 +49,8 @@ class PostsSettingsCubit extends HydratedCubit<PostsSettings> {
   void updateShowFlairColors(bool value) =>
       emit(state.copyWith(showFlairColors: value));
 
-  void updateShowEmojis(bool value) => emit(state.copyWith(showEmojis: value));
+  void updateShowFlairEmojis(bool value) =>
+      emit(state.copyWith(showFlairEmojis: value));
 
   void updateTapFlairToSearch(bool value) =>
       emit(state.copyWith(tapFlairToSearch: value));
@@ -163,12 +164,12 @@ class PostsSettingsView extends StatelessWidget {
               context.read<PostsSettingsCubit>().updateShowFlairColors(val!),
         ),
         CheckboxListTile(
-          title: Text(locales.posts_showEmojis),
+          title: Text(locales.posts_showFlairEmojis),
           secondary: null,
           subtitle: null,
-          value: settings.showEmojis,
+          value: settings.showFlairEmojis,
           onChanged: (val) =>
-              context.read<PostsSettingsCubit>().updateShowEmojis(val!),
+              context.read<PostsSettingsCubit>().updateShowFlairEmojis(val!),
         ),
         CheckboxListTile(
           title: Text(locales.posts_tapFlairToSearch),

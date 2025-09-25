@@ -55,19 +55,37 @@ class _CommentViewState extends State<CommentView>
   Widget topRow(CommentsSettings settings) {
     final comment = widget.comment;
     final color = CrabirTheme.of(context).secondaryText;
+    final settings = CommentsSettings.of(context);
     return Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      spacing: 8,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 4,
       children: [
-        _Username(
-          author: comment.author,
-          isSubmitter: comment.isSubmitter,
-          distinguished: comment.distinguished,
+        Flexible(
+          fit: FlexFit.loose,
+          child: Row(
+            spacing: 4,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _Username(
+                author: comment.author,
+                isSubmitter: comment.isSubmitter,
+                distinguished: comment.distinguished,
+              ),
+              if (comment.author != null && settings.showUserFlair)
+                Flexible(
+                  fit: FlexFit.loose,
+                  child: FlairView(
+                    flair: comment.author!.flair,
+                    showColor: settings.showFlairColors,
+                    showEmoji: settings.showFlairEmojis,
+                  ),
+                ),
+            ],
+          ),
         ),
-        if (comment.author != null)
-          Flexible(child: FlairView(flair: comment.author!.flair)),
-        Spacer(),
         SeparatedRow(
           spacing: 2,
           crossAxisAlignment: WrapCrossAlignment.center,

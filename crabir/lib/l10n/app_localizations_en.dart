@@ -391,7 +391,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get posts_showFlairColors => 'Show flair colors';
 
   @override
-  String get posts_showEmojis => 'Show emojis';
+  String get posts_showFlairEmojis => 'Show emojis';
 
   @override
   String get posts_tapFlairToSearch => 'Tap flair to search';

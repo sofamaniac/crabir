@@ -20,10 +20,18 @@ class PostFlair extends StatelessWidget {
             flair: post.linkFlair,
           ),
         ),
-        child: FlairView(flair: post.linkFlair),
+        child: FlairView(
+          flair: post.linkFlair,
+          showColor: settings.showFlairColors,
+          showEmoji: settings.showFlairEmojis,
+        ),
       );
     } else {
-      flairWidget = FlairView(flair: post.linkFlair);
+      flairWidget = FlairView(
+        flair: post.linkFlair,
+        showColor: settings.showFlairColors,
+        showEmoji: settings.showFlairEmojis,
+      );
     }
 
     if (post.spoiler) {

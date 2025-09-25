@@ -107,7 +107,7 @@ abstract class PostsSettings with _$PostsSettings {
     @Setting() @Default(true) bool clickableAwards,
     @Category(name: "Flairs") @Setting() @Default(true) bool showPostFlair,
     @Setting() @Default(true) bool showFlairColors,
-    @Setting() @Default(true) bool showEmojis,
+    @Setting() @Default(true) bool showFlairEmojis,
     @Setting() @Default(true) bool tapFlairToSearch,
     @Category(name: "Post info") @Setting() @Default(true) bool showAuthor,
     @Setting() @Default(true) bool clickableCommunity,

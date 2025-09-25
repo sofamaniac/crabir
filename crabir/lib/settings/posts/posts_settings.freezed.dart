@@ -33,7 +33,7 @@ mixin _$PostsSettings {
   @Setting()
   bool get showFlairColors;
   @Setting()
-  bool get showEmojis;
+  bool get showFlairEmojis;
   @Setting()
   bool get tapFlairToSearch;
   @Category(name: "Post info")
@@ -90,8 +90,8 @@ mixin _$PostsSettings {
                 other.showPostFlair == showPostFlair) &&
             (identical(other.showFlairColors, showFlairColors) ||
                 other.showFlairColors == showFlairColors) &&
-            (identical(other.showEmojis, showEmojis) ||
-                other.showEmojis == showEmojis) &&
+            (identical(other.showFlairEmojis, showFlairEmojis) ||
+                other.showFlairEmojis == showFlairEmojis) &&
             (identical(other.tapFlairToSearch, tapFlairToSearch) ||
                 other.tapFlairToSearch == tapFlairToSearch) &&
             (identical(other.showAuthor, showAuthor) ||
@@ -126,7 +126,7 @@ mixin _$PostsSettings {
         clickableAwards,
         showPostFlair,
         showFlairColors,
-        showEmojis,
+        showFlairEmojis,
         tapFlairToSearch,
         showAuthor,
         clickableCommunity,
@@ -141,7 +141,7 @@ mixin _$PostsSettings {
 
   @override
   String toString() {
-    return 'PostsSettings(defaultHomeSort: $defaultHomeSort, defaultSort: $defaultSort, rememberSortByCommunity: $rememberSortByCommunity, rememberedSorts: $rememberedSorts, showAwards: $showAwards, clickableAwards: $clickableAwards, showPostFlair: $showPostFlair, showFlairColors: $showFlairColors, showEmojis: $showEmojis, tapFlairToSearch: $tapFlairToSearch, showAuthor: $showAuthor, clickableCommunity: $clickableCommunity, clickableUser: $clickableUser, showFloatingButton: $showFloatingButton, showHideButton: $showHideButton, showMarkAsReadButton: $showMarkAsReadButton, showShareButton: $showShareButton, showCommentsButton: $showCommentsButton, showOpenInAppButton: $showOpenInAppButton)';
+    return 'PostsSettings(defaultHomeSort: $defaultHomeSort, defaultSort: $defaultSort, rememberSortByCommunity: $rememberSortByCommunity, rememberedSorts: $rememberedSorts, showAwards: $showAwards, clickableAwards: $clickableAwards, showPostFlair: $showPostFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, tapFlairToSearch: $tapFlairToSearch, showAuthor: $showAuthor, clickableCommunity: $clickableCommunity, clickableUser: $clickableUser, showFloatingButton: $showFloatingButton, showHideButton: $showHideButton, showMarkAsReadButton: $showMarkAsReadButton, showShareButton: $showShareButton, showCommentsButton: $showCommentsButton, showOpenInAppButton: $showOpenInAppButton)';
   }
 }
 
@@ -160,7 +160,7 @@ abstract mixin class $PostsSettingsCopyWith<$Res> {
       @Setting() bool clickableAwards,
       @Category(name: "Flairs") @Setting() bool showPostFlair,
       @Setting() bool showFlairColors,
-      @Setting() bool showEmojis,
+      @Setting() bool showFlairEmojis,
       @Setting() bool tapFlairToSearch,
       @Category(name: "Post info") @Setting() bool showAuthor,
       @Setting() bool clickableCommunity,
@@ -197,7 +197,7 @@ class _$PostsSettingsCopyWithImpl<$Res>
     Object? clickableAwards = null,
     Object? showPostFlair = null,
     Object? showFlairColors = null,
-    Object? showEmojis = null,
+    Object? showFlairEmojis = null,
     Object? tapFlairToSearch = null,
     Object? showAuthor = null,
     Object? clickableCommunity = null,
@@ -242,9 +242,9 @@ class _$PostsSettingsCopyWithImpl<$Res>
           ? _self.showFlairColors
           : showFlairColors // ignore: cast_nullable_to_non_nullable
               as bool,
-      showEmojis: null == showEmojis
-          ? _self.showEmojis
-          : showEmojis // ignore: cast_nullable_to_non_nullable
+      showFlairEmojis: null == showFlairEmojis
+          ? _self.showFlairEmojis
+          : showFlairEmojis // ignore: cast_nullable_to_non_nullable
               as bool,
       tapFlairToSearch: null == tapFlairToSearch
           ? _self.tapFlairToSearch
@@ -412,7 +412,7 @@ extension PostsSettingsPatterns on PostsSettings {
             @Setting() bool clickableAwards,
             @Category(name: "Flairs") @Setting() bool showPostFlair,
             @Setting() bool showFlairColors,
-            @Setting() bool showEmojis,
+            @Setting() bool showFlairEmojis,
             @Setting() bool tapFlairToSearch,
             @Category(name: "Post info") @Setting() bool showAuthor,
             @Setting() bool clickableCommunity,
@@ -440,7 +440,7 @@ extension PostsSettingsPatterns on PostsSettings {
             _that.clickableAwards,
             _that.showPostFlair,
             _that.showFlairColors,
-            _that.showEmojis,
+            _that.showFlairEmojis,
             _that.tapFlairToSearch,
             _that.showAuthor,
             _that.clickableCommunity,
@@ -480,7 +480,7 @@ extension PostsSettingsPatterns on PostsSettings {
             @Setting() bool clickableAwards,
             @Category(name: "Flairs") @Setting() bool showPostFlair,
             @Setting() bool showFlairColors,
-            @Setting() bool showEmojis,
+            @Setting() bool showFlairEmojis,
             @Setting() bool tapFlairToSearch,
             @Category(name: "Post info") @Setting() bool showAuthor,
             @Setting() bool clickableCommunity,
@@ -507,7 +507,7 @@ extension PostsSettingsPatterns on PostsSettings {
             _that.clickableAwards,
             _that.showPostFlair,
             _that.showFlairColors,
-            _that.showEmojis,
+            _that.showFlairEmojis,
             _that.tapFlairToSearch,
             _that.showAuthor,
             _that.clickableCommunity,
@@ -546,7 +546,7 @@ extension PostsSettingsPatterns on PostsSettings {
             @Setting() bool clickableAwards,
             @Category(name: "Flairs") @Setting() bool showPostFlair,
             @Setting() bool showFlairColors,
-            @Setting() bool showEmojis,
+            @Setting() bool showFlairEmojis,
             @Setting() bool tapFlairToSearch,
             @Category(name: "Post info") @Setting() bool showAuthor,
             @Setting() bool clickableCommunity,
@@ -573,7 +573,7 @@ extension PostsSettingsPatterns on PostsSettings {
             _that.clickableAwards,
             _that.showPostFlair,
             _that.showFlairColors,
-            _that.showEmojis,
+            _that.showFlairEmojis,
             _that.tapFlairToSearch,
             _that.showAuthor,
             _that.clickableCommunity,
@@ -604,7 +604,7 @@ class _PostsSettings extends PostsSettings {
       @Setting() this.clickableAwards = true,
       @Category(name: "Flairs") @Setting() this.showPostFlair = true,
       @Setting() this.showFlairColors = true,
-      @Setting() this.showEmojis = true,
+      @Setting() this.showFlairEmojis = true,
       @Setting() this.tapFlairToSearch = true,
       @Category(name: "Post info") @Setting() this.showAuthor = true,
       @Setting() this.clickableCommunity = true,
@@ -658,7 +658,7 @@ class _PostsSettings extends PostsSettings {
   @override
   @JsonKey()
   @Setting()
-  final bool showEmojis;
+  final bool showFlairEmojis;
   @override
   @JsonKey()
   @Setting()
@@ -739,8 +739,8 @@ class _PostsSettings extends PostsSettings {
                 other.showPostFlair == showPostFlair) &&
             (identical(other.showFlairColors, showFlairColors) ||
                 other.showFlairColors == showFlairColors) &&
-            (identical(other.showEmojis, showEmojis) ||
-                other.showEmojis == showEmojis) &&
+            (identical(other.showFlairEmojis, showFlairEmojis) ||
+                other.showFlairEmojis == showFlairEmojis) &&
             (identical(other.tapFlairToSearch, tapFlairToSearch) ||
                 other.tapFlairToSearch == tapFlairToSearch) &&
             (identical(other.showAuthor, showAuthor) ||
@@ -775,7 +775,7 @@ class _PostsSettings extends PostsSettings {
         clickableAwards,
         showPostFlair,
         showFlairColors,
-        showEmojis,
+        showFlairEmojis,
         tapFlairToSearch,
         showAuthor,
         clickableCommunity,
@@ -790,7 +790,7 @@ class _PostsSettings extends PostsSettings {
 
   @override
   String toString() {
-    return 'PostsSettings(defaultHomeSort: $defaultHomeSort, defaultSort: $defaultSort, rememberSortByCommunity: $rememberSortByCommunity, rememberedSorts: $rememberedSorts, showAwards: $showAwards, clickableAwards: $clickableAwards, showPostFlair: $showPostFlair, showFlairColors: $showFlairColors, showEmojis: $showEmojis, tapFlairToSearch: $tapFlairToSearch, showAuthor: $showAuthor, clickableCommunity: $clickableCommunity, clickableUser: $clickableUser, showFloatingButton: $showFloatingButton, showHideButton: $showHideButton, showMarkAsReadButton: $showMarkAsReadButton, showShareButton: $showShareButton, showCommentsButton: $showCommentsButton, showOpenInAppButton: $showOpenInAppButton)';
+    return 'PostsSettings(defaultHomeSort: $defaultHomeSort, defaultSort: $defaultSort, rememberSortByCommunity: $rememberSortByCommunity, rememberedSorts: $rememberedSorts, showAwards: $showAwards, clickableAwards: $clickableAwards, showPostFlair: $showPostFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, tapFlairToSearch: $tapFlairToSearch, showAuthor: $showAuthor, clickableCommunity: $clickableCommunity, clickableUser: $clickableUser, showFloatingButton: $showFloatingButton, showHideButton: $showHideButton, showMarkAsReadButton: $showMarkAsReadButton, showShareButton: $showShareButton, showCommentsButton: $showCommentsButton, showOpenInAppButton: $showOpenInAppButton)';
   }
 }
 
@@ -811,7 +811,7 @@ abstract mixin class _$PostsSettingsCopyWith<$Res>
       @Setting() bool clickableAwards,
       @Category(name: "Flairs") @Setting() bool showPostFlair,
       @Setting() bool showFlairColors,
-      @Setting() bool showEmojis,
+      @Setting() bool showFlairEmojis,
       @Setting() bool tapFlairToSearch,
       @Category(name: "Post info") @Setting() bool showAuthor,
       @Setting() bool clickableCommunity,
@@ -850,7 +850,7 @@ class __$PostsSettingsCopyWithImpl<$Res>
     Object? clickableAwards = null,
     Object? showPostFlair = null,
     Object? showFlairColors = null,
-    Object? showEmojis = null,
+    Object? showFlairEmojis = null,
     Object? tapFlairToSearch = null,
     Object? showAuthor = null,
     Object? clickableCommunity = null,
@@ -895,9 +895,9 @@ class __$PostsSettingsCopyWithImpl<$Res>
           ? _self.showFlairColors
           : showFlairColors // ignore: cast_nullable_to_non_nullable
               as bool,
-      showEmojis: null == showEmojis
-          ? _self.showEmojis
-          : showEmojis // ignore: cast_nullable_to_non_nullable
+      showFlairEmojis: null == showFlairEmojis
+          ? _self.showFlairEmojis
+          : showFlairEmojis // ignore: cast_nullable_to_non_nullable
               as bool,
       tapFlairToSearch: null == tapFlairToSearch
           ? _self.tapFlairToSearch

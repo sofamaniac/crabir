@@ -9,7 +9,14 @@ import 'package:logging/logging.dart';
 class FlairView extends StatelessWidget {
   final Flair flair;
   final Logger log = Logger("FlairView");
-  FlairView({super.key, required this.flair});
+  final bool showColor;
+  final bool showEmoji;
+  FlairView({
+    super.key,
+    required this.flair,
+    required this.showColor,
+    required this.showEmoji,
+  });
 
   /// Compute the luminance of a color according to https://www.w3.org/WAI/WCAG22/Techniques/general/G18.html
   double _luminance(Color c) {
@@ -37,36 +44,6 @@ class FlairView extends StatelessWidget {
     final rMax = min(r1, r2);
 
     return (rMax + 0.05) / (rMin + 0.05);
-  }
-
-  Widget coloredText(
-    BuildContext context,
-    String text, {
-    required Color backgroundColor,
-    required Color textColor,
-  }) {
-    final textStyle = Theme.of(context)
-        .textTheme
-        .labelSmall
-        ?.copyWith(backgroundColor: backgroundColor, color: textColor);
-    if (_colorRatio(textColor, backgroundColor) > 4.5) {
-      return Text(
-        text,
-        style: textStyle,
-        semanticsLabel: "flair",
-      );
-    } else {
-      final backgroundLuminance = _luminance(backgroundColor);
-      return Text(
-        text,
-        style: textStyle?.copyWith(
-          color: backgroundLuminance > 0.5 ? Colors.black : Colors.white,
-        ),
-        semanticsLabel: "flair",
-        overflow: TextOverflow.ellipsis,
-        maxLines: 1,
-      );
-    }
   }
 
   InlineSpan coloredRichtext(
@@ -107,42 +84,58 @@ class FlairView extends StatelessWidget {
     final height = Theme.of(context).textTheme.labelSmall?.height ?? 1;
     final imageHeight = height * fontSize;
     return switch (richtext) {
-      Richtext_Text(t: var text) => coloredRichtext(
+      Richtext_Text(t: final text) => coloredRichtext(
           context,
           text,
           textColor: textColor,
           backgroundColor: backgroundColor,
         ),
-      Richtext_Emoji(a: var text, u: var url) => WidgetSpan(
+      Richtext_Emoji(a: final text, u: final url) when showEmoji => WidgetSpan(
           child: Image.network(url, semanticLabel: text, height: imageHeight),
           style: TextStyle(
             color: textColor,
             backgroundColor: backgroundColor,
             fontWeight: FontWeight.bold,
           ),
-        )
+        ),
+      Richtext_Emoji(a: final text, u: _) => coloredRichtext(
+          context,
+          text,
+          textColor: textColor,
+          backgroundColor: backgroundColor,
+        ),
     };
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = CrabirTheme.of(context);
     // default to background color for luminance computation (should be the same as a transparent background)
-    final backgroundColor = flair.backgroundColor.stringToColor(
+    final theme = CrabirTheme.of(context);
+    final bg = flair.backgroundColor.stringToColor(
       defaultColor: theme.cardBackground,
     );
-    final foregroundColor = flair.textColor.stringToColor(
-      defaultColor: Theme.of(context).textTheme.labelSmall?.foreground?.color ??
-          Colors.grey,
+    final backgroundColor = showColor ? bg : theme.cardBackground;
+    final fg = flair.textColor.stringToColor(
+      defaultColor: theme.secondaryText,
     );
+    final Color foregroundColor;
+    if (backgroundColor == theme.cardBackground || !showColor) {
+      foregroundColor = theme.secondaryText;
+    } else {
+      foregroundColor = fg;
+    }
     Widget textWidget = Container();
     if (flair.richtext.isEmpty) {
       if (flair.text?.isNotEmpty == true) {
-        textWidget = coloredText(
-          context,
-          flair.text!,
-          backgroundColor: backgroundColor,
-          textColor: foregroundColor,
+        textWidget = RichText(
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          text: coloredRichtext(
+            context,
+            flair.text!,
+            backgroundColor: backgroundColor,
+            textColor: foregroundColor,
+          ),
         );
       }
     } else {
@@ -166,8 +159,13 @@ class FlairView extends StatelessWidget {
     if (textWidget is Container) {
       return Container();
     }
+    final double horizontalPadding =
+        (showColor && flair.backgroundColor != "transparent") ? 6 : 0;
     return Container(
-      padding: EdgeInsetsDirectional.symmetric(horizontal: 6, vertical: 2),
+      padding: EdgeInsetsDirectional.symmetric(
+        horizontal: horizontalPadding,
+        vertical: 2,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(2),
