@@ -211,7 +211,7 @@ Widget _postView(BuildContext context, Post post) {
     onSaveCallback: (save) async {
       state.add(Save(save: save, name: post.name));
     },
-    onTap: () => context.router.navigate(
+    onTap: () => context.router.push(
       ThreadRoute(
         post: post,
       ),

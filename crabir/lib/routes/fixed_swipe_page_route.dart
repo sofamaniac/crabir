@@ -9,7 +9,9 @@ class FixedSwipePageRoute<T> extends PageRoute<T> {
   });
 
   final WidgetBuilder builder;
-  final double dragThreshold; // fraction of screen width to trigger pop
+
+  /// fraction of screen width to trigger pop
+  final double dragThreshold;
 
   late AnimationController _pushController;
   late AnimationController _dragController;
@@ -66,13 +68,19 @@ class FixedSwipePageRoute<T> extends PageRoute<T> {
         if (progress > dragThreshold || velocity > 700) {
           // Complete pop
           _dragController
-              .animateTo(1.0,
-                  duration: transitionDuration, curve: Curves.easeOut)
+              .animateTo(
+                1.0,
+                duration: transitionDuration,
+                curve: Curves.easeOut,
+              )
               .whenComplete(() => navigator?.pop());
         } else {
           // Cancel and animate back
-          _dragController.animateBack(0.0,
-              duration: transitionDuration, curve: Curves.easeOut);
+          _dragController.animateBack(
+            0.0,
+            duration: transitionDuration,
+            curve: Curves.easeOut,
+          );
         }
       },
       child: AnimatedBuilder(

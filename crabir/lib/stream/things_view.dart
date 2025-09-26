@@ -9,22 +9,23 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class ThingsScaffold extends StatefulWidget {
-  /// Function to use do build a `Post` view.
-  final Widget Function(BuildContext, Post)? postView;
-
-  final Widget? subredditInfo;
-  final String? name;
   final reddit_stream.PagingHandler stream;
+
+  /// If provided show the widget at the top of the view.
+  final Widget? subredditInfo;
 
   /// Function to use do build a `Comment` view.
   final Widget Function(BuildContext, Comment)? commentView;
+
+  /// Function to use do build a `Post` view.
+  final Widget Function(BuildContext, Post)? postView;
+
   const ThingsScaffold({
     super.key,
     this.postView,
     this.commentView,
     required this.stream,
     this.subredditInfo,
-    this.name,
   });
 
   @override

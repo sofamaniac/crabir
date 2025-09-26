@@ -231,8 +231,9 @@ class _MainScreenViewState extends State<MainScreenView>
 
   bool showAccountSelectionDialogue(int index) {
     final account = context.read<AccountsBloc>().state.account;
+    final guardedPages = [profileIndex, inboxIndex];
     return (account == null || account.isAnonymous) &&
-        (index == profileIndex || index == inboxIndex);
+        guardedPages.contains(index);
   }
 
   void _showLoginDialog(BuildContext context) async {
@@ -262,13 +263,18 @@ class _MainScreenViewState extends State<MainScreenView>
   ) {
     void listener() {
       final index = tabsController.index;
+      // Show account selection dialog when necessary
       if (showAccountSelectionDialogue(index) &&
-          tabsController.indexIsChanging &&
-          tabsController.index > tabsController.previousIndex) {
+          tabsController.indexIsChanging) {
         tabsController.index = tabsController.previousIndex;
         WidgetsBinding.instance.addPostFrameCallback(
           (_) => _showLoginDialog(context),
         );
+      }
+
+      // When navigating away of subscription tab, reset stack
+      if (tabsController.previousIndex == subscriptionsIndex) {
+        tabsRouter.stackRouterOfIndex(index)?.popUntilRoot();
       }
     }
 

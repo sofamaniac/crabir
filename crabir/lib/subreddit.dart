@@ -44,8 +44,12 @@ class SubredditIcon extends StatelessWidget {
     };
     if (clickable && subredditName != null) {
       return InkWell(
-        onTap: () => context.router
-            .navigate(FeedRoute(feed: Feed.subreddit(subredditName!))),
+        onTap: () => context.router.navigate(
+          FeedRoute(
+            key: ValueKey(subredditName!),
+            feed: Feed.subreddit(subredditName!),
+          ),
+        ),
         child: avatar,
       );
     } else {
