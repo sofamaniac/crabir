@@ -36,8 +36,11 @@ class YoutubeContent extends StatelessWidget {
 class VideoContent extends StatefulWidget {
   final Post post;
   final Resolution resolution;
-  const VideoContent(
-      {super.key, required this.post, this.resolution = Resolution.source});
+  const VideoContent({
+    super.key,
+    required this.post,
+    this.resolution = Resolution.source,
+  });
 
   @override
   State<VideoContent> createState() => _VideoContentState();
@@ -79,54 +82,69 @@ class _VideoContentState extends State<VideoContent> {
         return AnimatedContent.fromRedditVideo(
           media: media,
           placeholderUrl: preview?.resolutions[0].url,
-          goFullScreen: () => context.router.navigate(
-            FullscreenVideoRoute(
-              videoUrl: media.field0.dashUrl,
-              width: media.field0.width,
-              height: media.field0.height,
-            ),
-          ),
+          goFullScreen: goFullScreen(context, widget.post, widget.resolution),
         );
       case Media_Oembed():
         return AnimatedContent.fromMediaOEmbed(
           media: media,
           placeholderUrl: preview?.resolutions[0].url,
-          goFullScreen: () => context.router.navigate(
-            FullscreenVideoRoute(
-              videoUrl: media.oembed.providerUrl,
-              width: media.oembed.width,
-              height: media.oembed.height,
-            ),
-          ),
+          goFullScreen: goFullScreen(context, widget.post, widget.resolution),
         );
       case null when preview?.variants.mp4 != null:
         final image = preview!.variants.mp4!.withResolution(widget.resolution);
         return AnimatedContent.fromImageBase(
           image: image,
           placeholderUrl: preview.resolutions[0].url,
-          goFullScreen: () => context.router.navigate(
-            FullscreenVideoRoute(
-              videoUrl: image.url,
-              width: image.width,
-              height: image.height,
-            ),
-          ),
+          goFullScreen: goFullScreen(context, widget.post, widget.resolution),
         );
       case null when preview?.variants.gif != null:
         final image = preview!.variants.gif!.withResolution(widget.resolution);
         return AnimatedContent.fromImageBase(
           image: image,
           placeholderUrl: preview.resolutions[0].url,
-          goFullScreen: () => context.router.navigate(
-            FullscreenVideoRoute(
-              videoUrl: image.url,
-              width: image.width,
-              height: image.height,
-            ),
-          ),
+          goFullScreen: goFullScreen(context, widget.post, widget.resolution),
         );
       default:
         return Center(child: Text("Error while loading video"));
     }
   }
+}
+
+VoidCallback goFullScreen(
+    BuildContext context, Post post, Resolution resolution) {
+  final String url;
+  final int width;
+  final int height;
+  final media = post.secureMedia;
+  final preview = post.preview?.images[0];
+  switch (media) {
+    case Media_RedditVideo():
+      url = media.field0.dashUrl;
+      width = media.field0.width;
+      height = media.field0.height;
+    case Media_Oembed():
+      url = media.oembed.providerUrl;
+      width = media.oembed.width;
+      height = media.oembed.height;
+    case null when preview?.variants.mp4 != null:
+      final image = preview!.variants.mp4!.withResolution(resolution);
+      url = image.url;
+      width = image.width;
+      height = image.height;
+    case null when preview?.variants.gif != null:
+      final image = preview!.variants.gif!.withResolution(resolution);
+      url = image.url;
+      width = image.width;
+      height = image.height;
+    default:
+      return () {};
+  }
+  return () => context.router.navigate(
+        FullscreenVideoRoute(
+          videoUrl: url,
+          width: width,
+          height: height,
+          post: post,
+        ),
+      );
 }

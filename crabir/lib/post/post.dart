@@ -13,6 +13,7 @@ import 'package:crabir/post/parts/video.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/routes/routes.dart';
 import 'package:crabir/separated_row.dart';
+import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
@@ -73,4 +74,6 @@ extension IsMediaKind on Kind {
   }
 }
 
-extension GetPostTitleWidget on Post {}
+class PostCubit extends Cubit<Post> {
+  PostCubit(super.post);
+}
