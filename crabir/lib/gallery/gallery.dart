@@ -25,6 +25,7 @@ class GalleryView extends StatelessWidget {
         (context.read<FiltersSettingsCubit>().state.blurNSFW && post.over18);
     if (post.gallery != null) {
       return _GalleryView(
+        post: post,
         gallery: post.gallery!,
         onVote: onVote,
         onSave: onSave,
@@ -34,6 +35,7 @@ class GalleryView extends StatelessWidget {
       final gallery = post.crosspostParentList[0].gallery;
       if (gallery != null) {
         return _GalleryView(
+          post: post,
           gallery: gallery,
           onVote: onVote,
           onSave: onSave,
@@ -53,12 +55,14 @@ class _GalleryView extends StatefulWidget {
   final void Function(VoteDirection)? onVote;
   final void Function(bool)? onSave;
   final bool obfuscate;
+  final Post post;
 
   const _GalleryView({
     required this.gallery,
     required this.obfuscate,
     this.onVote,
     this.onSave,
+    required this.post,
   });
 
   @override
@@ -86,6 +90,7 @@ class _GalleryViewState extends State<_GalleryView> {
       FullScreenGalleryRoute(
         gallery: widget.gallery,
         initialPage: initialPage,
+        post: widget.post,
       ),
     );
   }

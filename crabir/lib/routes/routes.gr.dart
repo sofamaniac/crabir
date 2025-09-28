@@ -137,6 +137,7 @@ class FullScreenGalleryRoute extends PageRouteInfo<FullScreenGalleryRouteArgs> {
     Key? key,
     required Gallery gallery,
     required int initialPage,
+    Post? post,
     List<PageRouteInfo>? children,
   }) : super(
           FullScreenGalleryRoute.name,
@@ -144,6 +145,7 @@ class FullScreenGalleryRoute extends PageRouteInfo<FullScreenGalleryRouteArgs> {
             key: key,
             gallery: gallery,
             initialPage: initialPage,
+            post: post,
           ),
           initialChildren: children,
         );
@@ -158,6 +160,7 @@ class FullScreenGalleryRoute extends PageRouteInfo<FullScreenGalleryRouteArgs> {
         key: args.key,
         gallery: args.gallery,
         initialPage: args.initialPage,
+        post: args.post,
       );
     },
   );
@@ -168,6 +171,7 @@ class FullScreenGalleryRouteArgs {
     this.key,
     required this.gallery,
     required this.initialPage,
+    this.post,
   });
 
   final Key? key;
@@ -176,9 +180,11 @@ class FullScreenGalleryRouteArgs {
 
   final int initialPage;
 
+  final Post? post;
+
   @override
   String toString() {
-    return 'FullScreenGalleryRouteArgs{key: $key, gallery: $gallery, initialPage: $initialPage}';
+    return 'FullScreenGalleryRouteArgs{key: $key, gallery: $gallery, initialPage: $initialPage, post: $post}';
   }
 
   @override
@@ -187,11 +193,13 @@ class FullScreenGalleryRouteArgs {
     if (other is! FullScreenGalleryRouteArgs) return false;
     return key == other.key &&
         gallery == other.gallery &&
-        initialPage == other.initialPage;
+        initialPage == other.initialPage &&
+        post == other.post;
   }
 
   @override
-  int get hashCode => key.hashCode ^ gallery.hashCode ^ initialPage.hashCode;
+  int get hashCode =>
+      key.hashCode ^ gallery.hashCode ^ initialPage.hashCode ^ post.hashCode;
 }
 
 /// generated route for
@@ -201,6 +209,7 @@ class FullscreenImageRoute extends PageRouteInfo<FullscreenImageRouteArgs> {
     Key? key,
     required String imageUrl,
     String? title,
+    Post? post,
     List<PageRouteInfo>? children,
   }) : super(
           FullscreenImageRoute.name,
@@ -208,6 +217,7 @@ class FullscreenImageRoute extends PageRouteInfo<FullscreenImageRouteArgs> {
             key: key,
             imageUrl: imageUrl,
             title: title,
+            post: post,
           ),
           initialChildren: children,
         );
@@ -222,6 +232,7 @@ class FullscreenImageRoute extends PageRouteInfo<FullscreenImageRouteArgs> {
         key: args.key,
         imageUrl: args.imageUrl,
         title: args.title,
+        post: args.post,
       );
     },
   );
@@ -232,6 +243,7 @@ class FullscreenImageRouteArgs {
     this.key,
     required this.imageUrl,
     this.title,
+    this.post,
   });
 
   final Key? key;
@@ -240,9 +252,11 @@ class FullscreenImageRouteArgs {
 
   final String? title;
 
+  final Post? post;
+
   @override
   String toString() {
-    return 'FullscreenImageRouteArgs{key: $key, imageUrl: $imageUrl, title: $title}';
+    return 'FullscreenImageRouteArgs{key: $key, imageUrl: $imageUrl, title: $title, post: $post}';
   }
 
   @override
@@ -251,11 +265,13 @@ class FullscreenImageRouteArgs {
     if (other is! FullscreenImageRouteArgs) return false;
     return key == other.key &&
         imageUrl == other.imageUrl &&
-        title == other.title;
+        title == other.title &&
+        post == other.post;
   }
 
   @override
-  int get hashCode => key.hashCode ^ imageUrl.hashCode ^ title.hashCode;
+  int get hashCode =>
+      key.hashCode ^ imageUrl.hashCode ^ title.hashCode ^ post.hashCode;
 }
 
 /// generated route for
@@ -267,6 +283,7 @@ class FullscreenVideoRoute extends PageRouteInfo<FullscreenVideoRouteArgs> {
     required int width,
     required int height,
     String? title,
+    Post? post,
     List<PageRouteInfo>? children,
   }) : super(
           FullscreenVideoRoute.name,
@@ -276,6 +293,7 @@ class FullscreenVideoRoute extends PageRouteInfo<FullscreenVideoRouteArgs> {
             width: width,
             height: height,
             title: title,
+            post: post,
           ),
           initialChildren: children,
         );
@@ -292,6 +310,7 @@ class FullscreenVideoRoute extends PageRouteInfo<FullscreenVideoRouteArgs> {
         width: args.width,
         height: args.height,
         title: args.title,
+        post: args.post,
       );
     },
   );
@@ -304,6 +323,7 @@ class FullscreenVideoRouteArgs {
     required this.width,
     required this.height,
     this.title,
+    this.post,
   });
 
   final Key? key;
@@ -316,9 +336,11 @@ class FullscreenVideoRouteArgs {
 
   final String? title;
 
+  final Post? post;
+
   @override
   String toString() {
-    return 'FullscreenVideoRouteArgs{key: $key, videoUrl: $videoUrl, width: $width, height: $height, title: $title}';
+    return 'FullscreenVideoRouteArgs{key: $key, videoUrl: $videoUrl, width: $width, height: $height, title: $title, post: $post}';
   }
 
   @override
@@ -329,7 +351,8 @@ class FullscreenVideoRouteArgs {
         videoUrl == other.videoUrl &&
         width == other.width &&
         height == other.height &&
-        title == other.title;
+        title == other.title &&
+        post == other.post;
   }
 
   @override
@@ -338,7 +361,8 @@ class FullscreenVideoRouteArgs {
       videoUrl.hashCode ^
       width.hashCode ^
       height.hashCode ^
-      title.hashCode;
+      title.hashCode ^
+      post.hashCode;
 }
 
 /// generated route for

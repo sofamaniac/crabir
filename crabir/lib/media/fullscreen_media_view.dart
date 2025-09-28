@@ -4,11 +4,13 @@ class FullscreenMediaView extends StatefulWidget {
   final Widget Function(VoidCallback) builder;
   final Widget? trailing;
   final String? title;
+  final Post? post;
   const FullscreenMediaView({
     super.key,
     required this.builder,
     this.trailing,
     this.title,
+    this.post,
   });
 
   @override
@@ -49,6 +51,10 @@ class _FullscreenMediaViewState extends State<FullscreenMediaView> {
   }
 
   Widget _bottomBar() {
+    final post = widget.post;
+    if (post == null) {
+      return SizedBox.shrink();
+    }
     final theme = CrabirTheme.of(context);
     final bar = SafeArea(
       top: false,
@@ -59,21 +65,43 @@ class _FullscreenMediaViewState extends State<FullscreenMediaView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              // TODO: buttons in fullscreen media view
               VoteButton.like(
-                likes: VoteDirection.neutral,
+                likes: post.likes.toVoteDirection(),
                 colorActive: theme.primaryColor,
+                onChange: (dir) async {
+                  await post.vote(direction: dir, client: RedditAPI.client());
+                  setState(() {});
+                },
+              ),
+              VoteButton.dislike(
+                likes: post.likes.toVoteDirection(),
+                colorActive: theme.downvoteContent,
+                onChange: (dir) async {
+                  await post.vote(direction: dir, client: RedditAPI.client());
+                  setState(() {});
+                },
+              ),
+              SaveButton(
+                initialValue: post.saved,
+                onChange: (save) async {
+                  if (save) {
+                    await post.save(client: RedditAPI.client());
+                  } else {
+                    await post.unsave(client: RedditAPI.client());
+                  }
+                  setState(() {});
+                },
               ),
               IconButton(
-                icon: const Icon(Icons.favorite_border, color: Colors.white),
-                onPressed: () {},
+                icon: Icon(Icons.comment_outlined),
+                color: theme.secondaryText,
+                onPressed: () {
+                  context.router.navigate(ThreadRoute(post: post));
+                },
               ),
               IconButton(
-                icon: const Icon(Icons.share, color: Colors.white),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: const Icon(Icons.download, color: Colors.white),
+                icon: Icon(Icons.share),
+                color: theme.secondaryText,
                 onPressed: () {},
               ),
             ],

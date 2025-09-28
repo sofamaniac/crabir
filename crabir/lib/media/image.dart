@@ -83,11 +83,18 @@ class ImageThumbnail extends StatelessWidget {
 class FullscreenImageView extends StatelessWidget {
   final String imageUrl;
   final String? title;
-  const FullscreenImageView({super.key, required this.imageUrl, this.title});
+  final Post? post;
+  const FullscreenImageView({
+    super.key,
+    required this.imageUrl,
+    this.title,
+    this.post,
+  });
 
   @override
   Widget build(BuildContext context) {
     return FullscreenMediaView(
+      post: post,
       builder: (onTap) => PhotoView(
         imageProvider: CachedNetworkImageProvider(imageUrl),
         minScale: PhotoViewComputedScale.contained * 1.0,
@@ -104,16 +111,20 @@ class FullscreenVideoView extends StatelessWidget {
   final String? title;
   final int width;
   final int height;
-  const FullscreenVideoView(
-      {super.key,
-      required this.videoUrl,
-      required this.width,
-      required this.height,
-      this.title});
+  final Post? post;
+  const FullscreenVideoView({
+    super.key,
+    required this.videoUrl,
+    required this.width,
+    required this.height,
+    this.title,
+    this.post,
+  });
 
   @override
   Widget build(BuildContext context) {
     return FullscreenMediaView(
+      post: post,
       builder: (onTap) => AnimatedContent(
         url: videoUrl,
         width: width,

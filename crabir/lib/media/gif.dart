@@ -27,6 +27,7 @@ class AnimatedContent extends StatefulWidget {
   final Widget? cartouche;
   final bool ignoreAutoplay;
   final VoidCallback? goFullScreen;
+  final Post? post;
 
   const AnimatedContent({
     super.key,
@@ -37,6 +38,7 @@ class AnimatedContent extends StatefulWidget {
     this.cartouche,
     this.ignoreAutoplay = false,
     this.goFullScreen,
+    this.post,
   });
 
   AnimatedContent.fromImageBase({
@@ -46,6 +48,7 @@ class AnimatedContent extends StatefulWidget {
     this.cartouche,
     this.ignoreAutoplay = false,
     this.goFullScreen,
+    this.post,
   })  : url = image.url,
         width = image.width,
         height = image.height;
@@ -56,6 +59,7 @@ class AnimatedContent extends StatefulWidget {
     Resolution preferredResolution = Resolution.source,
     bool ignoreAutoplay = false,
     VoidCallback? goFullScreen,
+    Post? post,
   }) {
     final ImageBase media;
     if (preferredResolution == Resolution.source) {
@@ -69,6 +73,7 @@ class AnimatedContent extends StatefulWidget {
       width: media.width,
       height: media.height,
       goFullScreen: goFullScreen,
+      post: post,
     );
   }
 
@@ -79,6 +84,7 @@ class AnimatedContent extends StatefulWidget {
     this.cartouche,
     this.ignoreAutoplay = false,
     this.goFullScreen,
+    this.post,
   })  : url = media.oembed.providerUrl,
         width = media.oembed.width,
         height = media.oembed.height;
@@ -93,6 +99,7 @@ class AnimatedContent extends StatefulWidget {
     ),
     this.ignoreAutoplay = false,
     this.goFullScreen,
+    this.post,
   })  : url = media.field0.dashUrl,
         width = media.field0.width,
         height = media.field0.height;

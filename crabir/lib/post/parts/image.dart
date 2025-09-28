@@ -34,7 +34,10 @@ class _ImageContentState extends State<ImageContent> {
     if (widget.post.preview == null) {
       return InkWell(
         onTap: () => context.router.navigate(
-          FullscreenImageRoute(imageUrl: widget.post.url),
+          FullscreenImageRoute(
+            imageUrl: widget.post.url,
+            post: widget.post,
+          ),
         ),
         child: ImageThumbnail(
           imageUrl: widget.post.url,
@@ -62,6 +65,7 @@ class _ImageContentState extends State<ImageContent> {
                       false,
                     )
                     .url,
+                post: widget.post,
               ),
             );
           } else {

@@ -4,11 +4,13 @@ part of 'gallery.dart';
 class FullScreenGalleryView extends StatefulWidget {
   final Gallery gallery;
   final int initialPage;
+  final Post? post;
 
   const FullScreenGalleryView({
     super.key,
     required this.gallery,
     required this.initialPage,
+    this.post,
   });
 
   @override
@@ -34,6 +36,7 @@ class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
   @override
   Widget build(BuildContext context) {
     return FullscreenMediaView(
+      post: widget.post,
       builder: (onTap) {
         return _GalleryPageViewer(
           controller: controller,
