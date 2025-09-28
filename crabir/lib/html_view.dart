@@ -29,9 +29,15 @@ class StyledHtml extends StatelessWidget {
     final htmlContent = this
         .htmlContent
         .replaceAll('<p>', '')
-        .replaceAll('</p>', '')
+        .replaceAll('</p>', '<br>')
         .replaceAll('\n\n', '<br>');
-    return htmlContent;
+    // Remove last <br>
+    final position = htmlContent.lastIndexOf("<br>");
+    if (position >= 0) {
+      return htmlContent.replaceFirst("<br>", "", position);
+    } else {
+      return htmlContent;
+    }
   }
 
   @override
