@@ -104,13 +104,16 @@ final currentUserRoute = AutoRoute(
 Widget _scaffold(
   BuildContext context,
   reddit_stream.PagingHandler stream,
-  String key,
-) {
+  String key, {
+  bool showHidden = false,
+}) {
   return ThingsScaffold(
-      stream: stream,
-      postView: _postView,
-      commentView: _commentView,
-      key: PageStorageKey(key));
+    key: PageStorageKey(key),
+    stream: stream,
+    postView: _postView,
+    commentView: _commentView,
+    showHidden: showHidden,
+  );
 }
 
 Widget _postView(BuildContext context, Post post) {
@@ -280,6 +283,7 @@ class UserHiddenView extends StatelessWidget {
       context,
       RedditAPI.client().userHidden(username: username),
       "userHidden",
+      showHidden: true,
     );
   }
 }

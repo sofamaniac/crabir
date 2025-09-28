@@ -5,7 +5,6 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/paging_handler.dart'
     as reddit_stream;
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class ThingsScaffold extends StatefulWidget {
@@ -20,12 +19,16 @@ class ThingsScaffold extends StatefulWidget {
   /// Function to use do build a `Post` view.
   final Widget Function(BuildContext, Post)? postView;
 
+  /// When set to true show post that were hidden
+  final bool showHidden;
+
   const ThingsScaffold({
     super.key,
     this.postView,
     this.commentView,
     required this.stream,
     this.subredditInfo,
+    this.showHidden = false,
   });
 
   @override
@@ -48,6 +51,13 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
   void dispose() {
     _pagingController.dispose();
     super.dispose();
+  }
+
+  /// return true when the post should be hidden
+  bool hide(Post post) {
+    return GlobalFilters.of(context).shouldHidePost(post) ||
+        (post.over18 && !FiltersSettings.of(context).showNSFW) ||
+        (post.hidden && !widget.showHidden);
   }
 
   @override
@@ -79,13 +89,10 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
 
                       switch (thing) {
                         case Thing_Post(field0: final post):
-                          if (context
-                              .read<GlobalFiltersCubit>()
-                              .shouldHidePost(post)) {
+                          if (hide(post) || widget.postView == null) {
                             return const SizedBox.shrink();
                           }
-                          return widget.postView?.call(context, post) ??
-                              const SizedBox.shrink();
+                          return widget.postView!.call(context, post);
                         case Thing_Comment(field0: final comment):
                           return widget.commentView?.call(context, comment) ??
                               const SizedBox.shrink();
