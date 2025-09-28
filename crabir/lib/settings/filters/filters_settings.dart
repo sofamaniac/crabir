@@ -76,6 +76,28 @@ class GlobalFilters {
 
   factory GlobalFilters.of(BuildContext context) =>
       context.watch<GlobalFiltersCubit>().state;
+
+  bool _emptyString(String? s) => (s ?? "").isNotEmpty;
+
+  bool isUserHidden(String? username) =>
+      _emptyString(username) && users.contains(username);
+  bool isFlairHidden(String? text) =>
+      _emptyString(text) && flairs.contains(text);
+  bool isSubredditHidden(String? name) =>
+      _emptyString(name) && subreddits.contains(name);
+  bool isDomainHidden(String? domain) =>
+      _emptyString(domain) && domains.contains(domain);
+
+  bool shouldHidePost(Post post) {
+    final username = post.author?.username ?? "";
+    final flairText = post.linkFlair.text ?? "";
+    final subreddit = post.subreddit.subreddit;
+    final domain = Uri.parse(post.url).host;
+    return isUserHidden(username) ||
+        isFlairHidden(flairText) ||
+        isSubredditHidden(subreddit) ||
+        isDomainHidden(domain);
+  }
 }
 
 class GlobalFiltersCubit extends HydratedCubit<GlobalFilters> {
@@ -90,28 +112,6 @@ class GlobalFiltersCubit extends HydratedCubit<GlobalFilters> {
   void setFlairs(List<String> flairs) => state.flairs = flairs;
   void setSubreddits(List<String> subreddits) => state.subreddits = subreddits;
   void setDomains(List<String> domains) => state.domains = domains;
-
-  bool isUserHidden(String username) => state.users.contains(username);
-  bool isFlairHidden(String text) => state.flairs.contains(text);
-  bool isSubredditHidden(String name) => state.subreddits.contains(name);
-  bool isDomainHidden(String domain) => state.domains.contains(domain);
-
-  bool shouldHidePost(Post post) {
-    final username = post.author?.username ?? "";
-    final flairText = post.linkFlair.text ?? "";
-    final subreddit = post.subreddit.subreddit;
-    if (username.isNotEmpty && isUserHidden(username)) {
-      return true;
-    } else if (flairText.isNotEmpty && isFlairHidden(flairText)) {
-      return true;
-    } else if (isSubredditHidden(subreddit)) {
-      return true;
-    } else if (isDomainHidden(Uri.parse(post.url).host)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
 
   @override
   GlobalFilters fromJson(Map<String, dynamic> json) =>
