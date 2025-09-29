@@ -123,7 +123,12 @@ class _AnimatedContentState extends State<AnimatedContent> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url));
+    _controller = VideoPlayerController.networkUrl(
+      Uri.parse(widget.url),
+      videoPlayerOptions: VideoPlayerOptions(
+        mixWithOthers: true,
+      ),
+    );
     _controller.setLooping(true);
     _controller.setVolume(0);
     WidgetsBinding.instance.addPostFrameCallback(
