@@ -173,28 +173,10 @@ class _AnimatedContentState extends State<AnimatedContent> {
     super.dispose();
   }
 
-  Widget placeholder() {
-    final defaultThumbnail = ColoredBox(
-      color: Colors.grey,
-      child: Center(
-        child: Icon(Icons.warning),
-      ),
-    );
+  Widget paused(Widget child) {
     return Stack(
       children: [
-        if (widget.placeholderUrl != null)
-          Center(
-            child: AspectRatio(
-              aspectRatio: aspectRatio,
-              child: CachedNetworkImage(
-                imageUrl: widget.placeholderUrl!,
-                fit: BoxFit.cover,
-                errorWidget: (_, __, ___) => defaultThumbnail,
-              ),
-            ),
-          )
-        else
-          const LoadingIndicator(),
+        child,
         if (widget.cartouche != null)
           Positioned(
             top: 8,
@@ -209,6 +191,31 @@ class _AnimatedContentState extends State<AnimatedContent> {
           )
       ],
     );
+  }
+
+  Widget placeholder() {
+    final defaultThumbnail = ColoredBox(
+      color: Colors.grey,
+      child: Center(
+        child: Icon(Icons.warning),
+      ),
+    );
+    if (widget.placeholderUrl != null) {
+      return paused(
+        Center(
+          child: AspectRatio(
+            aspectRatio: aspectRatio,
+            child: CachedNetworkImage(
+              imageUrl: widget.placeholderUrl!,
+              fit: BoxFit.cover,
+              errorWidget: (_, __, ___) => defaultThumbnail,
+            ),
+          ),
+        ),
+      );
+    } else {
+      return paused(const LoadingIndicator());
+    }
   }
 
   Widget _controls(BuildContext context, VideoPlayerValue value) {
@@ -277,7 +284,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
                 // // Show placeholder until we start playing the video
                 child: (_controller.value.isPlaying)
                     ? VideoPlayer(_controller)
-                    : placeholder(),
+                    : paused(VideoPlayer(_controller)),
               ),
               onVisibilityChanged: (visibilityInfo) {
                 if (mounted) {
