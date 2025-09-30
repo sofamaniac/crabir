@@ -55,7 +55,8 @@ class _MultiViewState extends State<MultiView> {
       onSortChanged: (sort) {
         if (settings.rememberSortByCommunity) {
           bloc.updateRememberedSorts(
-              settings.rememberedSorts.addMulti(widget.multi, sort));
+            settings.rememberedSorts.addMulti(widget.multi, sort),
+          );
         }
       },
       initialSort: sort,

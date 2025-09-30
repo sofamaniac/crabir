@@ -72,6 +72,11 @@ class _CommonFeedViewState extends State<CommonFeedView>
     _stream = widget.newStream(sort!);
   }
 
+  void _rebuild() {
+    _forceRebuild += 1;
+    setState(() {});
+  }
+
   Widget _appBar() {
     final theme = CrabirTheme.of(context);
     return SliverAppBar(
@@ -94,11 +99,9 @@ class _CommonFeedViewState extends State<CommonFeedView>
         SortMenu(
           onSelect: (sort) {
             widget.onSortChanged(sort);
-            setState(() {
-              this.sort = sort;
-              _forceRebuild += 1;
-              _stream = widget.newStream(sort);
-            });
+            this.sort = sort;
+            _stream = widget.newStream(sort);
+            _rebuild();
           },
         ),
         _moreOptions(),
@@ -122,7 +125,12 @@ class _CommonFeedViewState extends State<CommonFeedView>
         );
       },
       menuChildren: [
-        MenuItemButton(onPressed: _stream.refresh, child: Text("Refresh")),
+        MenuItemButton(
+            onPressed: () {
+              _stream.refresh();
+              _rebuild();
+            },
+            child: Text("Refresh")),
         MenuItemButton(
           onPressed: () {
             context.router.navigate(SettingsRoute());
