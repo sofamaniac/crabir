@@ -395,13 +395,7 @@ impl Common {
     #[must_use]
     #[frb(sync, getter)]
     pub fn icon(&self) -> SubredditIcon {
-        if let Some(url) = &self.icon_img {
-            SubredditIcon::Image(Icon {
-                url: url.to_owned(),
-                width: self.icon_size[0],
-                height: self.icon_size[1],
-            })
-        } else if let Some(url) = &self.community_icon {
+        if let Some(url) = &self.community_icon {
             let url = Url::parse(url).expect("Could not parse community icon url");
             let params: HashMap<Cow<str>, Cow<str>> = url.query_pairs().collect();
             let width: usize = params
@@ -415,6 +409,12 @@ impl Common {
                 url: url.to_string(),
                 width,
                 height,
+            })
+        } else if let Some(url) = &self.icon_img {
+            SubredditIcon::Image(Icon {
+                url: url.to_owned(),
+                width: self.icon_size[0],
+                height: self.icon_size[1],
             })
         } else {
             let color = self
