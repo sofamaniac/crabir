@@ -367,14 +367,24 @@ pub struct Subreddit {
 }
 
 impl Subreddit {
+    #[must_use]
+    #[frb(sync, getter)]
+    pub fn icon(&self) -> SubredditIcon {
+        self.other.icon()
+    }
     pub async fn subscribe(&mut self, client: &Client) -> Result<()> {
-        client.subscribe(self.other.get_name()).await?;
+        client.subscribe(self.other.name()).await?;
         self.other.user_is_subscriber = true;
         Ok(())
     }
     pub async fn unsubscribe(&mut self, client: &Client) -> Result<()> {
-        client.unsubscribe(self.other.get_name()).await?;
+        client.unsubscribe(self.other.name()).await?;
         self.other.user_is_subscriber = false;
+        Ok(())
+    }
+    pub async fn favorite(&mut self, favorite: bool, client: &Client) -> Result<()> {
+        client.favorite(self.other.display_name(), favorite).await?;
+        self.user_has_favorited = favorite;
         Ok(())
     }
 }
@@ -423,14 +433,6 @@ impl Common {
                 .unwrap_or(self.primary_color.clone().unwrap_or("black".to_owned()));
             SubredditIcon::Color(color)
         }
-    }
-}
-
-impl Subreddit {
-    #[must_use]
-    #[frb(sync, getter)]
-    pub fn icon(&self) -> SubredditIcon {
-        self.other.icon()
     }
 }
 

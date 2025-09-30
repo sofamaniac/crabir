@@ -538,7 +538,7 @@ impl Client {
     /// Subscribe to a subreddit
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
-    pub async fn subscribe(&self, name: Fullname) -> Result<()> {
+    pub async fn subscribe(&self, name: &Fullname) -> Result<()> {
         let url = self.join_url("api/subscribe");
         let request = self.post(url);
         let request = request.query(&[
@@ -554,7 +554,7 @@ impl Client {
     /// Unsubscribe to a subreddit
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
-    pub async fn unsubscribe(&self, name: Fullname) -> Result<()> {
+    pub async fn unsubscribe(&self, name: &Fullname) -> Result<()> {
         let url = self.join_url("api/subscribe");
         let request = self.post(url);
         let request = request.query(&[
@@ -718,7 +718,7 @@ impl Client {
 
     pub async fn load_more_comments(
         &self,
-        parent_id: Fullname,
+        parent_id: &Fullname,
         children: Vec<String>,
         sort: Option<comment::CommentSort>,
     ) -> Result<Vec<Thing>> {
@@ -781,5 +781,16 @@ impl Client {
         let request = self.get(url);
         let response = self.execute(request).await?;
         parse_thing(response).await
+    }
+
+    /// (un)favorite subreddit
+    pub async fn favorite(&self, subreddit: &str, make_favorite: bool) -> Result<()> {
+        let url = self.join_url("api/favorite");
+        let request = self.post(url).query(&[
+            ("sr_name", subreddit),
+            ("make_favorite", &make_favorite.to_string()),
+        ]);
+        self.execute(request).await?;
+        Ok(())
     }
 }

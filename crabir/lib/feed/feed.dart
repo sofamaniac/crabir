@@ -147,19 +147,8 @@ class _SubredditInfoViewState extends State<SubredditInfoView> {
                     ),
                   ),
                   JoinButton(
-                    subscribed: subscribed,
-                    onPressed: () async {
-                      if (subscribed) {
-                        await widget.infos
-                            .unsubscribe(client: RedditAPI.client());
-                      } else {
-                        await widget.infos
-                            .subscribe(client: RedditAPI.client());
-                      }
-                      setState(() {
-                        subscribed = widget.infos.other.userIsSubscriber;
-                      });
-                    },
+                    infos: widget.infos,
+                    onPressed: () => setState(() {}),
                   ),
                   MoreOptionButton(subreddit: widget.infos),
                 ],
@@ -205,15 +194,28 @@ class _SubredditInfoViewState extends State<SubredditInfoView> {
 }
 
 class JoinButton extends StatelessWidget {
-  final bool subscribed;
-  final VoidCallback onPressed;
+  final Subreddit infos;
 
-  const JoinButton(
-      {super.key, required this.subscribed, required this.onPressed});
+  /// Function to call after subscribing to the subreddit.
+  final VoidCallback? onPressed;
+
+  const JoinButton({
+    super.key,
+    required this.infos,
+    required this.onPressed,
+  });
   @override
   Widget build(BuildContext context) {
+    final subscribed = infos.other.userIsSubscriber;
     return ElevatedButton.icon(
-      onPressed: onPressed,
+      onPressed: () async {
+        if (subscribed) {
+          await infos.unsubscribe(client: RedditAPI.client());
+        } else {
+          await infos.subscribe(client: RedditAPI.client());
+        }
+        onPressed?.call();
+      },
       icon: Icon(subscribed ? Icons.check_circle : Icons.add_circle),
       label: subscribed
           // TODO: localize
@@ -235,14 +237,23 @@ class JoinButton extends StatelessWidget {
 }
 
 class FavButton extends StatelessWidget {
-  final bool favorite;
-  final VoidCallback onPressed;
+  final Subreddit infos;
 
-  const FavButton({super.key, required this.favorite, required this.onPressed});
+  /// Function to call after favoriting the subreddit.
+  final VoidCallback? onPressed;
+
+  const FavButton({super.key, required this.infos, required this.onPressed});
   @override
   Widget build(BuildContext context) {
+    final favorite = infos.userHasFavorited;
     return ElevatedButton.icon(
-      onPressed: onPressed,
+      onPressed: () async {
+        await infos.favorite(
+          favorite: !infos.userHasFavorited,
+          client: RedditAPI.client(),
+        );
+        onPressed?.call();
+      },
       icon: Icon(favorite ? Icons.check_circle : Icons.add_circle),
       // TODO: localize
       label: Text("Favorite"),
@@ -371,11 +382,16 @@ class MoreOptionButton extends StatelessWidget {
   }
 }
 
-class RightSide extends StatelessWidget {
+class RightSide extends StatefulWidget {
   final Subreddit infos;
 
   const RightSide({super.key, required this.infos});
 
+  @override
+  State<RightSide> createState() => _RightSideState();
+}
+
+class _RightSideState extends State<RightSide> {
   Widget infoView(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -386,19 +402,19 @@ class RightSide extends StatelessWidget {
             spacing: 16,
             children: [
               SubredditIcon(
-                icon: infos.other.icon,
+                icon: widget.infos.other.icon,
                 radius: 40,
               ),
               Column(
                 children: [
                   Text(
-                    infos.other.displayName,
+                    widget.infos.other.displayName,
                     style: Theme.of(context).textTheme.titleLarge,
                     overflow: TextOverflow.clip,
                   ),
                   Text(
                     // TODO: localize
-                    "${infos.other.subscribers} members",
+                    "${widget.infos.other.subscribers} members",
                     style: Theme.of(context)
                         .textTheme
                         .bodyMedium
@@ -413,19 +429,19 @@ class RightSide extends StatelessWidget {
             spacing: 16,
             children: [
               JoinButton(
-                subscribed: infos.other.userIsSubscriber,
-                onPressed: () {/* TODO: manage state */},
+                infos: widget.infos,
+                onPressed: () => setState(() {}),
               ),
               FavButton(
-                favorite: infos.userHasFavorited,
-                onPressed: () {/* TODO: manage state */},
+                infos: widget.infos,
+                onPressed: () => setState(() {}),
               ),
               // TODO:
-              MoreOptionButton(subreddit: infos),
+              MoreOptionButton(subreddit: widget.infos),
             ],
           ),
-          if (infos.publicDescriptionHtml != null)
-            StyledHtml(htmlContent: infos.publicDescriptionHtml!),
+          if (widget.infos.publicDescriptionHtml != null)
+            StyledHtml(htmlContent: widget.infos.publicDescriptionHtml!),
         ],
       ),
     );
@@ -442,7 +458,7 @@ class RightSide extends StatelessWidget {
         Divider(),
         Padding(
           padding: const EdgeInsets.all(16.0),
-          child: StyledHtml(htmlContent: infos.descriptionHtml ?? ""),
+          child: StyledHtml(htmlContent: widget.infos.descriptionHtml ?? ""),
         ),
       ]),
     );
