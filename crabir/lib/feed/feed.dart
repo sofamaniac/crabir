@@ -192,6 +192,7 @@ class _SubredditInfoViewState extends State<SubredditInfoView> {
           fit: BoxFit.cover,
           height: 100,
           width: double.infinity,
+          errorWidget: (_, __, ___) => SizedBox.shrink(),
         ),
       );
     } else {

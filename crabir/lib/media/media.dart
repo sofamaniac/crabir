@@ -29,3 +29,10 @@ part 'gif.dart';
 part 'resolution.dart';
 part 'fullscreen_media_view.dart';
 part 'streamable.dart';
+
+final defaultThumbnail = ColoredBox(
+  color: Colors.grey,
+  child: Center(
+    child: Icon(Icons.warning),
+  ),
+);

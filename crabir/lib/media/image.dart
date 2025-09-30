@@ -70,6 +70,7 @@ class ImageThumbnail extends StatelessWidget {
       child: CachedNetworkImage(
         imageUrl: imageUrl,
         placeholder: _thumbnail,
+        errorWidget: (_, __, ___) => defaultThumbnail,
         // No fade out
         fadeOutDuration: Duration(seconds: 0),
         fadeInDuration: Duration(seconds: 0),

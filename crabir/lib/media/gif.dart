@@ -1,20 +1,70 @@
 part of 'media.dart';
 
-class AnimatedContentController {
-  static ValueNotifier<List<String>> queue = ValueNotifier([]);
-  static void addToQueue(String url) {
+class VideoControllerPool {
+  static final _controllers = <String, (int, VideoPlayerController)>{};
+
+  static VideoPlayerController get(String url) {
+    final (ref, controller) = _controllers.putIfAbsent(url, () {
+      print("INSERTING $url");
+      final controller = VideoPlayerController.networkUrl(
+        Uri.parse(url),
+        videoPlayerOptions: VideoPlayerOptions(
+          mixWithOthers: true,
+        ),
+      );
+      controller.setLooping(true);
+      controller.initialize();
+      return (0, controller);
+    });
+    _controllers[url] = (ref + 1, controller);
+    return controller;
+  }
+
+  static void dispose(String url) {
+    final (refcount, controller) = _controllers[url]!;
+    if (refcount > 1) {
+      _controllers[url] = (refcount - 1, controller);
+    } else {
+      _controllers[url]!.$2.dispose();
+      _controllers.remove(url);
+    }
+  }
+}
+
+class AnimatedContentController
+    extends InheritedNotifier<ValueNotifier<List<String>>> {
+  const AnimatedContentController({
+    super.key,
+    required ValueNotifier<List<String>> super.notifier,
+    required super.child,
+  });
+
+  static AnimatedContentController? maybeOf(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<AnimatedContentController>();
+  }
+
+  static AnimatedContentController of(BuildContext context) {
+    final controller = maybeOf(context);
+    assert(controller != null, 'No AnimatedContentController found in context');
+    return controller!;
+  }
+
+  ValueNotifier<List<String>> get queue => notifier!;
+
+  void addToQueue(String url) {
     if (!queue.value.contains(url)) {
       queue.value = [...queue.value, url];
     }
   }
 
-  static void removeFromQueue(String url) {
+  void removeFromQueue(String url) {
     if (queue.value.contains(url)) {
       queue.value = queue.value.where((item) => item != url).toList();
     }
   }
 
-  static void clearQueue() {
+  void clearQueue() {
     queue.value = [];
   }
 }
@@ -110,7 +160,6 @@ class AnimatedContent extends StatefulWidget {
 
 class _AnimatedContentState extends State<AnimatedContent> {
   late VideoPlayerController _controller;
-  late final VoidCallback _queueListener;
   late final double aspectRatio =
       widget.width.toDouble() / widget.height.toDouble();
   bool _showControls = false;
@@ -120,32 +169,18 @@ class _AnimatedContentState extends State<AnimatedContent> {
 
   Timer? _hideControlsTimer;
 
+  late final animationController = AnimatedContentController.maybeOf(context);
+
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(
-      Uri.parse(widget.url),
-      videoPlayerOptions: VideoPlayerOptions(
-        mixWithOthers: true,
-      ),
-    );
+    _controller = VideoControllerPool.get(widget.url);
     _controller.setLooping(true);
     _controller.setVolume(0);
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _controller.initialize(),
-    );
 
     ImageLoading setting = context.read<DataSettingsCubit>().state.autoplay;
 
     _canAutoplay = NetworkStatus.canAutoplay(setting);
-    _queueListener = () {
-      if (_visibilityFraction == 1 &&
-          AnimatedContentController.queue.value.first == widget.url &&
-          !_controller.value.isPlaying) {
-        _controller.play();
-        setState(() {});
-      }
-    };
   }
 
   void _toggleControls() {
@@ -170,15 +205,33 @@ class _AnimatedContentState extends State<AnimatedContent> {
   @override
   void dispose() {
     _hideControlsTimer?.cancel();
-    _controller.dispose();
+    VideoControllerPool.dispose(widget.url);
 
     // Ensure we're not in the queue anymore
-    AnimatedContentController.queue.removeListener(_queueListener);
-    AnimatedContentController.removeFromQueue(widget.url);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => animationController?.removeFromQueue(widget.url),
+    );
     super.dispose();
   }
 
-  Widget paused(Widget child) {
+  Widget placeholder() {
+    final Widget child;
+    if (_controller.value.isInitialized) {
+      child = VideoPlayer(_controller);
+    } else if (widget.placeholderUrl != null) {
+      child = Center(
+        child: AspectRatio(
+          aspectRatio: aspectRatio,
+          child: CachedNetworkImage(
+            imageUrl: widget.placeholderUrl!,
+            fit: BoxFit.cover,
+            errorWidget: (_, __, ___) => defaultThumbnail,
+          ),
+        ),
+      );
+    } else {
+      child = const LoadingIndicator();
+    }
     return Stack(
       children: [
         child,
@@ -198,155 +251,136 @@ class _AnimatedContentState extends State<AnimatedContent> {
     );
   }
 
-  Widget placeholder() {
-    final defaultThumbnail = ColoredBox(
-      color: Colors.grey,
-      child: Center(
-        child: Icon(Icons.warning),
-      ),
-    );
-    if (widget.placeholderUrl != null) {
-      return paused(
-        Center(
-          child: AspectRatio(
-            aspectRatio: aspectRatio,
-            child: CachedNetworkImage(
-              imageUrl: widget.placeholderUrl!,
-              fit: BoxFit.cover,
-              errorWidget: (_, __, ___) => defaultThumbnail,
-            ),
-          ),
+  Widget videoPlayer() {
+    return Stack(children: [
+      VideoPlayer(_controller),
+      Positioned(
+        bottom: 8,
+        left: 8,
+        right: 8,
+        child: ValueListenableBuilder<VideoPlayerValue>(
+          valueListenable: _controller,
+          builder: (context, value, _) {
+            if (_showControls) {
+              return _controls(context, value);
+            } else {
+              return timeRemaining(context, value);
+            }
+          },
         ),
-      );
-    } else {
-      return paused(const LoadingIndicator());
-    }
+      ),
+    ]);
   }
 
   Widget _controls(BuildContext context, VideoPlayerValue value) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.black45,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            icon: Icon(
-              value.isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              if (value.isPlaying) {
-                _controller.pause();
-              } else {
-                _controller.play();
-              }
-              if (mounted) setState(() {});
-            },
-          ),
-          Expanded(
-            child: Slider(
-              value: value.position.inSeconds.toDouble(),
-              max: value.duration.inSeconds.toDouble(),
-              onChanged: (newValue) {
-                _controller.seekTo(Duration(seconds: newValue.toInt()));
-              },
-              activeColor: Colors.redAccent,
-              inactiveColor: Colors.white30,
-            ),
-          ),
-          IconButton(
-            icon: Icon(
-              _muted ? Icons.volume_off : Icons.volume_up,
-              color: Colors.white,
-            ),
-            onPressed: _toggleMute,
-          ),
-          if (widget.goFullScreen != null)
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.black45,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
             IconButton(
-              icon: Icon(Icons.fullscreen),
-              onPressed: widget.goFullScreen?.call,
-            )
-        ],
+              icon: Icon(
+                value.isPlaying ? Icons.pause : Icons.play_arrow,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                if (value.isPlaying) {
+                  _controller.pause();
+                } else {
+                  _controller.play();
+                }
+                if (mounted) setState(() {});
+              },
+            ),
+            Expanded(
+              child: Slider(
+                value: value.position.inSeconds.toDouble(),
+                max: value.duration.inSeconds.toDouble(),
+                onChanged: (newValue) {
+                  _controller.seekTo(Duration(seconds: newValue.toInt()));
+                },
+                activeColor: Colors.redAccent,
+                inactiveColor: Colors.white30,
+              ),
+            ),
+            IconButton(
+              icon: Icon(
+                _muted ? Icons.volume_off : Icons.volume_up,
+                color: Colors.white,
+              ),
+              onPressed: _toggleMute,
+            ),
+            if (widget.goFullScreen != null)
+              IconButton(
+                icon: Icon(Icons.fullscreen),
+                onPressed: widget.goFullScreen?.call,
+              )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget timeRemaining(BuildContext context, VideoPlayerValue value) {
+    // Remaining time overlay
+    final remaining = value.duration - value.position;
+    final minutes =
+        remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds =
+        remaining.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: Cartouche(
+        '$minutes:$seconds',
+        background: Colors.black54,
+        foreground: Colors.white,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final first = animationController?.queue.value.firstOrNull;
+    final isTopOfQueue =
+        (animationController == null || first == widget.url || first == null) &&
+            _visibilityFraction == 1 &&
+            !_controller.value.isPlaying;
+    if (isTopOfQueue) {
+      _controller.play();
+    }
     return GestureDetector(
-      behavior: HitTestBehavior.translucent,
+      behavior: HitTestBehavior.opaque,
       onTap: _toggleControls,
-      child: Stack(
-        children: [
-          Center(
-            child: VisibilityDetector(
-              key: ValueKey(widget.url),
-              child: AspectRatio(
-                aspectRatio: aspectRatio,
-                // // Show placeholder until we start playing the video
-                child: (_controller.value.isPlaying)
-                    ? VideoPlayer(_controller)
-                    : paused(VideoPlayer(_controller)),
-              ),
-              onVisibilityChanged: (visibilityInfo) {
-                if (mounted) {
-                  setState(() {
-                    _visibilityFraction = visibilityInfo.visibleFraction;
-                  });
-                }
-                final bool inQueue =
-                    AnimatedContentController.queue.value.contains(widget.url);
-                if (_visibilityFraction > 0.5 && _canAutoplay && !inQueue) {
-                  AnimatedContentController.queue.addListener(_queueListener);
-                  AnimatedContentController.addToQueue(widget.url);
-                } else if ((inQueue && _visibilityFraction < 0.4) ||
-                    (_controller.value.isPlaying &&
-                        _visibilityFraction < 0.8)) {
-                  _controller.pause();
-                  AnimatedContentController.queue
-                      .removeListener(_queueListener);
-                  AnimatedContentController.removeFromQueue(widget.url);
-                }
-                _queueListener();
-              },
-            ),
+      child: Center(
+        child: VisibilityDetector(
+          key: ValueKey(widget.url),
+          child: AspectRatio(
+            aspectRatio: aspectRatio,
+            // Show placeholder until we start playing the video
+            child:
+                (_controller.value.isPlaying) ? videoPlayer() : placeholder(),
           ),
-          Positioned(
-            bottom: 8,
-            left: 8,
-            right: 8,
-            child: ValueListenableBuilder<VideoPlayerValue>(
-              valueListenable: _controller,
-              builder: (context, value, _) {
-                if (_showControls) {
-                  return _controls(context, value);
-                } else {
-                  // Remaining time overlay
-                  final remaining = value.duration - value.position;
-                  final minutes = remaining.inMinutes
-                      .remainder(60)
-                      .toString()
-                      .padLeft(2, '0');
-                  final seconds = remaining.inSeconds
-                      .remainder(60)
-                      .toString()
-                      .padLeft(2, '0');
-                  return Align(
-                    alignment: Alignment.bottomRight,
-                    child: Cartouche(
-                      '$minutes:$seconds',
-                      background: Colors.black54,
-                      foreground: Colors.white,
-                    ),
-                  );
-                }
-              },
-            ),
-          ),
-        ],
+          onVisibilityChanged: (visibilityInfo) {
+            _visibilityFraction = visibilityInfo.visibleFraction;
+            if (mounted) {
+              setState(() {});
+            }
+            final bool inQueue =
+                animationController?.queue.value.contains(widget.url) ?? true;
+            if (_visibilityFraction > 0.5 && _canAutoplay) {
+              animationController?.addToQueue(widget.url);
+            } else if ((inQueue && _visibilityFraction < 0.4) ||
+                (_controller.value.isPlaying && _visibilityFraction < 0.8)) {
+              _controller.pause();
+              animationController?.removeFromQueue(widget.url);
+            }
+          },
+        ),
       ),
     );
   }

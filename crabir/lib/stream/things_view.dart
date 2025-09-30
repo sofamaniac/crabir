@@ -1,3 +1,4 @@
+import 'package:crabir/media/media.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
@@ -65,44 +66,47 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
     return PagingListener(
       controller: _pagingController,
       builder: (context, state, fetchNextPage) {
-        return RefreshIndicator(
-          onRefresh: () async {
-            await widget.stream.refresh();
-            _pagingController.refresh();
-          },
-          child: Scrollbar(
-            child: CustomScrollView(
-              slivers: [
-                // Optional subreddit info at the top
-                if (widget.subredditInfo != null)
-                  SliverToBoxAdapter(child: widget.subredditInfo!),
+        return AnimatedContentController(
+          notifier: ValueNotifier([]),
+          child: RefreshIndicator(
+            onRefresh: () async {
+              await widget.stream.refresh();
+              _pagingController.refresh();
+            },
+            child: Scrollbar(
+              child: CustomScrollView(
+                slivers: [
+                  // Optional subreddit info at the top
+                  if (widget.subredditInfo != null)
+                    SliverToBoxAdapter(child: widget.subredditInfo!),
 
-                // The main paginated list
-                PagedSliverList<bool, Thing>(
-                  fetchNextPage: fetchNextPage,
-                  state: state,
-                  builderDelegate: PagedChildBuilderDelegate(
-                    noMoreItemsIndicatorBuilder: (context) =>
-                        Center(child: Text("You've reached the end")),
-                    itemBuilder: (context, item, index) {
-                      final thing = item;
+                  // The main paginated list
+                  PagedSliverList<bool, Thing>(
+                    fetchNextPage: fetchNextPage,
+                    state: state,
+                    builderDelegate: PagedChildBuilderDelegate(
+                      noMoreItemsIndicatorBuilder: (context) =>
+                          Center(child: Text("You've reached the end")),
+                      itemBuilder: (context, item, index) {
+                        final thing = item;
 
-                      switch (thing) {
-                        case Thing_Post(field0: final post):
-                          if (hide(post) || widget.postView == null) {
+                        switch (thing) {
+                          case Thing_Post(field0: final post):
+                            if (hide(post) || widget.postView == null) {
+                              return const SizedBox.shrink();
+                            }
+                            return widget.postView!.call(context, post);
+                          case Thing_Comment(field0: final comment):
+                            return widget.commentView?.call(context, comment) ??
+                                const SizedBox.shrink();
+                          default:
                             return const SizedBox.shrink();
-                          }
-                          return widget.postView!.call(context, post);
-                        case Thing_Comment(field0: final comment):
-                          return widget.commentView?.call(context, comment) ??
-                              const SizedBox.shrink();
-                        default:
-                          return const SizedBox.shrink();
-                      }
-                    },
+                        }
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
