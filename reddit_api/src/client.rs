@@ -10,6 +10,7 @@ use crate::search::{PostSearchSort, SearchPost, SearchSubreddit, SubredditSearch
 use crate::votable::private::PrivateVotable;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
+use std::time::Duration;
 
 use base64::Engine;
 use base64::prelude::BASE64_URL_SAFE_NO_PAD;
@@ -93,6 +94,7 @@ impl Client {
     fn new_reqwest_client() -> reqwest::Client {
         reqwest::Client::builder()
             .user_agent(USER_AGENT)
+            .timeout(Duration::from_secs(5))
             .build()
             .expect("Building reqwest client should not fail")
     }
@@ -714,8 +716,6 @@ impl Client {
         self.comments(permalink, None).await.map(|r| r.0)
     }
 
-    // FIXME: crash when there are too many children because the url is too long.
-    // the doc says that it supports only up to 100 children.
     pub async fn load_more_comments(
         &self,
         parent_id: Fullname,
@@ -737,6 +737,7 @@ impl Client {
             things: Vec<Thing>,
         }
         let url = self.join_url("api/morechildren.json");
+        let children: Vec<String> = children.into_iter().take(100).collect();
         let request = self.get(url).query(&[
             ("api_type", "json"),
             ("children", &children.join(",")),
