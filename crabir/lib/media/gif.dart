@@ -166,10 +166,24 @@ class _AnimatedContentState extends State<AnimatedContent> {
   bool _muted = true;
   bool _canAutoplay = false;
   double _visibilityFraction = 0;
+  late VoidCallback _queueListener;
 
   Timer? _hideControlsTimer;
 
   late final animationController = AnimatedContentController.maybeOf(context);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        AnimatedContentController.maybeOf(context)
+            ?.queue
+            .addListener(_queueListener);
+        animationController?.removeFromQueue(widget.url);
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -181,6 +195,17 @@ class _AnimatedContentState extends State<AnimatedContent> {
     ImageLoading setting = context.read<DataSettingsCubit>().state.autoplay;
 
     _canAutoplay = NetworkStatus.canAutoplay(setting);
+    _queueListener = () {
+      final first = animationController?.queue.value.firstOrNull;
+      final isTopOfQueue = (animationController == null ||
+              first == widget.url ||
+              first == null) &&
+          _visibilityFraction == 1 &&
+          !_controller.value.isPlaying;
+      if (isTopOfQueue) {
+        _controller.play();
+      }
+    };
   }
 
   void _toggleControls() {
@@ -209,16 +234,19 @@ class _AnimatedContentState extends State<AnimatedContent> {
 
     // Ensure we're not in the queue anymore
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => animationController?.removeFromQueue(widget.url),
+      (_) {
+        AnimatedContentController.maybeOf(context)
+            ?.queue
+            .removeListener(_queueListener);
+        animationController?.removeFromQueue(widget.url);
+      },
     );
     super.dispose();
   }
 
   Widget placeholder() {
     final Widget child;
-    if (_controller.value.isInitialized) {
-      child = VideoPlayer(_controller);
-    } else if (widget.placeholderUrl != null) {
+    if (widget.placeholderUrl != null) {
       child = Center(
         child: AspectRatio(
           aspectRatio: aspectRatio,
@@ -252,24 +280,32 @@ class _AnimatedContentState extends State<AnimatedContent> {
   }
 
   Widget videoPlayer() {
-    return Stack(children: [
-      VideoPlayer(_controller),
-      Positioned(
-        bottom: 8,
-        left: 8,
-        right: 8,
-        child: ValueListenableBuilder<VideoPlayerValue>(
-          valueListenable: _controller,
-          builder: (context, value, _) {
-            if (_showControls) {
-              return _controls(context, value);
-            } else {
-              return timeRemaining(context, value);
-            }
-          },
+    return Stack(
+      children: [
+        VideoPlayer(_controller),
+        if (widget.cartouche != null && !_controller.value.isPlaying)
+          Positioned(
+            top: 8,
+            right: 8,
+            child: widget.cartouche!,
+          ),
+        Positioned(
+          bottom: 8,
+          left: 8,
+          right: 8,
+          child: ValueListenableBuilder<VideoPlayerValue>(
+            valueListenable: _controller,
+            builder: (context, value, _) {
+              if (_showControls) {
+                return _controls(context, value);
+              } else {
+                return timeRemaining(context, value);
+              }
+            },
+          ),
         ),
-      ),
-    ]);
+      ],
+    );
   }
 
   Widget _controls(BuildContext context, VideoPlayerValue value) {
@@ -345,14 +381,6 @@ class _AnimatedContentState extends State<AnimatedContent> {
 
   @override
   Widget build(BuildContext context) {
-    final first = animationController?.queue.value.firstOrNull;
-    final isTopOfQueue =
-        (animationController == null || first == widget.url || first == null) &&
-            _visibilityFraction == 1 &&
-            !_controller.value.isPlaying;
-    if (isTopOfQueue) {
-      _controller.play();
-    }
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _toggleControls,
@@ -362,8 +390,9 @@ class _AnimatedContentState extends State<AnimatedContent> {
           child: AspectRatio(
             aspectRatio: aspectRatio,
             // Show placeholder until we start playing the video
-            child:
-                (_controller.value.isPlaying) ? videoPlayer() : placeholder(),
+            child: (_controller.value.isInitialized)
+                ? videoPlayer()
+                : placeholder(),
           ),
           onVisibilityChanged: (visibilityInfo) {
             _visibilityFraction = visibilityInfo.visibleFraction;

@@ -83,12 +83,20 @@ class _VideoContentState extends State<VideoContent> {
           media: media,
           placeholderUrl: preview?.resolutions[0].url,
           goFullScreen: goFullScreen(context, widget.post, widget.resolution),
+          cartouche: Cartouche(
+            "VIDEO",
+            background: Colors.orange,
+          ),
         );
       case Media_Oembed():
         return AnimatedContent.fromMediaOEmbed(
           media: media,
           placeholderUrl: preview?.resolutions[0].url,
           goFullScreen: goFullScreen(context, widget.post, widget.resolution),
+          cartouche: Cartouche(
+            "VIDEO",
+            background: Colors.orange,
+          ),
         );
       case null when preview?.variants.mp4 != null:
         final image = preview!.variants.mp4!.withResolution(widget.resolution);
@@ -96,6 +104,10 @@ class _VideoContentState extends State<VideoContent> {
           image: image,
           placeholderUrl: preview.resolutions[0].url,
           goFullScreen: goFullScreen(context, widget.post, widget.resolution),
+          cartouche: Cartouche(
+            "VIDEO",
+            background: Colors.orange,
+          ),
         );
       case null when preview?.variants.gif != null:
         final image = preview!.variants.gif!.withResolution(widget.resolution);
@@ -103,6 +115,10 @@ class _VideoContentState extends State<VideoContent> {
           image: image,
           placeholderUrl: preview.resolutions[0].url,
           goFullScreen: goFullScreen(context, widget.post, widget.resolution),
+          cartouche: Cartouche(
+            "GIF",
+            background: Colors.cyan,
+          ),
         );
       default:
         return Center(child: Text("Error while loading video"));
