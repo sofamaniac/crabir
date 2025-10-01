@@ -66,13 +66,13 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
     return PagingListener(
       controller: _pagingController,
       builder: (context, state, fetchNextPage) {
-        return AnimatedContentController(
-          notifier: ValueNotifier([]),
-          child: RefreshIndicator(
-            onRefresh: () async {
-              await widget.stream.refresh();
-              _pagingController.refresh();
-            },
+        return RefreshIndicator(
+          onRefresh: () async {
+            await widget.stream.refresh();
+            _pagingController.refresh();
+          },
+          child: AnimatedContentController(
+            notifier: ValueNotifier([]),
             child: Scrollbar(
               child: CustomScrollView(
                 slivers: [

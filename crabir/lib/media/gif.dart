@@ -5,7 +5,6 @@ class VideoControllerPool {
 
   static VideoPlayerController get(String url) {
     final (ref, controller) = _controllers.putIfAbsent(url, () {
-      print("INSERTING $url");
       final controller = VideoPlayerController.networkUrl(
         Uri.parse(url),
         videoPlayerOptions: VideoPlayerOptions(
@@ -59,9 +58,7 @@ class AnimatedContentController
   }
 
   void removeFromQueue(String url) {
-    if (queue.value.contains(url)) {
-      queue.value = queue.value.where((item) => item != url).toList();
-    }
+    queue.value = queue.value.where((item) => item != url).toList();
   }
 
   void clearQueue() {
@@ -167,6 +164,7 @@ class _AnimatedContentState extends State<AnimatedContent> {
   bool _canAutoplay = false;
   double _visibilityFraction = 0;
   late VoidCallback _queueListener;
+  bool _addListener = true;
 
   Timer? _hideControlsTimer;
 
@@ -175,14 +173,12 @@ class _AnimatedContentState extends State<AnimatedContent> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        AnimatedContentController.maybeOf(context)
-            ?.queue
-            .addListener(_queueListener);
-        animationController?.removeFromQueue(widget.url);
-      },
-    );
+    if (_addListener) {
+      AnimatedContentController.maybeOf(context)
+          ?.queue
+          .addListener(_queueListener);
+      _addListener = false;
+    }
   }
 
   @override
@@ -196,13 +192,10 @@ class _AnimatedContentState extends State<AnimatedContent> {
 
     _canAutoplay = NetworkStatus.canAutoplay(setting);
     _queueListener = () {
+      if (!_canAutoplay) return;
       final first = animationController?.queue.value.firstOrNull;
-      final isTopOfQueue = (animationController == null ||
-              first == widget.url ||
-              first == null) &&
-          _visibilityFraction == 1 &&
-          !_controller.value.isPlaying;
-      if (isTopOfQueue) {
+      final isTopOfQueue = animationController == null || first == widget.url;
+      if (isTopOfQueue && _visibilityFraction == 1) {
         _controller.play();
       }
     };
@@ -233,14 +226,8 @@ class _AnimatedContentState extends State<AnimatedContent> {
     VideoControllerPool.dispose(widget.url);
 
     // Ensure we're not in the queue anymore
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        AnimatedContentController.maybeOf(context)
-            ?.queue
-            .removeListener(_queueListener);
-        animationController?.removeFromQueue(widget.url);
-      },
-    );
+    animationController?.queue.removeListener(_queueListener);
+    animationController?.removeFromQueue(widget.url);
     super.dispose();
   }
 
@@ -387,27 +374,25 @@ class _AnimatedContentState extends State<AnimatedContent> {
       child: Center(
         child: VisibilityDetector(
           key: ValueKey(widget.url),
-          child: AspectRatio(
-            aspectRatio: aspectRatio,
-            // Show placeholder until we start playing the video
-            child: (_controller.value.isInitialized)
-                ? videoPlayer()
-                : placeholder(),
+          child: ValueListenableBuilder(
+            valueListenable: _controller,
+            builder: (context, value, _) => AspectRatio(
+              aspectRatio: aspectRatio,
+              // Show placeholder until we start playing the video
+              child: (value.isInitialized) ? videoPlayer() : placeholder(),
+            ),
           ),
           onVisibilityChanged: (visibilityInfo) {
             _visibilityFraction = visibilityInfo.visibleFraction;
-            if (mounted) {
-              setState(() {});
-            }
             final bool inQueue =
-                animationController?.queue.value.contains(widget.url) ?? true;
-            if (_visibilityFraction > 0.5 && _canAutoplay) {
+                animationController?.queue.value.contains(widget.url) ?? false;
+            if (_visibilityFraction == 1 && _canAutoplay && !inQueue) {
               animationController?.addToQueue(widget.url);
-            } else if ((inQueue && _visibilityFraction < 0.4) ||
-                (_controller.value.isPlaying && _visibilityFraction < 0.8)) {
+            } else if (_visibilityFraction < 0.4) {
               _controller.pause();
               animationController?.removeFromQueue(widget.url);
             }
+            _queueListener();
           },
         ),
       ),
