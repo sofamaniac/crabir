@@ -20,17 +20,17 @@ class ImageContent extends StatefulWidget {
 }
 
 class _ImageContentState extends State<ImageContent> {
-  late bool obfuscate;
+  bool tapped = false;
   @override
   void initState() {
     super.initState();
-    obfuscate = widget.post.spoiler ||
-        (widget.post.over18 &&
-            context.read<FiltersSettingsCubit>().state.blurNSFW);
   }
 
   @override
   Widget build(BuildContext context) {
+    final obfuscate = widget.post.spoiler ||
+        (widget.post.over18 &&
+            context.watch<FiltersSettingsCubit>().state.blurNSFW);
     if (widget.post.preview == null) {
       return InkWell(
         onTap: () => context.router.navigate(
@@ -56,7 +56,7 @@ class _ImageContentState extends State<ImageContent> {
       final RedditImage image = widget.post.preview!.images[0];
       return InkWell(
         onTap: () {
-          if (!obfuscate) {
+          if (!obfuscate || tapped) {
             context.router.navigate(
               FullscreenImageRoute(
                 imageUrl: image
@@ -70,13 +70,13 @@ class _ImageContentState extends State<ImageContent> {
             );
           } else {
             setState(() {
-              obfuscate = false;
+              tapped = true;
             });
           }
         },
         child: ImageThumbnail.redditImage(
           image,
-          blur: obfuscate,
+          blur: obfuscate && !tapped,
           resolution: resolution,
         ),
       );

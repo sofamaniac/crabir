@@ -47,13 +47,10 @@ class VideoContent extends StatefulWidget {
 }
 
 class _VideoContentState extends State<VideoContent> {
-  late bool obfuscate;
+  bool tapped = false;
   @override
   void initState() {
     super.initState();
-    obfuscate = widget.post.spoiler ||
-        (context.read<FiltersSettingsCubit>().state.blurNSFW &&
-            widget.post.over18);
   }
 
   @override
@@ -61,7 +58,9 @@ class _VideoContentState extends State<VideoContent> {
     final media = widget.post.secureMedia;
     final preview = widget.post.preview?.images[0];
     final settings = context.read<DataSettingsCubit>().state;
-    if (obfuscate) {
+    final obfuscate =
+        widget.post.spoiler || (FiltersSettings.of(context).blurNSFW);
+    if (obfuscate && !tapped) {
       final placeholder =
           preview!.withResolution(settings.preferredQuality, obfuscate);
       return InkWell(
@@ -72,7 +71,7 @@ class _VideoContentState extends State<VideoContent> {
         ),
         onTap: () {
           setState(() {
-            obfuscate = false;
+            tapped = true;
           });
         },
       );

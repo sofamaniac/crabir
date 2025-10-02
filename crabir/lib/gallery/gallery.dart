@@ -21,8 +21,8 @@ class GalleryView extends StatelessWidget {
   const GalleryView({super.key, required this.post, this.onVote, this.onSave});
   @override
   Widget build(BuildContext context) {
-    final bool obfuscate = post.spoiler ||
-        (context.read<FiltersSettingsCubit>().state.blurNSFW && post.over18);
+    final bool obfuscate =
+        post.spoiler || (FiltersSettings.of(context).blurNSFW && post.over18);
     if (post.gallery != null) {
       return _GalleryView(
         post: post,
