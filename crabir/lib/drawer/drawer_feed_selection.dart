@@ -24,8 +24,7 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
     } else if (account.status case Unloaded()) {
       bloc.add(LoadSubscriptions());
     } else if (account.status case Loaded()) {
-      return Flexible(
-        fit: FlexFit.loose,
+      return Expanded(
         child: ListView(
           children: [
             ...baseFeeds(

@@ -250,6 +250,12 @@ abstract class AppLocalizations {
   /// **'Logout'**
   String get logoutButtonLabel;
 
+  /// No description provided for @gotoDropdownLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to ...'**
+  String get gotoDropdownLabel;
+
   /// No description provided for @resolutionSource.
   ///
   /// In en, this message translates to:

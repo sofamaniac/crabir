@@ -32,6 +32,7 @@ List<Widget> options(BuildContext context) {
     if (settings.darkMode)
       SwitchListTile(
         secondary: icon(DARK_MODE_ICON),
+        title: Text(locales.lateralMenu_darkMode),
         value: context.brightness == Brightness.dark,
         onChanged: (enable) {
           if (enable) {
@@ -48,6 +49,7 @@ List<Widget> options(BuildContext context) {
     if (settings.showNSFW)
       SwitchListTile(
         secondary: icon(SHOW_NSFW_ICON),
+        title: Text(locales.filters_showNSFW),
         value: FiltersSettings.of(context).showNSFW,
         onChanged: (enable) {
           context.read<FiltersSettingsCubit>().updateShowNSFW(enable);
@@ -56,6 +58,7 @@ List<Widget> options(BuildContext context) {
     if (settings.blurNSFW)
       SwitchListTile(
         secondary: icon(BLUR_NSFW_ICON),
+        title: Text(locales.filters_blurNSFW),
         value: FiltersSettings.of(context).blurNSFW,
         onChanged: (enable) {
           context.read<FiltersSettingsCubit>().updateBlurNSFW(enable);
@@ -75,15 +78,55 @@ class _GoToDropdownState extends State<GoToDropdown> {
   bool open = false;
   @override
   Widget build(BuildContext context) {
-    final icon = open ? Icons.arrow_drop_down : Icons.arrow_drop_up;
-    return ListTile(
-      title: Text("GOTO DROPDOWN"),
-      onTap: () => setState(
-        () {
-          open = !open;
-        },
-      ),
-      trailing: Icon(icon),
+    final icon = open ? Icons.arrow_drop_up : Icons.arrow_drop_down;
+    final theme = CrabirTheme.of(context);
+    final locales = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          leading: Icon(GOTO_ICON, color: theme.secondaryText),
+          title: Text(locales.gotoDropdownLabel),
+          onTap: () => setState(
+            () {
+              open = !open;
+            },
+          ),
+          trailing: Icon(icon),
+        ),
+        AnimatedSize(
+          duration: Duration(milliseconds: 100),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: open
+                ? Column(
+                    children: [
+                      ListTile(
+                        leading: Icon(null),
+                        title: Text(locales.lateralMenu_showGoToCommunity),
+                        onTap: () {
+                          Scaffold.of(context).closeDrawer();
+                          context.router.navigate(SubscriptionsTabRoute());
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(null),
+                        title: Text(locales.lateralMenu_showGoToUser),
+                        onTap: () {
+                          Scaffold.of(context).closeDrawer();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Not implemented"),
+                            ),
+                          );
+                        },
+                      )
+                    ],
+                  )
+                : SizedBox.shrink(),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -87,6 +87,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logoutButtonLabel => 'Logout';
 
   @override
+  String get gotoDropdownLabel => 'Go to ...';
+
+  @override
   String get resolutionSource => 'Source';
 
   @override

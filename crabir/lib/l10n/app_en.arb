@@ -29,6 +29,7 @@
 
   "loginButtonLabel": "Add an account",
   "logoutButtonLabel": "Logout",
+  "gotoDropdownLabel": "Go to ...",
 
   "resolutionSource": "Source",
   "resolutionHigh": "High",
