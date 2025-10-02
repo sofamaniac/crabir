@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
-import 'package:crabir/base_feeds.dart';
 import 'package:crabir/feed_list.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:flutter/material.dart';
@@ -46,9 +45,12 @@ class _SubscriptonsList extends StatelessWidget {
     } else if (account.status case Loaded()) {
       return ListView(
         children: [
-          ...baseFeeds(context, closeDrawer: false).where(
-            (feed) => feed.title.toLowerCase().contains(filter.toLowerCase()),
-          ),
+          // TODO:
+          // ...baseFeeds(
+          //   context,
+          // ).where(
+          //   (feed) => feed.title.toLowerCase().contains(filter.toLowerCase()),
+          // ),
           ...account.multis
               .where(
                 (multi) => multi.displayName

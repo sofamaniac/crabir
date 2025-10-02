@@ -382,6 +382,22 @@ class InboxRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [LateralMenuSettingsView]
+class LateralMenuSettingsRoute extends PageRouteInfo<void> {
+  const LateralMenuSettingsRoute({List<PageRouteInfo>? children})
+      : super(LateralMenuSettingsRoute.name, initialChildren: children);
+
+  static const String name = 'LateralMenuSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const LateralMenuSettingsView();
+    },
+  );
+}
+
+/// generated route for
 /// [MainScreenView]
 class MainScreenRoute extends PageRouteInfo<void> {
   const MainScreenRoute({List<PageRouteInfo>? children})

@@ -164,7 +164,7 @@ class $className extends StatelessWidget {
     final widgetType = setting.getField('widget')?.toTypeValue();
     final hasDescription =
         setting.getField("hasDescription")?.toBoolValue() ?? false;
-    final iconData = setting.getField("icon")?.toStringValue();
+    final iconData = setting.getField('icon')?.variable2?.name3;
 
     if (widgetType != null) {
       return '$widgetType('

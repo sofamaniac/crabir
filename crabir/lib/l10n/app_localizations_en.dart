@@ -493,4 +493,80 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filters_blurNSFW => 'Blur images in NSFW posts';
+
+  @override
+  String get lateralMenu_showHome => 'Home';
+
+  @override
+  String get lateralMenu_showHomeDescription =>
+      'Default feed. To set any community, go to Subscriptions list and select \"Set as default\".';
+
+  @override
+  String get lateralMenu_showHomeFeed => 'Home Feed';
+
+  @override
+  String get lateralMenu_showHomeFeedDescription => 'Posts from subscriptions';
+
+  @override
+  String get lateralMenu_showPopular => 'Popular';
+
+  @override
+  String get lateralMenu_showAll => 'All';
+
+  @override
+  String get lateralMenu_showSaved => 'Saved';
+
+  @override
+  String get lateralMenu_showHistory => 'History';
+
+  @override
+  String get lateralMenu_showProfile => 'Profile';
+
+  @override
+  String get lateralMenu_showInbox => 'Inbox';
+
+  @override
+  String get lateralMenu_showFriends => 'Friends';
+
+  @override
+  String get lateralMenu_showDrafts => 'Drafts';
+
+  @override
+  String get lateralMenu_showModeration => 'Moderation';
+
+  @override
+  String get lateralMenu_showSearch => 'Search';
+
+  @override
+  String get lateralMenu_showGoToDropdown => 'Go to dropdown';
+
+  @override
+  String get lateralMenu_showGoToCommunity => 'Go to community';
+
+  @override
+  String get lateralMenu_showGoToUser => 'Go to user';
+
+  @override
+  String get lateralMenu_darkMode => 'Dark mode';
+
+  @override
+  String get lateralMenu_showNSFW => 'Show NSFW';
+
+  @override
+  String get lateralMenu_blurNSFW => 'Blur NSFW';
+
+  @override
+  String get lateralMenu_showSubsInMenu => 'Show in menu';
+
+  @override
+  String get lateralMenu_showSubsIcon => 'Show icons';
+
+  @override
+  String get lateralMenu_showSubsFavOnly => 'Show only favorites';
+
+  @override
+  String get lateralMenu_showAccountAvatar => 'Show avatar';
+
+  @override
+  String get lateralMenu_showAccountUsername => 'Show username';
 }

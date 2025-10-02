@@ -30,35 +30,23 @@ class DrawerState extends State<AppDrawer> {
   }
 
   Widget currentAccountView(BuildContext context) {
-    return BlocBuilder<AccountsBloc, AccountState>(
-      builder: (context, account) {
-        if (account.account != null) {
-          final icon =
-              isSelectingAccount ? Icons.arrow_drop_up : Icons.arrow_drop_down;
-          return DrawerHeader(
-            child: InkWell(
-              onTap: changeMode,
-              child: Row(
-                spacing: 8,
-                children: [
-                  if (account.account != null) ...[
-                    CircleAvatar(
-                      radius: 32,
-                      foregroundImage:
-                          NetworkImage(account.account!.profilePicture),
-                    ),
-                    Text(account.account!.username)
-                  ] else
-                    const LoadingIndicator(),
-                  Icon(icon),
-                ],
-              ),
-            ),
-          );
-        } else {
-          return LoadingIndicator();
-        }
-      },
+    final account = context.watch<AccountsBloc>().state.account;
+    if (account == null) {
+      return Center(child: LoadingIndicator());
+    }
+    final icon =
+        isSelectingAccount ? Icons.arrow_drop_up : Icons.arrow_drop_down;
+    final settings = LateralMenuSettings.of(context);
+    return ListTile(
+      onTap: changeMode,
+      leading: settings.showAccountAvatar
+          ? CircleAvatar(
+              radius: 32,
+              foregroundImage: NetworkImage(account.profilePicture),
+            )
+          : null,
+      title: settings.showAccountUsername ? Text(account.username) : null,
+      trailing: Icon(icon),
     );
   }
 

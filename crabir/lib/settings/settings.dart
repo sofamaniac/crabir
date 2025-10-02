@@ -3,6 +3,7 @@ import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
+import 'package:crabir/settings/lateral_menu/lateral_menu_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,12 @@ class SettingsView extends StatelessWidget {
             title: Text("Comments"),
             onTap: () =>
                 AutoRouter.of(context).navigate(CommentsSettingsRoute()),
+          ),
+          ListTile(
+            leading: Icon(Icons.keyboard_tab),
+            title: Text("Lateral Menu"),
+            onTap: () =>
+                AutoRouter.of(context).navigate(LateralMenuSettingsRoute()),
           ),
           ListTile(
             leading: Icon(Icons.storage),
@@ -77,6 +84,7 @@ class SettingsBlocsProviders extends StatelessWidget {
         BlocProvider(create: (_) => FiltersSettingsCubit()),
         BlocProvider(create: (_) => ReadPosts()),
         BlocProvider(create: (_) => GlobalFiltersCubit()),
+        BlocProvider(create: (_) => LateralMenuSettingsCubit()),
       ],
       child: child,
     );

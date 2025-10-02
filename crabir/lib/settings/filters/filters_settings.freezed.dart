@@ -26,9 +26,9 @@ mixin _$FiltersSettings {
   @Category(name: "More options")
   @Setting(hasDescription: true)
   bool get showNSFW;
-  @Setting(icon: "Icons.image")
+  @Setting(icon: SHOW_NSFW_ICON)
   bool get showImageInNSFW;
-  @Setting(icon: "Icons.blur_on")
+  @Setting(icon: BLUR_NSFW_ICON)
   bool get blurNSFW;
 
   /// Create a copy of FiltersSettings
@@ -101,8 +101,8 @@ abstract mixin class $FiltersSettingsCopyWith<$Res> {
       @Category(name: "More options")
       @Setting(hasDescription: true)
       bool showNSFW,
-      @Setting(icon: "Icons.image") bool showImageInNSFW,
-      @Setting(icon: "Icons.blur_on") bool blurNSFW});
+      @Setting(icon: SHOW_NSFW_ICON) bool showImageInNSFW,
+      @Setting(icon: BLUR_NSFW_ICON) bool blurNSFW});
 }
 
 /// @nodoc
@@ -265,8 +265,8 @@ extension FiltersSettingsPatterns on FiltersSettings {
             @Category(name: "More options")
             @Setting(hasDescription: true)
             bool showNSFW,
-            @Setting(icon: "Icons.image") bool showImageInNSFW,
-            @Setting(icon: "Icons.blur_on") bool blurNSFW)?
+            @Setting(icon: SHOW_NSFW_ICON) bool showImageInNSFW,
+            @Setting(icon: BLUR_NSFW_ICON) bool blurNSFW)?
         $default, {
     required TResult orElse(),
   }) {
@@ -314,8 +314,8 @@ extension FiltersSettingsPatterns on FiltersSettings {
             @Category(name: "More options")
             @Setting(hasDescription: true)
             bool showNSFW,
-            @Setting(icon: "Icons.image") bool showImageInNSFW,
-            @Setting(icon: "Icons.blur_on") bool blurNSFW)
+            @Setting(icon: SHOW_NSFW_ICON) bool showImageInNSFW,
+            @Setting(icon: BLUR_NSFW_ICON) bool blurNSFW)
         $default,
   ) {
     final _that = this;
@@ -361,8 +361,8 @@ extension FiltersSettingsPatterns on FiltersSettings {
             @Category(name: "More options")
             @Setting(hasDescription: true)
             bool showNSFW,
-            @Setting(icon: "Icons.image") bool showImageInNSFW,
-            @Setting(icon: "Icons.blur_on") bool blurNSFW)?
+            @Setting(icon: SHOW_NSFW_ICON) bool showImageInNSFW,
+            @Setting(icon: BLUR_NSFW_ICON) bool blurNSFW)?
         $default,
   ) {
     final _that = this;
@@ -398,8 +398,8 @@ class _FiltersSettings extends FiltersSettings {
       @Category(name: "More options")
       @Setting(hasDescription: true)
       this.showNSFW = false,
-      @Setting(icon: "Icons.image") this.showImageInNSFW = true,
-      @Setting(icon: "Icons.blur_on") this.blurNSFW = false})
+      @Setting(icon: SHOW_NSFW_ICON) this.showImageInNSFW = true,
+      @Setting(icon: BLUR_NSFW_ICON) this.blurNSFW = false})
       : super._();
   factory _FiltersSettings.fromJson(Map<String, dynamic> json) =>
       _$FiltersSettingsFromJson(json);
@@ -428,11 +428,11 @@ class _FiltersSettings extends FiltersSettings {
   final bool showNSFW;
   @override
   @JsonKey()
-  @Setting(icon: "Icons.image")
+  @Setting(icon: SHOW_NSFW_ICON)
   final bool showImageInNSFW;
   @override
   @JsonKey()
-  @Setting(icon: "Icons.blur_on")
+  @Setting(icon: BLUR_NSFW_ICON)
   final bool blurNSFW;
 
   /// Create a copy of FiltersSettings
@@ -511,8 +511,8 @@ abstract mixin class _$FiltersSettingsCopyWith<$Res>
       @Category(name: "More options")
       @Setting(hasDescription: true)
       bool showNSFW,
-      @Setting(icon: "Icons.image") bool showImageInNSFW,
-      @Setting(icon: "Icons.blur_on") bool blurNSFW});
+      @Setting(icon: SHOW_NSFW_ICON) bool showImageInNSFW,
+      @Setting(icon: BLUR_NSFW_ICON) bool blurNSFW});
 }
 
 /// @nodoc

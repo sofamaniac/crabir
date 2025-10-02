@@ -13,6 +13,7 @@ import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/tabs_index.dart';
+import 'package:crabir/utils/brightness_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/frb_generated.dart';
@@ -321,11 +322,7 @@ class _MainScreenViewState extends State<MainScreenView>
 
     // Change system navigation bar background color.
     if (Platform.isAndroid) {
-      final brightness = switch (context.read<ThemeBloc>().state.mode) {
-        ThemeMode.dark => Brightness.dark,
-        ThemeMode.light => Brightness.light,
-        ThemeMode.system => MediaQuery.of(context).platformBrightness,
-      };
+      final brightness = context.brightness;
       SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(
           systemNavigationBarColor: theme.toolBarBackground,

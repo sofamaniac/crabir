@@ -21,7 +21,7 @@ class Setting {
   final Type? widget;
 
   /// Optional icon.
-  final String? icon;
+  final Object? icon;
 
   const Setting({
     this.titleKey,

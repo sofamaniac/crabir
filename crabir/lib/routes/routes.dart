@@ -9,6 +9,7 @@ import 'package:crabir/search_posts/widgets/search.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
+import 'package:crabir/settings/lateral_menu/lateral_menu_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme_editor.dart';
@@ -21,7 +22,6 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/user/model.dart';
 import 'package:crabir/subscriptions_tab.dart';
 import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/user/user.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crabir/search_subreddits/widgets/search.dart';
@@ -89,6 +89,7 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: ManageSortRoute.page),
         AutoRoute(page: DataSettingsRoute.page),
         AutoRoute(page: FiltersSettingsRoute.page),
+        AutoRoute(page: LateralMenuSettingsRoute.page),
       ];
 }
 
@@ -128,6 +129,11 @@ class SearchPage extends AutoRouter {
 }
 
 @RoutePage()
-class InboxView extends AutoRouter {
+class InboxView extends StatelessWidget {
   const InboxView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(child: Scaffold(body: Text("WORK IN PROGRESS")));
+  }
 }

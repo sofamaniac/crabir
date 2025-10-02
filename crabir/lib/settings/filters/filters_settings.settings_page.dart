@@ -107,7 +107,7 @@ class FiltersSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.filters_showImageInNSFW),
-          secondary: Icon(Icons.image),
+          secondary: Icon(SHOW_NSFW_ICON),
           subtitle: null,
           value: settings.showImageInNSFW,
           onChanged: (val) =>
@@ -115,7 +115,7 @@ class FiltersSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.filters_blurNSFW),
-          secondary: Icon(Icons.blur_on),
+          secondary: Icon(BLUR_NSFW_ICON),
           subtitle: null,
           value: settings.blurNSFW,
           onChanged: (val) =>

@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/settings_page/annotations.dart';
+import 'package:crabir/utils/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -36,8 +37,8 @@ abstract class FiltersSettings with _$FiltersSettings {
     @Default(false)
     @Setting(hasDescription: true)
     bool showNSFW,
-    @Default(true) @Setting(icon: "Icons.image") bool showImageInNSFW,
-    @Setting(icon: "Icons.blur_on") @Default(false) bool blurNSFW,
+    @Default(true) @Setting(icon: SHOW_NSFW_ICON) bool showImageInNSFW,
+    @Setting(icon: BLUR_NSFW_ICON) @Default(false) bool blurNSFW,
   }) = _FiltersSettings;
 
   factory FiltersSettings.fromJson(Map<String, dynamic> json) =>

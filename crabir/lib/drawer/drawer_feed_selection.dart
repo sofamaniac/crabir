@@ -8,7 +8,6 @@ class DrawerFeedSelection extends StatefulWidget {
 }
 
 class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
-  final List<String> userOptions = ["Profile", "Inbox", "Moderation"];
   final log = Logger("DrawerFeedSelection");
   UserAccount? account;
 
@@ -29,7 +28,11 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
         fit: FlexFit.loose,
         child: ListView(
           children: [
-            ...baseFeeds(context, closeDrawer: true),
+            ...baseFeeds(
+              context,
+            ),
+            Divider(),
+            ...options(context),
             Divider(),
             ListTile(
               leading: Icon(Icons.settings),
@@ -56,8 +59,6 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
                 icon: Icon(Icons.light),
               ),
             ),
-
-            //...userOptions.map((option) => ListTile(title: Text(option))),
             Divider(),
             ...account.multis.map(
               (multi) => MultiRedditTile(

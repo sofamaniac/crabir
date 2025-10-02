@@ -921,6 +921,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Blur images in NSFW posts'**
   String get filters_blurNSFW;
+
+  /// No description provided for @lateralMenu_showHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get lateralMenu_showHome;
+
+  /// No description provided for @lateralMenu_showHomeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Default feed. To set any community, go to Subscriptions list and select \"Set as default\".'**
+  String get lateralMenu_showHomeDescription;
+
+  /// No description provided for @lateralMenu_showHomeFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Home Feed'**
+  String get lateralMenu_showHomeFeed;
+
+  /// No description provided for @lateralMenu_showHomeFeedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts from subscriptions'**
+  String get lateralMenu_showHomeFeedDescription;
+
+  /// No description provided for @lateralMenu_showPopular.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular'**
+  String get lateralMenu_showPopular;
+
+  /// No description provided for @lateralMenu_showAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get lateralMenu_showAll;
+
+  /// No description provided for @lateralMenu_showSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get lateralMenu_showSaved;
+
+  /// No description provided for @lateralMenu_showHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get lateralMenu_showHistory;
+
+  /// No description provided for @lateralMenu_showProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get lateralMenu_showProfile;
+
+  /// No description provided for @lateralMenu_showInbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbox'**
+  String get lateralMenu_showInbox;
+
+  /// No description provided for @lateralMenu_showFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get lateralMenu_showFriends;
+
+  /// No description provided for @lateralMenu_showDrafts.
+  ///
+  /// In en, this message translates to:
+  /// **'Drafts'**
+  String get lateralMenu_showDrafts;
+
+  /// No description provided for @lateralMenu_showModeration.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderation'**
+  String get lateralMenu_showModeration;
+
+  /// No description provided for @lateralMenu_showSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get lateralMenu_showSearch;
+
+  /// No description provided for @lateralMenu_showGoToDropdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to dropdown'**
+  String get lateralMenu_showGoToDropdown;
+
+  /// No description provided for @lateralMenu_showGoToCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to community'**
+  String get lateralMenu_showGoToCommunity;
+
+  /// No description provided for @lateralMenu_showGoToUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to user'**
+  String get lateralMenu_showGoToUser;
+
+  /// No description provided for @lateralMenu_darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark mode'**
+  String get lateralMenu_darkMode;
+
+  /// No description provided for @lateralMenu_showNSFW.
+  ///
+  /// In en, this message translates to:
+  /// **'Show NSFW'**
+  String get lateralMenu_showNSFW;
+
+  /// No description provided for @lateralMenu_blurNSFW.
+  ///
+  /// In en, this message translates to:
+  /// **'Blur NSFW'**
+  String get lateralMenu_blurNSFW;
+
+  /// No description provided for @lateralMenu_showSubsInMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in menu'**
+  String get lateralMenu_showSubsInMenu;
+
+  /// No description provided for @lateralMenu_showSubsIcon.
+  ///
+  /// In en, this message translates to:
+  /// **'Show icons'**
+  String get lateralMenu_showSubsIcon;
+
+  /// No description provided for @lateralMenu_showSubsFavOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Show only favorites'**
+  String get lateralMenu_showSubsFavOnly;
+
+  /// No description provided for @lateralMenu_showAccountAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Show avatar'**
+  String get lateralMenu_showAccountAvatar;
+
+  /// No description provided for @lateralMenu_showAccountUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Show username'**
+  String get lateralMenu_showAccountUsername;
 }
 
 class _AppLocalizationsDelegate
