@@ -33,7 +33,7 @@ class AccountSelector extends StatelessWidget {
                   Scaffold.of(context).closeDrawer();
                 },
                 leading: CircleAvatar(
-                  radius: 24,
+                  radius: 16,
                   foregroundImage: NetworkImage(account.profilePicture),
                 ),
                 title: Text(account.username),
