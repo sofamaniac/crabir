@@ -267,7 +267,7 @@ int numReplies(Comment comment) {
     int acc = 0;
     for (final reply in comment.replies()) {
       acc += switch (reply) {
-        Thing_Comment(field0: final comment) => numReplies(comment),
+        Thing_Comment(field0: final comment) => 1 + numReplies(comment),
         Thing_More(:final count) => count,
         _ => 0,
       };
