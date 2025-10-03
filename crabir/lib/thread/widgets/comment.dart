@@ -14,11 +14,15 @@ import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/author.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
-import 'package:crabir/thread/bloc/thread_bloc.dart';
 import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/time_ellapsed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+class OpenedComment {
+  static ValueNotifier<String?> current = ValueNotifier(null);
+  OpenedComment();
+}
 
 class CommentView extends StatefulWidget {
   final Comment comment;
@@ -130,48 +134,52 @@ class _CommentViewState extends State<CommentView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final comment = widget.comment;
-    final settings = context.watch<CommentsSettingsCubit>().state;
-    final threadBloc = context.watch<ThreadBloc>();
-    final openComment = threadBloc.state.expandedComment;
-    final showBottomBar =
-        openComment == comment.id || settings.buttonsAlwaysVisible;
-    return GestureDetector(
-      onLongPress: widget.onLongPress,
-      onTap: () {
-        widget.onTap?.call();
-        if (openComment == comment.id) {
-          threadBloc.add(CloseComment());
-        } else {
-          threadBloc.add(OpenComment(comment.id));
-        }
+    return ValueListenableBuilder(
+      valueListenable: OpenedComment.current,
+      builder: (context, _, __) {
+        final comment = widget.comment;
+        final settings = context.watch<CommentsSettingsCubit>().state;
+        final openComment = OpenedComment.current.value;
+        final showBottomBar =
+            openComment == comment.id || settings.buttonsAlwaysVisible;
+        return GestureDetector(
+          onLongPress: widget.onLongPress,
+          onTap: () {
+            widget.onTap?.call();
+            if (openComment == comment.id) {
+              OpenedComment.current.value = null;
+            } else {
+              OpenedComment.current.value = comment.id;
+            }
+          },
+          behavior: HitTestBehavior.translucent,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 8,
+              children: [
+                topRow(settings),
+                StyledHtml(
+                  htmlContent: comment.bodyHtml,
+                  onLinkTap: (url, attributes, element) => defaultLinkHandler(
+                    context.router,
+                    url,
+                    attributes,
+                    element,
+                  ),
+                  showImages: settings.showCommentsImage,
+                ),
+                AnimatedSwitcher(
+                  duration: Duration(milliseconds: 200),
+                  child: showBottomBar ? bottomBar() : SizedBox.shrink(),
+                ),
+              ],
+            ),
+          ),
+        );
       },
-      behavior: HitTestBehavior.translucent,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 8,
-          children: [
-            topRow(settings),
-            StyledHtml(
-              htmlContent: comment.bodyHtml,
-              onLinkTap: (url, attributes, element) => defaultLinkHandler(
-                context.router,
-                url,
-                attributes,
-                element,
-              ),
-              showImages: settings.showCommentsImage,
-            ),
-            AnimatedSwitcher(
-              duration: Duration(milliseconds: 200),
-              child: showBottomBar ? bottomBar() : SizedBox.shrink(),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -287,7 +295,10 @@ class _Username extends StatelessWidget {
   });
 
   Widget _username(
-      CommentsSettings settings, String? currentUser, Color foreground) {
+    CommentsSettings settings,
+    String? currentUser,
+    Color foreground,
+  ) {
     final username = author?.username ?? "u/[deleted]";
     if (username == currentUser && settings.highlightMyUsername) {
       return Cartouche(
@@ -329,6 +340,82 @@ class _Username extends StatelessWidget {
         }
       },
       child: _username(settings, currentUser, theme.highlight),
+    );
+  }
+}
+
+class CollapsedComment extends StatelessWidget {
+  final Comment comment;
+  final VoidCallback? onLongPress;
+
+  const CollapsedComment({super.key, required this.comment, this.onLongPress});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = CrabirTheme.of(context).secondaryText;
+    final style =
+        Theme.of(context).textTheme.labelMedium!.copyWith(color: color);
+    return GestureDetector(
+      onLongPress: onLongPress,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: 4,
+          children: [
+            Flexible(
+              fit: FlexFit.loose,
+              child: Row(
+                spacing: 4,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "[+]",
+                    style: style,
+                  ),
+                  Text(
+                    comment.author?.username ?? "[deleted]",
+                    style: style,
+                  ),
+                ],
+              ),
+            ),
+            SeparatedRow(
+              spacing: 2,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              alignment: WrapAlignment.end,
+              separatorStyle: Theme.of(context)
+                  .textTheme
+                  .labelMedium!
+                  .copyWith(color: color),
+              children: [
+                Cartouche(
+                  "+${numReplies(comment)}",
+                  foreground: Colors.white,
+                  background: Colors.lightGreen,
+                ),
+                LikeText(
+                  score: comment.score,
+                  likes: comment.likes,
+                  hidden: comment.scoreHidden,
+                  style: Theme.of(context).textTheme.labelMedium!,
+                  scaling: 1.5,
+                ),
+                Text(
+                  comment.createdUtc.timeSince(context),
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium!
+                      .copyWith(color: color),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

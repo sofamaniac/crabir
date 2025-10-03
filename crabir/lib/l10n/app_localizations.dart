@@ -298,6 +298,24 @@ abstract class AppLocalizations {
   /// **'Full Size'**
   String get mediaPreviewSizeFull;
 
+  /// No description provided for @indentationStyleLines.
+  ///
+  /// In en, this message translates to:
+  /// **'Lines'**
+  String get indentationStyleLines;
+
+  /// No description provided for @indentationStyleColored.
+  ///
+  /// In en, this message translates to:
+  /// **'Colored lines'**
+  String get indentationStyleColored;
+
+  /// No description provided for @indentationStyleBars.
+  ///
+  /// In en, this message translates to:
+  /// **'Colored bars'**
+  String get indentationStyleBars;
+
   /// No description provided for @shareLink.
   ///
   /// In en, this message translates to:
@@ -675,6 +693,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Swipe to close thread'**
   String get comments_swipeToClose;
+
+  /// No description provided for @comments_distanceThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance threshold'**
+  String get comments_distanceThreshold;
+
+  /// No description provided for @comments_distanceThresholdDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Dragging distance from edge as a percentage of screen width before closing and going back.'**
+  String get comments_distanceThresholdDescription;
+
+  /// No description provided for @comments_threadGuide.
+  ///
+  /// In en, this message translates to:
+  /// **'Thread guides'**
+  String get comments_threadGuide;
 
   /// No description provided for @posts_defaultHomeSort.
   ///

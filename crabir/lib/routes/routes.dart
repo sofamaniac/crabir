@@ -23,7 +23,6 @@ import 'package:crabir/subscriptions_tab.dart';
 import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/user/user.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crabir/search_subreddits/widgets/search.dart';
 
 part 'routes.gr.dart';
@@ -102,11 +101,14 @@ final threadRoute = CustomRoute(
     Widget child,
     AutoRoutePage<T> page,
   ) {
-    if (context.read<CommentsSettingsCubit>().state.swipeToClose) {
+    final settings = CommentsSettings.of(context);
+    if (settings.swipeToClose) {
+      final threshold = settings.distanceThreshold;
       return FixedSwipePageRoute<T>(
         builder: (_) => child,
         settings: page,
         fullscreenDialog: page.fullscreenDialog,
+        dragThreshold: threshold / 100,
       );
     } else {
       return PageRouteBuilder<T>(

@@ -111,6 +111,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mediaPreviewSizeFull => 'Full Size';
 
   @override
+  String get indentationStyleLines => 'Lines';
+
+  @override
+  String get indentationStyleColored => 'Colored lines';
+
+  @override
+  String get indentationStyleBars => 'Colored bars';
+
+  @override
   String get shareLink => 'Share Link';
 
   @override
@@ -364,6 +373,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get comments_swipeToClose => 'Swipe to close thread';
+
+  @override
+  String get comments_distanceThreshold => 'Distance threshold';
+
+  @override
+  String get comments_distanceThresholdDescription =>
+      'Dragging distance from edge as a percentage of screen width before closing and going back.';
+
+  @override
+  String get comments_threadGuide => 'Thread guides';
 
   @override
   String get posts_defaultHomeSort => 'Default Home sort';

@@ -20,3 +20,4 @@ const GOTO_USER_ICON = Icons.person_outline;
 const DARK_MODE_ICON = Icons.dark_mode;
 const SHOW_NSFW_ICON = Icons.sentiment_neutral;
 const BLUR_NSFW_ICON = Icons.blur_on;
+const THREAD_LEVEL_INDICATOR_ICON = Icons.list;

@@ -40,6 +40,10 @@
   "mediaPreviewSizeThumbnail": "Thumbnail",
   "mediaPreviewSizeFull": "Full Size",
 
+  "indentationStyleLines": "Lines",
+  "indentationStyleColored": "Colored lines",
+  "indentationStyleBars": "Colored bars",
+
   "shareLink": "Share Link",
   "shareLinkTitle": "Share Title + Link",
   "sharePost": "Share Post",
@@ -200,6 +204,9 @@
 
   "comments_showSaveButton": "Show save button",
   "comments_swipeToClose": "Swipe to close thread",
+  "comments_distanceThreshold": "Distance threshold",
+  "comments_distanceThresholdDescription": "Dragging distance from edge as a percentage of screen width before closing and going back.",
+  "comments_threadGuide": "Thread guides",
 
   "posts_defaultHomeSort": "Default Home sort",
   "posts_defaultSort": "Default sort",
