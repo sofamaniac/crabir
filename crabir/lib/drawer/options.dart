@@ -16,7 +16,7 @@ List<Widget> options(BuildContext context) {
   final locales = AppLocalizations.of(context);
   final theme = CrabirTheme.of(context);
   Icon icon(IconData icon) => Icon(icon, color: theme.secondaryText);
-  return [
+  final children = [
     if (settings.showGoToDropdown) GoToDropdown(),
     if (settings.showGoToCommunity)
       ListTile(
@@ -65,6 +65,10 @@ List<Widget> options(BuildContext context) {
         },
       ),
   ];
+  if (children.isNotEmpty) {
+    children.add(Divider());
+  }
+  return children;
 }
 
 class GoToDropdown extends StatefulWidget {

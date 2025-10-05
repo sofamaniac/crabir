@@ -32,7 +32,6 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
             ),
             Divider(),
             ...options(context),
-            Divider(),
             ListTile(
               leading: Icon(Icons.settings),
               title: Text("Settings"),
