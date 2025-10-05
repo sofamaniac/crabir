@@ -59,7 +59,13 @@ class FiltersSettingsView extends StatelessWidget {
         body: ListView(
       children: [
         Divider(),
-        Text("Muting options"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Muting options",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         SubredditsFilterButton(
           title: Text(locales.filters_manageHiddenCommunities),
           leading: Icon(null),
@@ -96,7 +102,13 @@ class FiltersSettingsView extends StatelessWidget {
               .updateManageHiddenFlairs(val),
         ),
         Divider(),
-        Text("More options"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("More options",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.filters_showNSFW),
           secondary: Icon(null),

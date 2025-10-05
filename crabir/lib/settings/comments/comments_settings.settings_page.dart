@@ -126,7 +126,13 @@ class CommentsSettingsView extends StatelessWidget {
               .updateUseSuggestedSort(val!),
         ),
         Divider(),
-        Text("Appearance"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Appearance",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.comments_showNavigationBar),
           secondary: Icon(null),
@@ -216,7 +222,13 @@ class CommentsSettingsView extends StatelessWidget {
               .updateHighlightMyUsername(val!),
         ),
         Divider(),
-        Text("Flairs"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Flairs",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.comments_showUserFlair),
           secondary: Icon(null),
@@ -242,7 +254,13 @@ class CommentsSettingsView extends StatelessWidget {
               context.read<CommentsSettingsCubit>().updateShowFlairEmojis(val!),
         ),
         Divider(),
-        Text("Behavior"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Behavior",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         ListTile(
           title: Text("TODO: clickToCollapse"),
           leading: null,
@@ -283,7 +301,13 @@ class CommentsSettingsView extends StatelessWidget {
               .updateClickableUsername(val!),
         ),
         Divider(),
-        Text("Navigation"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Navigation",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.comments_showSaveButton),
           secondary: Icon(null),
@@ -293,7 +317,13 @@ class CommentsSettingsView extends StatelessWidget {
               context.read<CommentsSettingsCubit>().updateShowSaveButton(val!),
         ),
         Divider(),
-        Text("Gestures"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Gestures",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.comments_swipeToClose),
           secondary: Icon(null),

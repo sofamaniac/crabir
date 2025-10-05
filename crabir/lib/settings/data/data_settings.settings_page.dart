@@ -58,7 +58,13 @@ class DataSettingsView extends StatelessWidget {
         body: ListView(
       children: [
         Divider(),
-        Text("Videos"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Videos",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         ImageLoadingSelect(
           title: Text(locales.data_autoplay),
           leading: Icon(null),
@@ -84,7 +90,13 @@ class DataSettingsView extends StatelessWidget {
               context.read<DataSettingsCubit>().updateVideoQualityCellular(val),
         ),
         Divider(),
-        Text("Images"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Images",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         ImageLoadingSelect(
           title: Text(locales.data_loadImages),
           leading: Icon(null),

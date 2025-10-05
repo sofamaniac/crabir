@@ -100,7 +100,13 @@ class LateralMenuSettingsView extends StatelessWidget {
         body: ListView(
       children: [
         Divider(),
-        Text("Items to show"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Items to show",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.lateralMenu_showHome),
           secondary: Icon(HOME_PAGE_ICON),
@@ -249,7 +255,13 @@ class LateralMenuSettingsView extends StatelessWidget {
               context.read<LateralMenuSettingsCubit>().updateBlurNSFW(val!),
         ),
         Divider(),
-        Text("Subscription list"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Subscription list",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.lateralMenu_showSubsInMenu),
           secondary: Icon(null),
@@ -277,7 +289,13 @@ class LateralMenuSettingsView extends StatelessWidget {
               .updateShowSubsFavOnly(val!),
         ),
         Divider(),
-        Text("Account switcher"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Account switcher",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.lateralMenu_showAccountAvatar),
           secondary: Icon(null),

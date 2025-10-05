@@ -34,7 +34,9 @@ class Setting {
 
 class Category {
   final String? name;
+  final bool divider;
   const Category({
     this.name,
+    this.divider = true,
   });
 }

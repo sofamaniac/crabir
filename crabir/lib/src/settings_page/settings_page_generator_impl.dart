@@ -114,11 +114,17 @@ class $className extends StatelessWidget {
     for (final param in constructor.parameters) {
       final divider =
           TypeChecker.fromRuntime(Category).firstAnnotationOf(param);
-      if (divider != null) {
+      if (divider != null &&
+          (divider.getField("divider")?.toBoolValue() ?? true)) {
         buffer.writeln("Divider(),");
         final categoryName = divider.getField("name")?.toStringValue();
         if (categoryName != null) {
-          buffer.writeln('Text("$categoryName"),');
+          buffer.writeln(
+              'ListTile(leading: Icon(null), title: Text("$categoryName", style: Theme.of(context)'
+              '.textTheme'
+              '.labelMedium'
+              '?.copyWith(color: CrabirTheme.of(context).highlight)))'
+              ',');
         }
       }
       buffer.writeln(widget(param, element));

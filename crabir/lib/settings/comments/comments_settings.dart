@@ -1,3 +1,4 @@
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/sort.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/settings_page/annotations.dart';

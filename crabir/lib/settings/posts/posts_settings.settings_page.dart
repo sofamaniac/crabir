@@ -128,7 +128,13 @@ class PostsSettingsView extends StatelessWidget {
               context.read<PostsSettingsCubit>().updateRememberedSorts(val),
         ),
         Divider(),
-        Text("Awards"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Awards",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.posts_showAwards),
           secondary: Icon(null),
@@ -146,7 +152,13 @@ class PostsSettingsView extends StatelessWidget {
               context.read<PostsSettingsCubit>().updateClickableAwards(val!),
         ),
         Divider(),
-        Text("Flairs"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Flairs",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.posts_showPostFlair),
           secondary: Icon(null),
@@ -180,7 +192,13 @@ class PostsSettingsView extends StatelessWidget {
               context.read<PostsSettingsCubit>().updateTapFlairToSearch(val!),
         ),
         Divider(),
-        Text("Post info"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Post info",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.posts_showAuthor),
           secondary: Icon(null),
@@ -206,7 +224,13 @@ class PostsSettingsView extends StatelessWidget {
               context.read<PostsSettingsCubit>().updateClickableUser(val!),
         ),
         Divider(),
-        Text("Visible buttons"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Visible buttons",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.posts_showFloatingButton),
           secondary: Icon(null),
