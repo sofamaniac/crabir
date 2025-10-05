@@ -17,8 +17,7 @@ class Thumbnail extends StatelessWidget {
         await launchUrl(Uri.parse(post.url));
         break;
       case Kind.video:
-        final settings = context.read<DataSettingsCubit>().state;
-        goFullScreen(context, post, settings.videoQuality);
+        goFullScreen(context, post, NetworkStatus.videoQuality(context));
       case Kind.streamableVideo:
         throw Exception("TODO: fullscreen streamable.com");
       case Kind.gallery:

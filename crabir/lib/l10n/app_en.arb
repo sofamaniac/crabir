@@ -233,21 +233,18 @@
   "posts_showCommentsButton": "Comments",
   "posts_showOpenInAppButton": "Open in app",
 
-  "data_wifiDataSaver": "Wifi data saver",
-  "data_wifiDataSaverDescription": "Load lower-size media",
-
-  "data_mobileDataSaver": "Mobile data saver",
-  "data_mobileDataSaverDescription": "Load lower-size media",
 
   "data_autoplay": "Autoplay videos",
 
-  "data_videoQuality": "Video quality",
+  "data_videoQualityWifi": "Preferred video quality when connected to Wifi",
+  "data_videoQualityCellular": "Preferred video quality when connected to cellular",
 
   "data_minimumQuality": "Minimum quality",
   "data_maximumQuality": "Maximum quality",
 
   "data_loadImages": "Load images",
-  "data_preferredQuality": "Image Quality",
+  "data_imageQualityWifi": "Preferred image quality when connected to Wifi",
+  "data_imageQualityCellular": "Preferred image quality when connected to cellular",
 
   "filters_manageHiddenCommunities": "Communities",
   "filters_manageHiddenCommunitiesDescription": "Hide posts from these communities",

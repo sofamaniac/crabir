@@ -14,21 +14,20 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$DataSettings {
-  @Category(name: "Data Saver")
-  @Setting(hasDescription: true)
-  bool get mobileDataSaver;
-  @Setting(hasDescription: true)
-  bool get wifiDataSaver;
   @Category(name: "Videos")
   @Setting(widget: ImageLoadingSelect)
   ImageLoading get autoplay;
   @Setting(widget: ResolutionSelect)
-  Resolution get videoQuality;
+  Resolution get videoQualityWifi;
+  @Setting(widget: ResolutionSelect)
+  Resolution get videoQualityCellular;
   @Category(name: "Images")
   @Setting(widget: ImageLoadingSelect)
   ImageLoading get loadImages;
   @Setting(widget: ResolutionSelect)
-  Resolution get preferredQuality;
+  Resolution get imageQualityWifi;
+  @Setting(widget: ResolutionSelect)
+  Resolution get imageQualityCellular;
 
   /// Create a copy of DataSettings
   /// with the given fields replaced by the non-null parameter values.
@@ -46,28 +45,28 @@ mixin _$DataSettings {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is DataSettings &&
-            (identical(other.mobileDataSaver, mobileDataSaver) ||
-                other.mobileDataSaver == mobileDataSaver) &&
-            (identical(other.wifiDataSaver, wifiDataSaver) ||
-                other.wifiDataSaver == wifiDataSaver) &&
             (identical(other.autoplay, autoplay) ||
                 other.autoplay == autoplay) &&
-            (identical(other.videoQuality, videoQuality) ||
-                other.videoQuality == videoQuality) &&
+            (identical(other.videoQualityWifi, videoQualityWifi) ||
+                other.videoQualityWifi == videoQualityWifi) &&
+            (identical(other.videoQualityCellular, videoQualityCellular) ||
+                other.videoQualityCellular == videoQualityCellular) &&
             (identical(other.loadImages, loadImages) ||
                 other.loadImages == loadImages) &&
-            (identical(other.preferredQuality, preferredQuality) ||
-                other.preferredQuality == preferredQuality));
+            (identical(other.imageQualityWifi, imageQualityWifi) ||
+                other.imageQualityWifi == imageQualityWifi) &&
+            (identical(other.imageQualityCellular, imageQualityCellular) ||
+                other.imageQualityCellular == imageQualityCellular));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, mobileDataSaver, wifiDataSaver,
-      autoplay, videoQuality, loadImages, preferredQuality);
+  int get hashCode => Object.hash(runtimeType, autoplay, videoQualityWifi,
+      videoQualityCellular, loadImages, imageQualityWifi, imageQualityCellular);
 
   @override
   String toString() {
-    return 'DataSettings(mobileDataSaver: $mobileDataSaver, wifiDataSaver: $wifiDataSaver, autoplay: $autoplay, videoQuality: $videoQuality, loadImages: $loadImages, preferredQuality: $preferredQuality)';
+    return 'DataSettings(autoplay: $autoplay, videoQualityWifi: $videoQualityWifi, videoQualityCellular: $videoQualityCellular, loadImages: $loadImages, imageQualityWifi: $imageQualityWifi, imageQualityCellular: $imageQualityCellular)';
   }
 }
 
@@ -78,18 +77,16 @@ abstract mixin class $DataSettingsCopyWith<$Res> {
       _$DataSettingsCopyWithImpl;
   @useResult
   $Res call(
-      {@Category(name: "Data Saver")
-      @Setting(hasDescription: true)
-      bool mobileDataSaver,
-      @Setting(hasDescription: true) bool wifiDataSaver,
-      @Category(name: "Videos")
+      {@Category(name: "Videos")
       @Setting(widget: ImageLoadingSelect)
       ImageLoading autoplay,
-      @Setting(widget: ResolutionSelect) Resolution videoQuality,
+      @Setting(widget: ResolutionSelect) Resolution videoQualityWifi,
+      @Setting(widget: ResolutionSelect) Resolution videoQualityCellular,
       @Category(name: "Images")
       @Setting(widget: ImageLoadingSelect)
       ImageLoading loadImages,
-      @Setting(widget: ResolutionSelect) Resolution preferredQuality});
+      @Setting(widget: ResolutionSelect) Resolution imageQualityWifi,
+      @Setting(widget: ResolutionSelect) Resolution imageQualityCellular});
 }
 
 /// @nodoc
@@ -104,37 +101,37 @@ class _$DataSettingsCopyWithImpl<$Res> implements $DataSettingsCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? mobileDataSaver = null,
-    Object? wifiDataSaver = null,
     Object? autoplay = null,
-    Object? videoQuality = null,
+    Object? videoQualityWifi = null,
+    Object? videoQualityCellular = null,
     Object? loadImages = null,
-    Object? preferredQuality = null,
+    Object? imageQualityWifi = null,
+    Object? imageQualityCellular = null,
   }) {
     return _then(_self.copyWith(
-      mobileDataSaver: null == mobileDataSaver
-          ? _self.mobileDataSaver
-          : mobileDataSaver // ignore: cast_nullable_to_non_nullable
-              as bool,
-      wifiDataSaver: null == wifiDataSaver
-          ? _self.wifiDataSaver
-          : wifiDataSaver // ignore: cast_nullable_to_non_nullable
-              as bool,
       autoplay: null == autoplay
           ? _self.autoplay
           : autoplay // ignore: cast_nullable_to_non_nullable
               as ImageLoading,
-      videoQuality: null == videoQuality
-          ? _self.videoQuality
-          : videoQuality // ignore: cast_nullable_to_non_nullable
+      videoQualityWifi: null == videoQualityWifi
+          ? _self.videoQualityWifi
+          : videoQualityWifi // ignore: cast_nullable_to_non_nullable
+              as Resolution,
+      videoQualityCellular: null == videoQualityCellular
+          ? _self.videoQualityCellular
+          : videoQualityCellular // ignore: cast_nullable_to_non_nullable
               as Resolution,
       loadImages: null == loadImages
           ? _self.loadImages
           : loadImages // ignore: cast_nullable_to_non_nullable
               as ImageLoading,
-      preferredQuality: null == preferredQuality
-          ? _self.preferredQuality
-          : preferredQuality // ignore: cast_nullable_to_non_nullable
+      imageQualityWifi: null == imageQualityWifi
+          ? _self.imageQualityWifi
+          : imageQualityWifi // ignore: cast_nullable_to_non_nullable
+              as Resolution,
+      imageQualityCellular: null == imageQualityCellular
+          ? _self.imageQualityCellular
+          : imageQualityCellular // ignore: cast_nullable_to_non_nullable
               as Resolution,
     ));
   }
@@ -234,18 +231,16 @@ extension DataSettingsPatterns on DataSettings {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            @Category(name: "Data Saver")
-            @Setting(hasDescription: true)
-            bool mobileDataSaver,
-            @Setting(hasDescription: true) bool wifiDataSaver,
             @Category(name: "Videos")
             @Setting(widget: ImageLoadingSelect)
             ImageLoading autoplay,
-            @Setting(widget: ResolutionSelect) Resolution videoQuality,
+            @Setting(widget: ResolutionSelect) Resolution videoQualityWifi,
+            @Setting(widget: ResolutionSelect) Resolution videoQualityCellular,
             @Category(name: "Images")
             @Setting(widget: ImageLoadingSelect)
             ImageLoading loadImages,
-            @Setting(widget: ResolutionSelect) Resolution preferredQuality)?
+            @Setting(widget: ResolutionSelect) Resolution imageQualityWifi,
+            @Setting(widget: ResolutionSelect) Resolution imageQualityCellular)?
         $default, {
     required TResult orElse(),
   }) {
@@ -253,12 +248,12 @@ extension DataSettingsPatterns on DataSettings {
     switch (_that) {
       case _DataSettings() when $default != null:
         return $default(
-            _that.mobileDataSaver,
-            _that.wifiDataSaver,
             _that.autoplay,
-            _that.videoQuality,
+            _that.videoQualityWifi,
+            _that.videoQualityCellular,
             _that.loadImages,
-            _that.preferredQuality);
+            _that.imageQualityWifi,
+            _that.imageQualityCellular);
       case _:
         return orElse();
     }
@@ -280,30 +275,28 @@ extension DataSettingsPatterns on DataSettings {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            @Category(name: "Data Saver")
-            @Setting(hasDescription: true)
-            bool mobileDataSaver,
-            @Setting(hasDescription: true) bool wifiDataSaver,
             @Category(name: "Videos")
             @Setting(widget: ImageLoadingSelect)
             ImageLoading autoplay,
-            @Setting(widget: ResolutionSelect) Resolution videoQuality,
+            @Setting(widget: ResolutionSelect) Resolution videoQualityWifi,
+            @Setting(widget: ResolutionSelect) Resolution videoQualityCellular,
             @Category(name: "Images")
             @Setting(widget: ImageLoadingSelect)
             ImageLoading loadImages,
-            @Setting(widget: ResolutionSelect) Resolution preferredQuality)
+            @Setting(widget: ResolutionSelect) Resolution imageQualityWifi,
+            @Setting(widget: ResolutionSelect) Resolution imageQualityCellular)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _DataSettings():
         return $default(
-            _that.mobileDataSaver,
-            _that.wifiDataSaver,
             _that.autoplay,
-            _that.videoQuality,
+            _that.videoQualityWifi,
+            _that.videoQualityCellular,
             _that.loadImages,
-            _that.preferredQuality);
+            _that.imageQualityWifi,
+            _that.imageQualityCellular);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -324,30 +317,28 @@ extension DataSettingsPatterns on DataSettings {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            @Category(name: "Data Saver")
-            @Setting(hasDescription: true)
-            bool mobileDataSaver,
-            @Setting(hasDescription: true) bool wifiDataSaver,
             @Category(name: "Videos")
             @Setting(widget: ImageLoadingSelect)
             ImageLoading autoplay,
-            @Setting(widget: ResolutionSelect) Resolution videoQuality,
+            @Setting(widget: ResolutionSelect) Resolution videoQualityWifi,
+            @Setting(widget: ResolutionSelect) Resolution videoQualityCellular,
             @Category(name: "Images")
             @Setting(widget: ImageLoadingSelect)
             ImageLoading loadImages,
-            @Setting(widget: ResolutionSelect) Resolution preferredQuality)?
+            @Setting(widget: ResolutionSelect) Resolution imageQualityWifi,
+            @Setting(widget: ResolutionSelect) Resolution imageQualityCellular)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _DataSettings() when $default != null:
         return $default(
-            _that.mobileDataSaver,
-            _that.wifiDataSaver,
             _that.autoplay,
-            _that.videoQuality,
+            _that.videoQualityWifi,
+            _that.videoQualityCellular,
             _that.loadImages,
-            _that.preferredQuality);
+            _that.imageQualityWifi,
+            _that.imageQualityCellular);
       case _:
         return null;
     }
@@ -358,32 +349,24 @@ extension DataSettingsPatterns on DataSettings {
 @JsonSerializable()
 class _DataSettings extends DataSettings {
   _DataSettings(
-      {@Category(name: "Data Saver")
-      @Setting(hasDescription: true)
-      this.mobileDataSaver = false,
-      @Setting(hasDescription: true) this.wifiDataSaver = false,
-      @Category(name: "Videos")
+      {@Category(name: "Videos")
       @Setting(widget: ImageLoadingSelect)
       this.autoplay = ImageLoading.always,
-      @Setting(widget: ResolutionSelect) this.videoQuality = Resolution.source,
+      @Setting(widget: ResolutionSelect)
+      this.videoQualityWifi = Resolution.source,
+      @Setting(widget: ResolutionSelect)
+      this.videoQualityCellular = Resolution.source,
       @Category(name: "Images")
       @Setting(widget: ImageLoadingSelect)
       this.loadImages = ImageLoading.always,
       @Setting(widget: ResolutionSelect)
-      this.preferredQuality = Resolution.source})
+      this.imageQualityWifi = Resolution.source,
+      @Setting(widget: ResolutionSelect)
+      this.imageQualityCellular = Resolution.source})
       : super._();
   factory _DataSettings.fromJson(Map<String, dynamic> json) =>
       _$DataSettingsFromJson(json);
 
-  @override
-  @JsonKey()
-  @Category(name: "Data Saver")
-  @Setting(hasDescription: true)
-  final bool mobileDataSaver;
-  @override
-  @JsonKey()
-  @Setting(hasDescription: true)
-  final bool wifiDataSaver;
   @override
   @JsonKey()
   @Category(name: "Videos")
@@ -392,7 +375,11 @@ class _DataSettings extends DataSettings {
   @override
   @JsonKey()
   @Setting(widget: ResolutionSelect)
-  final Resolution videoQuality;
+  final Resolution videoQualityWifi;
+  @override
+  @JsonKey()
+  @Setting(widget: ResolutionSelect)
+  final Resolution videoQualityCellular;
   @override
   @JsonKey()
   @Category(name: "Images")
@@ -401,7 +388,11 @@ class _DataSettings extends DataSettings {
   @override
   @JsonKey()
   @Setting(widget: ResolutionSelect)
-  final Resolution preferredQuality;
+  final Resolution imageQualityWifi;
+  @override
+  @JsonKey()
+  @Setting(widget: ResolutionSelect)
+  final Resolution imageQualityCellular;
 
   /// Create a copy of DataSettings
   /// with the given fields replaced by the non-null parameter values.
@@ -423,28 +414,28 @@ class _DataSettings extends DataSettings {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _DataSettings &&
-            (identical(other.mobileDataSaver, mobileDataSaver) ||
-                other.mobileDataSaver == mobileDataSaver) &&
-            (identical(other.wifiDataSaver, wifiDataSaver) ||
-                other.wifiDataSaver == wifiDataSaver) &&
             (identical(other.autoplay, autoplay) ||
                 other.autoplay == autoplay) &&
-            (identical(other.videoQuality, videoQuality) ||
-                other.videoQuality == videoQuality) &&
+            (identical(other.videoQualityWifi, videoQualityWifi) ||
+                other.videoQualityWifi == videoQualityWifi) &&
+            (identical(other.videoQualityCellular, videoQualityCellular) ||
+                other.videoQualityCellular == videoQualityCellular) &&
             (identical(other.loadImages, loadImages) ||
                 other.loadImages == loadImages) &&
-            (identical(other.preferredQuality, preferredQuality) ||
-                other.preferredQuality == preferredQuality));
+            (identical(other.imageQualityWifi, imageQualityWifi) ||
+                other.imageQualityWifi == imageQualityWifi) &&
+            (identical(other.imageQualityCellular, imageQualityCellular) ||
+                other.imageQualityCellular == imageQualityCellular));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, mobileDataSaver, wifiDataSaver,
-      autoplay, videoQuality, loadImages, preferredQuality);
+  int get hashCode => Object.hash(runtimeType, autoplay, videoQualityWifi,
+      videoQualityCellular, loadImages, imageQualityWifi, imageQualityCellular);
 
   @override
   String toString() {
-    return 'DataSettings(mobileDataSaver: $mobileDataSaver, wifiDataSaver: $wifiDataSaver, autoplay: $autoplay, videoQuality: $videoQuality, loadImages: $loadImages, preferredQuality: $preferredQuality)';
+    return 'DataSettings(autoplay: $autoplay, videoQualityWifi: $videoQualityWifi, videoQualityCellular: $videoQualityCellular, loadImages: $loadImages, imageQualityWifi: $imageQualityWifi, imageQualityCellular: $imageQualityCellular)';
   }
 }
 
@@ -457,18 +448,16 @@ abstract mixin class _$DataSettingsCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@Category(name: "Data Saver")
-      @Setting(hasDescription: true)
-      bool mobileDataSaver,
-      @Setting(hasDescription: true) bool wifiDataSaver,
-      @Category(name: "Videos")
+      {@Category(name: "Videos")
       @Setting(widget: ImageLoadingSelect)
       ImageLoading autoplay,
-      @Setting(widget: ResolutionSelect) Resolution videoQuality,
+      @Setting(widget: ResolutionSelect) Resolution videoQualityWifi,
+      @Setting(widget: ResolutionSelect) Resolution videoQualityCellular,
       @Category(name: "Images")
       @Setting(widget: ImageLoadingSelect)
       ImageLoading loadImages,
-      @Setting(widget: ResolutionSelect) Resolution preferredQuality});
+      @Setting(widget: ResolutionSelect) Resolution imageQualityWifi,
+      @Setting(widget: ResolutionSelect) Resolution imageQualityCellular});
 }
 
 /// @nodoc
@@ -484,37 +473,37 @@ class __$DataSettingsCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? mobileDataSaver = null,
-    Object? wifiDataSaver = null,
     Object? autoplay = null,
-    Object? videoQuality = null,
+    Object? videoQualityWifi = null,
+    Object? videoQualityCellular = null,
     Object? loadImages = null,
-    Object? preferredQuality = null,
+    Object? imageQualityWifi = null,
+    Object? imageQualityCellular = null,
   }) {
     return _then(_DataSettings(
-      mobileDataSaver: null == mobileDataSaver
-          ? _self.mobileDataSaver
-          : mobileDataSaver // ignore: cast_nullable_to_non_nullable
-              as bool,
-      wifiDataSaver: null == wifiDataSaver
-          ? _self.wifiDataSaver
-          : wifiDataSaver // ignore: cast_nullable_to_non_nullable
-              as bool,
       autoplay: null == autoplay
           ? _self.autoplay
           : autoplay // ignore: cast_nullable_to_non_nullable
               as ImageLoading,
-      videoQuality: null == videoQuality
-          ? _self.videoQuality
-          : videoQuality // ignore: cast_nullable_to_non_nullable
+      videoQualityWifi: null == videoQualityWifi
+          ? _self.videoQualityWifi
+          : videoQualityWifi // ignore: cast_nullable_to_non_nullable
+              as Resolution,
+      videoQualityCellular: null == videoQualityCellular
+          ? _self.videoQualityCellular
+          : videoQualityCellular // ignore: cast_nullable_to_non_nullable
               as Resolution,
       loadImages: null == loadImages
           ? _self.loadImages
           : loadImages // ignore: cast_nullable_to_non_nullable
               as ImageLoading,
-      preferredQuality: null == preferredQuality
-          ? _self.preferredQuality
-          : preferredQuality // ignore: cast_nullable_to_non_nullable
+      imageQualityWifi: null == imageQualityWifi
+          ? _self.imageQualityWifi
+          : imageQualityWifi // ignore: cast_nullable_to_non_nullable
+              as Resolution,
+      imageQualityCellular: null == imageQualityCellular
+          ? _self.imageQualityCellular
+          : imageQualityCellular // ignore: cast_nullable_to_non_nullable
               as Resolution,
     ));
   }

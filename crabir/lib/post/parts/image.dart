@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/media/media.dart';
+import 'package:crabir/network_status.dart';
 import 'package:crabir/post/parts/video.dart';
 import 'package:crabir/routes/routes.dart';
-import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
@@ -44,8 +44,7 @@ class _ImageContentState extends State<ImageContent> {
         ),
       );
     } else {
-      final resolution =
-          context.read<DataSettingsCubit>().state.preferredQuality;
+      final resolution = NetworkStatus.imageQuality(context);
 
       if (widget.post.preview!.images[0].variants.mp4 != null) {
         return VideoContent(

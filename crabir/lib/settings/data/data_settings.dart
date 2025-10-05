@@ -17,25 +17,26 @@ part 'data_settings.g.dart';
 abstract class DataSettings with _$DataSettings {
   DataSettings._();
   factory DataSettings({
-    @Category(name: "Data Saver")
-    @Setting(hasDescription: true)
-    @Default(false)
-    bool mobileDataSaver,
-    @Setting(hasDescription: true) @Default(false) bool wifiDataSaver,
     @Category(name: "Videos")
     @Setting(widget: ImageLoadingSelect)
     @Default(ImageLoading.always)
     ImageLoading autoplay,
     @Setting(widget: ResolutionSelect)
     @Default(Resolution.source)
-    Resolution videoQuality,
+    Resolution videoQualityWifi,
+    @Setting(widget: ResolutionSelect)
+    @Default(Resolution.source)
+    Resolution videoQualityCellular,
     @Category(name: "Images")
     @Setting(widget: ImageLoadingSelect)
     @Default(ImageLoading.always)
     ImageLoading loadImages,
     @Setting(widget: ResolutionSelect)
     @Default(Resolution.source)
-    Resolution preferredQuality,
+    Resolution imageQualityWifi,
+    @Setting(widget: ResolutionSelect)
+    @Default(Resolution.source)
+    Resolution imageQualityCellular,
   }) = _DataSettings;
   factory DataSettings.fromJson(Map<String, dynamic> json) =>
       _$DataSettingsFromJson(json);

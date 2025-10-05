@@ -26,23 +26,23 @@ class DataSettingsCubit extends HydratedCubit<DataSettings> {
 
   @override
   Map<String, dynamic>? toJson(DataSettings state) => state.toJson();
-  void updateMobileDataSaver(bool value) =>
-      emit(state.copyWith(mobileDataSaver: value));
-
-  void updateWifiDataSaver(bool value) =>
-      emit(state.copyWith(wifiDataSaver: value));
-
   void updateAutoplay(ImageLoading value) =>
       emit(state.copyWith(autoplay: value));
 
-  void updateVideoQuality(Resolution value) =>
-      emit(state.copyWith(videoQuality: value));
+  void updateVideoQualityWifi(Resolution value) =>
+      emit(state.copyWith(videoQualityWifi: value));
+
+  void updateVideoQualityCellular(Resolution value) =>
+      emit(state.copyWith(videoQualityCellular: value));
 
   void updateLoadImages(ImageLoading value) =>
       emit(state.copyWith(loadImages: value));
 
-  void updatePreferredQuality(Resolution value) =>
-      emit(state.copyWith(preferredQuality: value));
+  void updateImageQualityWifi(Resolution value) =>
+      emit(state.copyWith(imageQualityWifi: value));
+
+  void updateImageQualityCellular(Resolution value) =>
+      emit(state.copyWith(imageQualityCellular: value));
 }
 
 // SettingsPage for DataSettings
@@ -58,24 +58,6 @@ class DataSettingsView extends StatelessWidget {
         body: ListView(
       children: [
         Divider(),
-        Text("Data Saver"),
-        CheckboxListTile(
-          title: Text(locales.data_mobileDataSaver),
-          secondary: Icon(null),
-          subtitle: Text(locales.data_mobileDataSaverDescription),
-          value: settings.mobileDataSaver,
-          onChanged: (val) =>
-              context.read<DataSettingsCubit>().updateMobileDataSaver(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.data_wifiDataSaver),
-          secondary: Icon(null),
-          subtitle: Text(locales.data_wifiDataSaverDescription),
-          value: settings.wifiDataSaver,
-          onChanged: (val) =>
-              context.read<DataSettingsCubit>().updateWifiDataSaver(val!),
-        ),
-        Divider(),
         Text("Videos"),
         ImageLoadingSelect(
           title: Text(locales.data_autoplay),
@@ -86,12 +68,20 @@ class DataSettingsView extends StatelessWidget {
               context.read<DataSettingsCubit>().updateAutoplay(val),
         ),
         ResolutionSelect(
-          title: Text(locales.data_videoQuality),
+          title: Text(locales.data_videoQualityWifi),
           leading: Icon(null),
           subtitle: null,
-          value: settings.videoQuality,
+          value: settings.videoQualityWifi,
           onChanged: (val) =>
-              context.read<DataSettingsCubit>().updateVideoQuality(val),
+              context.read<DataSettingsCubit>().updateVideoQualityWifi(val),
+        ),
+        ResolutionSelect(
+          title: Text(locales.data_videoQualityCellular),
+          leading: Icon(null),
+          subtitle: null,
+          value: settings.videoQualityCellular,
+          onChanged: (val) =>
+              context.read<DataSettingsCubit>().updateVideoQualityCellular(val),
         ),
         Divider(),
         Text("Images"),
@@ -104,12 +94,20 @@ class DataSettingsView extends StatelessWidget {
               context.read<DataSettingsCubit>().updateLoadImages(val),
         ),
         ResolutionSelect(
-          title: Text(locales.data_preferredQuality),
+          title: Text(locales.data_imageQualityWifi),
           leading: Icon(null),
           subtitle: null,
-          value: settings.preferredQuality,
+          value: settings.imageQualityWifi,
           onChanged: (val) =>
-              context.read<DataSettingsCubit>().updatePreferredQuality(val),
+              context.read<DataSettingsCubit>().updateImageQualityWifi(val),
+        ),
+        ResolutionSelect(
+          title: Text(locales.data_imageQualityCellular),
+          leading: Icon(null),
+          subtitle: null,
+          value: settings.imageQualityCellular,
+          onChanged: (val) =>
+              context.read<DataSettingsCubit>().updateImageQualityCellular(val),
         ),
       ],
     ));

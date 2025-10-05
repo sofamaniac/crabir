@@ -1,12 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/media/media.dart';
+import 'package:crabir/network_status.dart';
 import 'package:crabir/routes/routes.dart';
-import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class YoutubeContent extends StatelessWidget {
@@ -57,12 +56,11 @@ class _VideoContentState extends State<VideoContent> {
   Widget build(BuildContext context) {
     final media = widget.post.secureMedia;
     final preview = widget.post.preview?.images[0];
-    final settings = context.read<DataSettingsCubit>().state;
     final obfuscate =
         widget.post.spoiler || (FiltersSettings.of(context).blurNSFW);
     if (obfuscate && !tapped) {
-      final placeholder =
-          preview!.withResolution(settings.preferredQuality, obfuscate);
+      final placeholder = preview!
+          .withResolution(NetworkStatus.videoQuality(context), obfuscate);
       return InkWell(
         child: ImageThumbnail(
           imageUrl: placeholder.url,

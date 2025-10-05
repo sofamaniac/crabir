@@ -446,22 +446,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get posts_showOpenInAppButton => 'Open in app';
 
   @override
-  String get data_wifiDataSaver => 'Wifi data saver';
-
-  @override
-  String get data_wifiDataSaverDescription => 'Load lower-size media';
-
-  @override
-  String get data_mobileDataSaver => 'Mobile data saver';
-
-  @override
-  String get data_mobileDataSaverDescription => 'Load lower-size media';
-
-  @override
   String get data_autoplay => 'Autoplay videos';
 
   @override
-  String get data_videoQuality => 'Video quality';
+  String get data_videoQualityWifi =>
+      'Preferred video quality when connected to Wifi';
+
+  @override
+  String get data_videoQualityCellular =>
+      'Preferred video quality when connected to cellular';
 
   @override
   String get data_minimumQuality => 'Minimum quality';
@@ -473,7 +466,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get data_loadImages => 'Load images';
 
   @override
-  String get data_preferredQuality => 'Image Quality';
+  String get data_imageQualityWifi =>
+      'Preferred image quality when connected to Wifi';
+
+  @override
+  String get data_imageQualityCellular =>
+      'Preferred image quality when connected to cellular';
 
   @override
   String get filters_manageHiddenCommunities => 'Communities';

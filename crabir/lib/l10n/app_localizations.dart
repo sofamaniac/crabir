@@ -832,41 +832,23 @@ abstract class AppLocalizations {
   /// **'Open in app'**
   String get posts_showOpenInAppButton;
 
-  /// No description provided for @data_wifiDataSaver.
-  ///
-  /// In en, this message translates to:
-  /// **'Wifi data saver'**
-  String get data_wifiDataSaver;
-
-  /// No description provided for @data_wifiDataSaverDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Load lower-size media'**
-  String get data_wifiDataSaverDescription;
-
-  /// No description provided for @data_mobileDataSaver.
-  ///
-  /// In en, this message translates to:
-  /// **'Mobile data saver'**
-  String get data_mobileDataSaver;
-
-  /// No description provided for @data_mobileDataSaverDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Load lower-size media'**
-  String get data_mobileDataSaverDescription;
-
   /// No description provided for @data_autoplay.
   ///
   /// In en, this message translates to:
   /// **'Autoplay videos'**
   String get data_autoplay;
 
-  /// No description provided for @data_videoQuality.
+  /// No description provided for @data_videoQualityWifi.
   ///
   /// In en, this message translates to:
-  /// **'Video quality'**
-  String get data_videoQuality;
+  /// **'Preferred video quality when connected to Wifi'**
+  String get data_videoQualityWifi;
+
+  /// No description provided for @data_videoQualityCellular.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred video quality when connected to cellular'**
+  String get data_videoQualityCellular;
 
   /// No description provided for @data_minimumQuality.
   ///
@@ -886,11 +868,17 @@ abstract class AppLocalizations {
   /// **'Load images'**
   String get data_loadImages;
 
-  /// No description provided for @data_preferredQuality.
+  /// No description provided for @data_imageQualityWifi.
   ///
   /// In en, this message translates to:
-  /// **'Image Quality'**
-  String get data_preferredQuality;
+  /// **'Preferred image quality when connected to Wifi'**
+  String get data_imageQualityWifi;
+
+  /// No description provided for @data_imageQualityCellular.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred image quality when connected to cellular'**
+  String get data_imageQualityCellular;
 
   /// No description provided for @filters_manageHiddenCommunities.
   ///

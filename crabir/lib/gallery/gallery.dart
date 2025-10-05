@@ -1,14 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/media/media.dart';
+import 'package:crabir/network_status.dart';
 import 'package:crabir/routes/routes.dart';
-import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
@@ -232,7 +231,6 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
       onPageChanged: _onPageChange,
       itemCount: widget.gallery.length,
       builder: (context, index) {
-        final settings = context.watch<DataSettingsCubit>().state;
         final image = widget.gallery.get_(index: index);
         if (image == null) {
           return PhotoViewGalleryPageOptions.customChild(
@@ -241,7 +239,7 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
         } else {
           return toWidget(
             image,
-            settings.preferredQuality,
+            NetworkStatus.imageQuality(context),
             widget.obfuscate,
             index,
           );
