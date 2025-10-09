@@ -3,6 +3,7 @@ import 'package:crabir/feed/multi.dart';
 import 'package:crabir/gallery/gallery.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/main.dart';
+import 'package:crabir/markdown_editor/editor.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/routes/fixed_swipe_page_route.dart';
 import 'package:crabir/search_subreddits/widgets/search.dart';
@@ -15,7 +16,6 @@ import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme_editor.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/subscriptions_tab.dart';
@@ -114,11 +114,9 @@ final GoRouter appRouter = GoRouter(
               name: 'feed',
               builder: (context, state) {
                 final subreddit = state.pathParameters['subreddit']!;
-                //final extra = state.extra as Feed?; // optional complex object
-                final extra = null;
                 return FeedView(
                   key: ValueKey(subreddit),
-                  feed: extra ?? Feed.subreddit(subreddit),
+                  feed: Feed.subreddit(subreddit),
                 );
               },
               routes: [
@@ -206,11 +204,7 @@ final GoRouter appRouter = GoRouter(
       name: FullscreenImageViewBuilder.name,
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
-        return FullscreenImageView(
-          imageUrl: extra["imageUrl"] as String,
-          title: extra["title"] as String?,
-          post: extra["post"] as Post?,
-        );
+        return FullscreenImageViewBuilder.fromExtra(extra);
       },
     ),
     GoRoute(
@@ -218,13 +212,7 @@ final GoRouter appRouter = GoRouter(
       name: FullscreenVideoViewBuilder.name,
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
-        return FullscreenVideoView(
-          videoUrl: extra["videoUrl"] as String,
-          width: extra["width"] as int,
-          height: extra["height"] as int,
-          title: extra["title"] as String?,
-          post: extra["post"] as Post?,
-        );
+        return FullscreenVideoViewBuilder.fromExtra(extra);
       },
     ),
     GoRoute(
@@ -232,11 +220,17 @@ final GoRouter appRouter = GoRouter(
       name: FullScreenGalleryViewBuilder.name,
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
-        return FullScreenGalleryView(
-          initialPage: extra["initialPage"] as int,
-          gallery: extra['gallery'] as Gallery,
-          post: extra['post'] as Post?,
-        );
+        return FullScreenGalleryViewBuilder.fromExtra(extra);
+      },
+    ),
+
+    // Mardown Editor
+    GoRoute(
+      path: "/comment-editor",
+      name: CommentEditorBuilder.name,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return CommentEditorBuilder.fromExtra(extra);
       },
     ),
 

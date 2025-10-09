@@ -4,6 +4,7 @@ import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/html_view.dart';
+import 'package:crabir/markdown_editor/editor.dart';
 import 'package:crabir/separated_row.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
@@ -220,7 +221,10 @@ class _CommentViewState extends State<CommentView> {
         IconButton(
           color: theme.secondaryText,
           onPressed: () {
-            // TODO: reply to comment
+            CommentEditor.reply(
+              context,
+              widget.comment,
+            ).pushNamed(context);
             if (settings.hideButtonAfterAction) {
               OpenedComment.current.value = null;
             }

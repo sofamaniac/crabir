@@ -24,4 +24,8 @@ extension LateralMenuSettingsViewBuilder on LateralMenuSettingsView {
         pathParameters: pathParams,
         extra: extra,
       );
+
+  static LateralMenuSettingsView fromExtra(Map<String, dynamic> extra) {
+    return LateralMenuSettingsView();
+  }
 }

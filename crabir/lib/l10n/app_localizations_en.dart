@@ -90,6 +90,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gotoDropdownLabel => 'Go to ...';
 
   @override
+  String get replyTitle => 'Reply';
+
+  @override
+  String get deletedUser => '[deleted]';
+
+  @override
   String get resolutionSource => 'Source';
 
   @override

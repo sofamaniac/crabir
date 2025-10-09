@@ -19,7 +19,9 @@ use super::{Fullname, Thing, comment::CommentSort, gallery::Gallery, subreddit::
 with_prefix!(prefix_link_flair "link_flair_");
 with_prefix!(prefix_flair "flair_");
 
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Kind {
+    #[default]
     Selftext,
     Meta,
     Image,
@@ -457,3 +459,16 @@ pub struct Oembed {
     #[serde(flatten, with = "ThumbnailURL")]
     pub thumbnail: ThumbnailOption,
 }
+
+// #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+// #[frb(non_opaque)]
+// pub struct PostSubmit {
+//     title: String,
+//     text: String,
+//     subreddit: String,
+//     nsfw: bool,
+//     spoiler: bool,
+//     kind: Kind,
+//     flair_id: String,
+//     flair_text: String,
+// }

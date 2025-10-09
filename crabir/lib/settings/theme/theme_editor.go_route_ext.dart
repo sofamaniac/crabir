@@ -24,4 +24,8 @@ extension CrabirThemeEditorBuilder on CrabirThemeEditor {
         pathParameters: pathParams,
         extra: extra,
       );
+
+  static CrabirThemeEditor fromExtra(Map<String, dynamic> extra) {
+    return CrabirThemeEditor();
+  }
 }

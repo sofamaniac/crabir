@@ -24,4 +24,9 @@ extension UserViewBuilder on UserView {
         pathParameters: pathParams,
         extra: extra,
       );
+
+  static UserView fromExtra(Map<String, dynamic> extra) {
+    return UserView(
+        username: extra['username'] as String, tab: extra['tab'] as String);
+  }
 }

@@ -25,6 +25,13 @@ extension FullscreenImageViewBuilder on FullscreenImageView {
         pathParameters: pathParams,
         extra: extra,
       );
+
+  static FullscreenImageView fromExtra(Map<String, dynamic> extra) {
+    return FullscreenImageView(
+        imageUrl: extra['imageUrl'] as String,
+        title: extra['title'] as String?,
+        post: extra['post'] as Post?);
+  }
 }
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
@@ -50,4 +57,13 @@ extension FullscreenVideoViewBuilder on FullscreenVideoView {
         pathParameters: pathParams,
         extra: extra,
       );
+
+  static FullscreenVideoView fromExtra(Map<String, dynamic> extra) {
+    return FullscreenVideoView(
+        videoUrl: extra['videoUrl'] as String,
+        title: extra['title'] as String?,
+        width: extra['width'] as int,
+        height: extra['height'] as int,
+        post: extra['post'] as Post?);
+  }
 }

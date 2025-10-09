@@ -50,7 +50,7 @@ class GoRouteDataGenerator extends GeneratorForAnnotation<CrabirRoute> {
         ? '{}'
         : '{${extraFields.map((f) => "'${f.name}': ${f.name}").join(', ')}}';
 
-    final buffer = StringBuffer()
+    StringBuffer buffer = StringBuffer()
       ..writeln('// GENERATED CODE - DO NOT MODIFY BY HAND')
       //..writeln('part of "${buildStep.inputId.uri.pathSegments.last}";')
       ..writeln('extension ${className}Builder on $className {')
@@ -68,8 +68,20 @@ class GoRouteDataGenerator extends GeneratorForAnnotation<CrabirRoute> {
       ..writeln('    name,')
       ..writeln('    pathParameters: pathParams,')
       ..writeln('    extra: extra,')
-      ..writeln('  );')
-      ..writeln('}');
+      ..writeln('  );');
+    if (pathFields.entries.isEmpty) {
+      final fromExtraMap = extraFields.isEmpty
+          ? ''
+          : extraFields
+              .map((f) => "${f.name}: extra['${f.name}'] as ${f.type}")
+              .join(', ');
+      buffer = buffer
+        ..writeln()
+        ..writeln(' static $className fromExtra(Map<String, dynamic> extra) {')
+        ..writeln('   return $className($fromExtraMap);')
+        ..writeln(' }');
+    }
+    buffer.writeln('}');
     return buffer.toString();
   }
 }

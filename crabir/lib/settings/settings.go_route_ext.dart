@@ -24,4 +24,8 @@ extension SettingsViewBuilder on SettingsView {
         pathParameters: pathParams,
         extra: extra,
       );
+
+  static SettingsView fromExtra(Map<String, dynamic> extra) {
+    return SettingsView();
+  }
 }

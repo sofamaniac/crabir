@@ -256,6 +256,18 @@ abstract class AppLocalizations {
   /// **'Go to ...'**
   String get gotoDropdownLabel;
 
+  /// No description provided for @replyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply'**
+  String get replyTitle;
+
+  /// No description provided for @deletedUser.
+  ///
+  /// In en, this message translates to:
+  /// **'[deleted]'**
+  String get deletedUser;
+
   /// No description provided for @resolutionSource.
   ///
   /// In en, this message translates to:

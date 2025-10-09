@@ -24,4 +24,8 @@ extension CommentsSettingsViewBuilder on CommentsSettingsView {
         pathParameters: pathParams,
         extra: extra,
       );
+
+  static CommentsSettingsView fromExtra(Map<String, dynamic> extra) {
+    return CommentsSettingsView();
+  }
 }

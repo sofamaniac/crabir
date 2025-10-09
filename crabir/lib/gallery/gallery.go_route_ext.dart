@@ -25,4 +25,11 @@ extension FullScreenGalleryViewBuilder on FullScreenGalleryView {
         pathParameters: pathParams,
         extra: extra,
       );
+
+  static FullScreenGalleryView fromExtra(Map<String, dynamic> extra) {
+    return FullScreenGalleryView(
+        gallery: extra['gallery'] as Gallery,
+        initialPage: extra['initialPage'] as int,
+        post: extra['post'] as Post?);
+  }
 }

@@ -24,4 +24,8 @@ extension SearchSubredditsViewBuilder on SearchSubredditsView {
         pathParameters: pathParams,
         extra: extra,
       );
+
+  static SearchSubredditsView fromExtra(Map<String, dynamic> extra) {
+    return SearchSubredditsView();
+  }
 }

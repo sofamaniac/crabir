@@ -803,4 +803,16 @@ impl Client {
         self.execute(request).await?;
         Ok(())
     }
+
+    /// Submit a comment
+    pub async fn submit_comment(&self, parent: &Fullname, body: &str) -> Result<()> {
+        let url = self.join_url("api/comment");
+        let request = self.post(url).query(&[
+            ("api_type", "json"),
+            ("text", body),
+            ("thing_id", parent.as_ref()),
+        ]);
+        self.execute(request).await?;
+        Ok(())
+    }
 }

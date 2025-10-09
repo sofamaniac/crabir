@@ -24,4 +24,8 @@ extension FiltersSettingsViewBuilder on FiltersSettingsView {
         pathParameters: pathParams,
         extra: extra,
       );
+
+  static FiltersSettingsView fromExtra(Map<String, dynamic> extra) {
+    return FiltersSettingsView();
+  }
 }

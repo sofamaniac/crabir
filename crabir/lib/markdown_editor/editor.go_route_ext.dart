@@ -1,17 +1,17 @@
 // dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'posts_settings.dart';
+part of 'editor.dart';
 
 // **************************************************************************
 // GoRouteDataGenerator
 // **************************************************************************
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
-extension ManageSortViewBuilder on ManageSortView {
-  static const String name = 'ManageSortView';
+extension MarkdownEditorBuilder on MarkdownEditor {
+  static const String name = 'MarkdownEditor';
   Map<String, String> get pathParams => {};
-  Map<String, dynamic> get extra => {};
+  Map<String, dynamic> get extra => {'controller': controller};
 
   void goNamed(BuildContext context) => context.goNamed(
         name,
@@ -25,16 +25,22 @@ extension ManageSortViewBuilder on ManageSortView {
         extra: extra,
       );
 
-  static ManageSortView fromExtra(Map<String, dynamic> extra) {
-    return ManageSortView();
+  static MarkdownEditor fromExtra(Map<String, dynamic> extra) {
+    return MarkdownEditor(
+        controller: extra['controller'] as TextEditingController?);
   }
 }
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
-extension PostsSettingsViewBuilder on PostsSettingsView {
-  static const String name = 'PostsSettingsView';
+extension CommentEditorBuilder on CommentEditor {
+  static const String name = 'CommentEditor';
   Map<String, String> get pathParams => {};
-  Map<String, dynamic> get extra => {};
+  Map<String, dynamic> get extra => {
+        'title': title,
+        'author': author,
+        'text': text,
+        'parentName': parentName
+      };
 
   void goNamed(BuildContext context) => context.goNamed(
         name,
@@ -48,7 +54,11 @@ extension PostsSettingsViewBuilder on PostsSettingsView {
         extra: extra,
       );
 
-  static PostsSettingsView fromExtra(Map<String, dynamic> extra) {
-    return PostsSettingsView();
+  static CommentEditor fromExtra(Map<String, dynamic> extra) {
+    return CommentEditor(
+        title: extra['title'] as String,
+        author: extra['author'] as String,
+        text: extra['text'] as String,
+        parentName: extra['parentName'] as Fullname);
   }
 }

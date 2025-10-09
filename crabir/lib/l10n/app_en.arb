@@ -31,6 +31,9 @@
   "logoutButtonLabel": "Logout",
   "gotoDropdownLabel": "Go to ...",
 
+  "replyTitle": "Reply",
+  "deletedUser": "[deleted]",
+
   "resolutionSource": "Source",
   "resolutionHigh": "High",
   "resolutionMedium": "Medium",

@@ -24,4 +24,8 @@ extension DataSettingsViewBuilder on DataSettingsView {
         pathParameters: pathParams,
         extra: extra,
       );
+
+  static DataSettingsView fromExtra(Map<String, dynamic> extra) {
+    return DataSettingsView();
+  }
 }

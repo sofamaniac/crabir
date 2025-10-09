@@ -25,4 +25,11 @@ extension FeedViewBuilder on FeedView {
         pathParameters: pathParams,
         extra: extra,
       );
+
+  static FeedView fromExtra(Map<String, dynamic> extra) {
+    return FeedView(
+        feed: extra['feed'] as Feed?,
+        subreddit: extra['subreddit'] as String?,
+        initialSort: extra['initialSort'] as FeedSort?);
+  }
 }
