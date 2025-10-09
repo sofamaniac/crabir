@@ -42,12 +42,14 @@ class _UserViewState extends State<UserView>
   late final TabController _controller;
   late List<UserTabs> tabs;
   double opacity = 0;
+  late final List<Widget> _tabViews;
 
   @override
   void initState() {
     super.initState();
     _userFuture = RedditAPI.client().userAbout(username: widget.username);
     tabs = _tabs(widget.username);
+    _tabViews = tabs.map((t) => t.content(widget.username)).toList();
     int index = switch (widget.tab) {
       "overview" => 0,
       "about" => 1,
@@ -79,7 +81,7 @@ class _UserViewState extends State<UserView>
 
   @override
   Widget build(BuildContext context) {
-    final _ = context.watch<AccountsBloc>().state;
+    //final _ = context.watch<AccountsBloc>().state;
     return FutureBuilder(
       future: _userFuture,
       builder: (context, snapshot) {
@@ -90,8 +92,9 @@ class _UserViewState extends State<UserView>
         } else if (snapshot.hasData) {
           final infos = snapshot.data!;
           return SafeArea(
-            child: ExtendedNestedScrollView(
-              onlyOneScrollInBody: true,
+            key: ValueKey("USER VIEW"),
+            child: NestedScrollView(
+              //onlyOneScrollInBody: true,
               floatHeaderSlivers: true,
               headerSliverBuilder: (
                 BuildContext context,
@@ -105,13 +108,7 @@ class _UserViewState extends State<UserView>
               ],
               body: TabBarView(
                 controller: _controller,
-                children: tabs
-                    .map(
-                      (t) => t.content(
-                        widget.username,
-                      ),
-                    )
-                    .toList(),
+                children: _tabViews,
               ),
             ),
           );

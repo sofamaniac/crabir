@@ -66,7 +66,6 @@ class _ThingsScaffoldState extends State<ThingsScaffold>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final controller = PrimaryScrollController.of(context);
     return PagingListener(
       controller: _pagingController,
       builder: (context, state, fetchNextPage) {
@@ -79,8 +78,6 @@ class _ThingsScaffoldState extends State<ThingsScaffold>
             notifier: ValueNotifier([]),
             child: Scrollbar(
               child: CustomScrollView(
-                controller: controller,
-                primary: false,
                 slivers: [
                   // Optional subreddit info at the top
                   if (widget.subredditInfo != null)

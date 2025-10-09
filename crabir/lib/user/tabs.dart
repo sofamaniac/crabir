@@ -70,6 +70,7 @@ Widget _scaffold(
   bool showHidden = false,
 }) {
   return ThingsScaffold(
+    key: ValueKey(key),
     stream: stream,
     postView: postView,
     commentView: _commentView,

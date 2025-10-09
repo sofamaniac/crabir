@@ -42,17 +42,13 @@ class CommonFeedView extends StatefulWidget {
   State<CommonFeedView> createState() => _CommonFeedViewState();
 }
 
-class _CommonFeedViewState extends State<CommonFeedView>
-    with AutomaticKeepAliveClientMixin {
+class _CommonFeedViewState extends State<CommonFeedView> {
   FeedSort? sort;
 
   late final ScrollController _scrollController;
   late reddit_stream.PagingHandler _stream;
   String? currentUser;
   int _forceRebuild = 0;
-
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -144,8 +140,6 @@ class _CommonFeedViewState extends State<CommonFeedView>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     final account = context.watch<AccountsBloc>().state;
 
     if (sort == null) {
