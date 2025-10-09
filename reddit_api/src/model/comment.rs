@@ -173,6 +173,10 @@ impl PrivateVotable for Comment {
     fn set_saved(&mut self, saved: bool) {
         self.saved = saved;
     }
+
+    fn add_to_score(&mut self, delta: i32) {
+        self.score += delta;
+    }
 }
 impl Votable for Comment {}
 

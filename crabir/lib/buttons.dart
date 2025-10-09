@@ -253,11 +253,7 @@ class _LikeTextState extends State<LikeText>
       false => theme.downvoteContent,
       _ => theme.secondaryText,
     };
-    final scoreOffset = switch (widget.likes) {
-      true => 1,
-      false => -1,
-      _ => 0,
-    };
+
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 1.0, end: _scale),
       duration: const Duration(milliseconds: 200),
@@ -270,9 +266,7 @@ class _LikeTextState extends State<LikeText>
         );
       },
       child: Text(
-        widget.hidden
-            ? "?"
-            : NumberFormat.compact().format(widget.score + scoreOffset),
+        widget.hidden ? "?" : NumberFormat.compact().format(widget.score),
         style: widget.style.copyWith(
           color: color,
         ),

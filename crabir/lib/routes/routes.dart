@@ -139,8 +139,8 @@ final GoRouter appRouter = GoRouter(
 
                     if (settings.swipeToClose) {
                       final threshold = settings.distanceThreshold;
-                      return fixedSwipePage(
-                        child: pageChild,
+                      return FixedSwipePage(
+                        builder: (context) => pageChild,
                         dragThreshold: threshold / 100,
                       );
                     } else {

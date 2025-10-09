@@ -7,6 +7,7 @@ pub(crate) mod private {
         fn name(&self) -> &Fullname;
         fn set_likes(&mut self, likes: Option<bool>);
         fn set_saved(&mut self, saved: bool);
+        fn add_to_score(&mut self, delta: i32);
     }
 }
 
@@ -18,6 +19,12 @@ pub trait Votable: PrivateVotable {
     ) -> crate::result::Result<()> {
         client.vote(self.name(), direction).await?;
         self.set_likes(direction.into());
+        let delta = match direction {
+            VoteDirection::Up => 1,
+            VoteDirection::Down => -1,
+            VoteDirection::Neutral => 0,
+        };
+        self.add_to_score(delta);
         Ok(())
     }
 

@@ -1,62 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 
-CustomTransitionPage<T> fixedSwipePage<T>({
-  required Widget child,
-  double dragThreshold = 0.5,
-  Duration transitionDuration = const Duration(milliseconds: 300),
-}) {
-  final dragController = ValueNotifier<double>(0.0);
+class FixedSwipePage<T> extends Page<T> {
+  final WidgetBuilder builder;
 
-  return CustomTransitionPage<T>(
-    key: ValueKey(child.hashCode),
-    child: child,
-    transitionDuration: transitionDuration,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      final width = MediaQuery.of(context).size.width;
+  /// fraction of screen width to trigger pop
+  final double dragThreshold;
 
-      return GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onHorizontalDragUpdate: (details) {
-          dragController.value += details.delta.dx / width;
-        },
-        onHorizontalDragEnd: (details) {
-          final velocity = details.velocity.pixelsPerSecond.dx;
-          final progress = dragController.value;
-
-          if (progress > dragThreshold || velocity > 700) {
-            // Complete pop
-            dragController.value = 1.0;
-            Navigator.of(context).pop();
-          } else {
-            // Animate back to 0
-            dragController.value = 0.0;
-          }
-        },
-        child: AnimatedBuilder(
-          animation: Listenable.merge([animation, dragController]),
-          builder: (_, __) {
-            // Push animation + drag offset
-            final pushOffset = (1 - animation.value) * width;
-            final dragOffset = dragController.value * width;
-            return Transform.translate(
-              offset: Offset(pushOffset + dragOffset, 0),
-              child: child,
-            );
-          },
-        ),
-      );
-    },
-  );
+  const FixedSwipePage({
+    super.key,
+    super.name,
+    super.arguments,
+    super.restorationId,
+    super.canPop,
+    super.onPopInvoked,
+    required this.builder,
+    required this.dragThreshold,
+  });
+  @override
+  Route<T> createRoute(BuildContext context) {
+    return FixedSwipePageRoute(
+      builder: builder,
+      dragThreshold: dragThreshold,
+      settings: this,
+    );
+  }
 }
 
-class FixedSwipePageRoute<T> extends PageRoute<T> {
+class FixedSwipePageRoute<T> extends PageRoute<T> implements TickerProvider {
   FixedSwipePageRoute({
     required this.builder,
     this.dragThreshold = 0.5,
     super.fullscreenDialog,
     super.settings,
   });
+
+  @override
+  Ticker createTicker(TickerCallback onTick) =>
+      Ticker(onTick, debugLabel: 'FixedSwipePageRoute');
 
   final WidgetBuilder builder;
 
@@ -84,14 +66,21 @@ class FixedSwipePageRoute<T> extends PageRoute<T> {
     super.install();
     // _controller is provided by PageRoute internally; we just use it for vsync
     _pushController = AnimationController(
-      vsync: navigator!.overlay!,
+      vsync: this,
       duration: transitionDuration,
     )..forward(); // run the push animation
 
     _dragController = AnimationController(
-      vsync: navigator!.overlay!,
+      vsync: this,
       duration: transitionDuration,
     );
+  }
+
+  @override
+  void dispose() {
+    _pushController.dispose();
+    _dragController.dispose();
+    super.dispose();
   }
 
   @override
@@ -123,7 +112,7 @@ class FixedSwipePageRoute<T> extends PageRoute<T> {
                 duration: transitionDuration,
                 curve: Curves.easeOut,
               )
-              .whenComplete(() => navigator?.pop());
+              .whenComplete(() => GoRouter.of(context).pop());
         } else {
           // Cancel and animate back
           _dragController.animateBack(
