@@ -93,8 +93,8 @@ class _UserViewState extends State<UserView>
           final infos = snapshot.data!;
           return SafeArea(
             key: ValueKey("USER VIEW"),
-            child: NestedScrollView(
-              //onlyOneScrollInBody: true,
+            child: ExtendedNestedScrollView(
+              onlyOneScrollInBody: true,
               floatHeaderSlivers: true,
               headerSliverBuilder: (
                 BuildContext context,
