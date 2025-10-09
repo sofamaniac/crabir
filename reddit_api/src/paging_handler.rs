@@ -44,19 +44,24 @@ impl PagingHandler {
     }
 
     /// Returns true if there are still elements remaining.
-    pub async fn next(&mut self) -> Result<bool> {
+    pub async fn next(&mut self) -> Result<Vec<Thing>> {
         // Calling stream.next() after its completions is an error.
         if self.done {
-            return Ok(false);
+            return Ok(vec![]);
         }
         let mut stream = self.stream.lock().await;
         if let Some(next) = stream.next().await {
-            self.pages.push(next?);
-            Ok(true)
+            let page = next?;
+            self.pages.push(page.clone());
+            Ok(page)
         } else {
             self.done = true;
-            Ok(false)
+            Ok(vec![])
         }
+    }
+    #[frb(sync, getter)]
+    pub fn done(&self) -> bool {
+        self.done
     }
 
     #[frb(sync)]

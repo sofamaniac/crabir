@@ -1,7 +1,7 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Render HTML with some styling already done.
@@ -95,7 +95,12 @@ class StyledHtml extends StatelessWidget {
     return Html(
       style: style,
       data: htmlContent,
-      onLinkTap: onLinkTap,
+      onLinkTap: (url, attributes, __) => defaultLinkHandler(
+        context,
+        url,
+        attributes,
+        __,
+      ),
       shrinkWrap: true,
       extensions: [
         if (showImages) RedditImageExtension(),
@@ -114,13 +119,17 @@ class StyledHtml extends StatelessWidget {
 }
 
 Future<void> defaultLinkHandler(
-  StackRouter router,
+  BuildContext context,
   String? url,
   Map<String, String> attributes,
   __,
 ) async {
   Uri uri = Uri.parse(url!);
-  await launchUrl(uri);
+  if (url.startsWith("/")) {
+    context.push(url);
+  } else {
+    await launchUrl(uri);
+  }
 }
 
 /// Extension that turns reddit preview links into inline images

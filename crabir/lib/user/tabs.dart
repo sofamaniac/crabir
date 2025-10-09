@@ -9,11 +9,10 @@ enum UserTabs {
   upvoted,
   downvoted,
   hidden,
-  gilded,
   friends,
   blocked;
 
-  String name() {
+  String label() {
     return switch (this) {
       UserTabs.overview => "Overview",
       UserTabs.about => "About",
@@ -23,41 +22,23 @@ enum UserTabs {
       UserTabs.upvoted => "Upvoted",
       UserTabs.downvoted => "Downvoted",
       UserTabs.hidden => "Hidden",
-      UserTabs.gilded => "Gilded",
       UserTabs.friends => "Friends",
       UserTabs.blocked => "Blocked",
     };
   }
 
-  PageRouteInfo route(String username) {
+  Widget content(String username) {
     return switch (this) {
-      UserTabs.overview => UserOverviewRoute(username: username),
-      UserTabs.about => UserAboutRoute(username: username),
-      UserTabs.posts => UserPostsRoute(username: username),
-      UserTabs.comments => UserCommentsRoute(username: username),
-      UserTabs.saved => UserSavedRoute(username: username),
-      UserTabs.upvoted => UserUpvotedRoute(username: username),
-      UserTabs.downvoted => UserDownvotedRoute(username: username),
-      UserTabs.hidden => UserHiddenRoute(username: username),
-      UserTabs.gilded => UserGildedRoute(username: username),
-      UserTabs.friends => UserFriendsRoute(username: username),
-      UserTabs.blocked => UserBlockedRoute(username: username),
-    };
-  }
-
-  PageInfo page() {
-    return switch (this) {
-      UserTabs.overview => UserOverviewRoute.page,
-      UserTabs.about => UserAboutRoute.page,
-      UserTabs.posts => UserPostsRoute.page,
-      UserTabs.comments => UserCommentsRoute.page,
-      UserTabs.saved => UserSavedRoute.page,
-      UserTabs.upvoted => UserUpvotedRoute.page,
-      UserTabs.downvoted => UserDownvotedRoute.page,
-      UserTabs.hidden => UserHiddenRoute.page,
-      UserTabs.gilded => UserGildedRoute.page,
-      UserTabs.friends => UserFriendsRoute.page,
-      UserTabs.blocked => UserBlockedRoute.page,
+      UserTabs.overview => UserOverviewView(username: username),
+      UserTabs.about => UserAboutView(username: username),
+      UserTabs.posts => UserPostsView(username: username),
+      UserTabs.comments => UserCommentsView(username: username),
+      UserTabs.saved => UserSavedView(username: username),
+      UserTabs.upvoted => UserUpvotedView(username: username),
+      UserTabs.downvoted => UserDownvotedView(username: username),
+      UserTabs.hidden => UserHiddenView(username: username),
+      UserTabs.friends => UserFriendsView(username: username),
+      UserTabs.blocked => UserBlockedView(username: username),
     };
   }
 }
@@ -71,9 +52,8 @@ final allUserTabs = [
   UserTabs.upvoted,
   UserTabs.downvoted,
   UserTabs.hidden,
-  UserTabs.gilded,
-  UserTabs.friends,
-  UserTabs.blocked,
+  // UserTabs.friends,
+  // UserTabs.blocked,
 ];
 
 final publicUserTabs = [
@@ -81,49 +61,25 @@ final publicUserTabs = [
   UserTabs.about,
   UserTabs.posts,
   UserTabs.comments,
-  UserTabs.gilded,
 ];
-
-// Required, otherwise the stackRouterOfIndex in the main screen is null.
-@RoutePage(name: "ProfilePageRoute")
-class ProfilePageWrapper extends AutoRouter {
-  const ProfilePageWrapper({super.key});
-}
-
-final currentUserRoute = AutoRoute(
-  page: UserRoute.page,
-  children: allUserTabs
-      .map(
-        (tab) => AutoRoute(
-          page: tab.page(),
-        ),
-      )
-      .toList(),
-);
 
 Widget _scaffold(
   BuildContext context,
-  reddit_stream.PagingHandler stream,
-  String key, {
+  reddit_stream.PagingHandler stream, {
+  String? key,
   bool showHidden = false,
 }) {
   return ThingsScaffold(
-    key: PageStorageKey(key),
     stream: stream,
-    postView: _postView,
+    postView: postView,
     commentView: _commentView,
     showHidden: showHidden,
   );
 }
 
-Widget _postView(BuildContext context, Post post) {
+Widget postView(BuildContext context, Post post) {
   return RedditPostCard(
     post: post,
-    onTap: () => context.router.navigate(
-      ThreadRoute(
-        post: post,
-      ),
-    ),
   );
 }
 
@@ -134,8 +90,8 @@ Widget _commentView(BuildContext context, Comment comment) {
   );
 }
 
-@RoutePage()
 class UserOverviewView extends StatelessWidget {
+  @PathParam()
   final String username;
   final UserStreamSort sort;
   const UserOverviewView({
@@ -149,14 +105,14 @@ class UserOverviewView extends StatelessWidget {
     return _scaffold(
       context,
       RedditAPI.client().userOverview(username: username, sort: sort),
-      "userOverview",
+      key: "userOverview",
     );
   }
 }
 
-@RoutePage()
 class UserAboutView extends StatelessWidget {
   final UserInfo? about;
+  @PathParam()
   final String username;
   const UserAboutView({
     super.key,
@@ -173,8 +129,8 @@ class UserAboutView extends StatelessWidget {
   }
 }
 
-@RoutePage()
 class UserPostsView extends StatelessWidget {
+  @PathParam()
   final String username;
   final UserStreamSort sort;
   const UserPostsView({
@@ -188,13 +144,12 @@ class UserPostsView extends StatelessWidget {
     return _scaffold(
       context,
       RedditAPI.client().userSubmitted(username: username, sort: sort),
-      "userPosts",
     );
   }
 }
 
-@RoutePage()
 class UserCommentsView extends StatelessWidget {
+  @PathParam()
   final String username;
   final UserStreamSort sort;
   const UserCommentsView({
@@ -208,13 +163,13 @@ class UserCommentsView extends StatelessWidget {
     return _scaffold(
       context,
       RedditAPI.client().userComments(username: username, sort: sort),
-      "userComments",
+      key: "userComments",
     );
   }
 }
 
-@RoutePage()
 class UserSavedView extends StatelessWidget {
+  @PathParam()
   final String username;
   const UserSavedView({
     super.key,
@@ -226,13 +181,13 @@ class UserSavedView extends StatelessWidget {
     return _scaffold(
       context,
       RedditAPI.client().userSaved(username: username),
-      "userSaved",
+      key: "userSaved",
     );
   }
 }
 
-@RoutePage()
 class UserUpvotedView extends StatelessWidget {
+  @PathParam()
   final String username;
   const UserUpvotedView({
     super.key,
@@ -244,13 +199,13 @@ class UserUpvotedView extends StatelessWidget {
     return _scaffold(
       context,
       RedditAPI.client().userUpvoted(username: username),
-      "userUps",
+      key: "userUps",
     );
   }
 }
 
-@RoutePage()
 class UserDownvotedView extends StatelessWidget {
+  @PathParam()
   final String username;
   const UserDownvotedView({
     super.key,
@@ -262,13 +217,13 @@ class UserDownvotedView extends StatelessWidget {
     return _scaffold(
       context,
       RedditAPI.client().userDownvoted(username: username),
-      "userDowns",
+      key: "userDowns",
     );
   }
 }
 
-@RoutePage()
 class UserHiddenView extends StatelessWidget {
+  @PathParam()
   final String username;
   final UserStreamSort sort;
   const UserHiddenView({
@@ -282,30 +237,14 @@ class UserHiddenView extends StatelessWidget {
     return _scaffold(
       context,
       RedditAPI.client().userHidden(username: username),
-      "userHidden",
+      key: "userHidden",
       showHidden: true,
     );
   }
 }
 
-@RoutePage()
-class UserGildedView extends StatelessWidget {
-  final String username;
-  final UserStreamSort sort;
-  const UserGildedView({
-    super.key,
-    required this.username,
-    this.sort = const UserStreamSort.new_(),
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Text("TODO");
-  }
-}
-
-@RoutePage()
 class UserFriendsView extends StatelessWidget {
+  @PathParam()
   final String username;
   final UserStreamSort sort;
   const UserFriendsView({
@@ -320,8 +259,8 @@ class UserFriendsView extends StatelessWidget {
   }
 }
 
-@RoutePage()
 class UserBlockedView extends StatelessWidget {
+  @PathParam()
   final String username;
   final UserStreamSort sort;
   const UserBlockedView({

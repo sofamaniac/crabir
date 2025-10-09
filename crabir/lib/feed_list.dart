@@ -1,15 +1,9 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:crabir/routes/routes.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart'
     as subreddit;
 import 'package:crabir/subreddit.dart';
 import 'package:flutter/material.dart';
-
-void navigateToSubscriptionsTab(BuildContext context, destination) {
-  context.tabsRouter.navigate(destination);
-}
+import 'package:go_router/go_router.dart';
 
 /// Widget to display a subreddit in a list
 class SubredditTile extends StatelessWidget {
@@ -26,12 +20,8 @@ class SubredditTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        final destination = FeedRoute(
-          feed: Feed.subreddit(sub.other.displayName),
-          initialSort: FeedSort.best(),
-        );
         Scaffold.of(context).closeDrawer();
-        navigateToSubscriptionsTab(context, destination);
+        context.go("/r/${sub.other.displayName}");
       },
       leading: SubredditIcon(icon: sub.icon, radius: 12),
       title: Text(
@@ -60,11 +50,8 @@ class MultiRedditTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        final destination = MultiRoute(
-          multi: multi,
-        );
-        Navigator.pop(context);
-        navigateToSubscriptionsTab(context, destination);
+        Scaffold.of(context).closeDrawer();
+        context.go(multi.path, extra: multi);
       },
       leading: CircleAvatar(
         radius: 12,

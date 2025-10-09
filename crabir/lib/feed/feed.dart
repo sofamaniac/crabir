@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/common.dart';
@@ -6,6 +5,7 @@ import 'package:crabir/feed/top_bar.dart';
 import 'package:crabir/html_view.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
+import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/rule.dart';
@@ -14,15 +14,20 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart'
 import 'package:crabir/subreddit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
+part 'feed.go_route_ext.dart';
+
+@CrabirRoute()
 class FeedView extends StatefulWidget {
   const FeedView({
     super.key,
-    required this.feed,
+    this.feed,
     this.initialSort,
-  });
-  final Feed feed;
+    this.subreddit,
+  }) : assert(feed != null || subreddit != null);
+  final Feed? feed;
+  final String? subreddit;
 
   /// Override the setting-defined preferred sort.
   final FeedSort? initialSort;
@@ -33,15 +38,21 @@ class FeedView extends StatefulWidget {
 
 class _FeedViewState extends State<FeedView> {
   Subreddit? subredditAbout;
+  late Feed feed;
 
   @override
   void initState() {
     super.initState();
+    if (widget.subreddit != null) {
+      feed = Feed.subreddit(widget.subreddit!);
+    } else {
+      feed = widget.feed!;
+    }
     _loadAbout();
   }
 
   Future<void> _loadAbout() async {
-    switch (widget.feed) {
+    switch (feed) {
       case Feed_Subreddit(field0: final subreddit):
         subredditAbout =
             await RedditAPI.client().subredditAbout(subreddit: subreddit);
@@ -62,7 +73,7 @@ class _FeedViewState extends State<FeedView> {
     };
     final FeedSort sort;
     if (settings.rememberSortByCommunity) {
-      sort = settings.rememberedSorts.containsFeed(widget.feed) ??
+      sort = settings.rememberedSorts.containsFeed(feed) ??
           widget.initialSort ??
           defaultSort;
     } else {
@@ -70,15 +81,15 @@ class _FeedViewState extends State<FeedView> {
     }
     return CommonFeedView(
       key: ValueKey(widget.feed),
-      title: (sort) => FeedTitle(feed: widget.feed, sort: sort),
+      title: (sort) => FeedTitle(feed: feed, sort: sort),
       newStream: (sort) => RedditAPI.client().feedStream(
-        feed: widget.feed,
+        feed: feed,
         sort: sort,
       ),
       onSortChanged: (sort) {
         if (settings.rememberSortByCommunity) {
           bloc.updateRememberedSorts(
-              settings.rememberedSorts.addFeed(widget.feed, sort));
+              settings.rememberedSorts.addFeed(feed, sort));
         }
       },
       initialSort: sort,

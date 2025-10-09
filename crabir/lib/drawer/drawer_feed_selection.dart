@@ -36,7 +36,7 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
               leading: Icon(Icons.settings),
               title: Text("Settings"),
               onTap: () {
-                context.router.navigate(SettingsRoute());
+                SettingsView().goNamed(context);
               },
               trailing: IconButton(
                 onPressed: () {

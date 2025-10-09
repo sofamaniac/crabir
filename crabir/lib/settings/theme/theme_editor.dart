@@ -1,12 +1,15 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/settings/theme/theme_event.dart';
+import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage(name: "CrabirThemeEditorPage")
+part 'theme_editor.go_route_ext.dart';
+
+@CrabirRoute()
 class CrabirThemeEditor extends StatefulWidget {
   const CrabirThemeEditor({super.key});
 

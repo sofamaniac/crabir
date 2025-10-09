@@ -1,14 +1,16 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/feed_list.dart';
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/loading_indicator.dart';
-import 'package:crabir/routes/routes.dart';
 import 'package:crabir/search_subreddits/bloc/search_bloc.dart';
+import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
+part 'search.go_route_ext.dart';
+
+@CrabirRoute()
 class SearchSubredditsView extends StatefulWidget {
   const SearchSubredditsView({super.key});
   @override
@@ -66,9 +68,9 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
             ListTile(
               leading: Icon(Icons.search),
               title: Text("Search for posts with \"${state.query}\""),
-              onTap: () => context.pushRoute(
-                SearchPostsRoute(query: state.query),
-              ),
+              // onTap: () => context.pushRoute(
+              //   SearchPostsRoute(query: state.query),
+              // ),
             ),
           if (state.query.isNotEmpty)
             ListTile(

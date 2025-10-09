@@ -1,11 +1,11 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/feed/feed.dart';
 import 'package:crabir/feed/multi.dart';
 import 'package:crabir/gallery/gallery.dart';
+import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/main.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/routes/fixed_swipe_page_route.dart';
-import 'package:crabir/search_posts/widgets/search.dart';
+import 'package:crabir/search_subreddits/widgets/search.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
@@ -13,124 +13,279 @@ import 'package:crabir/settings/lateral_menu/lateral_menu_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme_editor.dart';
+import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/user/model.dart';
 import 'package:crabir/subscriptions_tab.dart';
 import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/user/user.dart';
 import 'package:flutter/material.dart';
-import 'package:crabir/search_subreddits/widgets/search.dart';
-
-part 'routes.gr.dart';
+import 'package:go_router/go_router.dart';
 
 const String homeRouteName = "HomeFeedRoute";
 const String homeRoutePath = "home";
 
-@AutoRouterConfig(replaceInRouteName: 'View|Page,Route')
-class AppRouter extends RootStackRouter {
-  @override
-  List<AutoRoute> get routes => [
-        AutoRoute(
-          initial: true,
-          page: MainScreenRoute.page,
-          children: [
-            NamedRouteDef(
-              name: homeRouteName,
-              path: homeRoutePath,
-              builder: (context, data) => FeedView(
+final GoRouter appRouter = GoRouter(
+  debugLogDiagnostics: true,
+  initialLocation: '/',
+  routes: [
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        // the UI shell
+        return MainScreenView(navigationShell: navigationShell);
+      },
+      branches: [
+        // home tab
+        StatefulShellBranch(
+          initialLocation: "/",
+          routes: [
+            /// Home feed
+            GoRoute(
+              path: '/',
+              name: 'home',
+              builder: (context, state) => FeedView(
+                key: state.pageKey,
                 feed: Feed.home(),
                 initialSort: FeedSort.best(),
               ),
-              initial: true,
             ),
-            AutoRoute(
-              page: ProfilePageRoute.page,
-              children: [
-                currentUserRoute,
-                // you could add other user-related routes here too
-              ],
+          ],
+        ),
+
+        // Search tab
+        StatefulShellBranch(
+          initialLocation: "/search",
+          routes: [
+            /// Home feed
+            GoRoute(
+              path: '/search',
+              name: SearchSubredditsViewBuilder.name,
+              builder: (context, state) => SearchSubredditsView(),
             ),
-            AutoRoute(
-              page: SubscriptionsOrFeedRoute.page,
-              children: [
-                AutoRoute(page: FeedRoute.page),
-                AutoRoute(page: MultiRoute.page),
-                AutoRoute(
-                  page: SubscriptionsTabRoute.page,
-                  initial: true,
+          ],
+        ),
+        // Feed tab
+        StatefulShellBranch(
+          initialLocation: "/subscriptions",
+          routes: [
+            GoRoute(
+              path: "/subscriptions",
+              builder: (context, state) => SubscriptionsTab(),
+            ),
+
+            /// Multis route
+            GoRoute(
+              path: "/user/:username/m/:multi",
+              builder: (context, state) {
+                final future = RedditAPI.client()
+                    .getMulti(multiPath: state.uri.toString());
+                final multi = state.extra as Multi?;
+                if (multi != null) {
+                  return MultiView(
+                    key: ValueKey(multi.path),
+                    multi: multi,
+                  );
+                } else {
+                  return FutureBuilder(
+                    future: future,
+                    builder: (context, asyncSnapshot) {
+                      if (asyncSnapshot.hasData) {
+                        final multi = asyncSnapshot.data!;
+                        return MultiView(
+                          key: ValueKey(multi.path),
+                          multi: multi,
+                        );
+                      } else {
+                        return Center(
+                          child: LoadingIndicator(),
+                        );
+                      }
+                    },
+                  );
+                }
+              },
+            ),
+
+            /// Subreddit feed
+            GoRoute(
+              path: '/r/:subreddit',
+              name: 'feed',
+              builder: (context, state) {
+                final subreddit = state.pathParameters['subreddit']!;
+                //final extra = state.extra as Feed?; // optional complex object
+                final extra = null;
+                return FeedView(
+                  key: ValueKey(subreddit),
+                  feed: extra ?? Feed.subreddit(subreddit),
+                );
+              },
+              routes: [
+                /// Thread route with swipe-to-close support
+                GoRoute(
+                  path: 'comments/:id/:title',
+                  name: 'thread',
+                  pageBuilder: (context, state) {
+                    final subreddit = state.pathParameters['subreddit']!;
+                    final threadId = state.pathParameters['id']!;
+                    final title = state.pathParameters['title']!;
+                    final settings = CommentsSettings.of(context);
+
+                    final pageChild = Thread(
+                      post: state.extra as Post?,
+                      subreddit: subreddit,
+                      postID: threadId,
+                      postTitle: title,
+                    );
+
+                    if (settings.swipeToClose) {
+                      final threshold = settings.distanceThreshold;
+                      return fixedSwipePage(
+                        child: pageChild,
+                        dragThreshold: threshold / 100,
+                      );
+                    } else {
+                      return MaterialPage(
+                        key: state.pageKey,
+                        child: pageChild,
+                      );
+                    }
+                  },
                 ),
               ],
             ),
-            AutoRoute(
-              page: SearchPageRoute.page,
-              children: [
-                AutoRoute(page: SearchSubredditsRoute.page, initial: true),
-                AutoRoute(page: SearchPostsRoute.page),
-              ],
-            ),
-            AutoRoute(page: InboxRoute.page),
           ],
         ),
-        threadRoute,
-        AutoRoute(page: FullscreenImageRoute.page),
-        AutoRoute(page: FullscreenVideoRoute.page),
-        AutoRoute(page: FullScreenGalleryRoute.page),
+        // Inbox tab
+        StatefulShellBranch(
+          initialLocation: "/inbox",
+          routes: [
+            GoRoute(
+              path: '/inbox',
+              name: 'inbox',
+              builder: (context, state) => const InboxView(),
+            ),
+          ],
+        ),
+        // Profile tab
+        StatefulShellBranch(
+          initialLocation: "/dummy",
+          routes: [
+            GoRoute(
+                path: "/dummy",
+                builder: (context, state) {
+                  return Scaffold();
+                }),
+            GoRoute(
+              path: "/u/:username",
+              // redirect `/u/alice` → `/u/alice/overview`
+              redirect: (context, state) {
+                final username = state.pathParameters['username']!;
+                if (state.uri.pathSegments.length == 2) {
+                  return '/u/$username/overview';
+                }
+                return null;
+              },
+            ),
+            GoRoute(
+              path: "/u/:username/:tab",
+              builder: (context, state) => UserView(
+                username: state.pathParameters['username']!,
+                tab: state.pathParameters['tab']!,
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
 
-        // Settings
-        AutoRoute(page: SettingsRoute.page),
-        AutoRoute(page: CrabirThemeEditorPage.page),
-        AutoRoute(page: CommentsSettingsRoute.page),
-        AutoRoute(page: PostsSettingsRoute.page),
-        AutoRoute(page: ManageSortRoute.page),
-        AutoRoute(page: DataSettingsRoute.page),
-        AutoRoute(page: FiltersSettingsRoute.page),
-        AutoRoute(page: LateralMenuSettingsRoute.page),
-      ];
-}
+    /// Fullscreen media routes
+    GoRoute(
+      path: '/fullscreen-image',
+      name: FullscreenImageViewBuilder.name,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return FullscreenImageView(
+          imageUrl: extra["imageUrl"] as String,
+          title: extra["title"] as String?,
+          post: extra["post"] as Post?,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/fullscreen-video',
+      name: FullscreenVideoViewBuilder.name,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return FullscreenVideoView(
+          videoUrl: extra["videoUrl"] as String,
+          width: extra["width"] as int,
+          height: extra["height"] as int,
+          title: extra["title"] as String?,
+          post: extra["post"] as Post?,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/fullscreen-gallery',
+      name: FullScreenGalleryViewBuilder.name,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return FullScreenGalleryView(
+          initialPage: extra["initialPage"] as int,
+          gallery: extra['gallery'] as Gallery,
+          post: extra['post'] as Post?,
+        );
+      },
+    ),
 
-/// Route with swipe to go back
-final threadRoute = CustomRoute(
-  path: "/r/:subreddit/comments/:id/:title",
-  page: ThreadRoute.page,
-  customRouteBuilder: <T>(
-    BuildContext context,
-    Widget child,
-    AutoRoutePage<T> page,
-  ) {
-    final settings = CommentsSettings.of(context);
-    if (settings.swipeToClose) {
-      final threshold = settings.distanceThreshold;
-      return FixedSwipePageRoute<T>(
-        builder: (_) => child,
-        settings: page,
-        fullscreenDialog: page.fullscreenDialog,
-        dragThreshold: threshold / 100,
-      );
-    } else {
-      return PageRouteBuilder<T>(
-        fullscreenDialog: page.fullscreenDialog,
-        settings: page,
-        pageBuilder: (_, __, ___) => child,
-      );
-    }
-  },
+    // Settings routes
+    GoRoute(
+      path: '/settings',
+      name: SettingsViewBuilder.name,
+      builder: (context, state) => SettingsView(),
+      routes: [
+        GoRoute(
+          path: 'theme-editor',
+          name: CrabirThemeEditorBuilder.name,
+          builder: (context, state) => CrabirThemeEditor(),
+        ),
+        GoRoute(
+          path: 'comments-settings',
+          name: CommentsSettingsViewBuilder.name,
+          builder: (context, state) => CommentsSettingsView(),
+        ),
+        GoRoute(
+          path: 'posts-settings',
+          name: PostsSettingsViewBuilder.name,
+          builder: (context, state) => PostsSettingsView(),
+        ),
+        GoRoute(
+          path: 'manage-sort',
+          name: ManageSortViewBuilder.name,
+          builder: (context, state) => ManageSortView(),
+        ),
+        GoRoute(
+          path: 'data-settings',
+          name: DataSettingsViewBuilder.name,
+          builder: (context, state) => DataSettingsView(),
+        ),
+        GoRoute(
+          path: 'filters-settings',
+          name: FiltersSettingsViewBuilder.name,
+          builder: (context, state) => FiltersSettingsView(),
+        ),
+        GoRoute(
+          path: 'lateral-menu-settings',
+          name: LateralMenuSettingsViewBuilder.name,
+          builder: (context, state) => LateralMenuSettingsView(),
+        ),
+      ],
+    ),
+  ],
 );
 
-@RoutePage()
-class SubscriptionsOrFeedView extends AutoRouter {
-  const SubscriptionsOrFeedView({super.key});
-}
-
-@RoutePage(name: "SearchPageRoute")
-class SearchPage extends AutoRouter {
-  const SearchPage({super.key});
-}
-
-@RoutePage()
 class InboxView extends StatelessWidget {
   const InboxView({super.key});
 

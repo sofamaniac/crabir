@@ -1,11 +1,9 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crabir/hexcolor.dart';
-import 'package:crabir/routes/routes.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart'
     as subreddit;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SubredditIcon extends StatelessWidget {
   final subreddit.SubredditIcon icon;
@@ -44,12 +42,7 @@ class SubredditIcon extends StatelessWidget {
     };
     if (clickable && subredditName != null) {
       return InkWell(
-        onTap: () => context.router.navigate(
-          FeedRoute(
-            key: ValueKey(subredditName!),
-            feed: Feed.subreddit(subredditName!),
-          ),
-        ),
+        onTap: () => context.go("/r/${subredditName!}"),
         child: avatar,
       );
     } else {

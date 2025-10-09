@@ -92,8 +92,8 @@ part of "${buildStep.inputId.uri.pathSegments.last}";
     buffer.write(imports(buildStep));
     buffer.write(CubitGenerator().makeCubit(element));
     final code = '''
+@CrabirRoute()
 // SettingsPage for ${classElement.name}
-@RoutePage()
 class $className extends StatelessWidget {
 
   const $className({super.key});

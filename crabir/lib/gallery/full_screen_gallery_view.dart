@@ -1,6 +1,6 @@
 part of 'gallery.dart';
 
-@RoutePage()
+@CrabirRoute()
 class FullScreenGalleryView extends StatefulWidget {
   final Gallery gallery;
   final int initialPage;

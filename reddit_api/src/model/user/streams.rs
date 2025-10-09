@@ -8,7 +8,7 @@ use futures::stream::BoxStream;
 pub use futures::{Stream, StreamExt};
 
 #[derive(Clone)]
-pub struct UserStream {
+pub(crate) struct UserStream {
     username: String,
     endpoint: String,
     client: Client,
@@ -28,17 +28,12 @@ impl UserStream {
 impl IntoStreamPrivate for UserStream {
     type Output = Vec<Thing>;
     fn to_stream(&self) -> BoxStream<'static, Result<Vec<Thing>>> {
-        let client = self.client.clone();
-        client.user_stream(self.url(), None).boxed()
+        self.client.clone().user_stream(self.url(), None).boxed()
     }
 }
-impl PartialEq for UserStream {
-    fn eq(&self, other: &Self) -> bool {
-        self.username == other.username
-    }
-}
+
 #[derive(Clone)]
-pub struct UserStreamSorted {
+pub(crate) struct UserStreamSorted {
     client: Client,
     username: String,
     sort: UserStreamSort,
@@ -71,8 +66,8 @@ impl UserStreamSorted {
 impl IntoStreamPrivate for UserStreamSorted {
     type Output = Vec<Thing>;
     fn to_stream(&self) -> BoxStream<'static, Result<Vec<Thing>>> {
-        let client = self.client.clone();
-        client
+        self.client
+            .clone()
             .sorted_user_stream(self.url(), self.sort, None)
             .boxed()
     }

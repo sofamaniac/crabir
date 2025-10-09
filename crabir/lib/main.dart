@@ -1,8 +1,5 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:app_links/app_links.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/accounts/widgets/account_selector.dart';
 import 'package:crabir/drawer/drawer.dart';
@@ -13,13 +10,13 @@ import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/tabs_index.dart';
-import 'package:crabir/utils/brightness_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/frb_generated.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logging/logging.dart';
@@ -71,7 +68,7 @@ bool _defaultOnNavigationNotification(NavigationNotification _) {
   }
 }
 
-void _handleRedditLink(StackRouter router, String url) async {
+void _handleRedditLink(BuildContext context, String url) async {
   final uri = Uri.parse(url);
   if (uri.host.contains('reddit.com') || uri.host == 'redd.it') {
     // Navigate using AutoRoute
@@ -82,7 +79,7 @@ void _handleRedditLink(StackRouter router, String url) async {
       destination = uri;
     }
     try {
-      router.pushPath(destination.toString());
+      context.go(destination.toString());
     } catch (_) {
       Logger("Crabir").warning(
         "Failed to navigate to $uri, opening in browser",
@@ -110,7 +107,7 @@ class Crabir extends StatelessWidget {
 }
 
 class TopLevel extends StatelessWidget {
-  final _appRouter = AppRouter();
+  final _appRouter = appRouter;
   TopLevel({super.key});
   @override
   Widget build(BuildContext context) {
@@ -163,14 +160,17 @@ class TopLevel extends StatelessWidget {
           ),
         ),
       ),
-      routerConfig: _appRouter.config(deepLinkTransformer: (deepLink) {
-        if (deepLink.path.contains('s')) {
-          // continue with the platform link
-          return _resolveRedditShortlink(deepLink);
-        } else {
-          return SynchronousFuture(deepLink);
-        }
-      }),
+      routerConfig: _appRouter,
+      // routerConfig: _appRouter.config(
+      //     includePrefixMatches: false,
+      //     deepLinkTransformer: (deepLink) {
+      //       if (deepLink.path.contains('s')) {
+      //         // continue with the platform link
+      //         return _resolveRedditShortlink(deepLink);
+      //       } else {
+      //         return SynchronousFuture(deepLink);
+      //       }
+      //     }),
     );
   }
 }
@@ -192,9 +192,11 @@ Future<Uri> _resolveRedditShortlink(Uri uri) async {
   }
 }
 
-@RoutePage()
 class MainScreenView extends StatefulWidget {
-  const MainScreenView({super.key});
+  final StatefulNavigationShell
+      navigationShell; // active route inside the shell
+
+  const MainScreenView({super.key, required this.navigationShell});
 
   @override
   State<MainScreenView> createState() => _MainScreenViewState();
@@ -202,42 +204,9 @@ class MainScreenView extends StatefulWidget {
 
 class _MainScreenViewState extends State<MainScreenView>
     with SingleTickerProviderStateMixin {
-  bool addListener = true;
   bool showingDialog = false;
-  StreamSubscription<Uri?>? _linkSub;
 
-  @override
-  void initState() {
-    super.initState();
-
-    // Subscribe to app links
-    final router = AutoRouter.of(context);
-    _linkSub = AppLinks().uriLinkStream.listen((uri) {
-      _handleRedditLink(router, uri.toString());
-    });
-
-    // Handle initial link
-    AppLinks().getInitialLink().then((uri) {
-      if (uri != null) {
-        _handleRedditLink(router, uri.toString());
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _linkSub?.cancel();
-    super.dispose();
-  }
-
-  bool showAccountSelectionDialogue(int index) {
-    final account = context.read<AccountsBloc>().state.account;
-    final guardedPages = [profileIndex, inboxIndex];
-    return (account == null || account.isAnonymous) &&
-        guardedPages.contains(index);
-  }
-
-  void _showLoginDialog(BuildContext context) async {
+  Future<void> _showLoginDialog(BuildContext context) async {
     if (showingDialog) return;
     showingDialog = true;
     await showDialog(
@@ -247,63 +216,43 @@ class _MainScreenViewState extends State<MainScreenView>
         content: AccountSelector(showCurrentAccount: false),
         actions: [
           TextButton(
-            child: const Text("Cancel"),
-            onPressed: () => Navigator.of(ctx).pop(),
-          ),
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text("Cancel")),
         ],
       ),
     );
     showingDialog = false;
   }
 
-  Widget bottomBar(
-    BuildContext context,
-    TabsRouter tabsRouter,
-    TabController tabsController,
-    CrabirTheme theme,
-  ) {
-    void listener() {
-      final index = tabsController.index;
-      // Show account selection dialog when necessary
-      if (showAccountSelectionDialogue(index) &&
-          tabsController.indexIsChanging) {
-        tabsController.index = tabsController.previousIndex;
-        WidgetsBinding.instance.addPostFrameCallback(
-          (_) => _showLoginDialog(context),
-        );
-      }
+  bool _showAccountSelectionDialogue(int index) {
+    final account = context.read<AccountsBloc>().state.account;
+    const guardedPages = [1, 4]; // searchIndex, profileIndex
+    return (account == null || account.isAnonymous) &&
+        guardedPages.contains(index);
+  }
 
-      // When navigating away of subscription tab, reset stack
-      if (tabsController.previousIndex == subscriptionsIndex) {
-        tabsRouter.stackRouterOfIndex(index)?.popUntilRoot();
-      }
-    }
-
-    if (addListener) {
-      tabsController.addListener(listener);
-      addListener = false;
-    }
+  Widget _bottomBar() {
+    final theme = CrabirTheme.of(context);
     return BottomNavigationBar(
-      currentIndex: tabsRouter.activeIndex,
+      currentIndex: widget.navigationShell.currentIndex,
+      type: BottomNavigationBarType.fixed,
       backgroundColor: theme.toolBarBackground,
       selectedItemColor: theme.primaryColor,
       unselectedItemColor: theme.toolBarText.withAlpha(120),
       showUnselectedLabels: false,
       showSelectedLabels: false,
-      type: BottomNavigationBarType.fixed, // so all items show
       onTap: (index) {
-        tabsRouter.setActiveIndex(index);
-        //tabsController.animateTo(index);
-
-        final rootRoutes = {
-          1: const SearchSubredditsRoute(),
-          2: const SubscriptionsTabRoute(),
-          4: UserRoute(),
-        };
-        final route = rootRoutes[index];
-        if (route != null) {
-          tabsRouter.stackRouterOfIndex(index)?.replaceAll([route]);
+        if (_showAccountSelectionDialogue(index)) {
+          _showLoginDialog(context);
+          return;
+        } else if (index == subscriptionsIndex) {
+          return context.go("/subscriptions");
+        } else if (index == profileIndex) {
+          final username = context.read<AccountsBloc>().state.account!.username;
+          return context.go("/u/$username");
         }
+
+        widget.navigationShell.goBranch(index);
       },
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
@@ -317,65 +266,22 @@ class _MainScreenViewState extends State<MainScreenView>
 
   @override
   Widget build(BuildContext context) {
-    final theme = CrabirTheme.of(context);
-    //final account = context.watch<AccountsBloc>().state.account;
-
-    // Change system navigation bar background color.
-    if (Platform.isAndroid) {
-      final brightness = context.brightness;
-      SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(
-          systemNavigationBarColor: theme.toolBarBackground,
-          systemNavigationBarIconBrightness: brightness,
-          statusBarColor: theme.toolBarBackground,
-          statusBarBrightness: brightness,
-          statusBarIconBrightness: switch (brightness) {
-            Brightness.light => Brightness.dark,
-            Brightness.dark => Brightness.light,
-          },
-        ),
-      );
-    }
-
-    final routes = <PageRouteInfo>[
-      NamedRoute(homeRouteName),
-      SearchSubredditsRoute(),
-      SubscriptionsTabRoute(),
-      InboxRoute(),
-      UserRoute(),
-    ];
-
-    return AutoTabsRouter.tabBar(
-      //key: ValueKey(account?.id),
-      homeIndex: 0,
-      physics: const NeverScrollableScrollPhysics(),
-      routes: routes,
-      builder: (context, child, tabController) {
-        final tabsRouter = AutoTabsRouter.of(context);
-
-        return PopScope(
-          canPop: tabsRouter.activeIndex == 0,
-          onPopInvokedWithResult: (_, __) async {
-            if (tabsRouter.activeIndex != 0) {
-              // If not on the home tab, go back to home tab
-              tabsRouter.setActiveIndex(0);
-            }
-          },
-          child: SafeArea(
-            child: Scaffold(
-              backgroundColor: theme.background,
-              drawer: AppDrawer(
-                onAccountChanged: () {
-                  tabsRouter.setActiveIndex(0);
-                },
-              ),
-              body: child,
-              bottomNavigationBar:
-                  bottomBar(context, tabsRouter, tabController, theme),
-            ),
-          ),
-        );
+    return PopScope(
+      canPop: widget.navigationShell.currentIndex == 0,
+      onPopInvokedWithResult: (_, __) async {
+        if (widget.navigationShell.currentIndex != 0) {
+          widget.navigationShell.goBranch(0);
+        }
       },
+      child: SafeArea(
+        child: Scaffold(
+          drawer: AppDrawer(onAccountChanged: () {
+            widget.navigationShell.goBranch(0);
+          }),
+          body: widget.navigationShell,
+          bottomNavigationBar: _bottomBar(),
+        ),
+      ),
     );
   }
 }

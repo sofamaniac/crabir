@@ -4,6 +4,9 @@ targets:
       crabir|settings_page:
         generate_for:
           - lib/**.dart
+      crabir|go_router_ext:
+        generate_for:
+          - lib/**.dart
 
 builders:
   settings_page:
@@ -13,5 +16,10 @@ builders:
     auto_apply: dependents
     build_to: source
     applies_builders: ["source_gen|combining_builder"]
-    runs_before: ["auto_route_generator:auto_route_generator"]
+  go_router_ext:
+    import: "package:crabir/src/go_router_ext/go_router_ext_generator.dart"
+    builder_factories: ["crabirRouteBuilder"]
+    build_extensions: {".dart": [".go_route_ext.dart"]}
+    auto_apply: dependents
+    build_to: source
 

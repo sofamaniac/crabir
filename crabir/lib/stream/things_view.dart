@@ -36,15 +36,17 @@ class ThingsScaffold extends StatefulWidget {
   State<ThingsScaffold> createState() => _ThingsScaffoldState();
 }
 
-class _ThingsScaffoldState extends State<ThingsScaffold> {
+class _ThingsScaffoldState extends State<ThingsScaffold>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   late final _pagingController = PagingController<bool, Thing>(
-    getNextPageKey: (state) => state.lastPageIsEmpty ? null : state.hasNextPage,
+    getNextPageKey: (state) {
+      return !widget.stream.done;
+    },
     fetchPage: (pageKey) async {
-      if (await widget.stream.next()) {
-        return widget.stream.last();
-      } else {
-        return [];
-      }
+      return await widget.stream.next();
     },
   );
 
@@ -63,6 +65,8 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+    final controller = PrimaryScrollController.of(context);
     return PagingListener(
       controller: _pagingController,
       builder: (context, state, fetchNextPage) {
@@ -75,6 +79,8 @@ class _ThingsScaffoldState extends State<ThingsScaffold> {
             notifier: ValueNotifier([]),
             child: Scrollbar(
               child: CustomScrollView(
+                controller: controller,
+                primary: false,
                 slivers: [
                   // Optional subreddit info at the top
                   if (widget.subredditInfo != null)

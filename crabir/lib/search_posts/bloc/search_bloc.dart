@@ -120,7 +120,8 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
     } else if (_streamable == null) {
       _newStream(debounce: false);
     } else {
-      _hasReachedMax = !await _streamable!.next();
+      await _streamable!.next();
+      _hasReachedMax = !_streamable!.done;
       await _filter(emit);
     }
   }

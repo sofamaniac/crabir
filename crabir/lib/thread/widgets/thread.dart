@@ -1,7 +1,5 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/post.dart';
-import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/sort.dart';
@@ -16,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crabir/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 part 'thread_entry.dart';
@@ -34,7 +33,6 @@ final commentSorts = [
   CommentSort.random,
 ];
 
-@RoutePage(name: "ThreadRoute")
 class Thread extends StatelessWidget {
   final Post? post;
   final String permalink;
@@ -42,9 +40,9 @@ class Thread extends StatelessWidget {
   /// requires either `subreddit, postID, postTitle` to be set or `post`.
   Thread({
     super.key,
-    @PathParam("subreddit") String? subreddit,
-    @PathParam("id") String? postID,
-    @PathParam("title") String? postTitle,
+    String? subreddit,
+    String? postID,
+    String? postTitle,
     this.post,
   }) : permalink =
             post?.permalink ?? "/r/$subreddit/comments/$postID/$postTitle";

@@ -1,14 +1,15 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
+import 'package:crabir/feed/feed.dart';
 import 'package:crabir/l10n/app_localizations.dart';
-import 'package:crabir/routes/routes.dart';
+import 'package:crabir/search_subreddits/widgets/search.dart';
 import 'package:crabir/settings/lateral_menu/lateral_menu_settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/utils/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-List<BaseFeed> baseFeeds(BuildContext context) {
+List<Widget> baseFeeds(BuildContext context) {
   final account = context.watch<AccountsBloc>().state;
   final locales = AppLocalizations.of(context);
   final settings = LateralMenuSettings.of(context);
@@ -17,34 +18,37 @@ List<BaseFeed> baseFeeds(BuildContext context) {
       BaseFeed(
         locales.feedHome,
         HOME_PAGE_ICON,
-        route: NamedRoute(homeRouteName),
+        feed: Feed.home(),
       ),
     if (settings.showHomeFeed)
       BaseFeed(
         locales.lateralMenu_showHomeFeed,
         HOME_FEED_ICON,
-        route: NamedRoute(homeRouteName),
+        feed: Feed.home(),
       ),
     if (settings.showPopular)
       BaseFeed(
         locales.feedPopular,
         POPULAR_ICON,
-        route: FeedRoute(feed: Feed.popular()),
+        feed: Feed.popular(),
       ),
     if (settings.showAll)
       BaseFeed(
         locales.feedAll,
         ALL_ICON,
-        route: FeedRoute(feed: Feed.all()),
+        feed: Feed.all(),
       ),
     if (account.account != null) ...[
       if (settings.showSaved)
-        BaseFeed(
-          locales.feedSaved,
-          SAVED_FEED_ICON,
-          route: UserSavedRoute(
-            username: account.account!.username,
-          ),
+        ListTile(
+          leading: Icon(SAVED_FEED_ICON),
+          title: Text(locales.feedSaved),
+          onTap: () {
+            final account = context.read<AccountsBloc>().state.account;
+            if (account != null && !account.isAnonymous) {
+              context.go("/u/${account.username}/saved");
+            }
+          },
         ),
       if (settings.showHistory)
         BaseFeed(
@@ -53,12 +57,13 @@ List<BaseFeed> baseFeeds(BuildContext context) {
           // TODO: history feed
         ),
     ],
-    if (settings.showSearch)
-      BaseFeed(
-        locales.lateralMenu_showSearch,
-        SEARCH_ICON,
-        route: SearchPostsRoute(),
-      ),
+    ListTile(
+      leading: Icon(SEARCH_ICON),
+      title: Text(locales.lateralMenu_showSearch),
+      onTap: () {
+        SearchSubredditsView().goNamed(context);
+      },
+    ),
     if (account.account != null) ...[
       if (settings.showProfile)
         BaseFeed(
@@ -89,14 +94,14 @@ class BaseFeed extends StatelessWidget {
   final IconData icon;
   final int tabIndex;
   final bool closeDrawer;
-  final PageRouteInfo? route;
+  final Feed? feed;
   const BaseFeed(
     this.title,
     this.icon, {
     super.key,
     this.tabIndex = 2,
     this.closeDrawer = true,
-    this.route,
+    this.feed,
   });
 
   @override
@@ -105,9 +110,9 @@ class BaseFeed extends StatelessWidget {
       leading: Icon(icon),
       title: Text(title),
       onTap: () {
-        if (route != null) {
+        if (feed != null) {
           Scaffold.of(context).closeDrawer();
-          context.tabsRouter.navigate(route!);
+          FeedView(feed: feed).goNamed(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

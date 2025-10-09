@@ -1,20 +1,22 @@
 import 'dart:collection';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/settings/theme/theme.dart';
+import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/settings_page/annotations.dart';
 import 'package:crabir/utils/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logging/logging.dart';
 
 part 'filters_settings.settings_page.dart';
 part 'filters_settings.freezed.dart';
 part 'filters_settings.g.dart';
+part 'filters_settings.go_route_ext.dart';
 
 @freezed
 @SettingsPage(prefix: "filters_", useFieldName: true)

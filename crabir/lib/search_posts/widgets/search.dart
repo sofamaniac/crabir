@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/post.dart';
@@ -12,8 +11,8 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
 class SearchPostsView extends StatefulWidget {
   const SearchPostsView({
     super.key,
@@ -211,10 +210,6 @@ Widget _postView(BuildContext context, Post post) {
     onSaveCallback: (save) async {
       state.add(Save(save: save, name: post.name));
     },
-    onTap: () => context.router.push(
-      ThreadRoute(
-        post: post,
-      ),
-    ),
+    onTap: () => context.go(post.permalink, extra: post),
   );
 }

@@ -1,8 +1,6 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/network_status.dart';
 import 'package:crabir/post/parts/video.dart';
-import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
@@ -33,12 +31,9 @@ class _ImageContentState extends State<ImageContent> {
             context.watch<FiltersSettingsCubit>().state.blurNSFW);
     if (widget.post.preview == null) {
       return InkWell(
-        onTap: () => context.router.navigate(
-          FullscreenImageRoute(
-            imageUrl: widget.post.url,
-            post: widget.post,
-          ),
-        ),
+        onTap: () =>
+            FullscreenImageView(imageUrl: widget.post.url, post: widget.post)
+                .pushNamed(context),
         child: ImageThumbnail(
           imageUrl: widget.post.url,
         ),
@@ -56,17 +51,15 @@ class _ImageContentState extends State<ImageContent> {
       return InkWell(
         onTap: () {
           if (!obfuscate || tapped) {
-            context.router.navigate(
-              FullscreenImageRoute(
-                imageUrl: image
-                    .withResolution(
-                      resolution,
-                      false,
-                    )
-                    .url,
-                post: widget.post,
-              ),
-            );
+            FullscreenImageView(
+              imageUrl: image
+                  .withResolution(
+                    resolution,
+                    false,
+                  )
+                  .url,
+              post: widget.post,
+            ).pushNamed(context);
           } else {
             setState(() {
               tapped = true;

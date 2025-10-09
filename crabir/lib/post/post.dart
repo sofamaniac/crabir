@@ -1,9 +1,7 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crabir/bool_to_vote.dart';
 import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
-import 'package:crabir/feed_list.dart';
 import 'package:crabir/gallery/gallery.dart';
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/media/media.dart';
@@ -12,7 +10,6 @@ import 'package:crabir/post/parts/html_with_fade.dart';
 import 'package:crabir/post/parts/image.dart';
 import 'package:crabir/post/parts/video.dart';
 import 'package:crabir/flair.dart';
-import 'package:crabir/routes/routes.dart';
 import 'package:crabir/separated_row.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
@@ -26,6 +23,7 @@ import 'package:crabir/time_ellapsed.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 

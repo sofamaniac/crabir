@@ -1,4 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+CustomTransitionPage<T> fixedSwipePage<T>({
+  required Widget child,
+  double dragThreshold = 0.5,
+  Duration transitionDuration = const Duration(milliseconds: 300),
+}) {
+  final dragController = ValueNotifier<double>(0.0);
+
+  return CustomTransitionPage<T>(
+    key: ValueKey(child.hashCode),
+    child: child,
+    transitionDuration: transitionDuration,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final width = MediaQuery.of(context).size.width;
+
+      return GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onHorizontalDragUpdate: (details) {
+          dragController.value += details.delta.dx / width;
+        },
+        onHorizontalDragEnd: (details) {
+          final velocity = details.velocity.pixelsPerSecond.dx;
+          final progress = dragController.value;
+
+          if (progress > dragThreshold || velocity > 700) {
+            // Complete pop
+            dragController.value = 1.0;
+            Navigator.of(context).pop();
+          } else {
+            // Animate back to 0
+            dragController.value = 0.0;
+          }
+        },
+        child: AnimatedBuilder(
+          animation: Listenable.merge([animation, dragController]),
+          builder: (_, __) {
+            // Push animation + drag offset
+            final pushOffset = (1 - animation.value) * width;
+            final dragOffset = dragController.value * width;
+            return Transform.translate(
+              offset: Offset(pushOffset + dragOffset, 0),
+              child: child,
+            );
+          },
+        ),
+      );
+    },
+  );
+}
 
 class FixedSwipePageRoute<T> extends PageRoute<T> {
   FixedSwipePageRoute({

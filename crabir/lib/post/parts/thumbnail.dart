@@ -25,9 +25,8 @@ class Thumbnail extends StatelessWidget {
         final gallery =
             post.gallery ?? post.crosspostParentList.firstOrNull?.gallery;
         if (gallery != null) {
-          context.router.navigate(
-            FullScreenGalleryRoute(gallery: gallery, initialPage: 0),
-          );
+          FullScreenGalleryView(gallery: gallery, initialPage: 0)
+              .goNamed(context);
         }
     }
   }

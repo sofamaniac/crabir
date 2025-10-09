@@ -96,7 +96,7 @@ class _FullscreenMediaViewState extends State<FullscreenMediaView> {
                 icon: Icon(Icons.comment_outlined),
                 color: theme.secondaryText,
                 onPressed: () {
-                  context.router.navigate(ThreadRoute(post: post));
+                  context.go(post.permalink, extra: post);
                 },
               ),
               IconButton(

@@ -45,8 +45,8 @@ class DataSettingsCubit extends HydratedCubit<DataSettings> {
       emit(state.copyWith(imageQualityCellular: value));
 }
 
+@CrabirRoute()
 // SettingsPage for DataSettings
-@RoutePage()
 class DataSettingsView extends StatelessWidget {
   const DataSettingsView({super.key});
 

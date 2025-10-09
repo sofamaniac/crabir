@@ -46,8 +46,8 @@ class FiltersSettingsCubit extends HydratedCubit<FiltersSettings> {
   void updateBlurNSFW(bool value) => emit(state.copyWith(blurNSFW: value));
 }
 
+@CrabirRoute()
 // SettingsPage for FiltersSettings
-@RoutePage()
 class FiltersSettingsView extends StatelessWidget {
   const FiltersSettingsView({super.key});
 

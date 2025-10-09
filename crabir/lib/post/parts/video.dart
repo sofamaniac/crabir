@@ -1,8 +1,6 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/network_status.dart';
-import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart';
@@ -152,12 +150,10 @@ VoidCallback goFullScreen(
     default:
       return () {};
   }
-  return () => context.router.navigate(
-        FullscreenVideoRoute(
-          videoUrl: url,
-          width: width,
-          height: height,
-          post: post,
-        ),
-      );
+  return () => FullscreenVideoView(
+        videoUrl: url,
+        width: width,
+        height: height,
+        post: post,
+      ).pushNamed(context);
 }

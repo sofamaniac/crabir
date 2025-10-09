@@ -1,9 +1,8 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:crabir/l10n/app_localizations.dart';
-import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/sort.dart';
+import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
@@ -11,12 +10,14 @@ import 'package:crabir/src/settings_page/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logging/logging.dart';
 
 part 'posts_settings.freezed.dart';
 part 'posts_settings.g.dart';
 part 'posts_settings.settings_page.dart';
+part 'posts_settings.go_route_ext.dart';
 
 final _multiPrefix = "_MULTI_";
 
@@ -40,12 +41,12 @@ class ManageSortButton extends StatelessWidget {
     return ListTile(
       title: Text("Manage Sorts"),
       leading: leading,
-      onTap: () => context.router.navigate(ManageSortRoute()),
+      onTap: () => ManageSortView().goNamed(context),
     );
   }
 }
 
-@RoutePage()
+@CrabirRoute()
 class ManageSortView extends StatelessWidget {
   const ManageSortView({super.key});
 

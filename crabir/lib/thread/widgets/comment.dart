@@ -1,11 +1,9 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/bool_to_vote.dart';
 import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/html_view.dart';
-import 'package:crabir/routes/routes.dart';
 import 'package:crabir/separated_row.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
@@ -18,6 +16,7 @@ import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/time_ellapsed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class OpenedComment {
   static ValueNotifier<String?> current = ValueNotifier(null);
@@ -43,20 +42,7 @@ class CommentView extends StatefulWidget {
   createState() => _CommentViewState();
 }
 
-class _CommentViewState extends State<CommentView>
-    with AutomaticKeepAliveClientMixin {
-  bool showBottomBar = false;
-
-  // we have to keep alive to remember `showBottomBar`.
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    super.initState();
-    showBottomBar = !widget.animateBottomBar;
-  }
-
+class _CommentViewState extends State<CommentView> {
   Widget topRow(CommentsSettings settings) {
     final comment = widget.comment;
     final color = CrabirTheme.of(context).secondaryText;
@@ -90,11 +76,13 @@ class _CommentViewState extends State<CommentView>
                 ),
               if (comment.locked) Icon(Icons.lock, color: color),
               if (comment.stickied)
-                Text("stickied",
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelMedium!
-                        .copyWith(color: Colors.green))
+                Text(
+                  "stickied",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium!
+                      .copyWith(color: Colors.green),
+                )
             ],
           ),
         ),
@@ -133,7 +121,6 @@ class _CommentViewState extends State<CommentView>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return ValueListenableBuilder(
       valueListenable: OpenedComment.current,
       builder: (context, _, __) {
@@ -163,12 +150,6 @@ class _CommentViewState extends State<CommentView>
                 topRow(settings),
                 StyledHtml(
                   htmlContent: comment.bodyHtml,
-                  onLinkTap: (url, attributes, element) => defaultLinkHandler(
-                    context.router,
-                    url,
-                    attributes,
-                    element,
-                  ),
                   showImages: settings.showCommentsImage,
                 ),
                 AnimatedSwitcher(
@@ -187,7 +168,7 @@ class _CommentViewState extends State<CommentView>
     await widget.comment.vote(client: RedditAPI.client(), direction: target);
     setState(() {
       if (hideButtonAfterAction) {
-        showBottomBar = false;
+        OpenedComment.current.value = null;
       }
     });
   }
@@ -200,7 +181,7 @@ class _CommentViewState extends State<CommentView>
     }
     setState(() {
       if (hideButtonAfterAction) {
-        showBottomBar = false;
+        OpenedComment.current.value = null;
       }
     });
   }
@@ -220,9 +201,6 @@ class _CommentViewState extends State<CommentView>
           colorActive: likeColor,
           onChange: (target) async {
             await vote(target, settings.hideButtonAfterAction);
-            if (settings.hideButtonAfterAction) {
-              showBottomBar = false;
-            }
           },
         ),
         VoteButton.dislike(
@@ -230,9 +208,6 @@ class _CommentViewState extends State<CommentView>
           colorActive: dislikeColor,
           onChange: (target) async {
             await vote(target, settings.hideButtonAfterAction);
-            if (settings.hideButtonAfterAction) {
-              showBottomBar = false;
-            }
           },
         ),
         if (settings.showSaveButton)
@@ -240,9 +215,6 @@ class _CommentViewState extends State<CommentView>
             initialValue: widget.comment.saved,
             onChange: (target) async {
               await save(target, settings.hideButtonAfterAction);
-              if (settings.hideButtonAfterAction) {
-                showBottomBar = false;
-              }
             },
           ),
         IconButton(
@@ -250,7 +222,7 @@ class _CommentViewState extends State<CommentView>
           onPressed: () {
             // TODO: reply to comment
             if (settings.hideButtonAfterAction) {
-              showBottomBar = false;
+              OpenedComment.current.value = null;
             }
           },
           icon: Icon(Icons.reply_rounded),
@@ -259,7 +231,7 @@ class _CommentViewState extends State<CommentView>
           comment: widget.comment,
           onPressed: () {
             if (settings.hideButtonAfterAction) {
-              showBottomBar = false;
+              OpenedComment.current.value = null;
             }
           },
         ),
@@ -334,9 +306,7 @@ class _Username extends StatelessWidget {
     return InkWell(
       onTap: () {
         if (author?.username != null && settings.clickableUsername) {
-          context.router.navigate(
-            UserRoute(username: author!.username),
-          );
+          context.go("/u/${author!.username}");
         }
       },
       child: _username(settings, currentUser, theme.highlight),

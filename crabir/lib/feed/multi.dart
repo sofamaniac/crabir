@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/common.dart';
 import 'package:crabir/feed/sort_display.dart';
@@ -9,7 +8,6 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-@RoutePage()
 class MultiView extends StatefulWidget {
   const MultiView({
     super.key,

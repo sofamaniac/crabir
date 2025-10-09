@@ -23,7 +23,7 @@ impl Client {
             .base_url()
             .join(&endpoint)
             .expect("Should not fail to build url.");
-        self.clone().stream_vec(url, pager, ())
+        self.stream_vec(url, pager, ())
     }
     pub(super) fn sorted_user_stream(
         self,
@@ -31,14 +31,11 @@ impl Client {
         sort: UserStreamSort,
         pager: Option<Pager>,
     ) -> impl Stream<Item = Result<Vec<Thing>>> {
-        let mut url = self
+        let url = self
             .base_url()
             .join(&endpoint)
             .expect("Should not fail to build url.");
-        for (name, value) in sort.to_query() {
-            url.query_pairs_mut().append_pair(name, value);
-        }
-        self.stream_vec(url, pager, ())
+        self.stream_vec(url, pager, sort.to_query())
     }
     /// Get saved items ( both [`Post`] and [`Comment`] ) for the specified user.
     /// # Errors

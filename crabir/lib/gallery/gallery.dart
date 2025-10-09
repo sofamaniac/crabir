@@ -1,17 +1,18 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/network_status.dart';
-import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
+import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart';
+import 'package:go_router/go_router.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
 part 'full_screen_gallery_view.dart';
+part 'gallery.go_route_ext.dart';
 
 class GalleryView extends StatelessWidget {
   final Post post;
@@ -85,13 +86,8 @@ class _GalleryViewState extends State<_GalleryView> {
       });
       return;
     }
-    context.router.navigate(
-      FullScreenGalleryRoute(
-        gallery: widget.gallery,
-        initialPage: initialPage,
-        post: widget.post,
-      ),
-    );
+    FullScreenGalleryView(gallery: widget.gallery, initialPage: initialPage)
+        .pushNamed(context);
   }
 
   @override

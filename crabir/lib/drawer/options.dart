@@ -1,6 +1,4 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/l10n/app_localizations.dart';
-import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/settings/lateral_menu/lateral_menu_settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
@@ -10,6 +8,7 @@ import 'package:crabir/utils/brightness_extension.dart';
 import 'package:crabir/utils/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 List<Widget> options(BuildContext context) {
   final settings = LateralMenuSettings.of(context);
@@ -22,7 +21,8 @@ List<Widget> options(BuildContext context) {
       ListTile(
         leading: icon(GOTO_COMMUNITY_ICON),
         title: Text(locales.lateralMenu_showGoToCommunity),
-        onTap: () => context.router.navigate(SubscriptionsTabRoute()),
+        //onTap: () => context.router.navigate(SubscriptionsTabRoute()),
+        onTap: () => context.go("/subscriptions"),
       ),
     if (settings.showGoToUser)
       ListTile(
@@ -110,7 +110,8 @@ class _GoToDropdownState extends State<GoToDropdown> {
                         title: Text(locales.lateralMenu_showGoToCommunity),
                         onTap: () {
                           Scaffold.of(context).closeDrawer();
-                          context.router.navigate(SubscriptionsTabRoute());
+                          //context.router.navigate(SubscriptionsTabRoute());
+                          context.go("/subscriptions");
                         },
                       ),
                       ListTile(

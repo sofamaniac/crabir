@@ -72,7 +72,8 @@ class SubredditSearchBloc
     if (state.hasReachedMax || streamable == null) {
       return emit(state);
     }
-    hasReachedMax = !await streamable!.next();
+    await streamable!.next();
+    hasReachedMax = !streamable!.done;
     await _filter(emit);
   }
 
@@ -95,8 +96,8 @@ class SubredditSearchBloc
         .map((sub) => sub.field0);
     if (subreddits.length < 20 && !hasReachedMax) {
       try {
-        while (await streamable!.next() && streamable!.length < 20) {}
-        hasReachedMax = !await streamable!.next();
+        while (!streamable!.done && streamable!.length < 20) {}
+        await streamable!.next();
         final subreddits = (streamable!.getAll())
             .whereType<Thing_Subreddit>()
             .map((sub) => sub.field0);

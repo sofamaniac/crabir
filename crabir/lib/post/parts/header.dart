@@ -26,10 +26,8 @@ class Header extends StatelessWidget {
       style: _labelStyle(context).copyWith(color: theme.highlight),
     );
     if (settings.clickableCommunity) {
-      final onTap = onSubredditTap ??
-          () => context.router.navigate(
-                FeedRoute(key: ValueKey(name), feed: Feed.subreddit(name)),
-              );
+      final onTap =
+          onSubredditTap ?? () => context.go("/r/${post.subreddit.subreddit}");
       return InkWell(onTap: onTap, child: subreddit);
     } else {
       return subreddit;
@@ -47,7 +45,7 @@ class Header extends StatelessWidget {
         onTap: () {
           final username = post.author?.username;
           if (username != null) {
-            context.router.navigate(UserRoute(username: username));
+            context.go("/u/$username");
           }
         },
         child: author,

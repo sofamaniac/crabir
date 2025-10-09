@@ -87,8 +87,8 @@ class LateralMenuSettingsCubit extends HydratedCubit<LateralMenuSettings> {
       emit(state.copyWith(showAccountUsername: value));
 }
 
+@CrabirRoute()
 // SettingsPage for LateralMenuSettings
-@RoutePage()
 class LateralMenuSettingsView extends StatelessWidget {
   const LateralMenuSettingsView({super.key});
 

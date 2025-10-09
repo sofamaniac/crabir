@@ -1,15 +1,18 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/settings/lateral_menu/lateral_menu_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/settings/theme/theme_editor.dart';
+import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
+part 'settings.go_route_ext.dart';
+
+@CrabirRoute()
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
 
@@ -22,35 +25,32 @@ class SettingsView extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.palette_outlined),
             title: Text("Theme"),
-            onTap: () => context.router.navigate(CrabirThemeEditorPage()),
+            onTap: () => CrabirThemeEditor().goNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.article),
             title: Text("Posts"),
-            onTap: () => context.router.navigate(PostsSettingsRoute()),
+            onTap: () => PostsSettingsView().goNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.comment),
             title: Text("Comments"),
-            onTap: () =>
-                AutoRouter.of(context).navigate(CommentsSettingsRoute()),
+            onTap: () => CommentsSettingsView().goNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.keyboard_tab),
             title: Text("Lateral Menu"),
-            onTap: () =>
-                AutoRouter.of(context).navigate(LateralMenuSettingsRoute()),
+            onTap: () => LateralMenuSettingsView().goNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.storage),
             title: Text("Data and Storage"),
-            onTap: () => AutoRouter.of(context).navigate(DataSettingsRoute()),
+            onTap: () => DataSettingsView().goNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.filter),
             title: Text("Content filters"),
-            onTap: () =>
-                AutoRouter.of(context).navigate(FiltersSettingsRoute()),
+            onTap: () => FiltersSettingsView().goNamed(context),
           ),
           ListTile(
             onTap: () => showLicensePage(context: context),

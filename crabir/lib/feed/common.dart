@@ -1,13 +1,13 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/feed.dart';
 import 'package:crabir/feed/scroll_aware_fab.dart';
 import 'package:crabir/feed/sort_menu.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/post.dart';
-import 'package:crabir/routes/routes.dart';
+import 'package:crabir/search_subreddits/widgets/search.dart' hide SortMenu;
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
+import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -18,6 +18,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/paging_handler.dart'
 import 'package:crabir/stream/things_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class CommonFeedView extends StatefulWidget {
   final reddit_stream.PagingHandler Function(FeedSort) newStream;
@@ -93,7 +94,7 @@ class _CommonFeedViewState extends State<CommonFeedView>
         IconButton(
           icon: Icon(Icons.search),
           onPressed: () {
-            context.router.navigate(SearchSubredditsRoute());
+            SearchSubredditsView().goNamed(context);
           },
         ),
         SortMenu(
@@ -133,7 +134,7 @@ class _CommonFeedViewState extends State<CommonFeedView>
             child: Text("Refresh")),
         MenuItemButton(
           onPressed: () {
-            context.router.navigate(SettingsRoute());
+            SettingsView().pushNamed(context);
           },
           child: Text("Settings"),
         ),
@@ -209,11 +210,7 @@ class _CommonFeedViewState extends State<CommonFeedView>
       post: post,
       onTap: () {
         context.read<ReadPosts>().mark(post.id);
-        context.router.navigate(
-          ThreadRoute(
-            post: post,
-          ),
-        );
+        context.push(post.permalink, extra: post);
       },
     );
   }

@@ -480,26 +480,23 @@ impl Client {
                     let response = client.execute(request).await;
                     match response {
                         Err(e) => Some((Err(e), acc)),
-                        Ok(response) => match parse_response::<Thing>(response).await {
-                            Ok(thing) => match thing {
-                                Thing::Listing(listing) => {
-                                    acc.pager.after(listing.after.clone());
-                                    acc.done = listing.after.is_none()
-                                        || listing.after.is_some_and(|after| after.is_empty());
-                                    let buffer: Vec<Thing> = listing
-                                        .children
-                                        .into_iter()
-                                        .filter(|thing| {
-                                            // Keep things that either do not have a name
-                                            // or that were not already seen
-                                            thing.name().is_none_or(|name| acc.seen.insert(name))
-                                        })
-                                        .collect();
+                        Ok(response) => match parse_thing::<Listing>(response).await {
+                            Ok(listing) => {
+                                acc.pager.after(listing.after.clone());
+                                acc.done = listing.after.is_none()
+                                    || listing.after.is_some_and(|after| after.is_empty());
+                                let buffer: Vec<Thing> = listing
+                                    .children
+                                    .into_iter()
+                                    .filter(|thing| {
+                                        // Keep things that either do not have a name
+                                        // or that were not already seen
+                                        thing.name().is_none_or(|name| acc.seen.insert(name))
+                                    })
+                                    .collect();
 
-                                    Some((Ok(buffer), acc))
-                                }
-                                _ => Some((Err(Error::InvalidThing), acc)),
-                            },
+                                Some((Ok(buffer), acc))
+                            }
                             Err(e) => Some((Err(e), acc)),
                         },
                     }
@@ -608,6 +605,19 @@ impl Client {
             .into_iter()
             .filter_map(|t| TryInto::<Multi>::try_into(t).ok())
             .collect())
+    }
+
+    /// Get a multi from its link (`/user/{username}/m/{name}`).
+    /// # Errors
+    /// Returns an error if the http client fails or if the parsing of the response fails.
+    pub async fn get_multi(&self, multi_path: &str) -> Result<Multi> {
+        let url = self
+            .join_url("api/multi")
+            .join(multi_path)
+            .expect("[get_multi] Could not parse url.");
+        let request = self.get(url);
+        let result = self.execute(request).await?;
+        parse_thing(result).await
     }
 
     #[frb(sync)]

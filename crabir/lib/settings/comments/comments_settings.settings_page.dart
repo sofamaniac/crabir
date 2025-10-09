@@ -96,8 +96,8 @@ class CommentsSettingsCubit extends HydratedCubit<CommentsSettings> {
       emit(state.copyWith(distanceThreshold: value));
 }
 
+@CrabirRoute()
 // SettingsPage for CommentsSettings
-@RoutePage()
 class CommentsSettingsView extends StatelessWidget {
   const CommentsSettingsView({super.key});
 

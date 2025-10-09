@@ -82,8 +82,8 @@ class PostsSettingsCubit extends HydratedCubit<PostsSettings> {
       emit(state.copyWith(showOpenInAppButton: value));
 }
 
+@CrabirRoute()
 // SettingsPage for PostsSettings
-@RoutePage()
 class PostsSettingsView extends StatelessWidget {
   const PostsSettingsView({super.key});
 

@@ -80,7 +80,7 @@ class ImageThumbnail extends StatelessWidget {
   }
 }
 
-@RoutePage()
+@CrabirRoute()
 class FullscreenImageView extends StatelessWidget {
   final String imageUrl;
   final String? title;
@@ -106,7 +106,7 @@ class FullscreenImageView extends StatelessWidget {
   }
 }
 
-@RoutePage()
+@CrabirRoute()
 class FullscreenVideoView extends StatelessWidget {
   final String videoUrl;
   final String? title;

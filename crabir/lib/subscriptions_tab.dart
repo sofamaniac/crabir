@@ -1,11 +1,9 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed_list.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-@RoutePage(name: "SubscriptionsTabRoute")
 class SubscriptionsTab extends StatefulWidget {
   const SubscriptionsTab({super.key});
   @override

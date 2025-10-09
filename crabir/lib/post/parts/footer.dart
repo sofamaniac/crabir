@@ -47,12 +47,13 @@ class Footer extends StatelessWidget {
             icon: const Icon(Icons.comment),
             color: theme.secondaryText,
             tooltip: 'Comments',
-            onPressed: () => navigateToSubscriptionsTab(
-              context,
-              ThreadRoute(
-                post: post,
-              ),
-            ),
+            // onPressed: () => navigateToSubscriptionsTab(
+            //   context,
+            //   ThreadRoute(
+            //     post: post,
+            //   ),
+            // ),
+            onPressed: () => context.go(post.permalink, extra: post),
           ),
         if (settings.showOpenInAppButton)
           IconButton(
@@ -137,11 +138,9 @@ class MoreOptionButton extends StatelessWidget {
               leading: Icon(Icons.reddit),
               title: Text("Go to ${post.subreddit.subreddit}"),
               onTap: () {
-                Navigator.pop(context);
-                context.router.navigate(
-                  FeedRoute(
-                    feed: Feed.subreddit(post.subreddit.subreddit),
-                  ),
+                context.go(
+                  post.subreddit.subredditNamePrefixed,
+                  extra: Feed.subreddit(post.subreddit.subreddit),
                 );
               },
             ),
@@ -150,10 +149,8 @@ class MoreOptionButton extends StatelessWidget {
                 leading: Icon(Icons.link),
                 title: Text("Go to original post"),
                 onTap: () {
-                  Navigator.pop(context);
-                  context.router.push(
-                    ThreadRoute(post: post.crosspostParentList.first),
-                  );
+                  context.go(post.crosspostParentList.first.permalink,
+                      extra: post.crosspostParentList.first);
                 },
               ),
             if (post.author?.username != null)
@@ -161,9 +158,9 @@ class MoreOptionButton extends StatelessWidget {
                 leading: Icon(Icons.person),
                 title: Text("See ${post.author!.username}'s info"),
                 onTap: () {
-                  Navigator.pop(context);
-                  context.router
-                      .navigate(UserRoute(username: post.author!.username));
+                  // Navigator.pop(context);
+                  // context.router
+                  //     .navigate(UserRoute(username: post.author!.username));
                 },
               ),
             if (post.linkFlair.text != null)
@@ -171,10 +168,10 @@ class MoreOptionButton extends StatelessWidget {
                 leading: Icon(Icons.label_outline),
                 title: Text("Search ${post.linkFlair.text} posts"),
                 onTap: () {
-                  Navigator.pop(context);
-                  context.router.navigate(
-                    SearchPostsRoute(flair: post.linkFlair),
-                  );
+                  // Navigator.pop(context);
+                  // context.router.navigate(
+                  //   SearchPostsRoute(flair: post.linkFlair),
+                  // );
                 },
               ),
             if (!settings.showMarkAsReadButton)

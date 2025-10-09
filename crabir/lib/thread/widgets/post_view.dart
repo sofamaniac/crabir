@@ -26,6 +26,9 @@ class _PostView extends StatelessWidget {
         wrapPostElement(
           Header(
             post: post,
+            onSubredditTap: () => context.push(
+              "/r/${post.crosspostParentList.first.subreddit.subreddit}",
+            ),
           ),
         ),
         wrapPostElement(title(context)),
@@ -43,11 +46,9 @@ class _PostView extends StatelessWidget {
                 // Disable shadow
                 elevation: 0,
                 onTap: () {
-                  context.router.push(
-                    ThreadRoute(
-                      key: ValueKey(post.id),
-                      post: post.crosspostParentList.first,
-                    ),
+                  context.push(
+                    post.crosspostParentList.first.permalink,
+                    extra: post.crosspostParentList.first,
                   );
                 },
               ),
@@ -83,11 +84,7 @@ class _PostView extends StatelessWidget {
         color: theme.background,
         elevation: 1,
         child: InkWell(
-          onTap: () => context.pushRoute(
-            ThreadRoute(
-              post: post.crosspostParentList.first,
-            ),
-          ),
+          onTap: () => context.push(post.crosspostParentList.first.permalink),
           child: contentWidget,
         ),
       );
