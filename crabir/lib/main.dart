@@ -17,12 +17,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:crabir/l10n/app_localizations.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 Future<void> main() async {
   await RustLib.init();
@@ -65,30 +63,6 @@ bool _defaultOnNavigationNotification(NavigationNotification _) {
 
       /// This must be `true` instead of `notification.canHandlePop`, otherwise application closes on back gesture.
       return true;
-  }
-}
-
-void _handleRedditLink(BuildContext context, String url) async {
-  final uri = Uri.parse(url);
-  if (uri.host.contains('reddit.com') || uri.host == 'redd.it') {
-    // Navigate using AutoRoute
-    final Uri destination;
-    if (uri.pathSegments.contains("s")) {
-      destination = await _resolveRedditShortlink(uri);
-    } else {
-      destination = uri;
-    }
-    try {
-      context.go(destination.toString());
-    } catch (_) {
-      Logger("Crabir").warning(
-        "Failed to navigate to $uri, opening in browser",
-      );
-      launchUrl(uri, mode: LaunchMode.inAppBrowserView);
-    }
-  } else {
-    // Open in external browser
-    launchUrl(uri);
   }
 }
 
@@ -161,34 +135,7 @@ class TopLevel extends StatelessWidget {
         ),
       ),
       routerConfig: _appRouter,
-      // routerConfig: _appRouter.config(
-      //     includePrefixMatches: false,
-      //     deepLinkTransformer: (deepLink) {
-      //       if (deepLink.path.contains('s')) {
-      //         // continue with the platform link
-      //         return _resolveRedditShortlink(deepLink);
-      //       } else {
-      //         return SynchronousFuture(deepLink);
-      //       }
-      //     }),
     );
-  }
-}
-
-/// Reddit share links (e.g. https://reddit.com/python/s/SOME_ID) are simple redirect.
-Future<Uri> _resolveRedditShortlink(Uri uri) async {
-  final client = http.Client();
-  try {
-    final req = http.Request('GET', uri)..followRedirects = false;
-    final resp = await client.send(req);
-
-    final location = resp.headers['location'];
-    if (location != null && location.isNotEmpty) {
-      return uri.resolve(location);
-    }
-    return uri; // no redirect
-  } finally {
-    client.close();
   }
 }
 
