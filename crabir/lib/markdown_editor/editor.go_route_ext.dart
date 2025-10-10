@@ -11,7 +11,12 @@ part of 'editor.dart';
 extension MarkdownEditorBuilder on MarkdownEditor {
   static const String name = 'MarkdownEditor';
   Map<String, String> get pathParams => {};
-  Map<String, dynamic> get extra => {'controller': controller};
+  Map<String, dynamic> get extra => {
+        'controller': controller,
+        'maxLines': maxLines,
+        'minLines': minLines,
+        'hint': hint
+      };
 
   void goNamed(BuildContext context) => context.goNamed(
         name,
@@ -19,7 +24,8 @@ extension MarkdownEditorBuilder on MarkdownEditor {
         extra: extra,
       );
 
-  void pushNamed(BuildContext context) => context.pushNamed(
+  Future<T?> pushNamed<T extends Object?>(BuildContext context) =>
+      context.pushNamed(
         name,
         pathParameters: pathParams,
         extra: extra,
@@ -27,7 +33,10 @@ extension MarkdownEditorBuilder on MarkdownEditor {
 
   static MarkdownEditor fromExtra(Map<String, dynamic> extra) {
     return MarkdownEditor(
-        controller: extra['controller'] as TextEditingController?);
+        controller: extra['controller'] as TextEditingController?,
+        maxLines: extra['maxLines'] as int?,
+        minLines: extra['minLines'] as int?,
+        hint: extra['hint'] as String?);
   }
 }
 
@@ -39,7 +48,8 @@ extension CommentEditorBuilder on CommentEditor {
         'title': title,
         'author': author,
         'text': text,
-        'parentName': parentName
+        'parentName': parentName,
+        'depth': depth
       };
 
   void goNamed(BuildContext context) => context.goNamed(
@@ -48,7 +58,8 @@ extension CommentEditorBuilder on CommentEditor {
         extra: extra,
       );
 
-  void pushNamed(BuildContext context) => context.pushNamed(
+  Future<T?> pushNamed<T extends Object?>(BuildContext context) =>
+      context.pushNamed(
         name,
         pathParameters: pathParams,
         extra: extra,
@@ -59,6 +70,31 @@ extension CommentEditorBuilder on CommentEditor {
         title: extra['title'] as String,
         author: extra['author'] as String,
         text: extra['text'] as String,
-        parentName: extra['parentName'] as Fullname);
+        parentName: extra['parentName'] as Fullname,
+        depth: extra['depth'] as int);
+  }
+}
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+extension PostEditorBuilder on PostEditor {
+  static const String name = 'PostEditor';
+  Map<String, String> get pathParams => {};
+  Map<String, dynamic> get extra => {};
+
+  void goNamed(BuildContext context) => context.goNamed(
+        name,
+        pathParameters: pathParams,
+        extra: extra,
+      );
+
+  Future<T?> pushNamed<T extends Object?>(BuildContext context) =>
+      context.pushNamed(
+        name,
+        pathParameters: pathParams,
+        extra: extra,
+      );
+
+  static PostEditor fromExtra(Map<String, dynamic> extra) {
+    return PostEditor();
   }
 }

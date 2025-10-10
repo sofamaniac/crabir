@@ -22,7 +22,26 @@ pub mod user;
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Represent the kind and the ID of a thing.
 /// For example a post has a fullname of the form "t3_xxxx".
+#[frb(
+    non_eq,
+    non_hash,
+    dart_code = "@override
+bool operator ==(Object other) {
+  if (identical(this, other)) return true;
+  if (other is! Fullname) return false;
+  return eq(other: other);
+}
+"
+)]
 pub struct Fullname(String);
+
+impl Fullname {
+    #[frb(sync)]
+    pub fn eq(&self, other: &Fullname) -> bool {
+        log::debug!("eq {} {}", self.0, other.0);
+        self == other
+    }
+}
 
 impl AsRef<str> for Fullname {
     fn as_ref(&self) -> &str {

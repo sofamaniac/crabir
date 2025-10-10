@@ -79,7 +79,7 @@ pub struct Comment {
     #[serde_as(as = "serde_with::TimestampSecondsWithFrac<f64>")]
     created: DateTime<Local>,
     send_replies: bool,
-    parent_id: String,
+    parent_id: Fullname,
     score: i32,
     // pub approved_by: Value,
     // pub mod_note: Value,
@@ -158,6 +158,11 @@ impl Comment {
                 }
             }
         }
+    }
+
+    /// When submitting a new comment, the response of the post request does not contains its depth
+    pub(crate) fn set_depth(&mut self, depth: i32) {
+        self.depth = depth;
     }
 }
 

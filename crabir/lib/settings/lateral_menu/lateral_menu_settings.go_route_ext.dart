@@ -19,7 +19,8 @@ extension LateralMenuSettingsViewBuilder on LateralMenuSettingsView {
         extra: extra,
       );
 
-  void pushNamed(BuildContext context) => context.pushNamed(
+  Future<T?> pushNamed<T extends Object?>(BuildContext context) =>
+      context.pushNamed(
         name,
         pathParameters: pathParams,
         extra: extra,

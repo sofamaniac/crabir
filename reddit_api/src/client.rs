@@ -1,3 +1,4 @@
+use crate::model::comment::Comment;
 use crate::model::feed::{self, Feed};
 use crate::model::flair::Flair;
 use crate::model::multi::{Multi, MultiStream};
@@ -382,8 +383,14 @@ impl Client {
         debug!("Executing {request:#?}");
         let request = request.build().expect("Building request should not fail");
         let url = request.url().clone();
-        let res = self.http.clone().execute(request).await?;
-        debug!("Done with request. {url:#?}");
+        let res = self.http.clone().execute(request).await;
+        let res = match res {
+            Ok(res) => res,
+            Err(err) => {
+                log::error!("Error while executing request ({}) : {:#?}", url, err);
+                return Err(err.into());
+            }
+        };
         res.error_for_status().map_err(Into::into)
     }
 
@@ -805,14 +812,46 @@ impl Client {
     }
 
     /// Submit a comment
-    pub async fn submit_comment(&self, parent: &Fullname, body: &str) -> Result<()> {
+    pub async fn submit_comment(
+        &self,
+        parent: &Fullname,
+        body: &str,
+        depth: i32,
+    ) -> Result<Comment> {
+        #[derive(Deserialize)]
+        struct Response {
+            json: Json,
+        }
+        #[derive(Deserialize)]
+        struct Json {
+            // error: Option<String>,
+            #[serde(default)]
+            data: Data,
+        }
+        #[derive(Deserialize, Default)]
+        struct Data {
+            things: Vec<Thing>,
+        }
         let url = self.join_url("api/comment");
         let request = self.post(url).query(&[
             ("api_type", "json"),
             ("text", body),
             ("thing_id", parent.as_ref()),
+            ("raw_json", "1"),
         ]);
-        self.execute(request).await?;
-        Ok(())
+        let res = self.execute(request).await?;
+        let response: Response = parse_response(res).await?;
+        let thing = response
+            .json
+            .data
+            .things
+            .first()
+            .ok_or(Error::Custom {
+                message: "No comment in answer".to_owned(),
+            })?
+            .clone();
+        let mut comment: Comment = thing.try_into()?;
+        comment.set_depth(depth);
+        Ok(comment)
     }
 }

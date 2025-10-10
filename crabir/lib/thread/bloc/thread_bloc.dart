@@ -1,9 +1,11 @@
 import 'dart:collection';
 
+import 'package:collection/collection.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:logging/logging.dart';
@@ -30,6 +32,15 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     on<SetSort>(_setSort);
     on<OpenComment>(_openComment);
     on<CloseComment>(_closeComment);
+    on<InsertComment>(_insertComment);
+  }
+
+  static ThreadBloc? maybeOf(BuildContext context) {
+    try {
+      return context.watch<ThreadBloc>();
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> _openComment(
@@ -44,6 +55,23 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     Emitter<ThreadState> emit,
   ) async {
     emit(state.copyWith(expandedComment: null));
+  }
+
+  Future<void> _insertComment(
+    InsertComment event,
+    Emitter<ThreadState> emit,
+  ) async {
+    final parent = event.comment.parentId;
+    final position = state.flatComments.indexWhere((thing) {
+      if (thing case Thing_Comment(field0: final comment)) {
+        return comment.name.eq(other: parent);
+      } else {
+        return false;
+      }
+    });
+    final comments = flatten(_comments);
+    comments.insert(position + 1, Thing_Comment(event.comment));
+    emit(state.copyWith(flatComments: comments));
   }
 
   Future<void> _fetchComments(Load _, Emitter<ThreadState> emit) async {

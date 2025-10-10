@@ -13,6 +13,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/author.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
+import 'package:crabir/thread/bloc/thread_bloc.dart';
 import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/time_ellapsed.dart';
 import 'package:flutter/material.dart';
@@ -193,6 +194,7 @@ class _CommentViewState extends State<CommentView> {
     final dislikeColor = theme.downvoteContent;
     final settings = CommentsSettings.of(context);
     final likes = widget.comment.likes.toVoteDirection();
+    final bloc = ThreadBloc.maybeOf(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.max,
@@ -218,19 +220,23 @@ class _CommentViewState extends State<CommentView> {
               await save(target, settings.hideButtonAfterAction);
             },
           ),
-        IconButton(
-          color: theme.secondaryText,
-          onPressed: () {
-            CommentEditor.reply(
-              context,
-              widget.comment,
-            ).pushNamed(context);
-            if (settings.hideButtonAfterAction) {
-              OpenedComment.current.value = null;
-            }
-          },
-          icon: Icon(Icons.reply_rounded),
-        ),
+        if (bloc != null)
+          IconButton(
+            color: theme.secondaryText,
+            onPressed: () async {
+              final Comment? comment = await CommentEditor.reply(
+                context,
+                widget.comment,
+              ).pushNamed(context);
+              if (settings.hideButtonAfterAction) {
+                OpenedComment.current.value = null;
+              }
+              if (comment != null) {
+                bloc.add(ThreadEvent.insertComment(comment));
+              }
+            },
+            icon: Icon(Icons.reply_rounded),
+          ),
         ShareButton(
           comment: widget.comment,
           onPressed: () {

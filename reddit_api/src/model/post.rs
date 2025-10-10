@@ -464,15 +464,14 @@ pub struct Oembed {
     pub thumbnail: ThumbnailOption,
 }
 
-// #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-// #[frb(non_opaque)]
-// pub struct PostSubmit {
-//     title: String,
-//     text: String,
-//     subreddit: String,
-//     nsfw: bool,
-//     spoiler: bool,
-//     kind: Kind,
-//     flair_id: String,
-//     flair_text: String,
-// }
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize, Setters)]
+pub struct PostSubmit {
+    title: String,
+    text: String,
+    subreddit: String,
+    nsfw: bool,
+    spoiler: bool,
+    kind: Kind,
+    flair_id: String,
+    flair_text: String,
+}

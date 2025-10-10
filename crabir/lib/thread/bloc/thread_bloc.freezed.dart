@@ -57,6 +57,7 @@ extension ThreadEventPatterns on ThreadEvent {
     TResult Function(SetSort value)? setSort,
     TResult Function(OpenComment value)? openComment,
     TResult Function(CloseComment value)? closeComment,
+    TResult Function(InsertComment value)? insertComment,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -75,6 +76,8 @@ extension ThreadEventPatterns on ThreadEvent {
         return openComment(_that);
       case CloseComment() when closeComment != null:
         return closeComment(_that);
+      case InsertComment() when insertComment != null:
+        return insertComment(_that);
       case _:
         return orElse();
     }
@@ -102,6 +105,7 @@ extension ThreadEventPatterns on ThreadEvent {
     required TResult Function(SetSort value) setSort,
     required TResult Function(OpenComment value) openComment,
     required TResult Function(CloseComment value) closeComment,
+    required TResult Function(InsertComment value) insertComment,
   }) {
     final _that = this;
     switch (_that) {
@@ -119,6 +123,8 @@ extension ThreadEventPatterns on ThreadEvent {
         return openComment(_that);
       case CloseComment():
         return closeComment(_that);
+      case InsertComment():
+        return insertComment(_that);
     }
   }
 
@@ -143,6 +149,7 @@ extension ThreadEventPatterns on ThreadEvent {
     TResult? Function(SetSort value)? setSort,
     TResult? Function(OpenComment value)? openComment,
     TResult? Function(CloseComment value)? closeComment,
+    TResult? Function(InsertComment value)? insertComment,
   }) {
     final _that = this;
     switch (_that) {
@@ -160,6 +167,8 @@ extension ThreadEventPatterns on ThreadEvent {
         return openComment(_that);
       case CloseComment() when closeComment != null:
         return closeComment(_that);
+      case InsertComment() when insertComment != null:
+        return insertComment(_that);
       case _:
         return null;
     }
@@ -186,6 +195,7 @@ extension ThreadEventPatterns on ThreadEvent {
     TResult Function(CommentSort? sort)? setSort,
     TResult Function(String comment)? openComment,
     TResult Function()? closeComment,
+    TResult Function(Comment comment)? insertComment,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -204,6 +214,8 @@ extension ThreadEventPatterns on ThreadEvent {
         return openComment(_that.comment);
       case CloseComment() when closeComment != null:
         return closeComment();
+      case InsertComment() when insertComment != null:
+        return insertComment(_that.comment);
       case _:
         return orElse();
     }
@@ -231,6 +243,7 @@ extension ThreadEventPatterns on ThreadEvent {
     required TResult Function(CommentSort? sort) setSort,
     required TResult Function(String comment) openComment,
     required TResult Function() closeComment,
+    required TResult Function(Comment comment) insertComment,
   }) {
     final _that = this;
     switch (_that) {
@@ -248,6 +261,8 @@ extension ThreadEventPatterns on ThreadEvent {
         return openComment(_that.comment);
       case CloseComment():
         return closeComment();
+      case InsertComment():
+        return insertComment(_that.comment);
     }
   }
 
@@ -272,6 +287,7 @@ extension ThreadEventPatterns on ThreadEvent {
     TResult? Function(CommentSort? sort)? setSort,
     TResult? Function(String comment)? openComment,
     TResult? Function()? closeComment,
+    TResult? Function(Comment comment)? insertComment,
   }) {
     final _that = this;
     switch (_that) {
@@ -289,6 +305,8 @@ extension ThreadEventPatterns on ThreadEvent {
         return openComment(_that.comment);
       case CloseComment() when closeComment != null:
         return closeComment();
+      case InsertComment() when insertComment != null:
+        return insertComment(_that.comment);
       case _:
         return null;
     }
@@ -602,6 +620,70 @@ class CloseComment implements ThreadEvent {
   @override
   String toString() {
     return 'ThreadEvent.closeComment()';
+  }
+}
+
+/// @nodoc
+
+class InsertComment implements ThreadEvent {
+  InsertComment(this.comment);
+
+  final Comment comment;
+
+  /// Create a copy of ThreadEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $InsertCommentCopyWith<InsertComment> get copyWith =>
+      _$InsertCommentCopyWithImpl<InsertComment>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is InsertComment &&
+            (identical(other.comment, comment) || other.comment == comment));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, comment);
+
+  @override
+  String toString() {
+    return 'ThreadEvent.insertComment(comment: $comment)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $InsertCommentCopyWith<$Res>
+    implements $ThreadEventCopyWith<$Res> {
+  factory $InsertCommentCopyWith(
+          InsertComment value, $Res Function(InsertComment) _then) =
+      _$InsertCommentCopyWithImpl;
+  @useResult
+  $Res call({Comment comment});
+}
+
+/// @nodoc
+class _$InsertCommentCopyWithImpl<$Res>
+    implements $InsertCommentCopyWith<$Res> {
+  _$InsertCommentCopyWithImpl(this._self, this._then);
+
+  final InsertComment _self;
+  final $Res Function(InsertComment) _then;
+
+  /// Create a copy of ThreadEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? comment = null,
+  }) {
+    return _then(InsertComment(
+      null == comment
+          ? _self.comment
+          : comment // ignore: cast_nullable_to_non_nullable
+              as Comment,
+    ));
   }
 }
 

@@ -20,4 +20,7 @@ sealed class ThreadEvent with _$ThreadEvent {
 
   /// Close bar on currently open comment
   factory ThreadEvent.closeComment() = CloseComment;
+
+  /// Insert a comment in the tree
+  factory ThreadEvent.insertComment(Comment comment) = InsertComment;
 }

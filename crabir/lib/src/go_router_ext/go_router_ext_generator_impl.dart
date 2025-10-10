@@ -64,7 +64,8 @@ class GoRouteDataGenerator extends GeneratorForAnnotation<CrabirRoute> {
       ..writeln('    extra: extra,')
       ..writeln('  );')
       ..writeln()
-      ..writeln('  void pushNamed(BuildContext context) => context.pushNamed(')
+      ..writeln(
+          '  Future<T?> pushNamed<T extends Object?>(BuildContext context) => context.pushNamed(')
       ..writeln('    name,')
       ..writeln('    pathParameters: pathParams,')
       ..writeln('    extra: extra,')

@@ -9,13 +9,20 @@ import 'package:logging/logging.dart';
 
 part 'editor.go_route_ext.dart';
 part 'comment_editor.dart';
+part 'post_editor.dart';
 
 @CrabirRoute()
 class MarkdownEditor extends StatefulWidget {
   final TextEditingController? controller;
+  final int? maxLines;
+  final int? minLines;
+  final String? hint;
   const MarkdownEditor({
     super.key,
     this.controller,
+    this.maxLines,
+    this.minLines,
+    this.hint,
   });
 
   @override
@@ -74,11 +81,11 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
         Expanded(
           child: TextField(
             controller: _controller,
-            maxLines: null,
-            minLines: 10,
-            decoration: const InputDecoration(
+            maxLines: widget.maxLines,
+            minLines: widget.minLines,
+            decoration: InputDecoration(
               border: OutlineInputBorder(),
-              hintText: 'Enter markdown...',
+              hintText: widget.hint ?? 'Enter markdown...',
             ),
           ),
         ),

@@ -1,19 +1,20 @@
 part of 'editor.dart';
 
-@CrabirRoute()
-
 /// Reply to a comment
+@CrabirRoute()
 class CommentEditor extends StatefulWidget {
   final String title;
   final String author;
   final String text;
   final Fullname parentName;
+  final int depth;
   const CommentEditor({
     super.key,
     required this.title,
     required this.author,
     required this.text,
     required this.parentName,
+    required this.depth,
   });
 
   factory CommentEditor.reply(BuildContext context, Comment comment) {
@@ -23,6 +24,7 @@ class CommentEditor extends StatefulWidget {
       author: comment.author?.username ?? locales.deletedUser,
       text: comment.body,
       parentName: comment.name,
+      depth: comment.depth + 1,
     );
   }
 
@@ -50,11 +52,12 @@ class _CommentEditorState extends State<CommentEditor> {
             icon: Icon(Icons.send),
             onPressed: () async {
               log.info("Submitting comment to ${widget.parentName}");
-              await RedditAPI.client().submitComment(
+              final comment = await RedditAPI.client().submitComment(
                 parent: widget.parentName,
                 body: _controller.text,
+                depth: widget.depth,
               );
-              if (context.mounted) context.pop();
+              if (context.mounted) context.pop(comment);
             },
           )
         ],

@@ -96,6 +96,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deletedUser => '[deleted]';
 
   @override
+  String get postEditorTitle => 'Create post';
+
+  @override
   String get resolutionSource => 'Source';
 
   @override

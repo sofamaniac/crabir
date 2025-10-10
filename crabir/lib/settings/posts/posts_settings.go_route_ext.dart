@@ -19,7 +19,8 @@ extension ManageSortViewBuilder on ManageSortView {
         extra: extra,
       );
 
-  void pushNamed(BuildContext context) => context.pushNamed(
+  Future<T?> pushNamed<T extends Object?>(BuildContext context) =>
+      context.pushNamed(
         name,
         pathParameters: pathParams,
         extra: extra,
@@ -42,7 +43,8 @@ extension PostsSettingsViewBuilder on PostsSettingsView {
         extra: extra,
       );
 
-  void pushNamed(BuildContext context) => context.pushNamed(
+  Future<T?> pushNamed<T extends Object?>(BuildContext context) =>
+      context.pushNamed(
         name,
         pathParameters: pathParams,
         extra: extra,

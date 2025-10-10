@@ -268,6 +268,12 @@ abstract class AppLocalizations {
   /// **'[deleted]'**
   String get deletedUser;
 
+  /// No description provided for @postEditorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create post'**
+  String get postEditorTitle;
+
   /// No description provided for @resolutionSource.
   ///
   /// In en, this message translates to:
