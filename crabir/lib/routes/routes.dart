@@ -6,6 +6,7 @@ import 'package:crabir/main.dart';
 import 'package:crabir/markdown_editor/editor.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/routes/fixed_swipe_page_route.dart';
+import 'package:crabir/routes/not_found_page.dart';
 import 'package:crabir/search_subreddits/widgets/search.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';
@@ -23,6 +24,7 @@ import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/user/user.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path/path.dart';
 
 const String homeRouteName = "HomeFeedRoute";
 const String homeRoutePath = "home";
@@ -30,6 +32,13 @@ const String homeRoutePath = "home";
 final GoRouter appRouter = GoRouter(
   debugLogDiagnostics: true,
   initialLocation: '/',
+  // Catch unhandled paths
+  errorBuilder: (context, state) {
+    final uri = state.uri;
+
+    return NotFoundPage(uri: uri.toString());
+  },
+
   routes: [
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
@@ -120,6 +129,26 @@ final GoRouter appRouter = GoRouter(
                 );
               },
               routes: [
+                /// Handle short links
+                GoRoute(
+                  path: "s/:id",
+                  builder: (context, state) {
+                    final future = RedditAPI.client().resolveShortLink(
+                      link: state.fullPath!,
+                    );
+                    return FutureBuilder(
+                      future: future,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          context.replace(snapshot.data!);
+                        }
+                        return Scaffold(
+                            body: Center(child: LoadingIndicator()));
+                      },
+                    );
+                  },
+                ),
+
                 /// Thread route with swipe-to-close support
                 GoRoute(
                   path: 'comments/:id/:title',
@@ -213,6 +242,15 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
         return FullscreenVideoViewBuilder.fromExtra(extra);
+      },
+    ),
+    GoRoute(
+      path: "/video/:id",
+      builder: (context, state) {
+        return Scaffold(
+            body: Center(
+          child: Text("TODO"),
+        ));
       },
     ),
     GoRoute(
