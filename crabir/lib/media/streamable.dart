@@ -1,7 +1,6 @@
 /// Handle streamable.com videos
 part of 'media.dart';
 
-// ignore: use_key_in_widget_constructors
 class StreamableVideo extends StatelessWidget {
   final Post post;
 
@@ -27,7 +26,10 @@ class StreamableVideo extends StatelessWidget {
               ),
             );
           } else if (snapshot.hasError) {
-            return Text("Failed to load the video: ${snapshot.error}");
+            Logger("StreamableVideo").severe(
+              "Failed to load streamable.com video ${snapshot.error}",
+            );
+            return Text("Could not load video");
           } else {
             return SizedBox.shrink();
           }
