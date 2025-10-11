@@ -5,12 +5,14 @@ class FullScreenGalleryView extends StatefulWidget {
   final Gallery gallery;
   final int initialPage;
   final Post? post;
+  final PageController? controller;
 
   const FullScreenGalleryView({
     super.key,
     required this.gallery,
     required this.initialPage,
     this.post,
+    this.controller,
   });
 
   @override
@@ -20,16 +22,20 @@ class FullScreenGalleryView extends StatefulWidget {
 class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
   late int _currentPage;
   late final PageController controller;
+  late final bool _ownController;
   @override
   void initState() {
     super.initState();
     _currentPage = widget.initialPage;
-    controller = PageController(initialPage: widget.initialPage);
+    controller =
+        widget.controller ?? PageController(initialPage: widget.initialPage);
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    if (_ownController) {
+      controller.dispose();
+    }
     super.dispose();
   }
 

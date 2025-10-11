@@ -38,6 +38,12 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
   final TextEditingController _controller = TextEditingController();
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final bloc = context.watch<SubredditSearchBloc>();
     final state = bloc.state;

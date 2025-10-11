@@ -72,6 +72,7 @@ class _GalleryView extends StatefulWidget {
 class _GalleryViewState extends State<_GalleryView> {
   int _currentPage = 0;
   late bool obfuscate;
+  final PageController _controller = PageController();
 
   @override
   void initState() {
@@ -86,8 +87,11 @@ class _GalleryViewState extends State<_GalleryView> {
       });
       return;
     }
-    FullScreenGalleryView(gallery: widget.gallery, initialPage: initialPage)
-        .pushNamed(context);
+    FullScreenGalleryView(
+      gallery: widget.gallery,
+      initialPage: initialPage,
+      controller: _controller,
+    ).pushNamed(context);
   }
 
   @override
@@ -100,6 +104,7 @@ class _GalleryViewState extends State<_GalleryView> {
           child: _GalleryPageViewer(
             gallery: widget.gallery,
             obfuscate: obfuscate,
+            controller: _controller,
             onPageChanged: (index) {
               setState(() {
                 _currentPage = index;
@@ -145,12 +150,15 @@ class _GalleryPageViewer extends StatefulWidget {
 
 class _GalleryPageViewerState extends State<_GalleryPageViewer> {
   int _currentPage = 0;
+  late final bool _ownedController;
   late final PageController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = PageController(initialPage: widget.initialPage);
+    _controller =
+        widget.controller ?? PageController(initialPage: widget.initialPage);
+    _ownedController = widget.controller == null;
 
     if (widget.controller == null) {
       // Ensure first frame jumps to the correct page, without that it jumps to
@@ -163,7 +171,9 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    if (_ownedController) {
+      _controller.dispose();
+    }
     super.dispose();
   }
 
@@ -223,7 +233,7 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
   @override
   Widget build(BuildContext context) {
     return PhotoViewGallery.builder(
-      pageController: widget.controller ?? _controller,
+      pageController: _controller,
       onPageChanged: _onPageChange,
       itemCount: widget.gallery.length,
       builder: (context, index) {

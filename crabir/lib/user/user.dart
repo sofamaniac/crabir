@@ -19,8 +19,6 @@ import 'package:logging/logging.dart';
 part 'tabs.dart';
 part 'user.go_route_ext.dart';
 
-/// Defaults to the current logged in user if not specified.
-/// Should only be called when there is a non-anonymous user logged in.
 @CrabirRoute()
 class UserView extends StatefulWidget {
   final String username;
@@ -79,7 +77,6 @@ class _UserViewState extends State<UserView>
 
   @override
   Widget build(BuildContext context) {
-    //final _ = context.watch<AccountsBloc>().state;
     return FutureBuilder(
       future: _userFuture,
       builder: (context, snapshot) {
@@ -90,7 +87,7 @@ class _UserViewState extends State<UserView>
         } else if (snapshot.hasData) {
           final infos = snapshot.data!;
           return SafeArea(
-            key: ValueKey("USER VIEW"),
+            key: ValueKey(widget.username),
             child: ExtendedNestedScrollView(
               onlyOneScrollInBody: true,
               floatHeaderSlivers: true,

@@ -74,6 +74,12 @@ class _VoteButtonState extends State<VoteButton>
     ]).animate(_controller);
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   final int duration = 100;
 
   @override
@@ -147,6 +153,12 @@ class _SaveButtonState extends State<SaveButton>
         weight: 50,
       ),
     ]).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
