@@ -854,4 +854,16 @@ impl Client {
         comment.set_depth(depth);
         Ok(comment)
     }
+
+    /// Resolve short link
+    pub async fn resolve_short_link(&self, link: &str) -> Result<String> {
+        let request = self
+            .http
+            .get(Url::parse(link).expect("Should not fail."))
+            .build()
+            .expect("Should not fail");
+        let response = self.http.execute(request).await?;
+        let url = response.url().to_string();
+        Ok(url)
+    }
 }
