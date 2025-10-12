@@ -80,18 +80,18 @@ class _GalleryViewState extends State<_GalleryView> {
     obfuscate = widget.obfuscate;
   }
 
-  void _openFullScreen(int initialPage) {
+  void _openFullScreen(int initialPage) async {
     if (obfuscate) {
       setState(() {
         obfuscate = false;
       });
       return;
     }
-    FullScreenGalleryView(
+    _currentPage = await FullScreenGalleryView(
       gallery: widget.gallery,
       initialPage: initialPage,
-      controller: _controller,
-    ).pushNamed(context);
+    ).pushNamed(context) as int;
+    _controller.jumpToPage(_currentPage);
   }
 
   @override
@@ -149,7 +149,6 @@ class _GalleryPageViewer extends StatefulWidget {
 }
 
 class _GalleryPageViewerState extends State<_GalleryPageViewer> {
-  int _currentPage = 0;
   late final bool _ownedController;
   late final PageController _controller;
 
@@ -160,11 +159,11 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
         widget.controller ?? PageController(initialPage: widget.initialPage);
     _ownedController = widget.controller == null;
 
-    if (widget.controller == null) {
+    if (_ownedController) {
       // Ensure first frame jumps to the correct page, without that it jumps to
       // the last page when scrolling into view.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _controller.jumpToPage(_currentPage);
+        _controller.jumpToPage(widget.initialPage);
       });
     }
   }
@@ -178,7 +177,6 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
   }
 
   void _onPageChange(int index) {
-    _currentPage = index;
     widget.onPageChanged?.call(index);
   }
 

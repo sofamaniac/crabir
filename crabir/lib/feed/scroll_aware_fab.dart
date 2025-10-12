@@ -1,6 +1,8 @@
+import 'package:crabir/markdown_editor/editor.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:go_router/go_router.dart';
 
 class ScrollAwareFab extends StatefulWidget {
   final ScrollController scrollController;
@@ -68,7 +70,7 @@ class _ScrollAwareFabState extends State<ScrollAwareFab> {
               backgroundColor: theme.primaryColor,
               child: const Icon(Icons.edit),
               label: 'Create Post',
-              onTap: () {},
+              onTap: () => PostEditor().pushNamed(context),
             ),
             SpeedDialChild(
               backgroundColor: theme.primaryColor,

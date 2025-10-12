@@ -24,13 +24,13 @@ import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/user/user.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path/path.dart';
 
-const String homeRouteName = "HomeFeedRoute";
-const String homeRoutePath = "home";
+final _rootNavigationKey = GlobalKey<NavigatorState>();
+final _indexStateKey = GlobalKey<StatefulNavigationShellState>();
 
 final GoRouter appRouter = GoRouter(
   debugLogDiagnostics: true,
+  navigatorKey: _rootNavigationKey,
   initialLocation: '/',
   // Catch unhandled paths
   errorBuilder: (context, state) {
@@ -41,6 +41,8 @@ final GoRouter appRouter = GoRouter(
 
   routes: [
     StatefulShellRoute.indexedStack(
+      key: _indexStateKey,
+      parentNavigatorKey: _rootNavigationKey,
       builder: (context, state, navigationShell) {
         // the UI shell
         return MainScreenView(navigationShell: navigationShell);
@@ -65,12 +67,10 @@ final GoRouter appRouter = GoRouter(
 
         // Search tab
         StatefulShellBranch(
-          initialLocation: "/search",
+          initialLocation: "/searchtab",
           routes: [
-            /// Home feed
             GoRoute(
-              path: '/search',
-              name: SearchSubredditsViewBuilder.name,
+              path: '/searchtab',
               builder: (context, state) => SearchSubredditsView(),
             ),
           ],
@@ -129,26 +129,6 @@ final GoRouter appRouter = GoRouter(
                 );
               },
               routes: [
-                /// Handle short links
-                GoRoute(
-                  path: "s/:id",
-                  builder: (context, state) {
-                    final future = RedditAPI.client().resolveShortLink(
-                      link: state.fullPath!,
-                    );
-                    return FutureBuilder(
-                      future: future,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          context.replace(snapshot.data!);
-                        }
-                        return Scaffold(
-                            body: Center(child: LoadingIndicator()));
-                      },
-                    );
-                  },
-                ),
-
                 /// Thread route with swipe-to-close support
                 GoRoute(
                   path: 'comments/:id/:title',
@@ -169,15 +149,36 @@ final GoRouter appRouter = GoRouter(
                     if (settings.swipeToClose) {
                       final threshold = settings.distanceThreshold;
                       return FixedSwipePage(
+                        key: ValueKey(threadId),
                         builder: (context) => pageChild,
                         dragThreshold: threshold / 100,
                       );
                     } else {
                       return MaterialPage(
-                        key: state.pageKey,
+                        key: ValueKey(threadId),
                         child: pageChild,
                       );
                     }
+                  },
+                ),
+
+                /// Handle short links
+                GoRoute(
+                  path: "s/:id",
+                  builder: (context, state) {
+                    final future = RedditAPI.client().resolveShortLink(
+                      link: state.fullPath!,
+                    );
+                    return FutureBuilder(
+                      future: future,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          context.replace(snapshot.data!);
+                        }
+                        return Scaffold(
+                            body: Center(child: LoadingIndicator()));
+                      },
+                    );
                   },
                 ),
               ],
@@ -227,6 +228,12 @@ final GoRouter appRouter = GoRouter(
       ],
     ),
 
+    GoRoute(
+      path: '/search',
+      name: SearchSubredditsViewBuilder.name,
+      builder: (context, state) => SearchSubredditsView(),
+    ),
+
     /// Fullscreen media routes
     GoRoute(
       path: '/fullscreen-image',
@@ -272,6 +279,14 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
+    GoRoute(
+      path: "/post-editor",
+      name: PostEditorBuilder.name,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return PostEditorBuilder.fromExtra(extra);
+      },
+    ),
     // Settings routes
     GoRoute(
       path: '/settings',

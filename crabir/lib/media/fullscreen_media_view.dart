@@ -5,12 +5,14 @@ class FullscreenMediaView extends StatefulWidget {
   final Widget? trailing;
   final String? title;
   final Post? post;
+  final Object Function()? onPop;
   const FullscreenMediaView({
     super.key,
     required this.builder,
     this.trailing,
     this.title,
     this.post,
+    this.onPop,
   });
 
   @override
@@ -30,7 +32,8 @@ class _FullscreenMediaViewState extends State<FullscreenMediaView> {
             Dismissible(
               key: Key("_FullscreenMediaViewState"),
               direction: DismissDirection.vertical,
-              onDismissed: (_) => context.pop(),
+              resizeDuration: null,
+              onDismissed: (_) => context.pop(widget.onPop?.call()),
               child: PhotoViewGestureDetectorScope(
                 axis: Axis.vertical,
                 child: widget.builder(_toggleBars),

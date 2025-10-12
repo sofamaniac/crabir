@@ -2,6 +2,7 @@ use crate::model::comment::Comment;
 use crate::model::feed::{self, Feed};
 use crate::model::flair::Flair;
 use crate::model::multi::{Multi, MultiStream};
+use crate::model::post::PostSubmit;
 use crate::model::rule::Rule;
 use crate::model::subreddit::Subreddit;
 use crate::model::{Fullname, Post, comment};
@@ -865,5 +866,17 @@ impl Client {
         let response = self.http.execute(request).await?;
         let url = response.url().to_string();
         Ok(url)
+    }
+
+    /// Create post
+    pub async fn submit_post(&self, post: PostSubmit) -> Result<()> {
+        let url = self.join_url("api/submit");
+        let request = self.post(url);
+        let request = request.form(&post);
+        log::debug!("{request:#?}");
+        let response = self.execute(request).await?;
+        let text = response.text().await?;
+        log::debug!("[submit_post] {text}");
+        Ok(())
     }
 }

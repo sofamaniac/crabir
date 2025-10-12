@@ -1,3 +1,4 @@
+use crate::model::subreddit::Subreddit;
 use crate::result::Result;
 pub use chrono::{DateTime, Local, Utc};
 use flutter_getter::FlutterGetters;
@@ -19,7 +20,7 @@ use super::{Fullname, Thing, comment::CommentSort, gallery::Gallery, subreddit::
 with_prefix!(prefix_link_flair "link_flair_");
 with_prefix!(prefix_flair "flair_");
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum Kind {
     #[default]
     Selftext,
@@ -37,6 +38,24 @@ pub enum Kind {
     MediaGallery,
     Link,
     Unknown,
+}
+
+impl Kind {
+    fn to_query_param(self) -> String {
+        let s = match self {
+            Kind::Selftext => "self",
+            Kind::Image => "image",
+            Kind::Video => "video",
+            Kind::Link => "link",
+            Kind::YoutubeVideo => "video",
+            Kind::StreamableVideo => "video",
+            Kind::Gallery => todo!(),
+            Kind::MediaGallery => todo!(),
+            Kind::Unknown => todo!(),
+            Kind::Meta => todo!(),
+        };
+        s.to_owned()
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -465,13 +484,109 @@ pub struct Oembed {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize, Setters)]
-pub struct PostSubmit {
+pub struct PostSubmitBuilder {
     title: String,
-    text: String,
+    text: Option<String>,
     subreddit: String,
     nsfw: bool,
     spoiler: bool,
     kind: Kind,
-    flair_id: String,
-    flair_text: String,
+    flair_id: Option<String>,
+    flair_text: Option<String>,
+    url: Option<String>,
+}
+
+impl PostSubmitBuilder {
+    #[frb(sync)]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_title(&mut self, title: String) {
+        self.title = title;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_text(&mut self, text: Option<String>) {
+        self.text = text;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_subreddit(&mut self, subreddit: &Subreddit) {
+        self.subreddit = subreddit.other().display_name().clone();
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_nsfw(&mut self, nsfw: bool) {
+        self.nsfw = nsfw;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_spoiler(&mut self, spoiler: bool) {
+        self.spoiler = spoiler;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_kind(&mut self, kind: Kind) {
+        self.kind = kind;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_flair_id(&mut self, flair_id: Option<String>) {
+        self.flair_id = flair_id;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_flair_text(&mut self, flair_text: Option<String>) {
+        self.flair_text = flair_text;
+    }
+
+    #[frb(sync)]
+    pub fn build(self) -> Result<PostSubmit> {
+        if self.title.is_empty() {
+            return Err(Error::Custom {
+                message: "Missing post title".to_owned(),
+            });
+        } else if self.text.is_none() && self.url.is_none() {
+            return Err(Error::Custom {
+                message: "text and url cannot be both empty".to_owned(),
+            });
+        } else if self.subreddit.is_empty() {
+            return Err(Error::Custom {
+                message: "Missing community".to_owned(),
+            });
+        } else {
+            return Ok(PostSubmit {
+                api_type: "json".to_owned(),
+                title: self.title,
+                text: self.text,
+                subreddit: self.subreddit,
+                nsfw: self.nsfw,
+                spoiler: self.spoiler,
+                kind: self.kind.to_query_param(),
+                flair_id: self.flair_id,
+                flair_text: self.flair_text,
+                url: self.url,
+            });
+        }
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize, Setters)]
+pub struct PostSubmit {
+    api_type: String,
+    title: String,
+    text: Option<String>,
+    #[serde(rename = "sr")]
+    subreddit: String,
+    nsfw: bool,
+    spoiler: bool,
+    kind: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flair_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flair_text: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    url: Option<String>,
 }

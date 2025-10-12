@@ -164,7 +164,7 @@ class _UserViewState extends State<UserView>
       ),
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(16),
-        child: TabBar(
+        child: TabBar.secondary(
           isScrollable: true,
           tabAlignment: TabAlignment.start,
           tabs: tabs.map((tab) => Text(tab.label())).toList(),

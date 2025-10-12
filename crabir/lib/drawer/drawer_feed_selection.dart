@@ -36,7 +36,7 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
               leading: Icon(Icons.settings),
               title: Text("Settings"),
               onTap: () {
-                SettingsView().goNamed(context);
+                SettingsView().pushNamed(context);
               },
               trailing: IconButton(
                 onPressed: () {
@@ -76,6 +76,10 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
                         color: theme.secondaryText,
                         fontWeight: FontWeight.bold,
                       ),
+                  onTap: () {
+                    Scaffold.of(context).closeDrawer();
+                    context.go("/r/${sub.other.displayName}");
+                  },
                 );
               },
             ),

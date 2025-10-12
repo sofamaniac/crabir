@@ -9,20 +9,19 @@ import 'package:go_router/go_router.dart';
 class SubredditTile extends StatelessWidget {
   final subreddit.Subreddit sub;
   final TextStyle? style;
+  final VoidCallback? onTap;
 
   const SubredditTile(
     this.sub, {
     super.key,
     this.style,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () {
-        Scaffold.of(context).closeDrawer();
-        context.go("/r/${sub.other.displayName}");
-      },
+      onTap: onTap,
       leading: SubredditIcon(icon: sub.icon, radius: 12),
       title: Text(
         sub.other.displayNamePrefixed,

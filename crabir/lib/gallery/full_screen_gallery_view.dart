@@ -21,20 +21,21 @@ class FullScreenGalleryView extends StatefulWidget {
 
 class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
   late int _currentPage;
-  late final PageController controller;
+  late final PageController _controller;
   late final bool _ownController;
   @override
   void initState() {
     super.initState();
     _currentPage = widget.initialPage;
-    controller =
+    _controller =
         widget.controller ?? PageController(initialPage: widget.initialPage);
+    _ownController = widget.controller == null;
   }
 
   @override
   void dispose() {
     if (_ownController) {
-      controller.dispose();
+      _controller.dispose();
     }
     super.dispose();
   }
@@ -43,12 +44,14 @@ class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
   Widget build(BuildContext context) {
     return FullscreenMediaView(
       post: widget.post,
+      onPop: () {
+        return _currentPage;
+      },
       builder: (onTap) {
         return _GalleryPageViewer(
-          controller: controller,
+          controller: _controller,
           gallery: widget.gallery,
           onTap: onTap,
-          initialPage: widget.initialPage,
           obfuscate: false,
           onPageChanged: (index) {
             setState(() {

@@ -1,10 +1,10 @@
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/post.dart';
-import 'package:crabir/routes/routes.dart';
 import 'package:crabir/search_posts/bloc/search_bloc.dart';
 import 'package:crabir/search_posts/widgets/sort_menu.dart';
 import 'package:crabir/sort.dart';
+import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -13,6 +13,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+part 'search.go_route_ext.dart';
+
+@CrabirRoute()
 class SearchPostsView extends StatefulWidget {
   const SearchPostsView({
     super.key,
