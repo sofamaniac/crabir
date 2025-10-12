@@ -9,6 +9,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/paging_handler.dart'
     as reddit_api;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:rxdart/rxdart.dart';
 
 part 'search_event.dart';
 part 'search_state.dart';
@@ -27,7 +28,14 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
           ),
         ) {
     on<Query>(_query);
-    on<Fetch>(_fetch);
+    on<Fetch>(
+      _fetch,
+      transformer: (events, mapper) {
+        return events
+            .debounceTime(const Duration(milliseconds: 300))
+            .asyncExpand(mapper);
+      },
+    );
     on<SetSort>(_setSort);
     on<RemoveSubreddit>(_removeSubreddit);
     on<Save>(_save);
@@ -49,8 +57,6 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
 
   /// true if `streamable` has reached its end
   bool _hasReachedMax = false;
-
-  Timer? _debounce;
 
   Future<void> _removeSubreddit(
       RemoveSubreddit _, Emitter<PostSearchState> emit) async {
@@ -77,26 +83,12 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
   /// Create new stream and throttles api requests.
   /// If `debounce` is true, the request will be delayed.
   void _newStream({bool debounce = true}) {
-    if (!debounce) {
-      _streamable = RedditAPI.client().searchPost(
-        query: query,
-        subreddit: _subreddit,
-        sort: _sort,
-      );
-      _hasReachedMax = false;
-      return;
-    }
-    if (_debounce?.isActive ?? false) {
-      _debounce!.cancel();
-    }
-    _debounce = Timer(const Duration(milliseconds: 200), () async {
-      _streamable = RedditAPI.client().searchPost(
-        query: query,
-        subreddit: _subreddit,
-        sort: _sort,
-      );
-      _hasReachedMax = false;
-    });
+    _streamable = RedditAPI.client().searchPost(
+      query: query,
+      subreddit: _subreddit,
+      sort: _sort,
+    );
+    _hasReachedMax = false;
   }
 
   Future<void> _query(
@@ -110,20 +102,16 @@ class PostSearchBloc extends Bloc<PostSearchEvent, PostSearchState> {
       query = newQuery.query;
       emit(state.copyWith(query: query));
       _newStream();
-      await _filter(emit);
     }
   }
 
   Future<void> _fetch(Fetch _, Emitter<PostSearchState> emit) async {
     if (state.hasReachedMax) {
-      return emit(state);
-    } else if (_streamable == null) {
-      _newStream(debounce: false);
-    } else {
-      await _streamable!.next();
-      _hasReachedMax = !_streamable!.done;
-      await _filter(emit);
+      return;
     }
+    await _streamable!.next();
+    _hasReachedMax = !_streamable!.done;
+    await _filter(emit);
   }
 
   Future<void> _setSort(
