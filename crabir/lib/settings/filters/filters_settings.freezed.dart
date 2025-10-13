@@ -19,9 +19,9 @@ mixin _$FiltersSettings {
   () get manageHiddenCommunities;
   @Setting(widget: DomainsFilterButton, hasDescription: true)
   () get manageHiddenDomains;
-  @Setting(widget: UserFilterButton, hasDescription: true)
+  @Setting(widget: UsersFilterButton, hasDescription: true)
   () get manageHiddenUsers;
-  @Setting(widget: FlairFilterButton, hasDescription: true)
+  @Setting(widget: FlairsFilterButton, hasDescription: true)
   () get manageHiddenFlairs;
   @Category(name: "More options")
   @Setting(hasDescription: true)
@@ -94,9 +94,9 @@ abstract mixin class $FiltersSettingsCopyWith<$Res> {
       () manageHiddenCommunities,
       @Setting(widget: DomainsFilterButton, hasDescription: true)
       () manageHiddenDomains,
-      @Setting(widget: UserFilterButton, hasDescription: true)
+      @Setting(widget: UsersFilterButton, hasDescription: true)
       () manageHiddenUsers,
-      @Setting(widget: FlairFilterButton, hasDescription: true)
+      @Setting(widget: FlairsFilterButton, hasDescription: true)
       () manageHiddenFlairs,
       @Category(name: "More options")
       @Setting(hasDescription: true)
@@ -258,9 +258,9 @@ extension FiltersSettingsPatterns on FiltersSettings {
             () manageHiddenCommunities,
             @Setting(widget: DomainsFilterButton, hasDescription: true)
             () manageHiddenDomains,
-            @Setting(widget: UserFilterButton, hasDescription: true)
+            @Setting(widget: UsersFilterButton, hasDescription: true)
             () manageHiddenUsers,
-            @Setting(widget: FlairFilterButton, hasDescription: true)
+            @Setting(widget: FlairsFilterButton, hasDescription: true)
             () manageHiddenFlairs,
             @Category(name: "More options")
             @Setting(hasDescription: true)
@@ -307,9 +307,9 @@ extension FiltersSettingsPatterns on FiltersSettings {
             () manageHiddenCommunities,
             @Setting(widget: DomainsFilterButton, hasDescription: true)
             () manageHiddenDomains,
-            @Setting(widget: UserFilterButton, hasDescription: true)
+            @Setting(widget: UsersFilterButton, hasDescription: true)
             () manageHiddenUsers,
-            @Setting(widget: FlairFilterButton, hasDescription: true)
+            @Setting(widget: FlairsFilterButton, hasDescription: true)
             () manageHiddenFlairs,
             @Category(name: "More options")
             @Setting(hasDescription: true)
@@ -354,9 +354,9 @@ extension FiltersSettingsPatterns on FiltersSettings {
             () manageHiddenCommunities,
             @Setting(widget: DomainsFilterButton, hasDescription: true)
             () manageHiddenDomains,
-            @Setting(widget: UserFilterButton, hasDescription: true)
+            @Setting(widget: UsersFilterButton, hasDescription: true)
             () manageHiddenUsers,
-            @Setting(widget: FlairFilterButton, hasDescription: true)
+            @Setting(widget: FlairsFilterButton, hasDescription: true)
             () manageHiddenFlairs,
             @Category(name: "More options")
             @Setting(hasDescription: true)
@@ -391,9 +391,9 @@ class _FiltersSettings extends FiltersSettings {
       this.manageHiddenCommunities = const (),
       @Setting(widget: DomainsFilterButton, hasDescription: true)
       this.manageHiddenDomains = const (),
-      @Setting(widget: UserFilterButton, hasDescription: true)
+      @Setting(widget: UsersFilterButton, hasDescription: true)
       this.manageHiddenUsers = const (),
-      @Setting(widget: FlairFilterButton, hasDescription: true)
+      @Setting(widget: FlairsFilterButton, hasDescription: true)
       this.manageHiddenFlairs = const (),
       @Category(name: "More options")
       @Setting(hasDescription: true)
@@ -415,11 +415,11 @@ class _FiltersSettings extends FiltersSettings {
   final () manageHiddenDomains;
   @override
   @JsonKey()
-  @Setting(widget: UserFilterButton, hasDescription: true)
+  @Setting(widget: UsersFilterButton, hasDescription: true)
   final () manageHiddenUsers;
   @override
   @JsonKey()
-  @Setting(widget: FlairFilterButton, hasDescription: true)
+  @Setting(widget: FlairsFilterButton, hasDescription: true)
   final () manageHiddenFlairs;
   @override
   @JsonKey()
@@ -504,9 +504,9 @@ abstract mixin class _$FiltersSettingsCopyWith<$Res>
       () manageHiddenCommunities,
       @Setting(widget: DomainsFilterButton, hasDescription: true)
       () manageHiddenDomains,
-      @Setting(widget: UserFilterButton, hasDescription: true)
+      @Setting(widget: UsersFilterButton, hasDescription: true)
       () manageHiddenUsers,
-      @Setting(widget: FlairFilterButton, hasDescription: true)
+      @Setting(widget: FlairsFilterButton, hasDescription: true)
       () manageHiddenFlairs,
       @Category(name: "More options")
       @Setting(hasDescription: true)

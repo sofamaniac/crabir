@@ -117,7 +117,7 @@ class MoreOptionButton extends StatelessWidget {
               leading: Icon(Icons.label_outlined),
               title: Text("Mute ${post.linkFlair.text!}"),
               onTap: () {
-                filters.hideFlair(post.linkFlair.text!);
+                filters.hideFlair(post.linkFlair);
                 Navigator.pop(context);
               },
             ),
@@ -168,10 +168,7 @@ class MoreOptionButton extends StatelessWidget {
                 leading: Icon(Icons.label_outline),
                 title: Text("Search ${post.linkFlair.text} posts"),
                 onTap: () {
-                  // Navigator.pop(context);
-                  // context.router.navigate(
-                  //   SearchPostsRoute(flair: post.linkFlair),
-                  // );
+                  SearchPostsView(flair: post.linkFlair).goNamed(context);
                 },
               ),
             if (!settings.showMarkAsReadButton)

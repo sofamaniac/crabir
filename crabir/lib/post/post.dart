@@ -10,6 +10,7 @@ import 'package:crabir/post/parts/html_with_fade.dart';
 import 'package:crabir/post/parts/image.dart';
 import 'package:crabir/post/parts/video.dart';
 import 'package:crabir/flair.dart';
+import 'package:crabir/search_posts/widgets/search.dart';
 import 'package:crabir/separated_row.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';

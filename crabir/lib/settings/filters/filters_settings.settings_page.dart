@@ -84,7 +84,7 @@ class FiltersSettingsView extends StatelessWidget {
               .read<FiltersSettingsCubit>()
               .updateManageHiddenDomains(val),
         ),
-        UserFilterButton(
+        UsersFilterButton(
           title: Text(locales.filters_manageHiddenUsers),
           leading: Icon(null),
           subtitle: Text(locales.filters_manageHiddenUsersDescription),
@@ -92,7 +92,7 @@ class FiltersSettingsView extends StatelessWidget {
           onChanged: (val) =>
               context.read<FiltersSettingsCubit>().updateManageHiddenUsers(val),
         ),
-        FlairFilterButton(
+        FlairsFilterButton(
           title: Text(locales.filters_manageHiddenFlairs),
           leading: Icon(null),
           subtitle: Text(locales.filters_manageHiddenFlairsDescription),

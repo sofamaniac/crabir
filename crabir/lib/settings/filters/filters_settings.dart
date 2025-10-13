@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/go_router_ext/annotations.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/settings_page/annotations.dart';
 import 'package:crabir/utils/icons.dart';
@@ -31,10 +32,10 @@ abstract class FiltersSettings with _$FiltersSettings {
     @Setting(widget: DomainsFilterButton, hasDescription: true)
     () manageHiddenDomains,
     @Default(())
-    @Setting(widget: UserFilterButton, hasDescription: true)
+    @Setting(widget: UsersFilterButton, hasDescription: true)
     () manageHiddenUsers,
     @Default(())
-    @Setting(widget: FlairFilterButton, hasDescription: true)
+    @Setting(widget: FlairsFilterButton, hasDescription: true)
     () manageHiddenFlairs,
     @Category(name: "More options")
     @Default(false)
@@ -70,13 +71,19 @@ class ReadPosts extends HydratedCubit<HashSet<String>> {
   }
 }
 
+@JsonSerializable()
 class GlobalFilters {
-  List<String> users = [];
-  List<String> flairs = [];
-  List<String> subreddits = [];
-  List<String> domains = [];
+  List<String> users;
+  List<Flair> flairs;
+  List<String> subreddits;
+  List<String> domains;
 
-  GlobalFilters();
+  GlobalFilters({
+    this.users = const [],
+    this.flairs = const [],
+    this.subreddits = const [],
+    this.domains = const [],
+  });
 
   factory GlobalFilters.of(BuildContext context) =>
       context.watch<GlobalFiltersCubit>().state;
@@ -85,8 +92,8 @@ class GlobalFilters {
 
   bool isUserHidden(String? username) =>
       _emptyString(username) && users.contains(username);
-  bool isFlairHidden(String? text) =>
-      _emptyString(text) && flairs.contains(text);
+  bool isFlairHidden(Flair flair) =>
+      flairs.any((f) => f.templateId == flair.templateId);
   bool isSubredditHidden(String? name) =>
       _emptyString(name) && subreddits.contains(name);
   bool isDomainHidden(String? domain) =>
@@ -94,46 +101,88 @@ class GlobalFilters {
 
   bool shouldHidePost(Post post) {
     final username = post.author?.username ?? "";
-    final flairText = post.linkFlair.text ?? "";
+    final flair = post.linkFlair;
     final subreddit = post.subreddit.subreddit;
     final domain = Uri.parse(post.url).host;
     return isUserHidden(username) ||
-        isFlairHidden(flairText) ||
+        isFlairHidden(flair) ||
         isSubredditHidden(subreddit) ||
         isDomainHidden(domain);
   }
+
+  GlobalFilters copyWith({
+    List<String>? users,
+    List<Flair>? flairs,
+    List<String>? subreddits,
+    List<String>? domains,
+  }) {
+    return GlobalFilters(
+      users: users ?? this.users,
+      flairs: flairs ?? this.flairs,
+      subreddits: subreddits ?? this.subreddits,
+      domains: domains ?? this.domains,
+    );
+  }
+
+  factory GlobalFilters.fromJson(Map<String, dynamic> json) =>
+      _$GlobalFiltersFromJson(json);
+
+  Map<String, dynamic> toJson() => _$GlobalFiltersToJson(this);
 }
 
 class GlobalFiltersCubit extends HydratedCubit<GlobalFilters> {
   GlobalFiltersCubit() : super(GlobalFilters());
 
-  void hideUser(String username) => state.users.add(username);
-  void hideFlair(String text) => state.flairs.add(text);
-  void hideSubreddit(String name) => state.subreddits.add(name);
-  void hideDomain(String domain) => state.domains.add(domain);
+  void hideUser(String username) {
+    if (state.users.contains(username)) {
+      return;
+    }
+    emit(state.copyWith(users: [...state.users, username]));
+  }
 
-  void setUsers(List<String> users) => state.users = users;
-  void setFlairs(List<String> flairs) => state.flairs = flairs;
-  void setSubreddits(List<String> subreddits) => state.subreddits = subreddits;
-  void setDomains(List<String> domains) => state.domains = domains;
+  void hideFlair(Flair flair) {
+    if (state.flairs.contains(flair)) {
+      return;
+    }
+    emit(state.copyWith(flairs: [...state.flairs, flair]));
+  }
+
+  void hideSubreddit(String subreddit) {
+    if (state.subreddits.contains(subreddit)) {
+      return;
+    }
+    emit(state.copyWith(subreddits: [...state.subreddits, subreddit]));
+  }
+
+  void hideDomain(String domain) {
+    if (state.domains.contains(domain)) {
+      return;
+    }
+    emit(state.copyWith(domains: [...state.domains, domain]));
+  }
+
+  void setUsers(List<String> users) => emit(state.copyWith(users: users));
+  void setFlairs(List<Flair> flairs) => emit(state.copyWith(flairs: flairs));
+  void setSubreddits(List<String> subreddits) =>
+      emit(state.copyWith(subreddits: subreddits));
+  void setDomains(List<String> domains) =>
+      emit(state.copyWith(domains: domains));
 
   @override
   GlobalFilters fromJson(Map<String, dynamic> json) =>
-      json['hidden'] as GlobalFilters;
+      GlobalFilters.fromJson(json);
 
   @override
-  Map<String, GlobalFilters> toJson(GlobalFilters state) => {'hidden': state};
+  Map<String, dynamic> toJson(GlobalFilters state) => state.toJson();
 }
 
 class FilterEditor extends StatelessWidget {
-  final List<String> filters;
-  final void Function(List<String>) onChanged;
+  final List<Widget> filters;
   final Widget title;
 
   const FilterEditor({
     super.key,
     required this.filters,
-    required this.onChanged,
     required this.title,
   });
 
@@ -150,145 +199,204 @@ class FilterEditor extends StatelessWidget {
       content: ListView.builder(
         shrinkWrap: true,
         itemCount: filters.length,
-        itemBuilder: (context, index) {
-          final filter = filters[index];
-          return ListTile(
-            title: Text(filter),
-            trailing: IconButton(
-              onPressed: () {
-                filters.remove(filter);
-                onChanged(filters);
-              },
-              icon: Icon(Icons.remove),
-            ),
-          );
-        },
+        itemBuilder: (context, index) => filters[index],
       ),
     );
   }
 }
 
-abstract class EditorFilterButton extends StatelessWidget {
-  final () value;
+class SubredditsFilterButton extends StatelessWidget {
   final Widget title;
-  final Widget? leading;
-  final void Function(()) onChanged;
+  final Widget leading;
   final Widget? subtitle;
-
-  const EditorFilterButton({
+  final () value;
+  final void Function(()) onChanged;
+  const SubredditsFilterButton({
     super.key,
-    required this.value,
     required this.title,
-    this.leading,
-    required this.onChanged,
+    required this.leading,
     this.subtitle,
+    required this.value,
+    required this.onChanged,
   });
-
-  @mustBeOverridden
-  void updateField(GlobalFiltersCubit cubit, List<String> filters);
-
-  @mustBeOverridden
-  List<String> getField(BuildContext context);
 
   @override
   Widget build(BuildContext context) {
     final cubit = context.watch<GlobalFiltersCubit>();
+    final subreddits = cubit.state.subreddits;
     return ListTile(
       leading: leading,
       title: title,
       subtitle: subtitle,
-      onTap: () => showAdaptiveDialog(
-        context: context,
-        builder: (context) => FilterEditor(
-          filters: getField(context),
-          onChanged: (newVal) => updateField(cubit, newVal),
-          title: title,
-        ),
-      ),
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => FilterEditor(
+            filters: subreddits
+                .map(
+                  (s) => ListTile(
+                    leading: IconButton(
+                      icon: Icon(Icons.remove),
+                      onPressed: () {
+                        subreddits.remove(s);
+                        cubit.setSubreddits(subreddits);
+                      },
+                    ),
+                    title: Text(s),
+                  ),
+                )
+                .toList(),
+            title: title,
+          ),
+        );
+      },
     );
   }
 }
 
-class UserFilterButton extends EditorFilterButton {
-  const UserFilterButton({
+class UsersFilterButton extends StatelessWidget {
+  final Widget title;
+  final Widget leading;
+  final Widget? subtitle;
+  final () value;
+  final void Function(()) onChanged;
+  const UsersFilterButton({
     super.key,
-    required super.value,
-    required super.title,
-    required super.onChanged,
-    super.leading,
-    super.subtitle,
+    required this.title,
+    required this.leading,
+    this.subtitle,
+    required this.value,
+    required this.onChanged,
   });
 
   @override
-  List<String> getField(BuildContext context) {
-    return context.watch<GlobalFiltersCubit>().state.users;
-  }
-
-  @override
-  void updateField(GlobalFiltersCubit cubit, List<String> filters) {
-    cubit.setUsers(filters);
-  }
-}
-
-class FlairFilterButton extends EditorFilterButton {
-  const FlairFilterButton({
-    super.key,
-    required super.value,
-    required super.title,
-    required super.onChanged,
-    super.leading,
-    super.subtitle,
-  });
-
-  @override
-  List<String> getField(BuildContext context) {
-    return context.watch<GlobalFiltersCubit>().state.flairs;
-  }
-
-  @override
-  void updateField(GlobalFiltersCubit cubit, List<String> filters) {
-    cubit.setFlairs(filters);
-  }
-}
-
-class SubredditsFilterButton extends EditorFilterButton {
-  const SubredditsFilterButton({
-    super.key,
-    required super.value,
-    required super.title,
-    required super.onChanged,
-    super.leading,
-    super.subtitle,
-  });
-
-  @override
-  List<String> getField(BuildContext context) {
-    return context.watch<GlobalFiltersCubit>().state.subreddits;
-  }
-
-  @override
-  void updateField(GlobalFiltersCubit cubit, List<String> filters) {
-    cubit.setSubreddits(filters);
+  Widget build(BuildContext context) {
+    final cubit = context.watch<GlobalFiltersCubit>();
+    final users = cubit.state.users;
+    return ListTile(
+      leading: leading,
+      title: title,
+      subtitle: subtitle,
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => FilterEditor(
+            filters: users
+                .map(
+                  (u) => ListTile(
+                    leading: IconButton(
+                      icon: Icon(Icons.remove),
+                      onPressed: () {
+                        users.remove(u);
+                        cubit.setUsers(users);
+                      },
+                    ),
+                    title: Text(u),
+                  ),
+                )
+                .toList(),
+            title: title,
+          ),
+        );
+      },
+    );
   }
 }
 
-class DomainsFilterButton extends EditorFilterButton {
+class DomainsFilterButton extends StatelessWidget {
+  final Widget title;
+  final Widget leading;
+  final Widget? subtitle;
+  final () value;
+  final void Function(()) onChanged;
   const DomainsFilterButton({
     super.key,
-    required super.value,
-    required super.title,
-    required super.onChanged,
-    super.leading,
-    super.subtitle,
+    required this.title,
+    required this.leading,
+    this.subtitle,
+    required this.value,
+    required this.onChanged,
   });
 
   @override
-  List<String> getField(BuildContext context) {
-    return context.watch<GlobalFiltersCubit>().state.domains;
+  Widget build(BuildContext context) {
+    final cubit = context.watch<GlobalFiltersCubit>();
+    final domains = cubit.state.domains;
+    return ListTile(
+      leading: leading,
+      title: title,
+      subtitle: subtitle,
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => FilterEditor(
+            filters: domains
+                .map(
+                  (d) => ListTile(
+                    leading: IconButton(
+                      icon: Icon(Icons.remove),
+                      onPressed: () {
+                        domains.remove(d);
+                        cubit.setDomains(domains);
+                      },
+                    ),
+                    title: Text(d),
+                  ),
+                )
+                .toList(),
+            title: title,
+          ),
+        );
+      },
+    );
   }
+}
+
+class FlairsFilterButton extends StatelessWidget {
+  final Widget title;
+  final Widget leading;
+  final Widget? subtitle;
+  final () value;
+  final void Function(()) onChanged;
+  const FlairsFilterButton({
+    super.key,
+    required this.title,
+    required this.leading,
+    this.subtitle,
+    required this.value,
+    required this.onChanged,
+  });
 
   @override
-  void updateField(GlobalFiltersCubit cubit, List<String> filters) {
-    cubit.setDomains(filters);
+  Widget build(BuildContext context) {
+    final cubit = context.watch<GlobalFiltersCubit>();
+    final flairs = cubit.state.flairs;
+    return ListTile(
+      leading: leading,
+      title: title,
+      subtitle: subtitle,
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => FilterEditor(
+            filters: flairs
+                .map(
+                  (f) => ListTile(
+                    leading: IconButton(
+                      icon: Icon(Icons.remove),
+                      onPressed: () {
+                        flairs.remove(f);
+                        cubit.setFlairs(flairs);
+                      },
+                    ),
+                    title: Text(f.text ?? "NO TEXT"),
+                  ),
+                )
+                .toList(),
+            title: title,
+          ),
+        );
+      },
+    );
   }
 }
