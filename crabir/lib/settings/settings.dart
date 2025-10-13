@@ -25,32 +25,32 @@ class SettingsView extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.palette_outlined),
             title: Text("Theme"),
-            onTap: () => CrabirThemeEditor().goNamed(context),
+            onTap: () => CrabirThemeEditor().pushNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.article),
             title: Text("Posts"),
-            onTap: () => PostsSettingsView().goNamed(context),
+            onTap: () => PostsSettingsView().pushNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.comment),
             title: Text("Comments"),
-            onTap: () => CommentsSettingsView().goNamed(context),
+            onTap: () => CommentsSettingsView().pushNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.keyboard_tab),
             title: Text("Lateral Menu"),
-            onTap: () => LateralMenuSettingsView().goNamed(context),
+            onTap: () => LateralMenuSettingsView().pushNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.storage),
             title: Text("Data and Storage"),
-            onTap: () => DataSettingsView().goNamed(context),
+            onTap: () => DataSettingsView().pushNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.filter),
             title: Text("Content filters"),
-            onTap: () => FiltersSettingsView().goNamed(context),
+            onTap: () => FiltersSettingsView().pushNamed(context),
           ),
           ListTile(
             onTap: () => showLicensePage(context: context),
