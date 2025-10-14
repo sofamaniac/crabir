@@ -21,7 +21,7 @@ class Setting {
   final Type? widget;
 
   /// Optional icon.
-  final String? icon;
+  final Object? icon;
 
   const Setting({
     this.titleKey,
@@ -34,7 +34,9 @@ class Setting {
 
 class Category {
   final String? name;
+  final bool divider;
   const Category({
     this.name,
+    this.divider = true,
   });
 }

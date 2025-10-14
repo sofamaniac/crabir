@@ -1,16 +1,26 @@
-import 'package:auto_route/auto_route.dart';
+import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed_list.dart';
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/loading_indicator.dart';
-import 'package:crabir/routes/routes.dart';
+import 'package:crabir/search_posts/widgets/search.dart';
 import 'package:crabir/search_subreddits/bloc/search_bloc.dart';
+import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
+part 'search.go_route_ext.dart';
+
+@CrabirRoute()
 class SearchSubredditsView extends StatefulWidget {
-  const SearchSubredditsView({super.key});
+  final bool enableUser;
+  final bool enablePost;
+  const SearchSubredditsView({
+    super.key,
+    this.enablePost = true,
+    this.enableUser = true,
+  });
   @override
   State<StatefulWidget> createState() => _SearchSubredditsViewState();
 }
@@ -20,12 +30,23 @@ class _SearchSubredditsViewState extends State<SearchSubredditsView> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-        create: (_) => SubredditSearchBloc(query: query),
-        child: _SearchViewBody());
+      create: (_) => SubredditSearchBloc(query: query),
+      child: _SearchViewBody(
+        enablePost: widget.enablePost,
+        enableUser: widget.enableUser,
+      ),
+    );
   }
 }
 
 class _SearchViewBody extends StatefulWidget {
+  final bool enableUser;
+  final bool enablePost;
+
+  const _SearchViewBody({
+    required this.enableUser,
+    required this.enablePost,
+  });
   @override
   State<StatefulWidget> createState() => _SearchViewBodyState();
 }
@@ -36,9 +57,16 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
   final TextEditingController _controller = TextEditingController();
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final bloc = context.watch<SubredditSearchBloc>();
     final state = bloc.state;
+    final subs = context.watch<AccountsBloc>().state.subscriptions;
     final locales = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
@@ -62,41 +90,59 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
       ),
       body: Column(
         children: [
-          if (state.query.isNotEmpty)
+          if (state.query.isNotEmpty && widget.enablePost)
             ListTile(
               leading: Icon(Icons.search),
               title: Text("Search for posts with \"${state.query}\""),
-              onTap: () => context.pushRoute(
-                SearchPostsRoute(query: state.query),
-              ),
+              onTap: () =>
+                  SearchPostsView(query: state.query).pushNamed(context),
             ),
-          if (state.query.isNotEmpty)
+          if (state.query.isNotEmpty && widget.enableUser)
             ListTile(
               leading: Icon(Icons.person),
               title: Text("Go to user u/\"${state.query}\""),
+              onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Not implemented"),
+                ),
+              ),
             ),
-          if (state.query.isNotEmpty) Divider(),
-          Expanded(
-            child: ListView.builder(
-              itemCount: state.items.length + 1,
-              itemBuilder: (context, index) {
-                if (index < state.items.length) {
-                  return SubredditTile(
-                    state.items[index],
-                  );
-                } else {
-                  if (!state.hasReachedMax && state.query.isNotEmpty) {
-                    bloc.add(Fetch());
-                    return LoadingIndicator();
-                  } else if (state.hasReachedMax) {
-                    return Text("Nothing more to show");
+          if (widget.enableUser || widget.enablePost) Divider(),
+          if (state.query.isNotEmpty)
+            Expanded(
+              child: ListView.builder(
+                itemCount: state.items.length + 1,
+                itemBuilder: (context, index) {
+                  if (index < state.items.length) {
+                    return SubredditTile(
+                      state.items[index],
+                      onTap: () => context.pop(state.items[index]),
+                    );
                   } else {
-                    return Container();
+                    if (!state.hasReachedMax && state.query.isNotEmpty) {
+                      bloc.add(Fetch());
+                      return LoadingIndicator();
+                    } else if (state.hasReachedMax) {
+                      return Text("Nothing more to show");
+                    } else {
+                      return Container();
+                    }
                   }
-                }
-              },
+                },
+              ),
+            )
+          else
+            Expanded(
+              child: ListView.builder(
+                itemCount: subs.length,
+                itemBuilder: (context, index) {
+                  return SubredditTile(
+                    subs[index],
+                    onTap: () => context.pop(subs[index]),
+                  );
+                },
+              ),
             ),
-          ),
         ],
       ),
     );

@@ -1,9 +1,11 @@
 import 'dart:collection';
 
+import 'package:collection/collection.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:logging/logging.dart';
@@ -17,32 +19,77 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   final Set<String> _hidden = {};
   final HashMap<String, List<Thing>> _moreLoaded = HashMap();
   List<Thing> _comments = [];
-  bool _loaded = false;
   late final Post _post;
   final String permalink;
   CommentSort? _sort;
   final Logger log = Logger("ThreadBloc");
 
   ThreadBloc(this.permalink) : super(ThreadState()) {
-    on<Load>(_initialize);
+    on<Load>(_fetchComments);
     on<Collapse>(_collapse);
     on<LoadMore>(_loadMore);
     on<Refresh>(_refresh);
     on<SetSort>(_setSort);
+    on<OpenComment>(_openComment);
+    on<CloseComment>(_closeComment);
+    on<InsertComment>(_insertComment);
   }
 
-  Future<void> _initialize(Load _, Emitter<ThreadState> emit) async {
-    if (_loaded) {
-      return;
-    }
-
+  static ThreadBloc? maybeOf(BuildContext context) {
     try {
-      final things = await RedditAPI.client().comments(permalink: permalink);
+      return context.watch<ThreadBloc>();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _openComment(
+    OpenComment event,
+    Emitter<ThreadState> emit,
+  ) async {
+    emit(state.copyWith(expandedComment: event.comment));
+  }
+
+  Future<void> _closeComment(
+    CloseComment _,
+    Emitter<ThreadState> emit,
+  ) async {
+    emit(state.copyWith(expandedComment: null));
+  }
+
+  Future<void> _insertComment(
+    InsertComment event,
+    Emitter<ThreadState> emit,
+  ) async {
+    final parent = event.comment.parentId;
+    final position = state.flatComments.indexWhere((thing) {
+      if (thing case Thing_Comment(field0: final comment)) {
+        return comment.name.eq(other: parent);
+      } else {
+        return false;
+      }
+    });
+    final comments = flatten(_comments);
+    comments.insert(position + 1, Thing_Comment(event.comment));
+    emit(state.copyWith(flatComments: comments));
+  }
+
+  Future<void> _fetchComments(Load _, Emitter<ThreadState> emit) async {
+    try {
+      final things = await RedditAPI.client().comments(
+        permalink: permalink,
+        sort: _sort,
+      );
       _post = things.$1;
       _comments = things.$2;
-      _loaded = true;
       log.info("(${_comments.length}) comments and post loaded");
-      emit(state.copyWith(post: _post, flatComments: flatten(_comments)));
+      emit(
+        state.copyWith(
+          status: Status.success,
+          post: _post,
+          flatComments: flatten(_comments),
+        ),
+      );
     } catch (e) {
       log.severe("Error during initial load: $e");
       emit(state.copyWith(status: Status.failure));
@@ -52,24 +99,17 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   Future<void> _setSort(SetSort sort, Emitter<ThreadState> emit) async {
     if (_sort == sort.sort) return;
     _sort = sort.sort;
-    await _refresh(Refresh(), emit);
+    emit(
+      state.copyWith(
+        sort: _sort,
+        status: Status.unloaded,
+        flatComments: [],
+      ),
+    );
   }
 
   Future<void> _refresh(Refresh _, Emitter<ThreadState> emit) async {
-    emit(state.copyWith(status: Status.unloaded));
-    try {
-      final things = await RedditAPI.client().comments(
-        permalink: permalink,
-        sort: _sort,
-      );
-      _comments = things.$2;
-      _loaded = true;
-      log.info("comments (${_comments.length}) refreshed");
-      emit(state.copyWith(sort: _sort, flatComments: flatten(_comments)));
-    } catch (e) {
-      log.severe("Error while refreshing comments: $e");
-      emit(state.copyWith(status: Status.failure));
-    }
+    emit(state.copyWith(status: Status.unloaded, flatComments: []));
   }
 
   Future<void> _collapse(Collapse event, Emitter<ThreadState> emit) async {
@@ -83,7 +123,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
         _reveal(reply);
       }
     }
-    emit(state.copyWith(collapsed: _collapsed, hidden: _hidden));
+    emit(state.copyWith(collapsed: {..._collapsed}, hidden: {..._hidden}));
   }
 
   void _hide(Thing comment) {

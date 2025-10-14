@@ -7,6 +7,18 @@ enum Resolution {
   low,
 }
 
+extension ResolutionLabel on Resolution {
+  String label(BuildContext context) {
+    final locales = AppLocalizations.of(context);
+    return switch (this) {
+      Resolution.source => locales.resolutionSource,
+      Resolution.high => locales.resolutionHigh,
+      Resolution.medium => locales.resolutionMedium,
+      Resolution.low => locales.resolutionLow,
+    };
+  }
+}
+
 extension FromResolution<T> on List<T> {
   T withResolution(Resolution resolution) {
     final log = Logger("FromResolution");
@@ -40,12 +52,35 @@ extension RedditImageGetResolution on RedditImage {
 }
 
 extension VariantGetResolution on VariantInner {
-  withResolution(Resolution resolution) {
+  ImageBase withResolution(Resolution resolution) {
     switch (resolution) {
       case Resolution.source:
         return source;
       default:
         return resolutions.withResolution(resolution);
+    }
+  }
+}
+
+extension GalleryMediaResolution on gallery.GalleryMedia {
+  gallery.Image withResolution(Resolution resolution, bool blur) {
+    final List<gallery.Image> previews;
+    if (blur) {
+      previews = obfuscated;
+    } else {
+      previews = this.previews;
+    }
+    switch (source) {
+      case gallery.Source_Image(:final source):
+        if (resolution == Resolution.source && blur) {
+          return obfuscated.last;
+        } else if (resolution == Resolution.source) {
+          return source;
+        } else {
+          return previews.withResolution(resolution);
+        }
+      case gallery.Source_AnimatedImage():
+        return previews.withResolution(resolution);
     }
   }
 }

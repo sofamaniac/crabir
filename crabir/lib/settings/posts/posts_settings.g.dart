@@ -6,6 +6,19 @@ part of 'posts_settings.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+RememberedSort _$RememberedSortFromJson(Map<String, dynamic> json) =>
+    RememberedSort(
+      data: (json['data'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(k, FeedSort.fromJson(e as Map<String, dynamic>)),
+          ) ??
+          const {},
+    );
+
+Map<String, dynamic> _$RememberedSortToJson(RememberedSort instance) =>
+    <String, dynamic>{
+      'data': instance.data,
+    };
+
 _PostsSettings _$PostsSettingsFromJson(Map<String, dynamic> json) =>
     _PostsSettings(
       defaultHomeSort: json['defaultHomeSort'] == null
@@ -15,11 +28,15 @@ _PostsSettings _$PostsSettingsFromJson(Map<String, dynamic> json) =>
           ? const FeedSort.hot()
           : FeedSort.fromJson(json['defaultSort'] as Map<String, dynamic>),
       rememberSortByCommunity: json['rememberSortByCommunity'] as bool? ?? true,
+      rememberedSorts: json['rememberedSorts'] == null
+          ? const RememberedSort()
+          : RememberedSort.fromJson(
+              json['rememberedSorts'] as Map<String, dynamic>),
       showAwards: json['showAwards'] as bool? ?? true,
       clickableAwards: json['clickableAwards'] as bool? ?? true,
       showPostFlair: json['showPostFlair'] as bool? ?? true,
       showFlairColors: json['showFlairColors'] as bool? ?? true,
-      showEmojis: json['showEmojis'] as bool? ?? true,
+      showFlairEmojis: json['showFlairEmojis'] as bool? ?? true,
       tapFlairToSearch: json['tapFlairToSearch'] as bool? ?? true,
       showAuthor: json['showAuthor'] as bool? ?? true,
       clickableCommunity: json['clickableCommunity'] as bool? ?? true,
@@ -37,11 +54,12 @@ Map<String, dynamic> _$PostsSettingsToJson(_PostsSettings instance) =>
       'defaultHomeSort': instance.defaultHomeSort,
       'defaultSort': instance.defaultSort,
       'rememberSortByCommunity': instance.rememberSortByCommunity,
+      'rememberedSorts': instance.rememberedSorts,
       'showAwards': instance.showAwards,
       'clickableAwards': instance.clickableAwards,
       'showPostFlair': instance.showPostFlair,
       'showFlairColors': instance.showFlairColors,
-      'showEmojis': instance.showEmojis,
+      'showFlairEmojis': instance.showFlairEmojis,
       'tapFlairToSearch': instance.tapFlairToSearch,
       'showAuthor': instance.showAuthor,
       'clickableCommunity': instance.clickableCommunity,

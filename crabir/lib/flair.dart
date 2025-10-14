@@ -1,15 +1,22 @@
 import 'dart:math';
 
-import 'package:crabir/bordered_text.dart';
 import 'package:crabir/hexcolor.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 class FlairView extends StatelessWidget {
   final Flair flair;
-  final Logger log = Logger("PostFlair");
-  FlairView({super.key, required this.flair});
+  final Logger log = Logger("FlairView");
+  final bool showColor;
+  final bool showEmoji;
+  FlairView({
+    super.key,
+    required this.flair,
+    required this.showColor,
+    required this.showEmoji,
+  });
 
   /// Compute the luminance of a color according to https://www.w3.org/WAI/WCAG22/Techniques/general/G18.html
   double _luminance(Color c) {
@@ -39,76 +46,86 @@ class FlairView extends StatelessWidget {
     return (rMax + 0.05) / (rMin + 0.05);
   }
 
-  /// Add a border around the text if the contrast between `backdgoundColor` and the `textColor`
-  /// is not high enough
-  Widget coloredText(BuildContext context, String text, Color backgroundColor,
-      Color textColor) {
+  InlineSpan coloredRichtext(
+    BuildContext context,
+    String text, {
+    required Color backgroundColor,
+    required Color textColor,
+  }) {
     final textStyle = Theme.of(context)
         .textTheme
         .labelSmall
         ?.copyWith(backgroundColor: backgroundColor, color: textColor);
     if (_colorRatio(textColor, backgroundColor) > 4.5) {
-      return Text(
-        text,
+      return TextSpan(
+        text: text,
         style: textStyle,
         semanticsLabel: "flair",
       );
     } else {
-      return BorderedText(
+      final backgroundLuminance = _luminance(backgroundColor);
+      return TextSpan(
         text: text,
-        borderColor: Colors.black,
-        style: textStyle,
-        semanticLabel: "flair",
+        style: textStyle?.copyWith(
+          color: backgroundLuminance > 0.5 ? Colors.black : Colors.white,
+        ),
+        semanticsLabel: "flair",
       );
     }
   }
 
-  InlineSpan richtext(BuildContext context, Richtext richtext,
-      Color backgroundColor, Color textColor) {
+  InlineSpan richtext(
+    BuildContext context,
+    Richtext richtext,
+    Color backgroundColor,
+    Color textColor,
+  ) {
     final fontSize = Theme.of(context).textTheme.labelSmall?.fontSize ?? 15;
     final height = Theme.of(context).textTheme.labelSmall?.height ?? 1;
     final imageHeight = height * fontSize;
     return switch (richtext) {
-      Richtext_Text(t: var text) => TextSpan(
-          text: text,
-          style: TextStyle(
-            color: textColor,
-            backgroundColor: backgroundColor,
-            fontWeight: FontWeight.bold,
-          ),
+      Richtext_Text(t: final text) => coloredRichtext(
+          context,
+          text,
+          textColor: textColor,
+          backgroundColor: backgroundColor,
         ),
-      Richtext_Emoji(a: var text, u: var url) => WidgetSpan(
+      Richtext_Emoji(a: final text, u: final url) when showEmoji => WidgetSpan(
           child: Image.network(url, semanticLabel: text, height: imageHeight),
           style: TextStyle(
             color: textColor,
             backgroundColor: backgroundColor,
             fontWeight: FontWeight.bold,
           ),
-        )
+        ),
+      Richtext_Emoji(a: final text, u: _) => coloredRichtext(
+          context,
+          text,
+          textColor: textColor,
+          backgroundColor: backgroundColor,
+        ),
     };
   }
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor =
-        flair.backgroundColor.stringToColor(defaultColor: Colors.transparent);
-    final foregroundColor = flair.textColor.stringToColor(
-        defaultColor:
-            Theme.of(context).textTheme.labelSmall?.foreground?.color ??
-                Colors.grey);
-    Widget textWidget = Container();
-    if (flair.richtext.isEmpty) {
-      if (flair.text?.isNotEmpty == true) {
-        textWidget = Text(
-          flair.text!,
-          style: Theme.of(context).textTheme.labelSmall!.copyWith(
-              backgroundColor: backgroundColor, color: foregroundColor),
-          semanticsLabel: "Flair",
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-        );
-      }
+    // default to background color for luminance computation (should be the same as a transparent background)
+    final theme = CrabirTheme.of(context);
+    final bg = flair.backgroundColor.stringToColor(
+      defaultColor: theme.cardBackground,
+    );
+    final backgroundColor = showColor ? bg : theme.cardBackground;
+    final fg = flair.textColor.stringToColor(
+      defaultColor: theme.secondaryText,
+    );
+    final Color foregroundColor;
+    if (backgroundColor == theme.cardBackground || !showColor) {
+      foregroundColor = theme.secondaryText;
     } else {
+      foregroundColor = fg;
+    }
+    Widget? textWidget;
+    if (flair.richtext.isNotEmpty) {
       textWidget = RichText(
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
@@ -125,12 +142,28 @@ class FlairView extends StatelessWidget {
               .toList(),
         ),
       );
+    } else if (flair.text?.isNotEmpty == true) {
+      textWidget = RichText(
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+        text: coloredRichtext(
+          context,
+          flair.text!,
+          backgroundColor: backgroundColor,
+          textColor: foregroundColor,
+        ),
+      );
     }
-    if (textWidget is Container) {
-      return Container();
+    if (textWidget == null) {
+      return SizedBox.shrink();
     }
+    final double horizontalPadding =
+        (showColor && flair.backgroundColor != "transparent") ? 6 : 0;
     return Container(
-      padding: EdgeInsetsDirectional.symmetric(horizontal: 6, vertical: 2),
+      padding: EdgeInsetsDirectional.symmetric(
+        horizontal: horizontalPadding,
+        vertical: 2,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(2),

@@ -1,104 +1,119 @@
-import 'package:crabir/loading_indicator.dart';
+import 'package:crabir/media/media.dart';
+import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/streamable.dart'
+import 'package:crabir/src/rust/third_party/reddit_api/paging_handler.dart'
     as reddit_stream;
 import 'package:flutter/material.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-/// Display things from a `StreamWrapper` in context.
 class ThingsScaffold extends StatefulWidget {
-  /// Function to use do build a `Post` view.
-  final Widget Function(BuildContext, Post)? postView;
+  final reddit_stream.PagingHandler stream;
 
+  /// If provided show the widget at the top of the view.
   final Widget? subredditInfo;
 
   /// Function to use do build a `Comment` view.
   final Widget Function(BuildContext, Comment)? commentView;
+
+  /// Function to use do build a `Post` view.
+  final Widget Function(BuildContext, Post)? postView;
+
+  /// When set to true show post that were hidden
+  final bool showHidden;
+
   const ThingsScaffold({
     super.key,
     this.postView,
     this.commentView,
     required this.stream,
     this.subredditInfo,
+    this.showHidden = false,
   });
-
-  final reddit_stream.Streamable stream;
 
   @override
   State<ThingsScaffold> createState() => _ThingsScaffoldState();
 }
 
-class _ThingsScaffoldState extends State<ThingsScaffold> {
-  bool _loadingMore = false;
+class _ThingsScaffoldState extends State<ThingsScaffold>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
 
-  List<Thing> items = [];
+  late final _pagingController = PagingController<bool, Thing>(
+    getNextPageKey: (state) {
+      return !widget.stream.done;
+    },
+    fetchPage: (pageKey) async {
+      return await widget.stream.next();
+    },
+  );
 
-  Future<void> _loadMore() async {
-    if (_loadingMore) return;
-    _loadingMore = true;
-    if (mounted) setState(() {});
-    await widget.stream.next(); // load more items
-    items = widget.stream.getAll();
-    if (mounted) setState(() {});
-    _loadingMore = false;
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
+  }
+
+  /// return true when the post should be hidden
+  bool hide(Post post) {
+    return GlobalFilters.of(context).shouldHidePost(post) ||
+        (post.over18 && !FiltersSettings.of(context).showNSFW) ||
+        (post.hidden && !widget.showHidden);
   }
 
   @override
   Widget build(BuildContext context) {
-    final itemCount = items.length;
-    final totalSliverItems = itemCount * 2 + 1; // double count for separators
-    return CustomScrollView(
-      key: PageStorageKey(widget.stream),
-      slivers: [
-        // Optional subreddit info at the top
-        if (widget.subredditInfo != null)
-          SliverToBoxAdapter(child: widget.subredditInfo!),
+    super.build(context);
+    return PagingListener(
+      controller: _pagingController,
+      builder: (context, state, fetchNextPage) {
+        return RefreshIndicator(
+          onRefresh: () async {
+            await widget.stream.refresh();
+            _pagingController.refresh();
+          },
+          child: AnimatedContentController(
+            notifier: ValueNotifier([]),
+            child: Scrollbar(
+              child: CustomScrollView(
+                slivers: [
+                  // Optional subreddit info at the top
+                  if (widget.subredditInfo != null)
+                    SliverToBoxAdapter(child: widget.subredditInfo!),
 
-        // SliverList with separators
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              if (index.isOdd) {
-                // Divider between items
-                return const Divider(height: 1);
-              }
+                  // The main paginated list
+                  PagedSliverList<bool, Thing>(
+                    fetchNextPage: fetchNextPage,
+                    state: state,
+                    builderDelegate: PagedChildBuilderDelegate(
+                      noMoreItemsIndicatorBuilder: (context) =>
+                          Center(child: Text("You've reached the end")),
+                      itemBuilder: (context, item, index) {
+                        final thing = item;
 
-              final dataIndex = index ~/ 2;
-              if (dataIndex < itemCount) {
-                final thing = items[dataIndex];
-
-                switch (thing) {
-                  case Thing_Post(field0: final post):
-                    return widget.postView?.call(context, post) ??
-                        const SizedBox.shrink();
-                  case Thing_Comment(field0: final comment):
-                    return widget.commentView?.call(context, comment) ??
-                        const SizedBox.shrink();
-                  default:
-                    return const SizedBox.shrink();
-                }
-              } else {
-                // Load more indicator at the end
-                WidgetsBinding.instance.addPostFrameCallback(
-                  (_) => _loadMore(),
-                );
-                return _loadingMore
-                    ? const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Center(child: LoadingIndicator()),
-                      )
-                    : const SizedBox.shrink();
-              }
-            },
-            childCount: totalSliverItems,
+                        switch (thing) {
+                          case Thing_Post(field0: final post):
+                            if (hide(post) || widget.postView == null) {
+                              return const SizedBox.shrink();
+                            }
+                            return widget.postView!.call(context, post);
+                          case Thing_Comment(field0: final comment):
+                            return widget.commentView?.call(context, comment) ??
+                                const SizedBox.shrink();
+                          default:
+                            return const SizedBox.shrink();
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-        // Ensure space at the bottom to avoid obstruction of the last element by the bottom bar.
-        SliverToBoxAdapter(
-          child: SizedBox(height: kBottomNavigationBarHeight),
-        ),
-      ],
+        );
+      },
     );
   }
 }

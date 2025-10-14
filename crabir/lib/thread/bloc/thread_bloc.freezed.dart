@@ -55,6 +55,9 @@ extension ThreadEventPatterns on ThreadEvent {
     TResult Function(Collapse value)? collapse,
     TResult Function(LoadMore value)? loadMore,
     TResult Function(SetSort value)? setSort,
+    TResult Function(OpenComment value)? openComment,
+    TResult Function(CloseComment value)? closeComment,
+    TResult Function(InsertComment value)? insertComment,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -69,6 +72,12 @@ extension ThreadEventPatterns on ThreadEvent {
         return loadMore(_that);
       case SetSort() when setSort != null:
         return setSort(_that);
+      case OpenComment() when openComment != null:
+        return openComment(_that);
+      case CloseComment() when closeComment != null:
+        return closeComment(_that);
+      case InsertComment() when insertComment != null:
+        return insertComment(_that);
       case _:
         return orElse();
     }
@@ -94,6 +103,9 @@ extension ThreadEventPatterns on ThreadEvent {
     required TResult Function(Collapse value) collapse,
     required TResult Function(LoadMore value) loadMore,
     required TResult Function(SetSort value) setSort,
+    required TResult Function(OpenComment value) openComment,
+    required TResult Function(CloseComment value) closeComment,
+    required TResult Function(InsertComment value) insertComment,
   }) {
     final _that = this;
     switch (_that) {
@@ -107,6 +119,12 @@ extension ThreadEventPatterns on ThreadEvent {
         return loadMore(_that);
       case SetSort():
         return setSort(_that);
+      case OpenComment():
+        return openComment(_that);
+      case CloseComment():
+        return closeComment(_that);
+      case InsertComment():
+        return insertComment(_that);
     }
   }
 
@@ -129,6 +147,9 @@ extension ThreadEventPatterns on ThreadEvent {
     TResult? Function(Collapse value)? collapse,
     TResult? Function(LoadMore value)? loadMore,
     TResult? Function(SetSort value)? setSort,
+    TResult? Function(OpenComment value)? openComment,
+    TResult? Function(CloseComment value)? closeComment,
+    TResult? Function(InsertComment value)? insertComment,
   }) {
     final _that = this;
     switch (_that) {
@@ -142,6 +163,12 @@ extension ThreadEventPatterns on ThreadEvent {
         return loadMore(_that);
       case SetSort() when setSort != null:
         return setSort(_that);
+      case OpenComment() when openComment != null:
+        return openComment(_that);
+      case CloseComment() when closeComment != null:
+        return closeComment(_that);
+      case InsertComment() when insertComment != null:
+        return insertComment(_that);
       case _:
         return null;
     }
@@ -166,6 +193,9 @@ extension ThreadEventPatterns on ThreadEvent {
     TResult Function(Comment comment)? collapse,
     TResult Function(Thing_More more)? loadMore,
     TResult Function(CommentSort? sort)? setSort,
+    TResult Function(String comment)? openComment,
+    TResult Function()? closeComment,
+    TResult Function(Comment comment)? insertComment,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -180,6 +210,12 @@ extension ThreadEventPatterns on ThreadEvent {
         return loadMore(_that.more);
       case SetSort() when setSort != null:
         return setSort(_that.sort);
+      case OpenComment() when openComment != null:
+        return openComment(_that.comment);
+      case CloseComment() when closeComment != null:
+        return closeComment();
+      case InsertComment() when insertComment != null:
+        return insertComment(_that.comment);
       case _:
         return orElse();
     }
@@ -205,6 +241,9 @@ extension ThreadEventPatterns on ThreadEvent {
     required TResult Function(Comment comment) collapse,
     required TResult Function(Thing_More more) loadMore,
     required TResult Function(CommentSort? sort) setSort,
+    required TResult Function(String comment) openComment,
+    required TResult Function() closeComment,
+    required TResult Function(Comment comment) insertComment,
   }) {
     final _that = this;
     switch (_that) {
@@ -218,6 +257,12 @@ extension ThreadEventPatterns on ThreadEvent {
         return loadMore(_that.more);
       case SetSort():
         return setSort(_that.sort);
+      case OpenComment():
+        return openComment(_that.comment);
+      case CloseComment():
+        return closeComment();
+      case InsertComment():
+        return insertComment(_that.comment);
     }
   }
 
@@ -240,6 +285,9 @@ extension ThreadEventPatterns on ThreadEvent {
     TResult? Function(Comment comment)? collapse,
     TResult? Function(Thing_More more)? loadMore,
     TResult? Function(CommentSort? sort)? setSort,
+    TResult? Function(String comment)? openComment,
+    TResult? Function()? closeComment,
+    TResult? Function(Comment comment)? insertComment,
   }) {
     final _that = this;
     switch (_that) {
@@ -253,6 +301,12 @@ extension ThreadEventPatterns on ThreadEvent {
         return loadMore(_that.more);
       case SetSort() when setSort != null:
         return setSort(_that.sort);
+      case OpenComment() when openComment != null:
+        return openComment(_that.comment);
+      case CloseComment() when closeComment != null:
+        return closeComment();
+      case InsertComment() when insertComment != null:
+        return insertComment(_that.comment);
       case _:
         return null;
     }
@@ -487,6 +541,153 @@ class _$SetSortCopyWithImpl<$Res> implements $SetSortCopyWith<$Res> {
 }
 
 /// @nodoc
+
+class OpenComment implements ThreadEvent {
+  OpenComment(this.comment);
+
+  final String comment;
+
+  /// Create a copy of ThreadEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $OpenCommentCopyWith<OpenComment> get copyWith =>
+      _$OpenCommentCopyWithImpl<OpenComment>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is OpenComment &&
+            (identical(other.comment, comment) || other.comment == comment));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, comment);
+
+  @override
+  String toString() {
+    return 'ThreadEvent.openComment(comment: $comment)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $OpenCommentCopyWith<$Res>
+    implements $ThreadEventCopyWith<$Res> {
+  factory $OpenCommentCopyWith(
+          OpenComment value, $Res Function(OpenComment) _then) =
+      _$OpenCommentCopyWithImpl;
+  @useResult
+  $Res call({String comment});
+}
+
+/// @nodoc
+class _$OpenCommentCopyWithImpl<$Res> implements $OpenCommentCopyWith<$Res> {
+  _$OpenCommentCopyWithImpl(this._self, this._then);
+
+  final OpenComment _self;
+  final $Res Function(OpenComment) _then;
+
+  /// Create a copy of ThreadEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? comment = null,
+  }) {
+    return _then(OpenComment(
+      null == comment
+          ? _self.comment
+          : comment // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+
+class CloseComment implements ThreadEvent {
+  CloseComment();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is CloseComment);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'ThreadEvent.closeComment()';
+  }
+}
+
+/// @nodoc
+
+class InsertComment implements ThreadEvent {
+  InsertComment(this.comment);
+
+  final Comment comment;
+
+  /// Create a copy of ThreadEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $InsertCommentCopyWith<InsertComment> get copyWith =>
+      _$InsertCommentCopyWithImpl<InsertComment>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is InsertComment &&
+            (identical(other.comment, comment) || other.comment == comment));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, comment);
+
+  @override
+  String toString() {
+    return 'ThreadEvent.insertComment(comment: $comment)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $InsertCommentCopyWith<$Res>
+    implements $ThreadEventCopyWith<$Res> {
+  factory $InsertCommentCopyWith(
+          InsertComment value, $Res Function(InsertComment) _then) =
+      _$InsertCommentCopyWithImpl;
+  @useResult
+  $Res call({Comment comment});
+}
+
+/// @nodoc
+class _$InsertCommentCopyWithImpl<$Res>
+    implements $InsertCommentCopyWith<$Res> {
+  _$InsertCommentCopyWithImpl(this._self, this._then);
+
+  final InsertComment _self;
+  final $Res Function(InsertComment) _then;
+
+  /// Create a copy of ThreadEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? comment = null,
+  }) {
+    return _then(InsertComment(
+      null == comment
+          ? _self.comment
+          : comment // ignore: cast_nullable_to_non_nullable
+              as Comment,
+    ));
+  }
+}
+
+/// @nodoc
 mixin _$ThreadState {
   List<Thing> get flatComments;
   Post? get post;
@@ -494,6 +695,9 @@ mixin _$ThreadState {
   Set<String> get collapsed;
   Set<String> get hidden;
   CommentSort? get sort;
+
+  /// Id of the comment where we should show the bottom bar
+  String? get expandedComment;
 
   /// Create a copy of ThreadState
   /// with the given fields replaced by the non-null parameter values.
@@ -513,7 +717,9 @@ mixin _$ThreadState {
             (identical(other.status, status) || other.status == status) &&
             const DeepCollectionEquality().equals(other.collapsed, collapsed) &&
             const DeepCollectionEquality().equals(other.hidden, hidden) &&
-            (identical(other.sort, sort) || other.sort == sort));
+            (identical(other.sort, sort) || other.sort == sort) &&
+            (identical(other.expandedComment, expandedComment) ||
+                other.expandedComment == expandedComment));
   }
 
   @override
@@ -524,11 +730,12 @@ mixin _$ThreadState {
       status,
       const DeepCollectionEquality().hash(collapsed),
       const DeepCollectionEquality().hash(hidden),
-      sort);
+      sort,
+      expandedComment);
 
   @override
   String toString() {
-    return 'ThreadState(flatComments: $flatComments, post: $post, status: $status, collapsed: $collapsed, hidden: $hidden, sort: $sort)';
+    return 'ThreadState(flatComments: $flatComments, post: $post, status: $status, collapsed: $collapsed, hidden: $hidden, sort: $sort, expandedComment: $expandedComment)';
   }
 }
 
@@ -544,7 +751,8 @@ abstract mixin class $ThreadStateCopyWith<$Res> {
       Status status,
       Set<String> collapsed,
       Set<String> hidden,
-      CommentSort? sort});
+      CommentSort? sort,
+      String? expandedComment});
 }
 
 /// @nodoc
@@ -565,6 +773,7 @@ class _$ThreadStateCopyWithImpl<$Res> implements $ThreadStateCopyWith<$Res> {
     Object? collapsed = null,
     Object? hidden = null,
     Object? sort = freezed,
+    Object? expandedComment = freezed,
   }) {
     return _then(_self.copyWith(
       flatComments: null == flatComments
@@ -591,6 +800,10 @@ class _$ThreadStateCopyWithImpl<$Res> implements $ThreadStateCopyWith<$Res> {
           ? _self.sort
           : sort // ignore: cast_nullable_to_non_nullable
               as CommentSort?,
+      expandedComment: freezed == expandedComment
+          ? _self.expandedComment
+          : expandedComment // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -688,8 +901,14 @@ extension ThreadStatePatterns on ThreadState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(List<Thing> flatComments, Post? post, Status status,
-            Set<String> collapsed, Set<String> hidden, CommentSort? sort)?
+    TResult Function(
+            List<Thing> flatComments,
+            Post? post,
+            Status status,
+            Set<String> collapsed,
+            Set<String> hidden,
+            CommentSort? sort,
+            String? expandedComment)?
         $default, {
     required TResult orElse(),
   }) {
@@ -697,7 +916,7 @@ extension ThreadStatePatterns on ThreadState {
     switch (_that) {
       case _ThreadState() when $default != null:
         return $default(_that.flatComments, _that.post, _that.status,
-            _that.collapsed, _that.hidden, _that.sort);
+            _that.collapsed, _that.hidden, _that.sort, _that.expandedComment);
       case _:
         return orElse();
     }
@@ -718,15 +937,21 @@ extension ThreadStatePatterns on ThreadState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(List<Thing> flatComments, Post? post, Status status,
-            Set<String> collapsed, Set<String> hidden, CommentSort? sort)
+    TResult Function(
+            List<Thing> flatComments,
+            Post? post,
+            Status status,
+            Set<String> collapsed,
+            Set<String> hidden,
+            CommentSort? sort,
+            String? expandedComment)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ThreadState():
         return $default(_that.flatComments, _that.post, _that.status,
-            _that.collapsed, _that.hidden, _that.sort);
+            _that.collapsed, _that.hidden, _that.sort, _that.expandedComment);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -746,15 +971,21 @@ extension ThreadStatePatterns on ThreadState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(List<Thing> flatComments, Post? post, Status status,
-            Set<String> collapsed, Set<String> hidden, CommentSort? sort)?
+    TResult? Function(
+            List<Thing> flatComments,
+            Post? post,
+            Status status,
+            Set<String> collapsed,
+            Set<String> hidden,
+            CommentSort? sort,
+            String? expandedComment)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ThreadState() when $default != null:
         return $default(_that.flatComments, _that.post, _that.status,
-            _that.collapsed, _that.hidden, _that.sort);
+            _that.collapsed, _that.hidden, _that.sort, _that.expandedComment);
       case _:
         return null;
     }
@@ -770,7 +1001,8 @@ class _ThreadState implements ThreadState {
       this.status = Status.unloaded,
       final Set<String> collapsed = const {},
       final Set<String> hidden = const {},
-      this.sort = null})
+      this.sort = null,
+      this.expandedComment = null})
       : _flatComments = flatComments,
         _collapsed = collapsed,
         _hidden = hidden;
@@ -811,6 +1043,11 @@ class _ThreadState implements ThreadState {
   @JsonKey()
   final CommentSort? sort;
 
+  /// Id of the comment where we should show the bottom bar
+  @override
+  @JsonKey()
+  final String? expandedComment;
+
   /// Create a copy of ThreadState
   /// with the given fields replaced by the non-null parameter values.
   @override
@@ -831,7 +1068,9 @@ class _ThreadState implements ThreadState {
             const DeepCollectionEquality()
                 .equals(other._collapsed, _collapsed) &&
             const DeepCollectionEquality().equals(other._hidden, _hidden) &&
-            (identical(other.sort, sort) || other.sort == sort));
+            (identical(other.sort, sort) || other.sort == sort) &&
+            (identical(other.expandedComment, expandedComment) ||
+                other.expandedComment == expandedComment));
   }
 
   @override
@@ -842,11 +1081,12 @@ class _ThreadState implements ThreadState {
       status,
       const DeepCollectionEquality().hash(_collapsed),
       const DeepCollectionEquality().hash(_hidden),
-      sort);
+      sort,
+      expandedComment);
 
   @override
   String toString() {
-    return 'ThreadState(flatComments: $flatComments, post: $post, status: $status, collapsed: $collapsed, hidden: $hidden, sort: $sort)';
+    return 'ThreadState(flatComments: $flatComments, post: $post, status: $status, collapsed: $collapsed, hidden: $hidden, sort: $sort, expandedComment: $expandedComment)';
   }
 }
 
@@ -864,7 +1104,8 @@ abstract mixin class _$ThreadStateCopyWith<$Res>
       Status status,
       Set<String> collapsed,
       Set<String> hidden,
-      CommentSort? sort});
+      CommentSort? sort,
+      String? expandedComment});
 }
 
 /// @nodoc
@@ -885,6 +1126,7 @@ class __$ThreadStateCopyWithImpl<$Res> implements _$ThreadStateCopyWith<$Res> {
     Object? collapsed = null,
     Object? hidden = null,
     Object? sort = freezed,
+    Object? expandedComment = freezed,
   }) {
     return _then(_ThreadState(
       flatComments: null == flatComments
@@ -911,6 +1153,10 @@ class __$ThreadStateCopyWithImpl<$Res> implements _$ThreadStateCopyWith<$Res> {
           ? _self.sort
           : sort // ignore: cast_nullable_to_non_nullable
               as CommentSort?,
+      expandedComment: freezed == expandedComment
+          ? _self.expandedComment
+          : expandedComment // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }

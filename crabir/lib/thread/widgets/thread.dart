@@ -1,23 +1,27 @@
-import 'package:auto_route/annotations.dart';
 import 'package:crabir/loading_indicator.dart';
-import 'package:crabir/post/widget/post.dart';
+import 'package:crabir/post/post.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
-import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/sort.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart'
+    hide Thumbnail;
 import 'package:crabir/thread/bloc/thread_bloc.dart';
 import 'package:crabir/thread/widgets/comment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crabir/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 
 part 'thread_entry.dart';
 part 'comments_list.dart';
 part 'indented_box.dart';
+part 'post_view.dart';
+part 'share_button.dart';
 
 final commentSorts = [
   CommentSort.confidence,
@@ -29,20 +33,20 @@ final commentSorts = [
   CommentSort.random,
 ];
 
-@RoutePage(name: "ThreadRoute")
 class Thread extends StatelessWidget {
   final Post? post;
   final String permalink;
 
-  /// requires either `subreddit, postID, postTitle` to be set or `post`.
+  /// requires either `permalink` to be set or `post`.
   Thread({
     super.key,
-    @PathParam("subreddit") String? subreddit,
-    @PathParam("id") String? postID,
-    @PathParam("title") String? postTitle,
     this.post,
-  }) : permalink =
-            post?.permalink ?? "/r/$subreddit/comments/$postID/$postTitle";
+    String? permalink,
+  })  : assert(post != null || permalink != null),
+        permalink = post?.permalink ?? permalink!;
+  factory Thread.fromPost(Post post) {
+    return Thread();
+  }
 
   Widget appBar(BuildContext context, ThreadBloc bloc) {
     final locales = AppLocalizations.of(context);
@@ -101,28 +105,28 @@ class Thread extends StatelessWidget {
       child: BlocBuilder<ThreadBloc, ThreadState>(
         builder: (BuildContext context, ThreadState state) {
           final post = this.post ?? state.post;
-          return Scaffold(
-            backgroundColor: Theme.of(context)
-                .scaffoldBackgroundColor, // Ensure the background is opaque
-            body: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                appBar(context, context.read()),
-              ],
-              floatHeaderSlivers: true,
-              body: RefreshIndicator(
-                onRefresh: () async {
-                  context.read<ThreadBloc>().add(Refresh());
-                },
-                child: CustomScrollView(
-                  slivers: [
-                    if (post != null)
-                      SliverToBoxAdapter(child: _PostView(post: post))
-                    else
-                      SliverToBoxAdapter(
-                        child: Center(child: LoadingIndicator()),
-                      ),
-                    CommentsList(),
-                  ],
+          return SafeArea(
+            child: Scaffold(
+              body: NestedScrollView(
+                headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                  appBar(context, context.read()),
+                ],
+                floatHeaderSlivers: true,
+                body: RefreshIndicator(
+                  onRefresh: () async {
+                    context.read<ThreadBloc>().add(Refresh());
+                  },
+                  child: CustomScrollView(
+                    slivers: [
+                      if (post != null)
+                        SliverToBoxAdapter(child: _PostView(post: post)),
+                      CommentsList(),
+                      if (state.status case Status.unloaded)
+                        SliverToBoxAdapter(
+                          child: Center(child: LoadingIndicator()),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -139,69 +143,4 @@ int depth(Thing comment) {
     Thing_More(depth: final depth) => depth,
     _ => -1,
   };
-}
-
-class _PostView extends RedditPostCard {
-  const _PostView({
-    required super.post,
-  }) : super(showMedia: false);
-
-  @override
-  bool showThumbnail() {
-    return super.showThumbnail() && post.crosspostParentList.isEmpty;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final contentWidget = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      spacing: 8,
-      children: [
-        wrap(Header(post: post)),
-        wrap(title(context)),
-        if (post.crosspostParentList.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.white54),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DenseCard(post: post.crosspostParentList.first),
-              ),
-            ),
-          )
-        else
-          content(context),
-        wrap(
-          Footer(
-            post: post,
-            onLike: (direction) async {
-              await post.vote(direction: direction, client: RedditAPI.client());
-            },
-            onSave: (save) async {
-              if (save) {
-                await post.save(client: RedditAPI.client());
-              } else {
-                await post.unsave(client: RedditAPI.client());
-              }
-            },
-          ),
-        ),
-      ],
-    );
-    final theme = context.watch<ThemeBloc>().state;
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      color: theme.background,
-      elevation: 1,
-      child: InkWell(
-        onTap: onTap,
-        child: contentWidget,
-      ),
-    );
-  }
 }

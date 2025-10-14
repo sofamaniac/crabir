@@ -14,70 +14,24 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$ThemeEvent {
-  ThemeField get field;
-  Color get color;
-
-  /// Create a copy of ThemeEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $ThemeEventCopyWith<ThemeEvent> get copyWith =>
-      _$ThemeEventCopyWithImpl<ThemeEvent>(this as ThemeEvent, _$identity);
-
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is ThemeEvent &&
-            (identical(other.field, field) || other.field == field) &&
-            const DeepCollectionEquality().equals(other.color, color));
+        (other.runtimeType == runtimeType && other is ThemeEvent);
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, field, const DeepCollectionEquality().hash(color));
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
-    return 'ThemeEvent(field: $field, color: $color)';
+    return 'ThemeEvent()';
   }
 }
 
 /// @nodoc
-abstract mixin class $ThemeEventCopyWith<$Res> {
-  factory $ThemeEventCopyWith(
-          ThemeEvent value, $Res Function(ThemeEvent) _then) =
-      _$ThemeEventCopyWithImpl;
-  @useResult
-  $Res call({ThemeField field, Color color});
-}
-
-/// @nodoc
-class _$ThemeEventCopyWithImpl<$Res> implements $ThemeEventCopyWith<$Res> {
-  _$ThemeEventCopyWithImpl(this._self, this._then);
-
-  final ThemeEvent _self;
-  final $Res Function(ThemeEvent) _then;
-
-  /// Create a copy of ThemeEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? field = null,
-    Object? color = freezed,
-  }) {
-    return _then(_self.copyWith(
-      field: null == field
-          ? _self.field
-          : field // ignore: cast_nullable_to_non_nullable
-              as ThemeField,
-      color: freezed == color
-          ? _self.color
-          : color // ignore: cast_nullable_to_non_nullable
-              as Color,
-    ));
-  }
+class $ThemeEventCopyWith<$Res> {
+  $ThemeEventCopyWith(ThemeEvent _, $Res Function(ThemeEvent) __);
 }
 
 /// Adds pattern-matching-related methods to [ThemeEvent].
@@ -97,12 +51,15 @@ extension ThemeEventPatterns on ThemeEvent {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SetColor value)? setColor,
+    TResult Function(SetMode value)? setMode,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case SetColor() when setColor != null:
         return setColor(_that);
+      case SetMode() when setMode != null:
+        return setMode(_that);
       case _:
         return orElse();
     }
@@ -124,11 +81,14 @@ extension ThemeEventPatterns on ThemeEvent {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(SetColor value) setColor,
+    required TResult Function(SetMode value) setMode,
   }) {
     final _that = this;
     switch (_that) {
       case SetColor():
         return setColor(_that);
+      case SetMode():
+        return setMode(_that);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -149,11 +109,14 @@ extension ThemeEventPatterns on ThemeEvent {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SetColor value)? setColor,
+    TResult? Function(SetMode value)? setMode,
   }) {
     final _that = this;
     switch (_that) {
       case SetColor() when setColor != null:
         return setColor(_that);
+      case SetMode() when setMode != null:
+        return setMode(_that);
       case _:
         return null;
     }
@@ -173,13 +136,17 @@ extension ThemeEventPatterns on ThemeEvent {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(ThemeField field, Color color)? setColor,
+    TResult Function(ThemeField field, Color color, Brightness brightness)?
+        setColor,
+    TResult Function(ThemeMode mode)? setMode,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case SetColor() when setColor != null:
-        return setColor(_that.field, _that.color);
+        return setColor(_that.field, _that.color, _that.brightness);
+      case SetMode() when setMode != null:
+        return setMode(_that.mode);
       case _:
         return orElse();
     }
@@ -200,12 +167,17 @@ extension ThemeEventPatterns on ThemeEvent {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(ThemeField field, Color color) setColor,
+    required TResult Function(
+            ThemeField field, Color color, Brightness brightness)
+        setColor,
+    required TResult Function(ThemeMode mode) setMode,
   }) {
     final _that = this;
     switch (_that) {
       case SetColor():
-        return setColor(_that.field, _that.color);
+        return setColor(_that.field, _that.color, _that.brightness);
+      case SetMode():
+        return setMode(_that.mode);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -225,12 +197,16 @@ extension ThemeEventPatterns on ThemeEvent {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(ThemeField field, Color color)? setColor,
+    TResult? Function(ThemeField field, Color color, Brightness brightness)?
+        setColor,
+    TResult? Function(ThemeMode mode)? setMode,
   }) {
     final _that = this;
     switch (_that) {
       case SetColor() when setColor != null:
-        return setColor(_that.field, _that.color);
+        return setColor(_that.field, _that.color, _that.brightness);
+      case SetMode() when setMode != null:
+        return setMode(_that.mode);
       case _:
         return null;
     }
@@ -240,16 +216,15 @@ extension ThemeEventPatterns on ThemeEvent {
 /// @nodoc
 
 class SetColor implements ThemeEvent {
-  SetColor({required this.field, required this.color});
+  SetColor(
+      {required this.field, required this.color, required this.brightness});
 
-  @override
   final ThemeField field;
-  @override
   final Color color;
+  final Brightness brightness;
 
   /// Create a copy of ThemeEvent
   /// with the given fields replaced by the non-null parameter values.
-  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   $SetColorCopyWith<SetColor> get copyWith =>
@@ -261,16 +236,21 @@ class SetColor implements ThemeEvent {
         (other.runtimeType == runtimeType &&
             other is SetColor &&
             (identical(other.field, field) || other.field == field) &&
-            const DeepCollectionEquality().equals(other.color, color));
+            const DeepCollectionEquality().equals(other.color, color) &&
+            const DeepCollectionEquality()
+                .equals(other.brightness, brightness));
   }
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, field, const DeepCollectionEquality().hash(color));
+      runtimeType,
+      field,
+      const DeepCollectionEquality().hash(color),
+      const DeepCollectionEquality().hash(brightness));
 
   @override
   String toString() {
-    return 'ThemeEvent.setColor(field: $field, color: $color)';
+    return 'ThemeEvent.setColor(field: $field, color: $color, brightness: $brightness)';
   }
 }
 
@@ -279,9 +259,8 @@ abstract mixin class $SetColorCopyWith<$Res>
     implements $ThemeEventCopyWith<$Res> {
   factory $SetColorCopyWith(SetColor value, $Res Function(SetColor) _then) =
       _$SetColorCopyWithImpl;
-  @override
   @useResult
-  $Res call({ThemeField field, Color color});
+  $Res call({ThemeField field, Color color, Brightness brightness});
 }
 
 /// @nodoc
@@ -293,11 +272,11 @@ class _$SetColorCopyWithImpl<$Res> implements $SetColorCopyWith<$Res> {
 
   /// Create a copy of ThemeEvent
   /// with the given fields replaced by the non-null parameter values.
-  @override
   @pragma('vm:prefer-inline')
   $Res call({
     Object? field = null,
     Object? color = freezed,
+    Object? brightness = freezed,
   }) {
     return _then(SetColor(
       field: null == field
@@ -308,6 +287,72 @@ class _$SetColorCopyWithImpl<$Res> implements $SetColorCopyWith<$Res> {
           ? _self.color
           : color // ignore: cast_nullable_to_non_nullable
               as Color,
+      brightness: freezed == brightness
+          ? _self.brightness
+          : brightness // ignore: cast_nullable_to_non_nullable
+              as Brightness,
+    ));
+  }
+}
+
+/// @nodoc
+
+class SetMode implements ThemeEvent {
+  SetMode({required this.mode});
+
+  final ThemeMode mode;
+
+  /// Create a copy of ThemeEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $SetModeCopyWith<SetMode> get copyWith =>
+      _$SetModeCopyWithImpl<SetMode>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SetMode &&
+            (identical(other.mode, mode) || other.mode == mode));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, mode);
+
+  @override
+  String toString() {
+    return 'ThemeEvent.setMode(mode: $mode)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $SetModeCopyWith<$Res>
+    implements $ThemeEventCopyWith<$Res> {
+  factory $SetModeCopyWith(SetMode value, $Res Function(SetMode) _then) =
+      _$SetModeCopyWithImpl;
+  @useResult
+  $Res call({ThemeMode mode});
+}
+
+/// @nodoc
+class _$SetModeCopyWithImpl<$Res> implements $SetModeCopyWith<$Res> {
+  _$SetModeCopyWithImpl(this._self, this._then);
+
+  final SetMode _self;
+  final $Res Function(SetMode) _then;
+
+  /// Create a copy of ThemeEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? mode = null,
+  }) {
+    return _then(SetMode(
+      mode: null == mode
+          ? _self.mode
+          : mode // ignore: cast_nullable_to_non_nullable
+              as ThemeMode,
     ));
   }
 }

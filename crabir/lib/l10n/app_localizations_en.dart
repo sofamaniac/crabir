@@ -87,6 +87,114 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logoutButtonLabel => 'Logout';
 
   @override
+  String get gotoDropdownLabel => 'Go to ...';
+
+  @override
+  String get replyTitle => 'Reply';
+
+  @override
+  String get deletedUser => '[deleted]';
+
+  @override
+  String get postEditorTitle => 'Create post';
+
+  @override
+  String get resolutionSource => 'Source';
+
+  @override
+  String get resolutionHigh => 'High';
+
+  @override
+  String get resolutionMedium => 'Medium';
+
+  @override
+  String get resolutionLow => 'Low';
+
+  @override
+  String get mediaPreviewSizeNone => 'None';
+
+  @override
+  String get mediaPreviewSizeThumbnail => 'Thumbnail';
+
+  @override
+  String get mediaPreviewSizeFull => 'Full Size';
+
+  @override
+  String get indentationStyleLines => 'Lines';
+
+  @override
+  String get indentationStyleColored => 'Colored lines';
+
+  @override
+  String get indentationStyleBars => 'Colored bars';
+
+  @override
+  String get shareLink => 'Share Link';
+
+  @override
+  String get shareLinkTitle => 'Share Title + Link';
+
+  @override
+  String get sharePost => 'Share Post';
+
+  @override
+  String get shareText => 'Share Text';
+
+  @override
+  String get shareButtonLabel => 'Share...';
+
+  @override
+  String get markRead => 'Mark post as read';
+
+  @override
+  String get markUnread => 'Mark post as unread';
+
+  @override
+  String get hidePost => 'Hide post';
+
+  @override
+  String get unhidePost => 'Unhide post';
+
+  @override
+  String get themeBackround => 'Background';
+
+  @override
+  String get themeCardBackground => 'Card background';
+
+  @override
+  String get themeToolbarBackground => 'Toolbar background';
+
+  @override
+  String get themeToolbarText => 'Toolbar text';
+
+  @override
+  String get themePrimaryColor => 'Primary color';
+
+  @override
+  String get themeHighlight => 'Highlight';
+
+  @override
+  String get themePostTitle => 'Post title';
+
+  @override
+  String get themeReadPost => 'Read post title';
+
+  @override
+  String get themeAnnouncement => 'Announcement';
+
+  @override
+  String get themeContentText => 'Context Text';
+
+  @override
+  String get themeLinkColor => 'Link color';
+
+  @override
+  String get themeSecondaryText => 'Secondary text color';
+
+  @override
+  String get themeDownvote => 'Downvote color';
+
+  @override
   String yearsAgo(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -153,7 +261,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get comments => 'Comments';
+  String get comments => 'comments';
+
+  @override
+  String commentsNumbered(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n comments',
+      one: '1 comment',
+    );
+    return '$_temp0';
+  }
 
   @override
   String loadMoreComments(int n) {
@@ -265,6 +384,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comments_swipeToClose => 'Swipe to close thread';
 
   @override
+  String get comments_distanceThreshold => 'Distance threshold';
+
+  @override
+  String get comments_distanceThresholdDescription =>
+      'Dragging distance from edge as a percentage of screen width before closing and going back.';
+
+  @override
+  String get comments_threadGuide => 'Thread guides';
+
+  @override
   String get posts_defaultHomeSort => 'Default Home sort';
 
   @override
@@ -276,6 +405,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get posts_rememberSortByCommunityDescription =>
       'Each community will remember the last sort you selected.';
+
+  @override
+  String get posts_rememberedSorts => 'Manage Sorts';
 
   @override
   String get posts_showAwards => 'Show awards';
@@ -290,7 +422,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get posts_showFlairColors => 'Show flair colors';
 
   @override
-  String get posts_showEmojis => 'Show emojis';
+  String get posts_showFlairEmojis => 'Show emojis';
 
   @override
   String get posts_tapFlairToSearch => 'Tap flair to search';
@@ -323,22 +455,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get posts_showOpenInAppButton => 'Open in app';
 
   @override
-  String get data_wifiDataSaver => 'Wifi data saver';
-
-  @override
-  String get data_wifiDataSaverDescription => 'Load lower-size media';
-
-  @override
-  String get data_mobileDataSaver => 'Mobile data saver';
-
-  @override
-  String get data_mobileDataSaverDescription => 'Load lower-size media';
-
-  @override
   String get data_autoplay => 'Autoplay videos';
 
   @override
-  String get data_videoQuality => 'Video quality';
+  String get data_videoQualityWifi =>
+      'Preferred video quality when connected to Wifi';
+
+  @override
+  String get data_videoQualityCellular =>
+      'Preferred video quality when connected to cellular';
 
   @override
   String get data_minimumQuality => 'Minimum quality';
@@ -350,8 +475,127 @@ class AppLocalizationsEn extends AppLocalizations {
   String get data_loadImages => 'Load images';
 
   @override
-  String get data_preferredQuality => 'Image Quality';
+  String get data_imageQualityWifi =>
+      'Preferred image quality when connected to Wifi';
+
+  @override
+  String get data_imageQualityCellular =>
+      'Preferred image quality when connected to cellular';
+
+  @override
+  String get filters_manageHiddenCommunities => 'Communities';
+
+  @override
+  String get filters_manageHiddenCommunitiesDescription =>
+      'Hide posts from these communities';
+
+  @override
+  String get filters_manageHiddenDomains => 'Domains';
+
+  @override
+  String get filters_manageHiddenDomainsDescription =>
+      'Hide posts from these domains';
+
+  @override
+  String get filters_manageHiddenUsers => 'Users';
+
+  @override
+  String get filters_manageHiddenUsersDescription =>
+      'Hide posts from these users';
+
+  @override
+  String get filters_manageHiddenFlairs => 'Flairs';
+
+  @override
+  String get filters_manageHiddenFlairsDescription =>
+      'Hide posts with these flairs';
+
+  @override
+  String get filters_showNSFW => 'Show NSFW';
+
+  @override
+  String get filters_showNSFWDescription =>
+      'Show content labeled Not Safe For Work';
+
+  @override
+  String get filters_showImageInNSFW => 'Show images in NSFW posts';
 
   @override
   String get filters_blurNSFW => 'Blur images in NSFW posts';
+
+  @override
+  String get lateralMenu_showHome => 'Home';
+
+  @override
+  String get lateralMenu_showHomeDescription =>
+      'Default feed. To set any community, go to Subscriptions list and select \"Set as default\".';
+
+  @override
+  String get lateralMenu_showHomeFeed => 'Home Feed';
+
+  @override
+  String get lateralMenu_showHomeFeedDescription => 'Posts from subscriptions';
+
+  @override
+  String get lateralMenu_showPopular => 'Popular';
+
+  @override
+  String get lateralMenu_showAll => 'All';
+
+  @override
+  String get lateralMenu_showSaved => 'Saved';
+
+  @override
+  String get lateralMenu_showHistory => 'History';
+
+  @override
+  String get lateralMenu_showProfile => 'Profile';
+
+  @override
+  String get lateralMenu_showInbox => 'Inbox';
+
+  @override
+  String get lateralMenu_showFriends => 'Friends';
+
+  @override
+  String get lateralMenu_showDrafts => 'Drafts';
+
+  @override
+  String get lateralMenu_showModeration => 'Moderation';
+
+  @override
+  String get lateralMenu_showSearch => 'Search';
+
+  @override
+  String get lateralMenu_showGoToDropdown => 'Go to dropdown';
+
+  @override
+  String get lateralMenu_showGoToCommunity => 'Go to community';
+
+  @override
+  String get lateralMenu_showGoToUser => 'Go to user';
+
+  @override
+  String get lateralMenu_darkMode => 'Dark mode';
+
+  @override
+  String get lateralMenu_showNSFW => 'Show NSFW';
+
+  @override
+  String get lateralMenu_blurNSFW => 'Blur NSFW';
+
+  @override
+  String get lateralMenu_showSubsInMenu => 'Show in menu';
+
+  @override
+  String get lateralMenu_showSubsIcon => 'Show icons';
+
+  @override
+  String get lateralMenu_showSubsFavOnly => 'Show only favorites';
+
+  @override
+  String get lateralMenu_showAccountAvatar => 'Show avatar';
+
+  @override
+  String get lateralMenu_showAccountUsername => 'Show username';
 }

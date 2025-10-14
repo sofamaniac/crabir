@@ -1,14 +1,18 @@
 part of 'media.dart';
 
 class FullscreenMediaView extends StatefulWidget {
-  final Widget Function(PhotoViewImageTapDownCallback) builder;
+  final Widget Function(VoidCallback) builder;
   final Widget? trailing;
   final String? title;
+  final Post? post;
+  final Object Function()? onPop;
   const FullscreenMediaView({
     super.key,
     required this.builder,
     this.trailing,
     this.title,
+    this.post,
+    this.onPop,
   });
 
   @override
@@ -16,42 +20,45 @@ class FullscreenMediaView extends StatefulWidget {
 }
 
 class _FullscreenMediaViewState extends State<FullscreenMediaView> {
-  bool _showBars = false;
+  bool _showBars = true;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          Dismissible(
-            key: Key("_FullscreenMediaViewState"),
-            direction: DismissDirection.vertical,
-            onDismissed: (_) => context.pop(),
-            child: PhotoViewGestureDetectorScope(
-              axis: Axis.vertical,
-              child: widget.builder(_toggleBars),
+    return SafeArea(
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        backgroundColor: Colors.black,
+        body: Stack(
+          children: [
+            Dismissible(
+              key: Key("_FullscreenMediaViewState"),
+              direction: DismissDirection.vertical,
+              resizeDuration: null,
+              onDismissed: (_) => context.pop(widget.onPop?.call()),
+              child: PhotoViewGestureDetectorScope(
+                axis: Axis.vertical,
+                child: widget.builder(_toggleBars),
+              ),
             ),
-          ),
-          _topBar(),
-          _bottomBar(),
-        ],
+            _topBar(),
+            _bottomBar(),
+          ],
+        ),
       ),
     );
   }
 
-  void _toggleBars(
-    BuildContext context,
-    TapDownDetails _,
-    PhotoViewControllerValue __,
-  ) {
+  void _toggleBars() {
     setState(() {
       _showBars = !_showBars;
     });
   }
 
   Widget _bottomBar() {
-    final theme = context.watch<ThemeBloc>().state;
+    final post = widget.post;
+    if (post == null) {
+      return SizedBox.shrink();
+    }
+    final theme = CrabirTheme.of(context);
     final bar = SafeArea(
       top: false,
       child: Column(
@@ -62,19 +69,42 @@ class _FullscreenMediaViewState extends State<FullscreenMediaView> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               VoteButton.like(
-                likes: ValueNotifier(VoteDirection.neutral),
+                likes: post.likes.toVoteDirection(),
                 colorActive: theme.primaryColor,
+                onChange: (dir) async {
+                  await post.vote(direction: dir, client: RedditAPI.client());
+                  setState(() {});
+                },
+              ),
+              VoteButton.dislike(
+                likes: post.likes.toVoteDirection(),
+                colorActive: theme.downvoteContent,
+                onChange: (dir) async {
+                  await post.vote(direction: dir, client: RedditAPI.client());
+                  setState(() {});
+                },
+              ),
+              SaveButton(
+                initialValue: post.saved,
+                onChange: (save) async {
+                  if (save) {
+                    await post.save(client: RedditAPI.client());
+                  } else {
+                    await post.unsave(client: RedditAPI.client());
+                  }
+                  setState(() {});
+                },
               ),
               IconButton(
-                icon: const Icon(Icons.favorite_border, color: Colors.white),
-                onPressed: () {},
+                icon: Icon(Icons.comment_outlined),
+                color: theme.secondaryText,
+                onPressed: () {
+                  context.go(post.permalink, extra: post);
+                },
               ),
               IconButton(
-                icon: const Icon(Icons.share, color: Colors.white),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: const Icon(Icons.download, color: Colors.white),
+                icon: Icon(Icons.share),
+                color: theme.secondaryText,
                 onPressed: () {},
               ),
             ],

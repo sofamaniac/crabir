@@ -3,7 +3,7 @@ use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
 use crate::result::Result;
-use crate::{client::Client, error::Error, streamable::stream::IntoStreamPrivate};
+use crate::{client::Client, error::Error, paging_handler::stream::IntoStreamPrivate};
 
 use super::{Fullname, Thing, feed::FeedSort};
 
@@ -89,7 +89,7 @@ impl MultiStream {
 }
 
 impl IntoStreamPrivate for MultiStream {
-    type Output = Thing;
+    type Output = Vec<Thing>;
 
     fn to_stream(&self) -> futures::stream::BoxStream<'static, Result<Self::Output>> {
         self.client

@@ -10,10 +10,10 @@
 
      ndk = {
       enable = true;
-      version = [ "26.3.11579264" ];
+      version = [ "27.0.12077973" "26.3.11579264" ];
     };
     
-    buildTools.version = [ "34.0.0" ];
+    buildTools.version = [ "34.0.0" "35.0.0" ];
     platforms.version = [ "33" "34" "35" ];
   };
 
@@ -60,13 +60,6 @@
     pushd $FLUTTER_DIR
     flutter_rust_bridge_codegen generate
     flutter run --dart-define-from-file $ENV_FILE
-    popd
-  '';
-
-  scripts.build.exec = ''
-    pushd $FLUTTER_DIR
-    flutter_rust_bridge_codegen generate
-    flutter build apk --dart-define-from-file $ENV_FILE
     popd
   '';
 

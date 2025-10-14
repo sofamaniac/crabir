@@ -1,47 +1,58 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/media/media.dart';
+import 'package:crabir/settings/theme/theme.dart';
+import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/settings_page/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:logging/logging.dart';
 
 part 'data_settings.settings_page.dart';
 part 'data_settings.freezed.dart';
 part 'data_settings.g.dart';
+part 'data_settings.go_route_ext.dart';
 
 @freezed
 @SettingsPage(prefix: "data_", useFieldName: true)
 abstract class DataSettings with _$DataSettings {
   DataSettings._();
   factory DataSettings({
-    @Category(name: "Data Saver")
-    @Setting(hasDescription: true)
-    @Default(false)
-    bool mobileDataSaver,
-    @Setting(hasDescription: true) @Default(false) bool wifiDataSaver,
     @Category(name: "Videos")
     @Setting(widget: ImageLoadingSelect)
     @Default(ImageLoading.always)
     ImageLoading autoplay,
-    @Setting() @Default(Resolution.source) Resolution videoQuality,
-    @Setting() @Default(Resolution.source) Resolution minimumQuality,
-    @Setting() @Default(Resolution.source) Resolution maximumQuality,
+    @Setting(widget: ResolutionSelect)
+    @Default(Resolution.source)
+    Resolution videoQualityWifi,
+    @Setting(widget: ResolutionSelect)
+    @Default(Resolution.source)
+    Resolution videoQualityCellular,
     @Category(name: "Images")
     @Setting(widget: ImageLoadingSelect)
     @Default(ImageLoading.always)
     ImageLoading loadImages,
-    @Setting() @Default(Resolution.source) Resolution preferredQuality,
+    @Setting(widget: ResolutionSelect)
+    @Default(Resolution.source)
+    Resolution imageQualityWifi,
+    @Setting(widget: ResolutionSelect)
+    @Default(Resolution.source)
+    Resolution imageQualityCellular,
   }) = _DataSettings;
   factory DataSettings.fromJson(Map<String, dynamic> json) =>
       _$DataSettingsFromJson(json);
+
+  factory DataSettings.of(BuildContext context) =>
+      context.watch<DataSettingsCubit>().state;
 }
 
 class ImageLoadingSelect extends StatelessWidget {
   final Widget title;
   final Widget? subtitle;
   final ImageLoading value;
+  final Widget? leading;
   final void Function(ImageLoading) onChanged;
   const ImageLoadingSelect({
     super.key,
@@ -49,6 +60,7 @@ class ImageLoadingSelect extends StatelessWidget {
     this.subtitle,
     required this.onChanged,
     required this.value,
+    this.leading,
   });
   String _label(ImageLoading mode) {
     switch (mode) {
@@ -74,38 +86,61 @@ class ImageLoadingSelect extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: ImageLoading.values.map((mode) {
-        return RadioListTile<ImageLoading>(
-          value: mode,
-          groupValue: value,
-          onChanged: (newValue) {
-            if (newValue != null) onChanged(newValue);
-          },
-          title: Text(_label(mode)),
-          secondary: Icon(_icon(mode)),
-        );
-      }).toList(),
+    return ListTile(
+      leading: leading,
+      title: title,
+      subtitle: subtitle,
+      trailing: DropdownMenu(
+        dropdownMenuEntries: ImageLoading.values
+            .map(
+              (mode) => DropdownMenuEntry(
+                value: mode,
+                leadingIcon: Icon(_icon(mode)),
+                label: _label(mode),
+              ),
+            )
+            .toList(),
+        onSelected: (mode) => onChanged(mode!),
+        initialSelection: value,
+      ),
     );
   }
 }
 
-class ResoltuionSelect extends StatelessWidget {
+class ResolutionSelect extends StatelessWidget {
   final Widget title;
   final Widget? subtitle;
   final Resolution value;
+  final Widget? leading;
   final void Function(Resolution) onChanged;
-  const ResoltuionSelect({
+  const ResolutionSelect({
     super.key,
     required this.title,
-    this.subtitle,
     required this.onChanged,
     required this.value,
+    this.subtitle,
+    this.leading,
   });
+
   @override
   Widget build(BuildContext context) {
-    return Text("TODO");
+    return ListTile(
+      title: title,
+      leading: leading,
+      subtitle: subtitle,
+      trailing: DropdownMenu(
+        dropdownMenuEntries: Resolution.values
+            .map(
+              (res) => DropdownMenuEntry(
+                value: res,
+                label: res.label(context),
+              ),
+            )
+            .toList(),
+        onSelected: (res) => onChanged(res!),
+        initialSelection: value,
+      ),
+    );
   }
 }
 

@@ -6,10 +6,7 @@ use serde::{Deserialize, Serialize};
 use subreddit::Subreddit;
 use user::model::User;
 
-use crate::{
-    client::{Client, VoteDirection},
-    error::Error,
-};
+use crate::error::Error;
 
 pub mod author;
 pub mod comment;
@@ -18,13 +15,33 @@ pub mod flair;
 pub mod gallery;
 pub mod multi;
 pub mod post;
+pub mod rule;
 pub mod subreddit;
 pub mod user;
 
-#[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Represent the kind and the ID of a thing.
 /// For example a post has a fullname of the form "t3_xxxx".
+#[frb(
+    non_eq,
+    non_hash,
+    dart_code = "@override
+bool operator ==(Object other) {
+  if (identical(this, other)) return true;
+  if (other is! Fullname) return false;
+  return eq(other: other);
+}
+"
+)]
 pub struct Fullname(String);
+
+impl Fullname {
+    #[frb(sync)]
+    pub fn eq(&self, other: &Fullname) -> bool {
+        log::debug!("eq {} {}", self.0, other.0);
+        self == other
+    }
+}
 
 impl AsRef<str> for Fullname {
     fn as_ref(&self) -> &str {
@@ -65,6 +82,9 @@ pub enum Thing {
         depth: u32,
         children: Vec<String>,
     },
+
+    #[serde(rename = "wikipage")]
+    Wikipage { content_html: String },
 }
 
 impl Thing {
@@ -72,37 +92,17 @@ impl Thing {
     pub fn name(&self) -> Option<Fullname> {
         match self {
             Thing::Listing(_) => None,
-            Thing::Comment(comment) => Some(comment.name.clone()),
+            Thing::Comment(comment) => Some(comment.get_name()),
             Thing::User(user) => Some(user.name()),
             Thing::Post(post) => Some(post.get_name()),
             Thing::Message => todo!(),
-            Thing::Subreddit(subreddit) => Some(subreddit.other.name.clone()),
+            Thing::Subreddit(subreddit) => Some(subreddit.other().get_name()),
             Thing::Award => None,
             Thing::Multi(multi) => Some(multi.name.clone()),
             Thing::More { .. } => None,
+            Thing::Wikipage { .. } => None,
         }
     }
-
-    // pub(crate) fn likes(&mut self, direction: crate::client::VoteDirection) {
-    //     let likes: Option<bool> = direction.into();
-    //     match self {
-    //         Thing::Comment(comment) => comment.likes = likes,
-    //         Thing::Post(post) => {
-    //             let _ = post.set_likes(likes);
-    //         }
-    //         _ => (),
-    //     }
-    // }
-    //
-    // pub(crate) fn save(&mut self, save: bool) {
-    //     match self {
-    //         Thing::Comment(comment) => comment.saved = save,
-    //         Thing::Post(post) => {
-    //             let _ = post.set_saved(save);
-    //         }
-    //         _ => (),
-    //     }
-    // }
 }
 
 impl TryFrom<Thing> for Listing {
@@ -150,14 +150,4 @@ impl Timeframe {
             Self::All => "all",
         }
     }
-}
-
-pub trait Votable {
-    async fn vote(
-        &mut self,
-        direction: VoteDirection,
-        client: &Client,
-    ) -> crate::result::Result<()>;
-    async fn save(&mut self, client: &Client) -> crate::result::Result<()>;
-    async fn unsave(&mut self, client: &Client) -> crate::result::Result<()>;
 }

@@ -142,7 +142,9 @@ class AccountsBloc extends Bloc<AccountEvent, AccountState> {
   }
 
   FutureOr<void> _addAccount(
-      AddAccount event, Emitter<AccountState> emit) async {
+    AddAccount event,
+    Emitter<AccountState> emit,
+  ) async {
     if (await loginToReddit()) {
       await _loadAccounts();
       final index = _accounts.length - 2;

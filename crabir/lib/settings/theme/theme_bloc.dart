@@ -1,34 +1,55 @@
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/settings/theme/theme_event.dart';
+import 'package:flutter/material.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
-class ThemeBloc extends HydratedBloc<ThemeEvent, CrabirTheme> {
-  ThemeBloc() : super(CrabirTheme()) {
+part 'theme_bloc.freezed.dart';
+part 'theme_bloc.g.dart';
+
+@freezed
+abstract class ThemeState with _$ThemeState {
+  ThemeState._();
+  factory ThemeState({
+    required CrabirTheme dark,
+    required CrabirTheme light,
+    required ThemeMode mode,
+  }) = _ThemeState;
+  factory ThemeState.fromJson(Map<String, dynamic> json) =>
+      _$ThemeStateFromJson(json);
+}
+
+class ThemeBloc extends HydratedBloc<ThemeEvent, ThemeState> {
+  ThemeBloc()
+      : super(ThemeState(
+          dark: CrabirTheme(),
+          light: CrabirTheme.light(),
+          mode: ThemeMode.system,
+        )) {
     on<SetColor>(_updateColor);
+    on<SetMode>(_setMode);
   }
 
   @override
-  Map<String, dynamic>? toJson(CrabirTheme state) => state.toJson();
+  Map<String, dynamic>? toJson(ThemeState state) => state.toJson();
 
   @override
-  CrabirTheme? fromJson(Map<String, dynamic> json) =>
-      CrabirTheme.fromJson(json);
+  ThemeState? fromJson(Map<String, dynamic> json) => ThemeState.fromJson(json);
 
-  Future<void> _updateColor(SetColor event, Emitter<CrabirTheme> emit) async {
-    final color = event.color;
-    final newState = switch (event.field) {
-      ThemeField.background => state.copyWith(background: color),
-      ThemeField.cardBackground => state.copyWith(cardBackground: color),
-      ThemeField.toolBarBackground => state.copyWith(toolBarBackground: color),
-      ThemeField.toolBarText => state.copyWith(toolBarText: color),
-      ThemeField.primaryColor => state.copyWith(primaryColor: color),
-      ThemeField.highlight => state.copyWith(highlight: color),
-      ThemeField.postTitle => state.copyWith(postTitle: color),
-      ThemeField.readPost => state.copyWith(readPost: color),
-      ThemeField.announcement => state.copyWith(announcement: color),
-      ThemeField.contentText => state.copyWith(contentText: color),
-      ThemeField.linkColor => state.copyWith(linkColor: color),
+  Future<void> _updateColor(SetColor event, Emitter<ThemeState> emit) async {
+    final theme = switch (event.brightness) {
+      Brightness.dark => state.dark,
+      Brightness.light => state.light,
+    };
+    final newTheme = theme.updateColor(field: event.field, color: event.color);
+    final newState = switch (event.brightness) {
+      Brightness.dark => state.copyWith(dark: newTheme),
+      Brightness.light => state.copyWith(light: newTheme),
     };
     emit(newState);
+  }
+
+  Future<void> _setMode(SetMode event, Emitter<ThemeState> emit) async {
+    emit(state.copyWith(mode: event.mode));
   }
 }

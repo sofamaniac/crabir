@@ -1,30 +1,30 @@
 import 'dart:async';
 
-import 'package:app_links/app_links.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/accounts/widgets/account_selector.dart';
 import 'package:crabir/drawer/drawer.dart';
-import 'package:crabir/media/media.dart';
 import 'package:crabir/network_status.dart';
 import 'package:crabir/routes/routes.dart';
+import 'package:crabir/settings/licenses_screen.dart';
 import 'package:crabir/settings/settings.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/tabs_index.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:crabir/src/rust/frb_generated.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:http/http.dart' as http;
+import 'package:go_router/go_router.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:crabir/l10n/app_localizations.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 Future<void> main() async {
   await RustLib.init();
+
   Logger.root.level = Level.ALL; // defaults to Level.INFO
   Logger.root.onRecord.listen((record) {
     debugPrint('${record.level.name}: ${record.time}: ${record.message}');
@@ -40,26 +40,29 @@ Future<void> main() async {
           ),
   );
 
+  // Add licenses rust libraries to list
+  await registerRustLicenses();
+
   // Initializing `NetworkStatus`
   await NetworkStatus.init();
 
   runApp(Crabir());
 }
 
-void _handleRedditLink(StackRouter router, String url) async {
-  final uri = Uri.parse(url);
-  if (uri.host.contains('reddit.com') || uri.host == 'redd.it') {
-    // Navigate using AutoRoute
-    final Uri destination;
-    if (uri.pathSegments.contains("s")) {
-      destination = await _resolveRedditShortlink(uri);
-    } else {
-      destination = uri;
-    }
-    router.pushPath(destination.toString());
-  } else {
-    // Open in external browser
-    launchUrl(uri);
+bool _defaultOnNavigationNotification(NavigationNotification _) {
+  switch (WidgetsBinding.instance.lifecycleState) {
+    case null:
+    case AppLifecycleState.detached:
+    case AppLifecycleState.inactive:
+      // Avoid updating the engine when the app isn't ready.
+      return true;
+    case AppLifecycleState.resumed:
+    case AppLifecycleState.hidden:
+    case AppLifecycleState.paused:
+      SystemNavigator.setFrameworkHandlesBack(true);
+
+      /// This must be `true` instead of `notification.canHandlePop`, otherwise application closes on back gesture.
+      return true;
   }
 }
 
@@ -78,12 +81,16 @@ class Crabir extends StatelessWidget {
 }
 
 class TopLevel extends StatelessWidget {
-  final _appRouter = AppRouter();
+  final _appRouter = appRouter;
   TopLevel({super.key});
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<ThemeBloc>().state;
+    final themeBloc = context.watch<ThemeBloc>().state;
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      // required to go back to home screen before exiting the app
+      // because flutter is broken.
+      onNavigationNotification: _defaultOnNavigationNotification,
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -91,96 +98,62 @@ class TopLevel extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      themeMode: ThemeMode.system,
-      theme: ThemeData.light(useMaterial3: true),
+      themeMode: themeBloc.mode,
       darkTheme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.dark(
-          primary: theme.primaryColor,
-          surface: theme.background,
-          secondary: theme.highlight,
+          primary: themeBloc.dark.primaryColor,
+          surface: themeBloc.dark.background,
+          secondary: themeBloc.dark.highlight,
           outlineVariant: Colors.white24,
         ),
-        cardTheme: CardThemeData(color: theme.cardBackground),
+        cardTheme: CardThemeData(
+          color: themeBloc.dark.cardBackground,
+          shadowColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero, // square corners
+          ),
+        ),
+        dialogTheme: const DialogThemeData(
+          backgroundColor: Color(0xFF1E1E1E),
+          shape: RoundedRectangleBorder(),
+        ),
       ),
-      routerConfig: _appRouter.config(deepLinkTransformer: (deepLink) {
-        if (deepLink.path.contains('s')) {
-          // continue with the platform link
-          return _resolveRedditShortlink(deepLink);
-        } else {
-          return SynchronousFuture(deepLink);
-        }
-      }),
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.light(
+          primary: themeBloc.light.primaryColor,
+          surface: themeBloc.light.background,
+          secondary: themeBloc.light.highlight,
+          outlineVariant: Colors.black26,
+        ),
+        cardTheme: CardThemeData(
+          color: themeBloc.light.cardBackground,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero, // square corners
+          ),
+        ),
+      ),
+      routerConfig: _appRouter,
     );
   }
 }
 
-/// Reddit share links (e.g. https://reddit.com/python/s/SOME_ID) are simple redirect.
-Future<Uri> _resolveRedditShortlink(Uri uri) async {
-  final client = http.Client();
-  try {
-    final req = http.Request('GET', uri)..followRedirects = false;
-    final resp = await client.send(req);
-
-    final location = resp.headers['location'];
-    if (location != null && location.isNotEmpty) {
-      return uri.resolve(location);
-    }
-    return uri; // no redirect
-  } finally {
-    client.close();
-  }
-}
-
-@RoutePage()
 class MainScreenView extends StatefulWidget {
-  const MainScreenView({super.key});
+  final StatefulNavigationShell
+      navigationShell; // active route inside the shell
+
+  const MainScreenView({super.key, required this.navigationShell});
 
   @override
   State<MainScreenView> createState() => _MainScreenViewState();
 }
 
-class _MainScreenViewState extends State<MainScreenView> {
-  bool addListener = true;
+class _MainScreenViewState extends State<MainScreenView>
+    with SingleTickerProviderStateMixin {
   bool showingDialog = false;
-  StreamSubscription<Uri?>? _linkSub;
 
-  // Scaffold key to control the drawers
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  Widget? _endDrawer; // dynamic end drawer
-
-  @override
-  void initState() {
-    super.initState();
-
-    final router = AutoRouter.of(context);
-
-    // Subscribe to app links
-    _linkSub = AppLinks().uriLinkStream.listen((uri) {
-      _handleRedditLink(router, uri.toString());
-    });
-
-    // Handle initial link
-    AppLinks().getInitialLink().then((uri) {
-      if (uri != null) {
-        _handleRedditLink(router, uri.toString());
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _linkSub?.cancel();
-    super.dispose();
-  }
-
-  bool showAccountSelectionDialogue(int index) {
-    final account = context.read<AccountsBloc>().state.account;
-    return (account == null || account.isAnonymous) &&
-        (index == profileIndex || index == inboxIndex);
-  }
-
-  void _showLoginDialog(BuildContext context) async {
+  Future<void> _showLoginDialog(BuildContext context) async {
     if (showingDialog) return;
     showingDialog = true;
     await showDialog(
@@ -190,131 +163,72 @@ class _MainScreenViewState extends State<MainScreenView> {
         content: AccountSelector(showCurrentAccount: false),
         actions: [
           TextButton(
-            child: const Text("Cancel"),
-            onPressed: () => Navigator.of(ctx).pop(),
-          ),
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text("Cancel")),
         ],
       ),
     );
     showingDialog = false;
   }
 
-  void setEndDrawer(Widget? drawer) {
-    setState(() => _endDrawer = drawer);
+  bool _showAccountSelectionDialogue(int index) {
+    final account = context.read<AccountsBloc>().state.account;
+    const guardedPages = [1, 4]; // searchIndex, profileIndex
+    return (account == null || account.isAnonymous) &&
+        guardedPages.contains(index);
   }
 
-  void openEndDrawer(Widget drawer) {
-    setEndDrawer(drawer);
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _scaffoldKey.currentState?.openEndDrawer(),
+  Widget _bottomBar() {
+    final theme = CrabirTheme.of(context);
+    return BottomNavigationBar(
+      currentIndex: widget.navigationShell.currentIndex,
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: theme.toolBarBackground,
+      selectedItemColor: theme.primaryColor,
+      unselectedItemColor: theme.toolBarText.withAlpha(120),
+      showUnselectedLabels: false,
+      showSelectedLabels: false,
+      onTap: (index) {
+        if (_showAccountSelectionDialogue(index)) {
+          _showLoginDialog(context);
+          return;
+        } else if (index == subscriptionsIndex) {
+          return context.go("/subscriptions");
+        } else if (index == profileIndex) {
+          final username = context.read<AccountsBloc>().state.account!.username;
+          return context.go("/u/$username");
+        }
+
+        widget.navigationShell.goBranch(index);
+      },
+      items: const [
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+        BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
+        BottomNavigationBarItem(icon: Icon(Icons.list), label: "Lists"),
+        BottomNavigationBarItem(icon: Icon(Icons.mail), label: "Messages"),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+      ],
     );
-  }
-
-  void closeEndDrawer() {
-    _scaffoldKey.currentState?.closeEndDrawer();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<ThemeBloc>().state;
-    final _ = context.watch<AccountsBloc>().state.account;
-
-    final routes = <PageRouteInfo>[
-      NamedRoute(homeRouteName),
-      SearchSubredditsRoute(),
-      SubscriptionsTabRoute(),
-      InboxRoute(),
-      UserRoute(),
-    ];
-
-    return AutoTabsRouter.tabBar(
-      homeIndex: 0,
-      physics: const NeverScrollableScrollPhysics(),
-      routes: routes,
-      builder: (context, child, tabController) {
-        void listener() {
-          final index = tabController.index;
-          if (showAccountSelectionDialogue(index) &&
-              tabController.indexIsChanging &&
-              tabController.index > tabController.previousIndex) {
-            tabController.index = tabController.previousIndex;
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) => _showLoginDialog(context),
-            );
-          }
+    return PopScope(
+      canPop: widget.navigationShell.currentIndex == 0,
+      onPopInvokedWithResult: (_, __) async {
+        if (widget.navigationShell.currentIndex != 0) {
+          context.go("/");
         }
-
-        void disableVideoOnChange() {
-          AnimatedContentController.currentlyPlaying.value = null;
-        }
-
-        if (addListener) {
-          tabController.addListener(listener);
-          tabController.addListener(disableVideoOnChange);
-          addListener = false;
-        }
-
-        final tabsRouter = AutoTabsRouter.of(context);
-
-        return DrawerHost(
-          setEndDrawer: setEndDrawer,
-          openEndDrawer: openEndDrawer,
-          closeEndDrawer: closeEndDrawer,
-          child: Scaffold(
-            key: _scaffoldKey,
-            backgroundColor: theme.background,
-            drawer: const AppDrawer(),
-            endDrawer: _endDrawer,
-            body: child,
-            bottomNavigationBar: TabBar(
-              labelColor: Theme.of(context).primaryTextTheme.bodyLarge!.color,
-              indicatorColor: theme.primaryColor,
-              controller: tabController,
-              onTap: (index) {
-                tabsRouter.setActiveIndex(index);
-                // routes to reset to when taping on their tab icon.
-                final rootRoutes = {
-                  subscriptionsIndex: const SubscriptionsTabRoute(),
-                  searchIndex: const SearchSubredditsRoute(),
-                  profileIndex: UserRoute(),
-                };
-                final route = rootRoutes[index];
-                if (route != null) {
-                  tabsRouter.stackRouterOfIndex(index)?.replaceAll([route]);
-                }
-              },
-              tabs: const [
-                Tab(icon: Icon(Icons.home)),
-                Tab(icon: Icon(Icons.search)),
-                Tab(icon: Icon(Icons.list)),
-                Tab(icon: Icon(Icons.mail)),
-                Tab(icon: Icon(Icons.person)),
-              ],
-            ),
-          ),
-        );
       },
+      child: SafeArea(
+        child: Scaffold(
+          drawer: AppDrawer(onAccountChanged: () {
+            widget.navigationShell.goBranch(0);
+          }),
+          body: widget.navigationShell,
+          bottomNavigationBar: _bottomBar(),
+        ),
+      ),
     );
   }
-}
-
-// -------- DrawerHost InheritedWidget --------
-class DrawerHost extends InheritedWidget {
-  final void Function(Widget?) setEndDrawer;
-  final void Function(Widget) openEndDrawer;
-  final VoidCallback closeEndDrawer;
-
-  const DrawerHost({
-    super.key,
-    required this.setEndDrawer,
-    required this.openEndDrawer,
-    required this.closeEndDrawer,
-    required super.child,
-  });
-
-  static DrawerHost of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<DrawerHost>()!;
-
-  @override
-  bool updateShouldNotify(DrawerHost oldWidget) => false;
 }

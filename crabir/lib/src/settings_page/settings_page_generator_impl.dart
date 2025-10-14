@@ -15,13 +15,16 @@ class CubitGenerator {
     buffer.write('''
 // HydratedCubit for ${classElement.name}
 class $cubitName extends HydratedCubit<${classElement.name}> {
+  final Logger log = Logger("$cubitName");
   $cubitName() : super(${classElement.name}());
 
   @override
   ${classElement.name}? fromJson(Map<String, dynamic> json) {
     try {
+      log.info("Successfully restored $cubitName");
       return ${classElement.name}.fromJson(json);
-    } catch (_) {
+    } catch (err) {
+      log.severe("Failed to resotre $cubitName: \$err");
       return ${classElement.name}();
     }
   }
@@ -89,8 +92,8 @@ part of "${buildStep.inputId.uri.pathSegments.last}";
     buffer.write(imports(buildStep));
     buffer.write(CubitGenerator().makeCubit(element));
     final code = '''
+@CrabirRoute()
 // SettingsPage for ${classElement.name}
-@RoutePage()
 class $className extends StatelessWidget {
 
   const $className({super.key});
@@ -111,11 +114,17 @@ class $className extends StatelessWidget {
     for (final param in constructor.parameters) {
       final divider =
           TypeChecker.fromRuntime(Category).firstAnnotationOf(param);
-      if (divider != null) {
+      if (divider != null &&
+          (divider.getField("divider")?.toBoolValue() ?? true)) {
         buffer.writeln("Divider(),");
         final categoryName = divider.getField("name")?.toStringValue();
         if (categoryName != null) {
-          buffer.writeln('Text("$categoryName"),');
+          buffer.writeln(
+              'ListTile(leading: Icon(null), title: Text("$categoryName", style: Theme.of(context)'
+              '.textTheme'
+              '.labelMedium'
+              '?.copyWith(color: CrabirTheme.of(context).highlight)))'
+              ',');
         }
       }
       buffer.writeln(widget(param, element));
@@ -161,10 +170,12 @@ class $className extends StatelessWidget {
     final widgetType = setting.getField('widget')?.toTypeValue();
     final hasDescription =
         setting.getField("hasDescription")?.toBoolValue() ?? false;
+    final iconData = setting.getField('icon')?.variable2?.name3;
 
     if (widgetType != null) {
       return '$widgetType('
           'title: Text(locales.$titleKey),'
+          'leading: Icon($iconData),'
           'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
           'value: settings.${param.name},'
           'onChanged: (val) => context.read<$cubitName>().update${param.name.toPascalCase()}(val),'
@@ -172,12 +183,16 @@ class $className extends StatelessWidget {
     } else if (param.type.isDartCoreBool) {
       return 'CheckboxListTile('
           'title: Text(locales.$titleKey),'
+          'secondary: Icon($iconData),'
           'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
           'value: settings.${param.name},'
           'onChanged: (val) => context.read<$cubitName>().update${param.name.toPascalCase()}(val!),'
           '),';
     }
-    return "";
+    return 'ListTile(title: Text("TODO: ${param.name}"),'
+        'leading: ${iconData != null ? "Icon($iconData)" : "null"},'
+        'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
+        '),';
   }
 }
 

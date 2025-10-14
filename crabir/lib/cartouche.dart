@@ -5,6 +5,7 @@ class Cartouche extends StatelessWidget {
   final Color background;
   final Color foreground;
   final double fontSize;
+  final Color? borderColor;
 
   const Cartouche(
     this.text, {
@@ -12,15 +13,16 @@ class Cartouche extends StatelessWidget {
     this.background = Colors.transparent,
     this.foreground = Colors.white,
     this.fontSize = 12,
+    this.borderColor,
   });
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(2),
-      ),
+          color: background,
+          borderRadius: BorderRadius.circular(4),
+          border: BoxBorder.all(color: borderColor ?? background)),
       child: Text(
         text,
         style: TextStyle(

@@ -15,7 +15,7 @@ class CommentsList extends StatelessWidget {
         itemBuilder: (context, index) {
           final comment = comments[index];
           final commentView = ThreadEntry(
-            comment: comment,
+            thing: comment,
           );
           if (index < comments.length - 1 && depth(comments[index + 1]) == 0) {
             return Column(

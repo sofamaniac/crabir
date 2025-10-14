@@ -14,4 +14,13 @@ sealed class ThreadEvent with _$ThreadEvent {
 
   /// Change sort
   factory ThreadEvent.setSort(CommentSort? sort) = SetSort;
+
+  /// Open bar on comment
+  factory ThreadEvent.openComment(String comment) = OpenComment;
+
+  /// Close bar on currently open comment
+  factory ThreadEvent.closeComment() = CloseComment;
+
+  /// Insert a comment in the tree
+  factory ThreadEvent.insertComment(Comment comment) = InsertComment;
 }

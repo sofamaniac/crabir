@@ -8,37 +8,35 @@ part of 'data_settings.dart';
 
 _DataSettings _$DataSettingsFromJson(Map<String, dynamic> json) =>
     _DataSettings(
-      mobileDataSaver: json['mobileDataSaver'] as bool? ?? false,
-      wifiDataSaver: json['wifiDataSaver'] as bool? ?? false,
       autoplay: $enumDecodeNullable(_$ImageLoadingEnumMap, json['autoplay']) ??
           ImageLoading.always,
-      videoQuality:
-          $enumDecodeNullable(_$ResolutionEnumMap, json['videoQuality']) ??
+      videoQualityWifi:
+          $enumDecodeNullable(_$ResolutionEnumMap, json['videoQualityWifi']) ??
               Resolution.source,
-      minimumQuality:
-          $enumDecodeNullable(_$ResolutionEnumMap, json['minimumQuality']) ??
-              Resolution.source,
-      maximumQuality:
-          $enumDecodeNullable(_$ResolutionEnumMap, json['maximumQuality']) ??
-              Resolution.source,
+      videoQualityCellular: $enumDecodeNullable(
+              _$ResolutionEnumMap, json['videoQualityCellular']) ??
+          Resolution.source,
       loadImages:
           $enumDecodeNullable(_$ImageLoadingEnumMap, json['loadImages']) ??
               ImageLoading.always,
-      preferredQuality:
-          $enumDecodeNullable(_$ResolutionEnumMap, json['preferredQuality']) ??
+      imageQualityWifi:
+          $enumDecodeNullable(_$ResolutionEnumMap, json['imageQualityWifi']) ??
               Resolution.source,
+      imageQualityCellular: $enumDecodeNullable(
+              _$ResolutionEnumMap, json['imageQualityCellular']) ??
+          Resolution.source,
     );
 
 Map<String, dynamic> _$DataSettingsToJson(_DataSettings instance) =>
     <String, dynamic>{
-      'mobileDataSaver': instance.mobileDataSaver,
-      'wifiDataSaver': instance.wifiDataSaver,
       'autoplay': _$ImageLoadingEnumMap[instance.autoplay]!,
-      'videoQuality': _$ResolutionEnumMap[instance.videoQuality]!,
-      'minimumQuality': _$ResolutionEnumMap[instance.minimumQuality]!,
-      'maximumQuality': _$ResolutionEnumMap[instance.maximumQuality]!,
+      'videoQualityWifi': _$ResolutionEnumMap[instance.videoQualityWifi]!,
+      'videoQualityCellular':
+          _$ResolutionEnumMap[instance.videoQualityCellular]!,
       'loadImages': _$ImageLoadingEnumMap[instance.loadImages]!,
-      'preferredQuality': _$ResolutionEnumMap[instance.preferredQuality]!,
+      'imageQualityWifi': _$ResolutionEnumMap[instance.imageQualityWifi]!,
+      'imageQualityCellular':
+          _$ResolutionEnumMap[instance.imageQualityCellular]!,
     };
 
 const _$ImageLoadingEnumMap = {

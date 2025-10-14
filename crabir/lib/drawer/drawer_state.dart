@@ -17,7 +17,6 @@ class AccountView extends StatelessWidget {
 
 class DrawerState extends State<AppDrawer> {
   bool _isSelectingAccount = false;
-
   bool get isSelectingAccount => _isSelectingAccount;
 
   Logger log = Logger("DrawerModel");
@@ -31,35 +30,28 @@ class DrawerState extends State<AppDrawer> {
   }
 
   Widget currentAccountView(BuildContext context) {
-    return BlocBuilder<AccountsBloc, AccountState>(
-      builder: (context, account) {
-        if (account.account != null) {
-          final icon =
-              isSelectingAccount ? Icons.arrow_drop_up : Icons.arrow_drop_down;
-          return DrawerHeader(
-            child: InkWell(
-              onTap: changeMode,
-              child: Row(
-                spacing: 8,
-                children: [
-                  if (account.account != null) ...[
-                    CircleAvatar(
-                      radius: 32,
-                      foregroundImage:
-                          NetworkImage(account.account!.profilePicture),
-                    ),
-                    Text(account.account!.username)
-                  ] else
-                    const LoadingIndicator(),
-                  Icon(icon),
-                ],
-              ),
-            ),
-          );
-        } else {
-          return LoadingIndicator();
-        }
-      },
+    final account = context.watch<AccountsBloc>().state.account;
+    if (account == null) {
+      return Center(child: LoadingIndicator());
+    }
+    final icon =
+        isSelectingAccount ? Icons.arrow_drop_up : Icons.arrow_drop_down;
+    final settings = LateralMenuSettings.of(context);
+    return Column(
+      children: [
+        ListTile(
+          onTap: changeMode,
+          leading: settings.showAccountAvatar
+              ? CircleAvatar(
+                  radius: 16,
+                  foregroundImage: NetworkImage(account.profilePicture),
+                )
+              : null,
+          title: settings.showAccountUsername ? Text(account.username) : null,
+          trailing: Icon(icon),
+        ),
+        Divider(),
+      ],
     );
   }
 
@@ -70,14 +62,18 @@ class DrawerState extends State<AppDrawer> {
         mainAxisSize: MainAxisSize.min,
         children: [
           currentAccountView(context),
-          isSelectingAccount
-              ? Expanded(
-                  child: AccountSelector(
-                    showCurrentAccount: false,
-                    onTapCallback: () => changeMode(isSelectingAccount: false),
-                  ),
-                )
-              : DrawerFeedSelection()
+          if (isSelectingAccount)
+            Expanded(
+              child: AccountSelector(
+                showCurrentAccount: false,
+                onTapCallback: () {
+                  changeMode(isSelectingAccount: false);
+                  widget.onAccountChanged?.call();
+                },
+              ),
+            )
+          else
+            DrawerFeedSelection()
         ],
       ),
     );

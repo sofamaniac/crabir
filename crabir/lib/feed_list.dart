@@ -1,41 +1,33 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:crabir/routes/routes.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart'
     as subreddit;
 import 'package:crabir/subreddit.dart';
 import 'package:flutter/material.dart';
-
-void navigateToSubscriptionsTab(BuildContext context, destination) {
-  context.tabsRouter.navigate(destination);
-}
+import 'package:go_router/go_router.dart';
 
 /// Widget to display a subreddit in a list
 class SubredditTile extends StatelessWidget {
   final subreddit.Subreddit sub;
+  final TextStyle? style;
+  final VoidCallback? onTap;
 
-  /// If set to `true`, closes drawer of closest scaffold before navigating to the destination
-  final bool closeDrawer;
+  const SubredditTile(
+    this.sub, {
+    super.key,
+    this.style,
+    this.onTap,
+  });
 
-  const SubredditTile(this.sub, {super.key, this.closeDrawer = false});
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () {
-        final destination = FeedRoute(
-          feed: Feed.subreddit(sub.other.displayName),
-          initialSort: FeedSort.best(),
-        );
-        if (closeDrawer) {
-          Scaffold.of(context).closeDrawer();
-        }
-        navigateToSubscriptionsTab(context, destination);
-      },
+      onTap: onTap,
       leading: SubredditIcon(icon: sub.icon, radius: 12),
       title: Text(
         sub.other.displayNamePrefixed,
-        style: Theme.of(context).textTheme.bodyMedium,
+        // style:
+        //     Theme.of(context).textTheme.bodyMedium!.copyWith(color: textColor),
+        style: style,
         maxLines: 1,
       ),
     );
@@ -45,28 +37,20 @@ class SubredditTile extends StatelessWidget {
 /// Widget to display a multireddit in a list
 class MultiRedditTile extends StatelessWidget {
   final Multi multi;
-
-  /// If set to `true`, calls `Navigator.pop()` before navigating to the destination
-  final bool closeDrawer;
+  final TextStyle? style;
 
   const MultiRedditTile(
     this.multi, {
     super.key,
-    this.closeDrawer = false,
+    this.style,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        final destination = MultiRoute(
-          multi: multi,
-          initialSort: FeedSort.best(),
-        );
-        if (closeDrawer) {
-          Navigator.pop(context);
-        }
-        navigateToSubscriptionsTab(context, destination);
+        Scaffold.of(context).closeDrawer();
+        context.go(multi.path, extra: multi);
       },
       leading: CircleAvatar(
         radius: 12,
@@ -74,7 +58,7 @@ class MultiRedditTile extends StatelessWidget {
       ),
       title: Text(
         multi.displayName,
-        style: Theme.of(context).textTheme.bodyMedium,
+        style: style,
         maxLines: 1,
       ),
     );

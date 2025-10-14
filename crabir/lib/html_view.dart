@@ -1,8 +1,7 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Render HTML with some styling already done.
@@ -16,7 +15,6 @@ class StyledHtml extends StatelessWidget {
   final OnTap? onLinkTap;
 
   /// Whether to show images or not.
-  /// TODO: showImages
   final bool showImages;
 
   const StyledHtml({
@@ -27,14 +25,33 @@ class StyledHtml extends StatelessWidget {
     this.showImages = true,
   });
 
-  @override
-  Widget build(BuildContext context) {
+  String sanitize(String htmlContent) {
     final htmlContent = this
         .htmlContent
         .replaceAll('<p>', '')
         .replaceAll('</p>', '<br>')
         .replaceAll('\n\n', '<br>');
-    final theme = context.watch<ThemeBloc>().state;
+    // Remove last <br>
+    final position = htmlContent.lastIndexOf("<br>");
+    if (position >= 0) {
+      return htmlContent.replaceFirst("<br>", "", position);
+    } else {
+      return htmlContent;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = CrabirTheme.of(context);
+    final brightness = Theme.of(context).brightness;
+
+    final htmlContent = sanitize(this.htmlContent);
+
+    final quoteBackground = switch (brightness) {
+      Brightness.light => Colors.grey.shade200,
+      Brightness.dark => Colors.grey.shade900
+    };
+
     final style = {
       // Style for divider
       "hr": Style(
@@ -42,12 +59,12 @@ class StyledHtml extends StatelessWidget {
 
         padding: HtmlPaddings.zero,
         height: Height(1), // control thickness
-        backgroundColor: Colors.grey, // ensure it's visible
+        backgroundColor: theme.secondaryText, // ensure it's visible
       ),
-      "a": Style(color: theme.linkColor),
+      "a": Style(color: theme.linkColor, textDecorationColor: theme.linkColor),
       'blockquote': Style(
         margin: Margins.symmetric(horizontal: 0, vertical: 8),
-        backgroundColor: Colors.grey.shade900,
+        backgroundColor: quoteBackground,
         padding: HtmlPaddings.all(12),
         border: Border(
           left: BorderSide(
@@ -78,9 +95,23 @@ class StyledHtml extends StatelessWidget {
     return Html(
       style: style,
       data: htmlContent,
-      onLinkTap: onLinkTap,
+      onLinkTap: (url, attributes, __) => defaultLinkHandler(
+        context,
+        url,
+        attributes,
+        __,
+      ),
+      shrinkWrap: true,
       extensions: [
-        RedditImageExtension(),
+        if (showImages) RedditImageExtension(),
+        if (!showImages)
+          ImageExtension(builder: (context) {
+            final src = context.attributes['src'] ?? '';
+            // Replace image with its link text
+            return Html(
+              data: '<a href="$src">$src</a>',
+            );
+          }),
         TextExtension(),
       ],
     );
@@ -88,13 +119,17 @@ class StyledHtml extends StatelessWidget {
 }
 
 Future<void> defaultLinkHandler(
-  StackRouter router,
+  BuildContext context,
   String? url,
   Map<String, String> attributes,
   __,
 ) async {
   Uri uri = Uri.parse(url!);
-  await launchUrl(uri);
+  if (url.startsWith("/")) {
+    context.push(url);
+  } else {
+    await launchUrl(uri);
+  }
 }
 
 /// Extension that turns reddit preview links into inline images

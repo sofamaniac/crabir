@@ -1,82 +1,121 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/bool_to_vote.dart';
 import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/html_view.dart';
-import 'package:crabir/routes/routes.dart';
+import 'package:crabir/markdown_editor/editor.dart';
+import 'package:crabir/separated_row.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
-import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/author.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
+import 'package:crabir/thread/bloc/thread_bloc.dart';
+import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/time_ellapsed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+
+class OpenedComment {
+  static ValueNotifier<String?> current = ValueNotifier(null);
+  OpenedComment();
+}
 
 class CommentView extends StatefulWidget {
   final Comment comment;
   final bool animateBottomBar;
   final VoidCallback? onLongPress;
   final VoidCallback? onTap;
+  // Display the number of replies in the header
+  final bool showRepliesNumber;
   const CommentView({
     super.key,
     required this.comment,
     this.animateBottomBar = true,
     this.onLongPress,
     this.onTap,
+    this.showRepliesNumber = false,
   });
   @override
   createState() => _CommentViewState();
 }
 
-class _CommentViewState extends State<CommentView>
-    with AutomaticKeepAliveClientMixin {
-  bool showBottomBar = false;
-
-  // we have to keep alive to remember `showBottomBar`.
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    super.initState();
-    showBottomBar = !widget.animateBottomBar;
-  }
-
+class _CommentViewState extends State<CommentView> {
   Widget topRow(CommentsSettings settings) {
     final comment = widget.comment;
+    final color = CrabirTheme.of(context).secondaryText;
+    final settings = CommentsSettings.of(context);
     return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 4,
       children: [
-        Expanded(
-          child: RichText(
-            text: TextSpan(
-              children: [
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.bottom,
-                  child: _Username(
-                    author: comment.author,
-                    isSubmitter: comment.isSubmitter,
-                    distinguished: comment.distinguished,
+        Flexible(
+          fit: FlexFit.loose,
+          child: Row(
+            spacing: 4,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _Username(
+                author: comment.author,
+                isSubmitter: comment.isSubmitter,
+                distinguished: comment.distinguished,
+              ),
+              if (comment.author != null && settings.showUserFlair)
+                Flexible(
+                  fit: FlexFit.loose,
+                  child: FlairView(
+                    flair: comment.author!.flair,
+                    showColor: settings.showFlairColors,
+                    showEmoji: settings.showFlairEmojis,
                   ),
                 ),
-                if (comment.author?.flair != null &&
-                    settings.showUserFlair) ...[
-                  const WidgetSpan(child: SizedBox(width: 8)),
-                  WidgetSpan(
-                    alignment: PlaceholderAlignment.middle,
-                    child: FlairView(flair: comment.author!.flair),
-                  ),
-                ],
-              ],
-            ),
+              if (comment.locked) Icon(Icons.lock, color: color),
+              if (comment.stickied)
+                Text(
+                  "stickied",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium!
+                      .copyWith(color: Colors.green),
+                )
+            ],
           ),
         ),
-        Text(
-          "${comment.scoreHidden ? "?" : comment.score} · ${comment.createdUtc.timeSince(context)}",
-          style: Theme.of(context).textTheme.labelMedium,
+        SeparatedRow(
+          spacing: 2,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          alignment: WrapAlignment.end,
+          separatorStyle:
+              Theme.of(context).textTheme.labelMedium!.copyWith(color: color),
+          children: [
+            if (widget.showRepliesNumber)
+              Cartouche(
+                "+${numReplies(comment)}",
+                foreground: Colors.white,
+                background: Colors.lightGreen,
+              ),
+            LikeText(
+              score: comment.score,
+              likes: comment.likes,
+              hidden: comment.scoreHidden,
+              style: Theme.of(context).textTheme.labelMedium!,
+              scaling: 1.5,
+            ),
+            Text(
+              comment.createdUtc.timeSince(context),
+              style: Theme.of(context)
+                  .textTheme
+                  .labelMedium!
+                  .copyWith(color: color),
+            ),
+          ],
         ),
       ],
     );
@@ -84,48 +123,46 @@ class _CommentViewState extends State<CommentView>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    final comment = widget.comment;
-    final settings = context.watch<CommentsSettingsCubit>().state;
-    final showBottomBar = this.showBottomBar || settings.buttonsAlwaysVisible;
-    final VoidCallback? onTap = widget.onTap ??
-        (widget.animateBottomBar
-            ? () => setState(
-                  () {
-                    this.showBottomBar = !this.showBottomBar;
-                  },
-                )
-            : null);
-    return GestureDetector(
-      onLongPress: widget.onLongPress,
-      onTap: onTap,
-      behavior: HitTestBehavior.translucent,
-      child: AnimatedSize(
-        duration: Duration(milliseconds: 200),
-        alignment: Alignment.topCenter,
-        child: Card(
+    return ValueListenableBuilder(
+      valueListenable: OpenedComment.current,
+      builder: (context, _, __) {
+        final comment = widget.comment;
+        final settings = context.watch<CommentsSettingsCubit>().state;
+        final openComment = OpenedComment.current.value;
+        final showBottomBar =
+            openComment == comment.id || settings.buttonsAlwaysVisible;
+        return GestureDetector(
+          onLongPress: widget.onLongPress,
+          onTap: () {
+            widget.onTap?.call();
+            if (openComment == comment.id) {
+              OpenedComment.current.value = null;
+            } else {
+              OpenedComment.current.value = comment.id;
+            }
+          },
+          behavior: HitTestBehavior.translucent,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 8,
               children: [
                 topRow(settings),
                 StyledHtml(
                   htmlContent: comment.bodyHtml,
-                  onLinkTap: (url, attributes, element) => defaultLinkHandler(
-                    context.router,
-                    url,
-                    attributes,
-                    element,
-                  ),
                   showImages: settings.showCommentsImage,
                 ),
-                if (showBottomBar) bottomBar(),
+                AnimatedSwitcher(
+                  duration: Duration(milliseconds: 200),
+                  child: showBottomBar ? bottomBar() : SizedBox.shrink(),
+                ),
               ],
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -133,29 +170,31 @@ class _CommentViewState extends State<CommentView>
     await widget.comment.vote(client: RedditAPI.client(), direction: target);
     setState(() {
       if (hideButtonAfterAction) {
-        showBottomBar = false;
+        OpenedComment.current.value = null;
       }
     });
   }
 
   Future<void> save(bool target, bool hideButtonAfterAction) async {
     if (target) {
-      await RedditAPI.client().unsave(thing: widget.comment.name);
+      await widget.comment.unsave(client: RedditAPI.client());
     } else {
-      await RedditAPI.client().save(thing: widget.comment.name);
+      await widget.comment.save(client: RedditAPI.client());
     }
     setState(() {
       if (hideButtonAfterAction) {
-        showBottomBar = false;
+        OpenedComment.current.value = null;
       }
     });
   }
 
   Widget bottomBar() {
-    final likeColor = Theme.of(context).colorScheme.primary;
-    final dislikeColor = Colors.cyanAccent;
-    final settings = context.watch<CommentsSettingsCubit>().state;
-    final likes = ValueNotifier(widget.comment.likes.toVoteDirection());
+    final theme = CrabirTheme.of(context);
+    final likeColor = theme.primaryColor;
+    final dislikeColor = theme.downvoteContent;
+    final settings = CommentsSettings.of(context);
+    final likes = widget.comment.likes.toVoteDirection();
+    final bloc = ThreadBloc.maybeOf(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.max,
@@ -181,26 +220,49 @@ class _CommentViewState extends State<CommentView>
               await save(target, settings.hideButtonAfterAction);
             },
           ),
-        IconButton(
+        if (bloc != null)
+          IconButton(
+            color: theme.secondaryText,
+            onPressed: () async {
+              final Comment? comment = await CommentEditor.reply(
+                context,
+                widget.comment,
+              ).pushNamed(context);
+              if (settings.hideButtonAfterAction) {
+                OpenedComment.current.value = null;
+              }
+              if (comment != null) {
+                bloc.add(ThreadEvent.insertComment(comment));
+              }
+            },
+            icon: Icon(Icons.reply_rounded),
+          ),
+        ShareButton(
+          comment: widget.comment,
           onPressed: () {
-            // TODO: reply to comment
             if (settings.hideButtonAfterAction) {
-              showBottomBar = false;
+              OpenedComment.current.value = null;
             }
           },
-          icon: Icon(Icons.reply_rounded),
-        ),
-        IconButton(
-          onPressed: () {
-            // TODO: share comment
-            if (settings.hideButtonAfterAction) {
-              showBottomBar = false;
-            }
-          },
-          icon: Icon(Icons.share),
         ),
       ],
     );
+  }
+}
+
+int numReplies(Comment comment) {
+  if (comment.replies().isEmpty) {
+    return 0;
+  } else {
+    int acc = 0;
+    for (final reply in comment.replies()) {
+      acc += switch (reply) {
+        Thing_Comment(field0: final comment) => 1 + numReplies(comment),
+        Thing_More(:final count) => count,
+        _ => 0,
+      };
+    }
+    return acc;
   }
 }
 
@@ -215,11 +277,12 @@ class _Username extends StatelessWidget {
   });
 
   Widget _username(
-      CommentsSettings settings, String? currentUser, Color foreground) {
-    final username = author?.username;
-    if (username == currentUser &&
-        username != null &&
-        settings.highlightMyUsername) {
+    CommentsSettings settings,
+    String? currentUser,
+    Color foreground,
+  ) {
+    final username = author?.username ?? "u/[deleted]";
+    if (username == currentUser && settings.highlightMyUsername) {
       return Cartouche(
         username,
         background: foreground,
@@ -227,20 +290,20 @@ class _Username extends StatelessWidget {
       );
     } else if (isSubmitter) {
       return Cartouche(
-        username!,
+        username,
         background: Colors.cyan,
         foreground: Colors.white,
       );
     } else if (distinguished == "moderator") {
       return Cartouche(
-        username!,
+        username,
         background: Colors.green,
         foreground: Colors.white,
       );
     } else {
-      return Cartouche(
-        username ?? "u/[deleted]",
-        foreground: foreground,
+      return Text(
+        username,
+        style: TextStyle(color: foreground, fontSize: 12),
       );
     }
   }
@@ -249,16 +312,90 @@ class _Username extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = context.read<CommentsSettingsCubit>().state;
     final currentUser = context.read<AccountsBloc>().state.account?.username;
-    final theme = context.read<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     return InkWell(
       onTap: () {
         if (author?.username != null && settings.clickableUsername) {
-          context.router.navigate(
-            UserRoute(username: author!.username),
-          );
+          context.go("/u/${author!.username}");
         }
       },
-      child: _username(settings, currentUser, theme.primaryColor),
+      child: _username(settings, currentUser, theme.highlight),
+    );
+  }
+}
+
+class CollapsedComment extends StatelessWidget {
+  final Comment comment;
+  final VoidCallback? onLongPress;
+
+  const CollapsedComment({super.key, required this.comment, this.onLongPress});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = CrabirTheme.of(context).secondaryText;
+    final style =
+        Theme.of(context).textTheme.labelMedium!.copyWith(color: color);
+    return GestureDetector(
+      onLongPress: onLongPress,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: 4,
+          children: [
+            Flexible(
+              fit: FlexFit.loose,
+              child: Row(
+                spacing: 4,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "[+]",
+                    style: style,
+                  ),
+                  Text(
+                    comment.author?.username ?? "[deleted]",
+                    style: style,
+                  ),
+                ],
+              ),
+            ),
+            SeparatedRow(
+              spacing: 2,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              alignment: WrapAlignment.end,
+              separatorStyle: Theme.of(context)
+                  .textTheme
+                  .labelMedium!
+                  .copyWith(color: color),
+              children: [
+                Cartouche(
+                  "+${numReplies(comment)}",
+                  foreground: Colors.white,
+                  background: Colors.lightGreen,
+                ),
+                LikeText(
+                  score: comment.score,
+                  likes: comment.likes,
+                  hidden: comment.scoreHidden,
+                  style: Theme.of(context).textTheme.labelMedium!,
+                  scaling: 1.5,
+                ),
+                Text(
+                  comment.createdUtc.timeSince(context),
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium!
+                      .copyWith(color: color),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

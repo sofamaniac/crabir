@@ -19,7 +19,9 @@ mixin _$PostsSettings {
   @Setting(widget: _SortSelection)
   FeedSort get defaultSort;
   @Setting(hasDescription: true)
-  bool get rememberSortByCommunity; // TODO: manage saved sort
+  bool get rememberSortByCommunity;
+  @Setting(widget: ManageSortButton)
+  RememberedSort get rememberedSorts;
   @Category(name: "Awards")
   @Setting()
   bool get showAwards;
@@ -31,7 +33,7 @@ mixin _$PostsSettings {
   @Setting()
   bool get showFlairColors;
   @Setting()
-  bool get showEmojis;
+  bool get showFlairEmojis;
   @Setting()
   bool get tapFlairToSearch;
   @Category(name: "Post info")
@@ -78,6 +80,8 @@ mixin _$PostsSettings {
             (identical(
                     other.rememberSortByCommunity, rememberSortByCommunity) ||
                 other.rememberSortByCommunity == rememberSortByCommunity) &&
+            (identical(other.rememberedSorts, rememberedSorts) ||
+                other.rememberedSorts == rememberedSorts) &&
             (identical(other.showAwards, showAwards) ||
                 other.showAwards == showAwards) &&
             (identical(other.clickableAwards, clickableAwards) ||
@@ -86,8 +90,8 @@ mixin _$PostsSettings {
                 other.showPostFlair == showPostFlair) &&
             (identical(other.showFlairColors, showFlairColors) ||
                 other.showFlairColors == showFlairColors) &&
-            (identical(other.showEmojis, showEmojis) ||
-                other.showEmojis == showEmojis) &&
+            (identical(other.showFlairEmojis, showFlairEmojis) ||
+                other.showFlairEmojis == showFlairEmojis) &&
             (identical(other.tapFlairToSearch, tapFlairToSearch) ||
                 other.tapFlairToSearch == tapFlairToSearch) &&
             (identical(other.showAuthor, showAuthor) ||
@@ -112,30 +116,32 @@ mixin _$PostsSettings {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      defaultHomeSort,
-      defaultSort,
-      rememberSortByCommunity,
-      showAwards,
-      clickableAwards,
-      showPostFlair,
-      showFlairColors,
-      showEmojis,
-      tapFlairToSearch,
-      showAuthor,
-      clickableCommunity,
-      clickableUser,
-      showFloatingButton,
-      showHideButton,
-      showMarkAsReadButton,
-      showShareButton,
-      showCommentsButton,
-      showOpenInAppButton);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        defaultHomeSort,
+        defaultSort,
+        rememberSortByCommunity,
+        rememberedSorts,
+        showAwards,
+        clickableAwards,
+        showPostFlair,
+        showFlairColors,
+        showFlairEmojis,
+        tapFlairToSearch,
+        showAuthor,
+        clickableCommunity,
+        clickableUser,
+        showFloatingButton,
+        showHideButton,
+        showMarkAsReadButton,
+        showShareButton,
+        showCommentsButton,
+        showOpenInAppButton
+      ]);
 
   @override
   String toString() {
-    return 'PostsSettings(defaultHomeSort: $defaultHomeSort, defaultSort: $defaultSort, rememberSortByCommunity: $rememberSortByCommunity, showAwards: $showAwards, clickableAwards: $clickableAwards, showPostFlair: $showPostFlair, showFlairColors: $showFlairColors, showEmojis: $showEmojis, tapFlairToSearch: $tapFlairToSearch, showAuthor: $showAuthor, clickableCommunity: $clickableCommunity, clickableUser: $clickableUser, showFloatingButton: $showFloatingButton, showHideButton: $showHideButton, showMarkAsReadButton: $showMarkAsReadButton, showShareButton: $showShareButton, showCommentsButton: $showCommentsButton, showOpenInAppButton: $showOpenInAppButton)';
+    return 'PostsSettings(defaultHomeSort: $defaultHomeSort, defaultSort: $defaultSort, rememberSortByCommunity: $rememberSortByCommunity, rememberedSorts: $rememberedSorts, showAwards: $showAwards, clickableAwards: $clickableAwards, showPostFlair: $showPostFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, tapFlairToSearch: $tapFlairToSearch, showAuthor: $showAuthor, clickableCommunity: $clickableCommunity, clickableUser: $clickableUser, showFloatingButton: $showFloatingButton, showHideButton: $showHideButton, showMarkAsReadButton: $showMarkAsReadButton, showShareButton: $showShareButton, showCommentsButton: $showCommentsButton, showOpenInAppButton: $showOpenInAppButton)';
   }
 }
 
@@ -149,11 +155,12 @@ abstract mixin class $PostsSettingsCopyWith<$Res> {
       {@Setting(widget: _SortSelection) FeedSort defaultHomeSort,
       @Setting(widget: _SortSelection) FeedSort defaultSort,
       @Setting(hasDescription: true) bool rememberSortByCommunity,
+      @Setting(widget: ManageSortButton) RememberedSort rememberedSorts,
       @Category(name: "Awards") @Setting() bool showAwards,
       @Setting() bool clickableAwards,
       @Category(name: "Flairs") @Setting() bool showPostFlair,
       @Setting() bool showFlairColors,
-      @Setting() bool showEmojis,
+      @Setting() bool showFlairEmojis,
       @Setting() bool tapFlairToSearch,
       @Category(name: "Post info") @Setting() bool showAuthor,
       @Setting() bool clickableCommunity,
@@ -185,11 +192,12 @@ class _$PostsSettingsCopyWithImpl<$Res>
     Object? defaultHomeSort = null,
     Object? defaultSort = null,
     Object? rememberSortByCommunity = null,
+    Object? rememberedSorts = null,
     Object? showAwards = null,
     Object? clickableAwards = null,
     Object? showPostFlair = null,
     Object? showFlairColors = null,
-    Object? showEmojis = null,
+    Object? showFlairEmojis = null,
     Object? tapFlairToSearch = null,
     Object? showAuthor = null,
     Object? clickableCommunity = null,
@@ -214,6 +222,10 @@ class _$PostsSettingsCopyWithImpl<$Res>
           ? _self.rememberSortByCommunity
           : rememberSortByCommunity // ignore: cast_nullable_to_non_nullable
               as bool,
+      rememberedSorts: null == rememberedSorts
+          ? _self.rememberedSorts
+          : rememberedSorts // ignore: cast_nullable_to_non_nullable
+              as RememberedSort,
       showAwards: null == showAwards
           ? _self.showAwards
           : showAwards // ignore: cast_nullable_to_non_nullable
@@ -230,9 +242,9 @@ class _$PostsSettingsCopyWithImpl<$Res>
           ? _self.showFlairColors
           : showFlairColors // ignore: cast_nullable_to_non_nullable
               as bool,
-      showEmojis: null == showEmojis
-          ? _self.showEmojis
-          : showEmojis // ignore: cast_nullable_to_non_nullable
+      showFlairEmojis: null == showFlairEmojis
+          ? _self.showFlairEmojis
+          : showFlairEmojis // ignore: cast_nullable_to_non_nullable
               as bool,
       tapFlairToSearch: null == tapFlairToSearch
           ? _self.tapFlairToSearch
@@ -395,11 +407,12 @@ extension PostsSettingsPatterns on PostsSettings {
             @Setting(widget: _SortSelection) FeedSort defaultHomeSort,
             @Setting(widget: _SortSelection) FeedSort defaultSort,
             @Setting(hasDescription: true) bool rememberSortByCommunity,
+            @Setting(widget: ManageSortButton) RememberedSort rememberedSorts,
             @Category(name: "Awards") @Setting() bool showAwards,
             @Setting() bool clickableAwards,
             @Category(name: "Flairs") @Setting() bool showPostFlair,
             @Setting() bool showFlairColors,
-            @Setting() bool showEmojis,
+            @Setting() bool showFlairEmojis,
             @Setting() bool tapFlairToSearch,
             @Category(name: "Post info") @Setting() bool showAuthor,
             @Setting() bool clickableCommunity,
@@ -422,11 +435,12 @@ extension PostsSettingsPatterns on PostsSettings {
             _that.defaultHomeSort,
             _that.defaultSort,
             _that.rememberSortByCommunity,
+            _that.rememberedSorts,
             _that.showAwards,
             _that.clickableAwards,
             _that.showPostFlair,
             _that.showFlairColors,
-            _that.showEmojis,
+            _that.showFlairEmojis,
             _that.tapFlairToSearch,
             _that.showAuthor,
             _that.clickableCommunity,
@@ -461,11 +475,12 @@ extension PostsSettingsPatterns on PostsSettings {
             @Setting(widget: _SortSelection) FeedSort defaultHomeSort,
             @Setting(widget: _SortSelection) FeedSort defaultSort,
             @Setting(hasDescription: true) bool rememberSortByCommunity,
+            @Setting(widget: ManageSortButton) RememberedSort rememberedSorts,
             @Category(name: "Awards") @Setting() bool showAwards,
             @Setting() bool clickableAwards,
             @Category(name: "Flairs") @Setting() bool showPostFlair,
             @Setting() bool showFlairColors,
-            @Setting() bool showEmojis,
+            @Setting() bool showFlairEmojis,
             @Setting() bool tapFlairToSearch,
             @Category(name: "Post info") @Setting() bool showAuthor,
             @Setting() bool clickableCommunity,
@@ -487,11 +502,12 @@ extension PostsSettingsPatterns on PostsSettings {
             _that.defaultHomeSort,
             _that.defaultSort,
             _that.rememberSortByCommunity,
+            _that.rememberedSorts,
             _that.showAwards,
             _that.clickableAwards,
             _that.showPostFlair,
             _that.showFlairColors,
-            _that.showEmojis,
+            _that.showFlairEmojis,
             _that.tapFlairToSearch,
             _that.showAuthor,
             _that.clickableCommunity,
@@ -525,11 +541,12 @@ extension PostsSettingsPatterns on PostsSettings {
             @Setting(widget: _SortSelection) FeedSort defaultHomeSort,
             @Setting(widget: _SortSelection) FeedSort defaultSort,
             @Setting(hasDescription: true) bool rememberSortByCommunity,
+            @Setting(widget: ManageSortButton) RememberedSort rememberedSorts,
             @Category(name: "Awards") @Setting() bool showAwards,
             @Setting() bool clickableAwards,
             @Category(name: "Flairs") @Setting() bool showPostFlair,
             @Setting() bool showFlairColors,
-            @Setting() bool showEmojis,
+            @Setting() bool showFlairEmojis,
             @Setting() bool tapFlairToSearch,
             @Category(name: "Post info") @Setting() bool showAuthor,
             @Setting() bool clickableCommunity,
@@ -551,11 +568,12 @@ extension PostsSettingsPatterns on PostsSettings {
             _that.defaultHomeSort,
             _that.defaultSort,
             _that.rememberSortByCommunity,
+            _that.rememberedSorts,
             _that.showAwards,
             _that.clickableAwards,
             _that.showPostFlair,
             _that.showFlairColors,
-            _that.showEmojis,
+            _that.showFlairEmojis,
             _that.tapFlairToSearch,
             _that.showAuthor,
             _that.clickableCommunity,
@@ -580,11 +598,13 @@ class _PostsSettings extends PostsSettings {
       this.defaultHomeSort = const FeedSort.best(),
       @Setting(widget: _SortSelection) this.defaultSort = const FeedSort.hot(),
       @Setting(hasDescription: true) this.rememberSortByCommunity = true,
+      @Setting(widget: ManageSortButton)
+      this.rememberedSorts = const RememberedSort(),
       @Category(name: "Awards") @Setting() this.showAwards = true,
       @Setting() this.clickableAwards = true,
       @Category(name: "Flairs") @Setting() this.showPostFlair = true,
       @Setting() this.showFlairColors = true,
-      @Setting() this.showEmojis = true,
+      @Setting() this.showFlairEmojis = true,
       @Setting() this.tapFlairToSearch = true,
       @Category(name: "Post info") @Setting() this.showAuthor = true,
       @Setting() this.clickableCommunity = true,
@@ -613,7 +633,10 @@ class _PostsSettings extends PostsSettings {
   @JsonKey()
   @Setting(hasDescription: true)
   final bool rememberSortByCommunity;
-// TODO: manage saved sort
+  @override
+  @JsonKey()
+  @Setting(widget: ManageSortButton)
+  final RememberedSort rememberedSorts;
   @override
   @JsonKey()
   @Category(name: "Awards")
@@ -635,7 +658,7 @@ class _PostsSettings extends PostsSettings {
   @override
   @JsonKey()
   @Setting()
-  final bool showEmojis;
+  final bool showFlairEmojis;
   @override
   @JsonKey()
   @Setting()
@@ -706,6 +729,8 @@ class _PostsSettings extends PostsSettings {
             (identical(
                     other.rememberSortByCommunity, rememberSortByCommunity) ||
                 other.rememberSortByCommunity == rememberSortByCommunity) &&
+            (identical(other.rememberedSorts, rememberedSorts) ||
+                other.rememberedSorts == rememberedSorts) &&
             (identical(other.showAwards, showAwards) ||
                 other.showAwards == showAwards) &&
             (identical(other.clickableAwards, clickableAwards) ||
@@ -714,8 +739,8 @@ class _PostsSettings extends PostsSettings {
                 other.showPostFlair == showPostFlair) &&
             (identical(other.showFlairColors, showFlairColors) ||
                 other.showFlairColors == showFlairColors) &&
-            (identical(other.showEmojis, showEmojis) ||
-                other.showEmojis == showEmojis) &&
+            (identical(other.showFlairEmojis, showFlairEmojis) ||
+                other.showFlairEmojis == showFlairEmojis) &&
             (identical(other.tapFlairToSearch, tapFlairToSearch) ||
                 other.tapFlairToSearch == tapFlairToSearch) &&
             (identical(other.showAuthor, showAuthor) ||
@@ -740,30 +765,32 @@ class _PostsSettings extends PostsSettings {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      defaultHomeSort,
-      defaultSort,
-      rememberSortByCommunity,
-      showAwards,
-      clickableAwards,
-      showPostFlair,
-      showFlairColors,
-      showEmojis,
-      tapFlairToSearch,
-      showAuthor,
-      clickableCommunity,
-      clickableUser,
-      showFloatingButton,
-      showHideButton,
-      showMarkAsReadButton,
-      showShareButton,
-      showCommentsButton,
-      showOpenInAppButton);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        defaultHomeSort,
+        defaultSort,
+        rememberSortByCommunity,
+        rememberedSorts,
+        showAwards,
+        clickableAwards,
+        showPostFlair,
+        showFlairColors,
+        showFlairEmojis,
+        tapFlairToSearch,
+        showAuthor,
+        clickableCommunity,
+        clickableUser,
+        showFloatingButton,
+        showHideButton,
+        showMarkAsReadButton,
+        showShareButton,
+        showCommentsButton,
+        showOpenInAppButton
+      ]);
 
   @override
   String toString() {
-    return 'PostsSettings(defaultHomeSort: $defaultHomeSort, defaultSort: $defaultSort, rememberSortByCommunity: $rememberSortByCommunity, showAwards: $showAwards, clickableAwards: $clickableAwards, showPostFlair: $showPostFlair, showFlairColors: $showFlairColors, showEmojis: $showEmojis, tapFlairToSearch: $tapFlairToSearch, showAuthor: $showAuthor, clickableCommunity: $clickableCommunity, clickableUser: $clickableUser, showFloatingButton: $showFloatingButton, showHideButton: $showHideButton, showMarkAsReadButton: $showMarkAsReadButton, showShareButton: $showShareButton, showCommentsButton: $showCommentsButton, showOpenInAppButton: $showOpenInAppButton)';
+    return 'PostsSettings(defaultHomeSort: $defaultHomeSort, defaultSort: $defaultSort, rememberSortByCommunity: $rememberSortByCommunity, rememberedSorts: $rememberedSorts, showAwards: $showAwards, clickableAwards: $clickableAwards, showPostFlair: $showPostFlair, showFlairColors: $showFlairColors, showFlairEmojis: $showFlairEmojis, tapFlairToSearch: $tapFlairToSearch, showAuthor: $showAuthor, clickableCommunity: $clickableCommunity, clickableUser: $clickableUser, showFloatingButton: $showFloatingButton, showHideButton: $showHideButton, showMarkAsReadButton: $showMarkAsReadButton, showShareButton: $showShareButton, showCommentsButton: $showCommentsButton, showOpenInAppButton: $showOpenInAppButton)';
   }
 }
 
@@ -779,11 +806,12 @@ abstract mixin class _$PostsSettingsCopyWith<$Res>
       {@Setting(widget: _SortSelection) FeedSort defaultHomeSort,
       @Setting(widget: _SortSelection) FeedSort defaultSort,
       @Setting(hasDescription: true) bool rememberSortByCommunity,
+      @Setting(widget: ManageSortButton) RememberedSort rememberedSorts,
       @Category(name: "Awards") @Setting() bool showAwards,
       @Setting() bool clickableAwards,
       @Category(name: "Flairs") @Setting() bool showPostFlair,
       @Setting() bool showFlairColors,
-      @Setting() bool showEmojis,
+      @Setting() bool showFlairEmojis,
       @Setting() bool tapFlairToSearch,
       @Category(name: "Post info") @Setting() bool showAuthor,
       @Setting() bool clickableCommunity,
@@ -817,11 +845,12 @@ class __$PostsSettingsCopyWithImpl<$Res>
     Object? defaultHomeSort = null,
     Object? defaultSort = null,
     Object? rememberSortByCommunity = null,
+    Object? rememberedSorts = null,
     Object? showAwards = null,
     Object? clickableAwards = null,
     Object? showPostFlair = null,
     Object? showFlairColors = null,
-    Object? showEmojis = null,
+    Object? showFlairEmojis = null,
     Object? tapFlairToSearch = null,
     Object? showAuthor = null,
     Object? clickableCommunity = null,
@@ -846,6 +875,10 @@ class __$PostsSettingsCopyWithImpl<$Res>
           ? _self.rememberSortByCommunity
           : rememberSortByCommunity // ignore: cast_nullable_to_non_nullable
               as bool,
+      rememberedSorts: null == rememberedSorts
+          ? _self.rememberedSorts
+          : rememberedSorts // ignore: cast_nullable_to_non_nullable
+              as RememberedSort,
       showAwards: null == showAwards
           ? _self.showAwards
           : showAwards // ignore: cast_nullable_to_non_nullable
@@ -862,9 +895,9 @@ class __$PostsSettingsCopyWithImpl<$Res>
           ? _self.showFlairColors
           : showFlairColors // ignore: cast_nullable_to_non_nullable
               as bool,
-      showEmojis: null == showEmojis
-          ? _self.showEmojis
-          : showEmojis // ignore: cast_nullable_to_non_nullable
+      showFlairEmojis: null == showFlairEmojis
+          ? _self.showFlairEmojis
+          : showFlairEmojis // ignore: cast_nullable_to_non_nullable
               as bool,
       tapFlairToSearch: null == tapFlairToSearch
           ? _self.tapFlairToSearch

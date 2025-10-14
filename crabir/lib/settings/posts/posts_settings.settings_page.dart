@@ -10,13 +10,16 @@ part of "posts_settings.dart";
 
 // HydratedCubit for PostsSettings
 class PostsSettingsCubit extends HydratedCubit<PostsSettings> {
+  final Logger log = Logger("PostsSettingsCubit");
   PostsSettingsCubit() : super(PostsSettings());
 
   @override
   PostsSettings? fromJson(Map<String, dynamic> json) {
     try {
+      log.info("Successfully restored PostsSettingsCubit");
       return PostsSettings.fromJson(json);
-    } catch (_) {
+    } catch (err) {
+      log.severe("Failed to resotre PostsSettingsCubit: $err");
       return PostsSettings();
     }
   }
@@ -32,6 +35,9 @@ class PostsSettingsCubit extends HydratedCubit<PostsSettings> {
   void updateRememberSortByCommunity(bool value) =>
       emit(state.copyWith(rememberSortByCommunity: value));
 
+  void updateRememberedSorts(RememberedSort value) =>
+      emit(state.copyWith(rememberedSorts: value));
+
   void updateShowAwards(bool value) => emit(state.copyWith(showAwards: value));
 
   void updateClickableAwards(bool value) =>
@@ -43,7 +49,8 @@ class PostsSettingsCubit extends HydratedCubit<PostsSettings> {
   void updateShowFlairColors(bool value) =>
       emit(state.copyWith(showFlairColors: value));
 
-  void updateShowEmojis(bool value) => emit(state.copyWith(showEmojis: value));
+  void updateShowFlairEmojis(bool value) =>
+      emit(state.copyWith(showFlairEmojis: value));
 
   void updateTapFlairToSearch(bool value) =>
       emit(state.copyWith(tapFlairToSearch: value));
@@ -75,8 +82,8 @@ class PostsSettingsCubit extends HydratedCubit<PostsSettings> {
       emit(state.copyWith(showOpenInAppButton: value));
 }
 
+@CrabirRoute()
 // SettingsPage for PostsSettings
-@RoutePage()
 class PostsSettingsView extends StatelessWidget {
   const PostsSettingsView({super.key});
 
@@ -89,6 +96,7 @@ class PostsSettingsView extends StatelessWidget {
       children: [
         _SortSelection(
           title: Text(locales.posts_defaultHomeSort),
+          leading: Icon(null),
           subtitle: null,
           value: settings.defaultHomeSort,
           onChanged: (val) =>
@@ -96,6 +104,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         _SortSelection(
           title: Text(locales.posts_defaultSort),
+          leading: Icon(null),
           subtitle: null,
           value: settings.defaultSort,
           onChanged: (val) =>
@@ -103,16 +112,32 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_rememberSortByCommunity),
+          secondary: Icon(null),
           subtitle: Text(locales.posts_rememberSortByCommunityDescription),
           value: settings.rememberSortByCommunity,
           onChanged: (val) => context
               .read<PostsSettingsCubit>()
               .updateRememberSortByCommunity(val!),
         ),
+        ManageSortButton(
+          title: Text(locales.posts_rememberedSorts),
+          leading: Icon(null),
+          subtitle: null,
+          value: settings.rememberedSorts,
+          onChanged: (val) =>
+              context.read<PostsSettingsCubit>().updateRememberedSorts(val),
+        ),
         Divider(),
-        Text("Awards"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Awards",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.posts_showAwards),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showAwards,
           onChanged: (val) =>
@@ -120,15 +145,23 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_clickableAwards),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.clickableAwards,
           onChanged: (val) =>
               context.read<PostsSettingsCubit>().updateClickableAwards(val!),
         ),
         Divider(),
-        Text("Flairs"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Flairs",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.posts_showPostFlair),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showPostFlair,
           onChanged: (val) =>
@@ -136,29 +169,39 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_showFlairColors),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showFlairColors,
           onChanged: (val) =>
               context.read<PostsSettingsCubit>().updateShowFlairColors(val!),
         ),
         CheckboxListTile(
-          title: Text(locales.posts_showEmojis),
+          title: Text(locales.posts_showFlairEmojis),
+          secondary: Icon(null),
           subtitle: null,
-          value: settings.showEmojis,
+          value: settings.showFlairEmojis,
           onChanged: (val) =>
-              context.read<PostsSettingsCubit>().updateShowEmojis(val!),
+              context.read<PostsSettingsCubit>().updateShowFlairEmojis(val!),
         ),
         CheckboxListTile(
           title: Text(locales.posts_tapFlairToSearch),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.tapFlairToSearch,
           onChanged: (val) =>
               context.read<PostsSettingsCubit>().updateTapFlairToSearch(val!),
         ),
         Divider(),
-        Text("Post info"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Post info",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.posts_showAuthor),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showAuthor,
           onChanged: (val) =>
@@ -166,6 +209,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_clickableCommunity),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.clickableCommunity,
           onChanged: (val) =>
@@ -173,15 +217,23 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_clickableUser),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.clickableUser,
           onChanged: (val) =>
               context.read<PostsSettingsCubit>().updateClickableUser(val!),
         ),
         Divider(),
-        Text("Visible buttons"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Visible buttons",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.posts_showFloatingButton),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showFloatingButton,
           onChanged: (val) =>
@@ -189,6 +241,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_showHideButton),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showHideButton,
           onChanged: (val) =>
@@ -196,6 +249,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_showMarkAsReadButton),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showMarkAsReadButton,
           onChanged: (val) => context
@@ -204,6 +258,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_showShareButton),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showShareButton,
           onChanged: (val) =>
@@ -211,6 +266,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_showCommentsButton),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showCommentsButton,
           onChanged: (val) =>
@@ -218,6 +274,7 @@ class PostsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.posts_showOpenInAppButton),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showOpenInAppButton,
           onChanged: (val) => context

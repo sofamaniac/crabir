@@ -27,6 +27,8 @@ mixin _$CrabirTheme {
   /// Buttons and widgets
   @ColorConverter()
   Color get primaryColor;
+  @ColorConverter()
+  Color get secondaryText;
 
   /// Communities and usernames
   @ColorConverter()
@@ -41,6 +43,8 @@ mixin _$CrabirTheme {
   Color get contentText;
   @ColorConverter()
   Color get linkColor;
+  @ColorConverter()
+  Color get downvoteContent;
 
   /// Create a copy of CrabirTheme
   /// with the given fields replaced by the non-null parameter values.
@@ -67,6 +71,8 @@ mixin _$CrabirTheme {
                 .equals(other.toolBarText, toolBarText) &&
             const DeepCollectionEquality()
                 .equals(other.primaryColor, primaryColor) &&
+            const DeepCollectionEquality()
+                .equals(other.secondaryText, secondaryText) &&
             const DeepCollectionEquality().equals(other.highlight, highlight) &&
             const DeepCollectionEquality().equals(other.postTitle, postTitle) &&
             const DeepCollectionEquality().equals(other.readPost, readPost) &&
@@ -74,7 +80,9 @@ mixin _$CrabirTheme {
                 .equals(other.announcement, announcement) &&
             const DeepCollectionEquality()
                 .equals(other.contentText, contentText) &&
-            const DeepCollectionEquality().equals(other.linkColor, linkColor));
+            const DeepCollectionEquality().equals(other.linkColor, linkColor) &&
+            const DeepCollectionEquality()
+                .equals(other.downvoteContent, downvoteContent));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -86,16 +94,18 @@ mixin _$CrabirTheme {
       const DeepCollectionEquality().hash(toolBarBackground),
       const DeepCollectionEquality().hash(toolBarText),
       const DeepCollectionEquality().hash(primaryColor),
+      const DeepCollectionEquality().hash(secondaryText),
       const DeepCollectionEquality().hash(highlight),
       const DeepCollectionEquality().hash(postTitle),
       const DeepCollectionEquality().hash(readPost),
       const DeepCollectionEquality().hash(announcement),
       const DeepCollectionEquality().hash(contentText),
-      const DeepCollectionEquality().hash(linkColor));
+      const DeepCollectionEquality().hash(linkColor),
+      const DeepCollectionEquality().hash(downvoteContent));
 
   @override
   String toString() {
-    return 'CrabirTheme(background: $background, cardBackground: $cardBackground, toolBarBackground: $toolBarBackground, toolBarText: $toolBarText, primaryColor: $primaryColor, highlight: $highlight, postTitle: $postTitle, readPost: $readPost, announcement: $announcement, contentText: $contentText, linkColor: $linkColor)';
+    return 'CrabirTheme(background: $background, cardBackground: $cardBackground, toolBarBackground: $toolBarBackground, toolBarText: $toolBarText, primaryColor: $primaryColor, secondaryText: $secondaryText, highlight: $highlight, postTitle: $postTitle, readPost: $readPost, announcement: $announcement, contentText: $contentText, linkColor: $linkColor, downvoteContent: $downvoteContent)';
   }
 }
 
@@ -111,12 +121,14 @@ abstract mixin class $CrabirThemeCopyWith<$Res> {
       @ColorConverter() Color toolBarBackground,
       @ColorConverter() Color toolBarText,
       @ColorConverter() Color primaryColor,
+      @ColorConverter() Color secondaryText,
       @ColorConverter() Color highlight,
       @ColorConverter() Color postTitle,
       @ColorConverter() Color readPost,
       @ColorConverter() Color announcement,
       @ColorConverter() Color contentText,
-      @ColorConverter() Color linkColor});
+      @ColorConverter() Color linkColor,
+      @ColorConverter() Color downvoteContent});
 }
 
 /// @nodoc
@@ -136,12 +148,14 @@ class _$CrabirThemeCopyWithImpl<$Res> implements $CrabirThemeCopyWith<$Res> {
     Object? toolBarBackground = freezed,
     Object? toolBarText = freezed,
     Object? primaryColor = freezed,
+    Object? secondaryText = freezed,
     Object? highlight = freezed,
     Object? postTitle = freezed,
     Object? readPost = freezed,
     Object? announcement = freezed,
     Object? contentText = freezed,
     Object? linkColor = freezed,
+    Object? downvoteContent = freezed,
   }) {
     return _then(_self.copyWith(
       background: freezed == background
@@ -163,6 +177,10 @@ class _$CrabirThemeCopyWithImpl<$Res> implements $CrabirThemeCopyWith<$Res> {
       primaryColor: freezed == primaryColor
           ? _self.primaryColor
           : primaryColor // ignore: cast_nullable_to_non_nullable
+              as Color,
+      secondaryText: freezed == secondaryText
+          ? _self.secondaryText
+          : secondaryText // ignore: cast_nullable_to_non_nullable
               as Color,
       highlight: freezed == highlight
           ? _self.highlight
@@ -187,6 +205,10 @@ class _$CrabirThemeCopyWithImpl<$Res> implements $CrabirThemeCopyWith<$Res> {
       linkColor: freezed == linkColor
           ? _self.linkColor
           : linkColor // ignore: cast_nullable_to_non_nullable
+              as Color,
+      downvoteContent: freezed == downvoteContent
+          ? _self.downvoteContent
+          : downvoteContent // ignore: cast_nullable_to_non_nullable
               as Color,
     ));
   }
@@ -291,12 +313,14 @@ extension CrabirThemePatterns on CrabirTheme {
             @ColorConverter() Color toolBarBackground,
             @ColorConverter() Color toolBarText,
             @ColorConverter() Color primaryColor,
+            @ColorConverter() Color secondaryText,
             @ColorConverter() Color highlight,
             @ColorConverter() Color postTitle,
             @ColorConverter() Color readPost,
             @ColorConverter() Color announcement,
             @ColorConverter() Color contentText,
-            @ColorConverter() Color linkColor)?
+            @ColorConverter() Color linkColor,
+            @ColorConverter() Color downvoteContent)?
         $default, {
     required TResult orElse(),
   }) {
@@ -309,12 +333,14 @@ extension CrabirThemePatterns on CrabirTheme {
             _that.toolBarBackground,
             _that.toolBarText,
             _that.primaryColor,
+            _that.secondaryText,
             _that.highlight,
             _that.postTitle,
             _that.readPost,
             _that.announcement,
             _that.contentText,
-            _that.linkColor);
+            _that.linkColor,
+            _that.downvoteContent);
       case _:
         return orElse();
     }
@@ -341,12 +367,14 @@ extension CrabirThemePatterns on CrabirTheme {
             @ColorConverter() Color toolBarBackground,
             @ColorConverter() Color toolBarText,
             @ColorConverter() Color primaryColor,
+            @ColorConverter() Color secondaryText,
             @ColorConverter() Color highlight,
             @ColorConverter() Color postTitle,
             @ColorConverter() Color readPost,
             @ColorConverter() Color announcement,
             @ColorConverter() Color contentText,
-            @ColorConverter() Color linkColor)
+            @ColorConverter() Color linkColor,
+            @ColorConverter() Color downvoteContent)
         $default,
   ) {
     final _that = this;
@@ -358,12 +386,14 @@ extension CrabirThemePatterns on CrabirTheme {
             _that.toolBarBackground,
             _that.toolBarText,
             _that.primaryColor,
+            _that.secondaryText,
             _that.highlight,
             _that.postTitle,
             _that.readPost,
             _that.announcement,
             _that.contentText,
-            _that.linkColor);
+            _that.linkColor,
+            _that.downvoteContent);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -389,12 +419,14 @@ extension CrabirThemePatterns on CrabirTheme {
             @ColorConverter() Color toolBarBackground,
             @ColorConverter() Color toolBarText,
             @ColorConverter() Color primaryColor,
+            @ColorConverter() Color secondaryText,
             @ColorConverter() Color highlight,
             @ColorConverter() Color postTitle,
             @ColorConverter() Color readPost,
             @ColorConverter() Color announcement,
             @ColorConverter() Color contentText,
-            @ColorConverter() Color linkColor)?
+            @ColorConverter() Color linkColor,
+            @ColorConverter() Color downvoteContent)?
         $default,
   ) {
     final _that = this;
@@ -406,12 +438,14 @@ extension CrabirThemePatterns on CrabirTheme {
             _that.toolBarBackground,
             _that.toolBarText,
             _that.primaryColor,
+            _that.secondaryText,
             _that.highlight,
             _that.postTitle,
             _that.readPost,
             _that.announcement,
             _that.contentText,
-            _that.linkColor);
+            _that.linkColor,
+            _that.downvoteContent);
       case _:
         return null;
     }
@@ -427,12 +461,14 @@ class _CrabirTheme extends CrabirTheme {
       @ColorConverter() this.toolBarBackground = Colors.black,
       @ColorConverter() this.toolBarText = Colors.white,
       @ColorConverter() this.primaryColor = const Color(0xffff6e40),
+      @ColorConverter() this.secondaryText = const Color(0xFFB7B8BC),
       @ColorConverter() this.highlight = const Color(0xffff0000),
       @ColorConverter() this.postTitle = const Color(0xFFF5F6F8),
       @ColorConverter() this.readPost = const Color(0xFFB7B8BC),
       @ColorConverter() this.announcement = const Color(0xFF00FF00),
       @ColorConverter() this.contentText = const Color(0xFFF5F6F8),
-      @ColorConverter() this.linkColor = const Color(0xFF4B91E2)})
+      @ColorConverter() this.linkColor = const Color(0xFF4B91E2),
+      @ColorConverter() this.downvoteContent = const Color(0xFF9580FF)})
       : super._();
   factory _CrabirTheme.fromJson(Map<String, dynamic> json) =>
       _$CrabirThemeFromJson(json);
@@ -460,6 +496,10 @@ class _CrabirTheme extends CrabirTheme {
   @JsonKey()
   @ColorConverter()
   final Color primaryColor;
+  @override
+  @JsonKey()
+  @ColorConverter()
+  final Color secondaryText;
 
   /// Communities and usernames
   @override
@@ -486,6 +526,10 @@ class _CrabirTheme extends CrabirTheme {
   @JsonKey()
   @ColorConverter()
   final Color linkColor;
+  @override
+  @JsonKey()
+  @ColorConverter()
+  final Color downvoteContent;
 
   /// Create a copy of CrabirTheme
   /// with the given fields replaced by the non-null parameter values.
@@ -517,6 +561,8 @@ class _CrabirTheme extends CrabirTheme {
                 .equals(other.toolBarText, toolBarText) &&
             const DeepCollectionEquality()
                 .equals(other.primaryColor, primaryColor) &&
+            const DeepCollectionEquality()
+                .equals(other.secondaryText, secondaryText) &&
             const DeepCollectionEquality().equals(other.highlight, highlight) &&
             const DeepCollectionEquality().equals(other.postTitle, postTitle) &&
             const DeepCollectionEquality().equals(other.readPost, readPost) &&
@@ -524,7 +570,9 @@ class _CrabirTheme extends CrabirTheme {
                 .equals(other.announcement, announcement) &&
             const DeepCollectionEquality()
                 .equals(other.contentText, contentText) &&
-            const DeepCollectionEquality().equals(other.linkColor, linkColor));
+            const DeepCollectionEquality().equals(other.linkColor, linkColor) &&
+            const DeepCollectionEquality()
+                .equals(other.downvoteContent, downvoteContent));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -536,16 +584,18 @@ class _CrabirTheme extends CrabirTheme {
       const DeepCollectionEquality().hash(toolBarBackground),
       const DeepCollectionEquality().hash(toolBarText),
       const DeepCollectionEquality().hash(primaryColor),
+      const DeepCollectionEquality().hash(secondaryText),
       const DeepCollectionEquality().hash(highlight),
       const DeepCollectionEquality().hash(postTitle),
       const DeepCollectionEquality().hash(readPost),
       const DeepCollectionEquality().hash(announcement),
       const DeepCollectionEquality().hash(contentText),
-      const DeepCollectionEquality().hash(linkColor));
+      const DeepCollectionEquality().hash(linkColor),
+      const DeepCollectionEquality().hash(downvoteContent));
 
   @override
   String toString() {
-    return 'CrabirTheme(background: $background, cardBackground: $cardBackground, toolBarBackground: $toolBarBackground, toolBarText: $toolBarText, primaryColor: $primaryColor, highlight: $highlight, postTitle: $postTitle, readPost: $readPost, announcement: $announcement, contentText: $contentText, linkColor: $linkColor)';
+    return 'CrabirTheme(background: $background, cardBackground: $cardBackground, toolBarBackground: $toolBarBackground, toolBarText: $toolBarText, primaryColor: $primaryColor, secondaryText: $secondaryText, highlight: $highlight, postTitle: $postTitle, readPost: $readPost, announcement: $announcement, contentText: $contentText, linkColor: $linkColor, downvoteContent: $downvoteContent)';
   }
 }
 
@@ -563,12 +613,14 @@ abstract mixin class _$CrabirThemeCopyWith<$Res>
       @ColorConverter() Color toolBarBackground,
       @ColorConverter() Color toolBarText,
       @ColorConverter() Color primaryColor,
+      @ColorConverter() Color secondaryText,
       @ColorConverter() Color highlight,
       @ColorConverter() Color postTitle,
       @ColorConverter() Color readPost,
       @ColorConverter() Color announcement,
       @ColorConverter() Color contentText,
-      @ColorConverter() Color linkColor});
+      @ColorConverter() Color linkColor,
+      @ColorConverter() Color downvoteContent});
 }
 
 /// @nodoc
@@ -588,12 +640,14 @@ class __$CrabirThemeCopyWithImpl<$Res> implements _$CrabirThemeCopyWith<$Res> {
     Object? toolBarBackground = freezed,
     Object? toolBarText = freezed,
     Object? primaryColor = freezed,
+    Object? secondaryText = freezed,
     Object? highlight = freezed,
     Object? postTitle = freezed,
     Object? readPost = freezed,
     Object? announcement = freezed,
     Object? contentText = freezed,
     Object? linkColor = freezed,
+    Object? downvoteContent = freezed,
   }) {
     return _then(_CrabirTheme(
       background: freezed == background
@@ -615,6 +669,10 @@ class __$CrabirThemeCopyWithImpl<$Res> implements _$CrabirThemeCopyWith<$Res> {
       primaryColor: freezed == primaryColor
           ? _self.primaryColor
           : primaryColor // ignore: cast_nullable_to_non_nullable
+              as Color,
+      secondaryText: freezed == secondaryText
+          ? _self.secondaryText
+          : secondaryText // ignore: cast_nullable_to_non_nullable
               as Color,
       highlight: freezed == highlight
           ? _self.highlight
@@ -639,6 +697,10 @@ class __$CrabirThemeCopyWithImpl<$Res> implements _$CrabirThemeCopyWith<$Res> {
       linkColor: freezed == linkColor
           ? _self.linkColor
           : linkColor // ignore: cast_nullable_to_non_nullable
+              as Color,
+      downvoteContent: freezed == downvoteContent
+          ? _self.downvoteContent
+          : downvoteContent // ignore: cast_nullable_to_non_nullable
               as Color,
     ));
   }

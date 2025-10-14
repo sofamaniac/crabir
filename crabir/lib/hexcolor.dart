@@ -11,11 +11,11 @@ extension StringToColor on String {
       return HexColor.fromHex(this);
     } else {
       return switch (this) {
-        "black" => Colors.black,
+        "black" => Colors.grey[850]!,
         "transparent" => Colors.transparent,
         "light" => Colors.white,
-        "dark" => Colors.black,
-        "gray" => Colors.grey,
+        "dark" => Colors.grey,
+        "gray" => Colors.grey[500]!,
         "" => defaultColor,
         _ => () {
             log.warning("Unknown color \"$this\"");

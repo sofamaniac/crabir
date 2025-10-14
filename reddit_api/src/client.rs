@@ -1,13 +1,18 @@
+use crate::model::comment::Comment;
 use crate::model::feed::{self, Feed};
 use crate::model::flair::Flair;
 use crate::model::multi::{Multi, MultiStream};
+use crate::model::post::PostSubmit;
+use crate::model::rule::Rule;
 use crate::model::subreddit::Subreddit;
 use crate::model::{Fullname, Post, comment};
+use crate::paging_handler::PagingHandler;
 use crate::result::Result;
 use crate::search::{PostSearchSort, SearchPost, SearchSubreddit, SubredditSearchSort};
-use crate::streamable::Streamable;
-use std::collections::HashMap;
+use crate::votable::private::PrivateVotable;
+use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
+use std::time::Duration;
 
 use base64::Engine;
 use base64::prelude::BASE64_URL_SAFE_NO_PAD;
@@ -91,6 +96,7 @@ impl Client {
     fn new_reqwest_client() -> reqwest::Client {
         reqwest::Client::builder()
             .user_agent(USER_AGENT)
+            .timeout(Duration::from_secs(5))
             .build()
             .expect("Building reqwest client should not fail")
     }
@@ -117,6 +123,10 @@ impl Client {
         Url::parse("https://oauth.reddit.com/").expect("Should not panic.")
     }
 
+    pub(crate) fn join_url(&self, url: &str) -> Url {
+        self.base_url().join(url).expect("Should not fail.")
+    }
+
     /// Authenticate the current client
     pub async fn authenticate(&self, refresh_token: String) {
         *self.refresh_token.write().unwrap() = Some(refresh_token);
@@ -126,11 +136,21 @@ impl Client {
 
 const MAX_LIMIT: u64 = 100;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct Pager {
     after: Option<String>,
     before: Option<String>,
     limit: u64,
+}
+
+impl Default for Pager {
+    fn default() -> Self {
+        Self {
+            after: Some(String::new()),
+            before: None,
+            limit: 100,
+        }
+    }
 }
 
 impl Pager {
@@ -322,10 +342,7 @@ impl Client {
     pub async fn logout(&self) -> Result<()> {
         let access_token = self.current_access_token.read().unwrap().clone();
         if let Some(access_token) = access_token {
-            let url = self
-                .base_url()
-                .join("api/v1/revoke_token")
-                .expect("Should not fail");
+            let url = self.join_url("api/v1/revoke_token");
             let request = self
                 .http
                 .post(url)
@@ -367,15 +384,21 @@ impl Client {
         debug!("Executing {request:#?}");
         let request = request.build().expect("Building request should not fail");
         let url = request.url().clone();
-        let res = self.http.clone().execute(request).await?;
-        debug!("Done with request. {url:#?}");
+        let res = self.http.clone().execute(request).await;
+        let res = match res {
+            Ok(res) => res,
+            Err(err) => {
+                log::error!("Error while executing request ({}) : {:#?}", url, err);
+                return Err(err.into());
+            }
+        };
         res.error_for_status().map_err(Into::into)
     }
 
     #[frb(sync)]
-    pub fn feed_stream(&self, feed: &Feed, sort: &feed::FeedSort) -> Streamable {
+    pub fn feed_stream(&self, feed: &Feed, sort: &feed::FeedSort) -> PagingHandler {
         let base_url = self.base_url();
-        Streamable::new(feed::FeedStream::new(
+        PagingHandler::new(feed::FeedStream::new(
             self.clone(),
             feed.clone(),
             *sort,
@@ -387,8 +410,7 @@ impl Client {
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
     pub async fn logged_user_info(&self) -> Result<UserInfo> {
-        let base_url = self.base_url();
-        let url = base_url.join("api/v1/me.json").expect("Should not fail");
+        let url = self.join_url("api/v1/me.json");
         let request = self.get(url);
         let response = self.execute(request).await?;
         let json = parse_response(response).await?;
@@ -403,89 +425,94 @@ impl Client {
     ) -> impl Stream<Item = Result<Listing>> {
         stream::unfold(
             (url, pager.unwrap_or_default()),
-            move |(url, mut pager)| async move {
+            move |(base_url, pager)| async move {
+                // Return None if after is None
+                pager.after.as_ref()?;
                 let client = self.clone();
-                let url = pager.add_to_url(url.clone());
+                let url = pager.add_to_url(base_url.clone());
                 let request = client.get(url.clone());
                 let request = request.query(query_params);
                 let response = client.execute(request).await;
                 match response {
-                    Err(e) => Some((Err(e), (url, Pager::default()))),
+                    Err(e) => Some((Err(e), (base_url, Pager::default()))),
                     Ok(response) => match parse_response::<Thing>(response).await {
                         Ok(thing) => match thing {
                             Thing::Listing(listing) => {
-                                pager.after(listing.after.clone());
-                                debug!("{pager:?}");
-                                if listing.after.clone()?.is_empty() {
-                                    return None;
-                                }
-                                Some((Ok(listing), (url, pager)))
+                                let pager = Pager {
+                                    after: listing.after.clone(),
+                                    ..pager
+                                };
+                                Some((Ok(listing), (base_url, pager)))
                             }
                             _ => Some((Err(Error::InvalidThing), (url, Pager::default()))),
                         },
-                        Err(e) => Some((Err(e), (url, Pager::default()))),
+                        Err(e) => Some((Err(e), (base_url, Pager::default()))),
                     },
                 }
             },
         )
     }
 
-    pub(crate) fn stream_vec<T, Q>(
+    pub(crate) fn stream_vec<Q>(
         self,
         url: Url,
         pager: Option<Pager>,
         query_params: Q,
-    ) -> impl Stream<Item = Result<T>>
+    ) -> impl Stream<Item = Result<Vec<Thing>>>
     where
-        T: TryFrom<Thing>,
         Q: Serialize + Clone,
     {
-        stream::unfold(
-            (url, pager.unwrap_or_default(), Vec::new(), false),
-            move |(url, mut pager, mut buffer, done)| {
-                let client = self.clone();
-                let query_params = query_params.clone();
-                async move {
-                    if let Some(thing) = buffer.pop() {
-                        Some((Ok(thing), (url, pager, buffer, done)))
-                    } else if !done {
-                        let url = pager.add_to_url(url.clone());
-                        let request = client.get(url.clone());
-                        let request = request.query(&query_params);
-                        let response = client.execute(request).await;
-                        match response {
-                            Err(e) => Some((Err(e), (url, Pager::default(), buffer, done))),
-                            Ok(response) => match parse_response::<Thing>(response).await {
-                                Ok(thing) => match thing {
-                                    Thing::Listing(listing) => {
-                                        pager.after(listing.after.clone());
-                                        let done = listing.after.is_none()
-                                            || listing.after.is_some_and(|after| after.is_empty());
-                                        buffer = listing
-                                            .children
-                                            .into_iter()
-                                            .filter_map(|item| item.try_into().ok())
-                                            .collect();
-                                        buffer.reverse();
+        struct Util<Q: Serialize + Clone> {
+            url: Url,
+            pager: Pager,
+            query_params: Q,
+            seen: HashSet<Fullname>,
+            done: bool,
+        }
 
-                                        buffer
-                                            .pop()
-                                            .map(|thing| (Ok(thing), (url, pager, buffer, done)))
-                                    }
-                                    _ => Some((
-                                        Err(Error::InvalidThing),
-                                        (url, Pager::default(), buffer, done),
-                                    )),
-                                },
-                                Err(e) => Some((Err(e), (url, Pager::default(), buffer, done))),
-                            },
-                        }
-                    } else {
-                        None
+        let init = Util {
+            url,
+            pager: pager.unwrap_or_default(),
+            query_params,
+            seen: HashSet::new(),
+            done: false,
+        };
+        stream::unfold(init, move |mut acc| {
+            let client = self.clone();
+            let query_params = acc.query_params.clone();
+            async move {
+                if !acc.done {
+                    let url = acc.pager.add_to_url(acc.url.clone());
+                    let request = client.get(url.clone());
+                    let request = request.query(&query_params);
+                    let response = client.execute(request).await;
+                    match response {
+                        Err(e) => Some((Err(e), acc)),
+                        Ok(response) => match parse_thing::<Listing>(response).await {
+                            Ok(listing) => {
+                                acc.pager.after(listing.after.clone());
+                                acc.done = listing.after.is_none()
+                                    || listing.after.is_some_and(|after| after.is_empty());
+                                let buffer: Vec<Thing> = listing
+                                    .children
+                                    .into_iter()
+                                    .filter(|thing| {
+                                        // Keep things that either do not have a name
+                                        // or that were not already seen
+                                        thing.name().is_none_or(|name| acc.seen.insert(name))
+                                    })
+                                    .collect();
+
+                                Some((Ok(buffer), acc))
+                            }
+                            Err(e) => Some((Err(e), acc)),
+                        },
                     }
+                } else {
+                    None
                 }
-            },
-        )
+            }
+        })
     }
 
     /// Try to collect everything from a paged request. Will continue until there is no
@@ -508,21 +535,76 @@ impl Client {
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
     pub async fn subscriptions(&self) -> Result<Vec<crate::model::subreddit::Subreddit>> {
-        let base_url = self.base_url();
-        let url = base_url
-            .join("subreddits/mine/subscriber.json")
-            .expect("Should not fail.");
-        self.collect_paged(&url, &[]).await
+        let url = self.join_url("subreddits/mine/subscriber.json");
+        let result: Vec<Subreddit> = self.collect_paged(&url, &[]).await?;
+        Ok(result)
+    }
+
+    /// Subscribe to a subreddit
+    /// # Errors
+    /// Returns an error if the http client fails or if the parsing of the response fails.
+    pub async fn subscribe(&self, name: &Fullname) -> Result<()> {
+        let url = self.join_url("api/subscribe");
+        let request = self.post(url);
+        let request = request.query(&[
+            ("action", "sub"),
+            ("action_source", "onboarding"),
+            ("skip_initial_defaults", "true"),
+            ("sr", name.as_ref()),
+        ]);
+        self.execute(request).await?;
+        Ok(())
+    }
+
+    /// Unsubscribe to a subreddit
+    /// # Errors
+    /// Returns an error if the http client fails or if the parsing of the response fails.
+    pub async fn unsubscribe(&self, name: &Fullname) -> Result<()> {
+        let url = self.join_url("api/subscribe");
+        let request = self.post(url);
+        let request = request.query(&[
+            ("action", "unsub"),
+            ("action_source", "onboarding"),
+            ("sr", name.as_ref()),
+        ]);
+        self.execute(request).await?;
+        Ok(())
+    }
+
+    /// Get html of wiki index of subreddit `name` (e.g: unixporn).
+    /// # Errors
+    /// Returns an error if the http client fails or if the parsing of the response fails.
+    pub async fn wiki(&self, name: String) -> Result<String> {
+        let url = self.join_url(&format!("r/{name}/wiki.json"));
+        let request = self.get(url);
+        let result = self.execute(request).await?;
+        if let Thing::Wikipage { content_html } = parse_response(result).await? {
+            Ok(content_html)
+        } else {
+            Err(Error::InvalidThing)
+        }
+    }
+
+    /// Get the rules of a subreddit by its display name (e.g.: unixporn).
+    /// # Errors
+    /// Returns an error if the http client fails or if the parsing of the response fails.
+    pub async fn rules(&self, name: String) -> Result<Vec<Rule>> {
+        #[derive(Deserialize)]
+        struct Response {
+            rules: Vec<Rule>,
+        }
+        let url = self.join_url(&format!("r/{name}/about/rules.json"));
+        let request = self.get(url);
+        let result = self.execute(request).await?;
+        let Response { rules } = parse_response(result).await?;
+        Ok(rules)
     }
 
     /// Get the list of multireddits the current user is subscribed to.
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
     pub async fn multis(&self) -> Result<Vec<crate::model::multi::Multi>> {
-        let base_url = self.base_url();
-        let url = base_url
-            .join("api/multi/mine.json")
-            .expect("Should not fail.");
+        let url = self.join_url("api/multi/mine.json");
         let request = self.get(url);
         //let request = self.get(url).query(&[("expand_srs", "true")]);
         let result = self.execute(request).await?;
@@ -533,10 +615,23 @@ impl Client {
             .collect())
     }
 
+    /// Get a multi from its link (`/user/{username}/m/{name}`).
+    /// # Errors
+    /// Returns an error if the http client fails or if the parsing of the response fails.
+    pub async fn get_multi(&self, multi_path: &str) -> Result<Multi> {
+        let url = self
+            .join_url("api/multi")
+            .join(multi_path)
+            .expect("[get_multi] Could not parse url.");
+        let request = self.get(url);
+        let result = self.execute(request).await?;
+        parse_thing(result).await
+    }
+
     #[frb(sync)]
-    pub fn multi_posts(&self, multi: &Multi, sort: &feed::FeedSort) -> Streamable {
+    pub fn multi_posts(&self, multi: &Multi, sort: &feed::FeedSort) -> PagingHandler {
         let base_url = self.base_url();
-        Streamable::new(MultiStream::new(
+        PagingHandler::new(MultiStream::new(
             self.clone(),
             multi.clone(),
             *sort,
@@ -547,14 +642,14 @@ impl Client {
     /// Vote on a votable item (i.e. a [`Post`] or a [`comment::Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
-    pub async fn vote(&self, fullname: &Fullname, direction: VoteDirection) -> Result<()> {
+    pub(crate) async fn vote(&self, fullname: &Fullname, direction: VoteDirection) -> Result<()> {
         let dir = match direction {
             VoteDirection::Up => 1,
             VoteDirection::Down => -1,
             VoteDirection::Neutral => 0,
         };
 
-        let url = self.base_url().join("api/vote").expect("Should not fail.");
+        let url = self.join_url("api/vote");
         let request = self.post(url);
         let request = request.query(&[("id", fullname.as_ref()), ("dir", &format!("{dir}"))]);
         let _ = self.execute(request).await?;
@@ -564,8 +659,8 @@ impl Client {
     /// Save a saveable item (i.e. a [`Post`] or a [`comment::Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
-    pub async fn save(&self, thing: &Fullname) -> Result<()> {
-        let url = self.base_url().join("api/save").expect("Should not fail.");
+    pub(crate) async fn save(&self, thing: &Fullname) -> Result<()> {
+        let url = self.join_url("api/save");
         let request = self.post(url);
         let request = request.query(&[("id", &thing)]);
         let _ = self.execute(request).await?;
@@ -575,13 +670,32 @@ impl Client {
     /// Unsave a saveable item (i.e. a [`Post`] or a [`comment::Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
-    pub async fn unsave(&self, thing: &Fullname) -> Result<()> {
-        let url = self
-            .base_url()
-            .join("api/unsave")
-            .expect("Should not fail.");
+    pub(crate) async fn unsave(&self, thing: &Fullname) -> Result<()> {
+        let url = self.join_url("api/unsave");
         let request = self.post(url);
         let request = request.query(&[("id", &thing)]);
+        let _ = self.execute(request).await?;
+        Ok(())
+    }
+
+    /// Hide a [`Post`]
+    /// # Errors
+    /// Returns an error if the request failed.
+    pub(crate) async fn hide(&self, post: &Post) -> Result<()> {
+        let url = self.join_url("api/hide");
+        let request = self.post(url);
+        let request = request.query(&[("id", &post.name().as_ref())]);
+        let _ = self.execute(request).await?;
+        Ok(())
+    }
+
+    /// Unhide a [`Post`]
+    /// # Errors
+    /// Returns an error if the request failed.
+    pub(crate) async fn unhide(&self, post: &Post) -> Result<()> {
+        let url = self.join_url("api/unhide");
+        let request = self.post(url);
+        let request = request.query(&[("id", &post.name().as_ref())]);
         let _ = self.execute(request).await?;
         Ok(())
     }
@@ -595,10 +709,7 @@ impl Client {
         permalink: String,
         sort: Option<comment::CommentSort>,
     ) -> Result<(Post, Vec<Thing>)> {
-        let url = self
-            .base_url()
-            .join(&format!("{permalink}.json"))
-            .expect("Should not fail.");
+        let url = self.join_url(&format!("{permalink}.json"));
         let request = self.get(url);
         let request = if let Some(sort) = sort {
             request.query(&[("sort", sort.as_url())])
@@ -623,11 +734,9 @@ impl Client {
         self.comments(permalink, None).await.map(|r| r.0)
     }
 
-    // FIXME: crash when there are too many children because the url is too long.
-    // the doc says that it supports only up to 100 children.
     pub async fn load_more_comments(
         &self,
-        parent_id: Fullname,
+        parent_id: &Fullname,
         children: Vec<String>,
         sort: Option<comment::CommentSort>,
     ) -> Result<Vec<Thing>> {
@@ -645,10 +754,8 @@ impl Client {
         struct Data {
             things: Vec<Thing>,
         }
-        let url = self
-            .base_url()
-            .join("api/morechildren.json")
-            .expect("Should not fail.");
+        let url = self.join_url("api/morechildren.json");
+        let children: Vec<String> = children.into_iter().take(100).collect();
         let request = self.get(url).query(&[
             ("api_type", "json"),
             ("children", &children.join(",")),
@@ -671,8 +778,8 @@ impl Client {
         flair: Option<Flair>,
         query: Option<String>,
         sort: PostSearchSort,
-    ) -> Streamable {
-        Streamable::new(Box::new(SearchPost::new(
+    ) -> PagingHandler {
+        PagingHandler::new(Box::new(SearchPost::new(
             self.clone(),
             subreddit,
             flair,
@@ -682,18 +789,94 @@ impl Client {
     }
 
     #[frb(sync)]
-    pub fn search_subreddits(&self, query: String, sort: SubredditSearchSort) -> Streamable {
-        Streamable::new(Box::new(SearchSubreddit::new(self.clone(), query, sort)))
+    pub fn search_subreddits(&self, query: String, sort: SubredditSearchSort) -> PagingHandler {
+        PagingHandler::new(Box::new(SearchSubreddit::new(self.clone(), query, sort)))
     }
 
     /// Get info on subreddit at 'r/`subreddit`/about'.
     pub async fn subreddit_about(&self, subreddit: String) -> Result<Subreddit> {
-        let url = self
-            .base_url()
-            .join(&format!("r/{subreddit}/about.json"))
-            .expect("Should not fail.");
+        let url = self.join_url(&format!("r/{subreddit}/about.json"));
         let request = self.get(url);
         let response = self.execute(request).await?;
         parse_thing(response).await
+    }
+
+    /// (un)favorite subreddit
+    pub async fn favorite(&self, subreddit: &str, make_favorite: bool) -> Result<()> {
+        let url = self.join_url("api/favorite");
+        let request = self.post(url).query(&[
+            ("sr_name", subreddit),
+            ("make_favorite", &make_favorite.to_string()),
+        ]);
+        self.execute(request).await?;
+        Ok(())
+    }
+
+    /// Submit a comment
+    pub async fn submit_comment(
+        &self,
+        parent: &Fullname,
+        body: &str,
+        depth: i32,
+    ) -> Result<Comment> {
+        #[derive(Deserialize)]
+        struct Response {
+            json: Json,
+        }
+        #[derive(Deserialize)]
+        struct Json {
+            // error: Option<String>,
+            #[serde(default)]
+            data: Data,
+        }
+        #[derive(Deserialize, Default)]
+        struct Data {
+            things: Vec<Thing>,
+        }
+        let url = self.join_url("api/comment");
+        let request = self.post(url).query(&[
+            ("api_type", "json"),
+            ("text", body),
+            ("thing_id", parent.as_ref()),
+            ("raw_json", "1"),
+        ]);
+        let res = self.execute(request).await?;
+        let response: Response = parse_response(res).await?;
+        let thing = response
+            .json
+            .data
+            .things
+            .first()
+            .ok_or(Error::Custom {
+                message: "No comment in answer".to_owned(),
+            })?
+            .clone();
+        let mut comment: Comment = thing.try_into()?;
+        comment.set_depth(depth);
+        Ok(comment)
+    }
+
+    /// Resolve short link
+    pub async fn resolve_short_link(&self, link: &str) -> Result<String> {
+        let request = self
+            .http
+            .get(Url::parse(link).expect("Should not fail."))
+            .build()
+            .expect("Should not fail");
+        let response = self.http.execute(request).await?;
+        let url = response.url().to_string();
+        Ok(url)
+    }
+
+    /// Create post
+    pub async fn submit_post(&self, post: PostSubmit) -> Result<()> {
+        let url = self.join_url("api/submit");
+        let request = self.post(url);
+        let request = request.form(&post);
+        log::debug!("{request:#?}");
+        let response = self.execute(request).await?;
+        let text = response.text().await?;
+        log::debug!("[submit_post] {text}");
+        Ok(())
     }
 }

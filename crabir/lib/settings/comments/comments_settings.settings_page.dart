@@ -10,13 +10,16 @@ part of "comments_settings.dart";
 
 // HydratedCubit for CommentsSettings
 class CommentsSettingsCubit extends HydratedCubit<CommentsSettings> {
+  final Logger log = Logger("CommentsSettingsCubit");
   CommentsSettingsCubit() : super(CommentsSettings());
 
   @override
   CommentsSettings? fromJson(Map<String, dynamic> json) {
     try {
+      log.info("Successfully restored CommentsSettingsCubit");
       return CommentsSettings.fromJson(json);
-    } catch (_) {
+    } catch (err) {
+      log.severe("Failed to resotre CommentsSettingsCubit: $err");
       return CommentsSettings();
     }
   }
@@ -32,11 +35,11 @@ class CommentsSettingsCubit extends HydratedCubit<CommentsSettings> {
   void updateShowNavigationBar(bool value) =>
       emit(state.copyWith(showNavigationBar: value));
 
-  void updateShowUserAvatar(bool value) =>
-      emit(state.copyWith(showUserAvatar: value));
-
   void updateShowCommentsImage(bool value) =>
       emit(state.copyWith(showCommentsImage: value));
+
+  void updatePostMediaPreviewSize(MediaPreviewSize value) =>
+      emit(state.copyWith(postMediaPreviewSize: value));
 
   void updateButtonsAlwaysVisible(bool value) =>
       emit(state.copyWith(buttonsAlwaysVisible: value));
@@ -53,16 +56,11 @@ class CommentsSettingsCubit extends HydratedCubit<CommentsSettings> {
   void updateShowPostUpvotePercentage(bool value) =>
       emit(state.copyWith(showPostUpvotePercentage: value));
 
+  void updateThreadGuide(IndentationStyle value) =>
+      emit(state.copyWith(threadGuide: value));
+
   void updateHighlightMyUsername(bool value) =>
       emit(state.copyWith(highlightMyUsername: value));
-
-  void updateShowFloatingButton(bool value) =>
-      emit(state.copyWith(showFloatingButton: value));
-
-  void updateShowAwards(bool value) => emit(state.copyWith(showAwards: value));
-
-  void updateClickableAwards(bool value) =>
-      emit(state.copyWith(clickableAwards: value));
 
   void updateShowUserFlair(bool value) =>
       emit(state.copyWith(showUserFlair: value));
@@ -73,7 +71,7 @@ class CommentsSettingsCubit extends HydratedCubit<CommentsSettings> {
   void updateShowFlairEmojis(bool value) =>
       emit(state.copyWith(showFlairEmojis: value));
 
-  void updateClickToCollapse(bool value) =>
+  void updateClickToCollapse(CollapseAction value) =>
       emit(state.copyWith(clickToCollapse: value));
 
   void updateHideTextCollapsed(bool value) =>
@@ -88,24 +86,18 @@ class CommentsSettingsCubit extends HydratedCubit<CommentsSettings> {
   void updateClickableUsername(bool value) =>
       emit(state.copyWith(clickableUsername: value));
 
-  void updateHighlightNewComments(bool value) =>
-      emit(state.copyWith(highlightNewComments: value));
-
-  void updateVolumeRockerNavigation(bool value) =>
-      emit(state.copyWith(volumeRockerNavigation: value));
-
-  void updateAnimateNavigation(bool value) =>
-      emit(state.copyWith(animateNavigation: value));
-
   void updateShowSaveButton(bool value) =>
       emit(state.copyWith(showSaveButton: value));
 
   void updateSwipeToClose(bool value) =>
       emit(state.copyWith(swipeToClose: value));
+
+  void updateDistanceThreshold(int value) =>
+      emit(state.copyWith(distanceThreshold: value));
 }
 
+@CrabirRoute()
 // SettingsPage for CommentsSettings
-@RoutePage()
 class CommentsSettingsView extends StatelessWidget {
   const CommentsSettingsView({super.key});
 
@@ -118,6 +110,7 @@ class CommentsSettingsView extends StatelessWidget {
       children: [
         _CommentsSortSelection(
           title: Text(locales.comments_defaultSort),
+          leading: Icon(null),
           subtitle: null,
           value: settings.defaultSort,
           onChanged: (val) =>
@@ -125,6 +118,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_useSuggestedSort),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.useSuggestedSort,
           onChanged: (val) => context
@@ -132,9 +126,16 @@ class CommentsSettingsView extends StatelessWidget {
               .updateUseSuggestedSort(val!),
         ),
         Divider(),
-        Text("Appearance"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Appearance",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.comments_showNavigationBar),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showNavigationBar,
           onChanged: (val) => context
@@ -142,22 +143,26 @@ class CommentsSettingsView extends StatelessWidget {
               .updateShowNavigationBar(val!),
         ),
         CheckboxListTile(
-          title: Text(locales.comments_showUserAvatar),
-          subtitle: null,
-          value: settings.showUserAvatar,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateShowUserAvatar(val!),
-        ),
-        CheckboxListTile(
           title: Text(locales.comments_showCommentsImage),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showCommentsImage,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
               .updateShowCommentsImage(val!),
         ),
+        MediaPreviewSizeSelect(
+          title: Text(locales.comments_postMediaPreviewSize),
+          leading: Icon(null),
+          subtitle: null,
+          value: settings.postMediaPreviewSize,
+          onChanged: (val) => context
+              .read<CommentsSettingsCubit>()
+              .updatePostMediaPreviewSize(val),
+        ),
         CheckboxListTile(
           title: Text(locales.comments_buttonsAlwaysVisible),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.buttonsAlwaysVisible,
           onChanged: (val) => context
@@ -166,6 +171,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_hideButtonAfterAction),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.hideButtonAfterAction,
           onChanged: (val) => context
@@ -174,6 +180,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_collapseAutoMod),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.collapseAutoMod,
           onChanged: (val) =>
@@ -181,6 +188,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_collapseDisruptiveComment),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.collapseDisruptiveComment,
           onChanged: (val) => context
@@ -189,48 +197,41 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_showPostUpvotePercentage),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showPostUpvotePercentage,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
               .updateShowPostUpvotePercentage(val!),
         ),
+        IndentationStyleSelect(
+          title: Text(locales.comments_threadGuide),
+          leading: Icon(THREAD_LEVEL_INDICATOR_ICON),
+          subtitle: null,
+          value: settings.threadGuide,
+          onChanged: (val) =>
+              context.read<CommentsSettingsCubit>().updateThreadGuide(val),
+        ),
         CheckboxListTile(
           title: Text(locales.comments_highlightMyUsername),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.highlightMyUsername,
           onChanged: (val) => context
               .read<CommentsSettingsCubit>()
               .updateHighlightMyUsername(val!),
         ),
-        CheckboxListTile(
-          title: Text(locales.comments_showFloatingButton),
-          subtitle: null,
-          value: settings.showFloatingButton,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateShowFloatingButton(val!),
-        ),
         Divider(),
-        Text("Awards"),
-        CheckboxListTile(
-          title: Text(locales.comments_showAwards),
-          subtitle: null,
-          value: settings.showAwards,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateShowAwards(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_clickableAwards),
-          subtitle: null,
-          value: settings.clickableAwards,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateClickableAwards(val!),
-        ),
-        Divider(),
-        Text("Flairs"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Flairs",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.comments_showUserFlair),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showUserFlair,
           onChanged: (val) =>
@@ -238,6 +239,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_showFlairColors),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showFlairColors,
           onChanged: (val) =>
@@ -245,22 +247,28 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_showFlairEmojis),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showFlairEmojis,
           onChanged: (val) =>
               context.read<CommentsSettingsCubit>().updateShowFlairEmojis(val!),
         ),
         Divider(),
-        Text("Behavior"),
-        CheckboxListTile(
-          title: Text(locales.comments_clickToCollapse),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Behavior",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
+        ListTile(
+          title: Text("TODO: clickToCollapse"),
+          leading: null,
           subtitle: null,
-          value: settings.clickToCollapse,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateClickToCollapse(val!),
         ),
         CheckboxListTile(
           title: Text(locales.comments_hideTextCollapsed),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.hideTextCollapsed,
           onChanged: (val) => context
@@ -269,6 +277,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_loadCollapsed),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.loadCollapsed,
           onChanged: (val) =>
@@ -276,6 +285,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_animateCollapse),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.animateCollapse,
           onChanged: (val) =>
@@ -283,6 +293,7 @@ class CommentsSettingsView extends StatelessWidget {
         ),
         CheckboxListTile(
           title: Text(locales.comments_clickableUsername),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.clickableUsername,
           onChanged: (val) => context
@@ -290,48 +301,41 @@ class CommentsSettingsView extends StatelessWidget {
               .updateClickableUsername(val!),
         ),
         Divider(),
-        Text("Navigation"),
-        CheckboxListTile(
-          title: Text(locales.comments_highlightNewComments),
-          subtitle: null,
-          value: settings.highlightNewComments,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateHighlightNewComments(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_volumeRockerNavigation),
-          subtitle: null,
-          value: settings.volumeRockerNavigation,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateVolumeRockerNavigation(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_animateNavigation),
-          subtitle: null,
-          value: settings.animateNavigation,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateAnimateNavigation(val!),
-        ),
-        Divider(),
-        Text("Visible buttons"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Navigation",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.comments_showSaveButton),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.showSaveButton,
           onChanged: (val) =>
               context.read<CommentsSettingsCubit>().updateShowSaveButton(val!),
         ),
         Divider(),
-        Text("Gestures"),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Gestures",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
         CheckboxListTile(
           title: Text(locales.comments_swipeToClose),
+          secondary: Icon(null),
           subtitle: null,
           value: settings.swipeToClose,
           onChanged: (val) =>
               context.read<CommentsSettingsCubit>().updateSwipeToClose(val!),
+        ),
+        ListTile(
+          title: Text("TODO: distanceThreshold"),
+          leading: null,
+          subtitle: Text(locales.comments_distanceThresholdDescription),
         ),
       ],
     ));

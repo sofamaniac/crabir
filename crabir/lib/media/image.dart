@@ -70,6 +70,7 @@ class ImageThumbnail extends StatelessWidget {
       child: CachedNetworkImage(
         imageUrl: imageUrl,
         placeholder: _thumbnail,
+        errorWidget: (_, __, ___) => defaultThumbnail,
         // No fade out
         fadeOutDuration: Duration(seconds: 0),
         fadeInDuration: Duration(seconds: 0),
@@ -79,20 +80,56 @@ class ImageThumbnail extends StatelessWidget {
   }
 }
 
-@RoutePage()
+@CrabirRoute()
 class FullscreenImageView extends StatelessWidget {
   final String imageUrl;
   final String? title;
-  const FullscreenImageView({super.key, required this.imageUrl, this.title});
+  final Post? post;
+  const FullscreenImageView({
+    super.key,
+    required this.imageUrl,
+    this.title,
+    this.post,
+  });
 
   @override
   Widget build(BuildContext context) {
     return FullscreenMediaView(
+      post: post,
       builder: (onTap) => PhotoView(
         imageProvider: CachedNetworkImageProvider(imageUrl),
         minScale: PhotoViewComputedScale.contained * 1.0,
         maxScale: PhotoViewComputedScale.contained * 5.0,
-        onTapDown: onTap,
+        onTapDown: (_, __, ___) => onTap(),
+      ),
+    );
+  }
+}
+
+@CrabirRoute()
+class FullscreenVideoView extends StatelessWidget {
+  final String videoUrl;
+  final String? title;
+  final int width;
+  final int height;
+  final Post? post;
+  const FullscreenVideoView({
+    super.key,
+    required this.videoUrl,
+    required this.width,
+    required this.height,
+    this.title,
+    this.post,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FullscreenMediaView(
+      post: post,
+      builder: (onTap) => AnimatedContent(
+        url: videoUrl,
+        width: width,
+        height: height,
       ),
     );
   }

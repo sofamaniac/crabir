@@ -6,8 +6,8 @@ use uuid::Uuid;
 use crate::{
     client::Client,
     model::{Thing, Timeframe, flair::Flair},
+    paging_handler::stream::IntoStreamPrivate,
     result::Result,
-    streamable::stream::IntoStreamPrivate,
 };
 
 pub struct SearchPost {
@@ -53,7 +53,7 @@ impl SearchPost {
 }
 
 impl IntoStreamPrivate for SearchPost {
-    type Output = Thing;
+    type Output = Vec<Thing>;
 
     fn to_stream(&self) -> futures::stream::BoxStream<'static, Result<Self::Output>> {
         let mut query_params = vec![("sr_detail".to_owned(), "true".to_owned())];
@@ -136,7 +136,7 @@ impl SearchSubreddit {
 }
 
 impl IntoStreamPrivate for SearchSubreddit {
-    type Output = Thing;
+    type Output = Vec<Thing>;
 
     fn to_stream(&self) -> futures::stream::BoxStream<'static, Result<Self::Output>> {
         let mut query_params = vec![("sr_detail".to_owned(), "true".to_owned())];

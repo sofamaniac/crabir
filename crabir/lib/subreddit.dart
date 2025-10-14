@@ -3,16 +3,25 @@ import 'package:crabir/hexcolor.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart'
     as subreddit;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SubredditIcon extends StatelessWidget {
   final subreddit.SubredditIcon icon;
   final double radius;
+  final bool clickable;
+  final String? subredditName;
 
-  const SubredditIcon({super.key, required this.icon, this.radius = 16});
+  const SubredditIcon({
+    super.key,
+    required this.icon,
+    this.radius = 16,
+    this.clickable = false,
+    this.subredditName,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return switch (icon) {
+    final avatar = switch (icon) {
       subreddit.SubredditIcon_Image(field0: final icon) => CircleAvatar(
           radius: radius,
           backgroundColor: Colors.transparent,
@@ -31,5 +40,13 @@ class SubredditIcon extends StatelessWidget {
           child: Text("r/"),
         )
     };
+    if (clickable && subredditName != null) {
+      return InkWell(
+        onTap: () => context.go("/r/${subredditName!}"),
+        child: avatar,
+      );
+    } else {
+      return avatar;
+    }
   }
 }

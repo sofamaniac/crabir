@@ -1,14 +1,18 @@
 part of 'gallery.dart';
 
-@RoutePage()
+@CrabirRoute()
 class FullScreenGalleryView extends StatefulWidget {
   final Gallery gallery;
   final int initialPage;
+  final Post? post;
+  final PageController? controller;
 
   const FullScreenGalleryView({
     super.key,
     required this.gallery,
     required this.initialPage,
+    this.post,
+    this.controller,
   });
 
   @override
@@ -17,29 +21,38 @@ class FullScreenGalleryView extends StatefulWidget {
 
 class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
   late int _currentPage;
-  late final PageController controller;
+  late final PageController _controller;
+  late final bool _ownController;
   @override
   void initState() {
     super.initState();
     _currentPage = widget.initialPage;
-    controller = PageController(initialPage: widget.initialPage);
+    _controller =
+        widget.controller ?? PageController(initialPage: widget.initialPage);
+    _ownController = widget.controller == null;
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    if (_ownController) {
+      _controller.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return FullscreenMediaView(
+      post: widget.post,
+      onPop: () {
+        return _currentPage;
+      },
       builder: (onTap) {
         return _GalleryPageViewer(
-          controller: controller,
+          controller: _controller,
           gallery: widget.gallery,
           onTap: onTap,
-          initialPage: widget.initialPage,
+          obfuscate: false,
           onPageChanged: (index) {
             setState(() {
               _currentPage = index;

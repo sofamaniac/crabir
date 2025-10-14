@@ -1,126 +1,72 @@
-use flutter_rust_bridge::frb;
-use futures::lock::Mutex;
+//! Handle requests to streamable.com.
 
-use crate::{
-    client::{Client, VoteDirection},
-    model::{Fullname, Thing, Votable as _},
-    result::Result,
-};
-use futures::{StreamExt, stream::BoxStream};
-use stream::IntoStreamPrivate;
+use crate::result::Result;
+use reqwest::Url;
+use serde::{Deserialize, Serialize};
 
-pub(crate) mod stream {
-    use crate::result::Result;
-    use futures::stream::BoxStream;
-    pub trait IntoStreamPrivate {
-        type Output;
-        fn to_stream(&self) -> BoxStream<'static, Result<Self::Output>>;
-    }
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct StreamableAnswer {
+    pub status: i64,
+    pub percent: i64,
+    pub url: String,
+    #[serde(rename = "embed_code")]
+    pub embed_code: String,
+    pub files: Files,
+    #[serde(rename = "thumbnail_url")]
+    pub thumbnail_url: String,
+    pub title: String,
+    #[serde(rename = "audio_channels")]
+    pub audio_channels: i64,
 }
 
-pub trait IntoStream: IntoStreamPrivate<Output = Thing> + Send + Sync {}
-
-impl<T: IntoStreamPrivate<Output = Thing> + Send + Sync> IntoStream for T {}
-
-#[frb(opaque)]
-pub struct Streamable {
-    listing: Box<dyn IntoStream>,
-    things: Vec<Thing>,
-    done: bool,
-    stream: Mutex<BoxStream<'static, Result<Thing>>>,
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Files {
+    #[serde(rename = "mp4-mobile")]
+    pub mp4_mobile: Video,
+    pub mp4: Video,
+    pub original: Original,
 }
 
-impl Streamable {
-    pub(crate) fn new(listing: Box<dyn IntoStream>) -> Streamable {
-        Self {
-            stream: listing.to_stream().into(),
-            listing,
-            things: Vec::new(),
-            done: false,
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Video {
+    pub status: i64,
+    pub url: String,
+    pub framerate: i64,
+    pub height: i64,
+    pub width: i64,
+    pub bitrate: i64,
+    pub size: i64,
+    pub duration: f64,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Original {
+    pub framerate: f64,
+    pub bitrate: i64,
+    pub size: i64,
+    pub duration: f64,
+    pub height: i64,
+    pub width: i64,
+}
+
+pub async fn get_streamable_video(url: &str) -> Result<(Video, String)> {
+    let url = Url::parse(url).expect("Could not parse streamable url");
+    let id = url
+        .path_segments()
+        .expect("Could not extract path segments from streamable url")
+        .next_back()
+        .expect("Could not extract id from streamable url");
+    let client = reqwest::Client::new();
+    let request = client
+        .get(format!("https://api.streamable.com/videos/{id}"))
+        .build()?;
+    let result = client.execute(request).await?;
+    let json = result.text().await?;
+    match serde_json::from_str::<StreamableAnswer>(&json) {
+        Ok(answer) => Ok((answer.files.mp4_mobile, answer.thumbnail_url)),
+        Err(err) => {
+            log::error!("[get_streamable_video] Error while parsing: {err}");
+            Err(err.into())
         }
-    }
-
-    pub async fn refresh(&mut self) {
-        self.things.clear();
-        let mut stream = self.stream.lock().await;
-        *stream = self.listing.to_stream();
-        self.done = false;
-    }
-
-    /// Returns true if there are still elements remaining.
-    pub async fn next(&mut self) -> Result<bool> {
-        // Calling stream.next() after its completions is an error.
-        if self.done {
-            return Ok(false);
-        }
-        let mut stream = self.stream.lock().await;
-        if let Some(next) = stream.next().await {
-            self.things.push(next?);
-            Ok(true)
-        } else {
-            self.done = true;
-            Ok(false)
-        }
-    }
-
-    #[frb(sync)]
-    pub fn nth(&self, n: u32) -> Option<Thing> {
-        self.things.get(n as usize).cloned()
-    }
-
-    #[frb(sync)]
-    pub fn get_all(&self) -> Vec<Thing> {
-        self.things.clone()
-    }
-
-    #[frb(sync, getter)]
-    pub fn get_length(&self) -> u32 {
-        self.things.len() as u32
-    }
-
-    pub async fn vote(
-        &mut self,
-        name: &Fullname,
-        direction: VoteDirection,
-        client: &Client,
-    ) -> Result<()> {
-        let index = self
-            .things
-            .iter()
-            .position(|t| t.name().is_some_and(|n| &n == name));
-        if index.is_none() {
-            return Ok(());
-        }
-        let thing = self.things.get_mut(index.unwrap());
-        match thing {
-            Some(Thing::Post(val)) => val.vote(direction, client).await?,
-            Some(Thing::Comment(val)) => val.vote(direction, client).await?,
-            _ => (),
-        };
-        Ok(())
-    }
-
-    pub async fn save(&mut self, name: &Fullname, save: bool, client: &Client) -> Result<()> {
-        if save {
-            client.save(name).await?;
-        } else {
-            client.unsave(name).await?;
-        }
-        let index = self
-            .things
-            .iter()
-            .position(|thing| &thing.name().unwrap_or_default() == name);
-        if index.is_none() {
-            return Ok(());
-        }
-        let thing = self.things.get_mut(index.unwrap());
-        match thing {
-            Some(Thing::Post(val)) if save => val.save(client).await?,
-            Some(Thing::Post(val)) if !save => val.unsave(client).await?,
-            Some(Thing::Comment(val)) if save => val.save(client).await?,
-            Some(Thing::Comment(val)) if !save => val.unsave(client).await?,
-            _ => (),
-        };
-        Ok(())
     }
 }

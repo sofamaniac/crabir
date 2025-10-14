@@ -1,14 +1,14 @@
 //! This file contains the streams for each tabs of a user profile.
-// Copyright (c) 2025 sofamaniac. All Rights Reserved.
+// Copyright (c) 2025 Antoine Grimod. All Rights Reserved.
 
 use super::model::UserStreamSort;
-use crate::streamable::stream::IntoStreamPrivate;
+use crate::paging_handler::stream::IntoStreamPrivate;
 use crate::{client::Client, model::Thing, result::Result};
 use futures::stream::BoxStream;
 pub use futures::{Stream, StreamExt};
 
 #[derive(Clone)]
-pub struct UserStream {
+pub(crate) struct UserStream {
     username: String,
     endpoint: String,
     client: Client,
@@ -26,19 +26,14 @@ impl UserStream {
     }
 }
 impl IntoStreamPrivate for UserStream {
-    type Output = Thing;
-    fn to_stream(&self) -> BoxStream<'static, Result<Thing>> {
-        let client = self.client.clone();
-        client.user_stream(self.url(), None).boxed()
+    type Output = Vec<Thing>;
+    fn to_stream(&self) -> BoxStream<'static, Result<Vec<Thing>>> {
+        self.client.clone().user_stream(self.url(), None).boxed()
     }
 }
-impl PartialEq for UserStream {
-    fn eq(&self, other: &Self) -> bool {
-        self.username == other.username
-    }
-}
+
 #[derive(Clone)]
-pub struct UserStreamSorted {
+pub(crate) struct UserStreamSorted {
     client: Client,
     username: String,
     sort: UserStreamSort,
@@ -69,10 +64,10 @@ impl UserStreamSorted {
     }
 }
 impl IntoStreamPrivate for UserStreamSorted {
-    type Output = Thing;
-    fn to_stream(&self) -> BoxStream<'static, Result<Thing>> {
-        let client = self.client.clone();
-        client
+    type Output = Vec<Thing>;
+    fn to_stream(&self) -> BoxStream<'static, Result<Vec<Thing>>> {
+        self.client
+            .clone()
             .sorted_user_stream(self.url(), self.sort, None)
             .boxed()
     }

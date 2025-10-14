@@ -1,22 +1,28 @@
+use crate::model::subreddit::Subreddit;
+use crate::result::Result;
 pub use chrono::{DateTime, Local, Utc};
+use flutter_getter::FlutterGetters;
 use flutter_rust_bridge::frb;
-use getset::{CloneGetters, Getters, Setters};
+use getset::{Getters, Setters};
 
+use crate::client::Client;
 use crate::model::author;
 use crate::model::author::AuthorInfo;
 use crate::model::flair::Flair;
 use crate::utils;
-use crate::{client::VoteDirection, error::Error};
+use crate::votable::Votable;
+use crate::{error::Error, votable::private::PrivateVotable};
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, with_prefix};
 
-use super::Votable;
 use super::{Fullname, Thing, comment::CommentSort, gallery::Gallery, subreddit::SubredditInfo};
 
 with_prefix!(prefix_link_flair "link_flair_");
 with_prefix!(prefix_flair "flair_");
 
+#[derive(Default, Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum Kind {
+    #[default]
     Selftext,
     Meta,
     Image,
@@ -24,12 +30,32 @@ pub enum Kind {
     Video,
     /// Video hosted on Youtube
     YoutubeVideo,
+    /// Video hosted on Streamable
+    StreamableVideo,
     /// Gallery present in `Post::Gallery`
     Gallery,
     /// Gallery at `Post::url`
     MediaGallery,
     Link,
     Unknown,
+}
+
+impl Kind {
+    fn to_query_param(self) -> String {
+        let s = match self {
+            Kind::Selftext => "self",
+            Kind::Image => "image",
+            Kind::Video => "video",
+            Kind::Link => "link",
+            Kind::YoutubeVideo => "video",
+            Kind::StreamableVideo => "video",
+            Kind::Gallery => todo!(),
+            Kind::MediaGallery => todo!(),
+            Kind::Unknown => todo!(),
+            Kind::Meta => todo!(),
+        };
+        s.to_owned()
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -44,35 +70,25 @@ impl PostID {
 
 #[serde_as]
 #[derive(
-    Default, Debug, Clone, PartialEq, Serialize, Deserialize, CloneGetters, Getters, Setters,
+    Default, Debug, Clone, PartialEq, Serialize, Deserialize, FlutterGetters, Getters, Setters,
 )]
-#[getset(get_clone = "pub with_prefix", get = "pub(crate)")]
+#[getset(get = "pub(crate)")]
 pub struct Post {
-    /// flutter_rust_bridge:getter,sync
+    #[getset(skip)]
     name: Fullname,
-    /// flutter_rust_bridge:getter,sync
     id: PostID,
     user_reports: Vec<Option<String>>,
     gilded: u32,
-    /// flutter_rust_bridge:getter,sync
     title: String,
-    /// flutter_rust_bridge:getter,sync
     domain: String,
-    /// flutter_rust_bridge:getter,sync
     url: String,
-    /// flutter_rust_bridge:getter,sync
     permalink: String,
-    /// flutter_rust_bridge:getter,sync
     url_overridden_by_dest: Option<String>,
-    /// flutter_rust_bridge:getter,sync
     selftext: Option<String>,
-    /// flutter_rust_bridge:getter,sync
     selftext_html: Option<String>,
-    /// flutter_rust_bridge:getter,sync
     num_comments: u32,
 
     /// Date of creation in UTC
-    /// flutter_rust_bridge:getter,sync
     #[serde_as(as = "serde_with::TimestampSecondsWithFrac<f64>")]
     created_utc: DateTime<Utc>,
     /// Date of creation in logged in user locale
@@ -83,31 +99,25 @@ pub struct Post {
     // User relationship
     clicked: bool,
     hidden: bool,
-    /// flutter_rust_bridge:getter,sync
-    #[getset(set = "pub(crate)")]
+    #[getset(skip)]
     saved: bool,
     /// Some(true) if upvoted, Some(false) if downvoted, None otherwise
-    /// flutter_rust_bridge:getter,sync
-    #[getset(set = "pub(crate)")]
+    #[getset(skip)]
     likes: Option<bool>,
     visited: bool,
 
     // Score
-    /// flutter_rust_bridge:getter,sync
     downs: u32,
-    /// flutter_rust_bridge:getter,sync
     upvote_ratio: f64,
-    /// flutter_rust_bridge:getter,sync
     ups: u32,
-    /// flutter_rust_bridge:getter,sync
     score: i32,
 
     #[serde(flatten, with = "prefix_link_flair")]
-    /// flutter_rust_bridge:getter,sync
     link_flair: Flair,
 
     #[serde(flatten)]
     #[getset(skip)]
+    #[flutter_getter(skip)]
     thumbnail: ThumbnailOption,
 
     #[serde(
@@ -115,28 +125,21 @@ pub struct Post {
         serialize_with = "author::serialize_author_option",
         deserialize_with = "author::author_option"
     )]
-    /// flutter_rust_bridge:getter,sync
     author: Option<AuthorInfo>,
 
     #[serde(flatten)]
-    /// flutter_rust_bridge:getter,sync
     subreddit: SubredditInfo,
 
     // Media
     #[serde(deserialize_with = "utils::response_or_none")]
-    /// flutter_rust_bridge:getter,sync
     media: Option<Media>,
     #[serde(deserialize_with = "utils::response_or_none")]
-    /// flutter_rust_bridge:getter,sync
     media_embed: Option<MediaEmbed>,
     #[serde(deserialize_with = "utils::response_or_none")]
-    /// flutter_rust_bridge:getter,sync
     secure_media: Option<Media>,
     #[serde(deserialize_with = "utils::response_or_none")]
-    /// flutter_rust_bridge:getter,sync
     secure_media_embed: Option<SecureMediaEmbed>,
     #[serde(flatten)]
-    /// flutter_rust_bridge:getter,sync
     gallery: Option<Gallery>,
 
     // Moderation
@@ -159,10 +162,8 @@ pub struct Post {
 
     // Post kind
     post_hint: Option<String>,
-    /// flutter_rust_bridge:getter,sync
     is_self: bool,
     is_original_content: bool,
-    /// flutter_rust_bridge:getter,sync
     is_reddit_media_domain: bool,
     is_meta: bool,
     is_created_from_ads_ui: bool,
@@ -173,23 +174,15 @@ pub struct Post {
     is_gallery: bool,
 
     // Post properties
-    /// flutter_rust_bridge:getter,sync
     pinned: bool,
-    /// flutter_rust_bridge:getter,sync
     over_18: bool,
-    /// flutter_rust_bridge:getter,sync
     preview: Option<Preview>,
-    /// flutter_rust_bridge:getter,sync
     spoiler: bool,
-    /// flutter_rust_bridge:getter,sync
     locked: bool,
-    /// flutter_rust_bridge:getter,sync
     stickied: bool,
     #[serde(deserialize_with = "utils::response_or_none")]
-    /// flutter_rust_bridge:getter,sync
     edited: Option<f64>,
     /// Suggested sort for comments
-    /// flutter_rust_bridge:getter,sync
     suggested_sort: Option<CommentSort>,
     view_count: Option<String>,
     archived: bool,
@@ -199,26 +192,25 @@ pub struct Post {
     top_awarded_type: Option<String>,
     total_awards_received: Option<u32>,
     gildings: Gildings,
-    #[serde_as(deserialize_as = "serde_with::DefaultOnNull")]
-    content_categories: Vec<String>,
-    wls: Option<i32>,
-    pwls: Option<i32>,
+    // #[serde_as(deserialize_as = "serde_with::DefaultOnNull")]
+    // content_categories: Vec<String>,
+    // wls: Option<i32>,
+    // pwls: Option<i32>,
     allow_live_comments: bool,
     no_follow: bool,
     all_awardings: Vec<Option<String>>,
     awarders: Vec<Option<String>>,
     can_gild: bool,
     treatment_tags: Vec<Option<String>>,
-    num_reports: Option<u32>,
+    // num_reports: Option<i32>,
     distinguished: Option<String>,
-    is_robot_indexable: bool,
+    // is_robot_indexable: bool,
     num_duplicates: Option<u32>,
     discussion_type: Option<String>,
     send_replies: bool,
     contest_mode: bool,
     num_crossposts: Option<u32>,
     #[serde(default)]
-    /// flutter_rust_bridge:getter,sync
     crosspost_parent_list: Vec<Post>,
 }
 
@@ -247,9 +239,13 @@ impl Post {
     }
 
     fn video_kind(&self) -> Kind {
-        const DOMAINS: [&str; 2] = ["youtube.com", "youtu.be"];
-        if DOMAINS.contains(&self.domain.as_str()) {
+        const YOUTUBE: [&str; 2] = ["youtube.com", "youtu.be"];
+        const STREAMABLE: [&str; 1] = ["streamable.com"];
+        let domain = self.domain.as_str();
+        if YOUTUBE.contains(&domain) {
             Kind::YoutubeVideo
+        } else if STREAMABLE.contains(&domain) {
+            Kind::StreamableVideo
         } else {
             Kind::Video
         }
@@ -287,30 +283,44 @@ impl Post {
     pub fn is_crosspost(&self) -> bool {
         !self.crosspost_parent_list.is_empty()
     }
-}
 
-impl Votable for Post {
-    async fn vote(
-        &mut self,
-        direction: VoteDirection,
-        client: &crate::client::Client,
-    ) -> crate::result::Result<()> {
-        client.vote(&self.name, direction).await?;
-        self.likes = direction.into();
+    /// Hide a post
+    /// # Error
+    /// Fails when the underlying request fails.
+    pub async fn hide(&mut self, client: Client) -> Result<()> {
+        client.hide(self).await?;
+        self.hidden = true;
         Ok(())
     }
 
-    async fn save(&mut self, client: &crate::client::Client) -> crate::result::Result<()> {
-        client.save(&self.name).await?;
-        self.saved = true;
-        Ok(())
-    }
-    async fn unsave(&mut self, client: &crate::client::Client) -> crate::result::Result<()> {
-        client.unsave(&self.name).await?;
-        self.saved = false;
+    /// Unhide a post
+    /// # Error
+    /// Fails when the underlying request fails.
+    pub async fn unhide(&mut self, client: Client) -> Result<()> {
+        client.unhide(self).await?;
+        self.hidden = false;
         Ok(())
     }
 }
+
+impl PrivateVotable for Post {
+    fn name(&self) -> &Fullname {
+        &self.name
+    }
+
+    fn set_likes(&mut self, likes: Option<bool>) {
+        self.likes = likes;
+    }
+
+    fn set_saved(&mut self, saved: bool) {
+        self.saved = saved;
+    }
+
+    fn add_to_score(&mut self, delta: i32) {
+        self.score += delta;
+    }
+}
+impl Votable for Post {}
 
 fn is_image_url(url: &str) -> bool {
     const EXTENSIONS: [&str; 5] = ["jpg", "jpeg", "png", "svg", "gif"];
@@ -471,4 +481,127 @@ pub struct Oembed {
     pub author_url: String,
     #[serde(flatten, with = "ThumbnailURL")]
     pub thumbnail: ThumbnailOption,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize, Setters, FlutterGetters)]
+pub struct PostSubmitBuilder {
+    title: String,
+    text: Option<String>,
+    #[flutter_getter(skip)]
+    subreddit: String,
+    nsfw: bool,
+    spoiler: bool,
+    kind: Kind,
+    flair_id: Option<String>,
+    flair_text: Option<String>,
+    url: Option<String>,
+    sendreplies: bool,
+}
+
+impl PostSubmitBuilder {
+    #[frb(sync)]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_title(&mut self, title: String) {
+        self.title = title;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_text(&mut self, text: Option<String>) {
+        self.text = text;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_subreddit(&mut self, subreddit: &Subreddit) {
+        self.subreddit = subreddit.other().display_name().clone();
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_nsfw(&mut self, nsfw: bool) {
+        self.nsfw = nsfw;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_spoiler(&mut self, spoiler: bool) {
+        self.spoiler = spoiler;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_kind(&mut self, kind: Kind) {
+        self.kind = kind;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_flair_id(&mut self, flair_id: Option<String>) {
+        self.flair_id = flair_id;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_flair_text(&mut self, flair_text: Option<String>) {
+        self.flair_text = flair_text;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_sendreplies(&mut self, sendreplies: bool) {
+        self.sendreplies = sendreplies;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_url(&mut self, url: Option<String>) {
+        self.url = url;
+    }
+
+    #[frb(sync)]
+    pub fn build(self) -> Result<PostSubmit> {
+        if self.title.is_empty() {
+            return Err(Error::Custom {
+                message: "Missing post title".to_owned(),
+            });
+        } else if self.text.is_none() && self.url.is_none() {
+            return Err(Error::Custom {
+                message: "text and url cannot be both empty".to_owned(),
+            });
+        } else if self.subreddit.is_empty() {
+            return Err(Error::Custom {
+                message: "Missing community".to_owned(),
+            });
+        } else {
+            return Ok(PostSubmit {
+                api_type: "json".to_owned(),
+                title: self.title,
+                text: self.text,
+                subreddit: self.subreddit,
+                nsfw: self.nsfw,
+                spoiler: self.spoiler,
+                kind: self.kind.to_query_param(),
+                sendreplies: self.sendreplies,
+                flair_id: self.flair_id,
+                flair_text: self.flair_text,
+                url: self.url,
+            });
+        }
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize, Setters)]
+pub struct PostSubmit {
+    api_type: String,
+    title: String,
+    text: Option<String>,
+    #[serde(rename = "sr")]
+    subreddit: String,
+    nsfw: bool,
+    spoiler: bool,
+    kind: String,
+    #[serde(rename = "sendreplies")]
+    sendreplies: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flair_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flair_text: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    url: Option<String>,
 }

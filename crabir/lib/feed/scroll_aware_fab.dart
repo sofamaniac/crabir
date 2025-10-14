@@ -1,6 +1,6 @@
-import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/markdown_editor/editor.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class ScrollAwareFab extends StatefulWidget {
@@ -44,7 +44,7 @@ class _ScrollAwareFabState extends State<ScrollAwareFab> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<ThemeBloc>().state;
+    final theme = CrabirTheme.of(context);
     return AnimatedSlide(
       duration: const Duration(milliseconds: 200),
       offset: _visible ? Offset.zero : const Offset(0, 2),
@@ -69,7 +69,9 @@ class _ScrollAwareFabState extends State<ScrollAwareFab> {
               backgroundColor: theme.primaryColor,
               child: const Icon(Icons.edit),
               label: 'Create Post',
-              onTap: () {},
+              onTap: () => showDialog(
+                  context: context,
+                  builder: (context) => postEditorDialog(context)),
             ),
             SpeedDialChild(
               backgroundColor: theme.primaryColor,

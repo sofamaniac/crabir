@@ -4,8 +4,8 @@ use futures::Stream;
 use crate::{
     client::{Client, Pager, parse_response},
     model::Thing,
+    paging_handler::PagingHandler,
     result::Result,
-    streamable::Streamable,
 };
 
 use super::{
@@ -14,38 +14,35 @@ use super::{
 };
 
 impl Client {
-    pub(super) fn user_stream<T: TryFrom<Thing>>(
+    pub(super) fn user_stream(
         self,
         endpoint: String,
         pager: Option<Pager>,
-    ) -> impl Stream<Item = Result<T>> {
+    ) -> impl Stream<Item = Result<Vec<Thing>>> {
         let url = self
             .base_url()
             .join(&endpoint)
             .expect("Should not fail to build url.");
-        self.clone().stream_vec(url, pager, ())
+        self.stream_vec(url, pager, ())
     }
-    pub(super) fn sorted_user_stream<T: TryFrom<Thing>>(
+    pub(super) fn sorted_user_stream(
         self,
         endpoint: String,
         sort: UserStreamSort,
         pager: Option<Pager>,
-    ) -> impl Stream<Item = Result<T>> {
-        let mut url = self
+    ) -> impl Stream<Item = Result<Vec<Thing>>> {
+        let url = self
             .base_url()
             .join(&endpoint)
             .expect("Should not fail to build url.");
-        for (name, value) in sort.to_query() {
-            url.query_pairs_mut().append_pair(name, value);
-        }
-        self.stream_vec(url, pager, ())
+        self.stream_vec(url, pager, sort.to_query())
     }
     /// Get saved items ( both [`Post`] and [`Comment`] ) for the specified user.
     /// # Errors
     /// Fails if api request fails.
     #[frb(sync)]
-    pub fn user_saved(&self, username: String) -> Streamable {
-        Streamable::new(UserStream::new(
+    pub fn user_saved(&self, username: String) -> PagingHandler {
+        PagingHandler::new(UserStream::new(
             self.clone(),
             username,
             String::from("saved"),
@@ -53,8 +50,8 @@ impl Client {
     }
 
     #[frb(sync)]
-    pub fn user_overview(&self, username: String, sort: UserStreamSort) -> Streamable {
-        Streamable::new(UserStreamSorted::new(
+    pub fn user_overview(&self, username: String, sort: UserStreamSort) -> PagingHandler {
+        PagingHandler::new(UserStreamSorted::new(
             self.clone(),
             username,
             sort,
@@ -62,8 +59,8 @@ impl Client {
         ))
     }
     #[frb(sync)]
-    pub fn user_submitted(&self, username: String, sort: UserStreamSort) -> Streamable {
-        Streamable::new(UserStreamSorted::new(
+    pub fn user_submitted(&self, username: String, sort: UserStreamSort) -> PagingHandler {
+        PagingHandler::new(UserStreamSorted::new(
             self.clone(),
             username,
             sort,
@@ -71,8 +68,8 @@ impl Client {
         ))
     }
     #[frb(sync)]
-    pub fn user_comments(&self, username: String, sort: UserStreamSort) -> Streamable {
-        Streamable::new(UserStreamSorted::new(
+    pub fn user_comments(&self, username: String, sort: UserStreamSort) -> PagingHandler {
+        PagingHandler::new(UserStreamSorted::new(
             self.clone(),
             username,
             sort,
@@ -80,32 +77,32 @@ impl Client {
         ))
     }
     #[frb(sync)]
-    pub fn user_upvoted(&self, username: String) -> Streamable {
-        Streamable::new(UserStream::new(
+    pub fn user_upvoted(&self, username: String) -> PagingHandler {
+        PagingHandler::new(UserStream::new(
             self.clone(),
             username,
             String::from("upvoted"),
         ))
     }
     #[frb(sync)]
-    pub fn user_downvoted(&self, username: String) -> Streamable {
-        Streamable::new(UserStream::new(
+    pub fn user_downvoted(&self, username: String) -> PagingHandler {
+        PagingHandler::new(UserStream::new(
             self.clone(),
             username,
             String::from("downvoted"),
         ))
     }
     #[frb(sync)]
-    pub fn user_hidden(&self, username: String) -> Streamable {
-        Streamable::new(UserStream::new(
+    pub fn user_hidden(&self, username: String) -> PagingHandler {
+        PagingHandler::new(UserStream::new(
             self.clone(),
             username,
             String::from("hidden"),
         ))
     }
     #[frb(sync)]
-    pub fn user_gilded(&self, username: String) -> Streamable {
-        Streamable::new(UserStream::new(
+    pub fn user_gilded(&self, username: String) -> PagingHandler {
+        PagingHandler::new(UserStream::new(
             self.clone(),
             username,
             String::from("gilded"),

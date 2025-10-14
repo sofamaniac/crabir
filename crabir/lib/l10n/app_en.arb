@@ -29,6 +29,50 @@
 
   "loginButtonLabel": "Add an account",
   "logoutButtonLabel": "Logout",
+  "gotoDropdownLabel": "Go to ...",
+
+  "replyTitle": "Reply",
+  "deletedUser": "[deleted]",
+
+  "postEditorTitle": "Create post",
+
+  "resolutionSource": "Source",
+  "resolutionHigh": "High",
+  "resolutionMedium": "Medium",
+  "resolutionLow": "Low",
+
+  "mediaPreviewSizeNone": "None",
+  "mediaPreviewSizeThumbnail": "Thumbnail",
+  "mediaPreviewSizeFull": "Full Size",
+
+  "indentationStyleLines": "Lines",
+  "indentationStyleColored": "Colored lines",
+  "indentationStyleBars": "Colored bars",
+
+  "shareLink": "Share Link",
+  "shareLinkTitle": "Share Title + Link",
+  "sharePost": "Share Post",
+  "shareText": "Share Text",
+  "shareButtonLabel": "Share...",
+
+  "markRead": "Mark post as read",
+  "markUnread": "Mark post as unread",
+  "hidePost": "Hide post",
+  "unhidePost": "Unhide post",
+
+  "themeBackround": "Background",
+  "themeCardBackground": "Card background",
+  "themeToolbarBackground": "Toolbar background",
+  "themeToolbarText": "Toolbar text",
+  "themePrimaryColor": "Primary color",
+  "themeHighlight": "Highlight",
+  "themePostTitle": "Post title",
+  "themeReadPost": "Read post title",
+  "themeAnnouncement": "Announcement",
+  "themeContentText": "Context Text",
+  "themeLinkColor": "Link color",
+  "themeSecondaryText": "Secondary text color",
+  "themeDownvote": "Downvote color",
 
   "yearsAgo": "{count, plural, =1 {{count}y} other {{count}y}}",
   "@yearsAgo": {
@@ -96,7 +140,18 @@
     }
   },
 
-  "comments": "Comments",
+  "comments": "comments",
+
+  "commentsNumbered": "{n, plural, =1{1 comment} other {{n} comments}}",
+  "@commentsNumbered": {
+    "description": "comments",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
   "loadMoreComments": "{n, plural, =1{Load 1 comment} other{Load {n} comments}}",
   "@loadMoreComments": {
     "description": "Label for load more button",
@@ -154,18 +209,22 @@
 
   "comments_showSaveButton": "Show save button",
   "comments_swipeToClose": "Swipe to close thread",
+  "comments_distanceThreshold": "Distance threshold",
+  "comments_distanceThresholdDescription": "Dragging distance from edge as a percentage of screen width before closing and going back.",
+  "comments_threadGuide": "Thread guides",
 
   "posts_defaultHomeSort": "Default Home sort",
   "posts_defaultSort": "Default sort",
   "posts_rememberSortByCommunity": "Remember by Community",
   "posts_rememberSortByCommunityDescription": "Each community will remember the last sort you selected.",
+  "posts_rememberedSorts": "Manage Sorts",
 
   "posts_showAwards": "Show awards",
   "posts_clickableAwards": "Clickable awards",
 
   "posts_showPostFlair": "Show post flair",
   "posts_showFlairColors": "Show flair colors",
-  "posts_showEmojis": "Show emojis",
+  "posts_showFlairEmojis": "Show emojis",
   "posts_tapFlairToSearch": "Tap flair to search",
 
   "posts_showAuthor": "Show author",
@@ -179,21 +238,55 @@
   "posts_showCommentsButton": "Comments",
   "posts_showOpenInAppButton": "Open in app",
 
-  "data_wifiDataSaver": "Wifi data saver",
-  "data_wifiDataSaverDescription": "Load lower-size media",
-
-  "data_mobileDataSaver": "Mobile data saver",
-  "data_mobileDataSaverDescription": "Load lower-size media",
 
   "data_autoplay": "Autoplay videos",
 
-  "data_videoQuality": "Video quality",
+  "data_videoQualityWifi": "Preferred video quality when connected to Wifi",
+  "data_videoQualityCellular": "Preferred video quality when connected to cellular",
 
   "data_minimumQuality": "Minimum quality",
   "data_maximumQuality": "Maximum quality",
 
   "data_loadImages": "Load images",
-  "data_preferredQuality": "Image Quality",
+  "data_imageQualityWifi": "Preferred image quality when connected to Wifi",
+  "data_imageQualityCellular": "Preferred image quality when connected to cellular",
 
-  "filters_blurNSFW": "Blur images in NSFW posts"
+  "filters_manageHiddenCommunities": "Communities",
+  "filters_manageHiddenCommunitiesDescription": "Hide posts from these communities",
+  "filters_manageHiddenDomains": "Domains",
+  "filters_manageHiddenDomainsDescription": "Hide posts from these domains",
+  "filters_manageHiddenUsers": "Users",
+  "filters_manageHiddenUsersDescription": "Hide posts from these users",
+  "filters_manageHiddenFlairs": "Flairs",
+  "filters_manageHiddenFlairsDescription": "Hide posts with these flairs",
+  "filters_showNSFW": "Show NSFW",
+  "filters_showNSFWDescription": "Show content labeled Not Safe For Work",
+  "filters_showImageInNSFW": "Show images in NSFW posts",
+  "filters_blurNSFW": "Blur images in NSFW posts",
+
+  "lateralMenu_showHome": "Home",
+  "lateralMenu_showHomeDescription": "Default feed. To set any community, go to Subscriptions list and select \"Set as default\".",
+  "lateralMenu_showHomeFeed": "Home Feed",
+  "lateralMenu_showHomeFeedDescription": "Posts from subscriptions",
+  "lateralMenu_showPopular":"Popular",
+  "lateralMenu_showAll":"All",
+  "lateralMenu_showSaved":"Saved",
+  "lateralMenu_showHistory":"History",
+  "lateralMenu_showProfile":"Profile",
+  "lateralMenu_showInbox":"Inbox",
+  "lateralMenu_showFriends":"Friends",
+  "lateralMenu_showDrafts":"Drafts",
+  "lateralMenu_showModeration":"Moderation",
+  "lateralMenu_showSearch":"Search",
+  "lateralMenu_showGoToDropdown":"Go to dropdown",
+  "lateralMenu_showGoToCommunity":"Go to community",
+  "lateralMenu_showGoToUser":"Go to user",
+  "lateralMenu_darkMode":"Dark mode",
+  "lateralMenu_showNSFW":"Show NSFW",
+  "lateralMenu_blurNSFW":"Blur NSFW",
+  "lateralMenu_showSubsInMenu":"Show in menu",
+  "lateralMenu_showSubsIcon":"Show icons",
+  "lateralMenu_showSubsFavOnly":"Show only favorites",
+  "lateralMenu_showAccountAvatar":"Show avatar",
+  "lateralMenu_showAccountUsername":"Show username"
 }

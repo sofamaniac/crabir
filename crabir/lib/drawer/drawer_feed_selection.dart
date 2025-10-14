@@ -8,7 +8,6 @@ class DrawerFeedSelection extends StatefulWidget {
 }
 
 class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
-  final List<String> userOptions = ["Profile", "Inbox", "Moderation"];
   final log = Logger("DrawerFeedSelection");
   UserAccount? account;
 
@@ -18,46 +17,71 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
   Widget build(BuildContext context) {
     final bloc = context.watch<AccountsBloc>();
     final account = bloc.state;
+    final theme = CrabirTheme.of(context);
 
     if (account.status case Uninit()) {
       bloc.add(Initialize());
     } else if (account.status case Unloaded()) {
       bloc.add(LoadSubscriptions());
     } else if (account.status case Loaded()) {
-      return Flexible(
-        fit: FlexFit.loose,
+      return Expanded(
         child: ListView(
           children: [
-            ...baseFeeds(context, closeDrawer: true),
+            ...baseFeeds(
+              context,
+            ),
             Divider(),
+            ...options(context),
             ListTile(
-                title: Text("Settings"),
-                onTap: () {
-                  context.router.navigate(SettingsRoute());
-                }),
-            //...userOptions.map((option) => ListTile(title: Text(option))),
+              leading: Icon(Icons.settings),
+              title: Text("Settings"),
+              onTap: () {
+                SettingsView().pushNamed(context);
+              },
+              trailing: IconButton(
+                onPressed: () {
+                  final bloc = context.read<ThemeBloc>();
+                  final mode = bloc.state.mode;
+                  final brightness = switch (mode) {
+                    ThemeMode.dark => Brightness.dark,
+                    ThemeMode.light => Brightness.light,
+                    ThemeMode.system =>
+                      MediaQuery.of(context).platformBrightness,
+                  };
+                  final newMode = switch (brightness) {
+                    Brightness.light => ThemeMode.dark,
+                    Brightness.dark => ThemeMode.light,
+                  };
+                  bloc.add(SetMode(mode: newMode));
+                },
+                icon: Icon(Icons.light),
+              ),
+            ),
             Divider(),
             ...account.multis.map(
               (multi) => MultiRedditTile(
                 multi,
-                closeDrawer: true,
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: theme.secondaryText,
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
             ),
             Divider(),
             ...account.subscriptions.map(
-              (sub) => SubredditTile(
-                sub,
-                closeDrawer: true,
-              ),
-            ),
-            Divider(),
-            ListTile(
-              onTap: () => showLicensePage(context: context),
-              title: Text(
-                "Licenses",
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              leading: Icon(Icons.info_outline),
+              (sub) {
+                return SubredditTile(
+                  sub,
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: theme.secondaryText,
+                        fontWeight: FontWeight.bold,
+                      ),
+                  onTap: () {
+                    Scaffold.of(context).closeDrawer();
+                    context.go("/r/${sub.other.displayName}");
+                  },
+                );
+              },
             ),
           ],
         ),

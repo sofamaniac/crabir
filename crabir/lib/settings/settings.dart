@@ -1,14 +1,18 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:crabir/routes/routes.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
+import 'package:crabir/settings/lateral_menu/lateral_menu_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/settings/theme/theme_editor.dart';
+import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-@RoutePage()
+part 'settings.go_route_ext.dart';
+
+@CrabirRoute()
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
 
@@ -19,26 +23,42 @@ class SettingsView extends StatelessWidget {
       body: ListView(
         children: [
           ListTile(
+            leading: Icon(Icons.palette_outlined),
+            title: Text("Theme"),
+            onTap: () => CrabirThemeEditor().pushNamed(context),
+          ),
+          ListTile(
             leading: Icon(Icons.article),
             title: Text("Posts"),
-            onTap: () => context.router.navigate(PostsSettingsRoute()),
+            onTap: () => PostsSettingsView().pushNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.comment),
             title: Text("Comments"),
-            onTap: () =>
-                AutoRouter.of(context).navigate(CommentsSettingsRoute()),
+            onTap: () => CommentsSettingsView().pushNamed(context),
+          ),
+          ListTile(
+            leading: Icon(Icons.keyboard_tab),
+            title: Text("Lateral Menu"),
+            onTap: () => LateralMenuSettingsView().pushNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.storage),
             title: Text("Data and Storage"),
-            onTap: () => AutoRouter.of(context).navigate(DataSettingsRoute()),
+            onTap: () => DataSettingsView().pushNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.filter),
             title: Text("Content filters"),
-            onTap: () =>
-                AutoRouter.of(context).navigate(FiltersSettingsRoute()),
+            onTap: () => FiltersSettingsView().pushNamed(context),
+          ),
+          ListTile(
+            onTap: () => showLicensePage(context: context),
+            title: Text(
+              "Licenses",
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            leading: Icon(Icons.info_outline),
           ),
         ],
       ),
@@ -62,6 +82,9 @@ class SettingsBlocsProviders extends StatelessWidget {
         BlocProvider(create: (_) => PostsSettingsCubit()),
         BlocProvider(create: (_) => DataSettingsCubit()),
         BlocProvider(create: (_) => FiltersSettingsCubit()),
+        BlocProvider(create: (_) => ReadPosts()),
+        BlocProvider(create: (_) => GlobalFiltersCubit()),
+        BlocProvider(create: (_) => LateralMenuSettingsCubit()),
       ],
       child: child,
     );

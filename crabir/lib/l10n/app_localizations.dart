@@ -250,6 +250,222 @@ abstract class AppLocalizations {
   /// **'Logout'**
   String get logoutButtonLabel;
 
+  /// No description provided for @gotoDropdownLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to ...'**
+  String get gotoDropdownLabel;
+
+  /// No description provided for @replyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply'**
+  String get replyTitle;
+
+  /// No description provided for @deletedUser.
+  ///
+  /// In en, this message translates to:
+  /// **'[deleted]'**
+  String get deletedUser;
+
+  /// No description provided for @postEditorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create post'**
+  String get postEditorTitle;
+
+  /// No description provided for @resolutionSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get resolutionSource;
+
+  /// No description provided for @resolutionHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get resolutionHigh;
+
+  /// No description provided for @resolutionMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get resolutionMedium;
+
+  /// No description provided for @resolutionLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get resolutionLow;
+
+  /// No description provided for @mediaPreviewSizeNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get mediaPreviewSizeNone;
+
+  /// No description provided for @mediaPreviewSizeThumbnail.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnail'**
+  String get mediaPreviewSizeThumbnail;
+
+  /// No description provided for @mediaPreviewSizeFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Size'**
+  String get mediaPreviewSizeFull;
+
+  /// No description provided for @indentationStyleLines.
+  ///
+  /// In en, this message translates to:
+  /// **'Lines'**
+  String get indentationStyleLines;
+
+  /// No description provided for @indentationStyleColored.
+  ///
+  /// In en, this message translates to:
+  /// **'Colored lines'**
+  String get indentationStyleColored;
+
+  /// No description provided for @indentationStyleBars.
+  ///
+  /// In en, this message translates to:
+  /// **'Colored bars'**
+  String get indentationStyleBars;
+
+  /// No description provided for @shareLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Link'**
+  String get shareLink;
+
+  /// No description provided for @shareLinkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Title + Link'**
+  String get shareLinkTitle;
+
+  /// No description provided for @sharePost.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Post'**
+  String get sharePost;
+
+  /// No description provided for @shareText.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Text'**
+  String get shareText;
+
+  /// No description provided for @shareButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Share...'**
+  String get shareButtonLabel;
+
+  /// No description provided for @markRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark post as read'**
+  String get markRead;
+
+  /// No description provided for @markUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark post as unread'**
+  String get markUnread;
+
+  /// No description provided for @hidePost.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide post'**
+  String get hidePost;
+
+  /// No description provided for @unhidePost.
+  ///
+  /// In en, this message translates to:
+  /// **'Unhide post'**
+  String get unhidePost;
+
+  /// No description provided for @themeBackround.
+  ///
+  /// In en, this message translates to:
+  /// **'Background'**
+  String get themeBackround;
+
+  /// No description provided for @themeCardBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Card background'**
+  String get themeCardBackground;
+
+  /// No description provided for @themeToolbarBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Toolbar background'**
+  String get themeToolbarBackground;
+
+  /// No description provided for @themeToolbarText.
+  ///
+  /// In en, this message translates to:
+  /// **'Toolbar text'**
+  String get themeToolbarText;
+
+  /// No description provided for @themePrimaryColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary color'**
+  String get themePrimaryColor;
+
+  /// No description provided for @themeHighlight.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlight'**
+  String get themeHighlight;
+
+  /// No description provided for @themePostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Post title'**
+  String get themePostTitle;
+
+  /// No description provided for @themeReadPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Read post title'**
+  String get themeReadPost;
+
+  /// No description provided for @themeAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement'**
+  String get themeAnnouncement;
+
+  /// No description provided for @themeContentText.
+  ///
+  /// In en, this message translates to:
+  /// **'Context Text'**
+  String get themeContentText;
+
+  /// No description provided for @themeLinkColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Link color'**
+  String get themeLinkColor;
+
+  /// No description provided for @themeSecondaryText.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary text color'**
+  String get themeSecondaryText;
+
+  /// No description provided for @themeDownvote.
+  ///
+  /// In en, this message translates to:
+  /// **'Downvote color'**
+  String get themeDownvote;
+
   /// Number of years ago, abbreviated (e.g., '1y', '2y')
   ///
   /// In en, this message translates to:
@@ -289,8 +505,14 @@ abstract class AppLocalizations {
   /// No description provided for @comments.
   ///
   /// In en, this message translates to:
-  /// **'Comments'**
+  /// **'comments'**
   String get comments;
+
+  /// comments
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{1 comment} other {{n} comments}}'**
+  String commentsNumbered(int n);
 
   /// Label for load more button
   ///
@@ -490,6 +712,24 @@ abstract class AppLocalizations {
   /// **'Swipe to close thread'**
   String get comments_swipeToClose;
 
+  /// No description provided for @comments_distanceThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance threshold'**
+  String get comments_distanceThreshold;
+
+  /// No description provided for @comments_distanceThresholdDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Dragging distance from edge as a percentage of screen width before closing and going back.'**
+  String get comments_distanceThresholdDescription;
+
+  /// No description provided for @comments_threadGuide.
+  ///
+  /// In en, this message translates to:
+  /// **'Thread guides'**
+  String get comments_threadGuide;
+
   /// No description provided for @posts_defaultHomeSort.
   ///
   /// In en, this message translates to:
@@ -513,6 +753,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Each community will remember the last sort you selected.'**
   String get posts_rememberSortByCommunityDescription;
+
+  /// No description provided for @posts_rememberedSorts.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Sorts'**
+  String get posts_rememberedSorts;
 
   /// No description provided for @posts_showAwards.
   ///
@@ -538,11 +784,11 @@ abstract class AppLocalizations {
   /// **'Show flair colors'**
   String get posts_showFlairColors;
 
-  /// No description provided for @posts_showEmojis.
+  /// No description provided for @posts_showFlairEmojis.
   ///
   /// In en, this message translates to:
   /// **'Show emojis'**
-  String get posts_showEmojis;
+  String get posts_showFlairEmojis;
 
   /// No description provided for @posts_tapFlairToSearch.
   ///
@@ -604,41 +850,23 @@ abstract class AppLocalizations {
   /// **'Open in app'**
   String get posts_showOpenInAppButton;
 
-  /// No description provided for @data_wifiDataSaver.
-  ///
-  /// In en, this message translates to:
-  /// **'Wifi data saver'**
-  String get data_wifiDataSaver;
-
-  /// No description provided for @data_wifiDataSaverDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Load lower-size media'**
-  String get data_wifiDataSaverDescription;
-
-  /// No description provided for @data_mobileDataSaver.
-  ///
-  /// In en, this message translates to:
-  /// **'Mobile data saver'**
-  String get data_mobileDataSaver;
-
-  /// No description provided for @data_mobileDataSaverDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Load lower-size media'**
-  String get data_mobileDataSaverDescription;
-
   /// No description provided for @data_autoplay.
   ///
   /// In en, this message translates to:
   /// **'Autoplay videos'**
   String get data_autoplay;
 
-  /// No description provided for @data_videoQuality.
+  /// No description provided for @data_videoQualityWifi.
   ///
   /// In en, this message translates to:
-  /// **'Video quality'**
-  String get data_videoQuality;
+  /// **'Preferred video quality when connected to Wifi'**
+  String get data_videoQualityWifi;
+
+  /// No description provided for @data_videoQualityCellular.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred video quality when connected to cellular'**
+  String get data_videoQualityCellular;
 
   /// No description provided for @data_minimumQuality.
   ///
@@ -658,17 +886,239 @@ abstract class AppLocalizations {
   /// **'Load images'**
   String get data_loadImages;
 
-  /// No description provided for @data_preferredQuality.
+  /// No description provided for @data_imageQualityWifi.
   ///
   /// In en, this message translates to:
-  /// **'Image Quality'**
-  String get data_preferredQuality;
+  /// **'Preferred image quality when connected to Wifi'**
+  String get data_imageQualityWifi;
+
+  /// No description provided for @data_imageQualityCellular.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred image quality when connected to cellular'**
+  String get data_imageQualityCellular;
+
+  /// No description provided for @filters_manageHiddenCommunities.
+  ///
+  /// In en, this message translates to:
+  /// **'Communities'**
+  String get filters_manageHiddenCommunities;
+
+  /// No description provided for @filters_manageHiddenCommunitiesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide posts from these communities'**
+  String get filters_manageHiddenCommunitiesDescription;
+
+  /// No description provided for @filters_manageHiddenDomains.
+  ///
+  /// In en, this message translates to:
+  /// **'Domains'**
+  String get filters_manageHiddenDomains;
+
+  /// No description provided for @filters_manageHiddenDomainsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide posts from these domains'**
+  String get filters_manageHiddenDomainsDescription;
+
+  /// No description provided for @filters_manageHiddenUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Users'**
+  String get filters_manageHiddenUsers;
+
+  /// No description provided for @filters_manageHiddenUsersDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide posts from these users'**
+  String get filters_manageHiddenUsersDescription;
+
+  /// No description provided for @filters_manageHiddenFlairs.
+  ///
+  /// In en, this message translates to:
+  /// **'Flairs'**
+  String get filters_manageHiddenFlairs;
+
+  /// No description provided for @filters_manageHiddenFlairsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide posts with these flairs'**
+  String get filters_manageHiddenFlairsDescription;
+
+  /// No description provided for @filters_showNSFW.
+  ///
+  /// In en, this message translates to:
+  /// **'Show NSFW'**
+  String get filters_showNSFW;
+
+  /// No description provided for @filters_showNSFWDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Show content labeled Not Safe For Work'**
+  String get filters_showNSFWDescription;
+
+  /// No description provided for @filters_showImageInNSFW.
+  ///
+  /// In en, this message translates to:
+  /// **'Show images in NSFW posts'**
+  String get filters_showImageInNSFW;
 
   /// No description provided for @filters_blurNSFW.
   ///
   /// In en, this message translates to:
   /// **'Blur images in NSFW posts'**
   String get filters_blurNSFW;
+
+  /// No description provided for @lateralMenu_showHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get lateralMenu_showHome;
+
+  /// No description provided for @lateralMenu_showHomeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Default feed. To set any community, go to Subscriptions list and select \"Set as default\".'**
+  String get lateralMenu_showHomeDescription;
+
+  /// No description provided for @lateralMenu_showHomeFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Home Feed'**
+  String get lateralMenu_showHomeFeed;
+
+  /// No description provided for @lateralMenu_showHomeFeedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts from subscriptions'**
+  String get lateralMenu_showHomeFeedDescription;
+
+  /// No description provided for @lateralMenu_showPopular.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular'**
+  String get lateralMenu_showPopular;
+
+  /// No description provided for @lateralMenu_showAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get lateralMenu_showAll;
+
+  /// No description provided for @lateralMenu_showSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get lateralMenu_showSaved;
+
+  /// No description provided for @lateralMenu_showHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get lateralMenu_showHistory;
+
+  /// No description provided for @lateralMenu_showProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get lateralMenu_showProfile;
+
+  /// No description provided for @lateralMenu_showInbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbox'**
+  String get lateralMenu_showInbox;
+
+  /// No description provided for @lateralMenu_showFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get lateralMenu_showFriends;
+
+  /// No description provided for @lateralMenu_showDrafts.
+  ///
+  /// In en, this message translates to:
+  /// **'Drafts'**
+  String get lateralMenu_showDrafts;
+
+  /// No description provided for @lateralMenu_showModeration.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderation'**
+  String get lateralMenu_showModeration;
+
+  /// No description provided for @lateralMenu_showSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get lateralMenu_showSearch;
+
+  /// No description provided for @lateralMenu_showGoToDropdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to dropdown'**
+  String get lateralMenu_showGoToDropdown;
+
+  /// No description provided for @lateralMenu_showGoToCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to community'**
+  String get lateralMenu_showGoToCommunity;
+
+  /// No description provided for @lateralMenu_showGoToUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to user'**
+  String get lateralMenu_showGoToUser;
+
+  /// No description provided for @lateralMenu_darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark mode'**
+  String get lateralMenu_darkMode;
+
+  /// No description provided for @lateralMenu_showNSFW.
+  ///
+  /// In en, this message translates to:
+  /// **'Show NSFW'**
+  String get lateralMenu_showNSFW;
+
+  /// No description provided for @lateralMenu_blurNSFW.
+  ///
+  /// In en, this message translates to:
+  /// **'Blur NSFW'**
+  String get lateralMenu_blurNSFW;
+
+  /// No description provided for @lateralMenu_showSubsInMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in menu'**
+  String get lateralMenu_showSubsInMenu;
+
+  /// No description provided for @lateralMenu_showSubsIcon.
+  ///
+  /// In en, this message translates to:
+  /// **'Show icons'**
+  String get lateralMenu_showSubsIcon;
+
+  /// No description provided for @lateralMenu_showSubsFavOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Show only favorites'**
+  String get lateralMenu_showSubsFavOnly;
+
+  /// No description provided for @lateralMenu_showAccountAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Show avatar'**
+  String get lateralMenu_showAccountAvatar;
+
+  /// No description provided for @lateralMenu_showAccountUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Show username'**
+  String get lateralMenu_showAccountUsername;
 }
 
 class _AppLocalizationsDelegate
