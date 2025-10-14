@@ -219,6 +219,7 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: "/u/:username/:tab",
               builder: (context, state) => UserView(
+                key: ValueKey(state.pathParameters["username"]),
                 username: state.pathParameters['username']!,
                 tab: state.pathParameters['tab']!,
               ),
