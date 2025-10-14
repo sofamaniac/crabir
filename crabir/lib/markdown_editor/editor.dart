@@ -1,5 +1,6 @@
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/search_subreddits/widgets/search.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
