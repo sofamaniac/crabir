@@ -47,13 +47,7 @@ class Footer extends StatelessWidget {
             icon: const Icon(Icons.comment),
             color: theme.secondaryText,
             tooltip: 'Comments',
-            // onPressed: () => navigateToSubscriptionsTab(
-            //   context,
-            //   ThreadRoute(
-            //     post: post,
-            //   ),
-            // ),
-            onPressed: () => context.go(post.permalink, extra: post),
+            onPressed: () => context.push(post.permalink, extra: post),
           ),
         if (settings.showOpenInAppButton)
           IconButton(

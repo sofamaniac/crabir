@@ -76,3 +76,9 @@ extension IsMediaKind on Kind {
 class PostCubit extends Cubit<Post> {
   PostCubit(super.post);
 }
+
+extension HasContent on Post {
+  bool hasContent({bool allowMedia = true}) {
+    return (selftext?.isNotEmpty ?? false) || (kind.isMedia() && allowMedia);
+  }
+}

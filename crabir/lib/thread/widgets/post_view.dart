@@ -43,6 +43,7 @@ class _PostView extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: DenseCard(
                 post: post.crosspostParentList.first,
+                pushSubreddit: true,
                 // Disable shadow
                 elevation: 0,
                 onTap: () {
@@ -93,7 +94,8 @@ class _PostView extends StatelessWidget {
       final showMedia =
           settings.postMediaPreviewSize == MediaPreviewSize.fullPreview;
       final showThumbnail =
-          settings.postMediaPreviewSize != MediaPreviewSize.none;
+          settings.postMediaPreviewSize == MediaPreviewSize.thumbnail &&
+              !post.kind.isMedia();
       return RedditPostCard(
         post: post,
         maxLines: null,

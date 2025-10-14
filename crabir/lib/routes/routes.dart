@@ -122,7 +122,10 @@ final GoRouter appRouter = GoRouter(
               path: '/r/:subreddit',
               name: 'feed',
               builder: (context, state) {
-                final subreddit = state.pathParameters['subreddit']!;
+                final subreddit = state.pathParameters['subreddit'];
+                if (subreddit == null) {
+                  return NotFoundPage(uri: state.uri.toString());
+                }
                 return FeedView(
                   key: ValueKey(subreddit),
                   feed: Feed.subreddit(subreddit),
@@ -132,18 +135,13 @@ final GoRouter appRouter = GoRouter(
                 /// Thread route with swipe-to-close support
                 GoRoute(
                   path: 'comments/:id/:title',
-                  name: 'thread',
                   pageBuilder: (context, state) {
-                    final subreddit = state.pathParameters['subreddit']!;
                     final threadId = state.pathParameters['id']!;
-                    final title = state.pathParameters['title']!;
                     final settings = CommentsSettings.of(context);
 
                     final pageChild = Thread(
                       post: state.extra as Post?,
-                      subreddit: subreddit,
-                      postID: threadId,
-                      postTitle: title,
+                      permalink: state.uri.toString(),
                     );
 
                     if (settings.swipeToClose) {

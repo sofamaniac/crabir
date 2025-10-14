@@ -37,15 +37,16 @@ class Thread extends StatelessWidget {
   final Post? post;
   final String permalink;
 
-  /// requires either `subreddit, postID, postTitle` to be set or `post`.
+  /// requires either `permalink` to be set or `post`.
   Thread({
     super.key,
-    String? subreddit,
-    String? postID,
-    String? postTitle,
     this.post,
-  }) : permalink =
-            post?.permalink ?? "/r/$subreddit/comments/$postID/$postTitle";
+    String? permalink,
+  })  : assert(post != null || permalink != null),
+        permalink = post?.permalink ?? permalink!;
+  factory Thread.fromPost(Post post) {
+    return Thread();
+  }
 
   Widget appBar(BuildContext context, ThreadBloc bloc) {
     final locales = AppLocalizations.of(context);

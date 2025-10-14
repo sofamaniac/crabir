@@ -6,6 +6,7 @@ class DenseCard extends StatelessWidget {
   final LikeCallback? onLikeCallback;
   final VoidCallback? onTap;
   final double? elevation;
+  final bool pushSubreddit;
   const DenseCard({
     super.key,
     required this.post,
@@ -13,6 +14,7 @@ class DenseCard extends StatelessWidget {
     this.onLikeCallback,
     this.onTap,
     this.elevation,
+    this.pushSubreddit = false,
   });
   Widget wrap(Widget widget) {
     return Padding(
@@ -37,6 +39,7 @@ class DenseCard extends StatelessWidget {
             Header(
               post: post,
               showSubredditIcon: false,
+              push: pushSubreddit,
             ),
           ),
           wrap(PostScore(post: post)),

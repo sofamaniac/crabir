@@ -494,6 +494,7 @@ pub struct PostSubmitBuilder {
     flair_id: Option<String>,
     flair_text: Option<String>,
     url: Option<String>,
+    sendreplies: bool,
 }
 
 impl PostSubmitBuilder {
@@ -542,6 +543,11 @@ impl PostSubmitBuilder {
         self.flair_text = flair_text;
     }
 
+    #[frb(sync, setter)]
+    pub fn set_sendreplies(&mut self, sendreplies: bool) {
+        self.sendreplies = sendreplies;
+    }
+
     #[frb(sync)]
     pub fn build(self) -> Result<PostSubmit> {
         if self.title.is_empty() {
@@ -565,6 +571,7 @@ impl PostSubmitBuilder {
                 nsfw: self.nsfw,
                 spoiler: self.spoiler,
                 kind: self.kind.to_query_param(),
+                sendreplies: self.sendreplies,
                 flair_id: self.flair_id,
                 flair_text: self.flair_text,
                 url: self.url,
@@ -583,6 +590,8 @@ pub struct PostSubmit {
     nsfw: bool,
     spoiler: bool,
     kind: String,
+    #[serde(rename = "sendreplies")]
+    sendreplies: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     flair_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]

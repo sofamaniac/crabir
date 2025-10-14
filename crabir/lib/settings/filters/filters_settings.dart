@@ -161,12 +161,13 @@ class GlobalFiltersCubit extends HydratedCubit<GlobalFilters> {
     emit(state.copyWith(domains: [...state.domains, domain]));
   }
 
-  void setUsers(List<String> users) => emit(state.copyWith(users: users));
-  void setFlairs(List<Flair> flairs) => emit(state.copyWith(flairs: flairs));
+  void setUsers(List<String> users) => emit(state.copyWith(users: [...users]));
+  void setFlairs(List<Flair> flairs) =>
+      emit(state.copyWith(flairs: [...flairs]));
   void setSubreddits(List<String> subreddits) =>
-      emit(state.copyWith(subreddits: subreddits));
+      emit(state.copyWith(subreddits: [...subreddits]));
   void setDomains(List<String> domains) =>
-      emit(state.copyWith(domains: domains));
+      emit(state.copyWith(domains: [...domains]));
 
   @override
   GlobalFilters fromJson(Map<String, dynamic> json) =>

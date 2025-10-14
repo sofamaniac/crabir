@@ -93,6 +93,7 @@ class _FeedViewState extends State<FeedView> {
         }
       },
       initialSort: sort,
+      subredditAbout: subredditAbout,
       endDrawer: subredditAbout != null
           ? Drawer(child: RightSide(infos: subredditAbout!))
           : null,

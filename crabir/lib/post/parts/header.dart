@@ -4,11 +4,15 @@ class Header extends StatelessWidget {
   final Post post;
   final bool showSubredditIcon;
   final VoidCallback? onSubredditTap;
+
+  /// If set to true, calls `context.push(subreddit)` instead of `context.go`
+  final bool push;
   const Header({
     super.key,
     required this.post,
     this.showSubredditIcon = true,
     this.onSubredditTap,
+    this.push = false,
   });
 
   bool _showDomain() {
@@ -26,8 +30,14 @@ class Header extends StatelessWidget {
       style: _labelStyle(context).copyWith(color: theme.highlight),
     );
     if (settings.clickableCommunity) {
-      final onTap =
-          onSubredditTap ?? () => context.go("/r/${post.subreddit.subreddit}");
+      final onTap = onSubredditTap ??
+          () {
+            if (push) {
+              context.push("/r/${post.subreddit.subreddit}");
+            } else {
+              context.go("/r/${post.subreddit.subreddit}");
+            }
+          };
       return InkWell(onTap: onTap, child: subreddit);
     } else {
       return subreddit;

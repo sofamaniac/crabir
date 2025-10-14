@@ -56,30 +56,86 @@ class _RedditPostCardState extends State<RedditPostCard> {
     await widget.onLikeCallback?.call(dir);
   }
 
+  @override
+  Widget build(BuildContext context) {
+    final contentWidget = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      spacing: 8,
+      children: [
+        wrapPostElement(Header(post: widget.post)),
+        PostCardTitle(
+          post: widget.post,
+          showMedia: widget.showMedia,
+          enableThumbnail: widget.enableThumbnail,
+          ignoreRead: widget.ignoreRead,
+        ),
+        if (widget.post.hasContent(allowMedia: widget.showMedia))
+          PostCardContent(
+            post: widget.post,
+            showMedia: widget.showMedia,
+            ignoreSelftextSpoiler: widget.ignoreSelftextSpoiler,
+            maxLines: widget.maxLines,
+          ),
+        Footer(
+          post: widget.post,
+          onLike: _onLike,
+          onSave: _onSave,
+        ),
+      ],
+    );
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      elevation: 1,
+      child: InkWell(
+        onTap: widget.onTap,
+        child: contentWidget,
+      ),
+    );
+  }
+}
+
+class PostCardContent extends StatelessWidget {
+  final bool showMedia;
+  final Post post;
+  final int? maxLines;
+  final bool ignoreSelftextSpoiler;
+  const PostCardContent({
+    super.key,
+    required this.post,
+    required this.showMedia,
+    this.maxLines,
+    required this.ignoreSelftextSpoiler,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return content(context) ?? SizedBox.shrink();
+  }
+
   Widget? media(BuildContext context) {
-    if (!widget.showMedia) {
+    if (!showMedia) {
       return null;
     }
-    return switch (widget.post.kind) {
+    return switch (post.kind) {
       // Media types
-      Kind.video => VideoContent(post: widget.post),
-      Kind.streamableVideo => StreamableVideo(post: widget.post),
-      Kind.youtubeVideo => YoutubeContent(post: widget.post),
-      (Kind.mediaGallery || Kind.gallery) => GalleryView(post: widget.post),
+      Kind.video => VideoContent(post: post),
+      Kind.streamableVideo => StreamableVideo(post: post),
+      Kind.youtubeVideo => YoutubeContent(post: post),
+      (Kind.mediaGallery || Kind.gallery) => GalleryView(post: post),
       Kind.image => ImageContent(
-          post: widget.post,
+          post: post,
         ),
       _ => null,
     };
   }
 
   Widget? selftext(BuildContext context) {
-    if ((!widget.post.spoiler || widget.ignoreSelftextSpoiler) &&
-        widget.post.selftextHtml != null) {
+    if ((!post.spoiler || ignoreSelftextSpoiler) && post.selftextHtml != null) {
       return wrapPostElement(
         HtmlWithConditionalFade(
-          htmlContent: widget.post.selftextHtml ?? "",
-          maxLines: widget.maxLines,
+          htmlContent: post.selftextHtml ?? "",
+          maxLines: maxLines,
         ),
       );
     } else {
@@ -106,57 +162,43 @@ class _RedditPostCardState extends State<RedditPostCard> {
       ],
     );
   }
+}
 
-  Widget title() {
+class PostCardTitle extends StatelessWidget {
+  final Post post;
+  final bool ignoreRead;
+  final bool showMedia;
+  final bool enableThumbnail;
+
+  const PostCardTitle({
+    super.key,
+    required this.post,
+    required this.ignoreRead,
+    required this.showMedia,
+    required this.enableThumbnail,
+  });
+  @override
+  Widget build(BuildContext context) {
     final title = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 4,
       children: [
         PostTitle(
-          post: widget.post,
-          ignoredRead: widget.ignoreRead,
+          post: post,
+          ignoredRead: ignoreRead,
         ),
-        PostFlair(post: widget.post),
-        PostScore(post: widget.post),
+        PostFlair(post: post),
+        PostScore(post: post),
       ],
     );
-    if (widget.enableThumbnail &&
-        widget.post.kind.showThumbnail(widget.showMedia)) {
+    if (enableThumbnail && post.kind.showThumbnail(showMedia)) {
       return wrapPostElement(
         Thumbnail(
-          post: widget.post,
+          post: post,
           child: title,
         ),
       );
     }
     return wrapPostElement(title);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final child = content(context);
-    final contentWidget = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      spacing: 8,
-      children: [
-        wrapPostElement(Header(post: widget.post)),
-        title(),
-        if (child != null) child,
-        Footer(
-          post: widget.post,
-          onLike: _onLike,
-          onSave: _onSave,
-        ),
-      ],
-    );
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      elevation: 1,
-      child: InkWell(
-        onTap: widget.onTap,
-        child: contentWidget,
-      ),
-    );
   }
 }
