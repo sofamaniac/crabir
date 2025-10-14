@@ -1,11 +1,67 @@
 part of 'editor.dart';
 
+AlertDialog postEditorDialog(BuildContext context, {Subreddit? subreddit}) {
+  return AlertDialog(
+    title: Text("Create Post"),
+    content: ListView(
+      children: [
+        ListTile(
+          title: Text("Text post"),
+          onTap: () => PostEditor.selftext(
+            initialSubreddit: subreddit,
+          ).pushNamed(context),
+        ),
+        ListTile(
+          title: Text("Link post"),
+          onTap: () => PostEditor.link(
+            initialSubreddit: subreddit,
+          ).pushNamed(context),
+        ),
+      ],
+    ),
+  );
+}
+
 /// Reply to a comment
-@CrabirRoute()
 class PostEditor extends StatefulWidget {
-  const PostEditor({
+  final Widget Function(PostSubmitBuilder) _builder;
+  final Kind _kind;
+  final Subreddit? initialSubreddit;
+
+  const PostEditor._({
     super.key,
-  });
+    required Widget Function(PostSubmitBuilder) builder,
+    required Kind kind,
+    this.initialSubreddit,
+  })  : _builder = builder,
+        _kind = kind;
+
+  factory PostEditor.selftext({Key? key, Subreddit? initialSubreddit}) {
+    return PostEditor._(
+      key: key,
+      builder: (submission) => MarkdownEditor(
+        onChanged: (body) => submission.text = body,
+      ),
+      kind: Kind.selftext,
+      initialSubreddit: initialSubreddit,
+    );
+  }
+
+  factory PostEditor.link({Key? key, Subreddit? initialSubreddit}) {
+    return PostEditor._(
+      key: key,
+      builder: (submission) => Column(
+        children: [
+          UrlTextField(
+            onChanged: (url) => submission.url = url,
+          ),
+          TextField(onChanged: (title) => submission.text = title)
+        ],
+      ),
+      kind: Kind.link,
+      initialSubreddit: initialSubreddit,
+    );
+  }
 
   @override
   State<PostEditor> createState() => _PostEditorState();
@@ -13,11 +69,8 @@ class PostEditor extends StatefulWidget {
 
 class _PostEditorState extends State<PostEditor> {
   final _titleController = TextEditingController();
-  final _bodyController = TextEditingController();
-  bool nsfw = false;
-  bool spoiler = false;
-  bool sendReplyNotification = true;
-  Subreddit? subreddit;
+  PostSubmitBuilder submission = PostSubmitBuilder();
+  late Subreddit? subreddit = widget.initialSubreddit;
   final Logger log = Logger("CommentEditor");
 
   @override
@@ -52,15 +105,18 @@ class _PostEditorState extends State<PostEditor> {
                 );
                 return;
               }
-              PostSubmitBuilder submission = PostSubmitBuilder();
-              submission.title = _titleController.text;
-              submission.text = _bodyController.text;
-              submission.subreddit = subreddit!;
-              submission.nsfw = nsfw;
-              submission.spoiler = spoiler;
-              submission.sendreplies = sendReplyNotification;
-              await RedditAPI.client().submitPost(post: submission.build());
-              if (context.mounted) context.pop();
+              try {
+                submission.kind = widget._kind;
+                await RedditAPI.client().submitPost(post: submission.build());
+                if (context.mounted) context.pop();
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Failed to create post"),
+                  ),
+                );
+                return;
+              }
             },
           )
         ],
@@ -81,6 +137,7 @@ class _PostEditorState extends State<PostEditor> {
                 WidgetsBinding.instance.addPostFrameCallback(
                   (_) => setState(() {
                     subreddit = newSubreddit;
+                    submission.subreddit = newSubreddit;
                   }),
                 );
               }
@@ -89,6 +146,7 @@ class _PostEditorState extends State<PostEditor> {
           ),
           TextField(
             controller: _titleController,
+            onChanged: (title) => submission.title = title,
             maxLines: 1,
             decoration: InputDecoration(
               border: OutlineInputBorder(),
@@ -101,7 +159,7 @@ class _PostEditorState extends State<PostEditor> {
               _PropertyButton(
                 onChanged: (value) {
                   setState(() {
-                    nsfw = value;
+                    submission.nsfw = value;
                   });
                 },
                 label: "NSFW",
@@ -109,7 +167,7 @@ class _PostEditorState extends State<PostEditor> {
               _PropertyButton(
                 onChanged: (value) {
                   setState(() {
-                    spoiler = value;
+                    submission.spoiler = value;
                   });
                 },
                 label: "Spoiler",
@@ -117,18 +175,16 @@ class _PostEditorState extends State<PostEditor> {
             ],
           ),
           CheckboxListTile(
-            value: sendReplyNotification,
+            value: submission.sendreplies,
             onChanged: (value) {
               setState(() {
-                sendReplyNotification = value!;
+                submission.sendreplies = value!;
               });
             },
             title: Text("Send reply notification"),
           ),
           Expanded(
-            child: MarkdownEditor(
-              controller: _bodyController,
-            ),
+            child: widget._builder(submission),
           ),
         ],
       ),
@@ -168,6 +224,79 @@ class _PropertyButtonState extends State<_PropertyButton> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       child: Text(widget.label),
+    );
+  }
+}
+
+extension PostEditorBuilder on PostEditor {
+  static const String name = 'PostEditor';
+  Map<String, String> get pathParams => {};
+  Map<String, dynamic> get extra => {
+        '_builder': _builder,
+        '_kind': _kind,
+        'initialSubreddit': initialSubreddit
+      };
+
+  void goNamed(BuildContext context) => context.goNamed(
+        name,
+        pathParameters: pathParams,
+        extra: extra,
+      );
+
+  Future<T?> pushNamed<T extends Object?>(BuildContext context) =>
+      context.pushNamed(
+        name,
+        pathParameters: pathParams,
+        extra: extra,
+      );
+
+  static PostEditor fromExtra(Map<String, dynamic> extra) {
+    return PostEditor._(
+        builder: extra['_builder'] as Widget Function(PostSubmitBuilder),
+        kind: extra['_kind'] as Kind,
+        initialSubreddit: extra['initialSubreddit'] as Subreddit?);
+  }
+}
+
+class UrlTextField extends StatelessWidget {
+  final TextEditingController? controller;
+  final void Function(String)? onChanged;
+
+  const UrlTextField({
+    super.key,
+    this.controller,
+    this.onChanged,
+  });
+
+  bool _isValidUrl(String input) {
+    final uri = Uri.tryParse(input);
+    return uri != null &&
+        (uri.hasScheme && uri.hasAuthority) &&
+        (uri.scheme == 'http' || uri.scheme == 'https');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: TextInputType.url,
+      decoration: const InputDecoration(
+        labelText: 'Enter URL',
+        hintText: 'https://example.com',
+        prefixIcon: Icon(Icons.link),
+        border: OutlineInputBorder(),
+      ),
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      onChanged: onChanged,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a URL';
+        }
+        if (!_isValidUrl(value)) {
+          return 'Invalid URL format';
+        }
+        return null;
+      },
     );
   }
 }

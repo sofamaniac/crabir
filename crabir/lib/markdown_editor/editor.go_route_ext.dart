@@ -15,7 +15,8 @@ extension MarkdownEditorBuilder on MarkdownEditor {
         'controller': controller,
         'maxLines': maxLines,
         'minLines': minLines,
-        'hint': hint
+        'hint': hint,
+        'onChanged': onChanged
       };
 
   void goNamed(BuildContext context) => context.goNamed(
@@ -36,7 +37,8 @@ extension MarkdownEditorBuilder on MarkdownEditor {
         controller: extra['controller'] as TextEditingController?,
         maxLines: extra['maxLines'] as int?,
         minLines: extra['minLines'] as int?,
-        hint: extra['hint'] as String?);
+        hint: extra['hint'] as String?,
+        onChanged: extra['onChanged'] as void Function(String)?);
   }
 }
 
@@ -72,29 +74,5 @@ extension CommentEditorBuilder on CommentEditor {
         text: extra['text'] as String,
         parentName: extra['parentName'] as Fullname,
         depth: extra['depth'] as int);
-  }
-}
-
-// GENERATED CODE - DO NOT MODIFY BY HAND
-extension PostEditorBuilder on PostEditor {
-  static const String name = 'PostEditor';
-  Map<String, String> get pathParams => {};
-  Map<String, dynamic> get extra => {};
-
-  void goNamed(BuildContext context) => context.goNamed(
-        name,
-        pathParameters: pathParams,
-        extra: extra,
-      );
-
-  Future<T?> pushNamed<T extends Object?>(BuildContext context) =>
-      context.pushNamed(
-        name,
-        pathParameters: pathParams,
-        extra: extra,
-      );
-
-  static PostEditor fromExtra(Map<String, dynamic> extra) {
-    return PostEditor();
   }
 }

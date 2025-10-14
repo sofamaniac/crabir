@@ -22,12 +22,14 @@ class MarkdownEditor extends StatefulWidget {
   final int? maxLines;
   final int? minLines;
   final String? hint;
+  final void Function(String)? onChanged;
   const MarkdownEditor({
     super.key,
     this.controller,
     this.maxLines,
     this.minLines,
     this.hint,
+    this.onChanged,
   });
 
   @override
@@ -88,6 +90,7 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
             controller: _controller,
             maxLines: widget.maxLines,
             minLines: widget.minLines,
+            onChanged: widget.onChanged?.call,
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               hintText: widget.hint ?? 'Enter markdown...',

@@ -483,10 +483,11 @@ pub struct Oembed {
     pub thumbnail: ThumbnailOption,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize, Setters)]
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize, Setters, FlutterGetters)]
 pub struct PostSubmitBuilder {
     title: String,
     text: Option<String>,
+    #[flutter_getter(skip)]
     subreddit: String,
     nsfw: bool,
     spoiler: bool,
@@ -546,6 +547,11 @@ impl PostSubmitBuilder {
     #[frb(sync, setter)]
     pub fn set_sendreplies(&mut self, sendreplies: bool) {
         self.sendreplies = sendreplies;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_url(&mut self, url: Option<String>) {
+        self.url = url;
     }
 
     #[frb(sync)]

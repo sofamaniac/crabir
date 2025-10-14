@@ -69,7 +69,9 @@ class _ScrollAwareFabState extends State<ScrollAwareFab> {
               backgroundColor: theme.primaryColor,
               child: const Icon(Icons.edit),
               label: 'Create Post',
-              onTap: () => PostEditor().pushNamed(context),
+              onTap: () => showDialog(
+                  context: context,
+                  builder: (context) => postEditorDialog(context)),
             ),
             SpeedDialChild(
               backgroundColor: theme.primaryColor,
