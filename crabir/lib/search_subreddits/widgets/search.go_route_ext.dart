@@ -11,8 +11,11 @@ part of 'search.dart';
 extension SearchSubredditsViewBuilder on SearchSubredditsView {
   static const String name = 'SearchSubredditsView';
   Map<String, String> get pathParams => {};
-  Map<String, dynamic> get extra =>
-      {'enableUser': enableUser, 'enablePost': enablePost};
+  Map<String, dynamic> get extra => {
+        'enableUser': enableUser,
+        'enablePost': enablePost,
+        'navigateOnTap': navigateOnTap
+      };
 
   void goNamed(BuildContext context) => context.goNamed(
         name,
@@ -30,6 +33,7 @@ extension SearchSubredditsViewBuilder on SearchSubredditsView {
   static SearchSubredditsView fromExtra(Map<String, dynamic> extra) {
     return SearchSubredditsView(
         enableUser: extra['enableUser'] as bool,
-        enablePost: extra['enablePost'] as bool);
+        enablePost: extra['enablePost'] as bool,
+        navigateOnTap: extra['navigateOnTap'] as bool);
   }
 }

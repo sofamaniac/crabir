@@ -168,15 +168,14 @@ class _AnimatedContentState extends State<AnimatedContent> {
 
   Timer? _hideControlsTimer;
 
-  late final animationController = AnimatedContentController.maybeOf(context);
+  AnimatedContentController? animationController;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    animationController = AnimatedContentController.maybeOf(context);
     if (_addListener) {
-      AnimatedContentController.maybeOf(context)
-          ?.queue
-          .addListener(_queueListener);
+      animationController?.queue.addListener(_queueListener);
       _addListener = false;
     }
   }
