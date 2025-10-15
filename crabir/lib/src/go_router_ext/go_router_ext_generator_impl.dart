@@ -1,7 +1,6 @@
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/constant/value.dart';
 import './annotations.dart';
 
 class GoRouteDataGenerator extends GeneratorForAnnotation<CrabirRoute> {
@@ -27,12 +26,11 @@ class GoRouteDataGenerator extends GeneratorForAnnotation<CrabirRoute> {
     // PathParam fields
     final pathFields = <FieldElement, String>{};
     for (final field in fields) {
-      for (final meta in field.metadata) {
+      for (final meta in field.metadata.annotations) {
         final obj = meta.computeConstantValue();
-        if (obj?.type?.getDisplayString(withNullability: false) ==
-            'PathParam') {
+        if (obj?.type?.getDisplayString() == 'PathParam') {
           final name = obj!.getField('name')?.toStringValue() ?? '';
-          pathFields[field] = name.isNotEmpty ? name : field.name;
+          pathFields[field] = name.isNotEmpty ? name : field.name!;
         }
       }
     }

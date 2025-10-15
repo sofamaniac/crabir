@@ -35,8 +35,8 @@ class $cubitName extends HydratedCubit<${classElement.name}> {
 
     // generate methods for each field
     /// WARN: will only work with @freezed classes.
-    for (final param in constructor.parameters) {
-      final name = param.name;
+    for (final param in constructor.formalParameters) {
+      final name = param.name!;
       final type = param.type;
 
       buffer.writeln('''
@@ -55,7 +55,7 @@ class SettingsPageGenerator extends GeneratorForAnnotation<SettingsPage> {
 
   void initialize(Element element) {
     final parameters =
-        TypeChecker.fromRuntime(SettingsPage).firstAnnotationOf(element)!;
+        TypeChecker.typeNamed(SettingsPage).firstAnnotationOf(element)!;
     prefix = parameters.getField("prefix")?.toStringValue();
     useFieldName = parameters.getField("useFieldName")?.toBoolValue() ?? false;
     cubitName = "${element.name}Cubit";
@@ -111,9 +111,8 @@ class $className extends StatelessWidget {
     buffer.writeln(code);
 
     /// WARN: will only work with @freezed classes.
-    for (final param in constructor.parameters) {
-      final divider =
-          TypeChecker.fromRuntime(Category).firstAnnotationOf(param);
+    for (final param in constructor.formalParameters) {
+      final divider = TypeChecker.typeNamed(Category).firstAnnotationOf(param);
       if (divider != null &&
           (divider.getField("divider")?.toBoolValue() ?? true)) {
         buffer.writeln("Divider(),");
@@ -138,14 +137,14 @@ class $className extends StatelessWidget {
     return buffer.toString();
   }
 
-  String widget(ParameterElement param, Element element) {
-    final setting = TypeChecker.fromRuntime(Setting).firstAnnotationOf(param);
+  String widget(FormalParameterElement param, Element element) {
+    final setting = TypeChecker.typeNamed(Setting).firstAnnotationOf(param);
     if (setting == null) {
       return 'ListTile(title: Text("TODO: ${param.name}")),';
     }
     String tempTitle = "";
     if (useFieldName) {
-      tempTitle = param.name;
+      tempTitle = param.name!;
     } else {
       try {
         tempTitle = setting.getField("titleKey")!.toStringValue()!;
@@ -170,7 +169,7 @@ class $className extends StatelessWidget {
     final widgetType = setting.getField('widget')?.toTypeValue();
     final hasDescription =
         setting.getField("hasDescription")?.toBoolValue() ?? false;
-    final iconData = setting.getField('icon')?.variable2?.name3;
+    final iconData = setting.getField('icon')?.variable?.name;
 
     if (widgetType != null) {
       return '$widgetType('
@@ -178,7 +177,7 @@ class $className extends StatelessWidget {
           'leading: Icon($iconData),'
           'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
           'value: settings.${param.name},'
-          'onChanged: (val) => context.read<$cubitName>().update${param.name.toPascalCase()}(val),'
+          'onChanged: (val) => context.read<$cubitName>().update${param.name!.toPascalCase()}(val),'
           '),';
     } else if (param.type.isDartCoreBool) {
       return 'CheckboxListTile('
@@ -186,7 +185,7 @@ class $className extends StatelessWidget {
           'secondary: Icon($iconData),'
           'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
           'value: settings.${param.name},'
-          'onChanged: (val) => context.read<$cubitName>().update${param.name.toPascalCase()}(val!),'
+          'onChanged: (val) => context.read<$cubitName>().update${param.name!.toPascalCase()}(val!),'
           '),';
     }
     return 'ListTile(title: Text("TODO: ${param.name}"),'
