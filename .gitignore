@@ -7,6 +7,8 @@ frb_generated*
 .gradle/
 .android/
 todo
+key.properties
+crabir/android/build/
 
 # Devenv
 .devenv*
