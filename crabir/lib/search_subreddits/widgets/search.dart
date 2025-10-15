@@ -13,27 +13,27 @@ import 'package:go_router/go_router.dart';
 part 'search.go_route_ext.dart';
 
 @CrabirRoute()
-class SearchSubredditsView extends StatefulWidget {
+class SearchSubredditsView extends StatelessWidget {
   final bool enableUser;
   final bool enablePost;
+
+  /// When set to true, navigate to the selected subreddit, otherwise calls `context.pop(subreddit)`.
+  final bool navigateOnTap;
   const SearchSubredditsView({
     super.key,
     this.enablePost = true,
     this.enableUser = true,
+    this.navigateOnTap = true,
   });
-  @override
-  State<StatefulWidget> createState() => _SearchSubredditsViewState();
-}
 
-class _SearchSubredditsViewState extends State<SearchSubredditsView> {
-  String query = "";
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => SubredditSearchBloc(query: query),
+      create: (_) => SubredditSearchBloc(query: ""),
       child: _SearchViewBody(
-        enablePost: widget.enablePost,
-        enableUser: widget.enableUser,
+        enablePost: enablePost,
+        enableUser: enableUser,
+        navigateOnTap: navigateOnTap,
       ),
     );
   }
@@ -42,10 +42,12 @@ class _SearchSubredditsViewState extends State<SearchSubredditsView> {
 class _SearchViewBody extends StatefulWidget {
   final bool enableUser;
   final bool enablePost;
+  final bool navigateOnTap;
 
   const _SearchViewBody({
     required this.enableUser,
     required this.enablePost,
+    required this.navigateOnTap,
   });
   @override
   State<StatefulWidget> createState() => _SearchViewBodyState();
@@ -116,7 +118,14 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
                   if (index < state.items.length) {
                     return SubredditTile(
                       state.items[index],
-                      onTap: () => context.pop(state.items[index]),
+                      onTap: () {
+                        if (widget.navigateOnTap) {
+                          context
+                              .go("/r/${state.items[index].other.displayName}");
+                        } else {
+                          context.pop(state.items[index]);
+                        }
+                      },
                     );
                   } else {
                     if (!state.hasReachedMax && state.query.isNotEmpty) {
@@ -138,7 +147,13 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
                 itemBuilder: (context, index) {
                   return SubredditTile(
                     subs[index],
-                    onTap: () => context.pop(subs[index]),
+                    onTap: () {
+                      if (widget.navigateOnTap) {
+                        context.go("/r/${subs[index].other.displayName}");
+                      } else {
+                        context.pop(subs[index]);
+                      }
+                    },
                   );
                 },
               ),
