@@ -89,7 +89,7 @@ dev_dependencies:
   json_serializable: ^6.9.5
   build_runner: ^2.4.15
   # custom_lint: ^0.7.3
-  source_gen: ^2.0.0
+  source_gen: ^4.0.2
   flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
