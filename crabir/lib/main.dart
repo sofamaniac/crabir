@@ -1,6 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
-import 'package:crabir/accounts/bloc/accounts_bloc.dart';
+import 'package:crabir/accounts/bloc/accounts_bloc.dart' as accounts;
 import 'package:crabir/accounts/widgets/account_selector.dart';
 import 'package:crabir/drawer/drawer.dart';
 import 'package:crabir/network_status.dart';
@@ -9,6 +10,9 @@ import 'package:crabir/settings/licenses_screen.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
+import 'package:crabir/subscription/bloc/subscription_bloc.dart'
+    as subscription;
+import 'package:crabir/subscription/widgets/paywall.dart';
 import 'package:crabir/tabs_index.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -71,10 +75,24 @@ class Crabir extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AccountsBloc()..add(Initialize()),
-      child: SettingsBlocsProviders(
-        child: TopLevel(),
+    return SettingsBlocsProviders(
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) =>
+                subscription.SubscriptionBloc()..add(subscription.Initialize()),
+          ),
+          BlocProvider(
+            create: (context) => accounts.AccountsBloc()
+              ..add(accounts.AccountEvent.initialize()),
+          )
+        ],
+        child: BlocBuilder<subscription.SubscriptionBloc,
+            subscription.SubscriptionState>(
+          builder: (context, state) {
+            return TopLevel();
+          },
+        ),
       ),
     );
   }
@@ -172,7 +190,7 @@ class _MainScreenViewState extends State<MainScreenView>
   }
 
   bool _showAccountSelectionDialogue(int index) {
-    final account = context.read<AccountsBloc>().state.account;
+    final account = context.read<accounts.AccountsBloc>().state.account;
     const guardedPages = [1, 4]; // searchIndex, profileIndex
     return (account == null || account.isAnonymous) &&
         guardedPages.contains(index);
@@ -195,7 +213,8 @@ class _MainScreenViewState extends State<MainScreenView>
         } else if (index == subscriptionsIndex) {
           return context.go("/subscriptions");
         } else if (index == profileIndex) {
-          final username = context.read<AccountsBloc>().state.account!.username;
+          final username =
+              context.read<accounts.AccountsBloc>().state.account!.username;
           return context.go("/u/$username");
         }
 
@@ -213,6 +232,11 @@ class _MainScreenViewState extends State<MainScreenView>
 
   @override
   Widget build(BuildContext context) {
+    final accountsBloc = context.watch<accounts.AccountsBloc>();
+
+    if (accountsBloc.state.status == accounts.AccountStatus.uninit()) {
+      accountsBloc.add(accounts.Initialize());
+    }
     return PopScope(
       canPop: widget.navigationShell.currentIndex == 0,
       onPopInvokedWithResult: (_, __) async {
