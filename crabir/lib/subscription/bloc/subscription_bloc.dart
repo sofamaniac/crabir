@@ -10,14 +10,21 @@ part 'subscription_event.dart';
 part 'subscription_state.dart';
 part 'subscription_bloc.freezed.dart';
 
-void presentPaywall() async {
-  final paywallResult = await RevenueCatUI.presentPaywall();
-  //log('Paywall result: $paywallResult');
-}
+// void presentPaywall() async {
+//   final paywallResult = await RevenueCatUI.presentPaywall();
+//   //log('Paywall result: $paywallResult');
+// }
 
-Future<void> presentPaywallIfNeeded() async {
-  final paywallResult = await RevenueCatUI.presentPaywallIfNeeded("subscribed");
-  return;
+Future<bool> presentPaywallIfNeeded() async {
+  final PaywallResult paywallResult =
+      await RevenueCatUI.presentPaywallIfNeeded("subscribed");
+  return switch (paywallResult) {
+    PaywallResult.notPresented ||
+    PaywallResult.purchased ||
+    PaywallResult.restored =>
+      true,
+    _ => false
+  };
   //log('Paywall result: $paywallResult');
 }
 
@@ -39,10 +46,8 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
           PurchasesConfiguration("test_czmMWYVlxWzjfRhNvGzeXIWnHOq"),
         );
       } else {
-        final configuration =
-            PurchasesConfiguration("goog_pkSBOavmncFweWFHROYvEmPtMoc");
         await Purchases.configure(
-          configuration,
+          PurchasesConfiguration("goog_pkSBOavmncFweWFHROYvEmPtMoc"),
         );
       }
 
@@ -71,6 +76,5 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     emit(event.isSubscribed
         ? const SubscriptionState.subscribed()
         : const SubscriptionState.unsubscribed());
-    await presentPaywallIfNeeded();
   }
 }
