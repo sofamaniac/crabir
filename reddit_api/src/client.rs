@@ -600,6 +600,21 @@ impl Client {
         Ok(rules)
     }
 
+    /// Report an `Thing`
+    /// # Errors
+    /// Returns an error if the http client fails or if the request fails.
+    pub async fn report(&self, name: Fullname, reason: String) -> Result<()> {
+        let url = self.join_url("api/report");
+        let request = self.post(url);
+        let mut params = HashMap::new();
+        params.insert("api_type", "json");
+        params.insert("thing_id", name.as_ref());
+        params.insert("reason", &reason);
+        let request = request.form(&params);
+        self.execute(request).await?;
+        Ok(())
+    }
+
     /// Get the list of multireddits the current user is subscribed to.
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.

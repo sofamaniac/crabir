@@ -306,11 +306,11 @@ class _RulesViewState extends State<RulesView> {
     });
   }
 
-  String kindToText(String kind) {
+  String kindToText(RuleKind kind) {
     return switch (kind) {
-      "all" => "Post and Comment",
-      "link" => "Post",
-      _ => "TODO: $kind"
+      RuleKind.all => "Post and Comment",
+      RuleKind.link => "Post",
+      RuleKind.comment => "Post",
     };
   }
 

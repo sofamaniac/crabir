@@ -5,6 +5,7 @@ import 'package:crabir/cartouche.dart';
 import 'package:crabir/flair.dart';
 import 'package:crabir/html_view.dart';
 import 'package:crabir/markdown_editor/editor.dart';
+import 'package:crabir/report.dart';
 import 'package:crabir/separated_row.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
@@ -13,6 +14,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/author.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/rule.dart';
 import 'package:crabir/thread/bloc/thread_bloc.dart';
 import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/time_ellapsed.dart';
@@ -244,6 +246,17 @@ class _CommentViewState extends State<CommentView> {
               OpenedComment.current.value = null;
             }
           },
+        ),
+        IconButton(
+          onPressed: () => showDialog(
+            context: context,
+            builder: (context) => ReportDialog(
+              subreddit: widget.comment.subreddit,
+              kind: RuleKind.comment,
+              thing: widget.comment.name,
+            ),
+          ),
+          icon: Icon(Icons.report),
         ),
       ],
     );

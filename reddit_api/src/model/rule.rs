@@ -6,8 +6,20 @@ use serde::{Deserialize, Serialize};
 #[getset(get = "pub(crate)")]
 /// Data returned by https://www.reddit.com/r/{subreddit}/about/rules
 pub struct Rule {
-    kind: String,
+    kind: RuleKind,
     description: String,
     short_name: String,
     description_html: String,
+    violation_reason: String,
+}
+
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RuleKind {
+    #[serde(rename = "all")]
+    #[default]
+    All,
+    #[serde(rename = "link")]
+    Link,
+    #[serde(rename = "comment")]
+    Comment,
 }

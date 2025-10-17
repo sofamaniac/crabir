@@ -152,9 +152,11 @@ class MoreOptionButton extends StatelessWidget {
                 leading: Icon(Icons.person),
                 title: Text("See ${post.author!.username}'s info"),
                 onTap: () {
-                  // Navigator.pop(context);
-                  // context.router
-                  //     .navigate(UserRoute(username: post.author!.username));
+                  context.pop();
+                  UserView(
+                    username: post.author!.username,
+                    tab: "/overview",
+                  ).goNamed(context);
                 },
               ),
             if (post.linkFlair.text != null)
@@ -172,7 +174,20 @@ class MoreOptionButton extends StatelessWidget {
                 post: post,
                 short: false,
               ),
-            Text("Report"),
+            ListTile(
+              leading: Icon(Icons.report),
+              title: Text("Report..."),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => ReportDialog(
+                    subreddit: post.subreddit.subreddit,
+                    kind: RuleKind.link,
+                    thing: post.name,
+                  ),
+                );
+              },
+            ),
             ListTile(
               leading: Icon(Icons.volume_off),
               title: Text("Mute..."),
