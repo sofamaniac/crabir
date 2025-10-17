@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use chrono::DateTime;
 use chrono::Local;
 use chrono::Utc;
@@ -15,6 +17,7 @@ use super::Thing;
 use super::author;
 use super::author::AuthorInfo;
 use crate::error::Error;
+use crate::model::gallery::GalleryMedia;
 use crate::utils;
 use crate::votable::{Votable, private::PrivateVotable};
 
@@ -122,6 +125,10 @@ pub struct Comment {
     #[getset(skip)]
     #[flutter_getter(skip)]
     parsed_replies: Vec<Thing>,
+
+    /// Optional embeded images
+    #[serde(default)]
+    media_metadata: HashMap<String, GalleryMedia>,
 }
 
 impl Comment {

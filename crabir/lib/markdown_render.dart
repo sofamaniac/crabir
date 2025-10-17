@@ -1,7 +1,11 @@
+import 'package:crabir/media/media.dart';
 import 'package:crabir/settings/theme/theme.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart'
+    as gallery;
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -14,6 +18,19 @@ class SpoilerSyntax extends md.InlineSyntax {
   bool onMatch(md.InlineParser parser, Match match) {
     final text = match[1]!;
     final element = md.Element(tag, [md.Text(text)]);
+    parser.addNode(element);
+    return true;
+  }
+}
+
+class RedditLinkSyntax extends md.InlineSyntax {
+  RedditLinkSyntax() : super(r'/?([ur]/[a-zA-Z0-9]+)');
+  static final tag = "redditLink";
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    final link = match[1]!;
+    final element = md.Element("a", [md.Text(link)]);
+    element.attributes["href"] = "/$link";
     parser.addNode(element);
     return true;
   }
@@ -64,11 +81,13 @@ class _SpoilerState extends State<_Spoiler> {
 class RedditMarkdown extends StatelessWidget {
   final String markdown;
   final bool showImages;
+  final Map<String, gallery.GalleryMedia>? images;
 
   const RedditMarkdown({
     super.key,
     required this.markdown,
     this.showImages = true,
+    this.images,
   });
 
   @override
@@ -80,20 +99,49 @@ class RedditMarkdown extends StatelessWidget {
       styleSheet: redditMarkdownStyle(context),
       inlineSyntaxes: [
         SpoilerSyntax(),
+        RedditLinkSyntax(),
       ],
       builders: {
         SpoilerSyntax.tag: SpoilerBuilder(),
       },
-      onTapLink: (url, _, __) async {
-        Uri uri = Uri.parse(url);
-        if (url.startsWith("/")) {
-          context.push(url);
+      onTapLink: (text, href, title) async {
+        if (href == null) {
+          Logger("RedditMarkdown")
+              .warning(": trying to open link without href");
+          return;
+        } else if (href.startsWith("/")) {
+          context.push(href);
         } else {
-          await launchUrl(uri);
+          final url = Uri.parse(href);
+          await launchUrl(url);
         }
       },
-      imageBuilder:
-          showImages ? (uri, _, __) => Image.network(uri.toString()) : null,
+      imageBuilder: showImages
+          ? (uri, _, alt) {
+              if (uri.scheme.isEmpty) {
+                final name = uri.toString().replaceAll("%7C", "|");
+                if (images?.containsKey(name) ?? false) {
+                  final image = images![name]!;
+                  switch (image.source) {
+                    case gallery.Source_Image():
+                      return Image.network(
+                        image.withResolution(Resolution.source, false).u,
+                        semanticLabel: alt,
+                      );
+                    case gallery.Source_AnimatedImage(:final source):
+                      return Image.network(
+                        source.gif,
+                        semanticLabel: alt,
+                      );
+                  }
+                }
+              }
+              return Image.network(
+                uri.toString(),
+                semanticLabel: alt,
+              );
+            }
+          : null,
     );
   }
 }
@@ -125,6 +173,6 @@ MarkdownStyleSheet redditMarkdownStyle(BuildContext context) {
         ),
       ),
     ),
-    blockquotePadding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+    blockquotePadding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
   );
 }

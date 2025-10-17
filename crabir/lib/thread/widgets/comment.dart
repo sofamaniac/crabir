@@ -155,6 +155,7 @@ class _CommentViewState extends State<CommentView> {
                 RedditMarkdown(
                   markdown: comment.body,
                   showImages: settings.showCommentsImage,
+                  images: comment.mediaMetadata,
                 ),
                 AnimatedSwitcher(
                   duration: Duration(milliseconds: 200),
