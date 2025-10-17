@@ -13,7 +13,7 @@ class IndentedBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final indentWidth = 16.0;
+    final indentWidth = 8.0;
 
     final List<Widget> dividers = [];
 
