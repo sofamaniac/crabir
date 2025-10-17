@@ -18,7 +18,14 @@ class GalleryView extends StatelessWidget {
   final Post post;
   final void Function(VoteDirection)? onVote;
   final void Function(bool)? onSave;
-  const GalleryView({super.key, required this.post, this.onVote, this.onSave});
+  final BoxFit fit;
+  const GalleryView({
+    super.key,
+    required this.post,
+    this.onVote,
+    this.onSave,
+    this.fit = BoxFit.contain,
+  });
   @override
   Widget build(BuildContext context) {
     final bool obfuscate =
@@ -30,6 +37,7 @@ class GalleryView extends StatelessWidget {
         onVote: onVote,
         onSave: onSave,
         obfuscate: obfuscate,
+        fit: fit,
       );
     } else if (post.isCrosspost) {
       final gallery = post.crosspostParentList[0].gallery;
@@ -40,6 +48,7 @@ class GalleryView extends StatelessWidget {
           onVote: onVote,
           onSave: onSave,
           obfuscate: obfuscate,
+          fit: fit,
         );
       } else {
         return Text("Error: Gallery and is Crosspost but no gallery on parent");
@@ -56,6 +65,7 @@ class _GalleryView extends StatefulWidget {
   final void Function(bool)? onSave;
   final bool obfuscate;
   final Post post;
+  final BoxFit fit;
 
   const _GalleryView({
     required this.gallery,
@@ -63,6 +73,7 @@ class _GalleryView extends StatefulWidget {
     this.onVote,
     this.onSave,
     required this.post,
+    this.fit = BoxFit.contain,
   });
 
   @override
@@ -105,6 +116,7 @@ class _GalleryViewState extends State<_GalleryView> {
             gallery: widget.gallery,
             obfuscate: obfuscate,
             controller: _controller,
+            fit: widget.fit,
             onPageChanged: (index) {
               setState(() {
                 _currentPage = index;
@@ -132,17 +144,17 @@ class _GalleryViewState extends State<_GalleryView> {
 class _GalleryPageViewer extends StatefulWidget {
   final Gallery gallery;
   final void Function(int index)? onPageChanged;
-  final int initialPage;
   final PageController? controller;
   final bool obfuscate;
   final VoidCallback? onTap;
+  final BoxFit fit;
   const _GalleryPageViewer({
     required this.gallery,
     required this.obfuscate,
     this.onTap,
     this.onPageChanged,
-    this.initialPage = 0,
     this.controller,
+    this.fit = BoxFit.contain,
   });
   @override
   State<_GalleryPageViewer> createState() => _GalleryPageViewerState();
@@ -155,17 +167,8 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
   @override
   void initState() {
     super.initState();
-    _controller =
-        widget.controller ?? PageController(initialPage: widget.initialPage);
+    _controller = widget.controller ?? PageController();
     _ownedController = widget.controller == null;
-
-    if (_ownedController) {
-      // Ensure first frame jumps to the correct page, without that it jumps to
-      // the last page when scrolling into view.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _controller.jumpToPage(widget.initialPage);
-      });
-    }
   }
 
   @override
@@ -197,6 +200,7 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
             width: image.x,
             height: image.y,
             placeholderUrl: placeholder.u,
+            fit: widget.fit,
           );
         }
         // In galleries video do not have alternate resolutions.
@@ -218,6 +222,7 @@ class _GalleryPageViewerState extends State<_GalleryPageViewer> {
         imageWidget = ImageThumbnail.fromGalleryImage(
           image,
           placeholderUrl: placeholder.u,
+          fit: widget.fit,
         );
     }
     return PhotoViewGalleryPageOptions.customChild(

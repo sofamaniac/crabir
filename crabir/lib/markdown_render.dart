@@ -77,6 +77,7 @@ class RedditMarkdown extends StatelessWidget {
       data: preprocessRedditComment(markdown),
       selectable: false,
       shrinkWrap: true,
+      styleSheet: redditMarkdownStyle(context),
       inlineSyntaxes: [
         SpoilerSyntax(),
       ],
@@ -109,4 +110,21 @@ String preprocessRedditComment(String text) {
     final url = match.group(1)!;
     return '\n\n![]($url)\n\n';
   });
+}
+
+MarkdownStyleSheet redditMarkdownStyle(BuildContext context) {
+  final theme = Theme.of(context);
+  final crabirTheme = CrabirTheme.of(context);
+  return MarkdownStyleSheet.fromTheme(theme).copyWith(
+    blockquoteDecoration: BoxDecoration(
+      color: crabirTheme.background,
+      border: Border(
+        left: BorderSide(
+          color: crabirTheme.highlight,
+          width: 4,
+        ),
+      ),
+    ),
+    blockquotePadding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+  );
 }

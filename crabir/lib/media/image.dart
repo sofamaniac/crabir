@@ -7,6 +7,7 @@ class ImageThumbnail extends StatelessWidget {
   final String imageUrl;
   final int? width;
   final int? height;
+  final BoxFit fit;
 
   const ImageThumbnail({
     super.key,
@@ -14,40 +15,47 @@ class ImageThumbnail extends StatelessWidget {
     this.placeholderUrl,
     this.width,
     this.height,
+    this.fit = BoxFit.cover,
   });
 
   factory ImageThumbnail.redditImage(
     RedditImage image, {
     required Resolution resolution,
     bool blur = false,
+    BoxFit fit = BoxFit.cover,
   }) {
     final imageBase = image.withResolution(resolution, blur);
     return ImageThumbnail(
       imageUrl: imageBase.url,
       width: imageBase.width,
       height: imageBase.height,
+      fit: fit,
     );
   }
 
   static ImageThumbnail imageBase(
-    ImageBase image,
-  ) {
+    ImageBase image, {
+    BoxFit fit = BoxFit.cover,
+  }) {
     return ImageThumbnail(
       imageUrl: image.url,
       width: image.width,
       height: image.height,
+      fit: fit,
     );
   }
 
   static ImageThumbnail fromGalleryImage(
     gallery.Image image, {
     String? placeholderUrl,
+    BoxFit fit = BoxFit.cover,
   }) {
     return ImageThumbnail(
       imageUrl: image.u,
       width: image.x,
       height: image.y,
       placeholderUrl: placeholderUrl,
+      fit: fit,
     );
   }
 
@@ -56,7 +64,7 @@ class ImageThumbnail extends StatelessWidget {
       return Image.network(
         placeholderUrl!,
         width: double.infinity,
-        fit: BoxFit.fitWidth,
+        fit: fit,
       );
     } else {
       return LoadingIndicator();
@@ -70,6 +78,7 @@ class ImageThumbnail extends StatelessWidget {
       child: CachedNetworkImage(
         imageUrl: imageUrl,
         placeholder: _thumbnail,
+        fit: fit,
         errorWidget: (_, __, ___) => defaultThumbnail,
         // No fade out
         fadeOutDuration: Duration(seconds: 0),

@@ -53,6 +53,7 @@ class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
           gallery: widget.gallery,
           onTap: onTap,
           obfuscate: false,
+          fit: BoxFit.contain,
           onPageChanged: (index) {
             setState(() {
               _currentPage = index;
