@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:crabir/accounts/bloc/accounts_bloc.dart' as accounts;
 import 'package:crabir/accounts/widgets/account_selector.dart';
@@ -12,7 +11,6 @@ import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/subscription/bloc/subscription_bloc.dart'
     as subscription;
-import 'package:crabir/subscription/widgets/paywall.dart';
 import 'package:crabir/tabs_index.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -49,6 +47,8 @@ Future<void> main() async {
 
   // Initializing `NetworkStatus`
   await NetworkStatus.init();
+
+  await subscription.initRevenueCat();
 
   runApp(Crabir());
 }

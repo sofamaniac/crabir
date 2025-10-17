@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:logging/logging.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
@@ -14,6 +15,23 @@ part 'subscription_bloc.freezed.dart';
 //   final paywallResult = await RevenueCatUI.presentPaywall();
 //   //log('Paywall result: $paywallResult');
 // }
+
+Future<void> initRevenueCat() async {
+  try {
+    // Configure RevenueCat
+    if (kDebugMode) {
+      await Purchases.configure(
+        PurchasesConfiguration("test_czmMWYVlxWzjfRhNvGzeXIWnHOq"),
+      );
+    } else {
+      await Purchases.configure(
+        PurchasesConfiguration("goog_pkSBOavmncFweWFHROYvEmPtMoc"),
+      );
+    }
+  } catch (e) {
+    Logger("initRevenueCat").severe("Failed to initalize revenue cat");
+  }
+}
 
 Future<bool> presentPaywallIfNeeded() async {
   final PaywallResult paywallResult =
