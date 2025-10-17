@@ -71,6 +71,8 @@ dependencies:
   purchases_flutter: ^9.8.0
   purchases_ui_flutter: ^9.8.0
   equatable: ^2.0.7
+  flutter_markdown_plus: ^1.0.5
+  markdown: ^7.3.0
 
 
 dev_dependencies:

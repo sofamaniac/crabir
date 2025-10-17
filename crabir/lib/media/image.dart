@@ -18,7 +18,7 @@ class ImageThumbnail extends StatelessWidget {
 
   factory ImageThumbnail.redditImage(
     RedditImage image, {
-    Resolution resolution = Resolution.source,
+    required Resolution resolution,
     bool blur = false,
   }) {
     final imageBase = image.withResolution(resolution, blur);

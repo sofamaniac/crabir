@@ -103,13 +103,13 @@ class AnimatedContent extends StatefulWidget {
   factory AnimatedContent.fromVariantInner({
     required VariantInner mp4,
     required VariantInner placeholder,
-    Resolution preferredResolution = Resolution.source,
+    required Resolution preferredResolution,
     bool ignoreAutoplay = false,
     VoidCallback? goFullScreen,
     Post? post,
   }) {
     final ImageBase media;
-    if (preferredResolution == Resolution.source) {
+    if (preferredResolution == Resolution.source || mp4.resolutions.isEmpty) {
       media = mp4.source;
     } else {
       media = mp4.resolutions.withResolution(preferredResolution);

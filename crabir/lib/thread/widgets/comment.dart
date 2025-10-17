@@ -3,8 +3,8 @@ import 'package:crabir/bool_to_vote.dart';
 import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/flair.dart';
-import 'package:crabir/html_view.dart';
 import 'package:crabir/markdown_editor/editor.dart';
+import 'package:crabir/markdown_render.dart';
 import 'package:crabir/report.dart';
 import 'package:crabir/separated_row.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
@@ -152,8 +152,8 @@ class _CommentViewState extends State<CommentView> {
               spacing: 8,
               children: [
                 topRow(settings),
-                StyledHtml(
-                  htmlContent: comment.bodyHtml,
+                RedditMarkdown(
+                  markdown: comment.body,
                   showImages: settings.showCommentsImage,
                 ),
                 AnimatedSwitcher(

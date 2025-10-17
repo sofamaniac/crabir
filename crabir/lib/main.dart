@@ -79,20 +79,11 @@ class Crabir extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (_) =>
-                subscription.SubscriptionBloc()..add(subscription.Initialize()),
-          ),
-          BlocProvider(
             create: (context) => accounts.AccountsBloc()
               ..add(accounts.AccountEvent.initialize()),
           )
         ],
-        child: BlocBuilder<subscription.SubscriptionBloc,
-            subscription.SubscriptionState>(
-          builder: (context, state) {
-            return TopLevel();
-          },
-        ),
+        child: TopLevel(),
       ),
     );
   }

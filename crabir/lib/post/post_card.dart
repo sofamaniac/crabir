@@ -117,9 +117,13 @@ class PostCardContent extends StatelessWidget {
     if (!showMedia) {
       return null;
     }
+    final videoResolution = NetworkStatus.videoQuality(context);
     return switch (post.kind) {
       // Media types
-      Kind.video => VideoContent(post: post),
+      Kind.video => VideoContent(
+          post: post,
+          resolution: videoResolution,
+        ),
       Kind.streamableVideo => StreamableVideo(post: post),
       Kind.youtubeVideo => YoutubeContent(post: post),
       (Kind.mediaGallery || Kind.gallery) => GalleryView(post: post),
@@ -132,6 +136,9 @@ class PostCardContent extends StatelessWidget {
 
   Widget? selftext(BuildContext context) {
     if ((!post.spoiler || ignoreSelftextSpoiler) && post.selftextHtml != null) {
+      if (maxLines == null) {
+        return wrapPostElement(RedditMarkdown(markdown: post.selftext ?? ""));
+      }
       return wrapPostElement(
         HtmlWithConditionalFade(
           htmlContent: post.selftextHtml ?? "",

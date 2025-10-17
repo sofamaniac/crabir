@@ -15,7 +15,10 @@ class YoutubeContent extends StatelessWidget {
       onTap: () => launchUrlString(post.url),
       child: Stack(
         children: [
-          ImageThumbnail.redditImage(post.preview!.images[0]),
+          ImageThumbnail.redditImage(
+            post.preview!.images[0],
+            resolution: Resolution.medium,
+          ),
           Positioned(
             top: 8,
             right: 8,
@@ -36,7 +39,7 @@ class VideoContent extends StatefulWidget {
   const VideoContent({
     super.key,
     required this.post,
-    this.resolution = Resolution.source,
+    required this.resolution,
   });
 
   @override
@@ -76,7 +79,7 @@ class _VideoContentState extends State<VideoContent> {
       case Media_RedditVideo():
         return AnimatedContent.fromRedditVideo(
           media: media,
-          placeholderUrl: preview?.resolutions[0].url,
+          placeholderUrl: preview?.resolutions.firstOrNull?.url,
           goFullScreen: goFullScreen(context, widget.post, widget.resolution),
           cartouche: Cartouche(
             "VIDEO",
@@ -86,7 +89,7 @@ class _VideoContentState extends State<VideoContent> {
       case Media_Oembed():
         return AnimatedContent.fromMediaOEmbed(
           media: media,
-          placeholderUrl: preview?.resolutions[0].url,
+          placeholderUrl: preview?.resolutions.firstOrNull?.url,
           goFullScreen: goFullScreen(context, widget.post, widget.resolution),
           cartouche: Cartouche(
             "VIDEO",
@@ -97,7 +100,7 @@ class _VideoContentState extends State<VideoContent> {
         final image = preview!.variants.mp4!.withResolution(widget.resolution);
         return AnimatedContent.fromImageBase(
           image: image,
-          placeholderUrl: preview.resolutions[0].url,
+          placeholderUrl: preview.resolutions.firstOrNull?.url,
           goFullScreen: goFullScreen(context, widget.post, widget.resolution),
           cartouche: Cartouche(
             "VIDEO",
@@ -108,7 +111,7 @@ class _VideoContentState extends State<VideoContent> {
         final image = preview!.variants.gif!.withResolution(widget.resolution);
         return AnimatedContent.fromImageBase(
           image: image,
-          placeholderUrl: preview.resolutions[0].url,
+          placeholderUrl: preview.resolutions.firstOrNull?.url,
           goFullScreen: goFullScreen(context, widget.post, widget.resolution),
           cartouche: Cartouche(
             "GIF",
@@ -127,7 +130,7 @@ VoidCallback goFullScreen(
   final int width;
   final int height;
   final media = post.secureMedia;
-  final preview = post.preview?.images[0];
+  final preview = post.preview?.images.firstOrNull;
   switch (media) {
     case Media_RedditVideo():
       url = media.field0.dashUrl;
