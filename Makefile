@@ -70,3 +70,7 @@ release: $(LICENSES_JSON) $(FRB_OUTPUT) $(CODEGEN_OUTPUT)
 	cd $(FLUTTER_APP_DIR)
 	flutter run --release --dart-define-from-file $(ENV_FILE)
 
+.PHONY: appbundle
+appbundle: $(LICENSES_JSON) $(FRB_OUTPUT) $(CODEGEN_OUTPUT)
+	cd $(FLUTTER_APP_DIR)
+	flutter build appbundle --dart-define-from-file $(ENV_FILE)

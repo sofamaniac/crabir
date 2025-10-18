@@ -10,12 +10,13 @@ import 'package:markdown/markdown.dart' as md;
 import 'package:url_launcher/url_launcher.dart';
 
 class SpoilerSyntax extends md.InlineSyntax {
-  SpoilerSyntax() : super(r'>!([\s\S]+?)!<');
+  SpoilerSyntax() : super(r'\|!([\s\S]+?)!\|');
 
   static final tag = "spoiler";
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
+    if (match.group(1) == null) return true;
     final text = match[1]!;
     final element = md.Element(tag, [md.Text(text)]);
     parser.addNode(element);
@@ -101,6 +102,8 @@ class RedditMarkdown extends StatelessWidget {
         SpoilerSyntax(),
         RedditLinkSyntax(),
       ],
+      blockSyntaxes: [],
+      extensionSet: md.ExtensionSet.none,
       builders: {
         SpoilerSyntax.tag: SpoilerBuilder(),
       },
@@ -152,12 +155,18 @@ String preprocessRedditComment(String text) {
     r'(https?:\/\/preview\.redd\.it\/[^\s]+(?:\?(?:[^\s]*))?)',
     caseSensitive: false,
   );
+  final spoilerRegex = RegExp(r'>!([\s\S]*?)!<');
 
   // Replace raw image URLs with markdown image syntax
-  return text.replaceAllMapped(imageUrlRegex, (match) {
+
+  final result = text.replaceAllMapped(imageUrlRegex, (match) {
     final url = match.group(1)!;
     return '\n\n![]($url)\n\n';
+  }).replaceAllMapped(spoilerRegex, (match) {
+    final spoil = match.group(1)!;
+    return '|! $spoil !|';
   });
+  return result;
 }
 
 MarkdownStyleSheet redditMarkdownStyle(BuildContext context) {
