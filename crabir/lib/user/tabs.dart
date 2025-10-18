@@ -80,7 +80,11 @@ Widget _scaffold(
 
 Widget postView(BuildContext context, Post post) {
   return RedditPostCard(
+    maxLines: 5,
     post: post,
+    onTap: () {
+      context.push(post.permalink, extra: post);
+    },
   );
 }
 
