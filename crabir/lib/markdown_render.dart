@@ -102,8 +102,6 @@ class RedditMarkdown extends StatelessWidget {
         SpoilerSyntax(),
         RedditLinkSyntax(),
       ],
-      blockSyntaxes: [],
-      extensionSet: md.ExtensionSet.none,
       builders: {
         SpoilerSyntax.tag: SpoilerBuilder(),
       },
