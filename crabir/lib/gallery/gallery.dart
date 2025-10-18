@@ -83,7 +83,7 @@ class _GalleryView extends StatefulWidget {
 class _GalleryViewState extends State<_GalleryView> {
   int _currentPage = 0;
   late bool obfuscate;
-  final PageController _controller = PageController();
+  final PageController _controller = PageController(keepPage: false);
 
   @override
   void initState() {
