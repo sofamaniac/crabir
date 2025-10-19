@@ -25,7 +25,7 @@ class SpoilerSyntax extends md.InlineSyntax {
 }
 
 class RedditLinkSyntax extends md.InlineSyntax {
-  RedditLinkSyntax() : super(r'/?([ur]/[a-zA-Z0-9]+)');
+  RedditLinkSyntax() : super(r'\b/?([ur]/[a-zA-Z0-9]+)');
   static final tag = "redditLink";
   @override
   bool onMatch(md.InlineParser parser, Match match) {
