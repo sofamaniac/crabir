@@ -97,7 +97,7 @@ impl Client {
     fn new_reqwest_client() -> reqwest::Client {
         reqwest::Client::builder()
             .user_agent(USER_AGENT)
-            .timeout(Duration::from_secs(5))
+            .timeout(Duration::from_secs(30))
             .build()
             .expect("Building reqwest client should not fail")
     }
