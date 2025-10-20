@@ -1,3 +1,4 @@
+import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/settings/lateral_menu/lateral_menu_settings.dart';
@@ -14,6 +15,7 @@ List<Widget> options(BuildContext context) {
   final settings = LateralMenuSettings.of(context);
   final locales = AppLocalizations.of(context);
   final theme = CrabirTheme.of(context);
+  final account = context.watch<AccountsBloc>().state;
   Icon icon(IconData icon) => Icon(icon, color: theme.secondaryText);
   final children = [
     if (settings.showGoToDropdown) GoToDropdown(),
@@ -21,13 +23,27 @@ List<Widget> options(BuildContext context) {
       ListTile(
         leading: icon(GOTO_COMMUNITY_ICON),
         title: Text(locales.lateralMenu_showGoToCommunity),
-        //onTap: () => context.router.navigate(SubscriptionsTabRoute()),
-        onTap: () => context.go("/subscriptions"),
+        onTap: () {
+          Scaffold.of(context).closeDrawer();
+          context.go("/subscriptions");
+        },
       ),
     if (settings.showGoToUser)
       ListTile(
         leading: icon(GOTO_USER_ICON),
         title: Text(locales.lateralMenu_showGoToUser),
+        onTap: () {
+          Scaffold.of(context).closeDrawer();
+          if (account.account == null || account.account!.isAnonymous) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Please login to  continue"),
+              ),
+            );
+          } else {
+            context.go("/u/${account.account?.username ?? ""}");
+          }
+        },
       ),
     if (settings.darkMode)
       SwitchListTile(
@@ -110,7 +126,6 @@ class _GoToDropdownState extends State<GoToDropdown> {
                         title: Text(locales.lateralMenu_showGoToCommunity),
                         onTap: () {
                           Scaffold.of(context).closeDrawer();
-                          //context.router.navigate(SubscriptionsTabRoute());
                           context.go("/subscriptions");
                         },
                       ),
