@@ -7,14 +7,20 @@ class DrawerFeedSelection extends StatefulWidget {
   State<StatefulWidget> createState() => DrawerFeedSelectionState();
 }
 
-class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
+class DrawerFeedSelectionState extends State<DrawerFeedSelection>
+    with AutomaticKeepAliveClientMixin {
   final log = Logger("DrawerFeedSelection");
+  final controller = ScrollController();
   UserAccount? account;
 
   DrawerFeedSelectionState();
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final bloc = context.watch<AccountsBloc>();
     final account = bloc.state;
     final theme = CrabirTheme.of(context);
@@ -26,6 +32,8 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection> {
     } else if (account.status case Loaded()) {
       return Expanded(
         child: ListView(
+          key: PageStorageKey("SubscriptionDrawerState"),
+          controller: controller,
           children: [
             ...baseFeeds(
               context,
