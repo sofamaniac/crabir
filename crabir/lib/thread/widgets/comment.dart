@@ -198,9 +198,9 @@ class _CommentViewState extends State<CommentView> {
     final settings = CommentsSettings.of(context);
     final likes = widget.comment.likes.toVoteDirection();
     final bloc = ThreadBloc.maybeOf(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      mainAxisSize: MainAxisSize.max,
+    return Wrap(
+      alignment: WrapAlignment.end,
+      //mainAxisSize: MainAxisSize.max,
       children: [
         VoteButton.like(
           likes: likes,

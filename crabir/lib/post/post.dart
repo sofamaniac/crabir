@@ -4,6 +4,7 @@ import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/gallery/gallery.dart';
 import 'package:crabir/l10n/app_localizations.dart';
+import 'package:crabir/markdown_editor/editor.dart';
 import 'package:crabir/markdown_render.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/network_status.dart';

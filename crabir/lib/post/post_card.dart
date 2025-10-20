@@ -9,6 +9,8 @@ class RedditPostCard extends StatefulWidget {
   /// Function to call after liking / disliking the post.
   final LikeCallback? onLikeCallback;
 
+  final HideCallback? onHideCallback;
+
   /// Function to call when the post is tapped.
   final VoidCallback? onTap;
 
@@ -28,17 +30,30 @@ class RedditPostCard extends StatefulWidget {
   /// Set to true to not change title color when post is read
   final bool ignoreRead;
 
+  /// Show navigate to comments button
+  final bool showCommentsButton;
+
+  /// Show reply to post button
+  final bool showReplyButton;
+
+  /// Whether to honor `post.hidden`. If set to false, the post is always shown.
+  final bool respectHidden;
+
   const RedditPostCard({
     super.key,
     required this.post,
     this.onLikeCallback,
     this.onSaveCallback,
+    this.onHideCallback,
     this.onTap,
     this.maxLines,
     this.showMedia = true,
     this.enableThumbnail = true,
     this.ignoreSelftextSpoiler = false,
     this.ignoreRead = false,
+    this.showCommentsButton = true,
+    this.showReplyButton = false,
+    this.respectHidden = true,
   });
 
   @override
@@ -56,8 +71,16 @@ class _RedditPostCardState extends State<RedditPostCard> {
     await widget.onLikeCallback?.call(dir);
   }
 
+  void _onHide(bool hidden) async {
+    setState(() {});
+    widget.onHideCallback?.call(hidden);
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.respectHidden && widget.post.hidden) {
+      return SizedBox.shrink();
+    }
     final contentWidget = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -81,6 +104,9 @@ class _RedditPostCardState extends State<RedditPostCard> {
           post: widget.post,
           onLike: _onLike,
           onSave: _onSave,
+          onHide: _onHide,
+          showReplyButton: widget.showReplyButton,
+          showCommentsButton: widget.showCommentsButton,
         ),
       ],
     );

@@ -55,7 +55,8 @@ class _VideoContentState extends State<VideoContent> {
 
   @override
   Widget build(BuildContext context) {
-    final media = widget.post.secureMedia;
+    final media = widget.post.secureMedia ??
+        widget.post.crosspostParentList.firstOrNull?.secureMedia;
     final preview = widget.post.preview?.images[0];
     final obfuscate =
         widget.post.spoiler || (FiltersSettings.of(context).blurNSFW);

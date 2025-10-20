@@ -198,7 +198,7 @@ class _CommonFeedViewState extends State<CommonFeedView> {
     };
   }
 
-  Widget postView(BuildContext context, Post post) {
+  Widget postView(BuildContext context, Post post, bool hide) {
     return RedditPostCard(
       maxLines: 5,
       post: post,
@@ -206,6 +206,7 @@ class _CommonFeedViewState extends State<CommonFeedView> {
         context.read<ReadPosts>().mark(post.id);
         context.push(post.permalink, extra: post);
       },
+      respectHidden: hide,
     );
   }
 }

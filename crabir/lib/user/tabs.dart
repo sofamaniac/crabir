@@ -78,13 +78,14 @@ Widget _scaffold(
   );
 }
 
-Widget postView(BuildContext context, Post post) {
+Widget postView(BuildContext context, Post post, bool hide) {
   return RedditPostCard(
     maxLines: 5,
     post: post,
     onTap: () {
       context.push(post.permalink, extra: post);
     },
+    respectHidden: hide,
   );
 }
 

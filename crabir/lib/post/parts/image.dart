@@ -29,7 +29,9 @@ class _ImageContentState extends State<ImageContent> {
     final obfuscate = widget.post.spoiler ||
         (widget.post.over18 &&
             context.watch<FiltersSettingsCubit>().state.blurNSFW);
-    if (widget.post.preview == null) {
+    final preview = widget.post.preview ??
+        widget.post.crosspostParentList.firstOrNull?.preview;
+    if (preview == null) {
       return InkWell(
         onTap: () =>
             FullscreenImageView(imageUrl: widget.post.url, post: widget.post)
@@ -41,13 +43,13 @@ class _ImageContentState extends State<ImageContent> {
     } else {
       final resolution = NetworkStatus.imageQuality(context);
 
-      if (widget.post.preview!.images[0].variants.mp4 != null) {
+      if (preview.images.firstOrNull?.variants.mp4 != null) {
         return VideoContent(
           post: widget.post,
           resolution: resolution,
         );
       }
-      final RedditImage image = widget.post.preview!.images[0];
+      final RedditImage image = preview.images[0];
       return InkWell(
         onTap: () {
           if (!obfuscate || tapped) {

@@ -28,6 +28,17 @@ class CommentEditor extends StatefulWidget {
     );
   }
 
+  factory CommentEditor.comment(BuildContext context, Post post) {
+    final locales = AppLocalizations.of(context);
+    return CommentEditor(
+      title: locales.replyTitle,
+      author: post.author?.username ?? locales.deletedUser,
+      text: post.selftext ?? "",
+      parentName: post.name,
+      depth: 0,
+    );
+  }
+
   @override
   State<CommentEditor> createState() => _CommentEditorState();
 }

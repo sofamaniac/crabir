@@ -18,7 +18,11 @@ class ThingsScaffold extends StatefulWidget {
   final Widget Function(BuildContext, Comment)? commentView;
 
   /// Function to use do build a `Post` view.
-  final Widget Function(BuildContext, Post)? postView;
+  final Widget Function(
+    BuildContext context,
+    Post post,
+    bool respectHide,
+  )? postView;
 
   /// When set to true show post that were hidden
   final bool showHidden;
@@ -59,8 +63,7 @@ class _ThingsScaffoldState extends State<ThingsScaffold>
   /// return true when the post should be hidden
   bool hide(Post post) {
     return GlobalFilters.of(context).shouldHidePost(post) ||
-        (post.over18 && !FiltersSettings.of(context).showNSFW) ||
-        (post.hidden && !widget.showHidden);
+        (post.over18 && !FiltersSettings.of(context).showNSFW);
   }
 
   @override
@@ -95,10 +98,14 @@ class _ThingsScaffoldState extends State<ThingsScaffold>
 
                         switch (thing) {
                           case Thing_Post(field0: final post):
-                            if (hide(post) || widget.postView == null) {
+                            if (widget.postView == null) {
                               return const SizedBox.shrink();
                             }
-                            return widget.postView!.call(context, post);
+                            return widget.postView!.call(
+                              context,
+                              post,
+                              !widget.showHidden,
+                            );
                           case Thing_Comment(field0: final comment):
                             return widget.commentView?.call(context, comment) ??
                                 const SizedBox.shrink();

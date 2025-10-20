@@ -1,10 +1,23 @@
 part of '../post.dart';
 
+typedef HideCallback = void Function(bool);
+
 class Footer extends StatelessWidget {
   final Post post;
   final SaveCallback? onSave;
   final LikeCallback? onLike;
-  const Footer({super.key, required this.post, this.onLike, this.onSave});
+  final HideCallback? onHide;
+  final bool showCommentsButton;
+  final bool showReplyButton;
+  const Footer({
+    super.key,
+    required this.post,
+    this.onLike,
+    this.onSave,
+    this.onHide,
+    required this.showCommentsButton,
+    required this.showReplyButton,
+  });
   @override
   Widget build(BuildContext context) {
     final theme = CrabirTheme.of(context);
@@ -42,12 +55,22 @@ class Footer extends StatelessWidget {
             onSave?.call(save);
           },
         ),
-        if (settings.showCommentsButton)
+        if (settings.showCommentsButton && showCommentsButton)
           IconButton(
             icon: const Icon(Icons.comment),
             color: theme.secondaryText,
             tooltip: 'Comments',
             onPressed: () => context.push(post.permalink, extra: post),
+          ),
+        if (showReplyButton)
+          IconButton(
+            icon: const Icon(Icons.reply),
+            color: theme.secondaryText,
+            tooltip: 'Reply',
+            onPressed: () => CommentEditor.comment(
+              context,
+              post,
+            ).pushNamed(context),
           ),
         if (settings.showOpenInAppButton)
           IconButton(
@@ -63,8 +86,16 @@ class Footer extends StatelessWidget {
           ),
         if (settings.showMarkAsReadButton) ReadButton(post: post, short: true),
         if (settings.showShareButton) ShareButton(post: post, short: true),
-        if (settings.showHideButton) HideButton(post: post, short: true),
-        MoreOptionButton(post: post),
+        if (settings.showHideButton)
+          HideButton(
+            post: post,
+            short: true,
+            onHide: onHide,
+          ),
+        MoreOptionButton(
+          post: post,
+          onHide: onHide,
+        ),
       ],
     );
   }
@@ -72,7 +103,12 @@ class Footer extends StatelessWidget {
 
 class MoreOptionButton extends StatelessWidget {
   final Post post;
-  const MoreOptionButton({super.key, required this.post});
+  final HideCallback? onHide;
+  const MoreOptionButton({
+    super.key,
+    required this.post,
+    this.onHide,
+  });
 
   Dialog muteDialog(BuildContext context) {
     final icon = post.subreddit.details?.icon;
@@ -173,6 +209,11 @@ class MoreOptionButton extends StatelessWidget {
               HideButton(
                 post: post,
                 short: false,
+                // Close dialog
+                onHide: (hidden) {
+                  onHide?.call(hidden);
+                  Navigator.of(context).pop();
+                },
               ),
             ListTile(
               leading: Icon(Icons.report),
@@ -237,17 +278,10 @@ abstract class LongShortButton extends StatelessWidget {
   }
 
   Widget _short(BuildContext context) {
-    final readPosts = ReadPosts.of(context);
     final theme = CrabirTheme.of(context);
     return IconButton(
       color: theme.secondaryText,
-      onPressed: () {
-        if (readPosts.isRead(post.id)) {
-          readPosts.unmark(post.id);
-        } else {
-          readPosts.mark(post.id);
-        }
-      },
+      onPressed: () => onTap(context),
       icon: icon(context),
       tooltip: label(context),
     );
@@ -299,14 +333,23 @@ class ReadButton extends LongShortButton {
 }
 
 class HideButton extends LongShortButton {
-  const HideButton({super.key, required super.post, required super.short});
+  final HideCallback? onHide;
+  const HideButton({
+    super.key,
+    required super.post,
+    required super.short,
+    this.onHide,
+  });
 
   @override
   onTap(BuildContext context) async {
+    print("ON TAPP $onHide");
     if (post.hidden) {
       await post.unhide(client: RedditAPI.client());
+      onHide?.call(false);
     } else {
       await post.hide_(client: RedditAPI.client());
+      onHide?.call(true);
     }
   }
 
