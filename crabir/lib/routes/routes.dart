@@ -160,7 +160,7 @@ final GoRouter appRouter = GoRouter(
 
                     final pageChild = Thread(
                       post: state.extra as Post?,
-                      permalink: state.uri.toString(),
+                      permalink: state.uri.path,
                     );
 
                     if (settings.swipeToClose) {
