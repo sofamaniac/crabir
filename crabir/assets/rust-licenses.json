@@ -1685,6 +1685,15 @@
     ]
   },
   {
+    "name": "tracing-attributes",
+    "version": "0.1.30",
+    "license": "MIT",
+    "repository": "https://github.com/tokio-rs/tracing",
+    "license_files": [
+      "assets/rust-licenses/tracing_attributes-LICENSE"
+    ]
+  },
+  {
     "name": "tracing-core",
     "version": "0.1.33",
     "license": "MIT",

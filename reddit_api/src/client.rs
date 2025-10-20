@@ -30,6 +30,7 @@ use serde::{
     de::{DeserializeOwned, Error as _},
 };
 use std::sync::RwLock;
+use tracing::instrument;
 use uuid::Uuid;
 
 use crate::{
@@ -409,6 +410,7 @@ impl Client {
     /// Get the info of the current user.
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
+    #[instrument]
     pub async fn logged_user_info(&self) -> Result<UserInfo> {
         let url = self.join_url("api/v1/me.json");
         let request = self.get(url);
@@ -534,6 +536,7 @@ impl Client {
     /// Get the list of all subreddits the current user is subscribed to.
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
+    #[instrument]
     pub async fn subscriptions(&self) -> Result<Vec<crate::model::subreddit::Subreddit>> {
         let url = self.join_url("subreddits/mine/subscriber.json");
         let result: Vec<Subreddit> = self.collect_paged(&url, &[]).await?;
@@ -543,6 +546,7 @@ impl Client {
     /// Subscribe to a subreddit
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
+    #[instrument]
     pub async fn subscribe(&self, name: &Fullname) -> Result<()> {
         let url = self.join_url("api/subscribe");
         let request = self.post(url);
@@ -559,6 +563,7 @@ impl Client {
     /// Unsubscribe to a subreddit
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
+    #[instrument]
     pub async fn unsubscribe(&self, name: &Fullname) -> Result<()> {
         let url = self.join_url("api/subscribe");
         let request = self.post(url);
@@ -574,6 +579,7 @@ impl Client {
     /// Get html of wiki index of subreddit `name` (e.g: unixporn).
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
+    #[instrument]
     pub async fn wiki(&self, name: String) -> Result<String> {
         let url = self.join_url(&format!("r/{name}/wiki.json"));
         let request = self.get(url);
@@ -588,6 +594,7 @@ impl Client {
     /// Get the rules of a subreddit by its display name (e.g.: unixporn).
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
+    #[instrument]
     pub async fn rules(&self, name: String) -> Result<Vec<Rule>> {
         #[derive(Deserialize)]
         struct Response {
@@ -603,6 +610,7 @@ impl Client {
     /// Report an `Thing`
     /// # Errors
     /// Returns an error if the http client fails or if the request fails.
+    #[instrument]
     pub async fn report(&self, name: Fullname, reason: String) -> Result<()> {
         let url = self.join_url("api/report");
         let request = self.post(url);
@@ -618,6 +626,7 @@ impl Client {
     /// Get the list of multireddits the current user is subscribed to.
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
+    #[instrument]
     pub async fn multis(&self) -> Result<Vec<crate::model::multi::Multi>> {
         let url = self.join_url("api/multi/mine.json");
         let request = self.get(url);
@@ -633,6 +642,7 @@ impl Client {
     /// Get a multi from its link (`/user/{username}/m/{name}`).
     /// # Errors
     /// Returns an error if the http client fails or if the parsing of the response fails.
+    #[instrument]
     pub async fn get_multi(&self, multi_path: &str) -> Result<Multi> {
         let url = self
             .join_url("api/multi")
@@ -657,6 +667,7 @@ impl Client {
     /// Vote on a votable item (i.e. a [`Post`] or a [`comment::Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
+    #[instrument]
     pub(crate) async fn vote(&self, fullname: &Fullname, direction: VoteDirection) -> Result<()> {
         let dir = match direction {
             VoteDirection::Up => 1,
@@ -674,6 +685,7 @@ impl Client {
     /// Save a saveable item (i.e. a [`Post`] or a [`comment::Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
+    #[instrument]
     pub(crate) async fn save(&self, thing: &Fullname) -> Result<()> {
         let url = self.join_url("api/save");
         let request = self.post(url);
@@ -685,6 +697,7 @@ impl Client {
     /// Unsave a saveable item (i.e. a [`Post`] or a [`comment::Comment`]).
     /// # Errors
     /// Returns an error if the request failed.
+    #[instrument]
     pub(crate) async fn unsave(&self, thing: &Fullname) -> Result<()> {
         let url = self.join_url("api/unsave");
         let request = self.post(url);
@@ -696,6 +709,7 @@ impl Client {
     /// Hide a [`Post`]
     /// # Errors
     /// Returns an error if the request failed.
+    #[instrument]
     pub(crate) async fn hide(&self, post: &Post) -> Result<()> {
         let url = self.join_url("api/hide");
         let request = self.post(url);
@@ -707,6 +721,7 @@ impl Client {
     /// Unhide a [`Post`]
     /// # Errors
     /// Returns an error if the request failed.
+    #[instrument]
     pub(crate) async fn unhide(&self, post: &Post) -> Result<()> {
         let url = self.join_url("api/unhide");
         let request = self.post(url);
@@ -719,6 +734,7 @@ impl Client {
     /// a [`Thing::Comment`] or a [`Thing::More`].
     /// # Errors
     /// Fails if the request fails or the parsing of the response fails.
+    #[instrument]
     pub async fn comments(
         &self,
         permalink: String,
@@ -745,10 +761,12 @@ impl Client {
     /// Returns the content of the post at the given permalink.
     /// # Errors
     /// Fails if the request fails or the parsing of the response fails.
+    #[instrument]
     pub async fn get_post(&self, permalink: String) -> Result<Post> {
         self.comments(permalink, None).await.map(|r| r.0)
     }
 
+    #[instrument]
     pub async fn load_more_comments(
         &self,
         parent_id: &Fullname,
@@ -809,6 +827,7 @@ impl Client {
     }
 
     /// Get info on subreddit at 'r/`subreddit`/about'.
+    #[instrument]
     pub async fn subreddit_about(&self, subreddit: String) -> Result<Subreddit> {
         let url = self.join_url(&format!("r/{subreddit}/about.json"));
         let request = self.get(url);
@@ -817,6 +836,7 @@ impl Client {
     }
 
     /// (un)favorite subreddit
+    #[instrument]
     pub async fn favorite(&self, subreddit: &str, make_favorite: bool) -> Result<()> {
         let url = self.join_url("api/favorite");
         let request = self.post(url).query(&[
@@ -828,6 +848,7 @@ impl Client {
     }
 
     /// Submit a comment
+    #[instrument]
     pub async fn submit_comment(
         &self,
         parent: &Fullname,
@@ -872,6 +893,7 @@ impl Client {
     }
 
     /// Resolve short link
+    #[instrument]
     pub async fn resolve_short_link(&self, link: &str) -> Result<String> {
         let request = self
             .http
@@ -884,6 +906,7 @@ impl Client {
     }
 
     /// Create post
+    #[instrument]
     pub async fn submit_post(&self, post: PostSubmit) -> Result<()> {
         let url = self.join_url("api/submit");
         let request = self.post(url);
