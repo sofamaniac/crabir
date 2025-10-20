@@ -18,11 +18,13 @@ Future<void> initRevenueCat() async {
 Future<bool> presentPaywallIfNeeded() async {
   final PaywallResult paywallResult =
       await RevenueCatUI.presentPaywallIfNeeded("subscribed");
+  Logger("presentPaywallIfNeeded").shout("PaywallResult: $paywallResult");
   return switch (paywallResult) {
     PaywallResult.notPresented ||
     PaywallResult.purchased ||
     PaywallResult.restored =>
       true,
-    _ => false
+    PaywallResult.cancelled => false,
+    PaywallResult.error => false,
   };
 }

@@ -19,7 +19,6 @@ import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
-import 'package:crabir/subscription/bloc/subscription_bloc.dart';
 import 'package:crabir/subscription/widgets/paywall.dart';
 import 'package:crabir/subscriptions_tab.dart';
 import 'package:crabir/thread/widgets/thread.dart';
@@ -49,12 +48,7 @@ final GoRouter appRouter = GoRouter(
     if (isSubscribed) {
       return null;
     } else {
-      final result = await presentPaywallIfNeeded();
-      if (result) {
-        return null;
-      } else {
-        return "/paywall";
-      }
+      return "/paywall";
     }
   },
 
