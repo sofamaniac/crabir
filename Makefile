@@ -8,7 +8,7 @@ FLUTTER_APP_DIR := $(MAKEFILE_DIR)/crabir
 ## Rust / FRB files
 RUST_FILES := $(shell find reddit_api -type f -name "*.rs")
 FRB_INPUT := $(shell find crabir_bridge/src/api -type f -name "*.rs")
-FRB_OUTPUT := $(FLUTTER_APP_DIR)/lib/src/rust/frb_generated.rs
+FRB_OUTPUT := $(FLUTTER_APP_DIR)/build/frb_generated
 
 ## L10N files
 LANG_FILES := $(wildcard $(FLUTTER_APP_DIR)/lib/l10n/*.arb)
@@ -38,6 +38,7 @@ $(LICENSES_JSON): $(LOCKFILE)
 $(FRB_OUTPUT): $(RUST_FILES) $(FRB_INPUT)
 	cd $(FLUTTER_APP_DIR)
 	flutter_rust_bridge_codegen generate --no-build-runner
+	touch $(FRB_OUTPUT)
 
 $(L10N_OUTPUT): $(LANG_FILES)
 	cd $(FLUTTER_APP_DIR)
