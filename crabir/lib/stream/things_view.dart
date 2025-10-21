@@ -47,7 +47,9 @@ class _ThingsScaffoldState extends State<ThingsScaffold>
 
   late final _pagingController = PagingController<bool, Thing>(
     getNextPageKey: (state) {
-      return !widget.stream.done;
+      // Return `null` when no more pages are available
+      if (widget.stream.done) return null;
+      return true;
     },
     fetchPage: (pageKey) async {
       return await widget.stream.next();
