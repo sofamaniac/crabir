@@ -70,7 +70,7 @@ pub struct GalleryMedia {
     pub media_type: String,
     #[serde(rename = "s", flatten)]
     pub source: Source,
-    #[serde(rename = "p")]
+    #[serde(rename = "p", default)]
     pub previews: Vec<Image>,
     #[serde(rename = "o", default)]
     pub obfuscated: Vec<Image>,
