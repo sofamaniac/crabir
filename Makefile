@@ -75,3 +75,10 @@ release: $(LICENSES_JSON) $(FRB_OUTPUT) $(CODEGEN_OUTPUT)
 appbundle: $(LICENSES_JSON) $(FRB_OUTPUT) $(CODEGEN_OUTPUT)
 	cd $(FLUTTER_APP_DIR)
 	flutter build appbundle --dart-define-from-file $(ENV_FILE)
+
+.PHONY: clean
+clean:
+	cd $(FLUTTER_APP_DIR)
+	flutter clean
+	# required by FRB_OUTPUT
+	mkdir build

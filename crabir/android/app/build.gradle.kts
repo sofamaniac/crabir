@@ -16,10 +16,10 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.example.crabir"
-    //compileSdk = flutter.compileSdkVersion
-    // ndkVersion = flutter.ndkVersion
-    ndkVersion = "27.0.12077973"
-    compileSdk = 35
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+    // ndkVersion = "27.0.12077973"
+    // compileSdk = 36
 
 
     compileOptions {
