@@ -95,11 +95,11 @@ class StyledHtml extends StatelessWidget {
     return Html(
       style: style,
       data: htmlContent,
-      onLinkTap: (url, attributes, __) => defaultLinkHandler(
+      onLinkTap: (url, attributes, element) => defaultLinkHandler(
         context,
         url,
         attributes,
-        __,
+        element,
       ),
       shrinkWrap: true,
       extensions: [

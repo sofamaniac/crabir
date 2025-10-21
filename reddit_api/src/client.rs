@@ -239,7 +239,7 @@ impl Client {
     }
 
     /// Check if token has expired
-    async fn is_access_token_valid(&self) -> bool {
+    fn is_access_token_valid(&self) -> bool {
         #[derive(Deserialize)]
         struct Claims {
             exp: f64,
@@ -369,18 +369,14 @@ impl Client {
     }
 
     pub(crate) async fn execute(&self, request: RequestBuilder) -> Result<reqwest::Response> {
-        if !self.is_access_token_valid().await {
+        if !self.is_access_token_valid() {
             self.refresh_token().await?;
         }
-        let request = if self.is_access_token_valid().await {
-            let access_token = self.current_access_token.read().unwrap().clone();
-            if let Some(access_token) = access_token {
-                request.bearer_auth(access_token)
-            } else {
-                request.basic_auth::<&str, &str>(CLIENT_ID, None)
-            }
+        let access_token = self.current_access_token.read().unwrap().clone();
+        let request = if let Some(access_token) = access_token {
+            request.bearer_auth(access_token)
         } else {
-            request
+            request.basic_auth::<&str, &str>(CLIENT_ID, None)
         };
         debug!("Executing {request:#?}");
         let request = request.build().expect("Building request should not fail");
@@ -892,7 +888,7 @@ impl Client {
         Ok(comment)
     }
 
-    /// Resolve short link
+    /// Resolve short link. `link` should be a valid url.
     #[instrument]
     pub async fn resolve_short_link(&self, link: &str) -> Result<String> {
         let request = self
@@ -911,10 +907,7 @@ impl Client {
         let url = self.join_url("api/submit");
         let request = self.post(url);
         let request = request.form(&post);
-        log::debug!("{request:#?}");
-        let response = self.execute(request).await?;
-        let text = response.text().await?;
-        log::debug!("[submit_post] {text}");
+        let _ = self.execute(request).await?;
         Ok(())
     }
 }
