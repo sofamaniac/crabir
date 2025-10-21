@@ -56,20 +56,22 @@ class _ReportDialogState extends State<ReportDialog> {
                 child: Text("Submit"),
               )
             ],
-            content: ListView.builder(
-              itemCount: rules.length,
-              itemBuilder: (context, index) {
-                return RadioListTile(
-                  value: rules[index],
-                  groupValue: _selected,
-                  title: Text(rules[index].violationReason),
-                  onChanged: (value) {
-                    setState(() {
-                      _selected = value;
-                    });
-                  },
-                );
+            content: RadioGroup(
+              groupValue: _selected,
+              onChanged: (value) {
+                setState(() {
+                  _selected = value;
+                });
               },
+              child: ListView.builder(
+                itemCount: rules.length,
+                itemBuilder: (context, index) {
+                  return RadioListTile(
+                    value: rules[index],
+                    title: Text(rules[index].violationReason),
+                  );
+                },
+              ),
             ),
           );
         } else {
