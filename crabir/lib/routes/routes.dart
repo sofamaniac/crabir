@@ -178,7 +178,7 @@ final GoRouter appRouter = GoRouter(
                   path: "s/:id",
                   builder: (context, state) {
                     final future = RedditAPI.client().resolveShortLink(
-                      link: state.fullPath!,
+                      link: state.uri.toString(),
                     );
                     return FutureBuilder(
                       future: future,
