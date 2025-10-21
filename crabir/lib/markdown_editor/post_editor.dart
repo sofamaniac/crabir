@@ -4,6 +4,7 @@ AlertDialog postEditorDialog(BuildContext context, {Subreddit? subreddit}) {
   return AlertDialog(
     title: Text("Create Post"),
     content: ListView(
+      shrinkWrap: true,
       children: [
         ListTile(
           title: Text("Text post"),
@@ -121,72 +122,76 @@ class _PostEditorState extends State<PostEditor> {
           )
         ],
       ),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            title: subreddit != null
-                ? Text(subreddit!.other.displayNamePrefixed)
-                : Text("Select a community"),
-            onTap: () async {
-              final newSubreddit = await SearchSubredditsView(
-                enableUser: false,
-                enablePost: false,
-              ).pushNamed(context) as Subreddit?;
-              if (newSubreddit != null) {
-                WidgetsBinding.instance.addPostFrameCallback(
-                  (_) => setState(() {
-                    subreddit = newSubreddit;
-                    submission.subreddit = newSubreddit;
-                  }),
-                );
-              }
-            },
-            trailing: Icon(Icons.arrow_downward_sharp),
-          ),
-          TextField(
-            controller: _titleController,
-            onChanged: (title) => submission.title = title,
-            maxLines: 1,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: "Enter title",
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: subreddit != null
+                  ? Text(subreddit!.other.displayNamePrefixed)
+                  : Text("Select a community"),
+              onTap: () async {
+                final newSubreddit = await SearchSubredditsView(
+                  enableUser: false,
+                  enablePost: false,
+                ).pushNamed(context) as Subreddit?;
+                if (newSubreddit != null) {
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => setState(() {
+                      subreddit = newSubreddit;
+                      submission.subreddit = newSubreddit;
+                    }),
+                  );
+                }
+              },
+              trailing: Icon(Icons.arrow_drop_down_sharp),
             ),
-            maxLength: 300,
-          ),
-          Row(
-            children: [
-              _PropertyButton(
-                onChanged: (value) {
-                  setState(() {
-                    submission.nsfw = value;
-                  });
-                },
-                label: "NSFW",
+            TextField(
+              controller: _titleController,
+              onChanged: (title) => submission.title = title,
+              maxLines: 1,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: "Title",
               ),
-              _PropertyButton(
-                onChanged: (value) {
-                  setState(() {
-                    submission.spoiler = value;
-                  });
-                },
-                label: "Spoiler",
-              )
-            ],
-          ),
-          CheckboxListTile(
-            value: submission.sendreplies,
-            onChanged: (value) {
-              setState(() {
-                submission.sendreplies = value!;
-              });
-            },
-            title: Text("Send reply notification"),
-          ),
-          Expanded(
-            child: widget._builder(submission),
-          ),
-        ],
+              maxLength: 300,
+            ),
+            Row(
+              spacing: 8,
+              children: [
+                _PropertyButton(
+                  onChanged: (value) {
+                    setState(() {
+                      submission.nsfw = value;
+                    });
+                  },
+                  label: "NSFW",
+                ),
+                _PropertyButton(
+                  onChanged: (value) {
+                    setState(() {
+                      submission.spoiler = value;
+                    });
+                  },
+                  label: "Spoiler",
+                )
+              ],
+            ),
+            CheckboxListTile(
+              value: submission.sendreplies,
+              onChanged: (value) {
+                setState(() {
+                  submission.sendreplies = value!;
+                });
+              },
+              title: Text("Send reply notification"),
+            ),
+            Expanded(
+              child: widget._builder(submission),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -210,7 +215,8 @@ class _PropertyButtonState extends State<_PropertyButton> {
   @override
   Widget build(BuildContext context) {
     final Color bgColor = _isActive ? Colors.red : Colors.transparent;
-    final Color textColor = CrabirTheme.of(context).secondaryText;
+    final Color textColor =
+        _isActive ? Colors.white : CrabirTheme.of(context).secondaryText;
 
     return OutlinedButton(
       onPressed: () {

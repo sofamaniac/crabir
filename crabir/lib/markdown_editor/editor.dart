@@ -78,8 +78,10 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
   }
 
   void _bold() => _insertMarkdown('**', '**');
-  void _italic() => _insertMarkdown('_', '_');
+  void _italic() => _insertMarkdown('*', '*');
   void _link() => _insertMarkdown('[', '](url)');
+  void _spoiler() => _insertMarkdown(">!", "!<");
+  void _quote() => _insertMarkdown(">", "");
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +95,7 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
             onChanged: widget.onChanged?.call,
             decoration: InputDecoration(
               border: OutlineInputBorder(),
-              hintText: widget.hint ?? 'Enter markdown...',
+              hintText: widget.hint ?? 'Enter text...',
             ),
           ),
         ),
@@ -114,6 +116,16 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
               icon: const Icon(Icons.link),
               onPressed: _link,
               tooltip: 'Link',
+            ),
+            IconButton(
+              icon: const Icon(Icons.warning),
+              onPressed: _spoiler,
+              tooltip: 'Spoiler',
+            ),
+            IconButton(
+              icon: const Icon(Icons.format_quote),
+              onPressed: _quote,
+              tooltip: 'Quote',
             ),
           ],
         ),
