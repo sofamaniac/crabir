@@ -93,6 +93,7 @@ class _ThingsScaffoldState extends State<ThingsScaffold>
                     fetchNextPage: fetchNextPage,
                     state: state,
                     builderDelegate: PagedChildBuilderDelegate(
+                      invisibleItemsThreshold: 10,
                       noMoreItemsIndicatorBuilder: (context) =>
                           Center(child: Text("You've reached the end")),
                       itemBuilder: (context, item, index) {
