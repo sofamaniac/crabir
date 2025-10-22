@@ -866,7 +866,7 @@ impl Client {
             things: Vec<Thing>,
         }
         let url = self.join_url("api/comment");
-        let request = self.post(url).query(&[
+        let request = self.post(url).form(&[
             ("api_type", "json"),
             ("text", body),
             ("thing_id", parent.as_ref()),

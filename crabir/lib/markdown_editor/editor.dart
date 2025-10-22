@@ -93,6 +93,7 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
             maxLines: widget.maxLines,
             minLines: widget.minLines,
             onChanged: widget.onChanged?.call,
+            maxLength: 10000,
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               hintText: widget.hint ?? 'Enter text...',

@@ -73,18 +73,86 @@ class _CommentEditorState extends State<CommentEditor> {
           )
         ],
       ),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(widget.author),
-          Text(widget.text),
-          Expanded(
-            child: MarkdownEditor(
-              controller: _controller,
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          spacing: 8,
+          children: [
+            InkWell(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(widget.author),
+                  Text(
+                    widget.text,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+              onTap: () => showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  scrollable: true,
+                  title: Text("Reply to"),
+                  content: Text(
+                    widget.text,
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => context.pop(),
+                      child: Text("Close"),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        context.pop();
+                        _insertQuote();
+                      },
+                      child: Text("Quote"),
+                    )
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: MarkdownEditor(
+                controller: _controller,
+                hint: "Comment",
+                minLines: 5,
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  void _insertQuote() {
+    final text = _controller.text;
+    final selection = _controller.selection;
+
+    final quote =
+        widget.text.splitMapJoin('\n', onNonMatch: (match) => '> $match');
+
+    if (!selection.isValid) {
+      // Insert at beginning if invalid selection
+      _controller.text.replaceRange(0, 0, quote);
+      return;
+    }
+
+    final newText = text.replaceRange(
+      selection.start,
+      selection.end,
+      quote,
+    );
+
+    final cursorPos = selection.start + quote.length;
+
+    _controller.value = _controller.value.copyWith(
+      text: newText,
+      selection: TextSelection.collapsed(offset: cursorPos),
     );
   }
 }
