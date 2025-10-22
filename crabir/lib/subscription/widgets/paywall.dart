@@ -1,3 +1,4 @@
+import 'package:crabir/routes/routes.dart';
 import 'package:crabir/subscription/bloc/subscription_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -11,7 +12,7 @@ class PaywallScreen extends StatelessWidget {
       future: presentPaywallIfNeeded(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          context.go("/");
+          context.go(DEFAULT_ROUTE);
         }
         return SizedBox.shrink();
       },
