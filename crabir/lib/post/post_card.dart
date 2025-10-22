@@ -166,9 +166,13 @@ class PostCardContent extends StatelessWidget {
         return wrapPostElement(RedditMarkdown(markdown: post.selftext ?? ""));
       }
       return wrapPostElement(
-        HtmlWithConditionalFade(
-          htmlContent: post.selftextHtml ?? "",
+        RedditMarkdownWithOverfow(
+          text: post.selftext ?? "",
           maxLines: maxLines,
+          fontSize:
+              (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 1).toInt(),
+          width: MediaQuery.widthOf(context).toInt(),
+          style: Theme.of(context).textTheme.bodyMedium!,
         ),
       );
     } else {

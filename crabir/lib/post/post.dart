@@ -8,7 +8,6 @@ import 'package:crabir/markdown_editor/editor.dart';
 import 'package:crabir/markdown_render.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/network_status.dart';
-import 'package:crabir/post/parts/html_with_fade.dart';
 import 'package:crabir/post/parts/image.dart';
 import 'package:crabir/post/parts/video.dart';
 import 'package:crabir/flair.dart';

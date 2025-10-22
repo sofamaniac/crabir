@@ -1,3 +1,5 @@
+import 'dart:math' show min;
+
 import 'package:crabir/media/media.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart'
@@ -182,4 +184,62 @@ MarkdownStyleSheet redditMarkdownStyle(BuildContext context) {
     ),
     blockquotePadding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
   );
+}
+
+class RedditMarkdownWithOverfow extends StatefulWidget {
+  final int? maxLines;
+  final String text;
+  final int width;
+  final int fontSize;
+  final TextStyle style;
+
+  const RedditMarkdownWithOverfow({
+    super.key,
+    this.maxLines,
+    required this.text,
+    required this.width,
+    required this.fontSize,
+    required this.style,
+  });
+
+  @override
+  State<RedditMarkdownWithOverfow> createState() =>
+      _RedditMarkdownWithOverfowState();
+}
+
+class _RedditMarkdownWithOverfowState extends State<RedditMarkdownWithOverfow> {
+  String text = "";
+
+  double measureAverageCharWidth(TextStyle style) {
+    final tp = TextPainter(
+      text: TextSpan(
+          text: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+          style: style),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    return tp.width / 52.0;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final charWidth = measureAverageCharWidth(widget.style);
+    final lineLength = (widget.width / charWidth).ceil();
+    if (widget.maxLines != null) {
+      final textLength = widget.maxLines != null
+          ? lineLength * widget.maxLines!
+          : widget.text.length;
+      text = widget.text.substring(0, min(textLength, widget.text.length));
+      if (text != widget.text) {
+        text += "...";
+      }
+    } else {
+      text = widget.text;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RedditMarkdown(markdown: text);
+  }
 }
