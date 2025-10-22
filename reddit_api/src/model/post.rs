@@ -605,3 +605,108 @@ pub struct PostSubmit {
     #[serde(skip_serializing_if = "Option::is_none")]
     url: Option<String>,
 }
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize, Setters, FlutterGetters)]
+pub struct CrosspostBuilder {
+    title: String,
+    #[flutter_getter(skip)]
+    subreddit: String,
+    #[flutter_getter(skip)]
+    post_fullname: Fullname,
+    nsfw: bool,
+    spoiler: bool,
+    sendreplies: bool,
+    flair_id: Option<String>,
+    flair_text: Option<String>,
+}
+
+impl CrosspostBuilder {
+    #[frb(sync)]
+    pub fn new() -> Self {
+        Self::default()
+    }
+    #[frb(sync, setter)]
+    pub fn set_title(&mut self, title: String) {
+        self.title = title;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_subreddit(&mut self, subreddit: &Subreddit) {
+        self.subreddit = subreddit.other().display_name().clone();
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_post_fullname(&mut self, post: &Post) {
+        self.post_fullname = post.name.clone();
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_nsfw(&mut self, nsfw: bool) {
+        self.nsfw = nsfw;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_spoiler(&mut self, spoiler: bool) {
+        self.spoiler = spoiler;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_sendreplies(&mut self, sendreplies: bool) {
+        self.sendreplies = sendreplies;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_flair_id(&mut self, flair_id: Option<String>) {
+        self.flair_id = flair_id;
+    }
+
+    #[frb(sync, setter)]
+    pub fn set_flair_text(&mut self, flair_text: Option<String>) {
+        self.flair_text = flair_text;
+    }
+
+    #[frb(sync)]
+    pub fn build(self) -> Result<Crosspost> {
+        if self.title.is_empty() {
+            return Err(Error::Custom {
+                message: "Missing post title".to_owned(),
+            });
+        } else if self.subreddit.is_empty() {
+            return Err(Error::Custom {
+                message: "Missing community".to_owned(),
+            });
+        } else {
+            return Ok(Crosspost {
+                api_type: "json".to_owned(),
+                title: self.title,
+                subreddit: self.subreddit,
+                nsfw: self.nsfw,
+                spoiler: self.spoiler,
+                kind: "crosspost".to_owned(),
+                sendreplies: self.sendreplies,
+                flair_id: self.flair_id,
+                flair_text: self.flair_text,
+                post_fullname: self.post_fullname,
+            });
+        }
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize, Setters)]
+pub struct Crosspost {
+    api_type: String,
+    title: String,
+    #[serde(rename = "sr")]
+    subreddit: String,
+    #[serde(rename = "crosspost_fullname")]
+    post_fullname: Fullname,
+    nsfw: bool,
+    spoiler: bool,
+    kind: String,
+    #[serde(rename = "sendreplies")]
+    sendreplies: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flair_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flair_text: Option<String>,
+}

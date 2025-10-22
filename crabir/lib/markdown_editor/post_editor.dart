@@ -72,7 +72,7 @@ class _PostEditorState extends State<PostEditor> {
   final _titleController = TextEditingController();
   PostSubmitBuilder submission = PostSubmitBuilder();
   late Subreddit? subreddit = widget.initialSubreddit;
-  final Logger log = Logger("CommentEditor");
+  final Logger log = Logger("PostEditor");
 
   @override
   void dispose() {
@@ -135,6 +135,7 @@ class _PostEditorState extends State<PostEditor> {
                 final newSubreddit = await SearchSubredditsView(
                   enableUser: false,
                   enablePost: false,
+                  navigateOnTap: false,
                 ).pushNamed(context) as Subreddit?;
                 if (newSubreddit != null) {
                   WidgetsBinding.instance.addPostFrameCallback(

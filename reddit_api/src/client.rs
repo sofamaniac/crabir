@@ -2,7 +2,7 @@ use crate::model::comment::Comment;
 use crate::model::feed::{self, Feed};
 use crate::model::flair::Flair;
 use crate::model::multi::{Multi, MultiStream};
-use crate::model::post::PostSubmit;
+use crate::model::post::{Crosspost, PostSubmit};
 use crate::model::rule::Rule;
 use crate::model::subreddit::Subreddit;
 use crate::model::{Fullname, Post, comment};
@@ -903,6 +903,15 @@ impl Client {
     /// Create post
     #[instrument]
     pub async fn submit_post(&self, post: PostSubmit) -> Result<()> {
+        let url = self.join_url("api/submit");
+        let request = self.post(url);
+        let request = request.form(&post);
+        let _ = self.execute(request).await?;
+        Ok(())
+    }
+
+    /// Create crosspost
+    pub async fn crosspost(&self, post: Crosspost) -> Result<()> {
         let url = self.join_url("api/submit");
         let request = self.post(url);
         let request = request.form(&post);

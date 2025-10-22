@@ -243,7 +243,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/search',
       name: SearchSubredditsViewBuilder.name,
-      builder: (context, state) => SearchSubredditsView(),
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return SearchSubredditsViewBuilder.fromExtra(extra);
+      },
     ),
 
     /// Fullscreen media routes
@@ -297,6 +300,14 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
         return PostEditorBuilder.fromExtra(extra);
+      },
+    ),
+    GoRoute(
+      path: "/crosspost-editor",
+      name: CrosspostEditorBuilder.name,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return CrosspostEditorBuilder.fromExtra(extra);
       },
     ),
     // Settings routes

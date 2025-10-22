@@ -2,7 +2,7 @@ use futures::StreamExt;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
-use crate::model::subreddit::{Details, SubredditInfo};
+use crate::model::subreddit::Details;
 use crate::result::Result;
 use crate::{client::Client, error::Error, paging_handler::stream::IntoStreamPrivate};
 

@@ -120,6 +120,7 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
                       state.items[index],
                       onTap: () {
                         if (widget.navigateOnTap) {
+                          print("NAVIGATE ON TAP");
                           context
                               .go("/r/${state.items[index].other.displayName}");
                         } else {

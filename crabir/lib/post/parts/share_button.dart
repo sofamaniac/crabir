@@ -40,6 +40,16 @@ shareModelBottomSheet(BuildContext context, Post post) {
                 SharePlus.instance.share(params);
               },
             ),
+            ListTile(
+              leading: const RotatedBox(
+                quarterTurns: 1,
+                child: Icon(
+                  Icons.alt_route,
+                ),
+              ),
+              title: Text("Crosspost"),
+              onTap: () => CrosspostEditor(post: post).pushNamed(ctx),
+            ),
             if (kDebugMode)
               ListTile(
                 leading: Icon(Icons.bug_report),

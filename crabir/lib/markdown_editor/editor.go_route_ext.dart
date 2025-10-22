@@ -76,3 +76,27 @@ extension CommentEditorBuilder on CommentEditor {
         depth: extra['depth'] as int);
   }
 }
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+extension CrosspostEditorBuilder on CrosspostEditor {
+  static const String name = 'CrosspostEditor';
+  Map<String, String> get pathParams => {};
+  Map<String, dynamic> get extra => {'post': post};
+
+  void goNamed(BuildContext context) => context.goNamed(
+        name,
+        pathParameters: pathParams,
+        extra: extra,
+      );
+
+  Future<T?> pushNamed<T extends Object?>(BuildContext context) =>
+      context.pushNamed(
+        name,
+        pathParameters: pathParams,
+        extra: extra,
+      );
+
+  static CrosspostEditor fromExtra(Map<String, dynamic> extra) {
+    return CrosspostEditor(post: extra['post'] as Post);
+  }
+}

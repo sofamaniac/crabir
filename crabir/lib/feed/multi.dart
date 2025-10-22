@@ -1,6 +1,5 @@
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/common.dart';
-import 'package:crabir/feed/feed.dart';
 import 'package:crabir/feed/sort_display.dart';
 import 'package:crabir/feed_list.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';

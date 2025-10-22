@@ -1,4 +1,5 @@
 import 'package:crabir/l10n/app_localizations.dart';
+import 'package:crabir/post/post.dart';
 import 'package:crabir/search_subreddits/widgets/search.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/go_router_ext/annotations.dart';
@@ -15,6 +16,7 @@ import 'package:logging/logging.dart';
 part 'editor.go_route_ext.dart';
 part 'comment_editor.dart';
 part 'post_editor.dart';
+part 'crosspost_editor.dart';
 
 @CrabirRoute()
 class MarkdownEditor extends StatefulWidget {
