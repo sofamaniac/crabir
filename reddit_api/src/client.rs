@@ -625,8 +625,7 @@ impl Client {
     #[instrument]
     pub async fn multis(&self) -> Result<Vec<crate::model::multi::Multi>> {
         let url = self.join_url("api/multi/mine.json");
-        let request = self.get(url);
-        //let request = self.get(url).query(&[("expand_srs", "true")]);
+        let request = self.get(url).query(&[("expand_srs", "true")]);
         let result = self.execute(request).await?;
         Ok(parse_response::<Vec<Thing>>(result)
             .await?

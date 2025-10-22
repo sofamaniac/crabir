@@ -2,6 +2,7 @@ use futures::StreamExt;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
+use crate::model::subreddit::{Details, SubredditInfo};
 use crate::result::Result;
 use crate::{client::Client, error::Error, paging_handler::stream::IntoStreamPrivate};
 
@@ -60,7 +61,7 @@ impl TryFrom<Thing> for Multi {
 pub struct SubredditDetails {
     /// name of the subreddit (e.g. awwnime)
     pub name: String,
-    // TODO: parse data
+    pub data: Details,
 }
 
 pub struct MultiStream {

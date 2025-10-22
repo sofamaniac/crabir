@@ -37,12 +37,14 @@ class SubredditTile extends StatelessWidget {
 /// Widget to display a multireddit in a list
 class MultiRedditTile extends StatelessWidget {
   final Multi multi;
+  final bool showSubtitle;
   final TextStyle? style;
 
   const MultiRedditTile(
     this.multi, {
     super.key,
     this.style,
+    this.showSubtitle = false,
   });
 
   @override
@@ -61,6 +63,10 @@ class MultiRedditTile extends StatelessWidget {
         style: style,
         maxLines: 1,
       ),
+      subtitle: showSubtitle
+          ? Text(
+              "${multi.subreddits.length} communities -- ${multi.visibility}")
+          : null,
     );
   }
 }

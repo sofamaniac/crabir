@@ -1,12 +1,16 @@
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/common.dart';
+import 'package:crabir/feed/feed.dart';
 import 'package:crabir/feed/sort_display.dart';
+import 'package:crabir/feed_list.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
+import 'package:crabir/subreddit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class MultiView extends StatefulWidget {
   const MultiView({
@@ -39,6 +43,7 @@ class _MultiViewState extends State<MultiView> {
     }
     return CommonFeedView(
       key: ValueKey(widget.multi),
+      endDrawer: RightSide(multi: widget.multi),
       title: (sort) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -58,6 +63,52 @@ class _MultiViewState extends State<MultiView> {
         }
       },
       initialSort: sort,
+    );
+  }
+}
+
+class RightSide extends StatefulWidget {
+  final Multi multi;
+
+  const RightSide({super.key, required this.multi});
+
+  @override
+  State<RightSide> createState() => _RightSideState();
+}
+
+class _RightSideState extends State<RightSide> {
+  Widget infoView(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: MultiRedditTile(
+        widget.multi,
+        showSubtitle: true,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Drawer(
+        child: ListView(
+          children: [
+            // TODO:
+            Text("Search post"),
+            Divider(),
+            infoView(context),
+            Divider(),
+            ...widget.multi.subreddits.map(
+              (SubredditDetails sub) => ListTile(
+                leading: SubredditIcon(icon: sub.data.icon),
+                title: Text(sub.name),
+                subtitle: Text("${sub.data.other.subscribers} members"),
+                onTap: () => context.push("/r/${sub.name}"),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

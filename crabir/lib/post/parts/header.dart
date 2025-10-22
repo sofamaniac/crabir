@@ -55,7 +55,7 @@ class Header extends StatelessWidget {
         onTap: () {
           final username = post.author?.username;
           if (username != null) {
-            context.go("/u/$username");
+            context.push("/u/$username");
           }
         },
         child: author,
