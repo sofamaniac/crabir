@@ -1,3 +1,4 @@
+import 'package:crabir/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -19,7 +20,7 @@ class NotFoundPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             ElevatedButton(
-              onPressed: () => context.go('/'),
+              onPressed: () => context.go(DEFAULT_ROUTE),
               child: const Text('Go Home'),
             ),
           ],
