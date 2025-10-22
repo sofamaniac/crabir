@@ -12,6 +12,7 @@ import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/settings/lateral_menu/lateral_menu_settings.dart';
+import 'package:crabir/settings/layout/layout_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme_editor.dart';
@@ -363,6 +364,11 @@ final GoRouter appRouter = GoRouter(
           path: 'lateral-menu-settings',
           name: LateralMenuSettingsViewBuilder.name,
           builder: (context, state) => LateralMenuSettingsView(),
+        ),
+        GoRoute(
+          path: "layout-settings",
+          name: LayoutSettingsViewBuilder.name,
+          builder: (context, state) => LayoutSettingsView(),
         ),
       ],
     ),

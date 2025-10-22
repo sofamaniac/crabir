@@ -63,18 +63,21 @@ class Thumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final layout = LayoutSettings.of(context);
+    final thumbnailWidget = InkWell(
+      onTap: () => onTap(context),
+      child: thumbnail(),
+    );
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 8,
       children: [
+        if (layout.thumbnailOnLeft) thumbnailWidget,
         Expanded(
           flex: 3,
           child: child,
         ),
-        InkWell(
-          onTap: () => onTap(context),
-          child: thumbnail(),
-        ),
+        if (!layout.thumbnailOnLeft) thumbnailWidget,
       ],
     );
   }

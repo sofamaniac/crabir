@@ -76,13 +76,17 @@ class Header extends StatelessWidget {
   Widget build(BuildContext context) {
     final icon = post.subreddit.details?.icon;
     final settings = context.watch<PostsSettingsCubit>().state;
+    final layout = LayoutSettings.of(context);
+    final subredditName = layout.prefixCommunities
+        ? post.subreddit.subredditNamePrefixed
+        : post.subreddit.subreddit;
     return Row(
       spacing: 8,
       children: [
         if (icon != null && showSubredditIcon)
           SubredditIcon(
             icon: icon,
-            subredditName: post.subreddit.subreddit,
+            subredditName: subredditName,
             clickable: settings.clickableCommunity,
           ),
         Expanded(

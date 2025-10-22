@@ -238,6 +238,12 @@
   "posts_showCommentsButton": "Comments",
   "posts_showOpenInAppButton": "Open in app",
 
+  "layout_defaultView": "Default post view",
+  "layout_rememberByCommunity": "Remember for each community",
+  "layout_thumbnailOnLeft": "Thumbnail on left",
+  "layout_font": "Font size and style",
+  "layout_prefixCommunities": "Prefix subreddit with /r",
+
 
   "data_autoplay": "Autoplay videos",
 

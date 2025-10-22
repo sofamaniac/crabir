@@ -7,6 +7,7 @@ class DenseCard extends StatelessWidget {
   final VoidCallback? onTap;
   final double? elevation;
   final bool pushSubreddit;
+  final bool respectHidden;
   const DenseCard({
     super.key,
     required this.post,
@@ -15,6 +16,7 @@ class DenseCard extends StatelessWidget {
     this.onTap,
     this.elevation,
     this.pushSubreddit = false,
+    this.respectHidden = true,
   });
   Widget wrap(Widget widget) {
     return Padding(
@@ -23,6 +25,9 @@ class DenseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (respectHidden && post.hidden) {
+      return SizedBox.shrink();
+    }
     final contentWidget = Thumbnail(
       post: post,
       child: Column(

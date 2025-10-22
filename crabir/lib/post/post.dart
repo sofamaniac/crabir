@@ -15,6 +15,7 @@ import 'package:crabir/report.dart';
 import 'package:crabir/search_posts/widgets/search.dart';
 import 'package:crabir/separated_row.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
+import 'package:crabir/settings/layout/layout_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';

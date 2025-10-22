@@ -198,68 +198,71 @@ class _CommentViewState extends State<CommentView> {
     final settings = CommentsSettings.of(context);
     final likes = widget.comment.likes.toVoteDirection();
     final bloc = ThreadBloc.maybeOf(context);
-    return Wrap(
-      alignment: WrapAlignment.end,
-      //mainAxisSize: MainAxisSize.max,
-      children: [
-        VoteButton.like(
-          likes: likes,
-          colorActive: likeColor,
-          onChange: (target) async {
-            await vote(target, settings.hideButtonAfterAction);
-          },
-        ),
-        VoteButton.dislike(
-          likes: likes,
-          colorActive: dislikeColor,
-          onChange: (target) async {
-            await vote(target, settings.hideButtonAfterAction);
-          },
-        ),
-        if (settings.showSaveButton)
-          SaveButton(
-            initialValue: widget.comment.saved,
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Wrap(
+        alignment: WrapAlignment.end,
+        //mainAxisSize: MainAxisSize.max,
+        children: [
+          VoteButton.like(
+            likes: likes,
+            colorActive: likeColor,
             onChange: (target) async {
-              await save(target, settings.hideButtonAfterAction);
+              await vote(target, settings.hideButtonAfterAction);
             },
           ),
-        if (bloc != null)
-          IconButton(
-            color: theme.secondaryText,
-            onPressed: () async {
-              final Comment? comment = await CommentEditor.reply(
-                context,
-                widget.comment,
-              ).pushNamed(context);
+          VoteButton.dislike(
+            likes: likes,
+            colorActive: dislikeColor,
+            onChange: (target) async {
+              await vote(target, settings.hideButtonAfterAction);
+            },
+          ),
+          if (settings.showSaveButton)
+            SaveButton(
+              initialValue: widget.comment.saved,
+              onChange: (target) async {
+                await save(target, settings.hideButtonAfterAction);
+              },
+            ),
+          if (bloc != null)
+            IconButton(
+              color: theme.secondaryText,
+              onPressed: () async {
+                final Comment? comment = await CommentEditor.reply(
+                  context,
+                  widget.comment,
+                ).pushNamed(context);
+                if (settings.hideButtonAfterAction) {
+                  OpenedComment.current.value = null;
+                }
+                if (comment != null) {
+                  bloc.add(ThreadEvent.insertComment(comment));
+                }
+              },
+              icon: Icon(Icons.reply_rounded),
+            ),
+          ShareButton(
+            comment: widget.comment,
+            onPressed: () {
               if (settings.hideButtonAfterAction) {
                 OpenedComment.current.value = null;
               }
-              if (comment != null) {
-                bloc.add(ThreadEvent.insertComment(comment));
-              }
             },
-            icon: Icon(Icons.reply_rounded),
           ),
-        ShareButton(
-          comment: widget.comment,
-          onPressed: () {
-            if (settings.hideButtonAfterAction) {
-              OpenedComment.current.value = null;
-            }
-          },
-        ),
-        IconButton(
-          onPressed: () => showDialog(
-            context: context,
-            builder: (context) => ReportDialog(
-              subreddit: widget.comment.subreddit,
-              kind: RuleKind.comment,
-              thing: widget.comment.name,
+          IconButton(
+            onPressed: () => showDialog(
+              context: context,
+              builder: (context) => ReportDialog(
+                subreddit: widget.comment.subreddit,
+                kind: RuleKind.comment,
+                thing: widget.comment.name,
+              ),
             ),
+            icon: Icon(Icons.report),
           ),
-          icon: Icon(Icons.report),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

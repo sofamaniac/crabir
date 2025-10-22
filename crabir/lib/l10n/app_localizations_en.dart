@@ -455,6 +455,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get posts_showOpenInAppButton => 'Open in app';
 
   @override
+  String get layout_defaultView => 'Default post view';
+
+  @override
+  String get layout_rememberByCommunity => 'Remember for each community';
+
+  @override
+  String get layout_thumbnailOnLeft => 'Thumbnail on left';
+
+  @override
+  String get layout_font => 'Font size and style';
+
+  @override
+  String get layout_prefixCommunities => 'Prefix subreddit with /r';
+
+  @override
   String get data_autoplay => 'Autoplay videos';
 
   @override

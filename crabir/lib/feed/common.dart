@@ -6,6 +6,7 @@ import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/post.dart';
 import 'package:crabir/search_subreddits/widgets/search.dart' hide SortMenu;
 import 'package:crabir/settings/filters/filters_settings.dart';
+import 'package:crabir/settings/layout/layout_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
@@ -156,6 +157,8 @@ class _CommonFeedViewState extends State<CommonFeedView> {
       }
     }
 
+    final layout = LayoutSettings.of(context);
+
     return switch (account.status) {
       Uninit() => Container(),
       Failure(:final message) =>
@@ -173,7 +176,12 @@ class _CommonFeedViewState extends State<CommonFeedView> {
                 body: ThingsScaffold(
                   key: ValueKey(_forceRebuild),
                   stream: _stream,
-                  postView: postView,
+                  postView: (context, post, hide) => postView(
+                    context,
+                    post,
+                    hide,
+                    layout.defaultView,
+                  ),
                   subredditInfo: widget.subredditAbout != null
                       ? SubredditInfoView(infos: widget.subredditAbout!)
                       : null,
@@ -198,15 +206,25 @@ class _CommonFeedViewState extends State<CommonFeedView> {
     };
   }
 
-  Widget postView(BuildContext context, Post post, bool hide) {
-    return RedditPostCard(
-      maxLines: 5,
-      post: post,
-      onTap: () {
-        context.read<ReadPosts>().mark(post.id);
-        context.push(post.permalink, extra: post);
-      },
-      respectHidden: hide,
-    );
+  Widget postView(BuildContext context, Post post, bool hide, ViewKind kind) {
+    return switch (kind) {
+      ViewKind.card => RedditPostCard(
+          maxLines: 5,
+          post: post,
+          onTap: () {
+            context.read<ReadPosts>().mark(post.id);
+            context.push(post.permalink, extra: post);
+          },
+          respectHidden: hide,
+        ),
+      ViewKind.compact => DenseCard(
+          post: post,
+          onTap: () {
+            context.read<ReadPosts>().mark(post.id);
+            context.push(post.permalink, extra: post);
+          },
+          respectHidden: hide,
+        )
+    };
   }
 }

@@ -2,6 +2,7 @@ import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/settings/lateral_menu/lateral_menu_settings.dart';
+import 'package:crabir/settings/layout/layout_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/settings/theme/theme_bloc.dart';
 import 'package:crabir/settings/theme/theme_editor.dart';
@@ -26,6 +27,11 @@ class SettingsView extends StatelessWidget {
             leading: Icon(Icons.palette_outlined),
             title: Text("Theme"),
             onTap: () => CrabirThemeEditor().pushNamed(context),
+          ),
+          ListTile(
+            leading: Icon(Icons.palette_outlined),
+            title: Text("Layout"),
+            onTap: () => LayoutSettingsView().pushNamed(context),
           ),
           ListTile(
             leading: Icon(Icons.article),
@@ -85,6 +91,7 @@ class SettingsBlocsProviders extends StatelessWidget {
         BlocProvider(create: (_) => ReadPosts()),
         BlocProvider(create: (_) => GlobalFiltersCubit()),
         BlocProvider(create: (_) => LateralMenuSettingsCubit()),
+        BlocProvider(create: (_) => LayoutSettingsCubit()),
       ],
       child: child,
     );

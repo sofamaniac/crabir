@@ -850,6 +850,36 @@ abstract class AppLocalizations {
   /// **'Open in app'**
   String get posts_showOpenInAppButton;
 
+  /// No description provided for @layout_defaultView.
+  ///
+  /// In en, this message translates to:
+  /// **'Default post view'**
+  String get layout_defaultView;
+
+  /// No description provided for @layout_rememberByCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember for each community'**
+  String get layout_rememberByCommunity;
+
+  /// No description provided for @layout_thumbnailOnLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnail on left'**
+  String get layout_thumbnailOnLeft;
+
+  /// No description provided for @layout_font.
+  ///
+  /// In en, this message translates to:
+  /// **'Font size and style'**
+  String get layout_font;
+
+  /// No description provided for @layout_prefixCommunities.
+  ///
+  /// In en, this message translates to:
+  /// **'Prefix subreddit with /r'**
+  String get layout_prefixCommunities;
+
   /// No description provided for @data_autoplay.
   ///
   /// In en, this message translates to:
