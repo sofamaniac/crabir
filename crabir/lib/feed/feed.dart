@@ -2,8 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/common.dart';
 import 'package:crabir/feed/top_bar.dart';
-import 'package:crabir/html_view.dart';
 import 'package:crabir/loading_indicator.dart';
+import 'package:crabir/markdown_render.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
@@ -173,8 +173,8 @@ class _SubredditInfoViewState extends State<SubredditInfoView> {
                     .bodyMedium
                     ?.copyWith(color: Colors.white70),
               ),
-              if (widget.infos.publicDescriptionHtml != null)
-                StyledHtml(htmlContent: widget.infos.publicDescriptionHtml!),
+              if (widget.infos.publicDescription != null)
+                RedditMarkdown(markdown: widget.infos.publicDescription!),
             ],
           ),
         ),
@@ -325,7 +325,7 @@ class _RulesViewState extends State<RulesView> {
           style: Theme.of(context).textTheme.labelMedium,
         ),
         SizedBox(height: 8),
-        StyledHtml(htmlContent: rule.descriptionHtml),
+        RedditMarkdown(markdown: rule.description),
       ],
     );
   }
@@ -452,8 +452,8 @@ class _RightSideState extends State<RightSide> {
               MoreOptionButton(subreddit: widget.infos),
             ],
           ),
-          if (widget.infos.publicDescriptionHtml != null)
-            StyledHtml(htmlContent: widget.infos.publicDescriptionHtml!),
+          if (widget.infos.publicDescription != null)
+            RedditMarkdown(markdown: widget.infos.publicDescription!),
         ],
       ),
     );
@@ -470,7 +470,7 @@ class _RightSideState extends State<RightSide> {
         Divider(),
         Padding(
           padding: const EdgeInsets.all(16.0),
-          child: StyledHtml(htmlContent: widget.infos.descriptionHtml ?? ""),
+          child: RedditMarkdown(markdown: widget.infos.description ?? ""),
         ),
       ]),
     );

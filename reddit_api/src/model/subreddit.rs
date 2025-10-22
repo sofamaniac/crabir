@@ -191,6 +191,8 @@ pub struct Subreddit {
     user_flair: Flair,
     #[serde(rename = "submit_text_html")]
     submit_text_html: Option<String>,
+    #[serde(rename = "submit_text")]
+    submit_text: Option<String>,
     #[serde(rename = "wiki_enabled")]
     wiki_enabled: Option<bool>,
     #[serde(rename = "user_can_flair_in_sr")]
@@ -246,10 +248,10 @@ pub struct Subreddit {
         deserialize_with = "response_or_default"
     )]
     community_reviewed: bool,
-    #[serde(rename = "submit_text")]
-    submit_text: Option<String>,
     #[serde(rename = "description_html")]
     description_html: Option<String>,
+    #[serde(rename = "description")]
+    description: Option<String>,
     #[serde(rename = "spoilers_enabled", deserialize_with = "response_or_default")]
     spoilers_enabled: bool,
     #[serde(rename = "comment_contribution_settings")]
@@ -299,6 +301,8 @@ pub struct Subreddit {
     emojis_custom_size: Option<Vec<i64>>,
     #[serde(rename = "public_description_html")]
     public_description_html: Option<String>,
+    #[serde(rename = "public_description")]
+    public_description: Option<String>,
     #[serde(rename = "allow_videos", deserialize_with = "response_or_default")]
     allow_videos: bool,
     #[serde(rename = "is_crosspostable_subreddit")]
@@ -346,8 +350,6 @@ pub struct Subreddit {
     over18: bool,
     #[serde(rename = "header_title", deserialize_with = "response_or_none_string")]
     header_title: Option<String>,
-    #[serde(rename = "description", deserialize_with = "response_or_none_string")]
-    description: Option<String>,
     #[serde(rename = "allow_images", deserialize_with = "response_or_default")]
     allow_images: bool,
     #[serde(rename = "lang", deserialize_with = "response_or_none_string")]
