@@ -1,9 +1,7 @@
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
-import 'package:crabir/feed/feed.dart';
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/search_subreddits/widgets/search.dart';
 import 'package:crabir/settings/lateral_menu/lateral_menu_settings.dart';
-import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/utils/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,25 +16,25 @@ List<Widget> baseFeeds(BuildContext context) {
       BaseFeed(
         locales.feedHome,
         HOME_PAGE_ICON,
-        feed: Feed.home(),
+        destination: "/default",
       ),
     if (settings.showHomeFeed)
       BaseFeed(
         locales.lateralMenu_showHomeFeed,
         HOME_FEED_ICON,
-        feed: Feed.home(),
+        destination: "/home",
       ),
     if (settings.showPopular)
       BaseFeed(
         locales.feedPopular,
         POPULAR_ICON,
-        feed: Feed.popular(),
+        destination: "/r/popular",
       ),
     if (settings.showAll)
       BaseFeed(
         locales.feedAll,
         ALL_ICON,
-        feed: Feed.all(),
+        destination: "/r/all",
       ),
     if (account.account != null) ...[
       if (settings.showSaved)
@@ -102,14 +100,14 @@ class BaseFeed extends StatelessWidget {
   final IconData icon;
   final int tabIndex;
   final bool closeDrawer;
-  final Feed? feed;
+  final String? destination;
   const BaseFeed(
     this.title,
     this.icon, {
     super.key,
     this.tabIndex = 2,
     this.closeDrawer = true,
-    this.feed,
+    this.destination,
   });
 
   @override
@@ -119,8 +117,8 @@ class BaseFeed extends StatelessWidget {
       title: Text(title),
       onTap: () {
         Scaffold.of(context).closeDrawer();
-        if (feed != null) {
-          FeedView(feed: feed).goNamed(context);
+        if (destination != null) {
+          context.go(destination!);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

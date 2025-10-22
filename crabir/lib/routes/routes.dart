@@ -30,10 +30,12 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 final _rootNavigationKey = GlobalKey<NavigatorState>();
 final _indexStateKey = GlobalKey<StatefulNavigationShellState>();
 
+final String DEFAULT_ROUTE = "/default";
+
 final GoRouter appRouter = GoRouter(
   debugLogDiagnostics: true,
   navigatorKey: _rootNavigationKey,
-  initialLocation: '/',
+  initialLocation: DEFAULT_ROUTE,
   // Catch unhandled paths
   errorBuilder: (context, state) {
     final uri = state.uri;
@@ -63,12 +65,23 @@ final GoRouter appRouter = GoRouter(
       branches: [
         // home tab
         StatefulShellBranch(
-          initialLocation: "/",
+          initialLocation: DEFAULT_ROUTE,
           routes: [
             /// Home feed
             GoRoute(
-              path: '/',
+              path: '/home',
               name: 'home',
+              builder: (context, state) => FeedView(
+                key: state.pageKey,
+                feed: Feed.home(),
+                initialSort: FeedSort.best(),
+              ),
+            ),
+
+            /// Default feed
+            GoRoute(
+              path: DEFAULT_ROUTE,
+              name: 'default',
               builder: (context, state) => FeedView(
                 key: state.pageKey,
                 feed: Feed.home(),

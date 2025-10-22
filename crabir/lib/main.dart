@@ -232,7 +232,7 @@ class _MainScreenViewState extends State<MainScreenView>
       canPop: widget.navigationShell.currentIndex == 0,
       onPopInvokedWithResult: (_, __) async {
         if (widget.navigationShell.currentIndex != 0) {
-          context.go("/");
+          context.go(DEFAULT_ROUTE);
         }
       },
       child: SafeArea(
