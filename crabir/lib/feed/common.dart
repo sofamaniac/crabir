@@ -139,20 +139,25 @@ class _CommonFeedViewState extends State<CommonFeedView> {
           },
           child: Text("Settings"),
         ),
-        SubmenuButton(
-          menuChildren: ViewKind.values
-              .map(
-                (view) => MenuItemButton(
-                  onPressed: () => widget.onViewChanged(view),
-                  child: RadioListTile(
-                    value: view,
-                    selected: view == widget.view,
-                    title: Text(view.label(context)),
+        RadioGroup<ViewKind>(
+          onChanged: (view) {
+            widget.onViewChanged(view!);
+            setState(() {});
+          },
+          groupValue: widget.view,
+          child: SubmenuButton(
+            menuChildren: ViewKind.values
+                .map(
+                  (view) => MenuItemButton(
+                    child: RadioListTile(
+                      value: view,
+                      title: Text(view.label(context)),
+                    ),
                   ),
-                ),
-              )
-              .toList(),
-          child: Text("Post View"),
+                )
+                .toList(),
+            child: Text("Post View"),
+          ),
         ),
       ],
     );
