@@ -44,6 +44,7 @@ class DrawerState extends State<AppDrawer> {
           leading: settings.showAccountAvatar
               ? CircleAvatar(
                   radius: 16,
+                  backgroundColor: CrabirTheme.of(context).background,
                   foregroundImage: NetworkImage(account.profilePicture),
                 )
               : null,
