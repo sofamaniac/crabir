@@ -50,7 +50,8 @@ class CommonFeedView extends StatefulWidget {
 class _CommonFeedViewState extends State<CommonFeedView> {
   FeedSort? sort;
 
-  late final ScrollController _scrollController;
+  late final ScrollController _scrollController = ScrollController();
+  late final MenuController _menuController = MenuController();
   late reddit_stream.PagingHandler _stream;
   String? currentUser;
   int _forceRebuild = 0;
@@ -59,7 +60,6 @@ class _CommonFeedViewState extends State<CommonFeedView> {
   void initState() {
     super.initState();
     _initializeSort();
-    _scrollController = ScrollController();
   }
 
   @override
@@ -111,9 +111,9 @@ class _CommonFeedViewState extends State<CommonFeedView> {
     );
   }
 
-  // TODO: allow for custom actions to be passed
   Widget _moreOptions() {
     return MenuAnchor(
+      controller: _menuController,
       builder: (BuildContext context, controller, _) {
         return IconButton(
           icon: const Icon(Icons.more_vert),
@@ -131,11 +131,13 @@ class _CommonFeedViewState extends State<CommonFeedView> {
             onPressed: () {
               _stream.refresh();
               _rebuild();
+              _menuController.close();
             },
             child: Text("Refresh")),
         MenuItemButton(
           onPressed: () {
             SettingsView().pushNamed(context);
+            _menuController.close();
           },
           child: Text("Settings"),
         ),
@@ -143,6 +145,7 @@ class _CommonFeedViewState extends State<CommonFeedView> {
           onChanged: (view) {
             widget.onViewChanged(view!);
             setState(() {});
+            _menuController.close();
           },
           groupValue: widget.view,
           child: SubmenuButton(
@@ -243,7 +246,7 @@ class _CommonFeedViewState extends State<CommonFeedView> {
           ignoreSelftextSpoiler: false,
           ignoreRead: false,
         ),
-      ViewKind.compact => DenseCard(
+      ViewKind.compact => CompactCard(
           post: post,
           onTap: () {
             context.read<ReadPosts>().mark(post.id);
@@ -262,6 +265,7 @@ class _CommonFeedViewState extends State<CommonFeedView> {
           respectHidden: hide,
           enableThumbnail: enableThumbnail,
           ignoreRead: false,
+          hideBottomBar: false,
         )
     };
   }
