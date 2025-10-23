@@ -1,3 +1,4 @@
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart'
     as subreddit;
@@ -56,6 +57,7 @@ class MultiRedditTile extends StatelessWidget {
       },
       leading: CircleAvatar(
         radius: 12,
+        backgroundColor: CrabirTheme.of(context).background,
         foregroundImage: NetworkImage(multi.iconUrl),
       ),
       title: Text(

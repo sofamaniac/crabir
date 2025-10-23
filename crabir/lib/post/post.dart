@@ -28,6 +28,7 @@ import 'package:crabir/time_ellapsed.dart';
 import 'package:crabir/user/user.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
@@ -43,6 +44,7 @@ part 'parts/thumbnail.dart';
 part 'parts/share_button.dart';
 part 'dense_card.dart';
 part 'post_card.dart';
+part 'compact_card.dart';
 
 typedef SaveCallback = Future<void> Function(bool);
 typedef LikeCallback = Future<void> Function(VoteDirection);
