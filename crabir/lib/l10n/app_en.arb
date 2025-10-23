@@ -240,9 +240,15 @@
 
   "layout_defaultView": "Default post view",
   "layout_rememberByCommunity": "Remember for each community",
+  "layout_rememberedView": "Manage views",
   "layout_thumbnailOnLeft": "Thumbnail on left",
+  "layout_showThumbnail": "Show thumbnail",
   "layout_font": "Font size and style",
   "layout_prefixCommunities": "Prefix subreddit with /r",
+
+  "viewCard": "Card",
+  "viewCompact": "Compact",
+  "viewDense": "Dense",
 
 
   "data_autoplay": "Autoplay videos",

@@ -26,7 +26,9 @@ class CommonFeedView extends StatefulWidget {
   final Widget Function(FeedSort) title;
   final Subreddit? subredditAbout;
   final FeedSort? initialSort;
+  final ViewKind view;
   final void Function(FeedSort) onSortChanged;
+  final void Function(ViewKind) onViewChanged;
   final Widget? endDrawer;
 
   const CommonFeedView({
@@ -35,7 +37,9 @@ class CommonFeedView extends StatefulWidget {
     required this.title,
     this.initialSort,
     this.subredditAbout,
+    required this.view,
     required this.onSortChanged,
+    required this.onViewChanged,
     this.endDrawer,
   });
 
@@ -135,6 +139,21 @@ class _CommonFeedViewState extends State<CommonFeedView> {
           },
           child: Text("Settings"),
         ),
+        SubmenuButton(
+          menuChildren: ViewKind.values
+              .map(
+                (view) => MenuItemButton(
+                  onPressed: () => widget.onViewChanged(view),
+                  child: RadioListTile(
+                    value: view,
+                    selected: view == widget.view,
+                    title: Text(view.label(context)),
+                  ),
+                ),
+              )
+              .toList(),
+          child: Text("Post View"),
+        ),
       ],
     );
   }
@@ -157,8 +176,6 @@ class _CommonFeedViewState extends State<CommonFeedView> {
       }
     }
 
-    final layout = LayoutSettings.of(context);
-
     return switch (account.status) {
       Uninit() => Container(),
       Failure(:final message) =>
@@ -180,7 +197,7 @@ class _CommonFeedViewState extends State<CommonFeedView> {
                     context,
                     post,
                     hide,
-                    layout.defaultView,
+                    widget.view,
                   ),
                   subredditInfo: widget.subredditAbout != null
                       ? SubredditInfoView(infos: widget.subredditAbout!)
@@ -207,6 +224,7 @@ class _CommonFeedViewState extends State<CommonFeedView> {
   }
 
   Widget postView(BuildContext context, Post post, bool hide, ViewKind kind) {
+    final enableThumbnail = LayoutSettings.of(context).showThumbnail;
     return switch (kind) {
       ViewKind.card => RedditPostCard(
           maxLines: 5,
@@ -216,6 +234,9 @@ class _CommonFeedViewState extends State<CommonFeedView> {
             context.push(post.permalink, extra: post);
           },
           respectHidden: hide,
+          enableThumbnail: enableThumbnail,
+          ignoreSelftextSpoiler: false,
+          ignoreRead: false,
         ),
       ViewKind.compact => DenseCard(
           post: post,
@@ -224,6 +245,18 @@ class _CommonFeedViewState extends State<CommonFeedView> {
             context.push(post.permalink, extra: post);
           },
           respectHidden: hide,
+          enableThumbnail: enableThumbnail,
+          ignoreRead: false,
+        ),
+      ViewKind.dense => DenseCard(
+          post: post,
+          onTap: () {
+            context.read<ReadPosts>().mark(post.id);
+            context.push(post.permalink, extra: post);
+          },
+          respectHidden: hide,
+          enableThumbnail: enableThumbnail,
+          ignoreRead: false,
         )
     };
   }

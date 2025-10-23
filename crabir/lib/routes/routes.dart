@@ -20,13 +20,13 @@ import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
+import 'package:crabir/subscription/bloc/subscription_bloc.dart';
 import 'package:crabir/subscription/widgets/paywall.dart';
 import 'package:crabir/subscriptions_tab.dart';
 import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/user/user.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 
 final _rootNavigationKey = GlobalKey<NavigatorState>();
 final _indexStateKey = GlobalKey<StatefulNavigationShellState>();
@@ -44,10 +44,7 @@ final GoRouter appRouter = GoRouter(
     return NotFoundPage(uri: uri.toString());
   },
   redirect: (context, state) async {
-    final infos = await Purchases.getCustomerInfo();
-    final isSubscribed =
-        infos.entitlements.all["subscribed"]?.isActive ?? false;
-
+    final isSubscribed = await presentPaywallIfNeeded();
     if (isSubscribed) {
       return null;
     } else {

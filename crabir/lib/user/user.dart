@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/post.dart';
+import 'package:crabir/settings/layout/layout_settings.dart';
 import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';

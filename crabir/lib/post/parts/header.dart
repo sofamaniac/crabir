@@ -24,7 +24,10 @@ class Header extends StatelessWidget {
   Widget _subreddit(BuildContext context) {
     final theme = CrabirTheme.of(context);
     final settings = context.read<PostsSettingsCubit>().state;
-    final name = post.subreddit.subreddit;
+    final layout = LayoutSettings.of(context);
+    final name = layout.prefixCommunities
+        ? post.subreddit.subredditNamePrefixed
+        : post.subreddit.subreddit;
     final subreddit = Text(
       name,
       style: _labelStyle(context).copyWith(color: theme.highlight),
@@ -76,17 +79,14 @@ class Header extends StatelessWidget {
   Widget build(BuildContext context) {
     final icon = post.subreddit.details?.icon;
     final settings = context.watch<PostsSettingsCubit>().state;
-    final layout = LayoutSettings.of(context);
-    final subredditName = layout.prefixCommunities
-        ? post.subreddit.subredditNamePrefixed
-        : post.subreddit.subreddit;
     return Row(
       spacing: 8,
       children: [
         if (icon != null && showSubredditIcon)
           SubredditIcon(
             icon: icon,
-            subredditName: subredditName,
+            radius: 12,
+            subredditName: post.subreddit.subreddit,
             clickable: settings.clickableCommunity,
           ),
         Expanded(

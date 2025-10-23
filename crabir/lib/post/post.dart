@@ -87,3 +87,43 @@ extension HasContent on Post {
     return (selftext?.isNotEmpty ?? false) || (kind.isMedia() && allowMedia);
   }
 }
+
+abstract class PostView extends StatefulWidget {
+  final Post post;
+
+  /// Function to call after saving / unsaving the post.
+  final SaveCallback? onSaveCallback;
+
+  /// Function to call after liking / disliking the post.
+  final LikeCallback? onLikeCallback;
+
+  final HideCallback? onHideCallback;
+
+  /// Function to call when the post is tapped.
+  final VoidCallback? onTap;
+
+  /// Enable thumbnail
+  final bool enableThumbnail;
+
+  /// If set to true, show the selftext even if the post is marked as spoiler
+  final bool ignoreSelftextSpoiler;
+
+  /// Set to true to not change title color when post is read
+  final bool ignoreRead;
+
+  /// Whether to honor `post.hidden`. If set to false, the post is always shown.
+  final bool respectHidden;
+
+  const PostView({
+    super.key,
+    required this.post,
+    this.onSaveCallback,
+    this.onLikeCallback,
+    this.onTap,
+    this.respectHidden = true,
+    this.onHideCallback,
+    required this.enableThumbnail,
+    required this.ignoreSelftextSpoiler,
+    required this.ignoreRead,
+  });
+}

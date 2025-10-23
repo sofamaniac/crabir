@@ -2,6 +2,7 @@ import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/common.dart';
 import 'package:crabir/feed/sort_display.dart';
 import 'package:crabir/feed_list.dart';
+import 'package:crabir/settings/layout/layout_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
@@ -40,6 +41,14 @@ class _MultiViewState extends State<MultiView> {
     } else {
       sort = widget.initialSort ?? settings.defaultSort;
     }
+    final layout = LayoutSettings.of(context);
+    final ViewKind view;
+    if (layout.rememberByCommunity) {
+      view = layout.rememberedView.containsMulti(widget.multi) ??
+          layout.defaultView;
+    } else {
+      view = layout.defaultView;
+    }
     return CommonFeedView(
       key: ValueKey(widget.multi),
       endDrawer: RightSide(multi: widget.multi),
@@ -61,6 +70,18 @@ class _MultiViewState extends State<MultiView> {
           );
         }
       },
+      onViewChanged: (view) {
+        if (layout.rememberByCommunity) {
+          context
+              .read<LayoutSettingsCubit>()
+              .state
+              .rememberedView
+              .addMulti(widget.multi, view);
+        } else {
+          context.read<LayoutSettingsCubit>().updateDefaultView(view);
+        }
+      },
+      view: view,
       initialSort: sort,
     );
   }

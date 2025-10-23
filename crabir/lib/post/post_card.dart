@@ -1,19 +1,6 @@
 part of 'post.dart';
 
-class RedditPostCard extends StatefulWidget {
-  final Post post;
-
-  /// Function to call after saving / unsaving the post.
-  final SaveCallback? onSaveCallback;
-
-  /// Function to call after liking / disliking the post.
-  final LikeCallback? onLikeCallback;
-
-  final HideCallback? onHideCallback;
-
-  /// Function to call when the post is tapped.
-  final VoidCallback? onTap;
-
+class RedditPostCard extends PostView {
   /// Maximum number of lines of the body to show.
   final int? maxLines;
 
@@ -21,59 +8,47 @@ class RedditPostCard extends StatefulWidget {
   /// If set to false, show a thumbnail instead (when `enableThumbnail` is true).
   final bool showMedia;
 
-  /// Enable thumbnail
-  final bool enableThumbnail;
-
-  /// If set to true, show the selftext even if the post is marked as spoiler
-  final bool ignoreSelftextSpoiler;
-
-  /// Set to true to not change title color when post is read
-  final bool ignoreRead;
-
   /// Show navigate to comments button
   final bool showCommentsButton;
 
   /// Show reply to post button
   final bool showReplyButton;
 
-  /// Whether to honor `post.hidden`. If set to false, the post is always shown.
-  final bool respectHidden;
-
   const RedditPostCard({
     super.key,
-    required this.post,
-    this.onLikeCallback,
-    this.onSaveCallback,
-    this.onHideCallback,
-    this.onTap,
-    this.maxLines,
-    this.showMedia = true,
-    this.enableThumbnail = true,
-    this.ignoreSelftextSpoiler = false,
-    this.ignoreRead = false,
+    required super.post,
+    super.onLikeCallback,
+    super.onSaveCallback,
+    super.onHideCallback,
+    super.onTap,
+    required super.enableThumbnail,
+    super.ignoreSelftextSpoiler = false,
+    super.ignoreRead = false,
+    super.respectHidden = true,
     this.showCommentsButton = true,
     this.showReplyButton = false,
-    this.respectHidden = true,
+    this.maxLines,
+    this.showMedia = true,
   });
 
   @override
-  State<RedditPostCard> createState() => _RedditPostCardState();
+  State<StatefulWidget> createState() => _RedditPostCardState();
 }
 
 class _RedditPostCardState extends State<RedditPostCard> {
   Future<void> _onSave(bool save) async {
-    setState(() {});
     await widget.onSaveCallback?.call(save);
+    setState(() {});
   }
 
   Future<void> _onLike(VoteDirection dir) async {
-    setState(() {});
     await widget.onLikeCallback?.call(dir);
+    setState(() {});
   }
 
   void _onHide(bool hidden) async {
-    setState(() {});
     widget.onHideCallback?.call(hidden);
+    setState(() {});
   }
 
   @override
@@ -87,11 +62,13 @@ class _RedditPostCardState extends State<RedditPostCard> {
       spacing: 8,
       children: [
         wrapPostElement(Header(post: widget.post)),
-        PostCardTitle(
-          post: widget.post,
-          showMedia: widget.showMedia,
-          enableThumbnail: widget.enableThumbnail,
-          ignoreRead: widget.ignoreRead,
+        wrapPostElement(
+          PostCardTitle(
+            post: widget.post,
+            showMedia: widget.showMedia,
+            enableThumbnail: widget.enableThumbnail,
+            ignoreRead: widget.ignoreRead,
+          ),
         ),
         if (widget.post.hasContent(allowMedia: widget.showMedia))
           PostCardContent(
@@ -204,13 +181,17 @@ class PostCardContent extends StatelessWidget {
 class PostCardTitle extends StatelessWidget {
   final Post post;
   final bool ignoreRead;
+
+  /// If set to true and the post has some media content, disable the thumbnail.
   final bool showMedia;
+
+  /// Show the thumbnail (if compatible with showMedia).
   final bool enableThumbnail;
 
   const PostCardTitle({
     super.key,
     required this.post,
-    required this.ignoreRead,
+    this.ignoreRead = false,
     required this.showMedia,
     required this.enableThumbnail,
   });
@@ -229,13 +210,11 @@ class PostCardTitle extends StatelessWidget {
       ],
     );
     if (enableThumbnail && post.kind.showThumbnail(showMedia)) {
-      return wrapPostElement(
-        Thumbnail(
-          post: post,
-          child: title,
-        ),
+      return Thumbnail(
+        post: post,
+        child: title,
       );
     }
-    return wrapPostElement(title);
+    return title;
   }
 }

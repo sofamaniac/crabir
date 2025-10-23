@@ -1,6 +1,7 @@
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/post.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
+import 'package:crabir/settings/layout/layout_settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/sort.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';

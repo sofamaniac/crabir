@@ -7,13 +7,13 @@ class _PostView extends StatelessWidget {
   });
 
   Widget title(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        PostTitle(post: post),
-        PostFlair(post: post),
-        PostScore(post: post),
-      ],
+    final settings = context.watch<CommentsSettingsCubit>().state;
+    final showMedia =
+        settings.postMediaPreviewSize == MediaPreviewSize.fullPreview;
+    return PostCardTitle(
+      post: post,
+      enableThumbnail: LayoutSettings.of(context).showThumbnail,
+      showMedia: showMedia,
     );
   }
 
@@ -42,6 +42,8 @@ class _PostView extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: DenseCard(
+                ignoreRead: false,
+                enableThumbnail: LayoutSettings.of(context).showThumbnail,
                 post: post.crosspostParentList.first,
                 pushSubreddit: true,
                 // Disable shadow

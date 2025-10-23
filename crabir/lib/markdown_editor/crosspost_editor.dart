@@ -136,7 +136,11 @@ class _CrosspostEditorState extends State<CrosspostEditor> {
               },
               title: Text("Send reply notification"),
             ),
-            DenseCard(post: widget.post),
+            DenseCard(
+              post: widget.post,
+              enableThumbnail: false,
+              ignoreRead: true,
+            ),
           ],
         ),
       ),

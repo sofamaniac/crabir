@@ -862,11 +862,23 @@ abstract class AppLocalizations {
   /// **'Remember for each community'**
   String get layout_rememberByCommunity;
 
+  /// No description provided for @layout_rememberedView.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage views'**
+  String get layout_rememberedView;
+
   /// No description provided for @layout_thumbnailOnLeft.
   ///
   /// In en, this message translates to:
   /// **'Thumbnail on left'**
   String get layout_thumbnailOnLeft;
+
+  /// No description provided for @layout_showThumbnail.
+  ///
+  /// In en, this message translates to:
+  /// **'Show thumbnail'**
+  String get layout_showThumbnail;
 
   /// No description provided for @layout_font.
   ///
@@ -879,6 +891,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Prefix subreddit with /r'**
   String get layout_prefixCommunities;
+
+  /// No description provided for @viewCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Card'**
+  String get viewCard;
+
+  /// No description provided for @viewCompact.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact'**
+  String get viewCompact;
+
+  /// No description provided for @viewDense.
+  ///
+  /// In en, this message translates to:
+  /// **'Dense'**
+  String get viewDense;
 
   /// No description provided for @data_autoplay.
   ///

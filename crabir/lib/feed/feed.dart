@@ -4,6 +4,7 @@ import 'package:crabir/feed/common.dart';
 import 'package:crabir/feed/top_bar.dart';
 import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/markdown_render.dart';
+import 'package:crabir/settings/layout/layout_settings.dart';
 import 'package:crabir/settings/posts/posts_settings.dart';
 import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
@@ -67,6 +68,7 @@ class _FeedViewState extends State<FeedView> {
     final _ = context.watch<AccountsBloc>().state;
     final bloc = context.read<PostsSettingsCubit>();
     final settings = context.read<PostsSettingsCubit>().state;
+    final layout = LayoutSettings.of(context);
     final defaultSort = switch (widget.feed) {
       Feed_Home() => settings.defaultHomeSort,
       _ => settings.defaultSort
@@ -79,6 +81,13 @@ class _FeedViewState extends State<FeedView> {
     } else {
       sort = widget.initialSort ?? defaultSort;
     }
+
+    final ViewKind view;
+    if (layout.rememberByCommunity) {
+      view = layout.rememberedView.containsFeed(feed) ?? layout.defaultView;
+    } else {
+      view = layout.defaultView;
+    }
     return CommonFeedView(
       key: ValueKey(widget.feed),
       title: (sort) => FeedTitle(feed: feed, sort: sort),
@@ -89,9 +98,22 @@ class _FeedViewState extends State<FeedView> {
       onSortChanged: (sort) {
         if (settings.rememberSortByCommunity) {
           bloc.updateRememberedSorts(
-              settings.rememberedSorts.addFeed(feed, sort));
+            settings.rememberedSorts.addFeed(feed, sort),
+          );
         }
       },
+      onViewChanged: (view) {
+        if (layout.rememberByCommunity) {
+          context
+              .read<LayoutSettingsCubit>()
+              .state
+              .rememberedView
+              .addFeed(feed, view);
+        } else {
+          context.read<LayoutSettingsCubit>().updateDefaultView(view);
+        }
+      },
+      view: view,
       initialSort: sort,
       subredditAbout: subredditAbout,
       endDrawer: subredditAbout != null

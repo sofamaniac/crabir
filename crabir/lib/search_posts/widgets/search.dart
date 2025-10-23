@@ -3,8 +3,11 @@ import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/post/post.dart';
 import 'package:crabir/search_posts/bloc/search_bloc.dart';
 import 'package:crabir/search_posts/widgets/sort_menu.dart';
+import 'package:crabir/settings/filters/filters_settings.dart';
+import 'package:crabir/settings/layout/layout_settings.dart';
 import 'package:crabir/sort.dart';
 import 'package:crabir/src/go_router_ext/annotations.dart';
+import 'package:crabir/src/rust/third_party/reddit_api/client.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
@@ -209,16 +212,48 @@ extension PostSearchSortString on PostSearchSort {
 }
 
 Widget _postView(BuildContext context, Post post) {
+  final kind = LayoutSettings.of(context).defaultView;
+  final enableThumbnail = LayoutSettings.of(context).showThumbnail;
   final state = context.read<PostSearchBloc>();
-  return RedditPostCard(
-    maxLines: 5,
-    post: post,
-    onLikeCallback: (direction) async {
-      state.add(Vote(direction: direction, name: post.name));
-    },
-    onSaveCallback: (save) async {
-      state.add(Save(save: save, name: post.name));
-    },
-    onTap: () => context.go(post.permalink, extra: post),
-  );
+  void onTap() {
+    context.read<ReadPosts>().mark(post.id);
+    context.push(post.permalink, extra: post);
+  }
+
+  Future<void> onLikeCallback(VoteDirection direction) async {
+    state.add(Vote(direction: direction, name: post.name));
+  }
+
+  Future<void> onSaveCallback(bool save) async {
+    state.add(Save(save: save, name: post.name));
+  }
+
+  return switch (kind) {
+    ViewKind.card => RedditPostCard(
+        maxLines: 5,
+        post: post,
+        onTap: onTap,
+        onLikeCallback: onLikeCallback,
+        onSaveCallback: onSaveCallback,
+        enableThumbnail: enableThumbnail,
+        ignoreSelftextSpoiler: false,
+        ignoreRead: false,
+      ),
+    ViewKind.compact => DenseCard(
+        post: post,
+        onTap: onTap,
+        onLikeCallback: onLikeCallback,
+        onSaveCallback: onSaveCallback,
+        enableThumbnail: enableThumbnail,
+        ignoreRead: false,
+      ),
+    ViewKind.dense => DenseCard(
+        post: post,
+        onTap: onTap,
+        onLikeCallback: onLikeCallback,
+        onSaveCallback: onSaveCallback,
+        enableThumbnail: enableThumbnail,
+        ignoreRead: false,
+      )
+  };
 }

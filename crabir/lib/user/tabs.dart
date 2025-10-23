@@ -85,6 +85,7 @@ Widget postView(BuildContext context, Post post, bool hide) {
     onTap: () {
       context.push(post.permalink, extra: post);
     },
+    enableThumbnail: LayoutSettings.of(context).showThumbnail,
     respectHidden: hide,
   );
 }
