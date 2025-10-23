@@ -97,3 +97,20 @@ class SettingsBlocsProviders extends StatelessWidget {
     );
   }
 }
+
+abstract class SettingButton<T> extends StatelessWidget {
+  final Widget title;
+  final Widget? subtitle;
+  final T value;
+  final Widget? leading;
+  final void Function(T)? onChanged;
+
+  const SettingButton({
+    super.key,
+    required this.title,
+    this.subtitle,
+    required this.value,
+    this.leading,
+    this.onChanged,
+  });
+}

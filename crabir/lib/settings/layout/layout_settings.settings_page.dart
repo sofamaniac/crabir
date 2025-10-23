@@ -32,9 +32,13 @@ class LayoutSettingsCubit extends HydratedCubit<LayoutSettings> {
   void updateRememberByCommunity(bool value) =>
       emit(state.copyWith(rememberByCommunity: value));
 
-  void updateManageViews(() value) => emit(state.copyWith(manageViews: value));
+  void updateRememberedView(RememberedView value) =>
+      emit(state.copyWith(rememberedView: value));
 
   void updateFont(() value) => emit(state.copyWith(font: value));
+
+  void updateShowThumbnail(bool value) =>
+      emit(state.copyWith(showThumbnail: value));
 
   void updateThumbnailOnLeft(bool value) =>
       emit(state.copyWith(thumbnailOnLeft: value));
@@ -72,10 +76,13 @@ class LayoutSettingsView extends StatelessWidget {
               .read<LayoutSettingsCubit>()
               .updateRememberByCommunity(val!),
         ),
-        ListTile(
-          title: Text("TODO: manageViews"),
-          leading: null,
+        _ManageViewButton(
+          title: Text(locales.layout_rememberedView),
+          leading: Icon(null),
           subtitle: null,
+          value: settings.rememberedView,
+          onChanged: (val) =>
+              context.read<LayoutSettingsCubit>().updateRememberedView(val),
         ),
         Divider(),
         ListTile(
@@ -84,12 +91,23 @@ class LayoutSettingsView extends StatelessWidget {
           subtitle: null,
         ),
         CheckboxListTile(
+          title: Text(locales.layout_showThumbnail),
+          secondary: Icon(null),
+          subtitle: null,
+          value: settings.showThumbnail,
+          onChanged: (val) =>
+              context.read<LayoutSettingsCubit>().updateShowThumbnail(val!),
+        ),
+        CheckboxListTile(
           title: Text(locales.layout_thumbnailOnLeft),
           secondary: Icon(null),
           subtitle: null,
           value: settings.thumbnailOnLeft,
-          onChanged: (val) =>
-              context.read<LayoutSettingsCubit>().updateThumbnailOnLeft(val!),
+          onChanged: settings.showThumbnail
+              ? (val) => context
+                  .read<LayoutSettingsCubit>()
+                  .updateThumbnailOnLeft(val!)
+              : null,
         ),
         CheckboxListTile(
           title: Text(locales.layout_prefixCommunities),

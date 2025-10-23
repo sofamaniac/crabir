@@ -1,5 +1,6 @@
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/media/media.dart';
+import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/settings_page/annotations.dart';
@@ -48,19 +49,14 @@ abstract class DataSettings with _$DataSettings {
       context.watch<DataSettingsCubit>().state;
 }
 
-class ImageLoadingSelect extends StatelessWidget {
-  final Widget title;
-  final Widget? subtitle;
-  final ImageLoading value;
-  final Widget? leading;
-  final void Function(ImageLoading) onChanged;
+class ImageLoadingSelect extends SettingButton<ImageLoading> {
   const ImageLoadingSelect({
     super.key,
-    required this.title,
-    this.subtitle,
-    required this.onChanged,
-    required this.value,
-    this.leading,
+    required super.title,
+    super.subtitle,
+    required super.onChanged,
+    required super.value,
+    super.leading,
   });
   String _label(ImageLoading mode) {
     switch (mode) {
@@ -90,7 +86,7 @@ class ImageLoadingSelect extends StatelessWidget {
       leading: leading,
       title: title,
       subtitle: subtitle,
-      trailing: DropdownMenu(
+      trailing: DropdownMenu<ImageLoading>(
         dropdownMenuEntries: ImageLoading.values
             .map(
               (mode) => DropdownMenuEntry(
@@ -100,26 +96,21 @@ class ImageLoadingSelect extends StatelessWidget {
               ),
             )
             .toList(),
-        onSelected: (mode) => onChanged(mode!),
+        onSelected: onChanged != null ? (mode) => onChanged!(mode!) : null,
         initialSelection: value,
       ),
     );
   }
 }
 
-class ResolutionSelect extends StatelessWidget {
-  final Widget title;
-  final Widget? subtitle;
-  final Resolution value;
-  final Widget? leading;
-  final void Function(Resolution) onChanged;
+class ResolutionSelect extends SettingButton<Resolution> {
   const ResolutionSelect({
     super.key,
-    required this.title,
-    required this.onChanged,
-    required this.value,
-    this.subtitle,
-    this.leading,
+    required super.title,
+    required super.onChanged,
+    required super.value,
+    super.subtitle,
+    super.leading,
   });
 
   @override
@@ -128,7 +119,7 @@ class ResolutionSelect extends StatelessWidget {
       title: title,
       leading: leading,
       subtitle: subtitle,
-      trailing: DropdownMenu(
+      trailing: DropdownMenu<Resolution>(
         dropdownMenuEntries: Resolution.values
             .map(
               (res) => DropdownMenuEntry(
@@ -137,7 +128,7 @@ class ResolutionSelect extends StatelessWidget {
               ),
             )
             .toList(),
-        onSelected: (res) => onChanged(res!),
+        onSelected: onChanged != null ? (res) => onChanged!(res!) : null,
         initialSelection: value,
       ),
     );

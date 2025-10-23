@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:crabir/l10n/app_localizations.dart';
+import 'package:crabir/settings/settings.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/sort.dart';
 import 'package:crabir/src/go_router_ext/annotations.dart';
@@ -21,19 +22,14 @@ part 'posts_settings.go_route_ext.dart';
 
 final _multiPrefix = "_MULTI_";
 
-class ManageSortButton extends StatelessWidget {
-  final Widget title;
-  final Widget? subtitle;
-  final Widget? leading;
-  final void Function(RememberedSort) onChanged;
-  final RememberedSort value;
+class ManageSortButton extends SettingButton<RememberedSort> {
   const ManageSortButton({
     super.key,
-    required this.title,
-    this.subtitle,
-    required this.onChanged,
-    required this.value,
-    this.leading,
+    required super.title,
+    super.subtitle,
+    required super.onChanged,
+    required super.value,
+    super.leading,
   });
 
   @override
@@ -41,7 +37,7 @@ class ManageSortButton extends StatelessWidget {
     return ListTile(
       title: Text("Manage Sorts"),
       leading: leading,
-      onTap: () => ManageSortView().goNamed(context),
+      onTap: () => ManageSortView().pushNamed(context),
     );
   }
 }
@@ -186,19 +182,13 @@ class RememberedSort {
   }
 }
 
-class _SortSelection extends StatelessWidget {
-  final Widget title;
-  final Widget? subtitle;
-  final FeedSort value;
-  final Widget? leading;
-  final void Function(FeedSort) onChanged;
-
+class _SortSelection extends SettingButton<FeedSort> {
   const _SortSelection({
-    required this.value,
-    required this.onChanged,
-    required this.title,
-    this.subtitle,
-    this.leading,
+    required super.value,
+    required super.onChanged,
+    required super.title,
+    super.subtitle,
+    super.leading,
   });
 
   @override
@@ -207,12 +197,14 @@ class _SortSelection extends StatelessWidget {
       title: title,
       leading: leading,
       subtitle: Text(value.label(context)),
-      onTap: () async {
-        final sort = await _showFeedSortDialog(context);
-        if (sort != null) {
-          onChanged(sort);
-        }
-      },
+      onTap: onChanged != null
+          ? () async {
+              final sort = await _showFeedSortDialog(context);
+              if (sort != null) {
+                onChanged!(sort);
+              }
+            }
+          : null,
     );
   }
 

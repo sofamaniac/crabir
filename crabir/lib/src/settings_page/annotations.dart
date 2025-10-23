@@ -23,12 +23,16 @@ class Setting {
   /// Optional icon.
   final Object? icon;
 
+  /// If this set to some field name, the setting will be active only if said field is true.
+  final String? dependsOn;
+
   const Setting({
     this.titleKey,
     this.hasDescription = false,
     this.descriptionKey,
     this.widget,
     this.icon,
+    this.dependsOn,
   });
 }
 

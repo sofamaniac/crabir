@@ -171,21 +171,32 @@ class $className extends StatelessWidget {
         setting.getField("hasDescription")?.toBoolValue() ?? false;
     final iconData = setting.getField('icon')?.variable?.name;
 
+    final dependsOn = setting.getField("dependsOn")?.toStringValue() ?? "";
+    final isBool = param.type.isDartCoreBool;
+    final onChangedFunc =
+        '(val) => context.read<$cubitName>().update${param.name!.toPascalCase()}(val${isBool ? '!' : ''}) ';
+    final String onChanged;
+    if (dependsOn.isNotEmpty) {
+      onChanged = 'settings.$dependsOn ? $onChangedFunc : null';
+    } else {
+      onChanged = onChangedFunc;
+    }
+
     if (widgetType != null) {
       return '$widgetType('
           'title: Text(locales.$titleKey),'
           'leading: Icon($iconData),'
           'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
           'value: settings.${param.name},'
-          'onChanged: (val) => context.read<$cubitName>().update${param.name!.toPascalCase()}(val),'
+          'onChanged: $onChanged,'
           '),';
-    } else if (param.type.isDartCoreBool) {
+    } else if (isBool) {
       return 'CheckboxListTile('
           'title: Text(locales.$titleKey),'
           'secondary: Icon($iconData),'
           'subtitle: ${hasDescription ? "Text(locales.$descKey)" : "null"},'
           'value: settings.${param.name},'
-          'onChanged: (val) => context.read<$cubitName>().update${param.name!.toPascalCase()}(val!),'
+          'onChanged: $onChanged,'
           '),';
     }
     return 'ListTile(title: Text("TODO: ${param.name}"),'

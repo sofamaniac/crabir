@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:crabir/l10n/app_localizations.dart';
+import 'package:crabir/settings/settings.dart';
 import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
@@ -19,6 +20,16 @@ part 'layout_settings.freezed.dart';
 enum ViewKind {
   card,
   compact,
+  dense;
+
+  String label(BuildContext context) {
+    final locales = AppLocalizations.of(context);
+    return switch (this) {
+      ViewKind.card => locales.viewCard,
+      ViewKind.compact => locales.viewCompact,
+      ViewKind.dense => locales.viewDense,
+    };
+  }
 }
 
 final _multiPrefix = "_MULTI_";
@@ -45,7 +56,7 @@ class RememberedView {
     return RememberedView(data: newData);
   }
 
-  RememberedView removeSort(String feed) {
+  RememberedView removeView(String feed) {
     Map<String, ViewKind> newData = Map.from(data);
     newData.remove(feed);
     return RememberedView(data: newData);
@@ -86,9 +97,12 @@ abstract class LayoutSettings with _$LayoutSettings {
     @Default(ViewKind.card)
     ViewKind defaultView,
     @Setting() @Default(false) bool rememberByCommunity,
-    @Setting() @Default(()) () manageViews,
+    @Setting(widget: _ManageViewButton)
+    @Default(RememberedView())
+    RememberedView rememberedView,
     @Category() @Setting() @Default(()) () font,
-    @Setting() @Default(false) bool thumbnailOnLeft,
+    @Setting() @Default(true) bool showThumbnail,
+    @Setting(dependsOn: "showThumbnail") @Default(false) bool thumbnailOnLeft,
     @Setting() @Default(false) bool prefixCommunities,
   }) = _LayoutSettings;
   factory LayoutSettings.fromJson(Map<String, dynamic> json) =>
@@ -125,7 +139,7 @@ class _ViewKindSelection extends StatelessWidget {
             .map(
               (kind) => DropdownMenuEntry(
                 value: kind,
-                label: _label(kind),
+                label: kind.label(context),
               ),
             )
             .toList(),
@@ -134,11 +148,69 @@ class _ViewKindSelection extends StatelessWidget {
       ),
     );
   }
+}
 
-  String _label(ViewKind kind) {
-    return switch (kind) {
-      ViewKind.card => "Card",
-      ViewKind.compact => "Compact",
-    };
+class _ManageViewButton extends SettingButton<RememberedView> {
+  const _ManageViewButton({
+    super.key,
+    required super.title,
+    super.subtitle,
+    required super.onChanged,
+    required super.value,
+    super.leading,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text("Manage Sorts"),
+      leading: leading,
+      onTap: () => ManageRememberedView().pushNamed(context),
+    );
+  }
+}
+
+@CrabirRoute()
+class ManageRememberedView extends StatelessWidget {
+  const ManageRememberedView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final settings = context.watch<LayoutSettingsCubit>();
+    final data = settings.state.rememberedView;
+    final feeds = data.inOrder().toList();
+    final locales = AppLocalizations.of(context);
+    return Scaffold(
+      body: ListView.builder(
+        itemCount: feeds.length,
+        itemBuilder: (context, index) {
+          final (feed, view) = feeds[index];
+          final Widget title = switch (feed) {
+            "_HOME" => Text(locales.feedHome),
+            "_ALL" => Text(locales.feedAll),
+            "_POPULAR" => Text(locales.feedPopular),
+            _ when feed.startsWith(_multiPrefix) => RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(text: feed.substring(_multiPrefix.length)),
+                    TextSpan(text: "feed")
+                  ],
+                ),
+              ),
+            _ => Text(feed),
+          };
+          return ListTile(
+            title: title,
+            subtitle: Text(view.label(context)),
+            trailing: IconButton(
+              onPressed: () {
+                settings.updateRememberedView(data.removeView(feed));
+              },
+              icon: Icon(Icons.remove),
+            ),
+          );
+        },
+      ),
+    );
   }
 }

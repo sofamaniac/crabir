@@ -22,6 +22,7 @@ Map<String, dynamic> _$RememberedViewToJson(RememberedView instance) =>
 const _$ViewKindEnumMap = {
   ViewKind.card: 'card',
   ViewKind.compact: 'compact',
+  ViewKind.dense: 'dense',
 };
 
 _LayoutSettings _$LayoutSettingsFromJson(Map<String, dynamic> json) =>
@@ -30,8 +31,12 @@ _LayoutSettings _$LayoutSettingsFromJson(Map<String, dynamic> json) =>
           $enumDecodeNullable(_$ViewKindEnumMap, json['defaultView']) ??
               ViewKind.card,
       rememberByCommunity: json['rememberByCommunity'] as bool? ?? false,
-      manageViews: () ?? (),
+      rememberedView: json['rememberedView'] == null
+          ? const RememberedView()
+          : RememberedView.fromJson(
+              json['rememberedView'] as Map<String, dynamic>),
       font: () ?? (),
+      showThumbnail: json['showThumbnail'] as bool? ?? true,
       thumbnailOnLeft: json['thumbnailOnLeft'] as bool? ?? false,
       prefixCommunities: json['prefixCommunities'] as bool? ?? false,
     );
@@ -40,8 +45,9 @@ Map<String, dynamic> _$LayoutSettingsToJson(_LayoutSettings instance) =>
     <String, dynamic>{
       'defaultView': _$ViewKindEnumMap[instance.defaultView]!,
       'rememberByCommunity': instance.rememberByCommunity,
-      'manageViews': <String, dynamic>{},
+      'rememberedView': instance.rememberedView,
       'font': <String, dynamic>{},
+      'showThumbnail': instance.showThumbnail,
       'thumbnailOnLeft': instance.thumbnailOnLeft,
       'prefixCommunities': instance.prefixCommunities,
     };

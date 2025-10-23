@@ -18,12 +18,14 @@ mixin _$LayoutSettings {
   ViewKind get defaultView;
   @Setting()
   bool get rememberByCommunity;
-  @Setting()
-  () get manageViews;
+  @Setting(widget: _ManageViewButton)
+  RememberedView get rememberedView;
   @Category()
   @Setting()
   () get font;
   @Setting()
+  bool get showThumbnail;
+  @Setting(dependsOn: "showThumbnail")
   bool get thumbnailOnLeft;
   @Setting()
   bool get prefixCommunities;
@@ -48,9 +50,11 @@ mixin _$LayoutSettings {
                 other.defaultView == defaultView) &&
             (identical(other.rememberByCommunity, rememberByCommunity) ||
                 other.rememberByCommunity == rememberByCommunity) &&
-            (identical(other.manageViews, manageViews) ||
-                other.manageViews == manageViews) &&
+            (identical(other.rememberedView, rememberedView) ||
+                other.rememberedView == rememberedView) &&
             (identical(other.font, font) || other.font == font) &&
+            (identical(other.showThumbnail, showThumbnail) ||
+                other.showThumbnail == showThumbnail) &&
             (identical(other.thumbnailOnLeft, thumbnailOnLeft) ||
                 other.thumbnailOnLeft == thumbnailOnLeft) &&
             (identical(other.prefixCommunities, prefixCommunities) ||
@@ -60,11 +64,11 @@ mixin _$LayoutSettings {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, defaultView, rememberByCommunity,
-      manageViews, font, thumbnailOnLeft, prefixCommunities);
+      rememberedView, font, showThumbnail, thumbnailOnLeft, prefixCommunities);
 
   @override
   String toString() {
-    return 'LayoutSettings(defaultView: $defaultView, rememberByCommunity: $rememberByCommunity, manageViews: $manageViews, font: $font, thumbnailOnLeft: $thumbnailOnLeft, prefixCommunities: $prefixCommunities)';
+    return 'LayoutSettings(defaultView: $defaultView, rememberByCommunity: $rememberByCommunity, rememberedView: $rememberedView, font: $font, showThumbnail: $showThumbnail, thumbnailOnLeft: $thumbnailOnLeft, prefixCommunities: $prefixCommunities)';
   }
 }
 
@@ -77,9 +81,10 @@ abstract mixin class $LayoutSettingsCopyWith<$Res> {
   $Res call(
       {@Setting(widget: _ViewKindSelection) ViewKind defaultView,
       @Setting() bool rememberByCommunity,
-      @Setting() () manageViews,
+      @Setting(widget: _ManageViewButton) RememberedView rememberedView,
       @Category() @Setting() () font,
-      @Setting() bool thumbnailOnLeft,
+      @Setting() bool showThumbnail,
+      @Setting(dependsOn: "showThumbnail") bool thumbnailOnLeft,
       @Setting() bool prefixCommunities});
 }
 
@@ -98,8 +103,9 @@ class _$LayoutSettingsCopyWithImpl<$Res>
   $Res call({
     Object? defaultView = null,
     Object? rememberByCommunity = null,
-    Object? manageViews = null,
+    Object? rememberedView = null,
     Object? font = null,
+    Object? showThumbnail = null,
     Object? thumbnailOnLeft = null,
     Object? prefixCommunities = null,
   }) {
@@ -112,14 +118,18 @@ class _$LayoutSettingsCopyWithImpl<$Res>
           ? _self.rememberByCommunity
           : rememberByCommunity // ignore: cast_nullable_to_non_nullable
               as bool,
-      manageViews: null == manageViews
-          ? _self.manageViews
-          : manageViews // ignore: cast_nullable_to_non_nullable
-              as (),
+      rememberedView: null == rememberedView
+          ? _self.rememberedView
+          : rememberedView // ignore: cast_nullable_to_non_nullable
+              as RememberedView,
       font: null == font
           ? _self.font
           : font // ignore: cast_nullable_to_non_nullable
               as (),
+      showThumbnail: null == showThumbnail
+          ? _self.showThumbnail
+          : showThumbnail // ignore: cast_nullable_to_non_nullable
+              as bool,
       thumbnailOnLeft: null == thumbnailOnLeft
           ? _self.thumbnailOnLeft
           : thumbnailOnLeft // ignore: cast_nullable_to_non_nullable
@@ -228,9 +238,10 @@ extension LayoutSettingsPatterns on LayoutSettings {
     TResult Function(
             @Setting(widget: _ViewKindSelection) ViewKind defaultView,
             @Setting() bool rememberByCommunity,
-            @Setting() () manageViews,
+            @Setting(widget: _ManageViewButton) RememberedView rememberedView,
             @Category() @Setting() () font,
-            @Setting() bool thumbnailOnLeft,
+            @Setting() bool showThumbnail,
+            @Setting(dependsOn: "showThumbnail") bool thumbnailOnLeft,
             @Setting() bool prefixCommunities)?
         $default, {
     required TResult orElse(),
@@ -241,8 +252,9 @@ extension LayoutSettingsPatterns on LayoutSettings {
         return $default(
             _that.defaultView,
             _that.rememberByCommunity,
-            _that.manageViews,
+            _that.rememberedView,
             _that.font,
+            _that.showThumbnail,
             _that.thumbnailOnLeft,
             _that.prefixCommunities);
       case _:
@@ -268,9 +280,10 @@ extension LayoutSettingsPatterns on LayoutSettings {
     TResult Function(
             @Setting(widget: _ViewKindSelection) ViewKind defaultView,
             @Setting() bool rememberByCommunity,
-            @Setting() () manageViews,
+            @Setting(widget: _ManageViewButton) RememberedView rememberedView,
             @Category() @Setting() () font,
-            @Setting() bool thumbnailOnLeft,
+            @Setting() bool showThumbnail,
+            @Setting(dependsOn: "showThumbnail") bool thumbnailOnLeft,
             @Setting() bool prefixCommunities)
         $default,
   ) {
@@ -280,8 +293,9 @@ extension LayoutSettingsPatterns on LayoutSettings {
         return $default(
             _that.defaultView,
             _that.rememberByCommunity,
-            _that.manageViews,
+            _that.rememberedView,
             _that.font,
+            _that.showThumbnail,
             _that.thumbnailOnLeft,
             _that.prefixCommunities);
       case _:
@@ -306,9 +320,10 @@ extension LayoutSettingsPatterns on LayoutSettings {
     TResult? Function(
             @Setting(widget: _ViewKindSelection) ViewKind defaultView,
             @Setting() bool rememberByCommunity,
-            @Setting() () manageViews,
+            @Setting(widget: _ManageViewButton) RememberedView rememberedView,
             @Category() @Setting() () font,
-            @Setting() bool thumbnailOnLeft,
+            @Setting() bool showThumbnail,
+            @Setting(dependsOn: "showThumbnail") bool thumbnailOnLeft,
             @Setting() bool prefixCommunities)?
         $default,
   ) {
@@ -318,8 +333,9 @@ extension LayoutSettingsPatterns on LayoutSettings {
         return $default(
             _that.defaultView,
             _that.rememberByCommunity,
-            _that.manageViews,
+            _that.rememberedView,
             _that.font,
+            _that.showThumbnail,
             _that.thumbnailOnLeft,
             _that.prefixCommunities);
       case _:
@@ -334,9 +350,11 @@ class _LayoutSettings extends LayoutSettings {
   _LayoutSettings(
       {@Setting(widget: _ViewKindSelection) this.defaultView = ViewKind.card,
       @Setting() this.rememberByCommunity = false,
-      @Setting() this.manageViews = const (),
+      @Setting(widget: _ManageViewButton)
+      this.rememberedView = const RememberedView(),
       @Category() @Setting() this.font = const (),
-      @Setting() this.thumbnailOnLeft = false,
+      @Setting() this.showThumbnail = true,
+      @Setting(dependsOn: "showThumbnail") this.thumbnailOnLeft = false,
       @Setting() this.prefixCommunities = false})
       : super._();
   factory _LayoutSettings.fromJson(Map<String, dynamic> json) =>
@@ -352,8 +370,8 @@ class _LayoutSettings extends LayoutSettings {
   final bool rememberByCommunity;
   @override
   @JsonKey()
-  @Setting()
-  final () manageViews;
+  @Setting(widget: _ManageViewButton)
+  final RememberedView rememberedView;
   @override
   @JsonKey()
   @Category()
@@ -362,6 +380,10 @@ class _LayoutSettings extends LayoutSettings {
   @override
   @JsonKey()
   @Setting()
+  final bool showThumbnail;
+  @override
+  @JsonKey()
+  @Setting(dependsOn: "showThumbnail")
   final bool thumbnailOnLeft;
   @override
   @JsonKey()
@@ -392,9 +414,11 @@ class _LayoutSettings extends LayoutSettings {
                 other.defaultView == defaultView) &&
             (identical(other.rememberByCommunity, rememberByCommunity) ||
                 other.rememberByCommunity == rememberByCommunity) &&
-            (identical(other.manageViews, manageViews) ||
-                other.manageViews == manageViews) &&
+            (identical(other.rememberedView, rememberedView) ||
+                other.rememberedView == rememberedView) &&
             (identical(other.font, font) || other.font == font) &&
+            (identical(other.showThumbnail, showThumbnail) ||
+                other.showThumbnail == showThumbnail) &&
             (identical(other.thumbnailOnLeft, thumbnailOnLeft) ||
                 other.thumbnailOnLeft == thumbnailOnLeft) &&
             (identical(other.prefixCommunities, prefixCommunities) ||
@@ -404,11 +428,11 @@ class _LayoutSettings extends LayoutSettings {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, defaultView, rememberByCommunity,
-      manageViews, font, thumbnailOnLeft, prefixCommunities);
+      rememberedView, font, showThumbnail, thumbnailOnLeft, prefixCommunities);
 
   @override
   String toString() {
-    return 'LayoutSettings(defaultView: $defaultView, rememberByCommunity: $rememberByCommunity, manageViews: $manageViews, font: $font, thumbnailOnLeft: $thumbnailOnLeft, prefixCommunities: $prefixCommunities)';
+    return 'LayoutSettings(defaultView: $defaultView, rememberByCommunity: $rememberByCommunity, rememberedView: $rememberedView, font: $font, showThumbnail: $showThumbnail, thumbnailOnLeft: $thumbnailOnLeft, prefixCommunities: $prefixCommunities)';
   }
 }
 
@@ -423,9 +447,10 @@ abstract mixin class _$LayoutSettingsCopyWith<$Res>
   $Res call(
       {@Setting(widget: _ViewKindSelection) ViewKind defaultView,
       @Setting() bool rememberByCommunity,
-      @Setting() () manageViews,
+      @Setting(widget: _ManageViewButton) RememberedView rememberedView,
       @Category() @Setting() () font,
-      @Setting() bool thumbnailOnLeft,
+      @Setting() bool showThumbnail,
+      @Setting(dependsOn: "showThumbnail") bool thumbnailOnLeft,
       @Setting() bool prefixCommunities});
 }
 
@@ -444,8 +469,9 @@ class __$LayoutSettingsCopyWithImpl<$Res>
   $Res call({
     Object? defaultView = null,
     Object? rememberByCommunity = null,
-    Object? manageViews = null,
+    Object? rememberedView = null,
     Object? font = null,
+    Object? showThumbnail = null,
     Object? thumbnailOnLeft = null,
     Object? prefixCommunities = null,
   }) {
@@ -458,14 +484,18 @@ class __$LayoutSettingsCopyWithImpl<$Res>
           ? _self.rememberByCommunity
           : rememberByCommunity // ignore: cast_nullable_to_non_nullable
               as bool,
-      manageViews: null == manageViews
-          ? _self.manageViews
-          : manageViews // ignore: cast_nullable_to_non_nullable
-              as (),
+      rememberedView: null == rememberedView
+          ? _self.rememberedView
+          : rememberedView // ignore: cast_nullable_to_non_nullable
+              as RememberedView,
       font: null == font
           ? _self.font
           : font // ignore: cast_nullable_to_non_nullable
               as (),
+      showThumbnail: null == showThumbnail
+          ? _self.showThumbnail
+          : showThumbnail // ignore: cast_nullable_to_non_nullable
+              as bool,
       thumbnailOnLeft: null == thumbnailOnLeft
           ? _self.thumbnailOnLeft
           : thumbnailOnLeft // ignore: cast_nullable_to_non_nullable
