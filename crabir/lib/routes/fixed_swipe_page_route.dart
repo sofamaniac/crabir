@@ -84,8 +84,11 @@ class FixedSwipePageRoute<T> extends PageRoute<T> implements TickerProvider {
   }
 
   @override
-  Widget buildPage(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation) {
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
     return builder(context);
   }
 

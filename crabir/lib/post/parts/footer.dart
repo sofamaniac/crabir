@@ -343,7 +343,6 @@ class HideButton extends LongShortButton {
 
   @override
   onTap(BuildContext context) async {
-    print("ON TAPP $onHide");
     if (post.hidden) {
       await post.unhide(client: RedditAPI.client());
       onHide?.call(false);

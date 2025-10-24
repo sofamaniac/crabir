@@ -95,7 +95,6 @@ class _Score extends StatelessWidget {
   final LikeCallback? onLike;
 
   const _Score({
-    super.key,
     required this.post,
     this.onLike,
   });

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crabir/feed/feed.dart';
 import 'package:crabir/feed/multi.dart';
 import 'package:crabir/gallery/gallery.dart';
@@ -7,6 +8,7 @@ import 'package:crabir/markdown_editor/editor.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/routes/fixed_swipe_page_route.dart';
 import 'package:crabir/routes/not_found_page.dart';
+import 'package:crabir/search_posts/widgets/search.dart';
 import 'package:crabir/search_subreddits/widgets/search.dart';
 import 'package:crabir/settings/comments/comments_settings.dart';
 import 'package:crabir/settings/data/data_settings.dart';
@@ -25,19 +27,20 @@ import 'package:crabir/subscription/widgets/paywall.dart';
 import 'package:crabir/subscriptions_tab.dart';
 import 'package:crabir/thread/widgets/thread.dart';
 import 'package:crabir/user/user.dart';
+import 'package:crabir/utils/post_search_parsing.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 final _rootNavigationKey = GlobalKey<NavigatorState>();
 final _indexStateKey = GlobalKey<StatefulNavigationShellState>();
 
-final String DEFAULT_ROUTE = "/default";
+// ignore: constant_identifier_names
+const String DEFAULT_ROUTE = "/default";
 
 final GoRouter appRouter = GoRouter(
   debugLogDiagnostics: true,
   navigatorKey: _rootNavigationKey,
   initialLocation: DEFAULT_ROUTE,
-  // Catch unhandled paths
   errorBuilder: (context, state) {
     final uri = state.uri;
 
@@ -51,7 +54,6 @@ final GoRouter appRouter = GoRouter(
       return "/paywall";
     }
   },
-
   routes: [
     StatefulShellRoute.indexedStack(
       key: _indexStateKey,
@@ -95,6 +97,7 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/searchtab',
+              name: SearchSubredditsViewBuilder.name,
               builder: (context, state) => SearchSubredditsView(),
             ),
           ],
@@ -184,6 +187,24 @@ final GoRouter appRouter = GoRouter(
                   },
                 ),
 
+                GoRoute(
+                    path: 'search',
+                    builder: (context, state) {
+                      final query = state.uri.queryParameters;
+                      final String? subreddit;
+                      if (query["restrict_sr"] == "on") {
+                        subreddit = state.pathParameters["subreddit"];
+                      } else {
+                        subreddit = null;
+                      }
+                      return SearchPostsView(
+                        query: query["q"] ?? "",
+                        subreddit: subreddit,
+                        initialSort:
+                            query["sort"].parsePostSearchSort(query["t"]),
+                      );
+                    }),
+
                 /// Handle short links
                 GoRoute(
                   path: "s/:id",
@@ -249,6 +270,16 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
       ],
+    ),
+
+    GoRoute(
+      path: "/media",
+      builder: (context, state) {
+        final url = state.uri.queryParameters["url"] ?? "";
+        return FullscreenMediaView(
+          builder: (_) => CachedNetworkImage(imageUrl: url),
+        );
+      },
     ),
 
     GoRoute(

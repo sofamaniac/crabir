@@ -3,6 +3,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/settings/data/data_settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NetworkStatus {
   static ValueNotifier<List<ConnectivityResult>> connection = ValueNotifier([]);
@@ -22,7 +23,8 @@ class NetworkStatus {
   }
 
   static Resolution imageQuality(BuildContext context) {
-    final settings = DataSettings.of(context);
+    //final settings = DataSettings.of(context);
+    final settings = context.read<DataSettingsCubit>().state;
     if (connection.value.contains(ConnectivityResult.wifi)) {
       return settings.imageQualityWifi;
     } else {

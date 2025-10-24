@@ -25,10 +25,12 @@ class SearchPostsView extends StatefulWidget {
     this.query = "",
     this.flair,
     this.subreddit,
+    this.initialSort,
   });
   final String query;
   final Flair? flair;
   final String? subreddit;
+  final PostSearchSort? initialSort;
   @override
   State<StatefulWidget> createState() => _SearchSubredditsViewState();
 }
@@ -46,6 +48,7 @@ class _SearchSubredditsViewState extends State<SearchPostsView> {
       create: (_) => PostSearchBloc(
         query: query,
         subreddit: widget.subreddit,
+        sort: widget.initialSort ?? PostSearchSort_Hot(),
       ),
       child: _SearchViewBody(
         initialQuery: query,

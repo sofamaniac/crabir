@@ -176,6 +176,7 @@ pub struct Post {
     // Post properties
     pinned: bool,
     over_18: bool,
+    #[flutter_getter(skip)]
     preview: Option<Preview>,
     spoiler: bool,
     locked: bool,
@@ -282,6 +283,16 @@ impl Post {
     #[frb(sync, getter)]
     pub fn is_crosspost(&self) -> bool {
         !self.crosspost_parent_list.is_empty()
+    }
+
+    #[frb(sync, getter)]
+    /// Get preview or crosspost parent preview if there is any.
+    pub fn get_preview(&self) -> Option<Preview> {
+        if let Some(preview) = self.preview.clone() {
+            Some(preview)
+        } else {
+            self.crosspost_parent_list.first()?.get_preview()
+        }
     }
 
     /// Hide a post

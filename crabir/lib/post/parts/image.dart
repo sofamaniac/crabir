@@ -29,8 +29,7 @@ class _ImageContentState extends State<ImageContent> {
     final obfuscate = widget.post.spoiler ||
         (widget.post.over18 &&
             context.watch<FiltersSettingsCubit>().state.blurNSFW);
-    final preview = widget.post.preview ??
-        widget.post.crosspostParentList.firstOrNull?.preview;
+    final preview = widget.post.preview;
     if (preview == null) {
       return InkWell(
         onTap: () =>

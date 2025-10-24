@@ -11,8 +11,12 @@ part of 'search.dart';
 extension SearchPostsViewBuilder on SearchPostsView {
   static const String name = 'SearchPostsView';
   Map<String, String> get pathParams => {};
-  Map<String, dynamic> get extra =>
-      {'query': query, 'flair': flair, 'subreddit': subreddit};
+  Map<String, dynamic> get extra => {
+        'query': query,
+        'flair': flair,
+        'subreddit': subreddit,
+        'initialSort': initialSort
+      };
 
   void goNamed(BuildContext context) => context.goNamed(
         name,
@@ -31,6 +35,7 @@ extension SearchPostsViewBuilder on SearchPostsView {
     return SearchPostsView(
         query: extra['query'] as String,
         flair: extra['flair'] as Flair?,
-        subreddit: extra['subreddit'] as String?);
+        subreddit: extra['subreddit'] as String?,
+        initialSort: extra['initialSort'] as PostSearchSort?);
   }
 }

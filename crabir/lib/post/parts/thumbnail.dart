@@ -12,10 +12,17 @@ class Thumbnail extends StatelessWidget {
       case Kind.unknown:
       case Kind.selftext:
       case Kind.meta:
-      case Kind.image:
       case Kind.youtubeVideo:
         await launchUrl(Uri.parse(post.url));
         break;
+      case Kind.image:
+        FullscreenImageView(
+          post: post,
+          imageUrl: post.preview?.images[0]
+                  .withResolution(NetworkStatus.imageQuality(context), false)
+                  .url ??
+              post.url,
+        ).pushNamed(context);
       case Kind.video:
         goFullScreen(context, post, NetworkStatus.videoQuality(context));
       case Kind.streamableVideo:

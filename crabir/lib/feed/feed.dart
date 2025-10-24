@@ -484,17 +484,19 @@ class _RightSideState extends State<RightSide> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: ListView(children: [
-        // TODO:
-        Text("Search post"),
-        Divider(),
-        infoView(context),
-        Divider(),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: RedditMarkdown(markdown: widget.infos.description ?? ""),
-        ),
-      ]),
+      child: ListView(
+        children: [
+          // TODO:
+          Text("Search post"),
+          Divider(),
+          infoView(context),
+          Divider(),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: RedditMarkdown(markdown: widget.infos.description ?? ""),
+          ),
+        ],
+      ),
     );
   }
 }

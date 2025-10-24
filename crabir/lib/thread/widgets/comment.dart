@@ -1,5 +1,5 @@
 import 'package:crabir/accounts/bloc/accounts_bloc.dart';
-import 'package:crabir/bool_to_vote.dart';
+import 'package:crabir/utils/bool_to_vote.dart';
 import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/flair.dart';
