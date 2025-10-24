@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:crabir/bool_to_vote.dart';
+import 'package:crabir/utils/bool_to_vote.dart';
 import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/l10n/app_localizations.dart';

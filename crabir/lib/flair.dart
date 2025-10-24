@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:crabir/hexcolor.dart';
+import 'package:crabir/utils/hexcolor.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/flair.dart';
 import 'package:flutter/material.dart';

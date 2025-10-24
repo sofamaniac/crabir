@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:crabir/bool_to_vote.dart';
+import 'package:crabir/utils/bool_to_vote.dart';
 import 'package:crabir/buttons.dart';
 import 'package:crabir/cartouche.dart';
 import 'package:crabir/gallery/gallery.dart';
@@ -24,7 +24,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/rule.dart';
 import 'package:crabir/subreddit.dart';
-import 'package:crabir/time_ellapsed.dart';
+import 'package:crabir/utils/time_ellapsed.dart';
 import 'package:crabir/user/user.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

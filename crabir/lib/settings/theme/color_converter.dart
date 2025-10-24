@@ -1,4 +1,4 @@
-import 'package:crabir/hexcolor.dart';
+import 'package:crabir/utils/hexcolor.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 

@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:crabir/hexcolor.dart';
+import 'package:crabir/utils/hexcolor.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart'
     as subreddit;
 import 'package:flutter/material.dart';

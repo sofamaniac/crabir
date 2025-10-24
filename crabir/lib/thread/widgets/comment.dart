@@ -17,7 +17,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/comment.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/rule.dart';
 import 'package:crabir/thread/bloc/thread_bloc.dart';
 import 'package:crabir/thread/widgets/thread.dart';
-import 'package:crabir/time_ellapsed.dart';
+import 'package:crabir/utils/time_ellapsed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
