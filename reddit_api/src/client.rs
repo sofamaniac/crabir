@@ -41,11 +41,32 @@ use crate::{
 const USER_AGENT: &str = dotenv_codegen::dotenv!("USER_AGENT");
 const CLIENT_ID: &str = dotenv_codegen::dotenv!("REDDIT_API_KEY");
 
+#[derive(Clone, Default)]
+struct Secret(String);
+
+impl Secret {
+    pub fn new(secret: String) -> Self {
+        Self(secret)
+    }
+}
+
+impl std::fmt::Debug for Secret {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("Secret").field(&"HIDDEN").finish()
+    }
+}
+
+impl AsRef<str> for Secret {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct Client {
     http: reqwest::Client,
-    refresh_token: Arc<RwLock<Option<String>>>,
-    current_access_token: Arc<RwLock<Option<String>>>,
+    refresh_token: Arc<RwLock<Option<Secret>>>,
+    current_access_token: Arc<RwLock<Option<Secret>>>,
 }
 
 impl Default for Client {
@@ -115,8 +136,8 @@ impl Client {
     pub fn from_refresh_token(refresh_token: String) -> Self {
         Self {
             http: Self::new_reqwest_client(),
-            refresh_token: Arc::new(RwLock::new(Some(refresh_token))),
-            current_access_token: Arc::new(RwLock::new(Some(String::new()))),
+            refresh_token: Arc::new(RwLock::new(Some(Secret::new(refresh_token)))),
+            current_access_token: Arc::new(RwLock::new(Some(Secret::default()))),
         }
     }
 
@@ -130,8 +151,8 @@ impl Client {
 
     /// Authenticate the current client
     pub async fn authenticate(&self, refresh_token: String) {
-        *self.refresh_token.write().unwrap() = Some(refresh_token);
-        *self.current_access_token.write().unwrap() = Some(String::new());
+        *self.refresh_token.write().unwrap() = Some(Secret::new(refresh_token));
+        *self.current_access_token.write().unwrap() = Some(Secret::default());
     }
 }
 
@@ -246,7 +267,7 @@ impl Client {
         }
         let token = self.current_access_token.read().unwrap().clone();
         if let Some(token) = token {
-            let parts: Vec<&str> = token.splitn(3, '.').collect();
+            let parts: Vec<&str> = token.as_ref().splitn(3, '.').collect();
             // The token is not valid
             if parts.len() < 3 {
                 return false;
@@ -302,7 +323,7 @@ impl Client {
         }
         let response = self.http.execute(request).await?;
         let response: Response = parse_response(response).await?;
-        *self.current_access_token.write().unwrap() = Some(response.access_token);
+        *self.current_access_token.write().unwrap() = Some(Secret::new(response.access_token));
         info!("[CLIENT] Anonymous token created.");
         Ok(())
     }
@@ -323,7 +344,7 @@ impl Client {
         let url = url.join("api/v1/access_token").expect("Should not fail.");
         let mut body = HashMap::new();
         body.insert("grant_type", "refresh_token");
-        body.insert("refresh_token", &refresh_token);
+        body.insert("refresh_token", refresh_token.as_ref());
 
         let request = self
             .http
@@ -335,7 +356,7 @@ impl Client {
         debug!("{request:#?}");
         let response = self.http.execute(request).await?;
         let response: Response = parse_response(response).await?;
-        *self.current_access_token.write().unwrap() = Some(response.access_token);
+        *self.current_access_token.write().unwrap() = Some(Secret(response.access_token));
         info!("[CLIENT] Token has been refreshed.");
         Ok(())
     }
@@ -349,8 +370,8 @@ impl Client {
                 .post(url)
                 .basic_auth::<&str, &str>(CLIENT_ID, None)
                 .query(&[
-                    ("token", access_token),
-                    ("token_type_hint", String::from("access_token")),
+                    ("token", access_token.as_ref()),
+                    ("token_type_hint", "access_token"),
                 ])
                 .build()
                 .expect("Building request should not fail");
@@ -374,7 +395,7 @@ impl Client {
         }
         let access_token = self.current_access_token.read().unwrap().clone();
         let request = if let Some(access_token) = access_token {
-            request.bearer_auth(access_token)
+            request.bearer_auth(access_token.as_ref())
         } else {
             request.basic_auth::<&str, &str>(CLIENT_ID, None)
         };
