@@ -17,7 +17,8 @@ class YoutubeContent extends StatelessWidget {
         children: [
           ImageThumbnail.redditImage(
             post.preview!.images[0],
-            resolution: Resolution.medium,
+            resolution: NetworkStatus.videoQuality(context),
+            blur: post.spoiler,
           ),
           Positioned(
             top: 8,

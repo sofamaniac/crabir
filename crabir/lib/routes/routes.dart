@@ -97,7 +97,6 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/searchtab',
-              name: SearchSubredditsViewBuilder.name,
               builder: (context, state) => SearchSubredditsView(),
             ),
           ],
