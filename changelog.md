@@ -1,23 +1,27 @@
-## [0.3.0] - 2025-10-22
+## [0.4.0] - 2025-10-25
 
 ### 🚀 Features
 
-- *(editor)* Add quote and spoiler, fix italics
-- Quote comment / post selftext in reply
-- Right side menu for multireddits
-- Add crossposting capability
+- View selector
+- Selection between views and remember by community
+- Compact cards
+- Better galleries
 
 ### 🐛 Bug Fixes
 
-- Proper spoiler rendering
-- Re-enable github flavored md syntax
-- User/subreddit link in comments
-- Drawer now remembers scroll position
-- Now properly navigates to thread from deeplinking
-- Close drawer when navigating to other tabs
-- Longer timeout on reddit api
-- Hidden post now immediatly disappear from feed
-- Short link navigation
-- Optional field in gallery media
-- Properly detect when reaching end of stream
-- Go to popular / all / home feed from drawer
+- Paywall navigation
+- Page not found go home button
+- Post view button selection in feed
+- Proper background color on loading subreddit icon in drawer
+- Close menu after selection in feed more option menu
+- Not found page, go back instead of go home
+- Youtube video thumbnail
+- Thread view no longer show drawer
+
+### 💼 Other
+
+- Add support for dependence between settings
+
+### 🚜 Refactor
+
+- Moving things around
