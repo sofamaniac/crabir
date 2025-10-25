@@ -140,6 +140,7 @@ pub struct Post {
     #[serde(deserialize_with = "utils::response_or_none")]
     secure_media_embed: Option<SecureMediaEmbed>,
     #[serde(flatten)]
+    #[flutter_getter(skip)]
     gallery: Option<Gallery>,
 
     // Moderation
@@ -292,6 +293,16 @@ impl Post {
             Some(preview)
         } else {
             self.crosspost_parent_list.first()?.get_preview()
+        }
+    }
+
+    #[frb(sync, getter)]
+    /// Get gallery or crosspost parent gallery if there is any.
+    pub fn get_gallery(&self) -> Option<Gallery> {
+        if let Some(gallery) = self.gallery.clone() {
+            Some(gallery)
+        } else {
+            self.crosspost_parent_list.first()?.get_gallery()
         }
     }
 

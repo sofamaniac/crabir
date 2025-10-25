@@ -54,6 +54,8 @@ class _FullScreenGalleryViewState extends State<FullScreenGalleryView> {
           onTap: onTap,
           obfuscate: false,
           fit: BoxFit.contain,
+          maxScale: 5.0,
+          blurBackround: false,
           onPageChanged: (index) {
             setState(() {
               _currentPage = index;

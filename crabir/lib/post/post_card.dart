@@ -121,6 +121,8 @@ class PostCardContent extends StatelessWidget {
       return null;
     }
     final videoResolution = NetworkStatus.videoQuality(context);
+    final obfuscate =
+        post.spoiler || (post.over18 && FiltersSettings.of(context).blurNSFW);
     return switch (post.kind) {
       // Media types
       Kind.video => VideoContent(
@@ -129,7 +131,12 @@ class PostCardContent extends StatelessWidget {
         ),
       Kind.streamableVideo => StreamableVideo(post: post),
       Kind.youtubeVideo => YoutubeContent(post: post),
-      (Kind.mediaGallery || Kind.gallery) => GalleryView(post: post),
+      (Kind.mediaGallery || Kind.gallery) => GalleryView(
+          post: post,
+          obfuscate: obfuscate,
+          maxScale: 1,
+          blurBackground: true,
+        ),
       Kind.image => ImageContent(
           post: post,
         ),
