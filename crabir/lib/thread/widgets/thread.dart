@@ -108,6 +108,7 @@ class Thread extends StatelessWidget {
           final post = this.post ?? state.post;
           return SafeArea(
             child: Scaffold(
+              drawerEnableOpenDragGesture: false,
               body: NestedScrollView(
                 headerSliverBuilder: (context, innerBoxIsScrolled) => [
                   appBar(context, context.read()),

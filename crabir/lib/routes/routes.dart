@@ -160,31 +160,50 @@ final GoRouter appRouter = GoRouter(
               routes: [
                 /// Thread route with swipe-to-close support
                 GoRoute(
-                  path: 'comments/:id/:title',
-                  pageBuilder: (context, state) {
-                    final threadId = state.pathParameters['id']!;
-                    final settings = CommentsSettings.of(context);
-
-                    final pageChild = Thread(
-                      post: state.extra as Post?,
-                      permalink: state.uri.path,
-                    );
-
-                    if (settings.swipeToClose) {
-                      final threshold = settings.distanceThreshold;
-                      return FixedSwipePage(
-                        key: ValueKey(threadId),
-                        builder: (context) => pageChild,
-                        dragThreshold: threshold / 100,
+                    path: 'comments/:id/:title',
+                    builder: (context, state) {
+                      // Extract params
+                      final id = state.pathParameters['id']!;
+                      final title = state.pathParameters['title']!;
+                      final extra = state.extra;
+                      final uri = state.uri.path;
+                      final newUri = Uri(
+                        path: "/thread",
+                        queryParameters: {"uri": uri},
                       );
-                    } else {
-                      return MaterialPage(
-                        key: ValueKey(threadId),
-                        child: pageChild,
-                      );
+
+                      // Perform redirect imperatively to preserve `extra`
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        context.replace(newUri.toString(), extra: extra);
+                      });
+
+                      // Temporary empty page (invisible)
+                      return const SizedBox.shrink();
                     }
-                  },
-                ),
+                    // pageBuilder: (context, state) {
+                    //   final threadId = state.pathParameters['id']!;
+                    //   final settings = CommentsSettings.of(context);
+                    //
+                    //   final pageChild = Thread(
+                    //     post: state.extra as Post?,
+                    //     permalink: state.uri.path,
+                    //   );
+                    //
+                    //   if (settings.swipeToClose) {
+                    //     final threshold = settings.distanceThreshold;
+                    //     return FixedSwipePage(
+                    //       key: ValueKey(threadId),
+                    //       builder: (context) => pageChild,
+                    //       dragThreshold: threshold / 100,
+                    //     );
+                    //   } else {
+                    //     return MaterialPage(
+                    //       key: ValueKey(threadId),
+                    //       child: pageChild,
+                    //     );
+                    //   }
+                    // },
+                    ),
 
                 GoRoute(
                     path: 'search',
@@ -269,6 +288,33 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
       ],
+    ),
+
+    GoRoute(
+      path: "/thread",
+      pageBuilder: (context, state) {
+        final uri = state.uri.queryParameters["uri"];
+        final settings = CommentsSettings.of(context);
+
+        final pageChild = Thread(
+          post: state.extra as Post?,
+          permalink: uri,
+        );
+
+        if (settings.swipeToClose) {
+          final threshold = settings.distanceThreshold;
+          return FixedSwipePage(
+            key: ValueKey(uri),
+            builder: (context) => pageChild,
+            dragThreshold: threshold / 100,
+          );
+        } else {
+          return MaterialPage(
+            key: ValueKey(uri),
+            child: pageChild,
+          );
+        }
+      },
     ),
 
     GoRoute(
