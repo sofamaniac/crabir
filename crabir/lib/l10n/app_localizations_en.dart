@@ -476,6 +476,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get layout_prefixCommunities => 'Prefix subreddit with /r';
 
   @override
+  String get layout_previewText => 'Preview text from post';
+
+  @override
+  String get layout_previewTextLength => 'Number of lines to preview';
+
+  @override
   String get viewCard => 'Card';
 
   @override

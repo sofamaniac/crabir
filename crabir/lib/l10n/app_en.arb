@@ -245,6 +245,8 @@
   "layout_showThumbnail": "Show thumbnail",
   "layout_font": "Font size and style",
   "layout_prefixCommunities": "Prefix subreddit with /r",
+  "layout_previewText": "Preview text from post",
+  "layout_previewTextLength": "Number of lines to preview",
 
   "viewCard": "Card",
   "viewCompact": "Compact",

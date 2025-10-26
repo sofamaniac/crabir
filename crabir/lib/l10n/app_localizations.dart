@@ -892,6 +892,18 @@ abstract class AppLocalizations {
   /// **'Prefix subreddit with /r'**
   String get layout_prefixCommunities;
 
+  /// No description provided for @layout_previewText.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview text from post'**
+  String get layout_previewText;
+
+  /// No description provided for @layout_previewTextLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of lines to preview'**
+  String get layout_previewTextLength;
+
   /// No description provided for @viewCard.
   ///
   /// In en, this message translates to:

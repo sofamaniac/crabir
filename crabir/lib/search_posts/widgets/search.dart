@@ -215,8 +215,9 @@ extension PostSearchSortString on PostSearchSort {
 }
 
 Widget _postView(BuildContext context, Post post) {
-  final kind = LayoutSettings.of(context).defaultView;
-  final enableThumbnail = LayoutSettings.of(context).showThumbnail;
+  final layout = LayoutSettings.of(context);
+  final kind = layout.defaultView;
+  final enableThumbnail = layout.showThumbnail;
   final state = context.read<PostSearchBloc>();
   void onTap() {
     context.read<ReadPosts>().mark(post.id);
@@ -233,7 +234,8 @@ Widget _postView(BuildContext context, Post post) {
 
   return switch (kind) {
     ViewKind.card => RedditPostCard(
-        maxLines: 5,
+        maxLines: layout.previewTextLength,
+        showSelfText: layout.previewText,
         post: post,
         onTap: onTap,
         onLikeCallback: onLikeCallback,

@@ -232,17 +232,18 @@ class _CommonFeedViewState extends State<CommonFeedView> {
   }
 
   Widget postView(BuildContext context, Post post, bool hide, ViewKind kind) {
-    final enableThumbnail = LayoutSettings.of(context).showThumbnail;
+    final layout = LayoutSettings.of(context);
     return switch (kind) {
       ViewKind.card => RedditPostCard(
-          maxLines: 5,
+          maxLines: layout.previewTextLength,
+          showSelfText: layout.previewText,
           post: post,
           onTap: () {
             context.read<ReadPosts>().mark(post.id);
             context.push(post.permalink, extra: post);
           },
           respectHidden: hide,
-          enableThumbnail: enableThumbnail,
+          enableThumbnail: layout.showThumbnail,
           ignoreSelftextSpoiler: false,
           ignoreRead: false,
         ),
@@ -253,7 +254,7 @@ class _CommonFeedViewState extends State<CommonFeedView> {
             context.push(post.permalink, extra: post);
           },
           respectHidden: hide,
-          enableThumbnail: enableThumbnail,
+          enableThumbnail: layout.showThumbnail,
           ignoreRead: false,
         ),
       ViewKind.dense => DenseCard(
@@ -263,7 +264,7 @@ class _CommonFeedViewState extends State<CommonFeedView> {
             context.push(post.permalink, extra: post);
           },
           respectHidden: hide,
-          enableThumbnail: enableThumbnail,
+          enableThumbnail: layout.showThumbnail,
           ignoreRead: false,
           hideBottomBar: false,
         )

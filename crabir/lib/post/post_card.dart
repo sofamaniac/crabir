@@ -14,6 +14,9 @@ class RedditPostCard extends PostView {
   /// Show reply to post button
   final bool showReplyButton;
 
+  /// Show self text
+  final bool showSelfText;
+
   const RedditPostCard({
     super.key,
     required super.post,
@@ -29,6 +32,7 @@ class RedditPostCard extends PostView {
     this.showReplyButton = false,
     this.maxLines,
     this.showMedia = true,
+    required this.showSelfText,
   });
 
   @override
@@ -76,6 +80,7 @@ class _RedditPostCardState extends State<RedditPostCard> {
             showMedia: widget.showMedia,
             ignoreSelftextSpoiler: widget.ignoreSelftextSpoiler,
             maxLines: widget.maxLines,
+            showSelftext: widget.showSelfText,
           ),
         Footer(
           post: widget.post,
@@ -103,12 +108,14 @@ class PostCardContent extends StatelessWidget {
   final Post post;
   final int? maxLines;
   final bool ignoreSelftextSpoiler;
+  final bool showSelftext;
   const PostCardContent({
     super.key,
     required this.post,
     required this.showMedia,
     this.maxLines,
     required this.ignoreSelftextSpoiler,
+    required this.showSelftext,
   });
 
   @override
@@ -145,6 +152,9 @@ class PostCardContent extends StatelessWidget {
   }
 
   Widget? selftext(BuildContext context) {
+    if (showSelftext == false) {
+      return null;
+    }
     if ((!post.spoiler || ignoreSelftextSpoiler) && post.selftextHtml != null) {
       if (maxLines == null) {
         return wrapPostElement(RedditMarkdown(markdown: post.selftext ?? ""));
