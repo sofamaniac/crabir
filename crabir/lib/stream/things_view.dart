@@ -1,3 +1,4 @@
+import 'package:crabir/loading_indicator.dart';
 import 'package:crabir/media/media.dart';
 import 'package:crabir/settings/filters/filters_settings.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model.dart';
@@ -6,7 +7,7 @@ import 'package:crabir/src/rust/third_party/reddit_api/model/post.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/paging_handler.dart'
     as reddit_stream;
 import 'package:flutter/material.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class ThingsScaffold extends StatefulWidget {
   final reddit_stream.PagingHandler stream;
@@ -27,6 +28,9 @@ class ThingsScaffold extends StatefulWidget {
   /// When set to true show post that were hidden
   final bool showHidden;
 
+  /// Number of column
+  final int columnCount;
+
   const ThingsScaffold({
     super.key,
     this.postView,
@@ -34,6 +38,7 @@ class ThingsScaffold extends StatefulWidget {
     required this.stream,
     this.subredditInfo,
     this.showHidden = false,
+    this.columnCount = 1,
   });
 
   @override
@@ -44,23 +49,9 @@ class _ThingsScaffoldState extends State<ThingsScaffold>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+  List<Thing> items = [];
 
-  late final _pagingController = PagingController<bool, Thing>(
-    getNextPageKey: (state) {
-      // Return `null` when no more pages are available
-      if (widget.stream.done) return null;
-      return true;
-    },
-    fetchPage: (pageKey) async {
-      return await widget.stream.next();
-    },
-  );
-
-  @override
-  void dispose() {
-    _pagingController.dispose();
-    super.dispose();
-  }
+  bool hasErrored = false;
 
   /// return true when the post should be hidden
   bool hide(Post post) {
@@ -68,62 +59,84 @@ class _ThingsScaffoldState extends State<ThingsScaffold>
         (post.over18 && !FiltersSettings.of(context).showNSFW);
   }
 
+  Future<void> _refresh() async {
+    await widget.stream.refresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return PagingListener(
-      controller: _pagingController,
-      builder: (context, state, fetchNextPage) {
-        return RefreshIndicator(
-          onRefresh: () async {
-            await widget.stream.refresh();
-            _pagingController.refresh();
-          },
-          child: AnimatedContentController(
-            notifier: ValueNotifier([]),
-            child: Scrollbar(
-              child: CustomScrollView(
-                slivers: [
-                  // Optional subreddit info at the top
-                  if (widget.subredditInfo != null)
-                    SliverToBoxAdapter(child: widget.subredditInfo!),
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: AnimatedContentController(
+        notifier: ValueNotifier([]),
+        child: Scrollbar(
+          child: CustomScrollView(
+            slivers: [
+              // Optional subreddit info at the top
+              if (widget.subredditInfo != null)
+                SliverToBoxAdapter(child: widget.subredditInfo!),
 
-                  // The main paginated list
-                  PagedSliverList<bool, Thing>(
-                    fetchNextPage: fetchNextPage,
-                    state: state,
-                    builderDelegate: PagedChildBuilderDelegate(
-                      invisibleItemsThreshold: 10,
-                      noMoreItemsIndicatorBuilder: (context) =>
-                          Center(child: Text("You've reached the end")),
-                      itemBuilder: (context, item, index) {
-                        final thing = item;
-
-                        switch (thing) {
-                          case Thing_Post(field0: final post):
-                            if (widget.postView == null) {
-                              return const SizedBox.shrink();
-                            }
-                            return widget.postView!.call(
-                              context,
-                              post,
-                              !widget.showHidden,
+              SliverMasonryGrid.count(
+                crossAxisCount: widget.columnCount,
+                childCount: items.length + 1,
+                itemBuilder: (context, index) {
+                  if ((index == items.length - 10 || items.length < 10) &&
+                      !widget.stream.done) {
+                    WidgetsBinding.instance.addPostFrameCallback(
+                      (_) async {
+                        try {
+                          items.addAll(await widget.stream.next());
+                          setState(() {});
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Something went wrong: $e"),
+                              ),
                             );
-                          case Thing_Comment(field0: final comment):
-                            return widget.commentView?.call(context, comment) ??
-                                const SizedBox.shrink();
-                          default:
-                            return const SizedBox.shrink();
+                          }
                         }
                       },
-                    ),
-                  ),
-                ],
+                    );
+                  }
+                  if (index == items.length) {
+                    if (widget.stream.done) {
+                      return Center(child: Text("Nothing more to show"));
+                    } else if (hasErrored) {
+                      return Center(
+                        child: ListTile(
+                          title: Text("Something went wrong. Tap to refresh"),
+                          onTap: _refresh,
+                        ),
+                      );
+                    } else {
+                      return Center(child: LoadingIndicator());
+                    }
+                  }
+                  final thing = items[index];
+                  switch (thing) {
+                    case Thing_Post(field0: final post):
+                      if (widget.postView == null) {
+                        return const SizedBox.shrink();
+                      }
+                      return widget.postView!.call(
+                        context,
+                        post,
+                        !widget.showHidden,
+                      );
+                    case Thing_Comment(field0: final comment):
+                      return widget.commentView?.call(context, comment) ??
+                          const SizedBox.shrink();
+                    default:
+                      return const SizedBox.shrink();
+                  }
+                },
               ),
-            ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
