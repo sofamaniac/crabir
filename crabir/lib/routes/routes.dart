@@ -31,15 +31,11 @@ import 'package:crabir/utils/post_search_parsing.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-final _rootNavigationKey = GlobalKey<NavigatorState>();
-final _indexStateKey = GlobalKey<StatefulNavigationShellState>();
-
 // ignore: constant_identifier_names
 const String DEFAULT_ROUTE = "/default";
 
 final GoRouter appRouter = GoRouter(
   debugLogDiagnostics: true,
-  navigatorKey: _rootNavigationKey,
   initialLocation: DEFAULT_ROUTE,
   errorBuilder: (context, state) {
     final uri = state.uri;
@@ -56,8 +52,6 @@ final GoRouter appRouter = GoRouter(
   },
   routes: [
     StatefulShellRoute.indexedStack(
-      key: _indexStateKey,
-      parentNavigatorKey: _rootNavigationKey,
       builder: (context, state, navigationShell) {
         // the UI shell
         return MainScreenView(navigationShell: navigationShell);
@@ -158,53 +152,6 @@ final GoRouter appRouter = GoRouter(
                 );
               },
               routes: [
-                /// Thread route with swipe-to-close support
-                GoRoute(
-                    path: 'comments/:id/:title',
-                    builder: (context, state) {
-                      // Extract params
-                      final id = state.pathParameters['id']!;
-                      final title = state.pathParameters['title']!;
-                      final extra = state.extra;
-                      final uri = state.uri.path;
-                      final newUri = Uri(
-                        path: "/thread",
-                        queryParameters: {"uri": uri},
-                      );
-
-                      // Perform redirect imperatively to preserve `extra`
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        context.replace(newUri.toString(), extra: extra);
-                      });
-
-                      // Temporary empty page (invisible)
-                      return const SizedBox.shrink();
-                    }
-                    // pageBuilder: (context, state) {
-                    //   final threadId = state.pathParameters['id']!;
-                    //   final settings = CommentsSettings.of(context);
-                    //
-                    //   final pageChild = Thread(
-                    //     post: state.extra as Post?,
-                    //     permalink: state.uri.path,
-                    //   );
-                    //
-                    //   if (settings.swipeToClose) {
-                    //     final threshold = settings.distanceThreshold;
-                    //     return FixedSwipePage(
-                    //       key: ValueKey(threadId),
-                    //       builder: (context) => pageChild,
-                    //       dragThreshold: threshold / 100,
-                    //     );
-                    //   } else {
-                    //     return MaterialPage(
-                    //       key: ValueKey(threadId),
-                    //       child: pageChild,
-                    //     );
-                    //   }
-                    // },
-                    ),
-
                 GoRoute(
                     path: 'search',
                     builder: (context, state) {
@@ -290,27 +237,28 @@ final GoRouter appRouter = GoRouter(
       ],
     ),
 
+    /// Thread route with swipe-to-close support
     GoRoute(
-      path: "/thread",
+      path: '/r/:subreddit/comments/:id/:title',
       pageBuilder: (context, state) {
-        final uri = state.uri.queryParameters["uri"];
+        final threadId = state.pathParameters['id']!;
         final settings = CommentsSettings.of(context);
 
         final pageChild = Thread(
           post: state.extra as Post?,
-          permalink: uri,
+          permalink: state.uri.path,
         );
 
         if (settings.swipeToClose) {
           final threshold = settings.distanceThreshold;
           return FixedSwipePage(
-            key: ValueKey(uri),
+            key: ValueKey(threadId),
             builder: (context) => pageChild,
             dragThreshold: threshold / 100,
           );
         } else {
           return MaterialPage(
-            key: ValueKey(uri),
+            key: ValueKey(threadId),
             child: pageChild,
           );
         }
