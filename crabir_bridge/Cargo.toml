@@ -9,6 +9,7 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 android_logger = "0.15.0"
 chrono = "0.4.41"
+env_filter = "0.1.4"
 flutter_rust_bridge = { version = "=2.11.1", features = ["chrono"] }
 futures = "0.3.31"
 log = "0.4.27"

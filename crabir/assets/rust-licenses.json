@@ -377,7 +377,7 @@
   },
   {
     "name": "env_filter",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "license": "Apache-2.0 OR MIT",
     "repository": "https://github.com/rust-cli/env_logger",
     "license_files": []
