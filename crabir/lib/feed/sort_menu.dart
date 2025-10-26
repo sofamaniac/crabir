@@ -32,19 +32,19 @@ class SortMenu extends StatelessWidget {
           child: Text(locales.sortRising),
         ),
         SubmenuButton(
-            menuChildren: menu(
-              FeedSort.top,
-              onSelect,
-              context,
-            ),
-            child: Text(locales.sortTop)),
-        SubmenuButton(
-            menuChildren: menu(
-              FeedSort.new_,
-              onSelect,
-              context,
-            ),
-            child: Text(locales.sortNew)),
+          menuChildren: menu(
+            FeedSort.top,
+            onSelect,
+            context,
+          ),
+          child: Text(locales.sortTop),
+        ),
+        MenuItemButton(
+          onPressed: () => onSelect(
+            FeedSort.new_(),
+          ),
+          child: Text(locales.sortNew),
+        ),
         SubmenuButton(
           menuChildren: menu(
             FeedSort.controversial,

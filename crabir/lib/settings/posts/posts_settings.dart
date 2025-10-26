@@ -228,18 +228,8 @@ class _SortSelection extends SettingButton<FeedSort> {
                 _buildOption(context, const FeedSort.best()),
                 _buildOption(context, const FeedSort.hot()),
                 _buildOption(context, const FeedSort.rising()),
+                _buildOption(context, const FeedSort.new_()),
                 const Divider(),
-                ExpansionTile(
-                  title: const Text("New"),
-                  children: Timeframe.values
-                      .map(
-                        (t) => _buildOption(
-                          context,
-                          FeedSort.new_(t),
-                        ),
-                      )
-                      .toList(),
-                ),
                 ExpansionTile(
                   title: const Text("Top"),
                   children: Timeframe.values

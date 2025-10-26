@@ -28,7 +28,7 @@ pub enum Feed {
 pub enum FeedSort {
     Best,
     Hot,
-    New(Timeframe),
+    New,
     Top(Timeframe),
     Rising,
     Controversial(Timeframe),
@@ -42,12 +42,12 @@ impl FeedSort {
             Self::Hot => "hot.json",
             Self::Rising => "rising.json",
             Self::Top(_) => "top.json",
-            Self::New(_) => "new.json",
+            Self::New => "new.json",
             Self::Controversial(_) => "controversial.json",
         };
         let mut url = url.join(sort).expect("Should not fail.");
         match &self {
-            Self::Top(timeframe) | Self::New(timeframe) | Self::Controversial(timeframe) => {
+            Self::Top(timeframe) | Self::Controversial(timeframe) => {
                 let _ = url
                     .query_pairs_mut()
                     .append_pair("t", timeframe.as_query_param());
