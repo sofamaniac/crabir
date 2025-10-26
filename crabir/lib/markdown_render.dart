@@ -226,10 +226,6 @@ class _RedditMarkdownWithOverfowState extends State<RedditMarkdownWithOverfow> {
     final charWidth = measureAverageCharWidth(widget.style);
     final lineLength = (widget.width / charWidth).ceil();
     if (widget.maxLines != null) {
-      // final textLength = widget.maxLines != null
-      //     ? lineLength * widget.maxLines!
-      //     : widget.text.length;
-      //text = widget.text.substring(0, min(textLength, widget.text.length));
       text = _truncateToLength(widget.text, lineLength, widget.maxLines!);
       if (text != widget.text) {
         text += "...";
