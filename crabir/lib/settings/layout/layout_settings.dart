@@ -1,11 +1,13 @@
 import 'package:collection/collection.dart';
 import 'package:crabir/l10n/app_localizations.dart';
 import 'package:crabir/settings/settings.dart';
+import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/settings_page/annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:go_router/go_router.dart';
@@ -104,6 +106,10 @@ abstract class LayoutSettings with _$LayoutSettings {
     @Setting() @Default(true) bool showThumbnail,
     @Setting(dependsOn: "showThumbnail") @Default(false) bool thumbnailOnLeft,
     @Setting() @Default(false) bool prefixCommunities,
+    @Category(name: "Cards") @Setting() @Default(true) bool previewText,
+    @Setting(dependsOn: "previewText", widget: _LengthSelection)
+    @Default(5)
+    int previewTextLength,
   }) = _LayoutSettings;
   factory LayoutSettings.fromJson(Map<String, dynamic> json) =>
       _$LayoutSettingsFromJson(json);
@@ -111,6 +117,34 @@ abstract class LayoutSettings with _$LayoutSettings {
       context.watch<LayoutSettingsCubit>().state;
   LayoutSettings._();
 }
+
+class _LengthSelection extends SettingButton<int> {
+  const _LengthSelection({
+    super.subtitle,
+    super.leading,
+    super.onChanged,
+    required super.title,
+    required super.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: leading,
+      title: title,
+      subtitle: TextFormField(
+        initialValue: "$value",
+        onChanged: (val) => onChanged?.call(int.parse(val)),
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly
+        ], // Only numbers can be entered
+      ),
+    );
+  }
+}
+
+class TextInputFormatter {}
 
 class _ViewKindSelection extends StatelessWidget {
   final Widget title;
@@ -120,7 +154,6 @@ class _ViewKindSelection extends StatelessWidget {
   final void Function(ViewKind) onChanged;
 
   const _ViewKindSelection({
-    super.key,
     required this.title,
     this.subtitle,
     required this.value,
@@ -152,7 +185,6 @@ class _ViewKindSelection extends StatelessWidget {
 
 class _ManageViewButton extends SettingButton<RememberedView> {
   const _ManageViewButton({
-    super.key,
     required super.title,
     super.subtitle,
     required super.onChanged,

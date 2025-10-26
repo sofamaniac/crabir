@@ -39,6 +39,8 @@ _LayoutSettings _$LayoutSettingsFromJson(Map<String, dynamic> json) =>
       showThumbnail: json['showThumbnail'] as bool? ?? true,
       thumbnailOnLeft: json['thumbnailOnLeft'] as bool? ?? false,
       prefixCommunities: json['prefixCommunities'] as bool? ?? false,
+      previewText: json['previewText'] as bool? ?? true,
+      previewTextLength: (json['previewTextLength'] as num?)?.toInt() ?? 5,
     );
 
 Map<String, dynamic> _$LayoutSettingsToJson(_LayoutSettings instance) =>
@@ -50,4 +52,6 @@ Map<String, dynamic> _$LayoutSettingsToJson(_LayoutSettings instance) =>
       'showThumbnail': instance.showThumbnail,
       'thumbnailOnLeft': instance.thumbnailOnLeft,
       'prefixCommunities': instance.prefixCommunities,
+      'previewText': instance.previewText,
+      'previewTextLength': instance.previewTextLength,
     };

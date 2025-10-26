@@ -29,6 +29,11 @@ mixin _$LayoutSettings {
   bool get thumbnailOnLeft;
   @Setting()
   bool get prefixCommunities;
+  @Category(name: "Cards")
+  @Setting()
+  bool get previewText;
+  @Setting(dependsOn: "previewText", widget: _LengthSelection)
+  int get previewTextLength;
 
   /// Create a copy of LayoutSettings
   /// with the given fields replaced by the non-null parameter values.
@@ -58,17 +63,30 @@ mixin _$LayoutSettings {
             (identical(other.thumbnailOnLeft, thumbnailOnLeft) ||
                 other.thumbnailOnLeft == thumbnailOnLeft) &&
             (identical(other.prefixCommunities, prefixCommunities) ||
-                other.prefixCommunities == prefixCommunities));
+                other.prefixCommunities == prefixCommunities) &&
+            (identical(other.previewText, previewText) ||
+                other.previewText == previewText) &&
+            (identical(other.previewTextLength, previewTextLength) ||
+                other.previewTextLength == previewTextLength));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, defaultView, rememberByCommunity,
-      rememberedView, font, showThumbnail, thumbnailOnLeft, prefixCommunities);
+  int get hashCode => Object.hash(
+      runtimeType,
+      defaultView,
+      rememberByCommunity,
+      rememberedView,
+      font,
+      showThumbnail,
+      thumbnailOnLeft,
+      prefixCommunities,
+      previewText,
+      previewTextLength);
 
   @override
   String toString() {
-    return 'LayoutSettings(defaultView: $defaultView, rememberByCommunity: $rememberByCommunity, rememberedView: $rememberedView, font: $font, showThumbnail: $showThumbnail, thumbnailOnLeft: $thumbnailOnLeft, prefixCommunities: $prefixCommunities)';
+    return 'LayoutSettings(defaultView: $defaultView, rememberByCommunity: $rememberByCommunity, rememberedView: $rememberedView, font: $font, showThumbnail: $showThumbnail, thumbnailOnLeft: $thumbnailOnLeft, prefixCommunities: $prefixCommunities, previewText: $previewText, previewTextLength: $previewTextLength)';
   }
 }
 
@@ -85,7 +103,10 @@ abstract mixin class $LayoutSettingsCopyWith<$Res> {
       @Category() @Setting() () font,
       @Setting() bool showThumbnail,
       @Setting(dependsOn: "showThumbnail") bool thumbnailOnLeft,
-      @Setting() bool prefixCommunities});
+      @Setting() bool prefixCommunities,
+      @Category(name: "Cards") @Setting() bool previewText,
+      @Setting(dependsOn: "previewText", widget: _LengthSelection)
+      int previewTextLength});
 }
 
 /// @nodoc
@@ -108,6 +129,8 @@ class _$LayoutSettingsCopyWithImpl<$Res>
     Object? showThumbnail = null,
     Object? thumbnailOnLeft = null,
     Object? prefixCommunities = null,
+    Object? previewText = null,
+    Object? previewTextLength = null,
   }) {
     return _then(_self.copyWith(
       defaultView: null == defaultView
@@ -138,6 +161,14 @@ class _$LayoutSettingsCopyWithImpl<$Res>
           ? _self.prefixCommunities
           : prefixCommunities // ignore: cast_nullable_to_non_nullable
               as bool,
+      previewText: null == previewText
+          ? _self.previewText
+          : previewText // ignore: cast_nullable_to_non_nullable
+              as bool,
+      previewTextLength: null == previewTextLength
+          ? _self.previewTextLength
+          : previewTextLength // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -242,7 +273,10 @@ extension LayoutSettingsPatterns on LayoutSettings {
             @Category() @Setting() () font,
             @Setting() bool showThumbnail,
             @Setting(dependsOn: "showThumbnail") bool thumbnailOnLeft,
-            @Setting() bool prefixCommunities)?
+            @Setting() bool prefixCommunities,
+            @Category(name: "Cards") @Setting() bool previewText,
+            @Setting(dependsOn: "previewText", widget: _LengthSelection)
+            int previewTextLength)?
         $default, {
     required TResult orElse(),
   }) {
@@ -256,7 +290,9 @@ extension LayoutSettingsPatterns on LayoutSettings {
             _that.font,
             _that.showThumbnail,
             _that.thumbnailOnLeft,
-            _that.prefixCommunities);
+            _that.prefixCommunities,
+            _that.previewText,
+            _that.previewTextLength);
       case _:
         return orElse();
     }
@@ -284,7 +320,10 @@ extension LayoutSettingsPatterns on LayoutSettings {
             @Category() @Setting() () font,
             @Setting() bool showThumbnail,
             @Setting(dependsOn: "showThumbnail") bool thumbnailOnLeft,
-            @Setting() bool prefixCommunities)
+            @Setting() bool prefixCommunities,
+            @Category(name: "Cards") @Setting() bool previewText,
+            @Setting(dependsOn: "previewText", widget: _LengthSelection)
+            int previewTextLength)
         $default,
   ) {
     final _that = this;
@@ -297,7 +336,9 @@ extension LayoutSettingsPatterns on LayoutSettings {
             _that.font,
             _that.showThumbnail,
             _that.thumbnailOnLeft,
-            _that.prefixCommunities);
+            _that.prefixCommunities,
+            _that.previewText,
+            _that.previewTextLength);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -324,7 +365,10 @@ extension LayoutSettingsPatterns on LayoutSettings {
             @Category() @Setting() () font,
             @Setting() bool showThumbnail,
             @Setting(dependsOn: "showThumbnail") bool thumbnailOnLeft,
-            @Setting() bool prefixCommunities)?
+            @Setting() bool prefixCommunities,
+            @Category(name: "Cards") @Setting() bool previewText,
+            @Setting(dependsOn: "previewText", widget: _LengthSelection)
+            int previewTextLength)?
         $default,
   ) {
     final _that = this;
@@ -337,7 +381,9 @@ extension LayoutSettingsPatterns on LayoutSettings {
             _that.font,
             _that.showThumbnail,
             _that.thumbnailOnLeft,
-            _that.prefixCommunities);
+            _that.prefixCommunities,
+            _that.previewText,
+            _that.previewTextLength);
       case _:
         return null;
     }
@@ -355,7 +401,10 @@ class _LayoutSettings extends LayoutSettings {
       @Category() @Setting() this.font = const (),
       @Setting() this.showThumbnail = true,
       @Setting(dependsOn: "showThumbnail") this.thumbnailOnLeft = false,
-      @Setting() this.prefixCommunities = false})
+      @Setting() this.prefixCommunities = false,
+      @Category(name: "Cards") @Setting() this.previewText = true,
+      @Setting(dependsOn: "previewText", widget: _LengthSelection)
+      this.previewTextLength = 5})
       : super._();
   factory _LayoutSettings.fromJson(Map<String, dynamic> json) =>
       _$LayoutSettingsFromJson(json);
@@ -389,6 +438,15 @@ class _LayoutSettings extends LayoutSettings {
   @JsonKey()
   @Setting()
   final bool prefixCommunities;
+  @override
+  @JsonKey()
+  @Category(name: "Cards")
+  @Setting()
+  final bool previewText;
+  @override
+  @JsonKey()
+  @Setting(dependsOn: "previewText", widget: _LengthSelection)
+  final int previewTextLength;
 
   /// Create a copy of LayoutSettings
   /// with the given fields replaced by the non-null parameter values.
@@ -422,17 +480,30 @@ class _LayoutSettings extends LayoutSettings {
             (identical(other.thumbnailOnLeft, thumbnailOnLeft) ||
                 other.thumbnailOnLeft == thumbnailOnLeft) &&
             (identical(other.prefixCommunities, prefixCommunities) ||
-                other.prefixCommunities == prefixCommunities));
+                other.prefixCommunities == prefixCommunities) &&
+            (identical(other.previewText, previewText) ||
+                other.previewText == previewText) &&
+            (identical(other.previewTextLength, previewTextLength) ||
+                other.previewTextLength == previewTextLength));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, defaultView, rememberByCommunity,
-      rememberedView, font, showThumbnail, thumbnailOnLeft, prefixCommunities);
+  int get hashCode => Object.hash(
+      runtimeType,
+      defaultView,
+      rememberByCommunity,
+      rememberedView,
+      font,
+      showThumbnail,
+      thumbnailOnLeft,
+      prefixCommunities,
+      previewText,
+      previewTextLength);
 
   @override
   String toString() {
-    return 'LayoutSettings(defaultView: $defaultView, rememberByCommunity: $rememberByCommunity, rememberedView: $rememberedView, font: $font, showThumbnail: $showThumbnail, thumbnailOnLeft: $thumbnailOnLeft, prefixCommunities: $prefixCommunities)';
+    return 'LayoutSettings(defaultView: $defaultView, rememberByCommunity: $rememberByCommunity, rememberedView: $rememberedView, font: $font, showThumbnail: $showThumbnail, thumbnailOnLeft: $thumbnailOnLeft, prefixCommunities: $prefixCommunities, previewText: $previewText, previewTextLength: $previewTextLength)';
   }
 }
 
@@ -451,7 +522,10 @@ abstract mixin class _$LayoutSettingsCopyWith<$Res>
       @Category() @Setting() () font,
       @Setting() bool showThumbnail,
       @Setting(dependsOn: "showThumbnail") bool thumbnailOnLeft,
-      @Setting() bool prefixCommunities});
+      @Setting() bool prefixCommunities,
+      @Category(name: "Cards") @Setting() bool previewText,
+      @Setting(dependsOn: "previewText", widget: _LengthSelection)
+      int previewTextLength});
 }
 
 /// @nodoc
@@ -474,6 +548,8 @@ class __$LayoutSettingsCopyWithImpl<$Res>
     Object? showThumbnail = null,
     Object? thumbnailOnLeft = null,
     Object? prefixCommunities = null,
+    Object? previewText = null,
+    Object? previewTextLength = null,
   }) {
     return _then(_LayoutSettings(
       defaultView: null == defaultView
@@ -504,6 +580,14 @@ class __$LayoutSettingsCopyWithImpl<$Res>
           ? _self.prefixCommunities
           : prefixCommunities // ignore: cast_nullable_to_non_nullable
               as bool,
+      previewText: null == previewText
+          ? _self.previewText
+          : previewText // ignore: cast_nullable_to_non_nullable
+              as bool,
+      previewTextLength: null == previewTextLength
+          ? _self.previewTextLength
+          : previewTextLength // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }

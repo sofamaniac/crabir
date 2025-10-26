@@ -61,6 +61,8 @@ class _ThingsScaffoldState extends State<ThingsScaffold>
 
   Future<void> _refresh() async {
     await widget.stream.refresh();
+    items.clear();
+    setState(() {});
   }
 
   @override

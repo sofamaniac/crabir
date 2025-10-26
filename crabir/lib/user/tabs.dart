@@ -79,8 +79,10 @@ Widget _scaffold(
 }
 
 Widget postView(BuildContext context, Post post, bool hide) {
+  final layout = LayoutSettings.of(context);
   return RedditPostCard(
-    maxLines: 5,
+    maxLines: layout.previewTextLength,
+    showSelfText: layout.previewText,
     post: post,
     onTap: () {
       context.push(post.permalink, extra: post);

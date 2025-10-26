@@ -102,6 +102,7 @@ class _PostView extends StatelessWidget {
       return RedditPostCard(
         post: post,
         maxLines: null,
+        showSelfText: true,
         showMedia: showMedia,
         enableThumbnail: showThumbnail,
         ignoreSelftextSpoiler: true,

@@ -9,6 +9,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:markdown/markdown.dart' as md;
+import 'package:path/path.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SpoilerSyntax extends md.InlineSyntax {
@@ -226,10 +227,11 @@ class _RedditMarkdownWithOverfowState extends State<RedditMarkdownWithOverfow> {
     final charWidth = measureAverageCharWidth(widget.style);
     final lineLength = (widget.width / charWidth).ceil();
     if (widget.maxLines != null) {
-      final textLength = widget.maxLines != null
-          ? lineLength * widget.maxLines!
-          : widget.text.length;
-      text = widget.text.substring(0, min(textLength, widget.text.length));
+      // final textLength = widget.maxLines != null
+      //     ? lineLength * widget.maxLines!
+      //     : widget.text.length;
+      //text = widget.text.substring(0, min(textLength, widget.text.length));
+      text = _truncateToLength(widget.text, lineLength, widget.maxLines!);
       if (text != widget.text) {
         text += "...";
       }
@@ -242,4 +244,31 @@ class _RedditMarkdownWithOverfowState extends State<RedditMarkdownWithOverfow> {
   Widget build(BuildContext context) {
     return RedditMarkdown(markdown: text);
   }
+}
+
+String _truncateToLength(String text, int lineLength, int lines) {
+  if (text.isEmpty || lines == 0 || lineLength == 0) return "";
+  int end = 0;
+  bool done = false;
+  int completedLines = 0;
+  int currentLineLength = 0;
+  while (!done) {
+    if (end == text.length - 1) {
+      done = true;
+      end += 1;
+      break;
+    } else if (currentLineLength > lineLength) {
+      currentLineLength = 0;
+      completedLines += 1;
+    } else if (text[end] == '\n' && text[end + 1] == '\n') {
+      currentLineLength = 0;
+      completedLines += 1;
+      end += 2;
+    } else {
+      currentLineLength += 1;
+      end += 1;
+    }
+    done = completedLines == lines;
+  }
+  return text.substring(0, min(text.length, end));
 }

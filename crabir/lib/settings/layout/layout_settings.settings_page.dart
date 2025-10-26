@@ -45,6 +45,12 @@ class LayoutSettingsCubit extends HydratedCubit<LayoutSettings> {
 
   void updatePrefixCommunities(bool value) =>
       emit(state.copyWith(prefixCommunities: value));
+
+  void updatePreviewText(bool value) =>
+      emit(state.copyWith(previewText: value));
+
+  void updatePreviewTextLength(int value) =>
+      emit(state.copyWith(previewTextLength: value));
 }
 
 @CrabirRoute()
@@ -116,6 +122,33 @@ class LayoutSettingsView extends StatelessWidget {
           value: settings.prefixCommunities,
           onChanged: (val) =>
               context.read<LayoutSettingsCubit>().updatePrefixCommunities(val!),
+        ),
+        Divider(),
+        ListTile(
+            leading: Icon(null),
+            title: Text("Cards",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
+        CheckboxListTile(
+          title: Text(locales.layout_previewText),
+          secondary: Icon(null),
+          subtitle: null,
+          value: settings.previewText,
+          onChanged: (val) =>
+              context.read<LayoutSettingsCubit>().updatePreviewText(val!),
+        ),
+        _LengthSelection(
+          title: Text(locales.layout_previewTextLength),
+          leading: Icon(null),
+          subtitle: null,
+          value: settings.previewTextLength,
+          onChanged: settings.previewText
+              ? (val) => context
+                  .read<LayoutSettingsCubit>()
+                  .updatePreviewTextLength(val)
+              : null,
         ),
       ],
     ));
