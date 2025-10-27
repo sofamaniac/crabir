@@ -112,6 +112,7 @@ class _FeedViewState extends State<FeedView> {
         } else {
           bloc.updateDefaultView(layout.view);
         }
+        setState(() {});
       },
       layout: layout,
       initialSort: sort,

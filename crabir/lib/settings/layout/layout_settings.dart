@@ -56,6 +56,7 @@ class Layout {
   }
 
   factory Layout.fromJson(Map<String, dynamic> json) => _$LayoutFromJson(json);
+  Map<String, dynamic> toJson() => _$LayoutToJson(this);
 }
 
 @JsonSerializable()

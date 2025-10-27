@@ -79,6 +79,7 @@ class _MultiViewState extends State<MultiView> {
         } else {
           bloc.updateDefaultView(layout.view);
         }
+        setState(() {});
       },
       layout: layout,
       initialSort: sort,

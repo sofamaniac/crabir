@@ -24,7 +24,6 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:crabir/l10n/app_localizations.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 Future<void> main() async {
   await RustLib.init();

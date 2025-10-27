@@ -36,7 +36,6 @@ const String DEFAULT_ROUTE = "/default";
 
 final _rootNavigationKey =
     GlobalKey<NavigatorState>(debugLabel: "_rootNavigationKey");
-final _indexStateKey = GlobalKey<StatefulNavigationShellState>();
 
 final GoRouter appRouter = GoRouter(
   debugLogDiagnostics: true,
