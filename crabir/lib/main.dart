@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_links/app_links.dart';
 import 'package:crabir/accounts/bloc/accounts_bloc.dart' as accounts;
 import 'package:crabir/accounts/widgets/account_selector.dart';
 import 'package:crabir/drawer/drawer.dart';
@@ -23,6 +24,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:crabir/l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Future<void> main() async {
   await RustLib.init();
@@ -89,9 +91,42 @@ class Crabir extends StatelessWidget {
   }
 }
 
-class TopLevel extends StatelessWidget {
+class TopLevel extends StatefulWidget {
+  const TopLevel({super.key});
+
+  @override
+  State<TopLevel> createState() => _TopLevelState();
+}
+
+class _TopLevelState extends State<TopLevel> {
   final _appRouter = appRouter;
-  TopLevel({super.key});
+  late final AppLinks _appLinks;
+
+  @override
+  void initState() {
+    super.initState();
+    _initDeepLinks();
+  }
+
+  void _initDeepLinks() async {
+    _appLinks = AppLinks();
+
+    // Handle initial (cold start) link
+    final initialUri = await _appLinks.getInitialLink();
+    if (initialUri != null) {
+      _handleIncomingLink(initialUri);
+    }
+
+    // Listen for incoming (runtime) links
+    _appLinks.uriLinkStream.listen((uri) {
+      _handleIncomingLink(uri);
+    });
+  }
+
+  void _handleIncomingLink(Uri uri) async {
+    context.go(uri.path);
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeBloc = context.watch<ThemeBloc>().state;
