@@ -43,12 +43,6 @@ class _SubscriptonsList extends StatelessWidget {
     } else if (account.status case Loaded()) {
       return ListView(
         children: [
-          // TODO:
-          // ...baseFeeds(
-          //   context,
-          // ).where(
-          //   (feed) => feed.title.toLowerCase().contains(filter.toLowerCase()),
-          // ),
           ...account.multis
               .where(
                 (multi) => multi.displayName

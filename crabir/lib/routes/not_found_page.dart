@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NotFoundPage extends StatelessWidget {
   final String uri;
@@ -21,6 +22,12 @@ class NotFoundPage extends StatelessWidget {
             ElevatedButton(
               onPressed: () => context.pop(),
               child: const Text('Go Back'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await launchUrl(Uri.parse(uri));
+              },
+              child: const Text('Open in browser'),
             ),
           ],
         ),

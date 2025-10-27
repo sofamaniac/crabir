@@ -68,7 +68,7 @@ class _FeedViewState extends State<FeedView> {
     final _ = context.watch<AccountsBloc>().state;
     final bloc = context.read<PostsSettingsCubit>();
     final settings = context.read<PostsSettingsCubit>().state;
-    final layout = LayoutSettings.of(context);
+    final layoutSettings = LayoutSettings.of(context);
     final defaultSort = switch (widget.feed) {
       Feed_Home() => settings.defaultHomeSort,
       _ => settings.defaultSort
@@ -82,11 +82,12 @@ class _FeedViewState extends State<FeedView> {
       sort = widget.initialSort ?? defaultSort;
     }
 
-    final ViewKind view;
-    if (layout.rememberByCommunity) {
-      view = layout.rememberedView.containsFeed(feed) ?? layout.defaultView;
+    final Layout layout;
+    if (layoutSettings.rememberByCommunity) {
+      layout = layoutSettings.rememberedView.containsFeed(feed) ??
+          Layout(view: layoutSettings.defaultView, columns: 1);
     } else {
-      view = layout.defaultView;
+      layout = Layout(view: layoutSettings.defaultView, columns: 1);
     }
     return CommonFeedView(
       key: ValueKey(widget.feed),
@@ -102,18 +103,17 @@ class _FeedViewState extends State<FeedView> {
           );
         }
       },
-      onViewChanged: (view) {
-        if (layout.rememberByCommunity) {
-          context
-              .read<LayoutSettingsCubit>()
-              .state
-              .rememberedView
-              .addFeed(feed, view);
+      onLayoutChanged: (layout) {
+        final bloc = context.read<LayoutSettingsCubit>();
+        if (layoutSettings.rememberByCommunity) {
+          bloc.updateRememberedView(
+            layoutSettings.rememberedView.addFeed(feed, layout),
+          );
         } else {
-          context.read<LayoutSettingsCubit>().updateDefaultView(view);
+          bloc.updateDefaultView(layout.view);
         }
       },
-      view: view,
+      layout: layout,
       initialSort: sort,
       subredditAbout: subredditAbout,
       endDrawer: subredditAbout != null

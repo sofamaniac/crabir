@@ -11,7 +11,7 @@ pub fn init_app() {
 fn setup_log_to_console() {
     let level = log::LevelFilter::Trace;
     let filter = env_filter::Builder::new()
-        .filter_module("h2", log::LevelFilter::Error)
+        //.filter_module("h2", log::LevelFilter::Error)
         .build();
     #[cfg(target_os = "android")]
     let _ = android_logger::init_once(

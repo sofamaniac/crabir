@@ -92,6 +92,7 @@ class _ThingsScaffoldState extends State<ThingsScaffold>
                           setState(() {});
                         } catch (e) {
                           if (mounted) {
+                            // ignore: use_build_context_synchronously
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text("Something went wrong: $e"),

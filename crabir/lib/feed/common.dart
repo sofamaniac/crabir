@@ -26,9 +26,9 @@ class CommonFeedView extends StatefulWidget {
   final Widget Function(FeedSort) title;
   final Subreddit? subredditAbout;
   final FeedSort? initialSort;
-  final ViewKind view;
+  final Layout layout;
   final void Function(FeedSort) onSortChanged;
-  final void Function(ViewKind) onViewChanged;
+  final void Function(Layout) onLayoutChanged;
   final Widget? endDrawer;
 
   const CommonFeedView({
@@ -37,9 +37,9 @@ class CommonFeedView extends StatefulWidget {
     required this.title,
     this.initialSort,
     this.subredditAbout,
-    required this.view,
+    required this.layout,
     required this.onSortChanged,
-    required this.onViewChanged,
+    required this.onLayoutChanged,
     this.endDrawer,
   });
 
@@ -143,11 +143,12 @@ class _CommonFeedViewState extends State<CommonFeedView> {
         ),
         RadioGroup<ViewKind>(
           onChanged: (view) {
-            widget.onViewChanged(view!);
+            final newLayout = widget.layout.withView(view);
+            widget.onLayoutChanged(newLayout);
             setState(() {});
             _menuController.close();
           },
-          groupValue: widget.view,
+          groupValue: widget.layout.view,
           child: SubmenuButton(
             menuChildren: ViewKind.values
                 .map(
@@ -160,6 +161,28 @@ class _CommonFeedViewState extends State<CommonFeedView> {
                 )
                 .toList(),
             child: Text("Post View"),
+          ),
+        ),
+        RadioGroup<int>(
+          onChanged: (columns) {
+            final newLayout = widget.layout.withColumns(columns);
+            widget.onLayoutChanged(newLayout);
+            setState(() {});
+            _menuController.close();
+          },
+          groupValue: widget.layout.columns,
+          child: SubmenuButton(
+            menuChildren: [1, 2, 3]
+                .map(
+                  (c) => MenuItemButton(
+                    child: RadioListTile(
+                      value: c,
+                      title: Text("$c"),
+                    ),
+                  ),
+                )
+                .toList(),
+            child: Text("Columns"),
           ),
         ),
       ],
@@ -205,8 +228,9 @@ class _CommonFeedViewState extends State<CommonFeedView> {
                     context,
                     post,
                     hide,
-                    widget.view,
+                    widget.layout.view,
                   ),
+                  columnCount: widget.layout.columns,
                   subredditInfo: widget.subredditAbout != null
                       ? SubredditInfoView(infos: widget.subredditAbout!)
                       : null,

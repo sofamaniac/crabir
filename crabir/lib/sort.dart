@@ -69,7 +69,6 @@ extension FeedSortLabel on FeedSort {
   Timeframe? _getTimeframe() {
     return switch (this) {
       FeedSort_Top(field0: final timeframe) ||
-      FeedSort_New(field0: final timeframe) ||
       FeedSort_Controversial(field0: final timeframe) =>
         timeframe,
       _ => null

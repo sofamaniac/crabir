@@ -52,7 +52,6 @@ class SubredditSearchBloc
   ) async {
     if (newQuery.query != query) {
       query = newQuery.query;
-      print("QUERY: $query");
       _newStream();
       emit(state.copyWith(query: query, hasReachedMax: false));
       add(Fetch());

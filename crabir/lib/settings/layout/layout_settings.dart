@@ -13,6 +13,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logging/logging.dart';
+import 'package:path/path.dart';
 
 part 'layout_settings.g.dart';
 part 'layout_settings.settings_page.dart';
@@ -37,8 +38,29 @@ enum ViewKind {
 final _multiPrefix = "_MULTI_";
 
 @JsonSerializable()
+class Layout {
+  final ViewKind view;
+  final int columns;
+
+  Layout({
+    required this.view,
+    required this.columns,
+  });
+
+  Layout withView(ViewKind? newView) {
+    return Layout(view: newView ?? view, columns: columns);
+  }
+
+  Layout withColumns(int? newColumns) {
+    return Layout(view: view, columns: newColumns ?? columns);
+  }
+
+  factory Layout.fromJson(Map<String, dynamic> json) => _$LayoutFromJson(json);
+}
+
+@JsonSerializable()
 class RememberedView {
-  final Map<String, ViewKind> data;
+  final Map<String, Layout> data;
   const RememberedView({this.data = const {}});
 
   factory RememberedView.fromJson(Map<String, dynamic> json) =>
@@ -46,33 +68,33 @@ class RememberedView {
 
   Map<String, dynamic> toJson() => _$RememberedViewToJson(this);
 
-  RememberedView addFeed(Feed feed, ViewKind kind) {
-    Map<String, ViewKind> newData = Map.from(data);
-    newData[_feedToString(feed)] = kind;
+  RememberedView addFeed(Feed feed, Layout layout) {
+    Map<String, Layout> newData = Map.from(data);
+    newData[_feedToString(feed)] = layout;
     return RememberedView(data: newData);
   }
 
-  RememberedView addMulti(Multi multi, ViewKind kind) {
-    Map<String, ViewKind> newData = Map.from(data);
-    newData[_multiToString(multi)] = kind;
+  RememberedView addMulti(Multi multi, Layout layout) {
+    Map<String, Layout> newData = Map.from(data);
+    newData[_multiToString(multi)] = layout;
     return RememberedView(data: newData);
   }
 
   RememberedView removeView(String feed) {
-    Map<String, ViewKind> newData = Map.from(data);
+    Map<String, Layout> newData = Map.from(data);
     newData.remove(feed);
     return RememberedView(data: newData);
   }
 
-  ViewKind? containsFeed(Feed feed) {
+  Layout? containsFeed(Feed feed) {
     return data[_feedToString(feed)];
   }
 
-  ViewKind? containsMulti(Multi multi) {
+  Layout? containsMulti(Multi multi) {
     return data[_multiToString(multi)];
   }
 
-  Iterable<(String, ViewKind)> inOrder() {
+  Iterable<(String, Layout)> inOrder() {
     final keys = data.keys.sorted();
     return keys.map((k) => (k, data[k]!));
   }
@@ -216,7 +238,7 @@ class ManageRememberedView extends StatelessWidget {
       body: ListView.builder(
         itemCount: feeds.length,
         itemBuilder: (context, index) {
-          final (feed, view) = feeds[index];
+          final (feed, layout) = feeds[index];
           final Widget title = switch (feed) {
             "_HOME" => Text(locales.feedHome),
             "_ALL" => Text(locales.feedAll),
@@ -233,7 +255,9 @@ class ManageRememberedView extends StatelessWidget {
           };
           return ListTile(
             title: title,
-            subtitle: Text(view.label(context)),
+            subtitle: Text(
+              "${layout.view.label(context)} - ${layout.columns} columns",
+            ),
             trailing: IconButton(
               onPressed: () {
                 settings.updateRememberedView(data.removeView(feed));

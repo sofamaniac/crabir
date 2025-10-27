@@ -6,17 +6,14 @@ part of 'layout_settings.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-RememberedView _$RememberedViewFromJson(Map<String, dynamic> json) =>
-    RememberedView(
-      data: (json['data'] as Map<String, dynamic>?)?.map(
-            (k, e) => MapEntry(k, $enumDecode(_$ViewKindEnumMap, e)),
-          ) ??
-          const {},
+Layout _$LayoutFromJson(Map<String, dynamic> json) => Layout(
+      view: $enumDecode(_$ViewKindEnumMap, json['view']),
+      columns: (json['columns'] as num).toInt(),
     );
 
-Map<String, dynamic> _$RememberedViewToJson(RememberedView instance) =>
-    <String, dynamic>{
-      'data': instance.data.map((k, e) => MapEntry(k, _$ViewKindEnumMap[e]!)),
+Map<String, dynamic> _$LayoutToJson(Layout instance) => <String, dynamic>{
+      'view': _$ViewKindEnumMap[instance.view]!,
+      'columns': instance.columns,
     };
 
 const _$ViewKindEnumMap = {
@@ -24,6 +21,19 @@ const _$ViewKindEnumMap = {
   ViewKind.compact: 'compact',
   ViewKind.dense: 'dense',
 };
+
+RememberedView _$RememberedViewFromJson(Map<String, dynamic> json) =>
+    RememberedView(
+      data: (json['data'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(k, Layout.fromJson(e as Map<String, dynamic>)),
+          ) ??
+          const {},
+    );
+
+Map<String, dynamic> _$RememberedViewToJson(RememberedView instance) =>
+    <String, dynamic>{
+      'data': instance.data,
+    };
 
 _LayoutSettings _$LayoutSettingsFromJson(Map<String, dynamic> json) =>
     _LayoutSettings(
