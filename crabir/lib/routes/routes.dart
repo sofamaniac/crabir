@@ -34,9 +34,14 @@ import 'package:go_router/go_router.dart';
 // ignore: constant_identifier_names
 const String DEFAULT_ROUTE = "/default";
 
+final _rootNavigationKey =
+    GlobalKey<NavigatorState>(debugLabel: "_rootNavigationKey");
+final _indexStateKey = GlobalKey<StatefulNavigationShellState>();
+
 final GoRouter appRouter = GoRouter(
   debugLogDiagnostics: true,
   initialLocation: DEFAULT_ROUTE,
+  navigatorKey: _rootNavigationKey,
   errorBuilder: (context, state) {
     final uri = state.uri;
 
@@ -52,6 +57,7 @@ final GoRouter appRouter = GoRouter(
   },
   routes: [
     StatefulShellRoute.indexedStack(
+      parentNavigatorKey: _rootNavigationKey,
       builder: (context, state, navigationShell) {
         // the UI shell
         return MainScreenView(navigationShell: navigationShell);
@@ -239,6 +245,7 @@ final GoRouter appRouter = GoRouter(
 
     /// Thread route with swipe-to-close support
     GoRoute(
+      parentNavigatorKey: _rootNavigationKey,
       path: '/r/:subreddit/comments/:id/:title',
       pageBuilder: (context, state) {
         final threadId = state.pathParameters['id']!;
@@ -267,6 +274,7 @@ final GoRouter appRouter = GoRouter(
 
     GoRoute(
       path: "/media",
+      parentNavigatorKey: _rootNavigationKey,
       builder: (context, state) {
         final url = state.uri.queryParameters["url"] ?? "";
         return FullscreenMediaView(
@@ -277,6 +285,7 @@ final GoRouter appRouter = GoRouter(
 
     GoRoute(
       path: '/search',
+      parentNavigatorKey: _rootNavigationKey,
       name: SearchSubredditsViewBuilder.name,
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
@@ -287,6 +296,7 @@ final GoRouter appRouter = GoRouter(
     /// Fullscreen media routes
     GoRoute(
       path: '/fullscreen-image',
+      parentNavigatorKey: _rootNavigationKey,
       name: FullscreenImageViewBuilder.name,
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
@@ -295,6 +305,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/fullscreen-video',
+      parentNavigatorKey: _rootNavigationKey,
       name: FullscreenVideoViewBuilder.name,
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
@@ -303,6 +314,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: "/video/:id",
+      parentNavigatorKey: _rootNavigationKey,
       builder: (context, state) {
         return Scaffold(
             body: Center(
@@ -312,6 +324,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/fullscreen-gallery',
+      parentNavigatorKey: _rootNavigationKey,
       name: FullScreenGalleryViewBuilder.name,
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
@@ -322,6 +335,7 @@ final GoRouter appRouter = GoRouter(
     // Mardown Editor
     GoRoute(
       path: "/comment-editor",
+      parentNavigatorKey: _rootNavigationKey,
       name: CommentEditorBuilder.name,
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
@@ -331,6 +345,7 @@ final GoRouter appRouter = GoRouter(
 
     GoRoute(
       path: "/post-editor",
+      parentNavigatorKey: _rootNavigationKey,
       name: PostEditorBuilder.name,
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
@@ -339,6 +354,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: "/crosspost-editor",
+      parentNavigatorKey: _rootNavigationKey,
       name: CrosspostEditorBuilder.name,
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
@@ -348,6 +364,7 @@ final GoRouter appRouter = GoRouter(
     // Settings routes
     GoRoute(
       path: '/settings',
+      parentNavigatorKey: _rootNavigationKey,
       name: SettingsViewBuilder.name,
       builder: (context, state) => SettingsView(),
       routes: [
@@ -393,7 +410,11 @@ final GoRouter appRouter = GoRouter(
         ),
       ],
     ),
-    GoRoute(path: "/paywall", builder: (context, state) => PaywallScreen())
+    GoRoute(
+      path: "/paywall",
+      parentNavigatorKey: _rootNavigationKey,
+      builder: (context, state) => PaywallScreen(),
+    )
   ],
 );
 
