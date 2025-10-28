@@ -43,6 +43,7 @@ class _PostView extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: DenseCard(
                 ignoreRead: false,
+                respectHidden: false,
                 enableThumbnail: LayoutSettings.of(context).showThumbnail,
                 post: post.crosspostParentList.first,
                 pushSubreddit: true,
@@ -108,6 +109,7 @@ class _PostView extends StatelessWidget {
         ignoreSelftextSpoiler: true,
         ignoreRead: true,
         showReplyButton: true,
+        respectHidden: false,
       );
     }
   }
