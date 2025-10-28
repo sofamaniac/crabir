@@ -1,4 +1,4 @@
-## [0.4.0] - 2025-10-25
+## [0.4.0] - 2025-10-28
 
 ### 🚀 Features
 
@@ -6,6 +6,9 @@
 - Selection between views and remember by community
 - Compact cards
 - Better galleries
+- Support for column
+- Change number of lines to preview
+- Support for column number per feed
 
 ### 🐛 Bug Fixes
 
@@ -17,6 +20,15 @@
 - Not found page, go back instead of go home
 - Youtube video thumbnail
 - Thread view no longer show drawer
+- Navigation to subreddit from comment link
+- Remove sort by new timeframe
+- Remove sort by new timeframe
+- /api links should not open in the app
+- Bottom bar showing up in fullscreen views
+- Switching number of column now works properly
+- Trying to access illegal indices in markdown
+- Close drawer when navigating to settings
+- Do not hide post in thread
 
 ### 💼 Other
 

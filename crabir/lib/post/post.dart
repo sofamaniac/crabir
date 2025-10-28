@@ -80,6 +80,16 @@ extension IsMediaKind on Kind {
   }
 }
 
+extension InThread on GoRouter {
+  /// Returns true if the thread associated with the post is in the go_router stack.
+  bool inThread(Post post) {
+    final matches = routerDelegate.currentConfiguration.matches;
+    final hasThreadRoute =
+        matches.any((m) => m.matchedLocation.contains(post.id.asString));
+    return hasThreadRoute;
+  }
+}
+
 class PostCubit extends Cubit<Post> {
   PostCubit(super.post);
 }

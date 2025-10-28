@@ -7,16 +7,12 @@ class Footer extends StatelessWidget {
   final SaveCallback? onSave;
   final LikeCallback? onLike;
   final HideCallback? onHide;
-  final bool showCommentsButton;
-  final bool showReplyButton;
   const Footer({
     super.key,
     required this.post,
     this.onLike,
     this.onSave,
     this.onHide,
-    required this.showCommentsButton,
-    required this.showReplyButton,
   });
   @override
   Widget build(BuildContext context) {
@@ -25,6 +21,7 @@ class Footer extends StatelessWidget {
     final dislikeColor = theme.downvoteContent;
     final settings = context.watch<PostsSettingsCubit>().state;
     final likes = post.likes.toVoteDirection();
+    final inThread = GoRouter.of(context).inThread(post);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -55,14 +52,14 @@ class Footer extends StatelessWidget {
             onSave?.call(save);
           },
         ),
-        if (settings.showCommentsButton && showCommentsButton)
+        if (settings.showCommentsButton && !inThread)
           IconButton(
             icon: const Icon(Icons.comment),
             color: theme.secondaryText,
             tooltip: 'Comments',
             onPressed: () => context.push(post.permalink, extra: post),
           ),
-        if (showReplyButton)
+        if (inThread)
           IconButton(
             icon: const Icon(Icons.reply),
             color: theme.secondaryText,

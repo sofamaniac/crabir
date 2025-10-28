@@ -32,9 +32,10 @@ class _ImageContentState extends State<ImageContent> {
     final preview = widget.post.preview;
     if (preview == null) {
       return InkWell(
-        onTap: () =>
-            FullscreenImageView(imageUrl: widget.post.url, post: widget.post)
-                .pushNamed(context),
+        onTap: () => FullscreenImageView(
+          imageUrl: widget.post.url,
+          post: widget.post,
+        ).pushNamed(context),
         child: ImageThumbnail(
           imageUrl: widget.post.url,
         ),

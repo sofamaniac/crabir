@@ -87,8 +87,6 @@ class _RedditPostCardState extends State<RedditPostCard> {
           onLike: _onLike,
           onSave: _onSave,
           onHide: _onHide,
-          showReplyButton: widget.showReplyButton,
-          showCommentsButton: widget.showCommentsButton,
         ),
       ],
     );

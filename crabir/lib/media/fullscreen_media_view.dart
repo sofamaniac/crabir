@@ -5,6 +5,7 @@ class FullscreenMediaView extends StatefulWidget {
   final Widget? trailing;
   final String? title;
   final Post? post;
+
   final Object Function()? onPop;
   const FullscreenMediaView({
     super.key,
@@ -23,25 +24,24 @@ class _FullscreenMediaViewState extends State<FullscreenMediaView> {
   bool _showBars = true;
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        backgroundColor: Colors.black,
-        body: Stack(
-          children: [
-            Dismissible(
-              key: Key("_FullscreenMediaViewState"),
-              direction: DismissDirection.vertical,
-              resizeDuration: null,
-              onDismissed: (_) => context.pop(widget.onPop?.call()),
-              child: PhotoViewGestureDetectorScope(
-                axis: Axis.vertical,
-                child: widget.builder(_toggleBars),
-              ),
-            ),
-            _topBar(),
-            _bottomBar(),
-          ],
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.black,
+      appBar: TopBar(show: _showBars),
+      bottomNavigationBar: BottomBar(
+        show: _showBars,
+        post: widget.post,
+      ),
+      body: Dismissible(
+        key: Key("_FullscreenMediaViewState"),
+        direction: DismissDirection.vertical,
+        resizeDuration: null,
+        onDismissed: (_) => context.pop(widget.onPop?.call()),
+        child: SafeArea(
+          child: PhotoViewGestureDetectorScope(
+            axis: Axis.vertical,
+            child: widget.builder(_toggleBars),
+          ),
         ),
       ),
     );
@@ -52,104 +52,149 @@ class _FullscreenMediaViewState extends State<FullscreenMediaView> {
       _showBars = !_showBars;
     });
   }
+}
 
-  Widget _bottomBar() {
-    final post = widget.post;
+class TopBar extends StatelessWidget implements PreferredSizeWidget {
+  final List<Widget> actions;
+  final bool show;
+
+  const TopBar({
+    super.key,
+    required this.show,
+    this.actions = const [],
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bar = Column(
+      children: [
+        SizedBox(
+          height: MediaQuery.of(context).padding.top,
+        ),
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
+            const Spacer(),
+            ...actions,
+            IconButton(
+              icon: const Icon(Icons.more_vert, color: Colors.white),
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ],
+    );
+    return SlidingBar(
+      offset: Offset(0, -1),
+      show: show,
+      child: bar,
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class BottomBar extends StatelessWidget {
+  final List<Widget> actions;
+  final bool show;
+  final Post? post;
+  final String? title;
+
+  const BottomBar({
+    super.key,
+    required this.show,
+    this.actions = const [],
+    this.post,
+    this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     if (post == null) {
       return SizedBox.shrink();
     }
+    final inThread = GoRouter.of(context).inThread(post!);
     final theme = CrabirTheme.of(context);
-    final bar = SafeArea(
-      top: false,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (widget.title != null) Text(widget.title!),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              VoteButton.like(
-                likes: post.likes.toVoteDirection(),
-                colorActive: theme.primaryColor,
-                onChange: (dir) async {
-                  await post.vote(direction: dir, client: RedditAPI.client());
-                  setState(() {});
-                },
-              ),
-              VoteButton.dislike(
-                likes: post.likes.toVoteDirection(),
-                colorActive: theme.downvoteContent,
-                onChange: (dir) async {
-                  await post.vote(direction: dir, client: RedditAPI.client());
-                  setState(() {});
-                },
-              ),
-              SaveButton(
-                initialValue: post.saved,
-                onChange: (save) async {
-                  if (save) {
-                    await post.save(client: RedditAPI.client());
-                  } else {
-                    await post.unsave(client: RedditAPI.client());
-                  }
-                  setState(() {});
-                },
-              ),
+    final bar = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (title != null) Text(title!),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            VoteButton.like(
+              likes: post!.likes.toVoteDirection(),
+              colorActive: theme.primaryColor,
+              onChange: (dir) async {
+                await post!.vote(direction: dir, client: RedditAPI.client());
+              },
+            ),
+            VoteButton.dislike(
+              likes: post!.likes.toVoteDirection(),
+              colorActive: theme.downvoteContent,
+              onChange: (dir) async {
+                await post!.vote(direction: dir, client: RedditAPI.client());
+              },
+            ),
+            SaveButton(
+              initialValue: post!.saved,
+              onChange: (save) async {
+                if (save) {
+                  await post?.save(client: RedditAPI.client());
+                } else {
+                  await post?.unsave(client: RedditAPI.client());
+                }
+              },
+            ),
+            if (!inThread)
               IconButton(
                 icon: Icon(Icons.comment_outlined),
                 color: theme.secondaryText,
                 onPressed: () {
-                  context.go(post.permalink, extra: post);
+                  context.replace(post!.permalink, extra: post);
                 },
               ),
-              IconButton(
-                icon: Icon(Icons.share),
-                color: theme.secondaryText,
-                onPressed: () {},
-              ),
-            ],
-          ),
-        ],
-      ),
+            ShareButton(post: post!, short: true)
+          ],
+        ),
+        SizedBox(height: MediaQuery.of(context).padding.bottom),
+      ],
     );
-    return _slidingBar(bar, Offset(0, 1), Alignment.bottomCenter);
-  }
-
-  Widget _topBar() {
-    final bar = SafeArea(
-      bottom: false,
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.close, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
-          const Spacer(),
-          if (widget.trailing != null) widget.trailing!,
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
-      ),
+    return SlidingBar(
+      offset: Offset(0, 1),
+      show: show,
+      child: bar,
     );
-    return _slidingBar(bar, Offset(0, -1), Alignment.topCenter);
   }
+}
 
-  Widget _slidingBar(Widget child, Offset offset, Alignment alignment) {
+class SlidingBar extends StatelessWidget {
+  final Widget child;
+  final Offset offset;
+  final bool show;
+
+  const SlidingBar({
+    super.key,
+    required this.offset,
+    required this.child,
+    required this.show,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return AnimatedSlide(
-      offset: _showBars ? Offset.zero : offset,
+      offset: show ? Offset.zero : offset,
       duration: const Duration(milliseconds: 250),
       child: AnimatedOpacity(
-        opacity: _showBars ? 1 : 0,
+        opacity: show ? 1 : 0,
         duration: const Duration(milliseconds: 250),
-        child: Align(
-          alignment: alignment,
-          child: Container(
-            color: Colors.black54,
-            padding: const EdgeInsets.all(12),
-            child: child,
-          ),
+        child: Container(
+          color: Colors.black54,
+          child: child,
         ),
       ),
     );

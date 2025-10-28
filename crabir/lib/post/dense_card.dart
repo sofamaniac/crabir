@@ -90,8 +90,6 @@ class _DenseCardState extends State<DenseCard> {
                 wrap(
                   Footer(
                     post: widget.post,
-                    showCommentsButton: true,
-                    showReplyButton: false,
                   ),
                 ),
             ],

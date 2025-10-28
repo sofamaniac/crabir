@@ -1,5 +1,3 @@
-import 'dart:math' show min;
-
 import 'package:crabir/media/media.dart';
 import 'package:crabir/settings/theme/theme.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/gallery.dart'
@@ -251,7 +249,7 @@ String _truncateToLength(String text, int lineLength, int lines) {
   while (!done) {
     if (end >= runes.length - 2) {
       done = true;
-      end += 1;
+      end = runes.length;
       break;
     } else if (currentLineLength > lineLength) {
       currentLineLength = 0;

@@ -65,8 +65,6 @@ class _PostView extends StatelessWidget {
             onLike: (direction) async {
               await post.vote(direction: direction, client: RedditAPI.client());
             },
-            showReplyButton: true,
-            showCommentsButton: false,
             onSave: (save) async {
               if (save) {
                 await post.save(client: RedditAPI.client());

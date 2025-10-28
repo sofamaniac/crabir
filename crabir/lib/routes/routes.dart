@@ -363,7 +363,6 @@ final GoRouter appRouter = GoRouter(
     // Settings routes
     GoRoute(
       path: '/settings',
-      parentNavigatorKey: _rootNavigationKey,
       name: SettingsViewBuilder.name,
       builder: (context, state) => SettingsView(),
       routes: [

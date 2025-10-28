@@ -3,8 +3,14 @@ part of '../post.dart';
 class Thumbnail extends StatelessWidget {
   final Post post;
   final Widget child;
+  final bool goToPostButton;
 
-  const Thumbnail({super.key, required this.post, required this.child});
+  const Thumbnail({
+    super.key,
+    required this.post,
+    required this.child,
+    this.goToPostButton = true,
+  });
 
   void onTap(BuildContext context) async {
     switch (post.kind) {

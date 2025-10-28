@@ -36,7 +36,7 @@ List<Widget> baseFeeds(BuildContext context) {
         ALL_ICON,
         destination: "/r/all",
       ),
-    if (account.account != null) ...[
+    if (account.account != null)
       if (settings.showSaved)
         ListTile(
           leading: Icon(SAVED_FEED_ICON),
@@ -55,13 +55,12 @@ List<Widget> baseFeeds(BuildContext context) {
             }
           },
         ),
-      if (settings.showHistory)
-        BaseFeed(
-          locales.feedHistory,
-          HISTORY_ICON,
-          // TODO: history feed
-        ),
-    ],
+    if (settings.showHistory)
+      BaseFeed(
+        locales.feedHistory,
+        HISTORY_ICON,
+        // TODO: history feed
+      ),
     ListTile(
       leading: Icon(SEARCH_ICON),
       title: Text(locales.lateralMenu_showSearch),
