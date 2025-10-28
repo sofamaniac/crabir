@@ -44,6 +44,7 @@ class DrawerFeedSelectionState extends State<DrawerFeedSelection>
               leading: Icon(Icons.settings),
               title: Text("Settings"),
               onTap: () {
+                Scaffold.of(context).closeDrawer();
                 SettingsView().pushNamed(context);
               },
               trailing: IconButton(
