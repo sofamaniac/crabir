@@ -247,15 +247,17 @@ String _truncateToLength(String text, int lineLength, int lines) {
   bool done = false;
   int completedLines = 0;
   int currentLineLength = 0;
+  final runes = text.runes.toList();
   while (!done) {
-    if (end == text.length - 1) {
+    if (end >= runes.length - 2) {
       done = true;
       end += 1;
       break;
     } else if (currentLineLength > lineLength) {
       currentLineLength = 0;
       completedLines += 1;
-    } else if (text[end] == '\n' && text[end + 1] == '\n') {
+    } else if (String.fromCharCode(runes[end]) == '\n' &&
+        String.fromCharCode(runes[end + 1]) == '\n') {
       currentLineLength = 0;
       completedLines += 1;
       end += 2;
@@ -265,5 +267,5 @@ String _truncateToLength(String text, int lineLength, int lines) {
     }
     done = completedLines == lines;
   }
-  return text.substring(0, min(text.length, end));
+  return String.fromCharCodes(runes, 0, end);
 }
