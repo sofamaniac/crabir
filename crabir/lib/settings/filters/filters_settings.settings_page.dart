@@ -56,84 +56,88 @@ class FiltersSettingsView extends StatelessWidget {
     final locales = AppLocalizations.of(context);
     final settings = context.watch<FiltersSettingsCubit>().state;
     return Scaffold(
-        body: ListView(
-      children: [
-        Divider(),
-        ListTile(
+      appBar: AppBar(),
+      body: ListView(
+        children: [
+          Divider(),
+          ListTile(
+              leading: Icon(null),
+              title: Text("Muting options",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(color: CrabirTheme.of(context).highlight))),
+          SubredditsFilterButton(
+            title: Text(locales.filters_manageHiddenCommunities),
             leading: Icon(null),
-            title: Text("Muting options",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
-        SubredditsFilterButton(
-          title: Text(locales.filters_manageHiddenCommunities),
-          leading: Icon(null),
-          subtitle: Text(locales.filters_manageHiddenCommunitiesDescription),
-          value: settings.manageHiddenCommunities,
-          onChanged: (val) => context
-              .read<FiltersSettingsCubit>()
-              .updateManageHiddenCommunities(val),
-        ),
-        DomainsFilterButton(
-          title: Text(locales.filters_manageHiddenDomains),
-          leading: Icon(null),
-          subtitle: Text(locales.filters_manageHiddenDomainsDescription),
-          value: settings.manageHiddenDomains,
-          onChanged: (val) => context
-              .read<FiltersSettingsCubit>()
-              .updateManageHiddenDomains(val),
-        ),
-        UsersFilterButton(
-          title: Text(locales.filters_manageHiddenUsers),
-          leading: Icon(null),
-          subtitle: Text(locales.filters_manageHiddenUsersDescription),
-          value: settings.manageHiddenUsers,
-          onChanged: (val) =>
-              context.read<FiltersSettingsCubit>().updateManageHiddenUsers(val),
-        ),
-        FlairsFilterButton(
-          title: Text(locales.filters_manageHiddenFlairs),
-          leading: Icon(null),
-          subtitle: Text(locales.filters_manageHiddenFlairsDescription),
-          value: settings.manageHiddenFlairs,
-          onChanged: (val) => context
-              .read<FiltersSettingsCubit>()
-              .updateManageHiddenFlairs(val),
-        ),
-        Divider(),
-        ListTile(
+            subtitle: Text(locales.filters_manageHiddenCommunitiesDescription),
+            value: settings.manageHiddenCommunities,
+            onChanged: (val) => context
+                .read<FiltersSettingsCubit>()
+                .updateManageHiddenCommunities(val),
+          ),
+          DomainsFilterButton(
+            title: Text(locales.filters_manageHiddenDomains),
             leading: Icon(null),
-            title: Text("More options",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
-        CheckboxListTile(
-          title: Text(locales.filters_showNSFW),
-          secondary: Icon(null),
-          subtitle: Text(locales.filters_showNSFWDescription),
-          value: settings.showNSFW,
-          onChanged: (val) =>
-              context.read<FiltersSettingsCubit>().updateShowNSFW(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.filters_showImageInNSFW),
-          secondary: Icon(SHOW_NSFW_ICON),
-          subtitle: null,
-          value: settings.showImageInNSFW,
-          onChanged: (val) =>
-              context.read<FiltersSettingsCubit>().updateShowImageInNSFW(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.filters_blurNSFW),
-          secondary: Icon(BLUR_NSFW_ICON),
-          subtitle: null,
-          value: settings.blurNSFW,
-          onChanged: (val) =>
-              context.read<FiltersSettingsCubit>().updateBlurNSFW(val!),
-        ),
-      ],
-    ));
+            subtitle: Text(locales.filters_manageHiddenDomainsDescription),
+            value: settings.manageHiddenDomains,
+            onChanged: (val) => context
+                .read<FiltersSettingsCubit>()
+                .updateManageHiddenDomains(val),
+          ),
+          UsersFilterButton(
+            title: Text(locales.filters_manageHiddenUsers),
+            leading: Icon(null),
+            subtitle: Text(locales.filters_manageHiddenUsersDescription),
+            value: settings.manageHiddenUsers,
+            onChanged: (val) => context
+                .read<FiltersSettingsCubit>()
+                .updateManageHiddenUsers(val),
+          ),
+          FlairsFilterButton(
+            title: Text(locales.filters_manageHiddenFlairs),
+            leading: Icon(null),
+            subtitle: Text(locales.filters_manageHiddenFlairsDescription),
+            value: settings.manageHiddenFlairs,
+            onChanged: (val) => context
+                .read<FiltersSettingsCubit>()
+                .updateManageHiddenFlairs(val),
+          ),
+          Divider(),
+          ListTile(
+              leading: Icon(null),
+              title: Text("More options",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(color: CrabirTheme.of(context).highlight))),
+          CheckboxListTile(
+            title: Text(locales.filters_showNSFW),
+            secondary: Icon(null),
+            subtitle: Text(locales.filters_showNSFWDescription),
+            value: settings.showNSFW,
+            onChanged: (val) =>
+                context.read<FiltersSettingsCubit>().updateShowNSFW(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.filters_showImageInNSFW),
+            secondary: Icon(SHOW_NSFW_ICON),
+            subtitle: null,
+            value: settings.showImageInNSFW,
+            onChanged: (val) => context
+                .read<FiltersSettingsCubit>()
+                .updateShowImageInNSFW(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.filters_blurNSFW),
+            secondary: Icon(BLUR_NSFW_ICON),
+            subtitle: null,
+            value: settings.blurNSFW,
+            onChanged: (val) =>
+                context.read<FiltersSettingsCubit>().updateBlurNSFW(val!),
+          ),
+        ],
+      ),
+    );
   }
 }

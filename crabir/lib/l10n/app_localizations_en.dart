@@ -458,6 +458,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get layout_defaultView => 'Default post view';
 
   @override
+  String get layout_defaultColumnsNumber => 'Default number of columns';
+
+  @override
   String get layout_rememberByCommunity => 'Remember for each community';
 
   @override

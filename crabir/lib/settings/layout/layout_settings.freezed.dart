@@ -16,6 +16,8 @@ T _$identity<T>(T value) => value;
 mixin _$LayoutSettings {
   @Setting(widget: _ViewKindSelection)
   ViewKind get defaultView;
+  @Setting(widget: _ColumnSelection)
+  int get defaultColumnsNumber;
   @Setting()
   bool get rememberByCommunity;
   @Setting(widget: _ManageViewButton)
@@ -53,6 +55,8 @@ mixin _$LayoutSettings {
             other is LayoutSettings &&
             (identical(other.defaultView, defaultView) ||
                 other.defaultView == defaultView) &&
+            (identical(other.defaultColumnsNumber, defaultColumnsNumber) ||
+                other.defaultColumnsNumber == defaultColumnsNumber) &&
             (identical(other.rememberByCommunity, rememberByCommunity) ||
                 other.rememberByCommunity == rememberByCommunity) &&
             (identical(other.rememberedView, rememberedView) ||
@@ -75,6 +79,7 @@ mixin _$LayoutSettings {
   int get hashCode => Object.hash(
       runtimeType,
       defaultView,
+      defaultColumnsNumber,
       rememberByCommunity,
       rememberedView,
       font,
@@ -86,7 +91,7 @@ mixin _$LayoutSettings {
 
   @override
   String toString() {
-    return 'LayoutSettings(defaultView: $defaultView, rememberByCommunity: $rememberByCommunity, rememberedView: $rememberedView, font: $font, showThumbnail: $showThumbnail, thumbnailOnLeft: $thumbnailOnLeft, prefixCommunities: $prefixCommunities, previewText: $previewText, previewTextLength: $previewTextLength)';
+    return 'LayoutSettings(defaultView: $defaultView, defaultColumnsNumber: $defaultColumnsNumber, rememberByCommunity: $rememberByCommunity, rememberedView: $rememberedView, font: $font, showThumbnail: $showThumbnail, thumbnailOnLeft: $thumbnailOnLeft, prefixCommunities: $prefixCommunities, previewText: $previewText, previewTextLength: $previewTextLength)';
   }
 }
 
@@ -98,6 +103,7 @@ abstract mixin class $LayoutSettingsCopyWith<$Res> {
   @useResult
   $Res call(
       {@Setting(widget: _ViewKindSelection) ViewKind defaultView,
+      @Setting(widget: _ColumnSelection) int defaultColumnsNumber,
       @Setting() bool rememberByCommunity,
       @Setting(widget: _ManageViewButton) RememberedView rememberedView,
       @Category() @Setting() () font,
@@ -123,6 +129,7 @@ class _$LayoutSettingsCopyWithImpl<$Res>
   @override
   $Res call({
     Object? defaultView = null,
+    Object? defaultColumnsNumber = null,
     Object? rememberByCommunity = null,
     Object? rememberedView = null,
     Object? font = null,
@@ -137,6 +144,10 @@ class _$LayoutSettingsCopyWithImpl<$Res>
           ? _self.defaultView
           : defaultView // ignore: cast_nullable_to_non_nullable
               as ViewKind,
+      defaultColumnsNumber: null == defaultColumnsNumber
+          ? _self.defaultColumnsNumber
+          : defaultColumnsNumber // ignore: cast_nullable_to_non_nullable
+              as int,
       rememberByCommunity: null == rememberByCommunity
           ? _self.rememberByCommunity
           : rememberByCommunity // ignore: cast_nullable_to_non_nullable
@@ -268,6 +279,7 @@ extension LayoutSettingsPatterns on LayoutSettings {
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
             @Setting(widget: _ViewKindSelection) ViewKind defaultView,
+            @Setting(widget: _ColumnSelection) int defaultColumnsNumber,
             @Setting() bool rememberByCommunity,
             @Setting(widget: _ManageViewButton) RememberedView rememberedView,
             @Category() @Setting() () font,
@@ -285,6 +297,7 @@ extension LayoutSettingsPatterns on LayoutSettings {
       case _LayoutSettings() when $default != null:
         return $default(
             _that.defaultView,
+            _that.defaultColumnsNumber,
             _that.rememberByCommunity,
             _that.rememberedView,
             _that.font,
@@ -315,6 +328,7 @@ extension LayoutSettingsPatterns on LayoutSettings {
   TResult when<TResult extends Object?>(
     TResult Function(
             @Setting(widget: _ViewKindSelection) ViewKind defaultView,
+            @Setting(widget: _ColumnSelection) int defaultColumnsNumber,
             @Setting() bool rememberByCommunity,
             @Setting(widget: _ManageViewButton) RememberedView rememberedView,
             @Category() @Setting() () font,
@@ -331,6 +345,7 @@ extension LayoutSettingsPatterns on LayoutSettings {
       case _LayoutSettings():
         return $default(
             _that.defaultView,
+            _that.defaultColumnsNumber,
             _that.rememberByCommunity,
             _that.rememberedView,
             _that.font,
@@ -360,6 +375,7 @@ extension LayoutSettingsPatterns on LayoutSettings {
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
             @Setting(widget: _ViewKindSelection) ViewKind defaultView,
+            @Setting(widget: _ColumnSelection) int defaultColumnsNumber,
             @Setting() bool rememberByCommunity,
             @Setting(widget: _ManageViewButton) RememberedView rememberedView,
             @Category() @Setting() () font,
@@ -376,6 +392,7 @@ extension LayoutSettingsPatterns on LayoutSettings {
       case _LayoutSettings() when $default != null:
         return $default(
             _that.defaultView,
+            _that.defaultColumnsNumber,
             _that.rememberByCommunity,
             _that.rememberedView,
             _that.font,
@@ -395,6 +412,7 @@ extension LayoutSettingsPatterns on LayoutSettings {
 class _LayoutSettings extends LayoutSettings {
   _LayoutSettings(
       {@Setting(widget: _ViewKindSelection) this.defaultView = ViewKind.card,
+      @Setting(widget: _ColumnSelection) this.defaultColumnsNumber = 1,
       @Setting() this.rememberByCommunity = false,
       @Setting(widget: _ManageViewButton)
       this.rememberedView = const RememberedView(),
@@ -413,6 +431,10 @@ class _LayoutSettings extends LayoutSettings {
   @JsonKey()
   @Setting(widget: _ViewKindSelection)
   final ViewKind defaultView;
+  @override
+  @JsonKey()
+  @Setting(widget: _ColumnSelection)
+  final int defaultColumnsNumber;
   @override
   @JsonKey()
   @Setting()
@@ -470,6 +492,8 @@ class _LayoutSettings extends LayoutSettings {
             other is _LayoutSettings &&
             (identical(other.defaultView, defaultView) ||
                 other.defaultView == defaultView) &&
+            (identical(other.defaultColumnsNumber, defaultColumnsNumber) ||
+                other.defaultColumnsNumber == defaultColumnsNumber) &&
             (identical(other.rememberByCommunity, rememberByCommunity) ||
                 other.rememberByCommunity == rememberByCommunity) &&
             (identical(other.rememberedView, rememberedView) ||
@@ -492,6 +516,7 @@ class _LayoutSettings extends LayoutSettings {
   int get hashCode => Object.hash(
       runtimeType,
       defaultView,
+      defaultColumnsNumber,
       rememberByCommunity,
       rememberedView,
       font,
@@ -503,7 +528,7 @@ class _LayoutSettings extends LayoutSettings {
 
   @override
   String toString() {
-    return 'LayoutSettings(defaultView: $defaultView, rememberByCommunity: $rememberByCommunity, rememberedView: $rememberedView, font: $font, showThumbnail: $showThumbnail, thumbnailOnLeft: $thumbnailOnLeft, prefixCommunities: $prefixCommunities, previewText: $previewText, previewTextLength: $previewTextLength)';
+    return 'LayoutSettings(defaultView: $defaultView, defaultColumnsNumber: $defaultColumnsNumber, rememberByCommunity: $rememberByCommunity, rememberedView: $rememberedView, font: $font, showThumbnail: $showThumbnail, thumbnailOnLeft: $thumbnailOnLeft, prefixCommunities: $prefixCommunities, previewText: $previewText, previewTextLength: $previewTextLength)';
   }
 }
 
@@ -517,6 +542,7 @@ abstract mixin class _$LayoutSettingsCopyWith<$Res>
   @useResult
   $Res call(
       {@Setting(widget: _ViewKindSelection) ViewKind defaultView,
+      @Setting(widget: _ColumnSelection) int defaultColumnsNumber,
       @Setting() bool rememberByCommunity,
       @Setting(widget: _ManageViewButton) RememberedView rememberedView,
       @Category() @Setting() () font,
@@ -542,6 +568,7 @@ class __$LayoutSettingsCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? defaultView = null,
+    Object? defaultColumnsNumber = null,
     Object? rememberByCommunity = null,
     Object? rememberedView = null,
     Object? font = null,
@@ -556,6 +583,10 @@ class __$LayoutSettingsCopyWithImpl<$Res>
           ? _self.defaultView
           : defaultView // ignore: cast_nullable_to_non_nullable
               as ViewKind,
+      defaultColumnsNumber: null == defaultColumnsNumber
+          ? _self.defaultColumnsNumber
+          : defaultColumnsNumber // ignore: cast_nullable_to_non_nullable
+              as int,
       rememberByCommunity: null == rememberByCommunity
           ? _self.rememberByCommunity
           : rememberByCommunity // ignore: cast_nullable_to_non_nullable

@@ -856,6 +856,12 @@ abstract class AppLocalizations {
   /// **'Default post view'**
   String get layout_defaultView;
 
+  /// No description provided for @layout_defaultColumnsNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Default number of columns'**
+  String get layout_defaultColumnsNumber;
+
   /// No description provided for @layout_rememberByCommunity.
   ///
   /// In en, this message translates to:

@@ -6,6 +6,7 @@ import 'package:crabir/src/go_router_ext/annotations.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/feed.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/settings_page/annotations.dart';
+import 'package:crabir/tabs_index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -121,6 +122,7 @@ abstract class LayoutSettings with _$LayoutSettings {
     @Setting(widget: _ViewKindSelection)
     @Default(ViewKind.card)
     ViewKind defaultView,
+    @Setting(widget: _ColumnSelection) @Default(1) int defaultColumnsNumber,
     @Setting() @Default(false) bool rememberByCommunity,
     @Setting(widget: _ManageViewButton)
     @Default(RememberedView())
@@ -158,10 +160,37 @@ class _LengthSelection extends SettingButton<int> {
       subtitle: TextFormField(
         initialValue: "$value",
         onChanged: (val) => onChanged?.call(int.parse(val)),
+        enabled: onChanged != null,
         keyboardType: TextInputType.number,
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly
         ], // Only numbers can be entered
+      ),
+    );
+  }
+}
+
+class _ColumnSelection extends SettingButton<int> {
+  const _ColumnSelection({
+    super.subtitle,
+    super.leading,
+    super.onChanged,
+    required super.title,
+    required super.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: leading,
+      title: title,
+      subtitle: Slider(
+        value: value.toDouble(),
+        onChanged: (val) => onChanged?.call(val.toInt()),
+        divisions: 2,
+        label: value.toString(),
+        min: 1,
+        max: 3,
       ),
     );
   }
@@ -218,7 +247,8 @@ class _ManageViewButton extends SettingButton<RememberedView> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text("Manage Sorts"),
+      title: title,
+      subtitle: subtitle,
       leading: leading,
       onTap: () => ManageRememberedView().pushNamed(context),
     );

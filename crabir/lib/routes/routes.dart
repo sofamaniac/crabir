@@ -406,6 +406,11 @@ final GoRouter appRouter = GoRouter(
           name: LayoutSettingsViewBuilder.name,
           builder: (context, state) => LayoutSettingsView(),
         ),
+        GoRoute(
+          path: 'manage-views',
+          name: ManageRememberedViewBuilder.name,
+          builder: (context, state) => ManageRememberedView(),
+        ),
       ],
     ),
     GoRoute(

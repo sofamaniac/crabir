@@ -40,6 +40,8 @@ _LayoutSettings _$LayoutSettingsFromJson(Map<String, dynamic> json) =>
       defaultView:
           $enumDecodeNullable(_$ViewKindEnumMap, json['defaultView']) ??
               ViewKind.card,
+      defaultColumnsNumber:
+          (json['defaultColumnsNumber'] as num?)?.toInt() ?? 1,
       rememberByCommunity: json['rememberByCommunity'] as bool? ?? false,
       rememberedView: json['rememberedView'] == null
           ? const RememberedView()
@@ -56,6 +58,7 @@ _LayoutSettings _$LayoutSettingsFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$LayoutSettingsToJson(_LayoutSettings instance) =>
     <String, dynamic>{
       'defaultView': _$ViewKindEnumMap[instance.defaultView]!,
+      'defaultColumnsNumber': instance.defaultColumnsNumber,
       'rememberByCommunity': instance.rememberByCommunity,
       'rememberedView': instance.rememberedView,
       'font': <String, dynamic>{},

@@ -29,6 +29,9 @@ class LayoutSettingsCubit extends HydratedCubit<LayoutSettings> {
   void updateDefaultView(ViewKind value) =>
       emit(state.copyWith(defaultView: value));
 
+  void updateDefaultColumnsNumber(int value) =>
+      emit(state.copyWith(defaultColumnsNumber: value));
+
   void updateRememberByCommunity(bool value) =>
       emit(state.copyWith(rememberByCommunity: value));
 
@@ -63,94 +66,106 @@ class LayoutSettingsView extends StatelessWidget {
     final locales = AppLocalizations.of(context);
     final settings = context.watch<LayoutSettingsCubit>().state;
     return Scaffold(
-        body: ListView(
-      children: [
-        _ViewKindSelection(
-          title: Text(locales.layout_defaultView),
-          leading: Icon(null),
-          subtitle: null,
-          value: settings.defaultView,
-          onChanged: (val) =>
-              context.read<LayoutSettingsCubit>().updateDefaultView(val),
-        ),
-        CheckboxListTile(
-          title: Text(locales.layout_rememberByCommunity),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.rememberByCommunity,
-          onChanged: (val) => context
-              .read<LayoutSettingsCubit>()
-              .updateRememberByCommunity(val!),
-        ),
-        _ManageViewButton(
-          title: Text(locales.layout_rememberedView),
-          leading: Icon(null),
-          subtitle: null,
-          value: settings.rememberedView,
-          onChanged: (val) =>
-              context.read<LayoutSettingsCubit>().updateRememberedView(val),
-        ),
-        Divider(),
-        ListTile(
-          title: Text("TODO: font"),
-          leading: null,
-          subtitle: null,
-        ),
-        CheckboxListTile(
-          title: Text(locales.layout_showThumbnail),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.showThumbnail,
-          onChanged: (val) =>
-              context.read<LayoutSettingsCubit>().updateShowThumbnail(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.layout_thumbnailOnLeft),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.thumbnailOnLeft,
-          onChanged: settings.showThumbnail
-              ? (val) => context
-                  .read<LayoutSettingsCubit>()
-                  .updateThumbnailOnLeft(val!)
-              : null,
-        ),
-        CheckboxListTile(
-          title: Text(locales.layout_prefixCommunities),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.prefixCommunities,
-          onChanged: (val) =>
-              context.read<LayoutSettingsCubit>().updatePrefixCommunities(val!),
-        ),
-        Divider(),
-        ListTile(
+      appBar: AppBar(),
+      body: ListView(
+        children: [
+          _ViewKindSelection(
+            title: Text(locales.layout_defaultView),
             leading: Icon(null),
-            title: Text("Cards",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
-        CheckboxListTile(
-          title: Text(locales.layout_previewText),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.previewText,
-          onChanged: (val) =>
-              context.read<LayoutSettingsCubit>().updatePreviewText(val!),
-        ),
-        _LengthSelection(
-          title: Text(locales.layout_previewTextLength),
-          leading: Icon(null),
-          subtitle: null,
-          value: settings.previewTextLength,
-          onChanged: settings.previewText
-              ? (val) => context
-                  .read<LayoutSettingsCubit>()
-                  .updatePreviewTextLength(val)
-              : null,
-        ),
-      ],
-    ));
+            subtitle: null,
+            value: settings.defaultView,
+            onChanged: (val) =>
+                context.read<LayoutSettingsCubit>().updateDefaultView(val),
+          ),
+          _ColumnSelection(
+            title: Text(locales.layout_defaultColumnsNumber),
+            leading: Icon(null),
+            subtitle: null,
+            value: settings.defaultColumnsNumber,
+            onChanged: (val) => context
+                .read<LayoutSettingsCubit>()
+                .updateDefaultColumnsNumber(val),
+          ),
+          CheckboxListTile(
+            title: Text(locales.layout_rememberByCommunity),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.rememberByCommunity,
+            onChanged: (val) => context
+                .read<LayoutSettingsCubit>()
+                .updateRememberByCommunity(val!),
+          ),
+          _ManageViewButton(
+            title: Text(locales.layout_rememberedView),
+            leading: Icon(null),
+            subtitle: null,
+            value: settings.rememberedView,
+            onChanged: (val) =>
+                context.read<LayoutSettingsCubit>().updateRememberedView(val),
+          ),
+          Divider(),
+          ListTile(
+            title: Text("TODO: font"),
+            leading: null,
+            subtitle: null,
+          ),
+          CheckboxListTile(
+            title: Text(locales.layout_showThumbnail),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.showThumbnail,
+            onChanged: (val) =>
+                context.read<LayoutSettingsCubit>().updateShowThumbnail(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.layout_thumbnailOnLeft),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.thumbnailOnLeft,
+            onChanged: settings.showThumbnail
+                ? (val) => context
+                    .read<LayoutSettingsCubit>()
+                    .updateThumbnailOnLeft(val!)
+                : null,
+          ),
+          CheckboxListTile(
+            title: Text(locales.layout_prefixCommunities),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.prefixCommunities,
+            onChanged: (val) => context
+                .read<LayoutSettingsCubit>()
+                .updatePrefixCommunities(val!),
+          ),
+          Divider(),
+          ListTile(
+              leading: Icon(null),
+              title: Text("Cards",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(color: CrabirTheme.of(context).highlight))),
+          CheckboxListTile(
+            title: Text(locales.layout_previewText),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.previewText,
+            onChanged: (val) =>
+                context.read<LayoutSettingsCubit>().updatePreviewText(val!),
+          ),
+          _LengthSelection(
+            title: Text(locales.layout_previewTextLength),
+            leading: Icon(null),
+            subtitle: null,
+            value: settings.previewTextLength,
+            onChanged: settings.previewText
+                ? (val) => context
+                    .read<LayoutSettingsCubit>()
+                    .updatePreviewTextLength(val)
+                : null,
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -82,12 +82,13 @@ class _FeedViewState extends State<FeedView> {
       sort = widget.initialSort ?? defaultSort;
     }
 
-    final Layout layout;
-    if (layoutSettings.rememberByCommunity) {
-      layout = layoutSettings.rememberedView.containsFeed(feed) ??
-          Layout(view: layoutSettings.defaultView, columns: 1);
-    } else {
-      layout = Layout(view: layoutSettings.defaultView, columns: 1);
+    Layout layout = Layout(
+      view: layoutSettings.defaultView,
+      columns: layoutSettings.defaultColumnsNumber,
+    );
+    final Layout? remembered = layoutSettings.rememberedView.containsFeed(feed);
+    if (layoutSettings.rememberByCommunity && remembered != null) {
+      layout = remembered;
     }
     return CommonFeedView(
       key: ValueKey(widget.feed),
@@ -111,6 +112,7 @@ class _FeedViewState extends State<FeedView> {
           );
         } else {
           bloc.updateDefaultView(layout.view);
+          bloc.updateDefaultColumnsNumber(layout.columns);
         }
         setState(() {});
       },

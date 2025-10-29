@@ -97,224 +97,233 @@ class LateralMenuSettingsView extends StatelessWidget {
     final locales = AppLocalizations.of(context);
     final settings = context.watch<LateralMenuSettingsCubit>().state;
     return Scaffold(
-        body: ListView(
-      children: [
-        Divider(),
-        ListTile(
-            leading: Icon(null),
-            title: Text("Items to show",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showHome),
-          secondary: Icon(HOME_PAGE_ICON),
-          subtitle: Text(locales.lateralMenu_showHomeDescription),
-          value: settings.showHome,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowHome(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showHomeFeed),
-          secondary: Icon(HOME_FEED_ICON),
-          subtitle: Text(locales.lateralMenu_showHomeFeedDescription),
-          value: settings.showHomeFeed,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowHomeFeed(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showPopular),
-          secondary: Icon(POPULAR_ICON),
-          subtitle: null,
-          value: settings.showPopular,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowPopular(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showAll),
-          secondary: Icon(ALL_ICON),
-          subtitle: null,
-          value: settings.showAll,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowAll(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showSaved),
-          secondary: Icon(SAVED_FEED_ICON),
-          subtitle: null,
-          value: settings.showSaved,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowSaved(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showHistory),
-          secondary: Icon(HISTORY_ICON),
-          subtitle: null,
-          value: settings.showHistory,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowHistory(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showProfile),
-          secondary: Icon(PROFILE_ICON),
-          subtitle: null,
-          value: settings.showProfile,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowProfile(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showInbox),
-          secondary: Icon(INBOX_ICON),
-          subtitle: null,
-          value: settings.showInbox,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowInbox(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showFriends),
-          secondary: Icon(FRIENDS_ICON),
-          subtitle: null,
-          value: settings.showFriends,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowFriends(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showDrafts),
-          secondary: Icon(DRAFTS_ICON),
-          subtitle: null,
-          value: settings.showDrafts,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowDrafts(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showModeration),
-          secondary: Icon(MODERATION_ICON),
-          subtitle: null,
-          value: settings.showModeration,
-          onChanged: (val) => context
-              .read<LateralMenuSettingsCubit>()
-              .updateShowModeration(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showSearch),
-          secondary: Icon(SEARCH_ICON),
-          subtitle: null,
-          value: settings.showSearch,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowSearch(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showGoToDropdown),
-          secondary: Icon(GOTO_ICON),
-          subtitle: null,
-          value: settings.showGoToDropdown,
-          onChanged: (val) => context
-              .read<LateralMenuSettingsCubit>()
-              .updateShowGoToDropdown(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showGoToCommunity),
-          secondary: Icon(GOTO_COMMUNITY_ICON),
-          subtitle: null,
-          value: settings.showGoToCommunity,
-          onChanged: (val) => context
-              .read<LateralMenuSettingsCubit>()
-              .updateShowGoToCommunity(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showGoToUser),
-          secondary: Icon(GOTO_USER_ICON),
-          subtitle: null,
-          value: settings.showGoToUser,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowGoToUser(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_darkMode),
-          secondary: Icon(DARK_MODE_ICON),
-          subtitle: null,
-          value: settings.darkMode,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateDarkMode(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showNSFW),
-          secondary: Icon(SHOW_NSFW_ICON),
-          subtitle: null,
-          value: settings.showNSFW,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowNSFW(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_blurNSFW),
-          secondary: Icon(BLUR_NSFW_ICON),
-          subtitle: null,
-          value: settings.blurNSFW,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateBlurNSFW(val!),
-        ),
-        Divider(),
-        ListTile(
-            leading: Icon(null),
-            title: Text("Subscription list",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showSubsInMenu),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.showSubsInMenu,
-          onChanged: (val) => context
-              .read<LateralMenuSettingsCubit>()
-              .updateShowSubsInMenu(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showSubsIcon),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.showSubsIcon,
-          onChanged: (val) =>
-              context.read<LateralMenuSettingsCubit>().updateShowSubsIcon(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showSubsFavOnly),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.showSubsFavOnly,
-          onChanged: (val) => context
-              .read<LateralMenuSettingsCubit>()
-              .updateShowSubsFavOnly(val!),
-        ),
-        Divider(),
-        ListTile(
-            leading: Icon(null),
-            title: Text("Account switcher",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showAccountAvatar),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.showAccountAvatar,
-          onChanged: (val) => context
-              .read<LateralMenuSettingsCubit>()
-              .updateShowAccountAvatar(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.lateralMenu_showAccountUsername),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.showAccountUsername,
-          onChanged: (val) => context
-              .read<LateralMenuSettingsCubit>()
-              .updateShowAccountUsername(val!),
-        ),
-      ],
-    ));
+      appBar: AppBar(),
+      body: ListView(
+        children: [
+          Divider(),
+          ListTile(
+              leading: Icon(null),
+              title: Text("Items to show",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(color: CrabirTheme.of(context).highlight))),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showHome),
+            secondary: Icon(HOME_PAGE_ICON),
+            subtitle: Text(locales.lateralMenu_showHomeDescription),
+            value: settings.showHome,
+            onChanged: (val) =>
+                context.read<LateralMenuSettingsCubit>().updateShowHome(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showHomeFeed),
+            secondary: Icon(HOME_FEED_ICON),
+            subtitle: Text(locales.lateralMenu_showHomeFeedDescription),
+            value: settings.showHomeFeed,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowHomeFeed(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showPopular),
+            secondary: Icon(POPULAR_ICON),
+            subtitle: null,
+            value: settings.showPopular,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowPopular(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showAll),
+            secondary: Icon(ALL_ICON),
+            subtitle: null,
+            value: settings.showAll,
+            onChanged: (val) =>
+                context.read<LateralMenuSettingsCubit>().updateShowAll(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showSaved),
+            secondary: Icon(SAVED_FEED_ICON),
+            subtitle: null,
+            value: settings.showSaved,
+            onChanged: (val) =>
+                context.read<LateralMenuSettingsCubit>().updateShowSaved(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showHistory),
+            secondary: Icon(HISTORY_ICON),
+            subtitle: null,
+            value: settings.showHistory,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowHistory(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showProfile),
+            secondary: Icon(PROFILE_ICON),
+            subtitle: null,
+            value: settings.showProfile,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowProfile(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showInbox),
+            secondary: Icon(INBOX_ICON),
+            subtitle: null,
+            value: settings.showInbox,
+            onChanged: (val) =>
+                context.read<LateralMenuSettingsCubit>().updateShowInbox(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showFriends),
+            secondary: Icon(FRIENDS_ICON),
+            subtitle: null,
+            value: settings.showFriends,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowFriends(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showDrafts),
+            secondary: Icon(DRAFTS_ICON),
+            subtitle: null,
+            value: settings.showDrafts,
+            onChanged: (val) =>
+                context.read<LateralMenuSettingsCubit>().updateShowDrafts(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showModeration),
+            secondary: Icon(MODERATION_ICON),
+            subtitle: null,
+            value: settings.showModeration,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowModeration(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showSearch),
+            secondary: Icon(SEARCH_ICON),
+            subtitle: null,
+            value: settings.showSearch,
+            onChanged: (val) =>
+                context.read<LateralMenuSettingsCubit>().updateShowSearch(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showGoToDropdown),
+            secondary: Icon(GOTO_ICON),
+            subtitle: null,
+            value: settings.showGoToDropdown,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowGoToDropdown(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showGoToCommunity),
+            secondary: Icon(GOTO_COMMUNITY_ICON),
+            subtitle: null,
+            value: settings.showGoToCommunity,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowGoToCommunity(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showGoToUser),
+            secondary: Icon(GOTO_USER_ICON),
+            subtitle: null,
+            value: settings.showGoToUser,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowGoToUser(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_darkMode),
+            secondary: Icon(DARK_MODE_ICON),
+            subtitle: null,
+            value: settings.darkMode,
+            onChanged: (val) =>
+                context.read<LateralMenuSettingsCubit>().updateDarkMode(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showNSFW),
+            secondary: Icon(SHOW_NSFW_ICON),
+            subtitle: null,
+            value: settings.showNSFW,
+            onChanged: (val) =>
+                context.read<LateralMenuSettingsCubit>().updateShowNSFW(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_blurNSFW),
+            secondary: Icon(BLUR_NSFW_ICON),
+            subtitle: null,
+            value: settings.blurNSFW,
+            onChanged: (val) =>
+                context.read<LateralMenuSettingsCubit>().updateBlurNSFW(val!),
+          ),
+          Divider(),
+          ListTile(
+              leading: Icon(null),
+              title: Text("Subscription list",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(color: CrabirTheme.of(context).highlight))),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showSubsInMenu),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.showSubsInMenu,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowSubsInMenu(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showSubsIcon),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.showSubsIcon,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowSubsIcon(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showSubsFavOnly),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.showSubsFavOnly,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowSubsFavOnly(val!),
+          ),
+          Divider(),
+          ListTile(
+              leading: Icon(null),
+              title: Text("Account switcher",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(color: CrabirTheme.of(context).highlight))),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showAccountAvatar),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.showAccountAvatar,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowAccountAvatar(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.lateralMenu_showAccountUsername),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.showAccountUsername,
+            onChanged: (val) => context
+                .read<LateralMenuSettingsCubit>()
+                .updateShowAccountUsername(val!),
+          ),
+        ],
+      ),
+    );
   }
 }

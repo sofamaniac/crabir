@@ -239,6 +239,7 @@
   "posts_showOpenInAppButton": "Open in app",
 
   "layout_defaultView": "Default post view",
+  "layout_defaultColumnsNumber": "Default number of columns",
   "layout_rememberByCommunity": "Remember for each community",
   "layout_rememberedView": "Manage views",
   "layout_thumbnailOnLeft": "Thumbnail on left",

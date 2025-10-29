@@ -42,12 +42,14 @@ class _MultiViewState extends State<MultiView> {
       sort = widget.initialSort ?? settings.defaultSort;
     }
     final layoutSettings = LayoutSettings.of(context);
-    final Layout layout;
-    if (layoutSettings.rememberByCommunity) {
-      layout = layoutSettings.rememberedView.containsMulti(widget.multi) ??
-          Layout(view: layoutSettings.defaultView, columns: 1);
-    } else {
-      layout = Layout(view: layoutSettings.defaultView, columns: 1);
+    Layout layout = Layout(
+      view: layoutSettings.defaultView,
+      columns: layoutSettings.defaultColumnsNumber,
+    );
+    final Layout? remembered =
+        layoutSettings.rememberedView.containsMulti(widget.multi);
+    if (layoutSettings.rememberByCommunity && remembered != null) {
+      layout = remembered;
     }
     return CommonFeedView(
       key: ValueKey(widget.multi),
@@ -78,6 +80,7 @@ class _MultiViewState extends State<MultiView> {
           );
         } else {
           bloc.updateDefaultView(layout.view);
+          bloc.updateDefaultColumnsNumber(layout.columns);
         }
         setState(() {});
       },

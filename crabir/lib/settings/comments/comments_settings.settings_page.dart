@@ -106,238 +106,245 @@ class CommentsSettingsView extends StatelessWidget {
     final locales = AppLocalizations.of(context);
     final settings = context.watch<CommentsSettingsCubit>().state;
     return Scaffold(
-        body: ListView(
-      children: [
-        _CommentsSortSelection(
-          title: Text(locales.comments_defaultSort),
-          leading: Icon(null),
-          subtitle: null,
-          value: settings.defaultSort,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateDefaultSort(val),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_useSuggestedSort),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.useSuggestedSort,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateUseSuggestedSort(val!),
-        ),
-        Divider(),
-        ListTile(
+      appBar: AppBar(),
+      body: ListView(
+        children: [
+          _CommentsSortSelection(
+            title: Text(locales.comments_defaultSort),
             leading: Icon(null),
-            title: Text("Appearance",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
-        CheckboxListTile(
-          title: Text(locales.comments_showNavigationBar),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.showNavigationBar,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateShowNavigationBar(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_showCommentsImage),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.showCommentsImage,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateShowCommentsImage(val!),
-        ),
-        MediaPreviewSizeSelect(
-          title: Text(locales.comments_postMediaPreviewSize),
-          leading: Icon(null),
-          subtitle: null,
-          value: settings.postMediaPreviewSize,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updatePostMediaPreviewSize(val),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_buttonsAlwaysVisible),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.buttonsAlwaysVisible,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateButtonsAlwaysVisible(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_hideButtonAfterAction),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.hideButtonAfterAction,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateHideButtonAfterAction(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_collapseAutoMod),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.collapseAutoMod,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateCollapseAutoMod(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_collapseDisruptiveComment),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.collapseDisruptiveComment,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateCollapseDisruptiveComment(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_showPostUpvotePercentage),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.showPostUpvotePercentage,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateShowPostUpvotePercentage(val!),
-        ),
-        IndentationStyleSelect(
-          title: Text(locales.comments_threadGuide),
-          leading: Icon(THREAD_LEVEL_INDICATOR_ICON),
-          subtitle: null,
-          value: settings.threadGuide,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateThreadGuide(val),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_highlightMyUsername),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.highlightMyUsername,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateHighlightMyUsername(val!),
-        ),
-        Divider(),
-        ListTile(
+            subtitle: null,
+            value: settings.defaultSort,
+            onChanged: (val) =>
+                context.read<CommentsSettingsCubit>().updateDefaultSort(val),
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_useSuggestedSort),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.useSuggestedSort,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateUseSuggestedSort(val!),
+          ),
+          Divider(),
+          ListTile(
+              leading: Icon(null),
+              title: Text("Appearance",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(color: CrabirTheme.of(context).highlight))),
+          CheckboxListTile(
+            title: Text(locales.comments_showNavigationBar),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.showNavigationBar,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateShowNavigationBar(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_showCommentsImage),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.showCommentsImage,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateShowCommentsImage(val!),
+          ),
+          MediaPreviewSizeSelect(
+            title: Text(locales.comments_postMediaPreviewSize),
             leading: Icon(null),
-            title: Text("Flairs",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
-        CheckboxListTile(
-          title: Text(locales.comments_showUserFlair),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.showUserFlair,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateShowUserFlair(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_showFlairColors),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.showFlairColors,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateShowFlairColors(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_showFlairEmojis),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.showFlairEmojis,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateShowFlairEmojis(val!),
-        ),
-        Divider(),
-        ListTile(
-            leading: Icon(null),
-            title: Text("Behavior",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
-        ListTile(
-          title: Text("TODO: clickToCollapse"),
-          leading: null,
-          subtitle: null,
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_hideTextCollapsed),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.hideTextCollapsed,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateHideTextCollapsed(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_loadCollapsed),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.loadCollapsed,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateLoadCollapsed(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_animateCollapse),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.animateCollapse,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateAnimateCollapse(val!),
-        ),
-        CheckboxListTile(
-          title: Text(locales.comments_clickableUsername),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.clickableUsername,
-          onChanged: (val) => context
-              .read<CommentsSettingsCubit>()
-              .updateClickableUsername(val!),
-        ),
-        Divider(),
-        ListTile(
-            leading: Icon(null),
-            title: Text("Navigation",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
-        CheckboxListTile(
-          title: Text(locales.comments_showSaveButton),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.showSaveButton,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateShowSaveButton(val!),
-        ),
-        Divider(),
-        ListTile(
-            leading: Icon(null),
-            title: Text("Gestures",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: CrabirTheme.of(context).highlight))),
-        CheckboxListTile(
-          title: Text(locales.comments_swipeToClose),
-          secondary: Icon(null),
-          subtitle: null,
-          value: settings.swipeToClose,
-          onChanged: (val) =>
-              context.read<CommentsSettingsCubit>().updateSwipeToClose(val!),
-        ),
-        ListTile(
-          title: Text("TODO: distanceThreshold"),
-          leading: null,
-          subtitle: Text(locales.comments_distanceThresholdDescription),
-        ),
-      ],
-    ));
+            subtitle: null,
+            value: settings.postMediaPreviewSize,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updatePostMediaPreviewSize(val),
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_buttonsAlwaysVisible),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.buttonsAlwaysVisible,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateButtonsAlwaysVisible(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_hideButtonAfterAction),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.hideButtonAfterAction,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateHideButtonAfterAction(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_collapseAutoMod),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.collapseAutoMod,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateCollapseAutoMod(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_collapseDisruptiveComment),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.collapseDisruptiveComment,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateCollapseDisruptiveComment(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_showPostUpvotePercentage),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.showPostUpvotePercentage,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateShowPostUpvotePercentage(val!),
+          ),
+          IndentationStyleSelect(
+            title: Text(locales.comments_threadGuide),
+            leading: Icon(THREAD_LEVEL_INDICATOR_ICON),
+            subtitle: null,
+            value: settings.threadGuide,
+            onChanged: (val) =>
+                context.read<CommentsSettingsCubit>().updateThreadGuide(val),
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_highlightMyUsername),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.highlightMyUsername,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateHighlightMyUsername(val!),
+          ),
+          Divider(),
+          ListTile(
+              leading: Icon(null),
+              title: Text("Flairs",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(color: CrabirTheme.of(context).highlight))),
+          CheckboxListTile(
+            title: Text(locales.comments_showUserFlair),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.showUserFlair,
+            onChanged: (val) =>
+                context.read<CommentsSettingsCubit>().updateShowUserFlair(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_showFlairColors),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.showFlairColors,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateShowFlairColors(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_showFlairEmojis),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.showFlairEmojis,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateShowFlairEmojis(val!),
+          ),
+          Divider(),
+          ListTile(
+              leading: Icon(null),
+              title: Text("Behavior",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(color: CrabirTheme.of(context).highlight))),
+          ListTile(
+            title: Text("TODO: clickToCollapse"),
+            leading: null,
+            subtitle: null,
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_hideTextCollapsed),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.hideTextCollapsed,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateHideTextCollapsed(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_loadCollapsed),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.loadCollapsed,
+            onChanged: (val) =>
+                context.read<CommentsSettingsCubit>().updateLoadCollapsed(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_animateCollapse),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.animateCollapse,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateAnimateCollapse(val!),
+          ),
+          CheckboxListTile(
+            title: Text(locales.comments_clickableUsername),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.clickableUsername,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateClickableUsername(val!),
+          ),
+          Divider(),
+          ListTile(
+              leading: Icon(null),
+              title: Text("Navigation",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(color: CrabirTheme.of(context).highlight))),
+          CheckboxListTile(
+            title: Text(locales.comments_showSaveButton),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.showSaveButton,
+            onChanged: (val) => context
+                .read<CommentsSettingsCubit>()
+                .updateShowSaveButton(val!),
+          ),
+          Divider(),
+          ListTile(
+              leading: Icon(null),
+              title: Text("Gestures",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(color: CrabirTheme.of(context).highlight))),
+          CheckboxListTile(
+            title: Text(locales.comments_swipeToClose),
+            secondary: Icon(null),
+            subtitle: null,
+            value: settings.swipeToClose,
+            onChanged: (val) =>
+                context.read<CommentsSettingsCubit>().updateSwipeToClose(val!),
+          ),
+          ListTile(
+            title: Text("TODO: distanceThreshold"),
+            leading: null,
+            subtitle: Text(locales.comments_distanceThresholdDescription),
+          ),
+        ],
+      ),
+    );
   }
 }

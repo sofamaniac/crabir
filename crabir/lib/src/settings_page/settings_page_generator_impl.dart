@@ -104,6 +104,7 @@ class $className extends StatelessWidget {
     final locales = AppLocalizations.of(context);
     final settings = context.watch<$cubitName>().state;
     return Scaffold(
+      appBar: AppBar(),
       body: ListView(
         children: [
 ''';
@@ -130,7 +131,7 @@ class $className extends StatelessWidget {
     }
 
     buffer.writeln('      ],');
-    buffer.writeln('    ));');
+    buffer.writeln('    ),);');
     buffer.writeln('  }');
     buffer.writeln('}');
 
