@@ -123,7 +123,7 @@ class _TopLevelState extends State<TopLevel> {
   }
 
   void _handleIncomingLink(Uri uri) async {
-    context.go(uri.path);
+    appRouter.push(uri.path);
   }
 
   @override
