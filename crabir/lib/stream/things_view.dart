@@ -95,7 +95,28 @@ class _ThingsScaffoldState extends State<ThingsScaffold>
                             // ignore: use_build_context_synchronously
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text("Something went wrong: $e"),
+                                content: Text("Something went wrong"),
+                                action: SnackBarAction(
+                                  label: "Show Detail",
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          content: Text("$e"),
+                                          scrollable: true,
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              child: Text("Close"),
+                                            )
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
                             );
                           }
