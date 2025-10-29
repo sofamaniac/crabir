@@ -89,7 +89,7 @@ dev_dependencies:
     sdk: flutter
   freezed: ^3.0.6
   json_serializable: ^6.9.5
-  build_runner: ^2.4.15
+  build_runner: ^2.10.1
   # custom_lint: ^0.7.3
   source_gen: ^4.0.2
   flutter_launcher_icons: ^0.14.4
