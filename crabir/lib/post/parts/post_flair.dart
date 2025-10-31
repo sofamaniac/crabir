@@ -11,16 +11,10 @@ class PostFlair extends StatelessWidget {
     final Widget flairWidget;
     if (settings.tapFlairToSearch) {
       flairWidget = InkWell(
-        // onTap: () => context.router.root.navigate(
-        //   SearchPostsRoute(
-        //     // provide key to differentiate the pages
-        //     // but prevents rebuilding when clicking the same flair again
-        //     key: ValueKey("${post.subreddit.subreddit}-${post.linkFlair}"),
-        //     subreddit: post.subreddit.subreddit,
-        //     flair: post.linkFlair,
-        //   ),
-        // ),
-        onTap: () => context.go("/search-posts"),
+        onTap: () => SearchPostsView(
+          subreddit: post.subreddit.subreddit,
+          flair: post.linkFlair,
+        ).goNamed(context),
         child: FlairView(
           flair: post.linkFlair,
           showColor: settings.showFlairColors,
