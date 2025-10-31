@@ -68,7 +68,7 @@ class _SearchViewBodyState extends State<_SearchViewBody> {
   Widget build(BuildContext context) {
     final bloc = context.watch<SubredditSearchBloc>();
     final state = bloc.state;
-    final subs = context.watch<AccountsBloc>().state.subscriptions;
+    final subs = AccountState.of(context).subscriptions;
     final locales = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(

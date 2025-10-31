@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:crabir/accounts/bloc/accounts_bloc.dart';
 import 'package:crabir/feed/common.dart';
 import 'package:crabir/feed/top_bar.dart';
 import 'package:crabir/loading_indicator.dart';
@@ -65,9 +64,8 @@ class _FeedViewState extends State<FeedView> {
 
   @override
   Widget build(BuildContext context) {
-    final _ = context.watch<AccountsBloc>().state;
-    final bloc = context.read<PostsSettingsCubit>();
-    final settings = context.read<PostsSettingsCubit>().state;
+    final bloc = context.watch<PostsSettingsCubit>();
+    final settings = bloc.state;
     final layoutSettings = LayoutSettings.of(context);
     final defaultSort = switch (widget.feed) {
       Feed_Home() => settings.defaultHomeSort,

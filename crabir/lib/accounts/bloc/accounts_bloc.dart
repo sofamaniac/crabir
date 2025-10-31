@@ -5,6 +5,7 @@ import 'package:crabir/accounts/user_account.dart';
 import 'package:crabir/src/rust/api/reddit_api.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/multi.dart';
 import 'package:crabir/src/rust/third_party/reddit_api/model/subreddit.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:logging/logging.dart';

@@ -4,11 +4,10 @@ import 'package:crabir/search_subreddits/widgets/search.dart';
 import 'package:crabir/settings/lateral_menu/lateral_menu_settings.dart';
 import 'package:crabir/utils/icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 List<Widget> baseFeeds(BuildContext context) {
-  final account = context.watch<AccountsBloc>().state;
+  final account = AccountState.of(context).account;
   final locales = AppLocalizations.of(context);
   final settings = LateralMenuSettings.of(context);
   return [
@@ -36,15 +35,14 @@ List<Widget> baseFeeds(BuildContext context) {
         ALL_ICON,
         destination: "/r/all",
       ),
-    if (account.account != null)
+    if (account != null)
       if (settings.showSaved)
         ListTile(
           leading: Icon(SAVED_FEED_ICON),
           title: Text(locales.feedSaved),
           onTap: () {
-            final account = context.read<AccountsBloc>().state.account;
             Scaffold.of(context).closeDrawer();
-            if (account != null && !account.isAnonymous) {
+            if (!account.isAnonymous) {
               context.go("/u/${account.username}/saved");
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -69,7 +67,7 @@ List<Widget> baseFeeds(BuildContext context) {
         SearchSubredditsView().goNamed(context);
       },
     ),
-    if (account.account != null) ...[
+    if (account != null) ...[
       if (settings.showProfile)
         BaseFeed(
           locales.lateralMenu_showProfile,

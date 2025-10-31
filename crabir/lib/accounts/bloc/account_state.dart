@@ -18,4 +18,8 @@ abstract class AccountState with _$AccountState {
     @Default([]) List<Multi> multis,
     @Default([]) List<UserAccount> allAccounts,
   }) = _AccountState;
+
+  factory AccountState.of(BuildContext context) {
+    return context.watch<AccountsBloc>().state;
+  }
 }

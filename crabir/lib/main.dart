@@ -98,7 +98,7 @@ class TopLevel extends StatefulWidget {
 }
 
 class _TopLevelState extends State<TopLevel> {
-  final _appRouter = appRouter;
+  final GoRouter _appRouter = appRouter;
   late final AppLinks _appLinks;
 
   @override
@@ -123,7 +123,7 @@ class _TopLevelState extends State<TopLevel> {
   }
 
   void _handleIncomingLink(Uri uri) async {
-    appRouter.push(uri.path);
+    _appRouter.push(uri.path);
   }
 
   @override

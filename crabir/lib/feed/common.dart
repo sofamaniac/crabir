@@ -191,15 +191,16 @@ class _CommonFeedViewState extends State<CommonFeedView> {
 
   @override
   Widget build(BuildContext context) {
-    final account = context.watch<AccountsBloc>().state;
+    final account = AccountState.of(context).account;
+    final status = AccountState.of(context).status;
 
     if (sort == null) {
       return const Center(child: LoadingIndicator());
     }
 
     // Reset stream when changing user
-    if (currentUser != account.account?.username) {
-      currentUser = account.account?.username;
+    if (currentUser != account?.username) {
+      currentUser = account?.username;
       if (currentUser != null) {
         setState(() {
           _stream = widget.newStream(sort!);
@@ -207,7 +208,7 @@ class _CommonFeedViewState extends State<CommonFeedView> {
       }
     }
 
-    return switch (account.status) {
+    return switch (status) {
       Uninit() => Container(),
       Failure(:final message) =>
         Center(child: Text("Failure in Account Manager: $message")),

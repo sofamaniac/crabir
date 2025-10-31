@@ -15,7 +15,7 @@ List<Widget> options(BuildContext context) {
   final settings = LateralMenuSettings.of(context);
   final locales = AppLocalizations.of(context);
   final theme = CrabirTheme.of(context);
-  final account = context.watch<AccountsBloc>().state;
+  final account = AccountState.of(context).account;
   Icon icon(IconData icon) => Icon(icon, color: theme.secondaryText);
   final children = [
     if (settings.showGoToDropdown) GoToDropdown(),
@@ -34,14 +34,14 @@ List<Widget> options(BuildContext context) {
         title: Text(locales.lateralMenu_showGoToUser),
         onTap: () {
           Scaffold.of(context).closeDrawer();
-          if (account.account == null || account.account!.isAnonymous) {
+          if (account == null || account.isAnonymous) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text("Please login to  continue"),
               ),
             );
           } else {
-            context.go("/u/${account.account?.username ?? ""}");
+            context.go("/u/${account.username}");
           }
         },
       ),

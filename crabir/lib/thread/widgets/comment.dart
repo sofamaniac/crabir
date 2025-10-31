@@ -328,7 +328,7 @@ class _Username extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = context.read<CommentsSettingsCubit>().state;
-    final currentUser = context.read<AccountsBloc>().state.account?.username;
+    final currentUser = AccountState.of(context).account?.username;
     final theme = CrabirTheme.of(context);
     return InkWell(
       onTap: () {

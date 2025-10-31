@@ -30,7 +30,6 @@ class MultiView extends StatefulWidget {
 class _MultiViewState extends State<MultiView> {
   @override
   Widget build(BuildContext context) {
-    final _ = context.watch<AccountsBloc>().state;
     final bloc = context.read<PostsSettingsCubit>();
     final settings = context.read<PostsSettingsCubit>().state;
     final FeedSort sort;
