@@ -5,22 +5,27 @@
 package com.sofamaniac.reboost.domain.repository.feed
 
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
-import com.sofamaniac.reboost.data.remote.dto.Thing.Post
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
+import com.sofamaniac.reboost.data.repository.PostRepository
 import com.sofamaniac.reboost.domain.model.PagedResponse
 import jakarta.inject.Inject
 
 class SubredditPostsRepository @Inject constructor(
+    postRepository: PostRepository,
     api: RedditAPIService,
-) : PostRepository(api), FeedRepository {
+) : FeedRepositoryCommon(postRepository, api), FeedRepository {
     private var currentSubreddit: String? = null
 
     fun updateSubreddit(subreddit: String) {
         currentSubreddit = subreddit
     }
 
-    override suspend fun getPosts(after: String, sort: Sort, timeframe: Timeframe?): PagedResponse<Post> {
+    override suspend fun getPosts(
+        after: String,
+        sort: Sort,
+        timeframe: Timeframe?
+    ): PagedResponse<String> {
         val subreddit = currentSubreddit ?: return PagedResponse()
         return makeRequest {
             api.getSubreddit(

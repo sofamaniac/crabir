@@ -5,23 +5,24 @@
 package com.sofamaniac.reboost.domain.repository.feed
 
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
-import com.sofamaniac.reboost.data.remote.dto.Thing.Post
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
+import com.sofamaniac.reboost.data.repository.PostRepository
 import com.sofamaniac.reboost.domain.model.PagedResponse
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class HomeRepository @Inject constructor(
+    postRepository: PostRepository,
     api: RedditAPIService
-) : PostRepository(api) , FeedRepository {
+) : FeedRepositoryCommon(postRepository, api), FeedRepository {
 
     override suspend fun getPosts(
         after: String,
         sort: Sort,
         timeframe: Timeframe?
-    ): PagedResponse<Post> {
+    ): PagedResponse<String> {
         return makeRequest {
             api.getHome(
                 sort = sort,

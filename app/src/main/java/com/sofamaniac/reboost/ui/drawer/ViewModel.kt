@@ -134,7 +134,7 @@ class DrawerViewModel @Inject constructor(
                         accountsRepository.updateAccount(
                             accounts.size,
                             newAccount.copy(
-                                username = identity.username,
+                                username = identity.name,
                                 thumbnailUrl = identity.iconImg
                             )
                         )

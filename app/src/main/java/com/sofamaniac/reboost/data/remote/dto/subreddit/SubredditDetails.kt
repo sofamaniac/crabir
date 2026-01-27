@@ -67,11 +67,11 @@ data class SubredditDetails(
     @SerialName("key_color")
     val keyColor: String?,
     val name: String,
-    val created: Double,
     val url: String,
     val quarantine: Boolean,
     @SerialName("created_utc")
-    val createdUtc: Double,
+    val createdUtc: Double = 0.0,
+    val created: Double = 0.0,
     @SerialName("banner_size")
     val bannerSize: List<Int>?,
     @SerialName("user_is_contributor")

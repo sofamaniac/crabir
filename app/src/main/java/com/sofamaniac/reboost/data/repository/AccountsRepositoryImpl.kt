@@ -122,7 +122,12 @@ class AccountsRepositoryImpl(
     override suspend fun addAccount(account: RedditAccount) {
         Log.d("AccountsRepositoryImpl", "addAccount: $account")
         dataStore.updateData { accounts ->
-            accounts.copy(accounts = accounts.accounts + account)
+            if (accounts.accounts.any { it.username == account.username }) {
+                Log.e("AccountsRepositoryImpl", "Account already exists: $account")
+                accounts
+            } else {
+                accounts.copy(accounts = accounts.accounts + account)
+            }
         }
     }
 

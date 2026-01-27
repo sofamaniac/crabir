@@ -2,6 +2,7 @@ package com.sofamaniac.reboost.di
 
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
+import com.sofamaniac.reboost.data.repository.PostRepository
 import com.sofamaniac.reboost.domain.repository.ThreadRepository
 import com.sofamaniac.reboost.domain.repository.ThreadRepositoryImpl
 import dagger.Module
@@ -16,9 +17,10 @@ object ThreadModule {
     @Provides
     fun provideThreadRepository(
         api: RedditAPIService,
-        visitedPostsDao: VisitedPostsDao
+        visitedPostsDao: VisitedPostsDao,
+        postRepository: PostRepository
     ): ThreadRepository {
-        return ThreadRepositoryImpl(api, visitedPostsDao)
+        return ThreadRepositoryImpl(api, visitedPostsDao, postRepository)
     }
 
 }

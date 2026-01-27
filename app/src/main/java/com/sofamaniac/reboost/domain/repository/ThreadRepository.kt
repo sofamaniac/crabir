@@ -1,12 +1,12 @@
 package com.sofamaniac.reboost.domain.repository
 
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
-import com.sofamaniac.reboost.data.local.entities.toEntity
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.comment.Sort
 import com.sofamaniac.reboost.data.remote.dto.post.PostDataMapper
+import com.sofamaniac.reboost.data.repository.PostRepository
 
 interface ThreadRepository {
     suspend fun getComments(
@@ -21,7 +21,11 @@ interface ThreadRepository {
     fun refresh()
 }
 
-class ThreadRepositoryImpl(val api: RedditAPIService, val visitedPostsDao: VisitedPostsDao) :
+class ThreadRepositoryImpl(
+    val api: RedditAPIService,
+    val visitedPostsDao: VisitedPostsDao,
+    val postRepository: PostRepository
+) :
     ThreadRepository {
     private var post: Thing.Post? = null
     private var comments: List<Thing> = emptyList()
@@ -39,7 +43,7 @@ class ThreadRepositoryImpl(val api: RedditAPIService, val visitedPostsDao: Visit
                 post = body.post.data.children.firstOrNull()
                 val postDomain = PostDataMapper.map(post!!.data)
                 comments = body.comments.data.children
-                visitedPostsDao.insert(postDomain.toEntity())
+                postRepository.addPost(postDomain)
             }
         }
         isRefreshing = false

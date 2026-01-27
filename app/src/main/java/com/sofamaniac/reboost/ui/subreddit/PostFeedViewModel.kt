@@ -9,6 +9,10 @@
 package com.sofamaniac.reboost.ui.subreddit
 
 import android.util.Log
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -20,7 +24,7 @@ import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.domain.model.RedditAccount
-import com.sofamaniac.reboost.domain.repository.feed.PostRepository
+import com.sofamaniac.reboost.domain.repository.feed.FeedRepositoryCommon
 import com.sofamaniac.reboost.domain.repository.feed.PostsSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,12 +34,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
-abstract class PostFeedViewModel(private val repository: PostRepository, private val visitedPostsDao: VisitedPostsDao) : ViewModel() {
+abstract class PostFeedViewModel(
+    private val repository: FeedRepositoryCommon,
+    private val visitedPostsDao: VisitedPostsDao
+) : ViewModel() {
+
+    var listState by mutableStateOf(LazyListState())
     data class FeedParams(
         val account: RedditAccount,
         val sort: Sort,
         val timeframe: Timeframe?
-
     )
 
     private val _params = MutableStateFlow(
@@ -46,6 +54,9 @@ abstract class PostFeedViewModel(private val repository: PostRepository, private
         )
     )
     val params: StateFlow<FeedParams> = _params.asStateFlow()
+
+    fun observePost(id: String) = repository.observePost(id)
+
 
     private var postsSource: PostsSource? = null
     var data = Pager(

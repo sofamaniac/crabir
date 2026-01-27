@@ -15,8 +15,8 @@ import com.sofamaniac.reboost.data.remote.dto.Thing.More
 import com.sofamaniac.reboost.data.remote.dto.Thing.Post
 import com.sofamaniac.reboost.data.remote.dto.Thing.Subreddit
 import com.sofamaniac.reboost.data.remote.dto.post.PostId
+import com.sofamaniac.reboost.data.remote.dto.user.User
 import com.sofamaniac.reboost.data.remote.utils.CommentsResponseSerializer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import retrofit2.Response
 import retrofit2.http.GET
@@ -34,7 +34,7 @@ private const val API_LIMIT = 100
 interface RedditAPIService : CommentAPI, PostAPI, RedditAuthApi {
 
     @GET("api/v1/me.json")
-    suspend fun getIdentity(): Response<Identity>
+    suspend fun getIdentity(): Response<User>
 
     @GET("user/{user}/saved.json")
     suspend fun getSaved(
@@ -131,21 +131,3 @@ data class CommentsResponse(
     val more: More? = null,
 )
 
-@Serializable
-data class Identity(
-    @SerialName("id") val id: String,
-    @SerialName("name") val username: String,
-    @SerialName("over_18") val over18: Boolean = false,
-    @SerialName("icon_img") val iconImg: String = "",
-    @SerialName("created_utc") val createdUtc: Double = 0.0,
-    @SerialName("is_blocked") val isBlocked: Boolean = false,
-    @SerialName("is_friend") val isFriend: Boolean = false,
-    @SerialName("verified") val verified: Boolean,
-    @SerialName("awardee_karma") val awardeeKarma: Int = 0,
-    @SerialName("awarder_karma") val awarderKarma: Int = 0,
-    @SerialName("link_karma") val linkKarma: Int = 0,
-    @SerialName("comment_karma") val commentKarma: Int = 0,
-    @SerialName("total_karma") val totalKarma: Int = 0,
-    // TODO
-    //@SerialName("subreddit") val subreddit: UserSubreddit
-)

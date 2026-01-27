@@ -2,6 +2,7 @@ package com.sofamaniac.reboost.di
 
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.data.repository.AccountsRepository
+import com.sofamaniac.reboost.data.repository.PostRepository
 import com.sofamaniac.reboost.domain.repository.feed.HomeRepository
 import com.sofamaniac.reboost.domain.repository.feed.SavedRepository
 import com.sofamaniac.reboost.domain.repository.feed.SubredditPostsRepository
@@ -16,19 +17,29 @@ import jakarta.inject.Singleton
 object RepositoryModule {
 
     @Provides
-    fun provideHomeRepository(api: RedditAPIService): HomeRepository {
-        return HomeRepository(api)
+    fun provideHomeRepository(
+        postRepository: PostRepository,
+        api: RedditAPIService
+    ): HomeRepository {
+        return HomeRepository(postRepository, api)
     }
 
     @Provides
-    fun provideSubredditPostsRepository(api: RedditAPIService): SubredditPostsRepository {
-        return SubredditPostsRepository(api)
+    fun provideSubredditPostsRepository(
+        postRepository: PostRepository,
+        api: RedditAPIService
+    ): SubredditPostsRepository {
+        return SubredditPostsRepository(postRepository, api)
     }
 
     @Provides
     @Singleton
-    fun provideSavedRepository(api: RedditAPIService, accountsRepository: AccountsRepository): SavedRepository {
-        return SavedRepository(api, accountsRepository)
+    fun provideSavedRepository(
+        postRepository: PostRepository,
+        api: RedditAPIService,
+        accountsRepository: AccountsRepository
+    ): SavedRepository {
+        return SavedRepository(postRepository, api, accountsRepository)
     }
 }
 

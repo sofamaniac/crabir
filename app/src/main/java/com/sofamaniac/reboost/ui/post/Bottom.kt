@@ -39,67 +39,51 @@ import com.sofamaniac.reboost.BuildConfig
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.PostRoute
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
+import com.sofamaniac.reboost.data.repository.PostRepository
 import com.sofamaniac.reboost.domain.model.PostData
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 @HiltViewModel(assistedFactory = ButtonViewModel.Factory::class)
 class ButtonViewModel @AssistedInject constructor(
-    @Assisted val post: PostData,
-    private val reddit: RedditAPIService
+    @Assisted val postId: String,
+    private val reddit: RedditAPIService,
+    private val posts: PostRepository,
 ) : ViewModel() {
 
-    private val _likes = MutableStateFlow(post.relationship.liked)
-    private val _saved = MutableStateFlow(post.relationship.saved)
-
-    val likes: StateFlow<Boolean?> = _likes
-    val saved: StateFlow<Boolean> = _saved
-
+    val likes = posts.observePost(postId).map { it.relationship.liked }
+    val saved = posts.observePost(postId).map { it.relationship.saved }
 
     fun upvote() {
         viewModelScope.launch {
-            if (_likes.value == true) {
-                reddit.vote(post.name, 0)
-                _likes.value = null
-            } else {
-                reddit.vote(post.name, 1)
-                _likes.value = true
-            }
+            posts.upvote(postId)
         }
     }
 
     fun downvote() {
         viewModelScope.launch {
-            if (_likes.value == false) {
-                reddit.vote(post.name, 0)
-                _likes.value = null
-            } else {
-                reddit.vote(post.name, -1)
-                _likes.value = false
-            }
+            posts.downvote(postId)
         }
     }
 
     fun save(target: Boolean) {
         viewModelScope.launch {
             if (target) {
-                reddit.save(post.name)
+                posts.save(postId)
             } else {
-                reddit.unsave(post.name)
+                posts.unsave(postId)
             }
-            _saved.value = target
         }
     }
 
     @AssistedFactory
     interface Factory {
-        fun create(post: PostData): ButtonViewModel
+        fun create(postId: String): ButtonViewModel
     }
 
 }
@@ -150,13 +134,13 @@ fun BottomRow(
     viewModel: ButtonViewModel = hiltViewModel(
         key = post.id.id,
         creationCallback = { factory: ButtonViewModel.Factory ->
-            factory.create(post)
+            factory.create(post.id.id)
         })
 ) {
     val navController = LocalNavController.current!!
     val uriHandler = LocalUriHandler.current
-    val likes by viewModel.likes.collectAsState()
-    val saved by viewModel.saved.collectAsState()
+    val likes by viewModel.likes.collectAsState(initial = false)
+    val saved by viewModel.saved.collectAsState(initial = false)
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
         UpButton(post, likes) { viewModel.upvote() }
         DownButton(post, likes) { viewModel.downvote() }

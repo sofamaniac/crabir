@@ -28,7 +28,10 @@ interface PostAPI {
      * See [POST /api/vote](https://www.reddit.com/dev/api#POST_api_vote) for more information.
      */
     @POST("/api/vote")
-    suspend fun vote(@Query("id") postFullname: PostFullname, @Query("dir") dir: Int)
+    suspend fun vote(
+        @Query("id") postFullname: PostFullname,
+        @Query("dir") dir: Int
+    ): Response<Unit>
 
     @POST("/api/save")
     suspend fun save(@Query("id") postFullname: PostFullname): Response<Unit>

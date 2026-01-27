@@ -12,27 +12,75 @@ import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
+import com.sofamaniac.reboost.data.repository.PostRepository
 import com.sofamaniac.reboost.domain.model.PagedResponse
 import com.sofamaniac.reboost.domain.model.PostData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import retrofit2.Response
 
 interface FeedRepository {
-    suspend fun getPosts(after: String, sort: Sort, timeframe: Timeframe? = null): PagedResponse<Thing.Post>
+    suspend fun getPosts(
+        after: String,
+        sort: Sort,
+        timeframe: Timeframe? = null
+    ): PagedResponse<String>
+
+    suspend fun upvote(id: String): Result<Unit>
+    suspend fun downvote(id: String): Result<Unit>
+    suspend fun save(id: String): Result<Unit>
+    suspend fun unsave(id: String): Result<Unit>
 }
 
-abstract class PostRepository(
-    val api: RedditAPIService
+abstract class FeedRepositoryCommon(
+    val postRepository: PostRepository,
+    val api: RedditAPIService,
 ) : FeedRepository {
+
+    private var _seenPosts: Set<String> = emptySet()
+
+    fun observePost(id: String): Flow<PostData> {
+        return postRepository.observePost(id)
+    }
+
+    override suspend fun upvote(id: String): Result<Unit> {
+        return postRepository.upvote(id)
+    }
+
+    override suspend fun downvote(id: String): Result<Unit> {
+        return postRepository.downvote(id)
+    }
+
+    override suspend fun save(id: String): Result<Unit> {
+        return postRepository.save(id)
+    }
+
+    override suspend fun unsave(id: String): Result<Unit> {
+        return postRepository.unsave(id)
+    }
+
     protected suspend fun makeRequest(
         request: suspend () -> Response<Thing.Listing<Thing.Post>>
-    ): PagedResponse<Thing.Post> {
+    ): PagedResponse<String> {
         val response = request()
         if (response.isSuccessful) {
             Log.d("makeRequest", "code ${response.code()}")
             val listing = response.body()
             listing?.let {
+                val posts = listing.data.children.map { post ->
+                    PostDataMapper.map(post.data)
+                }.filter { post ->
+                    !_seenPosts.contains(post.id.id)
+                }
+                postRepository.addPosts(posts)
+                posts.forEach { data ->
+                    _seenPosts += data.id.id
+                }
+                val postsIds = posts.map { post ->
+                    post.id.id
+                }
                 return PagedResponse(
-                    data = it.data.children,
+                    data = postsIds,
                     after = it.data.after,
                     total = it.size
                 )
@@ -45,7 +93,7 @@ abstract class PostRepository(
 }
 
 class PostsSource(
-    private val repository: PostRepository
+    private val repository: FeedRepositoryCommon
 ) : PagingSource<String, PostData>() {
 
     private var sort: Sort = Sort.Best
@@ -56,17 +104,18 @@ class PostsSource(
     }
 
     override suspend fun load(params: LoadParams<String>): LoadResult<String, PostData> {
-        val posts = if (params.key != null) {
+        val postsId = if (params.key != null) {
             getPosts(params.key!!)
         } else {
             PagedResponse()
         }
+        val posts = postsId.data.map { id ->
+            repository.observePost(id).first()
+        }
         return LoadResult.Page(
             prevKey = null,
-            nextKey = posts.after,
-            data = posts.data.map {
-               PostDataMapper.map(it.data)
-            }
+            nextKey = postsId.after,
+            data = posts
         )
     }
 
@@ -74,7 +123,12 @@ class PostsSource(
         this.sort = sort
         this.timeframe = timeframe
     }
-    private suspend fun getPosts(after: String, sort: Sort = Sort.Best, timeframe: Timeframe? = null): PagedResponse<Thing.Post> {
+
+    private suspend fun getPosts(
+        after: String,
+        sort: Sort = Sort.Best,
+        timeframe: Timeframe? = null
+    ): PagedResponse<String> {
         return repository.getPosts(after, sort, timeframe)
     }
 

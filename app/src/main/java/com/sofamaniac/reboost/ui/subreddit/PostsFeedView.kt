@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Menu
@@ -70,7 +69,7 @@ fun PostFeedViewer(
 ) {
 
     val posts = state.data.collectAsLazyPagingItems()
-    val listState = rememberLazyListState()
+    val listState = state.listState
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,
         onRefresh = {
@@ -85,11 +84,10 @@ fun PostFeedViewer(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = listState,
         ) {
-            items(count = posts.itemCount, key = posts.itemKey { it.id.id }) { index ->
-                posts[index]?.let { post ->
-                    View(post,  showSubredditIcon = showSubredditIcon, visitPost = state::visitPost) {
-                        PostBody(post)
-                    }
+            items(count = posts.itemCount, key = posts.itemKey { p -> p.id.id }) { index ->
+                val post = posts[index]!!
+                View(post, showSubredditIcon = showSubredditIcon, visitPost = state::visitPost) {
+                    PostBody(post)
                 }
             }
         }
