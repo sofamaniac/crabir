@@ -8,16 +8,16 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0"
-    id("com.google.devtools.ksp") version "2.3.0"
+    id("com.google.devtools.ksp") version "2.3.2"
     id("com.jaredsburrows.license") version "0.9.8" apply false
-    id("com.google.dagger.hilt.android") version "2.57.1" apply false
-    id("tech.mappie.plugin") version "2.3.0-2.3.0" apply true
+    id("com.google.dagger.hilt.android") version "2.59" apply false
+    id("tech.mappie.plugin") version "2.3.0-2.3.1" apply true
 
 }
 
 
-tasks.updateDaemonJvm {
-    jvmVersion = JavaLanguageVersion.of(21)
-}
-
+//tasks.updateDaemonJvm {
+//    jvmVersion = JavaLanguageVersion.of(21)
+//}
+//
 
