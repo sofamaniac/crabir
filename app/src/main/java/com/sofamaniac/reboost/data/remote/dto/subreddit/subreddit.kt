@@ -16,17 +16,13 @@ import kotlinx.serialization.Serializable
 value class SubredditId(val id: String)
 
 @Serializable
-@JvmInline
-value class SubredditName(val name: String)
-
-@Serializable
 data class CommentContributionSettings(
     @SerialName("allowed_media_types") val allowedMediaTypes: List<String>? = null
 )
 
 fun dummySubredditData(): SubredditData {
     return SubredditData(
-        display_name = SubredditName(""),
+        display_name = "",
         id = SubredditId(""),
         icon_img = "",
         primary_color = "black",
@@ -46,7 +42,7 @@ data class SubredditData(
     val user_is_muted: Boolean = false,
     val user_can_flair_in_sr: Boolean? = null,
     /** The name of the subreddit (e.g. "unixporn") */
-    val display_name: SubredditName = SubredditName(""),
+    val display_name: String = "",
     val header_img: String? = null,
     val title: String = "",
     val allow_galleries: Boolean = false,

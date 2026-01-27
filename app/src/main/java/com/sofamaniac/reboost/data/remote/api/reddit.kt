@@ -15,7 +15,6 @@ import com.sofamaniac.reboost.data.remote.dto.Thing.More
 import com.sofamaniac.reboost.data.remote.dto.Thing.Post
 import com.sofamaniac.reboost.data.remote.dto.Thing.Subreddit
 import com.sofamaniac.reboost.data.remote.dto.post.PostId
-import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditName
 import com.sofamaniac.reboost.data.remote.utils.CommentsResponseSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -58,7 +57,7 @@ interface RedditAPIService : CommentAPI, PostAPI, RedditAuthApi {
     ): Response<Listing<Post>>
 
     @GET("/r/{subreddit}/about.json")
-    suspend fun getSubInfo(@Path("subreddit") subreddit: SubredditName): Response<Subreddit>
+    suspend fun getSubInfo(@Path("subreddit") subreddit: String): Response<Subreddit>
 
     @GET("user/{username}/about.json")
     suspend fun getUserAbout(@Path("username") username: String): Response<Listing<Post>>
@@ -73,7 +72,7 @@ interface RedditAPIService : CommentAPI, PostAPI, RedditAuthApi {
 
     @GET("/r/{subreddit}/{sort}.json")
     suspend fun getSubreddit(
-        @Path("subreddit") subreddit: SubredditName,
+        @Path("subreddit") subreddit: String,
         @Path("sort") sort: PostSort = PostSort.Best,
         @Query("after") after: String? = null,
         @Query("before") before: String? = null,
@@ -95,7 +94,7 @@ interface RedditAPIService : CommentAPI, PostAPI, RedditAuthApi {
      */
     @GET("/r/{subreddit}/comments/{id}.json")
     suspend fun getComments(
-        @Path("subreddit") subreddit: SubredditName,
+        @Path("subreddit") subreddit: String,
         @Path("id") id: PostId,
         @Query("showedits") showEdits: Boolean = true,
         @Query("showmore") showMore: Boolean = true,

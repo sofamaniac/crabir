@@ -9,15 +9,12 @@
 package com.sofamaniac.reboost.ui.subredditList
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.DrawerState
@@ -41,13 +38,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.sofamaniac.reboost.ui.subreddit.SubredditIcon
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,7 +95,7 @@ fun SubredditListViewer(
     val subscriptions by viewModel.subscriptions.collectAsState()
 
     val sortedSubs =
-        subscriptions?.sortedBy { it.data.display_name.name.lowercase() } ?: emptyList()
+        subscriptions?.sortedBy { it.data.display_name.lowercase() } ?: emptyList()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
@@ -131,30 +125,7 @@ fun SubredditListViewer(
                 state = listState
             ) {
                 items(count = sortedSubs.size) { index ->
-                    sortedSubs[index].let { subs ->
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        ) {
-                            SubredditIcon(
-                                subs.data.display_name,
-                                subs.data.icon,
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                            )
-                            Text(
-                                text = subs.data.display_name.name,
-                                modifier = Modifier.clickable {
-                                    navController.navigate(
-                                        com.sofamaniac.reboost.SubredditRoute(
-                                            subs.data.display_name.name
-                                        )
-                                    )
-                                })
-                        }
-                    }
+                    Tile(sortedSubs[index])
                 }
             }
         }

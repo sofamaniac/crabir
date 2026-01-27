@@ -38,7 +38,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditName
 import com.sofamaniac.reboost.ui.ProfileView
 import com.sofamaniac.reboost.ui.drawer.DrawerContent
 import com.sofamaniac.reboost.ui.drawer.DrawerViewModel
@@ -172,21 +171,20 @@ fun NavigationGraph(
         }
         composable<SearchRoute> {
             SubredditViewer(
-                SubredditName("artknights"),
+                "artknights",
                 navController, selected,
             )
         }
         composable<InboxRoute> {
             SubredditViewer(
-                SubredditName("artknights"),
+                "artknights",
                 navController, selected,
             )
         }
         composable<SubredditRoute> { navBackStackEntry ->
             val subreddit = navBackStackEntry.toRoute<SubredditRoute>().subreddit
-            val subredditName = SubredditName(subreddit)
             SubredditViewer(
-                subredditName,
+                subreddit,
                 navController,
                 selected,
             )

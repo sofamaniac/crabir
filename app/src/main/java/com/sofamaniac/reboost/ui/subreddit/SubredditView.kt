@@ -18,7 +18,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
-import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditName
 import com.sofamaniac.reboost.domain.repository.feed.SubredditPostsRepository
 import com.sofamaniac.reboost.ui.TabBar
 import dagger.assisted.Assisted
@@ -30,19 +29,19 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubredditViewer(
-    subreddit: SubredditName,
+    subreddit: String,
     navController: NavController,
     selected: State<Int>,
     modifier: Modifier = Modifier,
-    viewModel: SubredditViewModel = hiltViewModel<SubredditViewModel, SubredditViewModel.Factory> {
-        factory -> factory.create(subreddit.name)
+    viewModel: SubredditViewModel = hiltViewModel<SubredditViewModel, SubredditViewModel.Factory> { factory ->
+        factory.create(subreddit)
     },
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     Scaffold(
         topBar = {
             TopBar(
-                subreddit.name,
+                subreddit,
                 viewModel,
                 rememberDrawerState(DrawerValue.Closed), scrollBehavior,
             )
@@ -67,7 +66,7 @@ class SubredditViewModel @AssistedInject constructor(
 ): PostFeedViewModel(repository, visitedPostsDao) {
 
     init {
-        repository.updateSubreddit(SubredditName(subredditName))
+        repository.updateSubreddit(subredditName)
     }
 
     @AssistedFactory

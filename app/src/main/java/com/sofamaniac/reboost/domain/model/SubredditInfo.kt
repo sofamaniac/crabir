@@ -5,12 +5,11 @@
 package com.sofamaniac.reboost.domain.model
 
 import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditId
-import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class SubredditInfo(
-    val name: SubredditName,
+    val name: String,
     val subredditId: SubredditId,
     val subredditPrefixed: String,
     val subredditSubscribers: Int,

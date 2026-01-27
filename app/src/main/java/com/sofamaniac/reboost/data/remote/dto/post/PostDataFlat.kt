@@ -11,7 +11,6 @@ package com.sofamaniac.reboost.data.remote.dto.post
 import com.sofamaniac.reboost.data.remote.dto.LinkFlairRichtext
 import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditDetails
 import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditId
-import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditName
 import com.sofamaniac.reboost.data.remote.utils.FalseOrTimestampSerializer
 import com.sofamaniac.reboost.data.remote.utils.InstantAsFloatSerializer
 import com.sofamaniac.reboost.data.remote.utils.MediaMetadataSerializer
@@ -97,7 +96,7 @@ data class PostDataFlat(
     // ================================================ //
     // SUBREDDIT INFORMATION
     // ================================================ //
-    @SerialName("subreddit") val subreddit: SubredditName,
+    @SerialName("subreddit") val subreddit: String,
     @SerialName("subreddit_id") val subredditId: SubredditId,
     @SerialName("subreddit_name_prefixed") val subredditNamePrefixed: String = "",
     @SerialName("subreddit_subscribers") val subredditSubscribers: Int = 0,

@@ -8,16 +8,15 @@ import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.data.remote.dto.Thing.Post
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
-import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditName
 import com.sofamaniac.reboost.domain.model.PagedResponse
 import jakarta.inject.Inject
 
 class SubredditPostsRepository @Inject constructor(
     api: RedditAPIService,
 ) : PostRepository(api), FeedRepository {
-    private var currentSubreddit: SubredditName? = null
+    private var currentSubreddit: String? = null
 
-    fun updateSubreddit(subreddit: SubredditName) {
+    fun updateSubreddit(subreddit: String) {
         currentSubreddit = subreddit
     }
 

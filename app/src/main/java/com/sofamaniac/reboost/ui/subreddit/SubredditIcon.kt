@@ -22,12 +22,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import coil3.compose.AsyncImage
 import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditIcon
-import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditName
 
 //@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun SubredditIcon(
-    subreddit: SubredditName,
+    subreddit: String,
     icon: SubredditIcon?,
     modifier: Modifier = Modifier
 ) {
@@ -35,7 +34,7 @@ fun SubredditIcon(
         is SubredditIcon.Icon ->
             AsyncImage(
                 model = icon.url,
-                contentDescription = "${subreddit.name} icon",
+                contentDescription = "${subreddit} icon",
                 modifier
             )
 

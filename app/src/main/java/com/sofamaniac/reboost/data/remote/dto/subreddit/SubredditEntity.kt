@@ -21,7 +21,7 @@ import com.sofamaniac.reboost.data.remote.dto.Thing.Subreddit
 data class SubredditEntity(
     @PrimaryKey val id: SubredditId,
     @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "display_name") val displayName: SubredditName,
+    @ColumnInfo(name = "display_name") val displayName: String,
     @ColumnInfo(name = "display_name_prefixed") val displayNamePrefixed: String,
     @ColumnInfo(name = "icon_img") val iconImg: String,
     @ColumnInfo(name = "primary_color") val primaryColor: String? = "#aaaaaa",
@@ -49,7 +49,7 @@ interface SubredditDao {
     fun getById(id: SubredditId): SubredditEntity?
 
     @Query("SELECT * FROM SubredditEntity WHERE display_name = :name")
-    fun getByName(name: SubredditName): SubredditEntity?
+    fun getByName(name: String): SubredditEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(subreddit: SubredditEntity)
