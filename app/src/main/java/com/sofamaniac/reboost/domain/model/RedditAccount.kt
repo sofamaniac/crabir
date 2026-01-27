@@ -41,6 +41,9 @@ data class RedditAccount(
         fun anonymous(): RedditAccount {
             return RedditAccount(-1, "Anonymous", "", AuthState())
         }
+        fun unitialized(id: Int, authState: AuthState): RedditAccount {
+            return RedditAccount(id, "", "", authState)
+        }
     }
 
     fun isAnonymous(): Boolean {

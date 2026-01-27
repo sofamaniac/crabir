@@ -13,6 +13,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.reboost.BuildConfig
+import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.data.remote.api.auth.AuthConfig
 import com.sofamaniac.reboost.data.remote.api.auth.BasicAuthClient
 import com.sofamaniac.reboost.data.remote.dto.Thing
@@ -45,6 +46,7 @@ class DrawerViewModel @Inject constructor(
     private val authService: AuthorizationService,
     private val accountsRepository: AccountsRepository,
     private val subsRepository: SubscriptionsRepository,
+    private val redditApi: RedditAPIService,
 ) : ViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
@@ -121,19 +123,33 @@ class DrawerViewModel @Inject constructor(
     private fun save(authState: AuthState) {
         viewModelScope.launch {
             try {
-                val username = fetchUsername(authState.accessToken!!)
                 val accounts = accountsRepository.accounts.first()
-                accountsRepository.addAccount(RedditAccount(accounts.size, username, "", authState))
+                val newAccount = RedditAccount.unitialized(accounts.size, authState)
+                accountsRepository.addAccount(newAccount)
+                accountsRepository.setActiveAccount(accounts.size)
+                try {
+                    val user = redditApi.getIdentity()
+                    if (user.isSuccessful) {
+                        val identity = user.body()!!
+                        accountsRepository.updateAccount(
+                            accounts.size,
+                            newAccount.copy(
+                                username = identity.username,
+                                thumbnailUrl = identity.iconImg
+                            )
+                        )
+                    } else {
+                        Log.e("LoginViewModel", "Failed to get user info: ${user.message()}")
+                        accountsRepository.deleteAccount(accounts.size)
+                    }
+                } catch (e: Exception) {
+                    Log.e("LoginViewModel", "Failed to get user info: $e")
+                    accountsRepository.deleteAccount(accounts.size)
+                }
             } catch (e: Exception) {
                 Log.e("LoginViewModel", "Failed to save account: $e")
                 _loginState.value = LoginState.Error("Failed to save account.")
             }
         }
     }
-}
-
-private suspend fun fetchUsername(accessToken: String): String {
-    // GET https://oauth.reddit.com/api/v1/me
-    // Use OkHttp directly or a lightweight Retrofit service
-    return "sofamaniacnsfw" // optional next step
 }

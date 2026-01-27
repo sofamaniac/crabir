@@ -11,7 +11,11 @@ interface AccountsRepository {
 
     suspend fun addAccount(account: RedditAccount)
     suspend fun setActiveAccount(accountId: Int)
+
+    /** Remove account from the list. Also remove all uninitialized accounts. */
     suspend fun deleteAccount(accountId: Int)
+
+    suspend fun updateAccount(accountId: Int, account: RedditAccount)
 
     //suspend fun refreshToken(accountId: Int)
     suspend fun updateAuthState(accountId: Int, authState: AuthState)

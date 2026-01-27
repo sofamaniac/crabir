@@ -31,8 +31,6 @@ class RedditAuthenticator @Inject constructor(
     private val activeAccount: StateFlow<RedditAccount> = accountsRepository.activeAccount
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        Log.d("RedditAuthenticator", "Authenticating")
-
         Log.d("RedditAuthenticator", "Authenticating with $activeAccount")
         val activeAccount = activeAccount.value
 
@@ -83,45 +81,4 @@ class RedditAuthenticator @Inject constructor(
             null
         }
     }
-
-    private fun responseCount(response: Response): Int {
-        var result = 1
-        var current = response.priorResponse
-        while (current != null) {
-            result++
-            current = current.priorResponse
-        }
-        return result
-    }
 }
-
-//class RedditAuthenticator(
-//    private val accountsRepository: AccountsRepository
-//) : Authenticator {
-//
-//    override fun authenticate(route: Route?, response: okhttp3.Response): Request? {
-//        val accountId: Int = runBlocking {
-//            accountsRepository.activeAccountId.last()
-//        }
-//        if (responseCount(response) >= 2) return null
-//
-//        val newToken = _root_ide_package_.kotlinx.coroutines.runBlocking{
-//            accountsRepository.refreshToken(accountId)
-//            accountsRepository.activeAccount.last().accessToken
-//        }
-//
-//        return response.request.newBuilder()
-//            .header("Authorization", "Bearer ${newToken}")
-//            .build()
-//    }
-//
-//    private fun responseCount(response: okhttp3.Response): Int {
-//        var count = 1
-//        var prior = response.priorResponse
-//        while (prior != null) {
-//            count++
-//            prior = prior.priorResponse
-//        }
-//        return count
-//    }
-//}

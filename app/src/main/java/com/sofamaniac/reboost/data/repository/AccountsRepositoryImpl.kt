@@ -135,7 +135,20 @@ class AccountsRepositoryImpl(
 
     override suspend fun deleteAccount(accountId: Int) {
         dataStore.updateData { accounts ->
-            accounts.copy(accounts = accounts.accounts.filter { it.id != accountId })
+            accounts.copy(accounts = accounts.accounts.filter { it.id != accountId && it.username.isNotEmpty() })
+        }
+    }
+
+    override suspend fun updateAccount(accountId: Int, account: RedditAccount) {
+        dataStore.updateData { accounts ->
+            val accountIndex = accounts.accounts.indexOfFirst { it.id == accountId }
+            if (accountIndex != -1) {
+                val accountsList = accounts.accounts.toMutableList()
+                accountsList[accountIndex] = account
+                accounts.copy(accounts = accountsList)
+            } else {
+                accounts
+            }
         }
     }
 
