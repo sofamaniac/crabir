@@ -12,7 +12,7 @@ import android.util.Log
 import com.sofamaniac.reboost.data.repository.AccountsRepository
 import com.sofamaniac.reboost.domain.model.RedditAccount
 import jakarta.inject.Inject
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.ClientAuthentication
@@ -25,16 +25,16 @@ import kotlin.coroutines.suspendCoroutine
 class RedditAuthenticator @Inject constructor(
     private val accountsRepository: AccountsRepository,
     private val authService: AuthorizationService,
-    private val clientAuth: ClientAuthentication
+    private val clientAuth: ClientAuthentication,
 ) : Interceptor {
+
+    private val activeAccount: StateFlow<RedditAccount> = accountsRepository.activeAccount
 
     override fun intercept(chain: Interceptor.Chain): Response {
         Log.d("RedditAuthenticator", "Authenticating")
 
-        val activeAccount = runBlocking {
-            accountsRepository.activeAccount.first()
-        }
         Log.d("RedditAuthenticator", "Authenticating with $activeAccount")
+        val activeAccount = activeAccount.value
 
         if (activeAccount.isAnonymous()) {
             Log.w("RedditAuthenticator", "Anonymous account")
@@ -45,7 +45,9 @@ class RedditAuthenticator @Inject constructor(
 
         val newAccessToken = if (activeAccount.auth.needsTokenRefresh) {
             refreshToken(activeAccount)
-        } else { activeAccount.auth.accessToken }
+        } else {
+            activeAccount.auth.accessToken
+        }
 
         val request = chain.request().newBuilder()
             .header("Authorization", "Bearer $newAccessToken").build()

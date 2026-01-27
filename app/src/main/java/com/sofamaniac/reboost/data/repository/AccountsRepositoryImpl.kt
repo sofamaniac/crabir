@@ -16,8 +16,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
 import androidx.datastore.dataStore
 import com.sofamaniac.reboost.domain.model.RedditAccount
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -66,26 +71,53 @@ object AccountsSerializer : Serializer<Accounts> {
 
 class AccountsRepositoryImpl(
     context: Context,
+    private val coroutineScope: CoroutineScope
 ) : AccountsRepository {
     private val dataStore: DataStore<Accounts> = context.dataStore
-    override val accounts: Flow<List<RedditAccount>> = dataStore.data.map {
+    private val accountsData: StateFlow<Accounts> = dataStore.data.onEach {
+        Log.d("AccountsRepositoryImpl", "accountsData emitted: ${it.activeId}")
+    }.stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.Eagerly,
+        initialValue = Accounts(emptyList(), -1)
+    )
+
+    override val accounts: StateFlow<List<RedditAccount>> = accountsData.map {
         Log.d("AccountsRepositoryImpl", "accounts: ${it.accounts}")
         it.accounts
-    }
-    override val activeAccount: Flow<RedditAccount> = dataStore.data.map {
-        if (it.activeId >= it.accounts.size || it.activeId < 0) {
-            Log.d("AccountsRepositoryImpl", "Invalid id: activeId: ${it.activeId}")
-            RedditAccount.anonymous()
-        } else {
-            Log.d("AccountsRepositoryImpl", "activeId: ${it.activeId}")
-            it.accounts[it.activeId]
-        }
-    }
-    override val activeAccountId: Flow<Int>
-        get() = dataStore.data.map { accounts ->
+    }.stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList()
+    )
+
+    override val activeAccount: StateFlow<RedditAccount>
+        get() = accounts.combine(activeAccountId) { accounts, activeId ->
+            if (activeId >= accounts.size || activeId < 0) {
+                if (activeId >= accounts.size) {
+                    Log.e("AccountsRepositoryImpl", "Invalid id: activeId: ${activeId}")
+                }
+                RedditAccount.anonymous()
+            } else {
+                Log.d("AccountsRepositoryImpl", "activeId: ${activeId}")
+                accounts[activeId]
+            }
+
+        }.stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.Eagerly,
+            initialValue = RedditAccount.anonymous()
+        )
+
+    override val activeAccountId: StateFlow<Int>
+        get() = accountsData.map { accounts ->
             Log.d("AccountsRepositoryImpl", "activeId: ${accounts.activeId}")
             accounts.activeId
-        }
+        }.stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.Eagerly,
+            initialValue = -1
+        )
 
     override suspend fun addAccount(account: RedditAccount) {
         Log.d("AccountsRepositoryImpl", "addAccount: $account")
@@ -95,6 +127,7 @@ class AccountsRepositoryImpl(
     }
 
     override suspend fun setActiveAccount(accountId: Int) {
+        Log.d("AccountsRepositoryImpl", "setActiveAccount: $accountId")
         dataStore.updateData { accounts ->
             accounts.copy(activeId = accountId)
         }
@@ -107,6 +140,7 @@ class AccountsRepositoryImpl(
     }
 
     override suspend fun updateAuthState(accountId: Int, authState: AuthState) {
+        Log.d("AccountsRepositoryImpl", "updateAuthState: $accountId")
         dataStore.updateData { accounts ->
             var account = accounts.accounts.fastFirstOrNull { it.id == accountId }
             if (account != null) {
@@ -121,20 +155,6 @@ class AccountsRepositoryImpl(
         }
 
     }
-
-//    override suspend fun refreshToken(accountId: Int) {
-//        dataStore.updateData { accounts ->
-//            var account = accounts.accounts[accountId]
-//            // TODO: handle errors
-//            val token = tokenRefresher.refreshToken(account.refreshToken)!!
-//            account =
-//                account.copy(accessToken = token.accessToken!!, refreshToken = token.refreshToken!!)
-//            val accountsList = accounts.accounts.toMutableList()
-//            accountsList[accountId] = account
-//            accounts.copy(accounts = accountsList)
-//        }
-//
-//    }
 
     override suspend fun clearAll() {
         dataStore.updateData {

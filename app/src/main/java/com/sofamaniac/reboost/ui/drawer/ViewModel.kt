@@ -13,17 +13,20 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.reboost.BuildConfig
-import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.data.remote.api.auth.AuthConfig
 import com.sofamaniac.reboost.data.remote.api.auth.BasicAuthClient
+import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.repository.AccountsRepository
+import com.sofamaniac.reboost.data.repository.SubscriptionsRepository
 import com.sofamaniac.reboost.domain.model.RedditAccount
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
@@ -41,8 +44,7 @@ sealed class LoginState {
 class DrawerViewModel @Inject constructor(
     private val authService: AuthorizationService,
     private val accountsRepository: AccountsRepository,
-    private val authConfig: AuthConfig,
-    private val redditApi: RedditAPIService,
+    private val subsRepository: SubscriptionsRepository,
 ) : ViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
@@ -52,6 +54,13 @@ class DrawerViewModel @Inject constructor(
     val activeAccount = accountsRepository.activeAccount
 
     val serviceConfig = AuthConfig()
+
+    val subscriptions: StateFlow<List<Thing.Subreddit>?>
+        get() = subsRepository.subscriptions.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList<Thing.Subreddit>()
+        )
 
     fun setActiveAccount(accountId: Int) {
         viewModelScope.launch {

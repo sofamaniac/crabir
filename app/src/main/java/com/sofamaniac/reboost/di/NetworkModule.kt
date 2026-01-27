@@ -38,18 +38,20 @@ object NetworkModule {
         authService: AuthorizationService,
         clientAuth: ClientAuthentication,
     ): RedditAuthenticator {
-        return RedditAuthenticator(accountsRepository, authService, clientAuth)
+        return RedditAuthenticator(
+            accountsRepository, authService, clientAuth
+        )
     }
 
     @Provides
     @Singleton
     fun provideRateLimiter(): RateLimitInterceptor {
-       return RateLimitInterceptor()
+        return RateLimitInterceptor()
     }
 
     @Provides
     @Singleton
-    fun provideForceJsonInterceptor() : ForceJsonInterceptor {
+    fun provideForceJsonInterceptor(): ForceJsonInterceptor {
         return ForceJsonInterceptor()
     }
 
@@ -73,7 +75,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideJson() : Json {
+    fun provideJson(): Json {
         return Json {
             ignoreUnknownKeys = true
             isLenient = true
@@ -100,3 +102,4 @@ object NetworkModule {
             .create(RedditAPIService::class.java)
     }
 }
+

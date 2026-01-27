@@ -10,6 +10,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import jakarta.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -18,10 +21,20 @@ object AccountsModule {
     @Provides
     @Singleton
     fun providesAccountsRepository(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
+        @ApplicationScope coroutineScope: CoroutineScope,
     ): AccountsRepositoryImpl {
-        return AccountsRepositoryImpl(context)
+        return AccountsRepositoryImpl(
+            context, coroutineScope
+        )
 
+    }
+
+    @ApplicationScope
+    @Provides
+    @Singleton
+    fun provideApplicationScope(): CoroutineScope {
+        return CoroutineScope(SupervisorJob() + Dispatchers.Default)
     }
 }
 
@@ -35,3 +48,5 @@ abstract class AccountsModuleAbstract {
         accountsRepositoryImpl: AccountsRepositoryImpl
     ): AccountsRepository
 }
+
+annotation class ApplicationScope

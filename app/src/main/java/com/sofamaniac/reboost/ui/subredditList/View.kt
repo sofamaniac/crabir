@@ -48,48 +48,47 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.sofamaniac.reboost.ui.subreddit.SubredditIcon
-import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun TopBar(drawerState: DrawerState, scrollBehavior: TopAppBarScrollBehavior?) {
-        var expanded by remember { mutableStateOf(true) }
-        var currentSearch by remember { mutableStateOf("") }
-        TopAppBar(scrollBehavior = scrollBehavior, title = {
-            Row {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to Home")
-                }
-                SearchBar(
-                    inputField = {
-                        SearchBarDefaults.InputField(
-                            query = currentSearch,
-                            onQueryChange = { currentSearch = it },
-                            onSearch = { },
-                            placeholder = { Text("Go to ...") },
-                            expanded = expanded,
-                            onExpandedChange = { expanded = it },
+@Composable
+fun TopBar(drawerState: DrawerState, scrollBehavior: TopAppBarScrollBehavior?) {
+    var expanded by remember { mutableStateOf(true) }
+    var currentSearch by remember { mutableStateOf("") }
+    TopAppBar(scrollBehavior = scrollBehavior, title = {
+        Row {
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to Home")
+            }
+            SearchBar(
+                inputField = {
+                    SearchBarDefaults.InputField(
+                        query = currentSearch,
+                        onQueryChange = { currentSearch = it },
+                        onSearch = { },
+                        placeholder = { Text("Go to ...") },
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it },
 //                        modifier = TODO(),
 //                        enabled = TODO(),
 //                        leadingIcon = TODO(),
 //                        trailingIcon = TODO(),
 //                        colors = TODO(),
 //                        interactionSource = TODO(),
-                        )
-                    },
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it },
+                    )
+                },
+                expanded = expanded,
+                onExpandedChange = { expanded = it },
 //                modifier = TODO(),
 //                shape = TODO(),
 //                colors = TODO(),
 //                tonalElevation = TODO(),
 //                shadowElevation = TODO(),
 //                windowInsets = TODO(),
-                ) { }
-            }
-        })
-    }
+            ) { }
+        }
+    })
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,7 +118,7 @@ fun SubredditListViewer(
             isRefreshing = isRefreshing,
             onRefresh = {
                 isRefreshing = true
-                scope.launch { viewModel.refresh() }
+                //scope.launch { viewModel.refresh() }
                 isRefreshing = false
             },
             modifier = Modifier.padding(innerPadding)
