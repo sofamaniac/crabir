@@ -24,82 +24,117 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.sofamaniac.reboost.BuildConfig
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.PostRoute
-import com.sofamaniac.reboost.data.remote.api.RedditAPI
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.domain.model.PostData
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
+@HiltViewModel(assistedFactory = ButtonViewModel.Factory::class)
+class ButtonViewModel @AssistedInject constructor(
+    @Assisted val post: PostData,
+    private val reddit: RedditAPIService
+) : ViewModel() {
+
+    private val _likes = MutableStateFlow(post.relationship.liked)
+    private val _saved = MutableStateFlow(post.relationship.saved)
+
+    val likes: StateFlow<Boolean?> = _likes
+    val saved: StateFlow<Boolean> = _saved
+
+
+    fun upvote() {
+        viewModelScope.launch {
+            if (_likes.value == true) {
+                reddit.vote(post.name, 0)
+                _likes.value = null
+            } else {
+                reddit.vote(post.name, 1)
+                _likes.value = true
+            }
+        }
+    }
+
+    fun downvote() {
+        viewModelScope.launch {
+            if (_likes.value == false) {
+                reddit.vote(post.name, 0)
+                _likes.value = null
+            } else {
+                reddit.vote(post.name, -1)
+                _likes.value = false
+            }
+        }
+    }
+
+    fun save(target: Boolean) {
+        viewModelScope.launch {
+            if (target) {
+                reddit.save(post.name)
+            } else {
+                reddit.unsave(post.name)
+            }
+            _saved.value = target
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(post: PostData): ButtonViewModel
+    }
+
+}
+
 @Composable
-private fun UpButton(post: PostData, reddit: RedditAPIService) {
-    val scope = rememberCoroutineScope()
-    val likes = remember { mutableStateOf(post.relationship.liked) }
+private fun UpButton(post: PostData, likes: Boolean?, onClick: () -> Unit) {
     val buttonColor = animateColorAsState(
-        targetValue = if (likes.value == true) Color.Red else Color.Gray,
+        targetValue = if (likes == true) Color.Red else Color.Gray,
         label = "button color"
     )
-    IconButton(onClick = {
-        if (likes.value == true) {
-            scope.launch { reddit.vote(post.name, 0) }
-            likes.value = null
-        } else {
-            scope.launch { reddit.vote(post.name, 1) }
-            likes.value = true
-        }
-    }) {
+    IconButton(
+        onClick = onClick
+    ) {
         Icon(Icons.Filled.ThumbUp, "upvote", tint = buttonColor.value)
     }
 }
 
 @Composable
-private fun DownButton(post: PostData, reddit: RedditAPIService) {
-    val scope = rememberCoroutineScope()
-    var likes by remember { mutableStateOf(post.relationship.liked) }
+private fun DownButton(post: PostData, likes: Boolean?, onClick: () -> Unit) {
     val buttonColor = animateColorAsState(
         targetValue = if (likes == false) Color.Blue else Color.Gray,
         label = "button color"
     )
-    IconButton(onClick = {
-        if (likes == false) {
-            scope.launch { reddit.vote(post.name, 0) }
-            likes = null
-        } else {
-            scope.launch { reddit.vote(post.name, 1) }
-            likes = false
-        }
-    }) {
-        Icon(Icons.Filled.ThumbDown, "upvote", tint = buttonColor.value)
+    IconButton(onClick = onClick) {
+        Icon(Icons.Filled.ThumbDown, "downvote", tint = buttonColor.value)
     }
 }
 
 @Composable
-private fun SavedButton(post: PostData, reddit: RedditAPIService) {
-    val scope = rememberCoroutineScope()
-    var saved by remember { mutableStateOf(post.relationship.saved) }
+private fun SavedButton(post: PostData, saved: Boolean, onClick: () -> Unit) {
     val buttonColor = animateColorAsState(
         targetValue = if (saved) Color.Yellow else Color.Gray,
         label = "button color"
     )
-    IconButton(onClick = {
-        if (saved) {
-            scope.launch { reddit.unsave(post.name) }
-        } else {
-            scope.launch { reddit.save(post.name) }
-        }
-        saved = !saved
-    }) {
+    IconButton(onClick = onClick) {
         if (saved) {
             Icon(Icons.Filled.Bookmark, "save", tint = buttonColor.value)
         } else {
@@ -109,16 +144,23 @@ private fun SavedButton(post: PostData, reddit: RedditAPIService) {
 }
 
 @Composable
-fun BottomRow(post: PostData, modifier: Modifier = Modifier) {
+fun BottomRow(
+    post: PostData,
+    modifier: Modifier = Modifier,
+    viewModel: ButtonViewModel = hiltViewModel(
+        key = post.id.id,
+        creationCallback = { factory: ButtonViewModel.Factory ->
+            factory.create(post)
+        })
+) {
     val navController = LocalNavController.current!!
     val uriHandler = LocalUriHandler.current
-    val service = RedditAPI()
-    service.init(LocalContext.current)
-    val reddit = service.service
+    val likes by viewModel.likes.collectAsState()
+    val saved by viewModel.saved.collectAsState()
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-        UpButton(post, reddit)
-        DownButton(post, reddit)
-        SavedButton(post, reddit)
+        UpButton(post, likes) { viewModel.upvote() }
+        DownButton(post, likes) { viewModel.downvote() }
+        SavedButton(post, saved) { viewModel.save(!saved) }
         IconButton(onClick = {
             navController.navigate(PostRoute(post.permalink))
         }) {

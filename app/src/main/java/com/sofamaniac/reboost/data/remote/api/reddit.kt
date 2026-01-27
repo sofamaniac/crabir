@@ -8,12 +8,7 @@
 
 package com.sofamaniac.reboost.data.remote.api
 
-import android.content.Context
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import com.sofamaniac.reboost.BuildConfig
-import com.sofamaniac.reboost.data.remote.api.auth.BasicAuthClient
 import com.sofamaniac.reboost.data.remote.api.auth.RedditAuthApi
-import com.sofamaniac.reboost.data.remote.api.auth.RedditAuthenticator
 import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.remote.dto.Thing.Listing
 import com.sofamaniac.reboost.data.remote.dto.Thing.More
@@ -21,28 +16,13 @@ import com.sofamaniac.reboost.data.remote.dto.Thing.Post
 import com.sofamaniac.reboost.data.remote.dto.Thing.Subreddit
 import com.sofamaniac.reboost.data.remote.dto.post.PostId
 import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditName
-import com.sofamaniac.reboost.data.remote.interceptors.ForceJsonInterceptor
-import com.sofamaniac.reboost.data.remote.interceptors.NetworkInterceptor
-import com.sofamaniac.reboost.data.remote.interceptors.RateLimitInterceptor
-import com.sofamaniac.reboost.data.remote.interceptors.loggingInterceptor
 import com.sofamaniac.reboost.data.remote.utils.CommentsResponseSerializer
-import com.sofamaniac.reboost.data.remote.utils.URISerializer
-import com.sofamaniac.reboost.data.remote.utils.URLSerializer
-import com.sofamaniac.reboost.data.repository.AccountsRepositoryImpl
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import net.openid.appauth.AuthorizationService
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
 import retrofit2.Response
-import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import java.net.URI
-import java.net.URL
 import com.sofamaniac.reboost.data.remote.dto.Timeframe as PostTimeframe
 import com.sofamaniac.reboost.data.remote.dto.comment.Sort as CommentSort
 import com.sofamaniac.reboost.data.remote.dto.post.Sort as PostSort
@@ -156,49 +136,3 @@ data class CommentsResponse(
 data class Identity(
     @SerialName("name") val username: String = "",
 )
-
-class RedditAPI {
-    lateinit var service: RedditAPIService
-    lateinit var authService: AuthorizationService
-    fun init(context: Context) {
-        authService = AuthorizationService(context)
-        val contentType = "application/json".toMediaType()
-        val json = Json {
-            ignoreUnknownKeys = true
-            isLenient = true
-            coerceInputValues = true
-            serializersModule = SerializersModule {
-                contextual(URL::class, URLSerializer)
-                contextual(URI::class, URISerializer)
-            }
-        }
-
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(json.asConverterFactory(contentType))
-            .client(okhttpClient(context))
-            .build()
-        service = retrofit.create(RedditAPIService::class.java)
-
-    }
-
-    private fun okhttpClient(context: Context): OkHttpClient {
-        val accountsRepository = AccountsRepositoryImpl(context)
-
-        return OkHttpClient.Builder()
-            .addInterceptor(
-                RedditAuthenticator(
-                    accountsRepository,
-                    authService,
-                    BasicAuthClient(BuildConfig.REDDIT_CLIENT_ID)
-                )
-            )
-            //.addInterceptor(AuthInterceptor(context))
-            .addInterceptor(RateLimitInterceptor())
-            .addInterceptor(ForceJsonInterceptor())
-            .addInterceptor(NetworkInterceptor())
-            .addInterceptor(loggingInterceptor)
-            .build()
-    }
-}
