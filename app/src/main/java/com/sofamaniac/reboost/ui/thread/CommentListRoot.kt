@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.sofamaniac.reboost.LocalNavController
@@ -23,15 +25,16 @@ fun CommentListRoot(
     rememberCoroutineScope()
     val navController = LocalNavController.current!!
     val listState = rememberLazyListState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     PullToRefreshBox(
-        isRefreshing = viewModel.isRefreshing,
+        isRefreshing = isRefreshing,
         onRefresh = {
             viewModel.refresh()
         },
         modifier = modifier.fillMaxSize()
     ) {
-        val comments = viewModel.getComments()
+        val comments by viewModel.comments.collectAsState()
         val post = viewModel.getPost()
         LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
             // Show post

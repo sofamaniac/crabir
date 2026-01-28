@@ -3,6 +3,7 @@ package com.sofamaniac.reboost.ui.thread
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.sofamaniac.reboost.PostRoute
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
@@ -17,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @HiltViewModel
@@ -29,22 +31,36 @@ class ThreadViewModel @Inject constructor(
     val permalink: String = savedStateHandle.toRoute<PostRoute>().post_permalink
     var id: String = repository.getPostId(permalink)
 
-    val isRefreshing: Boolean
-        get() = repository.isRefreshing()
+    val isRefreshing: StateFlow<Boolean>
+        get() = repository.isRefreshing
+
+
+    private var _comments = MutableStateFlow<List<Thing>>(emptyList())
+    val comments: StateFlow<List<Thing>> = _comments.asStateFlow()
 
 
     private val _sort = MutableStateFlow(Sort.Best)
     val sort: StateFlow<Sort> = _sort.asStateFlow()
 
+    init {
+        fetchComments()
+    }
+
     fun getPost(): PostData {
         val post = runBlocking(Dispatchers.IO) {
-            val post = visitedPostsDao.getPost(id)
+            val post = repository.getPost(id) ?: visitedPostsDao.getPost(id)?.toDomainModel()
             if (post == null) {
                 Log.e("ThreadViewModel", "getPost: Post not found in database ($id)")
             }
-            post!!.toDomainModel()
+            post!!
         }
         return post
+    }
+
+    fun fetchComments() {
+        viewModelScope.launch {
+            _comments.value = repository.getComments(permalink, sort = _sort.value)
+        }
     }
 
     fun getComments(): List<Thing> {
