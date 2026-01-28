@@ -22,7 +22,7 @@ class SubscriptionsRepository(
     val accountsRepository: AccountsRepository,
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
-    val subscriptions: StateFlow<List<Thing.Subreddit>?> =
+    val subscriptions: StateFlow<List<Thing.Subreddit>> =
         accountsRepository.activeAccount
             .flatMapLatest { account ->
                 Log.d("SubscriptionsRepository", "activeAccount: $account")
@@ -37,10 +37,26 @@ class SubscriptionsRepository(
                 initialValue = emptyList()
             )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val multis: StateFlow<List<Thing.Multi>> =
+        accountsRepository.activeAccount
+            .flatMapLatest { account ->
+                Log.d("SubscriptionsRepository", "activeAccount: $account")
+                if (!account.isAnonymous()) {
+                    flow { emit(loadMultis()) }
+                } else {
+                    flowOf(emptyList())
+                }
+            }.stateIn(
+                scope = CoroutineScope(Dispatchers.IO),
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = emptyList()
+            )
 
-    private suspend fun makeRequest(
-        request: suspend () -> Response<Listing<Subreddit>>
-    ): PagedResponse<Subreddit> {
+
+    private suspend fun <T : Thing> makeRequest(
+        request: suspend () -> Response<Listing<T>>
+    ): PagedResponse<T> {
         val response = request()
         if (response.isSuccessful) {
             val listing = response.body()
@@ -74,5 +90,16 @@ class SubscriptionsRepository(
             "loadSubscriptions: ${subs.size} subreddits loaded"
         )
         return subs
+    }
+
+    suspend fun loadMultis(): List<Thing.Multi> {
+        val response = api.getMultis()
+        if (response.isSuccessful) {
+            return response.body() ?: emptyList()
+        } else {
+            Log.e("SubscriptionsRepository", "Error loading multis: ${response.errorBody()}")
+            return emptyList()
+        }
+
     }
 }

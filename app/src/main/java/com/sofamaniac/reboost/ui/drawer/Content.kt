@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.sofamaniac.reboost.LicensesRoute
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.domain.model.RedditAccount
@@ -107,6 +108,31 @@ fun DrawerContent(
                 Icon(Icons.Default.Info, contentDescription = "About")
             }
             HorizontalDivider()
+            for (multi in viewModel.multis.collectAsState(initial = emptyList()).value) {
+                NavigationDrawerItem(
+                    label = { Text(multi.data.displayName) },
+                    selected = false,
+                    icon = {
+                        AsyncImage(
+                            multi.data.iconUrl,
+                            "${multi.data.displayName} icon",
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
+                        )
+                    },
+                    onClick = {
+                        navController.navigate(
+                            com.sofamaniac.reboost.MultiRoute(
+                                multi.data.displayName,
+                                multi.data.permalink,
+                            )
+                        )
+                        coroutineScope.launch {
+                            drawerState.close()
+                        }
+                    })
+            }
             for (subreddit in sortedSubscriptions ?: emptyList()) {
                 NavigationDrawerItem(
                     label = { Text(subreddit.data.display_name) },

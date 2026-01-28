@@ -60,6 +60,11 @@ sealed class Thing {
     @Serializable
     @SerialName("more")
     data class More(val data: MoreData) : Thing()
+
+    @Serializable
+    @SerialName("LabeledMulti")
+    data class Multi(val data: MultiData) : Thing()
+
 }
 
 

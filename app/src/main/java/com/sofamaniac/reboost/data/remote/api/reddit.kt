@@ -62,17 +62,44 @@ interface RedditAPIService : CommentAPI, PostAPI, RedditAuthApi {
     @GET("user/{username}/about.json")
     suspend fun getUserAbout(@Path("username") username: String): Response<Listing<Post>>
 
+    /** Get the list of subreddits the user is subscribed to. */
     @GET("/subreddits/mine/subscriber")
     suspend fun getSubreddits(
         @Query("after") after: String? = null,
         @Query("before") before: String? = null,
         @Query("count") count: Int = 0,
-        @Query("limit") limit: Int = API_LIMIT
+        @Query("limit") limit: Int = API_LIMIT,
     ): Response<Listing<Subreddit>>
 
+    /** Get the post of a given subreddit.
+     *
+     * @param subreddit The name of the subreddit without the `r/` prefix
+     * */
     @GET("/r/{subreddit}/{sort}.json")
     suspend fun getSubreddit(
         @Path("subreddit") subreddit: String,
+        @Path("sort") sort: PostSort = PostSort.Best,
+        @Query("after") after: String? = null,
+        @Query("before") before: String? = null,
+        @Query("count") count: Int = 0,
+        @Query("limit") limit: Int = API_LIMIT,
+        @Query("t") timeframe: PostTimeframe? = null,
+        @Query("sr_detail") srDetail: Boolean = true,
+    ): Response<Listing<Post>>
+
+    /** Get the list of multis the user is subscribed to. */
+    @GET("/api/multi/mine.json?raw_json=1")
+    suspend fun getMultis(
+        @Query("expand_srs") expandSrs: Boolean = true,
+    ): Response<List<Thing.Multi>>
+
+    /** Get the post of a given multi.
+     *
+     * @param path The permalink of the multi
+     * */
+    @GET("{path}/{sort}.json")
+    suspend fun getMulti(
+        @Path("path", encoded = true) path: String,
         @Path("sort") sort: PostSort = PostSort.Best,
         @Query("after") after: String? = null,
         @Query("before") before: String? = null,

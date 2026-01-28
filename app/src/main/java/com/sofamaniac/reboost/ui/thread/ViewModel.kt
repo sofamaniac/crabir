@@ -28,7 +28,7 @@ class ThreadViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
-    val permalink: String = savedStateHandle.toRoute<PostRoute>().post_permalink
+    val permalink: String = savedStateHandle.toRoute<PostRoute>().postPermalink
     var id: String = repository.getPostId(permalink)
 
     val isRefreshing: StateFlow<Boolean>

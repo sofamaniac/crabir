@@ -17,6 +17,7 @@ enum class RouteType {
     Subreddit,
     Post,
     Saved,
+    Multi,
 }
 
 @Serializable
@@ -62,7 +63,13 @@ class SubredditRoute(val subreddit: String) : Route {
 }
 
 @Serializable
-class PostRoute(val post_permalink: String) : Route {
+class MultiRoute(val displayName: String, val permalink: String) : Route {
+    override val route: String = RouteType.Multi.name
+    override val title: String = "Multi"
+}
+
+@Serializable
+class PostRoute(val postPermalink: String) : Route {
     override val route: String = RouteType.Post.name
     override val title: String = "Post"
 }

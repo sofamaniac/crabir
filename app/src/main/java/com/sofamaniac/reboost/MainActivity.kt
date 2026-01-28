@@ -49,6 +49,7 @@ import com.sofamaniac.reboost.ui.ProfileView
 import com.sofamaniac.reboost.ui.drawer.DrawerContent
 import com.sofamaniac.reboost.ui.drawer.DrawerViewModel
 import com.sofamaniac.reboost.ui.subreddit.HomeViewer
+import com.sofamaniac.reboost.ui.subreddit.MultiView
 import com.sofamaniac.reboost.ui.subreddit.SubredditViewer
 import com.sofamaniac.reboost.ui.subredditList.SubredditListViewer
 import com.sofamaniac.reboost.ui.theme.ReboostTheme
@@ -140,6 +141,7 @@ fun NavigationGraph(
                 currentRoute?.contains(SearchRoute::class.qualifiedName ?: "") == true -> 1
                 currentRoute?.contains(SubredditRoute::class.qualifiedName ?: "") == true -> 2
                 currentRoute?.contains(SubscriptionsRoute::class.qualifiedName ?: "") == true -> 2
+                currentRoute?.contains(MultiRoute::class.qualifiedName ?: "") == true -> 2
                 currentRoute?.contains(InboxRoute::class.qualifiedName ?: "") == true -> 3
                 currentRoute?.contains(ProfileRoute::class.qualifiedName ?: "") == true -> 4
                 else -> {
@@ -201,6 +203,16 @@ fun NavigationGraph(
             val subreddit = navBackStackEntry.toRoute<SubredditRoute>().subreddit
             SubredditViewer(
                 subreddit,
+                selected,
+                drawerState,
+            )
+        }
+        composable<MultiRoute> { navBackStackEntry ->
+            val permalink = navBackStackEntry.toRoute<MultiRoute>().permalink
+            val name = navBackStackEntry.toRoute<MultiRoute>().displayName
+            MultiView(
+                name,
+                permalink,
                 selected,
                 drawerState,
             )
