@@ -1,7 +1,6 @@
 package com.sofamaniac.reboost.di
 
 import android.content.Context
-import com.sofamaniac.reboost.BuildConfig
 import com.sofamaniac.reboost.data.remote.api.auth.AuthConfig
 import com.sofamaniac.reboost.data.remote.api.auth.BasicAuthClient
 import dagger.Module
@@ -30,7 +29,7 @@ object AuthModule {
 
     @Provides
     fun provideClientAuth(): ClientAuthentication {
-        return BasicAuthClient(BuildConfig.REDDIT_CLIENT_ID)
+        return BasicAuthClient()
     }
 
 }

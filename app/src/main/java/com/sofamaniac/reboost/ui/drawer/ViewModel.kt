@@ -12,7 +12,6 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.reboost.BuildConfig
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.data.remote.api.auth.AuthConfig
 import com.sofamaniac.reboost.data.remote.api.auth.BasicAuthClient
@@ -71,6 +70,17 @@ class DrawerViewModel @Inject constructor(
             initialValue = emptyList<Thing.Subreddit>()
         )
 
+    fun logout() {
+        viewModelScope.launch {
+            try {
+                redditApi.logout(activeAccount.first().auth.accessToken!!)
+                accountsRepository.deleteAccount(activeAccount.first().id)
+            } catch (e: Exception) {
+                Log.e("LoginViewModel", "Failed to logout: $e")
+            }
+        }
+    }
+
     fun setActiveAccount(accountId: Int) {
         viewModelScope.launch {
             accountsRepository.setActiveAccount(accountId)
@@ -107,7 +117,7 @@ class DrawerViewModel @Inject constructor(
     }
 
     private fun exchangeAuthCodeForToken(authResponse: AuthorizationResponse) {
-        val clientAuth = BasicAuthClient(BuildConfig.REDDIT_CLIENT_ID)
+        val clientAuth = BasicAuthClient()
         authService.performTokenRequest(
             authResponse.createTokenExchangeRequest(),
             clientAuth

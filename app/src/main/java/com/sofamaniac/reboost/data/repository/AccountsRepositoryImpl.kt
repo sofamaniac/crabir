@@ -140,7 +140,10 @@ class AccountsRepositoryImpl(
 
     override suspend fun deleteAccount(accountId: Int) {
         dataStore.updateData { accounts ->
-            accounts.copy(accounts = accounts.accounts.filter { it.id != accountId && it.username.isNotEmpty() })
+            accounts.copy(
+                activeId = -1,
+                accounts = accounts.accounts.filter { it.id != accountId && it.username.isNotEmpty() }
+            )
         }
     }
 

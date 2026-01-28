@@ -41,7 +41,7 @@ class AuthConfig(
 }
 
 
-class BasicAuthClient(private val clientId: String) : ClientAuthentication {
+class BasicAuthClient() : ClientAuthentication {
     override fun getRequestHeaders(clientId: String): MutableMap<String, String> {
         return mutableMapOf(
             "Authorization" to "Basic " + Base64.encodeToString("$clientId:".toByteArray(), Base64.NO_WRAP)
