@@ -173,12 +173,14 @@ fun NavigationGraph(
             SubredditViewer(
                 "artknights",
                 selected,
+                drawerState,
             )
         }
         composable<InboxRoute> {
             SubredditViewer(
                 "artknights",
                 selected,
+                drawerState,
             )
         }
         composable<SubredditRoute> { navBackStackEntry ->
@@ -186,11 +188,16 @@ fun NavigationGraph(
             SubredditViewer(
                 subreddit,
                 selected,
+                drawerState,
             )
         }
         composable<ProfileRoute> { navBackStackEntry ->
             val user = navBackStackEntry.toRoute<ProfileRoute>().author
-            ProfileView(user, selected = selected, drawerState = rememberDrawerState(DrawerValue.Closed))
+            ProfileView(
+                user,
+                selected = selected,
+                drawerState = rememberDrawerState(DrawerValue.Closed)
+            )
         }
         composable<LicensesRoute> {
             LicenseWebView()

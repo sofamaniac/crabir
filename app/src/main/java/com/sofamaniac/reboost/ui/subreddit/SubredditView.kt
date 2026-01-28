@@ -5,11 +5,10 @@
 package com.sofamaniac.reboost.ui.subreddit
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -30,6 +29,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 fun SubredditViewer(
     subreddit: String,
     selected: State<Int>,
+    drawerState: DrawerState,
     modifier: Modifier = Modifier,
     viewModel: SubredditViewModel = hiltViewModel<SubredditViewModel, SubredditViewModel.Factory> { factory ->
         factory.create(subreddit)
@@ -41,16 +41,15 @@ fun SubredditViewer(
             TopBar(
                 subreddit,
                 viewModel,
-                rememberDrawerState(DrawerValue.Closed), scrollBehavior,
+                drawerState,
+                scrollBehavior,
             )
         },
         bottomBar = { TabBar(selected) },
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         PostFeedViewer(
-            viewModel,
-            showSubredditIcon = false,
-            modifier = Modifier.padding(innerPadding)
+            viewModel, showSubredditIcon = false, modifier = Modifier.padding(innerPadding)
         )
     }
 }
@@ -60,7 +59,7 @@ class SubredditViewModel @AssistedInject constructor(
     repository: SubredditPostsRepository,
     visitedPostsDao: VisitedPostsDao,
     @Assisted private val subredditName: String
-): PostFeedViewModel(repository, visitedPostsDao) {
+) : PostFeedViewModel(repository, visitedPostsDao) {
 
     init {
         repository.updateSubreddit(subredditName)
