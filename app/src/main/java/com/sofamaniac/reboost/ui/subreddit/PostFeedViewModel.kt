@@ -64,19 +64,28 @@ abstract class PostFeedViewModel(
     var data = Pager(
         config = PagingConfig(pageSize = 100),
         initialKey = "",
-        pagingSourceFactory = { PostsSource(repository).also { postsSource = it } }
+        pagingSourceFactory = {
+            PostsSource(
+                repository,
+                params.value.sort,
+                params.value.timeframe
+            ).also { postsSource = it }
+        }
     )
         .flow.cachedIn(
             viewModelScope
         )
 
     fun updateSort(sort: Sort, timeframe: Timeframe? = null) {
+        val needRefresh = params.value.sort != sort || params.value.timeframe != timeframe
         _params.update {
-            if (it.sort == sort && it.timeframe == timeframe) it
+            if (!needRefresh) it
             else {
-                postsSource?.setSort(sort, timeframe)
                 it.copy(sort = sort, timeframe = timeframe)
             }
+        }
+        if (needRefresh) {
+            refresh()
         }
     }
 

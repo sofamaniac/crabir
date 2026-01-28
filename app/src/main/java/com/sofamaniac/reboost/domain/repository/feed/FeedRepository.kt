@@ -97,11 +97,11 @@ abstract class FeedRepositoryCommon(
 }
 
 class PostsSource(
-    private val repository: FeedRepositoryCommon
+    private val repository: FeedRepositoryCommon,
+    private val sort: Sort,
+    private val timeframe: Timeframe?,
 ) : PagingSource<String, PostData>() {
 
-    private var sort: Sort = Sort.Best
-    private var timeframe: Timeframe? = null
 
     override fun getRefreshKey(state: PagingState<String, PostData>): String {
         return ""
@@ -109,7 +109,7 @@ class PostsSource(
 
     override suspend fun load(params: LoadParams<String>): LoadResult<String, PostData> {
         val postsId = if (params.key != null) {
-            getPosts(params.key!!)
+            getPosts(params.key!!, sort, timeframe)
         } else {
             PagedResponse()
         }
@@ -121,11 +121,6 @@ class PostsSource(
             nextKey = postsId.after,
             data = posts
         )
-    }
-
-    fun setSort(sort: Sort, timeframe: Timeframe? = null) {
-        this.sort = sort
-        this.timeframe = timeframe
     }
 
     private suspend fun getPosts(
