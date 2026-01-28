@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -56,6 +57,7 @@ fun DrawerContent(
     ModalDrawerSheet {
         Column(
             modifier = Modifier
+                .fillMaxWidth(0.75f)
                 .navigationBarsPadding()
                 .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
@@ -82,7 +84,6 @@ fun DrawerContent(
             ) {
                 Text("Login")
             }
-            val navController = LocalNavController.current!!
             IconButton(onClick = {
                 navController.navigate(LicensesRoute)
             }) {
@@ -109,10 +110,8 @@ fun DrawerContent(
                             )
                         )
                     }
-
                 )
             }
-
         }
     }
 }
