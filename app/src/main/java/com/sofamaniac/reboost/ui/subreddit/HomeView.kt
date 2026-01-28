@@ -41,7 +41,6 @@ fun HomeViewer(
     ) { innerPadding ->
         PostFeedViewer(
             viewModel,
-            navController,
             modifier = Modifier.padding(innerPadding)
         )
     }

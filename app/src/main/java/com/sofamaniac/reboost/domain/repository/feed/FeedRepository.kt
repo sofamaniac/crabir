@@ -39,6 +39,10 @@ abstract class FeedRepositoryCommon(
 
     private var _seenPosts: Set<String> = emptySet()
 
+    fun refresh() {
+        _seenPosts = emptySet()
+    }
+
     fun observePost(id: String): Flow<PostData> {
         return postRepository.observePost(id)
     }

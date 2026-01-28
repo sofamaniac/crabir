@@ -16,7 +16,6 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
 import com.sofamaniac.reboost.domain.repository.feed.SubredditPostsRepository
 import com.sofamaniac.reboost.ui.TabBar
@@ -30,7 +29,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 @Composable
 fun SubredditViewer(
     subreddit: String,
-    navController: NavController,
     selected: State<Int>,
     modifier: Modifier = Modifier,
     viewModel: SubredditViewModel = hiltViewModel<SubredditViewModel, SubredditViewModel.Factory> { factory ->
@@ -51,7 +49,6 @@ fun SubredditViewer(
     ) { innerPadding ->
         PostFeedViewer(
             viewModel,
-            navController,
             showSubredditIcon = false,
             modifier = Modifier.padding(innerPadding)
         )

@@ -23,7 +23,6 @@ import com.sofamaniac.reboost.data.local.entities.toEntity
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
 import com.sofamaniac.reboost.domain.model.PostData
-import com.sofamaniac.reboost.domain.model.RedditAccount
 import com.sofamaniac.reboost.domain.repository.feed.FeedRepositoryCommon
 import com.sofamaniac.reboost.domain.repository.feed.PostsSource
 import kotlinx.coroutines.Dispatchers
@@ -41,22 +40,25 @@ abstract class PostFeedViewModel(
 
     var listState by mutableStateOf(LazyListState())
     data class FeedParams(
-        val account: RedditAccount,
         val sort: Sort,
         val timeframe: Timeframe?
     )
 
     private val _params = MutableStateFlow(
         FeedParams(
-            account = RedditAccount.anonymous(),
             sort = Sort.Best,
             timeframe = null,
         )
     )
     val params: StateFlow<FeedParams> = _params.asStateFlow()
 
-    fun observePost(id: String) = repository.observePost(id)
-
+    fun refresh() {
+        postsSource?.invalidate()
+        repository.refresh()
+        viewModelScope.launch {
+            listState.scrollToItem(0)
+        }
+    }
 
     private var postsSource: PostsSource? = null
     var data = Pager(

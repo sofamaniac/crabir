@@ -43,7 +43,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
@@ -63,7 +62,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun PostFeedViewer(
     state: PostFeedViewModel,
-    navController: NavController,
     modifier: Modifier = Modifier,
     showSubredditIcon: Boolean = true
 ) {
@@ -73,7 +71,7 @@ fun PostFeedViewer(
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,
         onRefresh = {
-            posts.refresh()
+            state.refresh()
         },
         modifier = modifier.fillMaxSize(),
     ) {
@@ -100,7 +98,7 @@ fun TopBar(
     title: String,
     state: PostFeedViewModel,
     drawerState: DrawerState,
-    scrollBehavior: TopAppBarScrollBehavior?
+    scrollBehavior: TopAppBarScrollBehavior?,
 ) {
     val scope = rememberCoroutineScope()
     val params = state.params.collectAsState()
@@ -143,6 +141,7 @@ fun TopBar(
             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                 DropdownMenuItem(onClick = { }, text = { Text("Settings") })
                 DropdownMenuItem(onClick = { }, text = { Text("Info") })
+                DropdownMenuItem(onClick = { state.refresh() }, text = { Text("Refresh") })
             }
             SortMenu(state)
         }

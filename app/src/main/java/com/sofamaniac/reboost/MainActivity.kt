@@ -172,20 +172,19 @@ fun NavigationGraph(
         composable<SearchRoute> {
             SubredditViewer(
                 "artknights",
-                navController, selected,
+                selected,
             )
         }
         composable<InboxRoute> {
             SubredditViewer(
                 "artknights",
-                navController, selected,
+                selected,
             )
         }
         composable<SubredditRoute> { navBackStackEntry ->
             val subreddit = navBackStackEntry.toRoute<SubredditRoute>().subreddit
             SubredditViewer(
                 subreddit,
-                navController,
                 selected,
             )
         }
