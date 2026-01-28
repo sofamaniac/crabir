@@ -16,7 +16,13 @@ enum class Kind {
     Link
 }
 
+fun isVideoPost(post: PostDataFlat): Boolean {
+    return post.isVideo || (post.postHint == "image" && isVideoUrl(post.url))
+}
+
 fun getKind(post: PostDataFlat): Kind {
+    if (isVideoPost(post)) return Kind.Video
+
     val kind = if (post.isSelfPost) Kind.Self
     else if (post.isVideo) Kind.Video
     else if (post.isGallery || post.galleryData != null) Kind.Gallery
@@ -32,6 +38,8 @@ fun getKind(post: PostDataFlat): Kind {
         else -> {
             if (post.url.startsWith("https://www.reddit.com/gallery")) {
                 return Kind.Gallery
+            } else if (isVideoUrl(post.url)) {
+                return Kind.Video
             } else if (isImageUrl(post.url)) {
                 return Kind.Image
             }
@@ -42,7 +50,12 @@ fun getKind(post: PostDataFlat): Kind {
 
 }
 
+fun isVideoUrl(url: String): Boolean {
+    val extensions = listOf("gif", "mp4")
+    return extensions.any { url.endsWith(it) }
+}
+
 fun isImageUrl(url: String): Boolean {
-    val extensions = listOf("jpg", "png", "jpeg", "png", "svg", "gif")
+    val extensions = listOf("jpg", "png", "jpeg", "png", "svg")
     return extensions.any { url.endsWith(it) }
 }

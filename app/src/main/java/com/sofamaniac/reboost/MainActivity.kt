@@ -54,6 +54,8 @@ import com.sofamaniac.reboost.ui.subreddit.SubredditViewer
 import com.sofamaniac.reboost.ui.subredditList.SubredditListViewer
 import com.sofamaniac.reboost.ui.theme.ReboostTheme
 import com.sofamaniac.reboost.ui.thread.ThreadView
+import com.sofamaniac.reboost.ui.videoPlayer.LocalVideoPlayerManager
+import com.sofamaniac.reboost.ui.videoPlayer.VideoPlayerManager
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 
@@ -85,11 +87,14 @@ class MainActivity : ComponentActivity() {
             ReboostTheme {
                 MaterialTheme {
                     val navController = rememberNavController()
+                    val videoPlayerManager = remember { VideoPlayerManager() }
                     // Setup nav controller
                     CompositionLocalProvider(LocalNavController provides navController) {
-                        MainScreen(
-                            navController = navController,
-                        )
+                        CompositionLocalProvider(LocalVideoPlayerManager provides videoPlayerManager) {
+                            MainScreen(
+                                navController = navController,
+                            )
+                        }
                     }
                 }
             }

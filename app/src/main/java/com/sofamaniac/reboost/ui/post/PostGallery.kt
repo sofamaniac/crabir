@@ -13,7 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
+import com.sofamaniac.reboost.data.remote.dto.post.PostImageSource
 import com.sofamaniac.reboost.domain.model.PostData
+import com.sofamaniac.reboost.ui.videoPlayer.VideoPlayer
 
 @Composable
 fun PostGallery(post: PostData, modifier: Modifier = Modifier) {
@@ -24,9 +26,17 @@ fun PostGallery(post: PostData, modifier: Modifier = Modifier) {
     val current = rememberPagerState(initialPage = 0, pageCount = { gallery.images.size })
     val minRatio = gallery.mediaMetadata.map { metadata ->
         when (val data = metadata.value) {
-            is MediaMetadata.Image -> data.s!!.ratio
-            is MediaMetadata.Gif -> data.s!!.ratio
-            else -> 1f
+            is MediaMetadata.Image -> {
+                data.s!!.ratio
+            }
+
+            is MediaMetadata.Gif -> {
+                data.s!!.ratio
+            }
+
+            else -> {
+                1f
+            }
         }
     }.min()
     Box(
@@ -41,7 +51,14 @@ fun PostGallery(post: PostData, modifier: Modifier = Modifier) {
             if (metadata != null) {
                 when (metadata) {
                     is MediaMetadata.Image -> ImageView(metadata)
-                    is MediaMetadata.Gif -> ImageView(metadata)
+                    is MediaMetadata.Gif -> VideoPlayer(
+                        PostImageSource(
+                            metadata.s?.mp4Url,
+                            metadata.s?.width!!,
+                            metadata.s.height
+                        )
+                    )
+
                     else -> {
                         Text("No luck my friend (${metadata.javaClass.simpleName})")
                     }

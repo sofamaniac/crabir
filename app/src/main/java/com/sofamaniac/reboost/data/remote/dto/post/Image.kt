@@ -16,6 +16,14 @@ data class PostImage(
 
 @Serializable
 data class PostImageVariants(
-    val obfuscated: PostImageSource? = null,
-    val nsfw: PostImageSource? = null,
+    val obfuscated: PostImageData? = null,
+    val nsfw: PostImageData? = null,
+    val gif: PostImageData? = null,
+    val mp4: PostImageData? = null,
+)
+
+@Serializable
+data class PostImageData(
+    val source: PostImageSource? = null,
+    val resolutions: List<PostImageSource>? = null,
 )

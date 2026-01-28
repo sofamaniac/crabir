@@ -85,6 +85,7 @@ fun PostFeedViewer(
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id.id }) { index ->
                 val post = posts[index]!!
                 View(post, showSubredditIcon = showSubredditIcon, visitPost = state::visitPost) {
+                    Text(post.kind.name)
                     PostBody(post)
                 }
             }

@@ -4,66 +4,33 @@
 
 package com.sofamaniac.reboost.ui.post
 
-import android.util.Log
 import androidx.annotation.OptIn
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
+import com.sofamaniac.reboost.data.remote.dto.post.PostImageSource
 import com.sofamaniac.reboost.domain.model.PostData
+import com.sofamaniac.reboost.ui.videoPlayer.VideoPlayer
 
 @OptIn(UnstableApi::class)
 @Composable
 fun PostVideo(post: PostData, modifier: Modifier = Modifier) {
-    val media = post.media.media
-    if (media != null && media.reddit_video != null) {
-        val context = LocalContext.current
-        val mediaItem = MediaItem.fromUri(media.reddit_video.fallback_url?.toString() ?: "")
-        val width = media.reddit_video.width
-        val height = media.reddit_video.height
-        val exoPlayer = remember {
-            ExoPlayer.Builder(context).build().apply {
-                // Set MediaSource to ExoPlayer
-                setMediaItem(mediaItem)
-                playWhenReady = true
-                prepare()
-            }
-        }
-        Log.d("PostVideo", "${post}")
-
-        // Manage lifecycle events
-        DisposableEffect(Unit) {
-            onDispose {
-                exoPlayer.release()
-            }
-        }
-        Box {
-            Text(text = post.url.toString())
-            AndroidView(
-                factory = { ctx ->
-                    PlayerView(ctx).apply {
-                        player = exoPlayer
-                        setShowNextButton(false)
-                        setShowRewindButton(false)
-                        setShowFastForwardButton(false)
-                        setShowPreviousButton(false)
-                    }
-                },
-                modifier = Modifier
-                    .aspectRatio(width.toFloat() / height.toFloat())
-                    .fillMaxWidth()
-            )
-        }
+    val source = getVideoUrl(post)
+    if (source != null) {
+        VideoPlayer(source)
+    } else {
+        PostImage(post)
     }
+
 }
+
+
+fun getVideoUrl(post: PostData): PostImageSource? {
+    val media = post.media.media?.reddit_video
+    if (media != null) {
+        return PostImageSource(url = media.fallback_url, width = media.width, height = media.height)
+    }
+    return post.getPreview()?.images?.firstOrNull()?.variants?.mp4?.source
+}
+
 
