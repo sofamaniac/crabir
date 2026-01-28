@@ -55,6 +55,13 @@ class DrawerViewModel @Inject constructor(
     val accountsList = accountsRepository.accounts
     val activeAccount = accountsRepository.activeAccount
 
+    private val _selectingAccount = MutableStateFlow(false)
+    val selectingAccount = _selectingAccount.asStateFlow()
+
+    fun toggleSelectAccount() {
+        _selectingAccount.value = !_selectingAccount.value
+    }
+
     val serviceConfig = AuthConfig()
 
     val subscriptions: StateFlow<List<Thing.Subreddit>?>

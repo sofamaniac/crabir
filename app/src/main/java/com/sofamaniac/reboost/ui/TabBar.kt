@@ -13,7 +13,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
-import com.sofamaniac.reboost.Home
+import com.sofamaniac.reboost.HomeRoute
 import com.sofamaniac.reboost.InboxRoute
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.ProfileRoute
@@ -23,7 +23,7 @@ import com.sofamaniac.reboost.SubscriptionsRoute
 @Composable
 fun TabBar(selected: State<Int> ,modifier: Modifier = Modifier) {
     val tabs = listOf(
-        Pair(Icons.Filled.Home, Home),
+        Pair(Icons.Filled.Home, HomeRoute),
         Pair(Icons.Default.Search, SearchRoute),
         Pair(Icons.AutoMirrored.Outlined.List, SubscriptionsRoute),
         Pair(Icons.Default.Email, InboxRoute),

@@ -26,6 +26,8 @@ class PostRepository(private val api: RedditAPIService) {
         _cache.value += newEntries
     }
 
+    fun getPost(id: String): PostData = _cache.value[id]!!
+
 
     suspend fun vote(id: String, upvote: Boolean): Result<Unit> {
         val post: PostData = _cache.value[id]!!

@@ -20,7 +20,7 @@ enum class RouteType {
 }
 
 @Serializable
-object Home : Route {
+object HomeRoute : Route {
     override val route: String = RouteType.Home.name
     override val title: String = "Home"
 }

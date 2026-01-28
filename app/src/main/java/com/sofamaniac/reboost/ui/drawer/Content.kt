@@ -8,9 +8,8 @@
 
 package com.sofamaniac.reboost.ui.drawer
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,8 +21,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Button
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,64 +33,81 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.reboost.LicensesRoute
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.domain.model.RedditAccount
 import com.sofamaniac.reboost.ui.subreddit.SubredditIcon
+import kotlinx.coroutines.launch
 import java.util.Collections.emptyList
 
 @Composable
 fun DrawerContent(
     viewModel: DrawerViewModel,
-    onAccountChange: () -> Unit,
+    drawerState: DrawerState,
     modifier: Modifier = Modifier,
 ) {
-    val authLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        viewModel.handleAuthResult(result.data)
-    }
     val navController = LocalNavController.current!!
+    val subscriptions = viewModel.subscriptions.collectAsState(initial = emptyList())
+    val sortedSubscriptions = subscriptions.value?.sortedBy { it.data.display_name.lowercase() }
+    val selectingAccount by viewModel.selectingAccount.collectAsState()
+    val rotation =
+        animateFloatAsState(targetValue = if (selectingAccount) 180f else 0f, label = "rotation")
+    val coroutineScope = rememberCoroutineScope()
     ModalDrawerSheet {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth(0.75f)
                 .navigationBarsPadding()
                 .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
         ) {
             val account by viewModel.activeAccount.collectAsState(initial = RedditAccount.anonymous())
-            Text(account.username)
-            for (account in viewModel.accountsList.collectAsState(initial = emptyList()).value) {
-                Text(
-                    account.username,
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .clickable(onClick = {
-                            viewModel.setActiveAccount(account.id)
-                            onAccountChange()
-                        })
-                )
+            AccountTile(
+                account,
+                onClick = viewModel::toggleSelectAccount,
+                iconModifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape),
+                badge = {
+                    Icon(
+                        Icons.Default.ArrowDropDown,
+                        contentDescription = "Select account",
+                        modifier = Modifier
+                            .size(32.dp)
+                            .rotate(rotation.value)
+                    )
+                })
+            AnimatedVisibility(selectingAccount) { AccountSelector(viewModel) }
+            HorizontalDivider()
+
+            for (feed in FeedButtons.entries) {
+                NavigationDrawerItem(label = { Text(feed.name) }, icon = {
+                    Icon(
+                        feed.icon,
+                        contentDescription = feed.name,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }, selected = false, onClick = {
+                    navController.navigate(feed.route)
+                    coroutineScope.launch {
+                        drawerState.close()
+                    }
+                })
             }
+
             Spacer(modifier = Modifier.padding(16.dp))
-            Button(
-                onClick = {
-                    val authIntent = viewModel.createAuthIntent()
-                    authLauncher.launch(authIntent)
-                }
-            ) {
-                Text("Login")
-            }
             IconButton(onClick = {
                 navController.navigate(LicensesRoute)
             }) {
                 Icon(Icons.Default.Info, contentDescription = "About")
             }
             HorizontalDivider()
-            for (subreddit in viewModel.subscriptions.collectAsState(initial = emptyList()).value!!) {
+            for (subreddit in sortedSubscriptions ?: emptyList()) {
                 NavigationDrawerItem(
                     label = { Text(subreddit.data.display_name) },
                     selected = false,
@@ -109,9 +126,12 @@ fun DrawerContent(
                                 subreddit.data.display_name
                             )
                         )
-                    }
-                )
+                        coroutineScope.launch {
+                            drawerState.close()
+                        }
+                    })
             }
         }
     }
 }
+

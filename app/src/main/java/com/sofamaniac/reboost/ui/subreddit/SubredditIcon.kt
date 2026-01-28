@@ -8,7 +8,6 @@
 
 package com.sofamaniac.reboost.ui.subreddit
 
-//import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -23,7 +22,6 @@ import androidx.core.graphics.toColorInt
 import coil3.compose.AsyncImage
 import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditIcon
 
-//@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun SubredditIcon(
     subreddit: String,
@@ -34,7 +32,7 @@ fun SubredditIcon(
         is SubredditIcon.Icon ->
             AsyncImage(
                 model = icon.url,
-                contentDescription = "${subreddit} icon",
+                contentDescription = "$subreddit icon",
                 modifier
             )
 

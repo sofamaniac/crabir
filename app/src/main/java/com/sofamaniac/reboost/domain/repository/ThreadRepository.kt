@@ -7,18 +7,22 @@ import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.comment.Sort
 import com.sofamaniac.reboost.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.reboost.data.repository.PostRepository
+import com.sofamaniac.reboost.domain.model.PostData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 interface ThreadRepository {
     suspend fun getComments(
         permalink: String,
         sort: Sort, timeframe: Timeframe? = null): List<Thing>
-    suspend fun getPost(): Thing.Post?
+    suspend fun getPost(id: String): PostData?
     suspend fun getMoreComments(more: Thing.More): List<Thing>
     fun getPostId(permalink: String): String
 
-    fun isRefreshing(): Boolean
-
     fun refresh()
+
+    val isRefreshing: StateFlow<Boolean>
 }
 
 class ThreadRepositoryImpl(
@@ -27,29 +31,35 @@ class ThreadRepositoryImpl(
     val postRepository: PostRepository
 ) :
     ThreadRepository {
-    private var post: Thing.Post? = null
+    private var post: PostData? = null
     private var comments: List<Thing> = emptyList()
-    private var isRefreshing = false
+    private var _isRefreshing = MutableStateFlow(false)
+    override val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     suspend fun fetchThread(permalink: String, sort: Sort) {
         if (post != null && comments.isNotEmpty()) {
             return
         }
-        isRefreshing = true
+        _isRefreshing.value = true
         val response = api.getThread(permalink, sort = sort)
         if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
-                post = body.post.data.children.firstOrNull()
-                val postDomain = PostDataMapper.map(post!!.data)
+                val data = body.post.data.children.first()
+                post = PostDataMapper.map(data.data)
                 comments = body.comments.data.children
-                postRepository.addPost(postDomain)
+                postRepository.addPost(post!!)
             }
         }
-        isRefreshing = false
+        _isRefreshing.value = false
     }
 
-    override suspend fun getPost(): Thing.Post? {
+    override suspend fun getPost(id: String): PostData? {
+        if (post != null) {
+            return post
+        } else {
+            post = postRepository.getPost(id)
+        }
         return post
     }
 
@@ -76,8 +86,5 @@ class ThreadRepositoryImpl(
         comments = emptyList()
     }
 
-    override fun isRefreshing(): Boolean {
-        return isRefreshing
-    }
 }
 

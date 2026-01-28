@@ -14,6 +14,13 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -28,8 +35,8 @@ import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -48,7 +55,6 @@ import com.sofamaniac.reboost.ui.theme.ReboostTheme
 import com.sofamaniac.reboost.ui.thread.ThreadView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.launch
 
 
 @HiltAndroidApp
@@ -99,21 +105,13 @@ fun MainScreen(
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val drawerViewModel: DrawerViewModel = viewModel()
-    val scope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             DrawerContent(
                 viewModel = drawerViewModel,
-                onAccountChange = {
-                    navController.navigate(Home) {
-                        popUpTo(0) {
-                            inclusive = true
-                        }
-                    }
-                    scope.launch {drawerState.close()}
-                }
+                drawerState = drawerState,
             )
         },
     ) {
@@ -137,12 +135,12 @@ fun NavigationGraph(
     val selected = remember(navBackStackEntry) {
         val currentRoute = navBackStackEntry?.destination?.route
         derivedStateOf {
-            when  {
-                currentRoute?.contains(Home::class.qualifiedName ?: "") == true-> 0
+            when {
+                currentRoute?.contains(HomeRoute::class.qualifiedName ?: "") == true -> 0
                 currentRoute?.contains(SearchRoute::class.qualifiedName ?: "") == true -> 1
                 currentRoute?.contains(SubredditRoute::class.qualifiedName ?: "") == true -> 2
                 currentRoute?.contains(SubscriptionsRoute::class.qualifiedName ?: "") == true -> 2
-                currentRoute?.contains(InboxRoute::class.qualifiedName ?: "") == true ->3
+                currentRoute?.contains(InboxRoute::class.qualifiedName ?: "") == true -> 3
                 currentRoute?.contains(ProfileRoute::class.qualifiedName ?: "") == true -> 4
                 else -> {
                     Log.w("NavigationGraph", "Unknown route: $currentRoute")
@@ -155,15 +153,31 @@ fun NavigationGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Home,
-        modifier = modifier.fillMaxSize()
+        startDestination = HomeRoute,
+        modifier = modifier.fillMaxSize(),
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None }
     ) {
-        composable<Home> {
+        composable<HomeRoute> {
             HomeViewer(
                 navController, drawerState, selected
             )
         }
-        composable<PostRoute> {
+        composable<PostRoute>(
+            enterTransition = {
+                fadeIn(animationSpec = tween(500)) +
+                        slideIn(animationSpec = tween(500)) { fullSize ->
+                            IntOffset(fullSize.width, 0)
+                        }
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(500)) +
+                        slideOut(animationSpec = tween(500)) { fullSize ->
+                            IntOffset(fullSize.width, 0)
+                        }
+            },
+        )
+        {
             ThreadView(selected)
         }
         composable<SubscriptionsRoute> {
