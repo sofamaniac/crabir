@@ -6,7 +6,6 @@ import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.comment.Sort
 import com.sofamaniac.reboost.data.remote.dto.post.PostDataMapper
-import com.sofamaniac.reboost.data.repository.PostRepository
 import com.sofamaniac.reboost.domain.model.PostData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

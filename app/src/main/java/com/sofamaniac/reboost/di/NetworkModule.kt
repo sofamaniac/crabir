@@ -8,7 +8,7 @@ import com.sofamaniac.reboost.data.remote.interceptors.RateLimitInterceptor
 import com.sofamaniac.reboost.data.remote.interceptors.loggingInterceptor
 import com.sofamaniac.reboost.data.remote.utils.URISerializer
 import com.sofamaniac.reboost.data.remote.utils.URLSerializer
-import com.sofamaniac.reboost.data.repository.AccountsRepository
+import com.sofamaniac.reboost.domain.repository.AccountsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

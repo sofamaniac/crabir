@@ -1,8 +1,8 @@
 package com.sofamaniac.reboost.di
 
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
-import com.sofamaniac.reboost.data.repository.AccountsRepository
-import com.sofamaniac.reboost.data.repository.PostRepository
+import com.sofamaniac.reboost.domain.repository.AccountsRepository
+import com.sofamaniac.reboost.domain.repository.PostRepository
 import com.sofamaniac.reboost.domain.repository.feed.HomeRepository
 import com.sofamaniac.reboost.domain.repository.feed.SavedRepository
 import com.sofamaniac.reboost.domain.repository.feed.SubredditPostsRepository

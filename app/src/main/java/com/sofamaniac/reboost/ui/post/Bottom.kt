@@ -39,8 +39,8 @@ import com.sofamaniac.reboost.BuildConfig
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.PostRoute
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
-import com.sofamaniac.reboost.data.repository.PostRepository
 import com.sofamaniac.reboost.domain.model.PostData
+import com.sofamaniac.reboost.domain.repository.PostRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

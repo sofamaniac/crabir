@@ -12,9 +12,9 @@ import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
-import com.sofamaniac.reboost.data.repository.PostRepository
 import com.sofamaniac.reboost.domain.model.PagedResponse
 import com.sofamaniac.reboost.domain.model.PostData
+import com.sofamaniac.reboost.domain.repository.PostRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import retrofit2.Response

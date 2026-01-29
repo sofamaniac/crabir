@@ -1,8 +1,8 @@
 package com.sofamaniac.reboost.di
 
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
-import com.sofamaniac.reboost.data.repository.AccountsRepository
-import com.sofamaniac.reboost.data.repository.SubscriptionsRepository
+import com.sofamaniac.reboost.domain.repository.AccountsRepository
+import com.sofamaniac.reboost.domain.repository.SubscriptionsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

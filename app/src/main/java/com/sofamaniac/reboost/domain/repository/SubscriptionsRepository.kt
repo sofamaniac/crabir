@@ -1,4 +1,4 @@
-package com.sofamaniac.reboost.data.repository
+package com.sofamaniac.reboost.domain.repository
 
 import android.util.Log
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
@@ -22,7 +22,7 @@ class SubscriptionsRepository(
     val accountsRepository: AccountsRepository,
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
-    val subscriptions: StateFlow<List<Thing.Subreddit>> =
+    val subscriptions: StateFlow<List<Subreddit>> =
         accountsRepository.activeAccount
             .flatMapLatest { account ->
                 Log.d("SubscriptionsRepository", "activeAccount: $account")
@@ -77,9 +77,9 @@ class SubscriptionsRepository(
         return makeRequest { api.getSubreddits(after = after) }
     }
 
-    suspend fun loadSubscriptions(): List<Thing.Subreddit> {
+    suspend fun loadSubscriptions(): List<Subreddit> {
         var after: String? = ""
-        var subs: List<Thing.Subreddit> = emptyList()
+        var subs: List<Subreddit> = emptyList()
         while (after != null) {
             val response = getSubreddits(after)
             after = response.data.lastOrNull()?.data?.name

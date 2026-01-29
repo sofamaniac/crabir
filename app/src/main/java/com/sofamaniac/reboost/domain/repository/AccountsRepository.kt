@@ -1,4 +1,4 @@
-package com.sofamaniac.reboost.data.repository
+package com.sofamaniac.reboost.domain.repository
 
 import com.sofamaniac.reboost.domain.model.RedditAccount
 import kotlinx.coroutines.flow.StateFlow

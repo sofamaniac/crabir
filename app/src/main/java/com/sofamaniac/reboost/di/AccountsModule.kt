@@ -1,8 +1,8 @@
 package com.sofamaniac.reboost.di
 
 import android.content.Context
-import com.sofamaniac.reboost.data.repository.AccountsRepository
-import com.sofamaniac.reboost.data.repository.AccountsRepositoryImpl
+import com.sofamaniac.reboost.domain.repository.AccountsRepository
+import com.sofamaniac.reboost.domain.repository.AccountsRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

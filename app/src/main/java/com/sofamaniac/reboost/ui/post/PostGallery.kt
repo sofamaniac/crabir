@@ -15,7 +15,8 @@ import androidx.compose.ui.graphics.Color
 import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.reboost.data.remote.dto.post.PostImageSource
 import com.sofamaniac.reboost.domain.model.PostData
-import com.sofamaniac.reboost.ui.videoPlayer.VideoPlayer
+import com.sofamaniac.reboost.ui.media.image.ImageView
+import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayer
 
 @Composable
 fun PostGallery(post: PostData, modifier: Modifier = Modifier) {

@@ -9,8 +9,8 @@
 package com.sofamaniac.reboost.data.remote.api.auth
 
 import android.util.Log
-import com.sofamaniac.reboost.data.repository.AccountsRepository
 import com.sofamaniac.reboost.domain.model.RedditAccount
+import com.sofamaniac.reboost.domain.repository.AccountsRepository
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking

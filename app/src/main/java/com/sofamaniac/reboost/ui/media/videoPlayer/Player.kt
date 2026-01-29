@@ -1,4 +1,4 @@
-package com.sofamaniac.reboost.ui.videoPlayer
+package com.sofamaniac.reboost.ui.media.videoPlayer
 
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
@@ -53,6 +53,7 @@ import androidx.media3.ui.compose.state.rememberPlayPauseButtonState
 import com.sofamaniac.reboost.data.remote.dto.post.PostImageSource
 import com.sofamaniac.reboost.ui.Cartouche
 import kotlinx.coroutines.delay
+import kotlin.math.abs
 
 
 @OptIn(UnstableApi::class)
@@ -130,8 +131,8 @@ fun VideoPlayer(
                 val videoCenterX = (rect.left + rect.right) / 2
 
                 // Distance from screen center
-                val distanceFromCenterY = kotlin.math.abs(videoCenterY - screenCenterY)
-                val distanceFromCenterX = kotlin.math.abs(videoCenterX - screenCenterX)
+                val distanceFromCenterY = abs(videoCenterY - screenCenterY)
+                val distanceFromCenterX = abs(videoCenterX - screenCenterX)
 
                 // Check if this video's center is closest to screen center
                 // This is simplified - ideally you'd compare with other videos

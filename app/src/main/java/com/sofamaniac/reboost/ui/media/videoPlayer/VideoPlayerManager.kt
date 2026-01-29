@@ -1,4 +1,4 @@
-package com.sofamaniac.reboost.ui.videoPlayer
+package com.sofamaniac.reboost.ui.media.videoPlayer
 
 import androidx.compose.runtime.compositionLocalOf
 import androidx.media3.exoplayer.ExoPlayer

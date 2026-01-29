@@ -1,8 +1,8 @@
 package com.sofamaniac.reboost
 
 import androidx.lifecycle.ViewModel
-import com.sofamaniac.reboost.data.repository.AccountsRepository
 import com.sofamaniac.reboost.domain.model.RedditAccount
+import com.sofamaniac.reboost.domain.repository.AccountsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 

@@ -1,4 +1,4 @@
-package com.sofamaniac.reboost.data.repository
+package com.sofamaniac.reboost.domain.repository
 
 import android.util.Log
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService

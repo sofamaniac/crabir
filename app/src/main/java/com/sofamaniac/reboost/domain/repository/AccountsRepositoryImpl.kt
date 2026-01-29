@@ -6,7 +6,7 @@
  *
  */
 
-package com.sofamaniac.reboost.data.repository
+package com.sofamaniac.reboost.domain.repository
 
 import android.content.Context
 import android.util.Log

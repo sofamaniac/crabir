@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.media3.common.util.UnstableApi
 import com.sofamaniac.reboost.data.remote.dto.post.PostImageSource
 import com.sofamaniac.reboost.domain.model.PostData
-import com.sofamaniac.reboost.ui.videoPlayer.VideoPlayer
+import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayer
 
 @OptIn(UnstableApi::class)
 @Composable
