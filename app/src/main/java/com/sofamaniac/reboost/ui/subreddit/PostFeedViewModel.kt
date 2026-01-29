@@ -52,6 +52,12 @@ abstract class PostFeedViewModel(
     )
     val params: StateFlow<FeedParams> = _params.asStateFlow()
 
+    fun scrollToTop() {
+        viewModelScope.launch {
+            listState.scrollToItem(0)
+        }
+    }
+
     fun refresh() {
         postsSource?.invalidate()
         repository.refresh()

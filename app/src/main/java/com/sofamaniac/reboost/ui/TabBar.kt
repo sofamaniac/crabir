@@ -21,7 +21,11 @@ import com.sofamaniac.reboost.SearchRoute
 import com.sofamaniac.reboost.SubscriptionsRoute
 
 @Composable
-fun TabBar(selected: State<Int>, modifier: Modifier = Modifier) {
+fun TabBar(
+    selected: State<Int>,
+    modifier: Modifier = Modifier,
+    onTabReselect: (() -> Unit)? = null
+) {
     val tabs = listOf(
         Pair(Icons.Filled.Home, HomeRoute),
         Pair(Icons.Default.Search, SearchRoute),
@@ -35,6 +39,7 @@ fun TabBar(selected: State<Int>, modifier: Modifier = Modifier) {
             Tab(
                 selected = selected.value == index,
                 onClick = {
+                    if (onTabReselect != null && selected.value == index) onTabReselect()
                     navController.navigate(tab.second) {
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = true

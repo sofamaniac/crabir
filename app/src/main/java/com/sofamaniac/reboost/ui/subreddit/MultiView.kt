@@ -8,6 +8,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -18,6 +19,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,6 +34,8 @@ fun MultiView(
     },
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val scope = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
             TopBar(
@@ -41,7 +45,16 @@ fun MultiView(
                 scrollBehavior,
             )
         },
-        bottomBar = { TabBar(selected) },
+        bottomBar = {
+            TabBar(
+                selected,
+                onTabReselect = {
+                    scope.launch {
+                        viewModel.listState.animateScrollToItem(0)
+                    }
+                }
+            )
+        },
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         PostFeedViewer(
