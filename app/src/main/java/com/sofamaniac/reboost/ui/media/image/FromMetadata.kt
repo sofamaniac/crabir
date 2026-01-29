@@ -14,7 +14,7 @@ import java.lang.Float
 import kotlin.toString
 
 @Composable
-fun FromMetadata(post: PostData, modifier: Modifier = Modifier) {
+fun FromPreview(post: PostData, modifier: Modifier = Modifier) {
     val images = post.getPreview()!!
     val image = images.images[0].source
     val url = image.url

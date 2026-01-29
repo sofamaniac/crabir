@@ -37,7 +37,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sofamaniac.reboost.LocalNavController
-import com.sofamaniac.reboost.PostRoute
 import com.sofamaniac.reboost.domain.model.Kind
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.Flair
@@ -181,7 +180,7 @@ fun View(
             .fillMaxWidth()
             .clickable(enabled = clickable, onClick = {
                 visitPost(post)
-                navController.navigate(PostRoute(post.permalink))
+                //navController.navigate(PostRoute(post.permalink))
             }),
     ) {
         PostHeader(
@@ -197,6 +196,6 @@ fun View(
             enablePreview = enablePreview,
         )
         body()
-        BottomRow(post, modifier)
+        BottomRow(post, modifier, visitPost = visitPost)
     }
 }

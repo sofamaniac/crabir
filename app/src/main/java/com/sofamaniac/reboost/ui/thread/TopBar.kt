@@ -20,15 +20,18 @@ import com.sofamaniac.reboost.data.remote.dto.comment.Sort
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(viewModel: ThreadViewModel, scrollBehavior: TopAppBarScrollBehavior?) {
+fun TopBar(
+    viewModel: ThreadViewModel,
+    scrollBehavior: TopAppBarScrollBehavior?,
+    dismiss: () -> Unit
+) {
     val navController = LocalNavController.current!!
     val sort: Sort by viewModel.sort.collectAsState()
     TopAppBar(
         scrollBehavior = scrollBehavior,
         navigationIcon = {
             IconButton(
-                onClick = { navController.popBackStack() },
-
+                onClick = dismiss,
                 ) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
             }

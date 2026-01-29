@@ -1,19 +1,18 @@
 package com.sofamaniac.reboost.ui.thread
 
 import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
-import com.sofamaniac.reboost.PostRoute
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
 import com.sofamaniac.reboost.data.local.entities.toDomainModel
 import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.remote.dto.comment.Sort
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.domain.repository.ThreadRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,14 +20,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-@HiltViewModel
-class ThreadViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = ThreadViewModel.Factory::class)
+class ThreadViewModel @AssistedInject constructor(
     private val repository: ThreadRepository,
     private val visitedPostsDao: VisitedPostsDao,
-    private val savedStateHandle: SavedStateHandle
+    @Assisted val permalink: String,
 ): ViewModel() {
 
-    val permalink: String = savedStateHandle.toRoute<PostRoute>().postPermalink
     var id: String = repository.getPostId(permalink)
 
     val isRefreshing: StateFlow<Boolean>
@@ -77,5 +75,10 @@ class ThreadViewModel @Inject constructor(
 
     fun refresh() {
         repository.refresh()
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(permalink: String): ThreadViewModel
     }
 }

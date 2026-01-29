@@ -167,7 +167,7 @@ fun NavigationGraph(
     ) {
         composable<HomeRoute> {
             HomeViewer(
-                navController, drawerState, selected
+                drawerState, selected
             )
         }
         composable<PostRoute>(
@@ -185,7 +185,7 @@ fun NavigationGraph(
             },
         )
         {
-            ThreadView(selected)
+            ThreadView(dismiss = { navController.popBackStack() })
         }
         composable<SubscriptionsRoute> {
             SubredditListViewer(navController = navController)

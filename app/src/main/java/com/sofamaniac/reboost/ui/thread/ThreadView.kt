@@ -11,21 +11,31 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.toRoute
+import com.sofamaniac.reboost.LocalNavController
+import com.sofamaniac.reboost.PostRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThreadView(
-    selected: State<Int>,
     modifier: Modifier = Modifier,
-    viewModel: ThreadViewModel = hiltViewModel()
+    permalink: String? = null,
+    dismiss: () -> Unit = {},
 ) {
+    val link = permalink
+        ?: LocalNavController.current?.currentBackStackEntry?.toRoute<PostRoute>()?.postPermalink
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val viewModel: ThreadViewModel =
+        hiltViewModel<ThreadViewModel, ThreadViewModel.Factory> { factory ->
+            factory.create(link!!)
+        }
+
     Scaffold(
-        topBar = { TopBar(viewModel, scrollBehavior) },
+        topBar = { TopBar(viewModel, scrollBehavior, dismiss) },
         //bottomBar = { TabBar(selected) },
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->

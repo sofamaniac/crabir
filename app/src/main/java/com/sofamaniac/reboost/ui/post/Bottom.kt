@@ -37,8 +37,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.reboost.BuildConfig
 import com.sofamaniac.reboost.LocalNavController
-import com.sofamaniac.reboost.PostRoute
-import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.domain.repository.PostRepository
 import dagger.assisted.Assisted
@@ -52,7 +50,6 @@ import kotlinx.serialization.json.Json
 @HiltViewModel(assistedFactory = ButtonViewModel.Factory::class)
 class ButtonViewModel @AssistedInject constructor(
     @Assisted val postId: String,
-    private val reddit: RedditAPIService,
     private val posts: PostRepository,
 ) : ViewModel() {
 
@@ -135,18 +132,19 @@ fun BottomRow(
         key = post.id.id,
         creationCallback = { factory: ButtonViewModel.Factory ->
             factory.create(post.id.id)
-        })
+        }),
+    visitPost: (PostData) -> Unit = {},
 ) {
     val navController = LocalNavController.current!!
     val uriHandler = LocalUriHandler.current
-    val likes by viewModel.likes.collectAsState(initial = false)
-    val saved by viewModel.saved.collectAsState(initial = false)
+    val likes by viewModel.likes.collectAsState(initial = post.relationship.liked)
+    val saved by viewModel.saved.collectAsState(initial = post.relationship.saved)
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
         UpButton(post, likes) { viewModel.upvote() }
         DownButton(post, likes) { viewModel.downvote() }
         SavedButton(post, saved) { viewModel.save(!saved) }
         IconButton(onClick = {
-            navController.navigate(PostRoute(post.permalink))
+            visitPost(post)
         }) {
             Icon(Icons.AutoMirrored.Outlined.Chat, "comments")
         }

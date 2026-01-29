@@ -19,8 +19,9 @@ fun Cartouche(
     Surface(
         color = backgroundColor,
         shape = RoundedCornerShape(corner = CornerSize(2.dp)),
+        modifier = modifier,
     ) {
-        Box(modifier = modifier.padding(horizontal = 4.dp)) {
+        Box(modifier = Modifier.padding(horizontal = 4.dp)) {
             content()
         }
     }

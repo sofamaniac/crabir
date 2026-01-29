@@ -39,6 +39,9 @@ abstract class PostFeedViewModel(
 ) : ViewModel() {
 
     var listState by mutableStateOf(LazyListState())
+
+    var currentPost by mutableStateOf<String?>(null)
+
     data class FeedParams(
         val sort: Sort,
         val timeframe: Timeframe?

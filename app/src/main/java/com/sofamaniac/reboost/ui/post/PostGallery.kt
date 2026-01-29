@@ -1,22 +1,26 @@
 package com.sofamaniac.reboost.ui.post
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
-import com.sofamaniac.reboost.data.remote.dto.post.PostImageSource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.sofamaniac.reboost.domain.model.PostData
-import com.sofamaniac.reboost.ui.media.image.ImageView
-import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayer
+import com.sofamaniac.reboost.ui.Cartouche
+import com.sofamaniac.reboost.ui.media.Gallery
 
 @Composable
 fun PostGallery(post: PostData, modifier: Modifier = Modifier) {
@@ -24,51 +28,42 @@ fun PostGallery(post: PostData, modifier: Modifier = Modifier) {
     if (gallery.images.isEmpty()) {
         return
     }
-    val current = rememberPagerState(initialPage = 0, pageCount = { gallery.images.size })
-    val minRatio = gallery.mediaMetadata.map { metadata ->
-        when (val data = metadata.value) {
-            is MediaMetadata.Image -> {
-                data.s!!.ratio
-            }
 
-            is MediaMetadata.Gif -> {
-                data.s!!.ratio
-            }
+    val state = rememberPagerState(initialPage = 0, pageCount = { gallery.images.size })
+    var fullscreen by remember { mutableStateOf(false) }
+    Gallery(gallery, modifier, state, onTap = { fullscreen = true }) {
+        Cartouche(
+            backgroundColor = Color.Black.copy(alpha = 0.6f),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(all = 4.dp)
+        ) {
+            Text(
+                "${state.currentPage + 1}/${gallery.images.size}",
+            )
+        }
+    }
+    if (fullscreen) {
+        val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
+        Dialog(
+            onDismissRequest = { fullscreen = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            SwipeToDismissBox(
+                state = swipeToDismissBoxState,
+                backgroundContent = {},
+                onDismiss = { fullscreen = false }
+            ) {
+                Gallery(
+                    gallery,
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.Black),
+                    state,
+                    onTap = null
+                )
 
-            else -> {
-                1f
             }
         }
-    }.min()
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .aspectRatio(minRatio),
-        contentAlignment = Alignment.TopEnd
-    ) {
-        HorizontalPager(state = current, modifier = Modifier.fillMaxSize()) { page ->
-            val mediaId = gallery.images[page].mediaId
-            val metadata: MediaMetadata? = gallery.mediaMetadata[mediaId]
-            if (metadata != null) {
-                when (metadata) {
-                    is MediaMetadata.Image -> ImageView(metadata)
-                    is MediaMetadata.Gif -> VideoPlayer(
-                        PostImageSource(
-                            metadata.s?.mp4Url,
-                            metadata.s?.width!!,
-                            metadata.s.height
-                        )
-                    )
-
-                    else -> {
-                        Text("No luck my friend (${metadata.javaClass.simpleName})")
-                    }
-                }
-            }
-        }
-        Text(
-            "${current.currentPage + 1}/${gallery.images.size}",
-            modifier = Modifier.background(Color.Black.copy(alpha = 0.6f))
-        )
     }
 }

@@ -11,12 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
 import com.sofamaniac.reboost.domain.model.PostData
-import com.sofamaniac.reboost.ui.media.image.FromMetadata
+import com.sofamaniac.reboost.ui.media.image.FromPreview
 
 @Composable
 fun PostImage(post: PostData, modifier: Modifier = Modifier) {
-    if (post._preview?.images?.isNotEmpty() == true) {
-        FromMetadata(post, modifier)
+    if (post.getPreview()?.images?.isNotEmpty() == true) {
+        FromPreview(post, modifier)
     } else {
         val url = post.url
         AsyncImage(

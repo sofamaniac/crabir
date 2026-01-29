@@ -4,10 +4,8 @@
 
 package com.sofamaniac.reboost.ui.subreddit
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -39,32 +37,28 @@ fun SubredditViewer(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
-
-    Scaffold(
-        topBar = {
-            TopBar(
-                subreddit,
-                viewModel,
-                drawerState,
-                scrollBehavior,
-            )
-        },
-        bottomBar = {
-            TabBar(
-                selected,
-                onTabReselect = {
-                    scope.launch {
-                        viewModel.listState.animateScrollToItem(0)
-                    }
-                }
-            )
-        },
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-    ) { innerPadding ->
-        PostFeedViewer(
-            viewModel, showSubredditIcon = false, modifier = Modifier.padding(innerPadding)
+    val topBar = @Composable {
+        TopBar(
+            subreddit,
+            viewModel,
+            drawerState,
+            scrollBehavior,
         )
     }
+    val bottomBar = @Composable {
+        TabBar(
+            selected,
+            onTabReselect = {
+                scope.launch {
+                    viewModel.listState.animateScrollToItem(0)
+                }
+            }
+        )
+    }
+    FullFeedView(
+        drawerState, topBar, bottomBar, viewModel,
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+    )
 }
 
 @HiltViewModel(assistedFactory = SubredditViewModel.Factory::class)
