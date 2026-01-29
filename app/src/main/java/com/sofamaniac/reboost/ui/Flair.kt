@@ -8,11 +8,7 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -80,10 +76,9 @@ fun Flair(flair: Flair) {
     if (flair.text.isEmpty() && flair.richText.isEmpty()) return
     val backgroundColor = mapColor(flair.backgroundColor)
     val textColor = mapColor(flair.textColor)
-    Surface(color = backgroundColor, shape = RoundedCornerShape(corner = CornerSize(2.dp))) {
+    Cartouche(backgroundColor = backgroundColor) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.padding(horizontal = 4.dp)
         ) {
             when (flair.type) {
                 "richtext" -> {
