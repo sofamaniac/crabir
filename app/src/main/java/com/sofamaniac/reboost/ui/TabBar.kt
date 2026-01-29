@@ -21,7 +21,7 @@ import com.sofamaniac.reboost.SearchRoute
 import com.sofamaniac.reboost.SubscriptionsRoute
 
 @Composable
-fun TabBar(selected: State<Int> ,modifier: Modifier = Modifier) {
+fun TabBar(selected: State<Int>, modifier: Modifier = Modifier) {
     val tabs = listOf(
         Pair(Icons.Filled.Home, HomeRoute),
         Pair(Icons.Default.Search, SearchRoute),
@@ -40,7 +40,7 @@ fun TabBar(selected: State<Int> ,modifier: Modifier = Modifier) {
                             saveState = true
                         }
                         launchSingleTop = true
-                        restoreState = true
+                        restoreState = index == 0
                     }
                 },
                 icon = { Icon(tab.first, contentDescription = tab.second.title) },
