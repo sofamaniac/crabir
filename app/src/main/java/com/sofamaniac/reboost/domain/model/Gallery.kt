@@ -13,11 +13,11 @@ data class Gallery(
     val aspectRatio = mediaMetadata.map { metadata ->
         when (val data = metadata.value) {
             is MediaMetadata.Image -> {
-                data.s!!.ratio
+                data.source!!.ratio
             }
 
             is MediaMetadata.Gif -> {
-                data.s!!.ratio
+                data.source!!.ratio
             }
 
             else -> {

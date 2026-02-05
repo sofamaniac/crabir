@@ -41,7 +41,6 @@ fun HomeViewer(
         })
     }
     FullFeedView(
-        drawerState,
         topBar,
         bottomBar,
         viewModel,

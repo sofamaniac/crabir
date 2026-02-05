@@ -27,7 +27,7 @@ class GalleryViewModel @AssistedInject constructor(
         for (image in gallery.images) {
             val metadata = gallery.mediaMetadata[image.mediaId]!!
             if (metadata is MediaMetadata.Gif) {
-                val mediaItem = MediaItem.fromUri(metadata.s!!.mp4Url!!)
+                val mediaItem = MediaItem.fromUri(metadata.source!!.mp4Url!!)
                 val player = ExoPlayer.Builder(context).build().apply {
                     repeatMode = ExoPlayer.REPEAT_MODE_ONE
                     addMediaItem(mediaItem)

@@ -350,17 +350,17 @@ data class OEmbed(
 @Serializable
 data class RedditVideo(
     /** Use this url to get the video */
-    val fallback_url: String,
+    @SerialName("fallback_url") val fallbackUrl: String,
     val width: Int = 0,
     val height: Int = 0,
-    val scrubber_media_url: String,
-    val dash_url: String,
+    @SerialName("scrubber_media_url") val scrubberMediaUrl: String,
+    @SerialName("dash_url") val dashUrl: String,
     /** Duration in seconds */
     val duration: Int,
-    val hls_url: String? = null,
-    val is_gif: Boolean = false,
+    @SerialName("hls_url") val hlsUrl: String? = null,
+    @SerialName("is_gif") val isGif: Boolean = false,
 ) {
-    fun toMediaResource() = MediaResource(fallback_url, width.toFloat() / height.toFloat())
+    fun toMediaResource() = MediaResource(fallbackUrl, width.toFloat() / height.toFloat())
 }
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -372,17 +372,15 @@ sealed class MediaMetadata() {
     data class Image(
         @SerialName("id") val id: String? = null,
         /** Something like "image/jpeg" */
-        @SerialName("m") val m: String? = null,
+        @SerialName("m") val mime: String? = null,
         @SerialName("p") val preview: List<MediaPreview>? = emptyList(),
-        /** Source ? */
-        @SerialName("s") val s: MediaPreview? = null,
-        /** Original ? */
-        @SerialName("o") val o: List<MediaPreview>? = emptyList(),
+        @SerialName("s") val source: MediaPreview? = null,
+        @SerialName("o") val obfuscated: List<MediaPreview>? = emptyList(),
     ) : MediaMetadata() {
         val ratio: Float
-            get() = s?.ratio ?: 1f
+            get() = source?.ratio ?: 1f
 
-        fun toMediaResource() = MediaResource(s!!.url!!, ratio)
+        fun toMediaResource() = MediaResource(source!!.url!!, ratio)
     }
 
     @Serializable
@@ -390,17 +388,15 @@ sealed class MediaMetadata() {
     data class Gif(
         @SerialName("id") val id: String? = null,
         /** Something like "image/jpeg" */
-        @SerialName("m") val m: String? = null,
+        @SerialName("m") val mime: String? = null,
         @SerialName("p") val preview: List<MediaPreview> = emptyList(),
-        /** Source ? */
-        @SerialName("s") val s: MediaPreviewGifSource? = null,
-        /** Original ? */
-        @SerialName("o") val o: List<MediaPreview> = emptyList(),
+        @SerialName("s") val source: MediaPreviewGifSource? = null,
+        @SerialName("o") val obfuscated: List<MediaPreview> = emptyList(),
     ) : MediaMetadata() {
         val ratio: Float
-            get() = s?.ratio ?: 1f
+            get() = source?.ratio ?: 1f
 
-        fun toMediaResource() = MediaResource(s!!.mp4Url!!, ratio)
+        fun toMediaResource() = MediaResource(source!!.mp4Url!!, ratio)
     }
 
     @Serializable

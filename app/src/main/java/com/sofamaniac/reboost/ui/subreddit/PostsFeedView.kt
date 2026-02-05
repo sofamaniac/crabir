@@ -39,6 +39,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,6 +52,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
+import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.post.PostBody
 import com.sofamaniac.reboost.ui.post.View
 import com.sofamaniac.reboost.ui.thread.ThreadView
@@ -102,36 +104,35 @@ fun PostFeedViewer(
         ) {
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id.id }) { index ->
                 val post = posts[index]!!
-                val threadView = @Composable {
+                val threadView = @Composable { post: PostData ->
                     val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
                     SwipeToDismissBox(
                         state = swipeToDismissBoxState,
                         backgroundContent = {},
                         onDismiss = {
-                            state.fullscreenView = null
+                            state.setFullscreenView(null)
                         }) {
                         ThreadView(
                             permalink = post.permalink,
                             dismiss = {
-                                state.fullscreenView = null
+                                state.setFullscreenView(null)
                             })
                     }
                 }
                 View(
                     post,
                     showSubredditIcon = showSubredditIcon,
-                    visitPost = {
-                        state.fullscreenView = threadView
+                    visitPost = { post ->
+                        state.setFullscreenView { key(post.id.id) { threadView(post) } }
                     },
                 ) {
-                    Text("${mostVisibleItemIndex} - $index")
                     PostBody(
                         post,
                         canPlayVideo = index == mostVisibleItemIndex,
                         goFullscreen = {
-                            state.fullscreenView = it
+                            state.setFullscreenView(it)
                         }, dismiss = {
-                            state.fullscreenView = null
+                            state.setFullscreenView(null)
                         })
                 }
             }

@@ -189,10 +189,10 @@ fun View(
         shape = RoundedCornerShape(0),
         modifier = Modifier
             .fillMaxWidth()
-//            .clickable(enabled = clickable, onClick = {
-//                visitPost(post)
-//                //navController.navigate(PostRoute(post.permalink))
-//            }),
+            .clickable(enabled = clickable, onClick = {
+                visitPost(post)
+                //navController.navigate(PostRoute(post.permalink))
+            }),
     ) {
         PostHeader(
             post,

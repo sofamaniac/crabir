@@ -96,7 +96,7 @@ fun EmbeddedGallery(
     canPlayVideo: Boolean = false,
 ) {
 
-    Box() {
+    Box(modifier = modifier) {
         Gallery(
             gallery,
             modifier.aspectRatio(gallery.aspectRatio),
@@ -106,7 +106,6 @@ fun EmbeddedGallery(
                 is MediaMetadata.Image -> ImageView(
                     metadata.toMediaResource(),
                     allowTransformation = false,
-                    onTap = goFullscreen
                 )
 
                 is MediaMetadata.Gif ->

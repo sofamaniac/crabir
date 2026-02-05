@@ -52,7 +52,7 @@ fun MultiView(
         )
     }
     FullFeedView(
-        drawerState, topBar, bottomBar, viewModel,
+        topBar, bottomBar, viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     )
 }

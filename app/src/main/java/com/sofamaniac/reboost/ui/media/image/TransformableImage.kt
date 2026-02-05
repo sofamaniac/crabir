@@ -25,7 +25,6 @@ fun TransformableImage(
             onTap = onTap,
             scrollGesturePropagation = ScrollGesturePropagation.NotZoomed
         )
-
     } else {
         modifier
     }

@@ -1,6 +1,5 @@
 package com.sofamaniac.reboost.ui.media.videoPlayer
 
-import android.util.Log
 import androidx.annotation.OptIn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -51,11 +50,9 @@ fun VideoPlayer(
 
     val context = LocalContext.current
     val player = remember { VideoPlayerManager.getInstance(context) }
-    var hasFirstFrame by remember { mutableStateOf(true) }
     val currentUrl = VideoPlayerManager.currentUrl.collectAsState()
 
     LaunchedEffect(startPlaying, currentUrl) {
-        Log.d("VideoPlayer", "launching effect")
         if (startPlaying) {
             VideoPlayerManager.setMediaItem(media.url)
             player.playWhenReady = true
@@ -72,7 +69,7 @@ fun VideoPlayer(
 
     val playing = rememberPlayPauseButtonState(player).showPlay
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .aspectRatio(media.aspectRatio)
             .clickable(onClick = { showControls = !showControls })

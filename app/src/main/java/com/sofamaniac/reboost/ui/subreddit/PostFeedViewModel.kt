@@ -41,7 +41,9 @@ abstract class PostFeedViewModel(
 
     var listState by mutableStateOf(LazyListState())
 
-    var fullscreenView by mutableStateOf<(@Composable () -> Unit)?>(null)
+    var _fullscreenView = MutableStateFlow<(@Composable () -> Unit)?>(null)
+
+    val fullscreenView = _fullscreenView.asStateFlow()
 
     data class FeedParams(
         val sort: Sort,
@@ -55,6 +57,11 @@ abstract class PostFeedViewModel(
         )
     )
     val params: StateFlow<FeedParams> = _params.asStateFlow()
+
+    fun setFullscreenView(view: @Composable (() -> Unit)?) {
+        _fullscreenView.value = view
+    }
+
 
     fun scrollToTop() {
         viewModelScope.launch {
