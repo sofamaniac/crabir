@@ -30,7 +30,7 @@ fun ThreadView(
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val viewModel: ThreadViewModel =
-        hiltViewModel<ThreadViewModel, ThreadViewModel.Factory> { factory ->
+        hiltViewModel<ThreadViewModel, ThreadViewModel.Factory>(key = link) { factory ->
             factory.create(link!!)
         }
 
