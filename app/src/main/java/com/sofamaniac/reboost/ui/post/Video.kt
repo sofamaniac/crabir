@@ -8,16 +8,16 @@ import androidx.annotation.OptIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.media3.common.util.UnstableApi
-import com.sofamaniac.reboost.data.remote.dto.post.PostImageSource
+import com.sofamaniac.reboost.domain.model.MediaResource
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayer
 
 @OptIn(UnstableApi::class)
 @Composable
-fun PostVideo(post: PostData, modifier: Modifier = Modifier) {
+fun PostVideo(post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boolean = false) {
     val source = getVideoUrl(post)
     if (source != null) {
-        VideoPlayer(source)
+        VideoPlayer(source, startPlaying = canPlayVideo)
     } else {
         PostImage(post)
     }
@@ -25,12 +25,12 @@ fun PostVideo(post: PostData, modifier: Modifier = Modifier) {
 }
 
 
-fun getVideoUrl(post: PostData): PostImageSource? {
-    val media = post.media.media?.reddit_video
+fun getVideoUrl(post: PostData): MediaResource? {
+    val media = post.media.media?.reddit_video?.toMediaResource()
     if (media != null) {
-        return PostImageSource(url = media.fallback_url, width = media.width, height = media.height)
+        return media
     }
-    return post.getPreview()?.images?.firstOrNull()?.variants?.mp4?.source
+    return post.getPreview()?.images?.firstOrNull()?.variants?.mp4?.source?.toMediaResource()
 }
 
 

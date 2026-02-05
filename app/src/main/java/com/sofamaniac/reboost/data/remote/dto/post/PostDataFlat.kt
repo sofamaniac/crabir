@@ -19,6 +19,7 @@ import com.sofamaniac.reboost.domain.model.AuthorInfo
 import com.sofamaniac.reboost.domain.model.Flair
 import com.sofamaniac.reboost.domain.model.Gallery
 import com.sofamaniac.reboost.domain.model.MediaInfo
+import com.sofamaniac.reboost.domain.model.MediaResource
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.domain.model.Relationship
 import com.sofamaniac.reboost.domain.model.Score
@@ -358,7 +359,9 @@ data class RedditVideo(
     val duration: Int,
     val hls_url: String? = null,
     val is_gif: Boolean = false,
-)
+) {
+    fun toMediaResource() = MediaResource(fallback_url, width.toFloat() / height.toFloat())
+}
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable(with = MediaMetadataSerializer::class)
@@ -375,7 +378,12 @@ sealed class MediaMetadata() {
         @SerialName("s") val s: MediaPreview? = null,
         /** Original ? */
         @SerialName("o") val o: List<MediaPreview>? = emptyList(),
-    ) : MediaMetadata()
+    ) : MediaMetadata() {
+        val ratio: Float
+            get() = s?.ratio ?: 1f
+
+        fun toMediaResource() = MediaResource(s!!.url!!, ratio)
+    }
 
     @Serializable
     @SerialName("AnimatedImage")
@@ -388,7 +396,12 @@ sealed class MediaMetadata() {
         @SerialName("s") val s: MediaPreviewGifSource? = null,
         /** Original ? */
         @SerialName("o") val o: List<MediaPreview> = emptyList(),
-    ) : MediaMetadata()
+    ) : MediaMetadata() {
+        val ratio: Float
+            get() = s?.ratio ?: 1f
+
+        fun toMediaResource() = MediaResource(s!!.mp4Url!!, ratio)
+    }
 
     @Serializable
     @SerialName("Invalid")

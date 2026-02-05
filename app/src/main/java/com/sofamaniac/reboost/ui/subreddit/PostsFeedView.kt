@@ -27,14 +27,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,7 +53,9 @@ import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
 import com.sofamaniac.reboost.ui.post.PostBody
 import com.sofamaniac.reboost.ui.post.View
+import com.sofamaniac.reboost.ui.thread.ThreadView
 import kotlinx.coroutines.launch
+import kotlin.math.max
 
 
 /**
@@ -68,6 +73,19 @@ fun PostFeedViewer(
 
     val posts = state.data.collectAsLazyPagingItems()
     val listState = state.listState
+
+    val mostVisibleItemIndex by remember {
+        derivedStateOf {
+            listState.layoutInfo.visibleItemsInfo
+                .maxByOrNull { item ->
+                    val size = item.size
+                    val itemTop = maxOf(item.offset, 0)
+                    val itemBottom =
+                        minOf(item.offset + item.size, listState.layoutInfo.viewportEndOffset)
+                    (itemBottom - itemTop).toFloat() / max(item.size, 1).toFloat()
+                }?.index ?: 0
+        }
+    }
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,
         onRefresh = {
@@ -84,13 +102,37 @@ fun PostFeedViewer(
         ) {
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id.id }) { index ->
                 val post = posts[index]!!
+                val threadView = @Composable {
+                    val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
+                    SwipeToDismissBox(
+                        state = swipeToDismissBoxState,
+                        backgroundContent = {},
+                        onDismiss = {
+                            state.fullscreenView = null
+                        }) {
+                        ThreadView(
+                            permalink = post.permalink,
+                            dismiss = {
+                                state.fullscreenView = null
+                            })
+                    }
+                }
                 View(
                     post,
                     showSubredditIcon = showSubredditIcon,
-                    visitPost = { state.currentPost = post.permalink },
+                    visitPost = {
+                        state.fullscreenView = threadView
+                    },
                 ) {
-                    Text(post.kind.name)
-                    PostBody(post)
+                    Text("${mostVisibleItemIndex} - $index")
+                    PostBody(
+                        post,
+                        canPlayVideo = index == mostVisibleItemIndex,
+                        goFullscreen = {
+                            state.fullscreenView = it
+                        }, dismiss = {
+                            state.fullscreenView = null
+                        })
                 }
             }
         }

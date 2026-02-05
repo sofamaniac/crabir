@@ -8,4 +8,21 @@ import kotlinx.serialization.Serializable
 data class Gallery(
     val images: List<GalleryDataImage>,
     val mediaMetadata: Map<String, MediaMetadata>
-)
+) {
+
+    val aspectRatio = mediaMetadata.map { metadata ->
+        when (val data = metadata.value) {
+            is MediaMetadata.Image -> {
+                data.s!!.ratio
+            }
+
+            is MediaMetadata.Gif -> {
+                data.s!!.ratio
+            }
+
+            else -> {
+                1f
+            }
+        }
+    }.minOrNull() ?: 1f
+}

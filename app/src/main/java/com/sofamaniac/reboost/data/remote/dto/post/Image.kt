@@ -24,6 +24,6 @@ data class PostImageVariants(
 
 @Serializable
 data class PostImageData(
-    val source: PostImageSource? = null,
-    val resolutions: List<PostImageSource>? = null,
+    val source: PostImageSource,
+    val resolutions: List<PostImageSource> = emptyList(),
 )

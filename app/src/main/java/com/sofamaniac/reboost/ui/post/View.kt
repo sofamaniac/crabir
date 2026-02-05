@@ -36,7 +36,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.domain.model.Kind
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.Flair
@@ -46,14 +45,20 @@ import java.util.Locale
 
 
 @Composable
-internal fun PostBody(post: PostData, modifier: Modifier = Modifier) {
+internal fun PostBody(
+    post: PostData,
+    modifier: Modifier = Modifier,
+    canPlayVideo: Boolean = false,
+    goFullscreen: (@Composable () -> Unit) -> Unit,
+    dismiss: () -> Unit
+) {
     when (post.kind) {
         Kind.Image -> {
             PostImage(post, Modifier.fillMaxWidth())
         }
 
         Kind.Video -> {
-            PostVideo(post, Modifier.fillMaxWidth())
+            PostVideo(post, Modifier.fillMaxWidth(), canPlayVideo = canPlayVideo)
         }
 
         Kind.Link -> {
@@ -61,7 +66,13 @@ internal fun PostBody(post: PostData, modifier: Modifier = Modifier) {
         }
 
         Kind.Gallery -> {
-            PostGallery(post, Modifier.fillMaxWidth())
+            PostGallery(
+                post,
+                Modifier.fillMaxWidth(),
+                goFullscreen,
+                dismiss,
+                canPlayVideo = canPlayVideo
+            )
         }
 
         else -> {
@@ -159,6 +170,7 @@ fun PostData.scoreString(): AnnotatedString {
  * @param modifier Modifier for the root layout of the post.
  * @param showSubredditIcon Whether to display the subreddit icon in the header. Defaults to true.
  * @param clickable Whether the post is clickable to navigate to the full post view. Defaults to true.
+ * @param visitPost A lambda that takes a [Post] and navigates to the full post view.
  * @param body A composable lambda that defines the main content/body of the post (e.g., text, image). It should manage the horizontal padding itself
  */
 @Composable
@@ -173,15 +185,14 @@ fun View(
     // We do not apply the padding on the column, but on each of its children except [body]
     // to have images that take the full width
     val modifier = Modifier.padding(horizontal = 16.dp)
-    val navController = LocalNavController.current!!
     Card(
         shape = RoundedCornerShape(0),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(enabled = clickable, onClick = {
-                visitPost(post)
-                //navController.navigate(PostRoute(post.permalink))
-            }),
+//            .clickable(enabled = clickable, onClick = {
+//                visitPost(post)
+//                //navController.navigate(PostRoute(post.permalink))
+//            }),
     ) {
         PostHeader(
             post,
@@ -189,7 +200,7 @@ fun View(
             modifier = modifier.padding(vertical = 8.dp)
         )
         val enablePreview =
-            post.thumbnail.uri.toString().isNotEmpty() && post.kind == Kind.Link
+            post.thumbnail.uri.isNotEmpty() && post.kind == Kind.Link
         PostInfo(
             post,
             modifier = modifier,

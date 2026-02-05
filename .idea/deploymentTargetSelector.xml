@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="Reboost.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-01-28T20:34:27.449272067Z">
+        <DropdownSelection timestamp="2026-02-02T00:25:12.158332081Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="Default" identifier="serial=192.168.240.112:5555;connection=9884aba3" />
+              <DeviceId pluginId="Default" identifier="serial=192.168.240.112:5555;connection=8f0f9a2f" />
             </handle>
           </Target>
         </DropdownSelection>

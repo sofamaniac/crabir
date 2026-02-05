@@ -10,6 +10,7 @@ package com.sofamaniac.reboost.ui.subreddit
 
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -40,7 +41,7 @@ abstract class PostFeedViewModel(
 
     var listState by mutableStateOf(LazyListState())
 
-    var currentPost by mutableStateOf<String?>(null)
+    var fullscreenView by mutableStateOf<(@Composable () -> Unit)?>(null)
 
     data class FeedParams(
         val sort: Sort,

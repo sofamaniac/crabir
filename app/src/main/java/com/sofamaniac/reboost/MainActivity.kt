@@ -31,6 +31,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -48,7 +49,6 @@ import androidx.navigation.toRoute
 import com.sofamaniac.reboost.ui.ProfileView
 import com.sofamaniac.reboost.ui.drawer.DrawerContent
 import com.sofamaniac.reboost.ui.drawer.DrawerViewModel
-import com.sofamaniac.reboost.ui.media.videoPlayer.LocalVideoPlayerManager
 import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayerManager
 import com.sofamaniac.reboost.ui.subreddit.HomeViewer
 import com.sofamaniac.reboost.ui.subreddit.MultiView
@@ -87,14 +87,11 @@ class MainActivity : ComponentActivity() {
             ReboostTheme {
                 MaterialTheme {
                     val navController = rememberNavController()
-                    val videoPlayerManager = remember { VideoPlayerManager() }
                     // Setup nav controller
                     CompositionLocalProvider(LocalNavController provides navController) {
-                        CompositionLocalProvider(LocalVideoPlayerManager provides videoPlayerManager) {
-                            MainScreen(
-                                navController = navController,
-                            )
-                        }
+                        MainScreen(
+                            navController = navController,
+                        )
                     }
                 }
             }
@@ -111,6 +108,12 @@ fun MainScreen(
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val drawerViewModel: DrawerViewModel = viewModel()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            VideoPlayerManager.releasePlayer()
+        }
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,

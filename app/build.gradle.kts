@@ -131,14 +131,14 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.coroutines.core)
 
-    implementation("com.google.dagger:hilt-android:2.57.2")
-    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.compose.foundation.layout)
-    ksp("com.google.dagger:hilt-android-compiler:2.57.2")
-    ksp("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 
 
-    implementation("tech.mappie:mappie-api:2.3.0-2.3.0")
+    implementation(libs.mappie.api)
 
 
     testImplementation(libs.junit)
@@ -153,23 +153,25 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor) // Optional, for request/response logging
+
     // Json serialization
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.kotlinx.datetime)
 
     implementation(libs.androidx.navigation.compose)
-
     implementation(libs.androidx.paging.compose)
-
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
 
     // Parse HTML-encoded urls
     implementation(libs.commons.text)
 
     // More material icons
     implementation(libs.androidx.material.icons.extended)
+
+    // Images
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation("net.engawapg.lib:zoomable:2.9.0")
 
     // Video player
     implementation(libs.androidx.media3.exoplayer)
