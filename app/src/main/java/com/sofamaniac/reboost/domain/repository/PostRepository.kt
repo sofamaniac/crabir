@@ -11,9 +11,10 @@ import retrofit2.Response
 
 class PostRepository(private val api: RedditAPIService) {
     private val _cache =
-        MutableStateFlow<MutableMap<String, VotableData>>(emptyMap<String, VotableData>().toMutableMap())
+        MutableStateFlow(emptyMap<String, VotableData>())
 
-    fun observePost(id: String): Flow<VotableData> = _cache.map { it[id]!! }.distinctUntilChanged()
+    fun observePost(id: String): Flow<VotableData> = _cache.map { it[id]!! }
+        .distinctUntilChanged()
 
     /** Returns true if the post was added, false if it already existed */
     fun addPost(post: VotableData): Boolean {
@@ -44,11 +45,8 @@ class PostRepository(private val api: RedditAPIService) {
             val score = post.score.copy(score = post.score.score + dir)
             val relationship = post.relationship.copy(liked = newLike)
             if (res.isSuccessful) {
-                _cache.value.compute(id) { _, value ->
-                    value?.relationship = relationship
-                    value?.score = score
-                    value
-                }
+                val newPost = post.copy(score = score, relationship = relationship)
+                _cache.value += (id to newPost)
                 return Result.success(Unit)
             } else {
                 Log.e("PostRepository", "Error upvoting post: ${res.errorBody()}")
@@ -74,10 +72,7 @@ class PostRepository(private val api: RedditAPIService) {
             val res = if (target) api.save(post.name) else api.unsave(post.name)
             if (res.isSuccessful) {
                 val relationship = post.relationship.copy(saved = target)
-                _cache.value.compute(id) { _, value ->
-                    value?.relationship = relationship
-                    value
-                }
+                _cache.value += (id to post.copy(relationship = relationship))
                 return Result.success(Unit)
             } else {
                 Log.e("PostRepository", "Error saving post: ${res.errorBody()}")

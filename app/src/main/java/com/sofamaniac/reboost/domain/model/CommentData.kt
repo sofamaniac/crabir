@@ -17,10 +17,13 @@ data class CommentData(
     val permalink: String,
     val replies: List<CommentReply>,
     val author: AuthorInfo,
-    override var relationship: Relationship,
+    override val relationship: Relationship,
     val subredditInfo: SubredditInfo,
-    override var score: Score,
+    override val score: Score,
     val collapsed: Boolean,
     val createdUtc: Instant,
     val edited: Instant?,
-) : VotableData
+) : VotableData {
+    override fun copy(relationship: Relationship?, score: Score?): CommentData =
+        copy(relationship = relationship ?: this.relationship, score = score ?: this.score)
+}

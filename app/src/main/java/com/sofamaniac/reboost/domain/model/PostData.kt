@@ -7,15 +7,15 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 @Serializable
-class PostData(
+data class PostData(
     override val id: String,
     override val name: String,
-    override var relationship: Relationship,
+    override val relationship: Relationship,
     val createdUtc: Instant,
     val edited: Instant?,
     val author: AuthorInfo,
     val subreddit: SubredditInfo,
-    override var score: Score,
+    override val score: Score,
     val url: String,
     val domain: String,
     val permalink: String,
@@ -38,4 +38,8 @@ class PostData(
         get() {
             return crosspostParentList.isNotEmpty()
         }
+
+    override fun copy(relationship: Relationship?, score: Score?): VotableData {
+        return copy(relationship = relationship ?: this.relationship, score = score ?: this.score)
+    }
 }
