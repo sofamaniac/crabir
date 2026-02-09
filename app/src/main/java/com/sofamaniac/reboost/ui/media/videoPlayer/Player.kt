@@ -82,6 +82,12 @@ fun VideoPlayer(
                     .fillMaxSize()
                     .align(Alignment.Center)
             )
+            if (showControls) {
+                Controls(fullscreenButton = fullscreenButton)
+
+            } else {
+                AlwaysOnInfo(player, modifier = Modifier.align(Alignment.BottomCenter))
+            }
         } else {
             placeholder?.invoke()
             if (!playing) {
@@ -89,13 +95,6 @@ fun VideoPlayer(
                     cartouche?.invoke()
                 }
             }
-        }
-
-        if (showControls) {
-            Controls(fullscreenButton = fullscreenButton)
-
-        } else {
-            AlwaysOnInfo(player, modifier = Modifier.align(Alignment.BottomCenter))
         }
     }
 }

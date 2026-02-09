@@ -16,7 +16,6 @@ object VideoPlayerManager {
 
     var currentUrl: StateFlow<String?> = _currentUrl.asStateFlow()
 
-
     fun getInstance(context: Context): ExoPlayer {
         if (player == null) {
             player = ExoPlayer.Builder(context).build().apply {

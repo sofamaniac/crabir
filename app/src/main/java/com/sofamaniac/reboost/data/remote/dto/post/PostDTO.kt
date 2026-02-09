@@ -433,4 +433,8 @@ data class MediaPreview(
 ) {
     val ratio: Float
         get() = width.toFloat() / height.toFloat()
+
+    fun toMediaResource(): MediaResource {
+        return MediaResource(url!!, ratio)
+    }
 }

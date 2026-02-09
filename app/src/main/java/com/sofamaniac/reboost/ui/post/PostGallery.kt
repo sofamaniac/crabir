@@ -113,6 +113,12 @@ fun EmbeddedGallery(
                         media = metadata.toMediaResource(),
                         modifier = Modifier.fillMaxSize(),
                         startPlaying = canPlayVideo && state.currentPage == page,
+                        placeholder = {
+                            ImageView(
+                                metadata.preview.last().toMediaResource(),
+                                allowTransformation = false,
+                            )
+                        },
                         fullscreenButton = {
                             IconButton(onClick = goFullscreen) {
                                 Icon(
@@ -178,6 +184,12 @@ fun FullscreenGallery(
                         media = metadata.toMediaResource(),
                         modifier = Modifier.fillMaxSize(),
                         startPlaying = state.currentPage == page,
+                        placeholder = {
+                            ImageView(
+                                metadata.preview.last().toMediaResource(),
+                                allowTransformation = false,
+                            )
+                        },
                         fullscreenButton = {
                             IconButton(onClick = dismiss) {
                                 Icon(

@@ -17,7 +17,11 @@ import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayer
 fun PostVideo(post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boolean = false) {
     val source = getVideoUrl(post)
     if (source != null) {
-        VideoPlayer(source, startPlaying = canPlayVideo)
+        VideoPlayer(
+            source, startPlaying = canPlayVideo,
+            placeholder = {
+                PostImage(post)
+            })
     } else {
         PostImage(post)
     }
