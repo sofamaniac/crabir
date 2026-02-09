@@ -11,7 +11,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.ui.markdown.SimpleMarkdown
 import com.sofamaniac.reboost.ui.post.View
@@ -23,7 +22,6 @@ fun CommentListRoot(
     modifier: Modifier = Modifier,
 ) {
     rememberCoroutineScope()
-    val navController = LocalNavController.current!!
     val listState = rememberLazyListState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 

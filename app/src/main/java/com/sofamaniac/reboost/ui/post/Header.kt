@@ -91,7 +91,7 @@ fun PostHeader(
                 append(post.domain)
             }
             append(" · ")
-            append(formatElapsedTimeLocalized(post.createdAt))
+            append(formatElapsedTimeLocalized(post.createdUtc))
         }
         Text(text, style = MaterialTheme.typography.bodySmall)
         if (post.isCrosspost) Icon(

@@ -10,10 +10,11 @@ import androidx.paging.PagingState
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
+import com.sofamaniac.reboost.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.reboost.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
 import com.sofamaniac.reboost.domain.model.PagedResponse
-import com.sofamaniac.reboost.domain.model.PostData
+import com.sofamaniac.reboost.domain.model.VotableData
 import com.sofamaniac.reboost.domain.repository.PostRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -43,7 +44,7 @@ abstract class FeedRepositoryCommon(
         _seenPosts = emptySet()
     }
 
-    fun observePost(id: String): Flow<PostData> {
+    fun observePost(id: String): Flow<VotableData> {
         return postRepository.observePost(id)
     }
 
@@ -63,25 +64,37 @@ abstract class FeedRepositoryCommon(
         return postRepository.unsave(id)
     }
 
-    protected suspend fun makeRequest(
-        request: suspend () -> Response<Thing.Listing<Thing.Post>>
+    protected suspend fun <T : Thing.Votable> makeRequest(
+        request: suspend () -> Response<Thing.Listing<T>>
     ): PagedResponse<String> {
         val response = request()
         if (response.isSuccessful) {
             Log.d("makeRequest", "code ${response.code()}")
             val listing = response.body()
             listing?.let {
-                val posts = listing.data.children.map { post ->
-                    PostDataMapper.map(post.data)
-                }.filter { post ->
-                    !_seenPosts.contains(post.id.id)
+                val posts = listing.data.children.map { thing ->
+                    when (thing) {
+                        is Thing.Post -> {
+                            PostDataMapper.map(thing.data)
+                        }
+
+                        is Thing.Comment -> {
+                            CommentDataMapper.map(thing.data)
+                        }
+
+                        else -> {
+                            throw IllegalArgumentException("Unreachable code")
+                        }
+                    }
+                }.filter { thing ->
+                    !_seenPosts.contains(thing.id)
                 }
                 postRepository.addPosts(posts)
                 posts.forEach { data ->
-                    _seenPosts += data.id.id
+                    _seenPosts += data.id
                 }
                 val postsIds = posts.map { post ->
-                    post.id.id
+                    post.id
                 }
                 return PagedResponse(
                     data = postsIds,
@@ -100,14 +113,14 @@ class PostsSource(
     private val repository: FeedRepositoryCommon,
     private val sort: Sort,
     private val timeframe: Timeframe?,
-) : PagingSource<String, PostData>() {
+) : PagingSource<String, VotableData>() {
 
 
-    override fun getRefreshKey(state: PagingState<String, PostData>): String {
+    override fun getRefreshKey(state: PagingState<String, VotableData>): String {
         return ""
     }
 
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, PostData> {
+    override suspend fun load(params: LoadParams<String>): LoadResult<String, VotableData> {
         val postsId = if (params.key != null) {
             getPosts(params.key!!, sort, timeframe)
         } else {

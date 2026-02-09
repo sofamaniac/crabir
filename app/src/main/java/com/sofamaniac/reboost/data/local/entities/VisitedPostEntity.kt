@@ -17,5 +17,5 @@ fun VisitedPostEntity.toDomainModel(): PostData {
 }
 
 fun PostData.toEntity(): VisitedPostEntity {
-    return VisitedPostEntity(id = id.id, post = Json.encodeToString(this))
+    return VisitedPostEntity(id = id, post = Json.encodeToString(this))
 }

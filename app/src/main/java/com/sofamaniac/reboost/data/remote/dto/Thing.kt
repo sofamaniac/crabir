@@ -8,8 +8,8 @@
 
 package com.sofamaniac.reboost.data.remote.dto
 
-import com.sofamaniac.reboost.data.remote.dto.comment.CommentData
-import com.sofamaniac.reboost.data.remote.dto.post.PostDataFlat
+import com.sofamaniac.reboost.data.remote.dto.comment.CommentDTO
+import com.sofamaniac.reboost.data.remote.dto.post.PostDTO
 import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.reboost.data.remote.dto.subreddit.dummySubredditData
 import com.sofamaniac.reboost.reddit.ListingData
@@ -22,9 +22,12 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @Serializable
 @JsonClassDiscriminator("kind")
 sealed class Thing {
+
+    interface Votable
+
     @Serializable
     @SerialName("t1")
-    data class Comment(val data: CommentData) : Thing()
+    data class Comment(val data: CommentDTO) : Thing(), Votable
 
     @Serializable
     @SerialName("t2")
@@ -32,8 +35,7 @@ sealed class Thing {
 
     @Serializable
     @SerialName("t3")
-    data class Post(val data: PostDataFlat) :
-        Thing()
+    data class Post(val data: PostDTO) : Thing(), Votable
 
     @Serializable
     @SerialName("t5")
@@ -42,7 +44,7 @@ sealed class Thing {
 
     @Serializable
     @SerialName("Listing")
-    data class Listing<T : Thing>(
+    data class Listing<T>(
         val data: ListingData<T>
     ) : Thing(), Iterable<T> {
 
@@ -71,9 +73,6 @@ sealed class Thing {
 fun emptyListing(): Thing.Listing<Thing> {
     return Thing.Listing(data = ListingData())
 }
-
-
-
 
 @Serializable
 data class MoreData(

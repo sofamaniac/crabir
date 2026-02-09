@@ -31,7 +31,7 @@ private const val BASE_URL = "https://oauth.reddit.com/"
 
 private const val API_LIMIT = 100
 
-interface RedditAPIService : CommentAPI, PostAPI, RedditAuthApi {
+interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi {
 
     @GET("api/v1/me.json")
     suspend fun getIdentity(): Response<User>
@@ -44,7 +44,7 @@ interface RedditAPIService : CommentAPI, PostAPI, RedditAuthApi {
         @Query("after") after: String? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
-    ): Response<Listing<Post>>
+    ): Response<Listing<Thing.Votable>>
 
     @GET("{sort}.json")
     suspend fun getHome(
@@ -89,16 +89,27 @@ interface RedditAPIService : CommentAPI, PostAPI, RedditAuthApi {
 
     /** Get the list of multis the user is subscribed to. */
     @GET("/api/multi/mine.json?raw_json=1")
-    suspend fun getMultis(
+    suspend fun getMultireddits(
         @Query("expand_srs") expandSrs: Boolean = true,
     ): Response<List<Thing.Multi>>
+
+    @GET("/user/{username}/saved.json")
+    suspend fun getSaved(
+        @Path("username") username: String,
+        @Query("after") after: String? = null,
+        @Query("before") before: String? = null,
+        @Query("count") count: Int = 0,
+        @Query("limit") limit: Int = API_LIMIT,
+        @Query("t") timeframe: PostTimeframe? = null,
+        @Query("sr_detail") srDetail: Boolean = true,
+    ): Response<Listing<Thing>>
 
     /** Get the post of a given multi.
      *
      * @param path The permalink of the multi
      * */
     @GET("{path}/{sort}.json")
-    suspend fun getMulti(
+    suspend fun getMultreddit(
         @Path("path", encoded = true) path: String,
         @Path("sort") sort: PostSort = PostSort.Best,
         @Query("after") after: String? = null,

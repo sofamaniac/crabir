@@ -17,10 +17,10 @@ import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 
-object TranscodedVideo : KSerializer<RedditVideo?> {
+/** If `transcoding_status` is different from `completed` returns null*/
+object RedditVideoSerializer : KSerializer<RedditVideo?> {
     override val descriptor: SerialDescriptor =
-        // TODO find better descriptor
-        PrimitiveSerialDescriptor("TranscodedVideo", PrimitiveKind.STRING)
+        PrimitiveSerialDescriptor("RedditVideoSerializer", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: RedditVideo?) {
         encoder.encodeString(value.toString())

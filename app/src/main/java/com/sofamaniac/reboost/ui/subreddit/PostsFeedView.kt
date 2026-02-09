@@ -102,7 +102,7 @@ fun PostFeedViewer(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = listState,
         ) {
-            items(count = posts.itemCount, key = posts.itemKey { p -> p.id.id }) { index ->
+            items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
                 val post = posts[index]!!
                 val threadView = @Composable { post: PostData ->
                     val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
@@ -119,11 +119,15 @@ fun PostFeedViewer(
                             })
                     }
                 }
+                if (post !is PostData) {
+                    // TODO: show comment
+                    return@items
+                }
                 View(
                     post,
                     showSubredditIcon = showSubredditIcon,
                     visitPost = { post ->
-                        state.setFullscreenView { key(post.id.id) { threadView(post) } }
+                        state.setFullscreenView { key(post.id) { threadView(post) } }
                     },
                 ) {
                     PostBody(

@@ -109,7 +109,7 @@ abstract class PostFeedViewModel(
     fun visitPost(post: PostData) {
         viewModelScope.launch(Dispatchers.IO) {
             visitedPostsDao.insert(post.toEntity())
-            Log.d("PostFeedViewModel", "visitPost: Post visited (${post.id.id})")
+            Log.d("PostFeedViewModel", "visitPost: Post visited (${post.id})")
         }
     }
 }

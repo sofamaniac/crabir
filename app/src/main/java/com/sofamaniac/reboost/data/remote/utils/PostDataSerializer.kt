@@ -8,7 +8,7 @@
 
 package com.sofamaniac.reboost.data.remote.utils
 
-import com.sofamaniac.reboost.data.remote.dto.post.PostDataFlat
+import com.sofamaniac.reboost.data.remote.dto.post.PostDTO
 import com.sofamaniac.reboost.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.reboost.domain.model.PostData
 import kotlinx.serialization.KSerializer
@@ -38,7 +38,7 @@ object PostDataSerializer : KSerializer<PostData> {
         return when (val element = jsonDecoder.decodeJsonElement()) {
             is JsonObject -> {
                 val data =
-                    jsonDecoder.json.decodeFromJsonElement(PostDataFlat.serializer(), element)
+                    jsonDecoder.json.decodeFromJsonElement(PostDTO.serializer(), element)
                 PostDataMapper.map(data)
             }
 

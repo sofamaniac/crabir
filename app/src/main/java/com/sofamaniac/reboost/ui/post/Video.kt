@@ -26,11 +26,11 @@ fun PostVideo(post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boole
 
 
 fun getVideoUrl(post: PostData): MediaResource? {
-    val media = post.media.media?.reddit_video?.toMediaResource()
+    val media = post.media.media?.redditVideo?.toMediaResource()
     if (media != null) {
         return media
     }
-    return post.getPreview()?.images?.firstOrNull()?.variants?.mp4?.source?.toMediaResource()
+    return post.preview?.images?.firstOrNull()?.variants?.mp4?.source?.toMediaResource()
 }
 
 

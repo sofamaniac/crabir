@@ -57,8 +57,8 @@ fun PostGallery(
     dismiss: () -> Unit,
     canPlayVideo: Boolean = false,
 ) {
-    val gallery = post.getGalleryData()
-    if (gallery.images.isEmpty()) {
+    val gallery = post.gallery
+    if (gallery?.images.isNullOrEmpty()) {
         return
     }
 

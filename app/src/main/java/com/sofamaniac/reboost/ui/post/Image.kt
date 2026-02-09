@@ -15,7 +15,7 @@ import com.sofamaniac.reboost.ui.media.image.FromPreview
 
 @Composable
 fun PostImage(post: PostData, modifier: Modifier = Modifier) {
-    if (post.getPreview()?.images?.isNotEmpty() == true) {
+    if (post.preview?.images?.isNotEmpty() == true) {
         FromPreview(post, modifier)
     } else {
         val url = post.url

@@ -93,7 +93,7 @@ class SubscriptionsRepository(
     }
 
     suspend fun loadMultis(): List<Thing.Multi> {
-        val response = api.getMultis()
+        val response = api.getMultireddits()
         if (response.isSuccessful) {
             return response.body() ?: emptyList()
         } else {

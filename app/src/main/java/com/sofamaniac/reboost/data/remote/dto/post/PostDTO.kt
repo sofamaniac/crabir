@@ -14,7 +14,7 @@ import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditId
 import com.sofamaniac.reboost.data.remote.utils.FalseOrTimestampSerializer
 import com.sofamaniac.reboost.data.remote.utils.InstantAsFloatSerializer
 import com.sofamaniac.reboost.data.remote.utils.MediaMetadataSerializer
-import com.sofamaniac.reboost.data.remote.utils.TranscodedVideo
+import com.sofamaniac.reboost.data.remote.utils.RedditVideoSerializer
 import com.sofamaniac.reboost.domain.model.AuthorInfo
 import com.sofamaniac.reboost.domain.model.Flair
 import com.sofamaniac.reboost.domain.model.Gallery
@@ -50,10 +50,10 @@ value class PostId(val id: String)
 value class PostFullname(val id: String)
 
 @Serializable
-data class PostDataFlat(
+data class PostDTO(
 
-    @SerialName("id") val id: PostId,
-    @SerialName("name") val fullname: PostFullname,
+    @SerialName("id") val id: String,
+    @SerialName("name") val fullname: String,
     @SerialName("url") val url: String,
     @SerialName("title") val title: String = "",
     @SerialName("suggested_sort") val suggestedSort: String? = null,
@@ -63,7 +63,7 @@ data class PostDataFlat(
     @SerialName("post_hint") val postHint: String? = null,
     @SerialName("pinned") val pinned: Boolean = false,
     @SerialName("preview") val preview: Preview? = null,
-    @SerialName("crosspost_parent_list") val crosspostParentList: List<PostDataFlat> = emptyList(),
+    @SerialName("crosspost_parent_list") val crosspostParentList: List<PostDTO> = emptyList(),
 
 
 
@@ -147,7 +147,7 @@ data class PostDataFlat(
     // Status
     @SerialName("archived") val archived: Boolean = false,
     @Serializable(with = FalseOrTimestampSerializer::class)
-    @SerialName("edited") val edited: Long? = null,
+    @SerialName("edited") val edited: Instant? = null,
     @SerialName("hidden") val hidden: Boolean = false,
     @SerialName("locked") val locked: Boolean = false,
     @SerialName("is_crosspostable") val isCrosspostable: Boolean = false,
@@ -220,7 +220,7 @@ data class PostDataFlat(
     @SerialName("allow_live_comments") val allowLiveComments: Boolean = false,
 )
 
-private fun PostDataFlat.toAuthorInfo() = AuthorInfo(
+private fun PostDTO.toAuthorInfo() = AuthorInfo(
     username = author ?: "",
     flair = this.toAuthorFlair(),
     authorFullname = authorFullname,
@@ -229,7 +229,7 @@ private fun PostDataFlat.toAuthorInfo() = AuthorInfo(
     isAuthorPremium = authorPremium
 )
 
-private fun PostDataFlat.toAuthorFlair() = Flair(
+private fun PostDTO.toAuthorFlair() = Flair(
     text = authorFlairText ?: "",
     backgroundColor = authorFlairBackgroundColor ?: "",
     textColor = authorFlairTextColor ?: "",
@@ -237,7 +237,7 @@ private fun PostDataFlat.toAuthorFlair() = Flair(
     type = authorFlairType ?: ""
 )
 
-private fun PostDataFlat.toSubredditInfo() = SubredditInfo(
+private fun PostDTO.toSubredditInfo() = SubredditInfo(
     name = subreddit,
     subredditId = subredditId,
     subredditPrefixed = subredditNamePrefixed,
@@ -245,13 +245,13 @@ private fun PostDataFlat.toSubredditInfo() = SubredditInfo(
     subredditType = subredditType
 )
 
-private fun PostDataFlat.toThumbnail() = Thumbnail(
+private fun PostDTO.toThumbnail() = Thumbnail(
     uri = thumbnailUrl ?: "",
     width = thumbnailWidth ?: 0,
     height = thumbnailHeight ?: 0
 )
 
-private fun PostDataFlat.toScore() = Score(
+private fun PostDTO.toScore() = Score(
     ups = ups,
     downs = downs,
     score = scoreInt,
@@ -259,12 +259,12 @@ private fun PostDataFlat.toScore() = Score(
     hideScore = hideScore
 )
 
-private fun PostDataFlat.toSelftext() = Selftext(
+private fun PostDTO.toSelftext() = Selftext(
     selftext = selftextRaw,
     selftextHtml = selftextHtml ?: ""
 )
 
-private fun PostDataFlat.toLinkFlair() = Flair(
+private fun PostDTO.toLinkFlair() = Flair(
     text = linkFlairText ?: "",
     backgroundColor = linkFlairBackgroundColor ?: "",
     textColor = linkFlairTextColor ?: "",
@@ -272,35 +272,42 @@ private fun PostDataFlat.toLinkFlair() = Flair(
     type = linkFlairType ?: ""
 )
 
-private fun PostDataFlat.toMediaInfo() = MediaInfo(
+private fun PostDTO.toMediaInfo() = MediaInfo(
     media = media,
     mediaEmbed = mediaEmbed,
     mediaOnly = isMediaOnly
 )
 
-private fun PostDataFlat.toGallery() = Gallery(
+private fun PostDTO.toGallery() = Gallery(
     images = galleryData?.items ?: emptyList(),
     mediaMetadata = mediaMetadata
 )
 
 
-private fun PostDataFlat.toRelationship() = Relationship(
+private fun PostDTO.toRelationship() = Relationship(
     clicked = clicked,
     visited = visited,
     saved = saved,
     liked = likes
 )
 
+private fun PostDTO.getPreview() = preview ?: crosspostParentList.firstOrNull()?.preview
 
-object PostDataMapper : ObjectMappie<PostDataFlat, PostData>() {
+private fun PostDTO.getGalleryData(): Gallery? {
+    val gallery = toGallery()
+    if (gallery.images.isNotEmpty()) return gallery
+    return crosspostParentList.firstOrNull()?.getGalleryData()
+}
 
-    override fun map(from: PostDataFlat) = mapping {
+object PostDataMapper : ObjectMappie<PostDTO, PostData>() {
+
+    override fun map(from: PostDTO) = mapping {
 
         PostData::name fromProperty from::fullname
 
         PostData::url fromProperty from::url
         PostData::suggestedSort fromValue (from.suggestedSort ?: "")
-        PostData::_preview fromProperty from::preview
+        PostData::preview fromValue from.getPreview()
         PostData::crosspostParentList fromProperty from::crosspostParentList
 
         PostData::author fromValue from.toAuthorInfo()
@@ -313,10 +320,10 @@ object PostDataMapper : ObjectMappie<PostDataFlat, PostData>() {
         PostData::relationship fromValue from.toRelationship()
         PostData::kind fromValue getKind(from)
 
-        PostData::createdAt fromProperty from::createdUtc
-        PostData::edited fromValue Instant.fromEpochSeconds(from.edited ?: 0)
+        PostData::createdUtc fromProperty from::createdUtc
+        PostData::edited fromProperty from::edited
 
-        PostData::gallery fromValue from.toGallery()
+        PostData::gallery fromValue from.getGalleryData()
     }
 }
 
@@ -324,8 +331,9 @@ object PostDataMapper : ObjectMappie<PostDataFlat, PostData>() {
 //FIXME
 @Serializable
 data class Media(
-    @Serializable(with = TranscodedVideo::class)
-    val reddit_video: RedditVideo? = null,
+    @Serializable(with = RedditVideoSerializer::class)
+    @SerialName("reddit_video")
+    val redditVideo: RedditVideo? = null,
     val oembed: OEmbed? = null,
 )
 

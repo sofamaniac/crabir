@@ -13,26 +13,29 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.longOrNull
+import kotlin.time.Instant
 
-object FalseOrTimestampSerializer : KSerializer<Long?> {
+object FalseOrTimestampSerializer : KSerializer<Instant?> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("FalseOrTimestamp", PrimitiveKind.STRING)
 
-    override fun deserialize(decoder: Decoder): Long? {
+    override fun deserialize(decoder: Decoder): Instant? {
         val jsonDecoder = decoder as? JsonDecoder
             ?: throw SerializationException("Expected JsonDecoder")
         return when (val element = jsonDecoder.decodeJsonElement()) {
             is JsonPrimitive -> {
                 if (element.isString && element.content == "false") null
-                else element.longOrNull
+                else if (element.booleanOrNull != null) null
+                else Instant.fromEpochSeconds(element.longOrNull ?: 0L)
             }
 
             else -> null
         }
     }
 
-    override fun serialize(encoder: Encoder, value: Long?) {
-        encoder.encodeLong(value ?: 0L)
+    override fun serialize(encoder: Encoder, value: Instant?) {
+        encoder.encodeLong(value?.epochSeconds ?: 0L)
     }
 }

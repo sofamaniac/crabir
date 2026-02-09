@@ -1,5 +1,6 @@
 package com.sofamaniac.reboost.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.List
@@ -39,13 +40,15 @@ fun TabBar(
             Tab(
                 selected = selected.value == index,
                 onClick = {
-                    if (onTabReselect != null && selected.value == index) onTabReselect()
+                    Log.d("TabBar", "Clicked on tab ${tab.second.title}")
+                    if (onTabReselect != null && selected.value == index)
+                        return@Tab onTabReselect()
                     navController.navigate(tab.second) {
+                        Log.d("TabBar", "Navigating to ${tab.second.title}")
                         popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+                            saveState = index == 0
                         }
                         launchSingleTop = true
-                        restoreState = index == 0
                     }
                 },
                 icon = { Icon(tab.first, contentDescription = tab.second.title) },

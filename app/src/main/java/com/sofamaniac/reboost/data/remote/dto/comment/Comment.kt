@@ -6,11 +6,20 @@ package com.sofamaniac.reboost.data.remote.dto.comment
 
 import com.sofamaniac.reboost.data.remote.dto.LinkFlairRichtext
 import com.sofamaniac.reboost.data.remote.dto.Thing
+import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditId
 import com.sofamaniac.reboost.data.remote.utils.EmptyStringOrListingSerializer
 import com.sofamaniac.reboost.data.remote.utils.FalseOrTimestampSerializer
 import com.sofamaniac.reboost.data.remote.utils.InstantAsFloatSerializer
-import kotlinx.datetime.Instant
+import com.sofamaniac.reboost.domain.model.AuthorInfo
+import com.sofamaniac.reboost.domain.model.CommentData
+import com.sofamaniac.reboost.domain.model.Flair
+import com.sofamaniac.reboost.domain.model.Relationship
+import com.sofamaniac.reboost.domain.model.Score
+import com.sofamaniac.reboost.domain.model.SubredditInfo
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import tech.mappie.api.ObjectMappie
+import kotlin.time.Instant
 
 @Serializable
 @JvmInline
@@ -21,13 +30,15 @@ value class CommentId(val id: String)
 value class CommentFullname(val id: String)
 
 @Serializable
-data class CommentData(
-    val name: CommentFullname,
+data class CommentDTO(
+    val id: String,
+    val name: String,
     val body: String,
-    val body_html: String,
-    val id: CommentId,
+    @SerialName("body_html")
+    val bodyHtml: String,
     val depth: Int,
-    val parent_id: String,
+    @SerialName("parent_id")
+    val parentId: String,
     val permalink: String,
     @Serializable(with = EmptyStringOrListingSerializer::class)
     val replies: Thing.Listing<Thing>,
@@ -36,7 +47,7 @@ data class CommentData(
     // AUTHOR INFORMATION
     // ================================================ //
     val author: String,
-    val author_fullname: String? = null,
+    val author_fullname: String,
     val author_is_blocked: Boolean = false,
     val author_patreon_flair: Boolean = false,
     val author_premium: Boolean = false,
@@ -80,12 +91,13 @@ data class CommentData(
     val collapsed_reason_code: String? = null,
     val comment_type: String? = null,
     val controversiality: Int,
-    val created: Double,
+    @Serializable(with = InstantAsFloatSerializer::class)
+    val created: Instant,
     @Serializable(with = InstantAsFloatSerializer::class)
     val created_utc: Instant,
     val distinguished: String? = null,
     @Serializable(with = FalseOrTimestampSerializer::class)
-    val edited: Long? = null,
+    val edited: Instant? = null,
     val gilded: Int,
     // FIXME
     //val gildings: List<String>,
@@ -108,4 +120,65 @@ data class CommentData(
     val treatment_tags: List<String>,
     val unrepliable_reason: String?,
     val user_reports: List<String>
+)
+
+object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
+    override fun map(from: CommentDTO) = mapping {
+        CommentData::name fromProperty from::name
+        CommentData::id fromProperty from::id
+        CommentData::parentId fromProperty from::parentId
+        CommentData::depth fromProperty from::depth
+        CommentData::author fromValue from.toAuthorInfo()
+        CommentData::bodyMd fromProperty from::body
+        CommentData::bodyHtml fromProperty from::bodyHtml
+        CommentData::relationship fromValue from.toRelationship()
+        CommentData::permalink fromProperty from::permalink
+        CommentData::score fromValue from.toScore()
+        CommentData::subredditInfo fromValue from.toSubredditInfo()
+        CommentData::replies fromValue emptyList()
+        CommentData::createdUtc fromProperty from::created_utc
+    }
+
+}
+
+
+private fun CommentDTO.toAuthorInfo() = AuthorInfo(
+    username = author,
+    flair = this.toAuthorFlair(),
+    authorFullname = author_fullname,
+    isAuthorBlocked = author_is_blocked,
+    hasPatreonFlair = author_patreon_flair,
+    isAuthorPremium = author_premium,
+)
+
+private fun CommentDTO.toAuthorFlair() = Flair(
+    text = author_flair_text ?: "",
+    backgroundColor = author_flair_background_color ?: "",
+    textColor = author_flair_text_color ?: "",
+    richText = author_flair_richtext,
+    type = author_flair_type ?: ""
+)
+
+private fun CommentDTO.toRelationship() = Relationship(
+    clicked = false,
+    visited = false,
+    saved = saved,
+    liked = likes
+)
+
+
+private fun CommentDTO.toScore() = Score(
+    ups = ups,
+    downs = downs,
+    score = score,
+    hideScore = score_hidden,
+    upvoteRatio = ups.toDouble() / (ups + downs).toDouble()
+)
+
+private fun CommentDTO.toSubredditInfo() = SubredditInfo(
+    name = subreddit,
+    subredditId = SubredditId(subreddit_id),
+    subredditPrefixed = subreddit_name_prefixed,
+    subredditSubscribers = 0,
+    subredditType = subreddit_type
 )

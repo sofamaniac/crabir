@@ -129,9 +129,9 @@ fun BottomRow(
     post: PostData,
     modifier: Modifier = Modifier,
     viewModel: ButtonViewModel = hiltViewModel(
-        key = post.id.id,
+        key = post.id,
         creationCallback = { factory: ButtonViewModel.Factory ->
-            factory.create(post.id.id)
+            factory.create(post.id)
         }),
     visitPost: (PostData) -> Unit = {},
 ) {

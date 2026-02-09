@@ -21,7 +21,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,11 +47,6 @@ fun SubredditViewer(
     val bottomBar = @Composable {
         TabBar(
             selected,
-            onTabReselect = {
-                scope.launch {
-                    viewModel.listState.animateScrollToItem(0)
-                }
-            }
         )
     }
     FullFeedView(

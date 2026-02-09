@@ -48,15 +48,33 @@ fun TopBar(
     )
 }
 
+enum class ProfileTabs {
+    Overview,
+    About,
+    Posts,
+    Comments,
+    Saved,
+    Upvoted,
+    Downvoted,
+    Hidden;
+
+    val publicTabs get() = listOf(Overview, About, Posts, Comments)
+}
+
 @Composable
 fun ProfileInfo(modifier: Modifier = Modifier) {
     Text("WIP")
 }
 
 @Composable
-fun ProfileView(user: String, selected: State<Int>, drawerState: DrawerState, modifier: Modifier = Modifier) {
-    var currentTab = rememberPagerState(initialPage = 0, pageCount = { 5 })
-    val tabs = listOf("Overview", "About", "Posts", "Comments", "Gilded")
+fun ProfileView(
+    user: String,
+    selected: State<Int>,
+    drawerState: DrawerState,
+    modifier: Modifier = Modifier,
+) {
+    val tabs = ProfileTabs.entries
+    val currentTab = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
     val scope = rememberCoroutineScope()
 
     Scaffold(
@@ -66,7 +84,11 @@ fun ProfileView(user: String, selected: State<Int>, drawerState: DrawerState, mo
             TabBar(selected = selected)
         }
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
             ProfileInfo()
             SecondaryScrollableTabRow(
                 selectedTabIndex = currentTab.currentPage,
@@ -79,17 +101,11 @@ fun ProfileView(user: String, selected: State<Int>, drawerState: DrawerState, mo
                         onClick = {
                             scope.launch { currentTab.animateScrollToPage(index) }
                         },
-                        text = { Text(tab) })
+                        text = { Text(tab.name) })
                 }
             }
             HorizontalPager(state = currentTab, modifier = Modifier.fillMaxSize()) {
-                when (it) {
-                    0 -> Text("Overview")
-                    1 -> Text("About")
-                    2 -> Text("Posts")
-                    3 -> Text("Comments")
-                    4 -> Text("Gilded")
-                }
+                Text("Page $it")
             }
         }
     }

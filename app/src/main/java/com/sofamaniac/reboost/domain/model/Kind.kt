@@ -5,7 +5,7 @@
 package com.sofamaniac.reboost.domain.model
 
 import android.util.Log
-import com.sofamaniac.reboost.data.remote.dto.post.PostDataFlat
+import com.sofamaniac.reboost.data.remote.dto.post.PostDTO
 
 enum class Kind {
     Self,
@@ -16,11 +16,11 @@ enum class Kind {
     Link
 }
 
-fun isVideoPost(post: PostDataFlat): Boolean {
+fun isVideoPost(post: PostDTO): Boolean {
     return post.isVideo || (post.postHint == "image" && isVideoUrl(post.url))
 }
 
-fun getKind(post: PostDataFlat): Kind {
+fun getKind(post: PostDTO): Kind {
     if (isVideoPost(post)) return Kind.Video
 
     val kind = if (post.isSelfPost) Kind.Self
