@@ -54,11 +54,11 @@ internal fun PostBody(
 ) {
     when (post.kind) {
         Kind.Image -> {
-            PostImage(post, Modifier.fillMaxWidth())
+            PostImage(post, modifier.fillMaxWidth())
         }
 
         Kind.Video -> {
-            PostVideo(post, Modifier.fillMaxWidth(), canPlayVideo = canPlayVideo)
+            PostVideo(post, modifier.fillMaxWidth(), canPlayVideo = canPlayVideo)
         }
 
         Kind.Link -> {
@@ -68,7 +68,7 @@ internal fun PostBody(
         Kind.Gallery -> {
             PostGallery(
                 post,
-                Modifier.fillMaxWidth(),
+                modifier.fillMaxWidth(),
                 goFullscreen,
                 dismiss,
                 canPlayVideo = canPlayVideo
@@ -81,7 +81,7 @@ internal fun PostBody(
                 SimpleMarkdown(
                     markdown = selftext,
                     maxLines = 6,
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    modifier = modifier.padding(horizontal = 16.dp),
                 )
             }
         }
@@ -190,6 +190,7 @@ fun View(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(enabled = clickable, onClick = {
+                Log.d("Post View", "Clicked on post ${post.id}")
                 visitPost(post)
                 //navController.navigate(PostRoute(post.permalink))
             }),

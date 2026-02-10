@@ -5,7 +5,6 @@
 package com.sofamaniac.reboost.ui.markdown
 
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.widget.TextView
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -18,51 +17,7 @@ import io.noties.markwon.Markwon
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
-import org.intellij.markdown.ast.ASTNode
 
-
-//@Composable
-//fun SimpleMarkdown(
-//    markdown: String,
-//    maxLines: Int? = null,
-//    modifier: Modifier = Modifier
-//) {
-//    // Process Reddit-specific markdown
-//    val flavor = RedditMDFlavourDescriptor()
-//    val parser = org.intellij.markdown.parser.MarkdownParser(flavor)
-//    val processedMarkdown = parser.buildMarkdownTreeFromString(markdown)
-//    printAst(processedMarkdown)
-//
-//
-//    // Render markdown
-//
-//
-//        MarkdownText(
-//            markdown = markdown,
-//            maxLines = maxLines ?: Int.MAX_VALUE,
-////            onTextLayout = { result ->
-////                hasOverflow = result.hasVisualOverflow
-////            },
-//            style = MaterialTheme.typography.bodyMedium,
-//            linkColor = Color(0xFF0079D3),
-//        )
-//
-//}
-
-fun printAst(node: ASTNode, depth: Int = 0) {
-    Log.d("SimpleMarkdown", "${"\t".repeat(depth)}Node: ${node.type} ${node.children.size}")
-    for (child in node.children) {
-        printAst(child, depth + 1)
-    }
-}
-
-//@Composable
-//fun SimpleMarkdown(markdown: String, modifier: Modifier = Modifier, maxLines: Int = Int.MAX_VALUE) {
-//    val annotatedString = markdown.buildMarkdownAnnotatedString(MaterialTheme.typography.bodyMedium, )
-//    Log.d("SimpleMarkdown", "Rendering $annotatedString")
-//    //Text(annotatedString, modifier = modifier, maxLines = maxLines)
-//    Markdown(markdown)
-//}
 
 @Composable
 fun SimpleMarkdown(markdown: String, modifier: Modifier = Modifier, maxLines: Int = Int.MAX_VALUE) {
@@ -110,6 +65,10 @@ fun SimpleMarkdown(markdown: String, modifier: Modifier = Modifier, maxLines: In
         modifier = modifier,
         update = { textView ->
             markwon.setMarkdown(textView, processedMarkdown)
+            // Disable link when truncating view and allow clicks to be passed to parent view.
+            if (maxLines != Int.MAX_VALUE) {
+                textView.movementMethod = null
+            }
         }
     )
 }
