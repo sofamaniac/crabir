@@ -41,7 +41,7 @@ abstract class PostFeedViewModel(
 
     var listState by mutableStateOf(LazyListState())
 
-    var _fullscreenView = MutableStateFlow<(@Composable () -> Unit)?>(null)
+    private var _fullscreenView = MutableStateFlow<(@Composable () -> Unit)?>(null)
 
     val fullscreenView = _fullscreenView.asStateFlow()
 
@@ -72,9 +72,7 @@ abstract class PostFeedViewModel(
     fun refresh() {
         postsSource?.invalidate()
         repository.refresh()
-        viewModelScope.launch {
-            listState.scrollToItem(0)
-        }
+        listState = LazyListState()
     }
 
     private var postsSource: PostsSource? = null
