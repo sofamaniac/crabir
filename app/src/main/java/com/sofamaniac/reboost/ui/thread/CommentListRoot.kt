@@ -1,6 +1,7 @@
 package com.sofamaniac.reboost.ui.thread
 
 import android.util.Log
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -63,6 +64,9 @@ fun CommentListRoot(
                         )
                     }
                 }
+            }
+            item {
+                Spacer(modifier = Modifier.fillParentMaxHeight(0.1f))
             }
         }
     }
