@@ -1,6 +1,5 @@
 package com.sofamaniac.reboost.ui.post
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
@@ -79,7 +78,6 @@ fun PostGallery(
             .fillMaxSize()
             .aspectRatio(gallery.aspectRatio)
             .clickable(onClick = {
-                Log.d("PostGallery", "Clicking on gallery")
                 goFullscreen { fullscreenView() }
             }),
         goFullscreen = { goFullscreen { fullscreenView() } },

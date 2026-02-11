@@ -83,7 +83,14 @@ fun DrawerContent(
                             .rotate(rotation.value)
                     )
                 })
-            AnimatedVisibility(selectingAccount) { AccountSelector(viewModel) }
+            AnimatedVisibility(selectingAccount) {
+                AccountSelector(viewModel) {
+                    coroutineScope.launch {
+                        drawerState.close()
+                    }
+                    viewModel.toggleSelectAccount()
+                }
+            }
             HorizontalDivider()
 
             for (feed in FeedButtons.entries) {

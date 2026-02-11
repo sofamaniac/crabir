@@ -24,7 +24,7 @@ fun FromPreview(
     val x = image.width
     val y = Float.max(image.height.toFloat(), 1.0.toFloat())
     post.thumbnail.uri.toHttpUrlOrNull()?.toUrl()
-    val modifier = Modifier
+    val modifier = modifier
         .fillMaxWidth()
         .aspectRatio(x / y)
     TransformableImage(

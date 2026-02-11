@@ -54,7 +54,7 @@ internal fun PostBody(
 ) {
     when (post.kind) {
         Kind.Image -> {
-            PostImage(post, modifier.fillMaxWidth())
+            PostImage(post, modifier.fillMaxWidth(), goFullscreen = goFullscreen, dismiss = dismiss)
         }
 
         Kind.Video -> {
@@ -159,41 +159,41 @@ fun PostData.scoreString(): AnnotatedString {
 }
 
 /**
- * Composable function that displays a single post in a column format.
+ * Composable function that displays a single post in a Card format.
  *
  * This function creates a view for a given [Post], including its header,
- * content, and bottom row of actions. It handles navigation to the full
- * post view.
+ * content, and bottom row of actions.
  *
  * @param post The [Post] data to display.
  * @param selected A [MutableIntState] that holds the index of the current tab.
  * @param modifier Modifier for the root layout of the post.
  * @param showSubredditIcon Whether to display the subreddit icon in the header. Defaults to true.
- * @param clickable Whether the post is clickable to navigate to the full post view. Defaults to true.
- * @param visitPost A lambda that takes a [Post] and navigates to the full post view.
+ * @param clickable Whether the post is clickable to navigate to the thread view. Defaults to true.
+ * @param onClick A lambda that takes a [Post] and is called before navigating to the post.
  * @param body A composable lambda that defines the main content/body of the post (e.g., text, image). It should manage the horizontal padding itself
  */
 @Composable
-fun View(
+fun PostCard(
     post: PostData,
     modifier: Modifier = Modifier,
     showSubredditIcon: Boolean = true,
     clickable: Boolean = true,
-    visitPost: (PostData) -> Unit = {},
+    onClick: (PostData) -> Unit = {},
     body: @Composable () -> Unit,
 ) {
     // We do not apply the padding on the column, but on each of its children except [body]
     // to have images that take the full width
     val modifier = Modifier.padding(horizontal = 16.dp)
+    val cardModifier = if (clickable) {
+        Modifier
+            .fillMaxWidth()
+            .clickable(onClick = { onClick(post) })
+    } else {
+        Modifier.fillMaxWidth()
+    }
     Card(
         shape = RoundedCornerShape(0),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(enabled = clickable, onClick = {
-                Log.d("Post View", "Clicked on post ${post.id}")
-                visitPost(post)
-                //navController.navigate(PostRoute(post.permalink))
-            }),
+        modifier = cardModifier,
     ) {
         PostHeader(
             post,
@@ -208,6 +208,6 @@ fun View(
             enablePreview = enablePreview,
         )
         body()
-        BottomRow(post, modifier, visitPost = visitPost)
+        BottomRow(post, modifier, visitPost = onClick)
     }
 }

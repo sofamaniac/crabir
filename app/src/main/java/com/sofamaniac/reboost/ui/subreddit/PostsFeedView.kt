@@ -8,6 +8,7 @@
 
 package com.sofamaniac.reboost.ui.subreddit
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,7 +55,7 @@ import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.post.PostBody
-import com.sofamaniac.reboost.ui.post.View
+import com.sofamaniac.reboost.ui.post.PostCard
 import com.sofamaniac.reboost.ui.thread.ThreadView
 import kotlinx.coroutines.launch
 import kotlin.math.max
@@ -112,6 +113,9 @@ fun PostFeedViewer(
                         onDismiss = {
                             state.setFullscreenView(null)
                         }) {
+                        BackHandler {
+                            state.setFullscreenView(null)
+                        }
                         ThreadView(
                             permalink = post.permalink,
                             dismiss = {
@@ -123,10 +127,10 @@ fun PostFeedViewer(
                     // TODO: show comment
                     return@items
                 }
-                View(
+                PostCard(
                     post,
                     showSubredditIcon = showSubredditIcon,
-                    visitPost = { post ->
+                    onClick = { post ->
                         state.setFullscreenView { key(post.id) { threadView(post) } }
                     },
                 ) {

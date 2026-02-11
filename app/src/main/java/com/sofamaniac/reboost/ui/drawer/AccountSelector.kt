@@ -19,21 +19,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.sofamaniac.reboost.HomeRoute
+import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.domain.model.RedditAccount
 import java.util.Collections
 
 @Composable
-fun AccountSelector(viewModel: DrawerViewModel) {
+fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: () -> Unit) {
     val iconModifier = Modifier
         .size(32.dp)
         .padding(4.dp)
         .clip(CircleShape)
+    val navController = LocalNavController.current!!
     Column {
         for (account in viewModel.accountsList.collectAsState(initial = Collections.emptyList()).value) {
             AccountTile(
                 account,
                 onClick = {
                     viewModel.setActiveAccount(account.id)
+                    navController.navigate(HomeRoute) {
+                        restoreState = false
+                    }
+                    onAccountSelection()
                 },
                 iconModifier = iconModifier
             )
