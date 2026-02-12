@@ -55,7 +55,7 @@ fun CommentListRoot(
             }
             items(comments.size) { index ->
                 when (val comment = comments[index]) {
-                    is Thing.Comment -> CommentView(comment)
+                    is Thing.Comment -> CommentView(comment, viewModel)
                     is Thing.More -> MoreViewer(comment)
                     else -> {
                         Log.e(

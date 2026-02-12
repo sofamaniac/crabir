@@ -35,3 +35,7 @@ interface VotableAPI {
     @POST("/api/unsave")
     suspend fun unsave(@Query("id") fullname: String): Response<Unit>
 }
+
+const val UPVOTED = 1
+const val DOWNVOTED = -1
+const val NEUTRAL = 0

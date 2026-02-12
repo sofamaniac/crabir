@@ -25,7 +25,7 @@ class ThreadViewModel @AssistedInject constructor(
     private val repository: ThreadRepository,
     private val visitedPostsDao: VisitedPostsDao,
     @Assisted val permalink: String,
-): ViewModel() {
+) : ViewModel() {
 
     var id: String = repository.getPostId(permalink)
 
@@ -36,6 +36,19 @@ class ThreadViewModel @AssistedInject constructor(
     private var _comments = MutableStateFlow<List<Thing>>(emptyList())
     val comments: StateFlow<List<Thing>> = _comments.asStateFlow()
 
+    private var _openComment = MutableStateFlow<String?>(null)
+
+    /** Id of the comment currently open */
+    val openComment: StateFlow<String?> = _openComment.asStateFlow()
+
+    /** If [openComment] is equal to [id], close it. Otherwise, open it. */
+    fun toggleComment(id: String) {
+        if (_openComment.value == id) {
+            _openComment.value = null
+        } else {
+            _openComment.value = id
+        }
+    }
 
     private val _sort = MutableStateFlow(Sort.Best)
     val sort: StateFlow<Sort> = _sort.asStateFlow()
@@ -75,6 +88,50 @@ class ThreadViewModel @AssistedInject constructor(
 
     fun refresh() {
         repository.refresh()
+    }
+
+    fun upvote(name: String) {
+        val comment = comments.value.find { it is Thing.Comment && it.data.name == name }
+        if (comment != null) {
+            viewModelScope.launch {
+                val likes = (comment as Thing.Comment).data.likes
+                if (likes != true) {
+                    repository.upvote(name)
+                } else {
+                    repository.neutralVote(name)
+
+                }
+            }
+        }
+    }
+
+    fun downvote(name: String) {
+        val comment = comments.value.find { it is Thing.Comment && it.data.name == name }
+        if (comment != null) {
+            viewModelScope.launch {
+                val likes = (comment as Thing.Comment).data.likes
+                if (likes != true) {
+                    repository.upvote(name)
+                } else {
+                    repository.neutralVote(name)
+
+                }
+            }
+        }
+    }
+
+    fun save(name: String) {
+        val comment = comments.value.find { it is Thing.Comment && it.data.name == name }
+        if (comment != null) {
+            viewModelScope.launch {
+                val saved = (comment as Thing.Comment).data.saved
+                if (saved) {
+                    repository.unsave(name)
+                } else {
+                    repository.save(name)
+                }
+            }
+        }
     }
 
     @AssistedFactory

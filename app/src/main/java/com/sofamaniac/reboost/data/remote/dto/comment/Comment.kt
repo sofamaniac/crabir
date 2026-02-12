@@ -46,8 +46,8 @@ data class CommentDTO(
     // ================================================ //
     // AUTHOR INFORMATION
     // ================================================ //
-    val author: String,
-    val author_fullname: String,
+    val author: String = "[deleted]",
+    val author_fullname: String = "[deleted]",
     val author_is_blocked: Boolean = false,
     val author_patreon_flair: Boolean = false,
     val author_premium: Boolean = false,

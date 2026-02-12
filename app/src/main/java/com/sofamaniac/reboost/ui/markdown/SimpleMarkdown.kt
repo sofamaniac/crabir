@@ -20,6 +20,13 @@ import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 
 
 @Composable
+        /** Display Reddit style markdown.
+         * @param markdown The markdown to display.
+         * @param modifier The modifier to apply to the text.
+         * @param maxLines The maximum number of lines to display.
+         *
+         * If [maxLines] is different from [Int.MAX_VALUE], the link in the text will not be clickable
+         */
 fun SimpleMarkdown(markdown: String, modifier: Modifier = Modifier, maxLines: Int = Int.MAX_VALUE) {
     val colorScheme = MaterialTheme.colorScheme
 

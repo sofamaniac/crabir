@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.VerticalDivider
@@ -17,15 +18,16 @@ import androidx.compose.ui.unit.dp
 import com.sofamaniac.reboost.data.remote.dto.Thing
 
 @Composable
-fun CommentView(comment: Thing.Comment, modifier: Modifier = Modifier) {
+fun CommentView(comment: Thing.Comment, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
     val comments = flattenComments(comment)
     Column(modifier = Modifier.fillMaxWidth()) {
         for (comment in comments) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
                     .height(IntrinsicSize.Max),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 repeat(comment.second) {
                     VerticalDivider(
@@ -36,7 +38,12 @@ fun CommentView(comment: Thing.Comment, modifier: Modifier = Modifier) {
 
                 }
                 when (comment.first) {
-                    is Thing.Comment -> CommentNode(comment.first as Thing.Comment)
+                    is Thing.Comment -> CommentNode(
+                        comment.first as Thing.Comment,
+                        viewModel = viewModel,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+
                     is Thing.More -> MoreViewer(comment.first as Thing.More)
                     else -> {
                         Log.e(
@@ -50,6 +57,7 @@ fun CommentView(comment: Thing.Comment, modifier: Modifier = Modifier) {
         HorizontalDivider()
     }
 }
+
 fun flattenComments(comment: Thing, depth: Int = 0): List<Pair<Thing, Int>> {
     return when (comment) {
         is Thing.Comment -> {

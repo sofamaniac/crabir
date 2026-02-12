@@ -5,7 +5,6 @@
 package com.sofamaniac.reboost.ui.post
 
 import android.util.Log
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -13,11 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
-import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.ThumbDown
-import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -30,7 +25,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -86,45 +80,6 @@ class ButtonViewModel @AssistedInject constructor(
 }
 
 @Composable
-private fun UpButton(post: PostData, likes: Boolean?, onClick: () -> Unit) {
-    val buttonColor = animateColorAsState(
-        targetValue = if (likes == true) Color.Red else Color.Gray,
-        label = "button color"
-    )
-    IconButton(
-        onClick = onClick
-    ) {
-        Icon(Icons.Filled.ThumbUp, "upvote", tint = buttonColor.value)
-    }
-}
-
-@Composable
-private fun DownButton(post: PostData, likes: Boolean?, onClick: () -> Unit) {
-    val buttonColor = animateColorAsState(
-        targetValue = if (likes == false) Color.Blue else Color.Gray,
-        label = "button color"
-    )
-    IconButton(onClick = onClick) {
-        Icon(Icons.Filled.ThumbDown, "downvote", tint = buttonColor.value)
-    }
-}
-
-@Composable
-private fun SavedButton(post: PostData, saved: Boolean, onClick: () -> Unit) {
-    val buttonColor = animateColorAsState(
-        targetValue = if (saved) Color.Yellow else Color.Gray,
-        label = "button color"
-    )
-    IconButton(onClick = onClick) {
-        if (saved) {
-            Icon(Icons.Filled.Bookmark, "save", tint = buttonColor.value)
-        } else {
-            Icon(Icons.Outlined.BookmarkBorder, "save", tint = buttonColor.value)
-        }
-    }
-}
-
-@Composable
 fun BottomRow(
     post: PostData,
     modifier: Modifier = Modifier,
@@ -140,9 +95,9 @@ fun BottomRow(
     val likes by viewModel.likes.collectAsState(initial = post.relationship.liked)
     val saved by viewModel.saved.collectAsState(initial = post.relationship.saved)
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-        UpButton(post, likes) { viewModel.upvote() }
-        DownButton(post, likes) { viewModel.downvote() }
-        SavedButton(post, saved) { viewModel.save(!saved) }
+        UpButton(likes) { viewModel.upvote() }
+        DownButton(likes) { viewModel.downvote() }
+        SavedButton(saved) { viewModel.save(!saved) }
         IconButton(onClick = {
             visitPost(post)
         }) {

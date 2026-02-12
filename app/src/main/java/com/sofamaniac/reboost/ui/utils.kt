@@ -4,13 +4,12 @@
 
 package com.sofamaniac.reboost.ui
 
-import kotlinx.datetime.Instant
 import java.time.Clock
 import java.time.Duration
 import java.util.Locale
 
 fun formatElapsedTimeLocalized(
-    creationDate: Instant,
+    creationDate: kotlin.time.Instant,
     locale: Locale = Locale.getDefault()
 ): String {
     val end = Clock.systemUTC().millis()
