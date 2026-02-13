@@ -273,8 +273,8 @@ private fun PostDTO.toLinkFlair() = Flair(
 )
 
 private fun PostDTO.toMediaInfo() = MediaInfo(
-    media = media,
-    mediaEmbed = mediaEmbed,
+    media = secureMedia ?: media,
+    mediaEmbed = secureMediaEmbed.ifEmpty { mediaEmbed },
     mediaOnly = isMediaOnly
 )
 

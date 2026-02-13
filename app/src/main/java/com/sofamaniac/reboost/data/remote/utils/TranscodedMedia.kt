@@ -15,7 +15,9 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 /** If `transcoding_status` is different from `completed` returns null*/
 object RedditVideoSerializer : KSerializer<RedditVideo?> {
@@ -31,9 +33,15 @@ object RedditVideoSerializer : KSerializer<RedditVideo?> {
             ?: throw SerializationException("Expected JsonDecoder")
         return when (val element = jsonDecoder.decodeJsonElement()) {
             is JsonObject -> {
-                if (element.jsonObject["transcoding_status"]?.toString() == "completed") {
+                val status = element.jsonObject["transcoding_status"]?.jsonPrimitive?.contentOrNull
+
+                if (status == "completed") {
                     jsonDecoder.json.decodeFromJsonElement(RedditVideo.serializer(), element)
                 } else {
+                    Log.i(
+                        "TranscodedMedia",
+                        "Transcoding status ${element.jsonObject["transcoding_status"]}"
+                    )
                     null
                 }
             }

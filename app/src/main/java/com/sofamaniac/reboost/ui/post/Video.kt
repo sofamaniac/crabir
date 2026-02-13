@@ -22,6 +22,20 @@ fun PostVideo(post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boole
             placeholder = {
                 PostImage(post)
             })
+    } else if (post.media.media?.redditVideo != null) {
+        val video = post.media.media.redditVideo.toMediaResource()
+        VideoPlayer(
+            video, startPlaying = canPlayVideo,
+            placeholder = {
+                PostImage(post)
+            })
+    } else if (post.media.media?.redditVideo != null) {
+        val video = post.media.media.redditVideo.toMediaResource()
+        VideoPlayer(
+            video, startPlaying = canPlayVideo,
+            placeholder = {
+                PostImage(post)
+            })
     } else {
         PostImage(post)
     }
