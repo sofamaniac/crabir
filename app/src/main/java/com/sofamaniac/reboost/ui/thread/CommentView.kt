@@ -11,49 +11,47 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.reboost.data.remote.dto.Thing
+import com.sofamaniac.reboost.domain.model.CommentType
 
 @Composable
-fun CommentView(comment: Thing.Comment, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
-    val comments = flattenComments(comment)
+fun CommentView(comment: CommentType, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        for (comment in comments) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .height(IntrinsicSize.Max),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                repeat(comment.second) {
-                    VerticalDivider(
-                        modifier = Modifier
-                            .width(2.dp)
-                            .fillMaxHeight()
-                    )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .height(IntrinsicSize.Max),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            repeat(comment.depth) {
+                VerticalDivider(
+                    modifier = Modifier
+                        .width(2.dp)
+                        .fillMaxHeight()
+                )
 
+            }
+            if (comment is CommentType.Comment) {
+                CommentNode(
+                    comment.comment,
+                    viewModel = viewModel,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                for (reply in comment.comment.replies) {
+                    CommentView(reply, viewModel, modifier)
                 }
-                when (comment.first) {
-                    is Thing.Comment -> CommentNode(
-                        comment.first as Thing.Comment,
-                        viewModel = viewModel,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-
-                    is Thing.More -> MoreViewer(comment.first as Thing.More)
-                    else -> {
-                        Log.e(
-                            "CommentViewImp",
-                            "Unknown comment type: ${comment.first.javaClass.name}"
-                        )
-                    }
-                }
+            } else {
+                Text("TODO MORE VIEW")
             }
         }
+    }
+    if (comment.depth == 0) {
         HorizontalDivider()
     }
 }

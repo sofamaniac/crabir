@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
 import com.sofamaniac.reboost.data.local.entities.toDomainModel
-import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.remote.dto.comment.Sort
+import com.sofamaniac.reboost.domain.model.CommentType
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.domain.repository.ThreadRepository
 import dagger.assisted.Assisted
@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -29,12 +30,13 @@ class ThreadViewModel @AssistedInject constructor(
 
     var id: String = repository.getPostId(permalink)
 
+    private var _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean>
-        get() = repository.isRefreshing
+        get() = _isRefreshing.asStateFlow()
 
 
-    private var _comments = MutableStateFlow<List<Thing>>(emptyList())
-    val comments: StateFlow<List<Thing>> = _comments.asStateFlow()
+    private var _comments = MutableStateFlow<List<CommentType>>(emptyList())
+    val comments: StateFlow<List<CommentType>> = _comments.asStateFlow()
 
     private var _openComment = MutableStateFlow<String?>(null)
 
@@ -70,19 +72,15 @@ class ThreadViewModel @AssistedInject constructor(
 
     fun fetchComments() {
         viewModelScope.launch {
+            _isRefreshing.value = true
             _comments.value = repository.getComments(permalink, sort = _sort.value)
+            _isRefreshing.value = false
         }
-    }
-
-    fun getComments(): List<Thing> {
-        val comments = runBlocking(Dispatchers.IO) {
-            repository.getComments(permalink, sort = _sort.value)
-        }
-        return comments
     }
 
     fun setSort(sort: Sort) {
         _sort.value = sort
+        refresh()
     }
 
 
@@ -90,47 +88,91 @@ class ThreadViewModel @AssistedInject constructor(
         repository.refresh()
     }
 
-    fun upvote(name: String) {
-        val comment = comments.value.find { it is Thing.Comment && it.data.name == name }
-        if (comment != null) {
-            viewModelScope.launch {
-                val likes = (comment as Thing.Comment).data.likes
+    fun upvote(name: String, likes: Boolean?) {
+        viewModelScope.launch {
+            try {
                 if (likes != true) {
                     repository.upvote(name)
                 } else {
                     repository.neutralVote(name)
-
                 }
+                _comments.update {
+                    it.updateComment(name, { c ->
+                        val comment = (c as CommentType.Comment).comment
+                        // TODO: update score
+                        CommentType.Comment(
+                            comment.copy(
+                                relationship = comment.relationship.copy(
+                                    liked = if (likes != true) {
+                                        true
+                                    } else {
+                                        null
+                                    }
+                                )
+                            )
+                        )
+                    })
+                }
+            } catch (e: Exception) {
+                Log.e("ThreadViewModel", "upvote: $e")
             }
         }
     }
 
-    fun downvote(name: String) {
-        val comment = comments.value.find { it is Thing.Comment && it.data.name == name }
-        if (comment != null) {
-            viewModelScope.launch {
-                val likes = (comment as Thing.Comment).data.likes
-                if (likes != true) {
-                    repository.upvote(name)
+    fun downvote(name: String, likes: Boolean?) {
+        viewModelScope.launch {
+            try {
+                if (likes != false) {
+                    repository.downvote(name)
                 } else {
                     repository.neutralVote(name)
-
                 }
+                _comments.update {
+                    it.updateComment(name, { c ->
+                        val comment = (c as CommentType.Comment).comment
+                        // TODO: update score
+                        CommentType.Comment(
+                            comment.copy(
+                                relationship = comment.relationship.copy(
+                                    liked = if (likes != false) {
+                                        false
+                                    } else {
+                                        null
+                                    }
+                                )
+                            )
+                        )
+                    })
+                }
+            } catch (e: Exception) {
+                Log.e("ThreadViewModel", "downvote: $e")
             }
         }
     }
 
-    fun save(name: String) {
-        val comment = comments.value.find { it is Thing.Comment && it.data.name == name }
-        if (comment != null) {
+    fun save(name: String, saved: Boolean) {
+        try {
             viewModelScope.launch {
-                val saved = (comment as Thing.Comment).data.saved
                 if (saved) {
                     repository.unsave(name)
                 } else {
                     repository.save(name)
                 }
             }
+            _comments.update {
+                it.updateComment(name, { c ->
+                    val comment = (c as CommentType.Comment).comment
+                    CommentType.Comment(
+                        comment.copy(
+                            relationship = comment.relationship.copy(
+                                saved = !saved
+                            )
+                        )
+                    )
+                })
+            }
+        } catch (e: Exception) {
+            Log.e("ThreadViewModel", "save: $e")
         }
     }
 
@@ -138,4 +180,27 @@ class ThreadViewModel @AssistedInject constructor(
     interface Factory {
         fun create(permalink: String): ThreadViewModel
     }
+}
+
+fun List<CommentType>.updateComment(
+    name: String,
+    update: (CommentType) -> CommentType
+): List<CommentType> {
+    return map { comment ->
+        when {
+            comment.name == name -> update(comment)
+            comment is CommentType.Comment ->
+                CommentType.Comment(
+                    comment.comment.updateReplies(
+                        replies = comment.comment.replies.updateComment(
+                            name,
+                            update
+                        )
+                    )
+                )
+
+            else -> comment
+        }
+    }
+
 }

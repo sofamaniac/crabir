@@ -14,7 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
-import com.sofamaniac.reboost.data.remote.dto.Thing
+import com.sofamaniac.reboost.domain.model.CommentData
 import com.sofamaniac.reboost.ui.formatElapsedTimeLocalized
 import com.sofamaniac.reboost.ui.markdown.SimpleMarkdown
 import com.sofamaniac.reboost.ui.post.DownButton
@@ -23,15 +23,15 @@ import com.sofamaniac.reboost.ui.post.UpButton
 import kotlinx.coroutines.flow.map
 
 @Composable
-fun CommentNode(comment: Thing.Comment, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
-    val showBottomBar by viewModel.openComment.map { it == comment.data.id }
+fun CommentNode(comment: CommentData, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
+    val showBottomBar by viewModel.openComment.map { it == comment.id }
         .collectAsState(initial = false)
     Column(
-        modifier = modifier.clickable(onClick = { viewModel.toggleComment(comment.data.id) })
+        modifier = modifier.clickable(onClick = { viewModel.toggleComment(comment.id) })
     ) {
         TopRow(comment)
         SimpleMarkdown(
-            comment.data.body,
+            comment.bodyMd,
         )
         AnimatedVisibility(showBottomBar) {
             BottomRow(comment, viewModel)
@@ -40,24 +40,26 @@ fun CommentNode(comment: Thing.Comment, viewModel: ThreadViewModel, modifier: Mo
 }
 
 @Composable
-fun BottomRow(comment: Thing.Comment, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
+fun BottomRow(comment: CommentData, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
+    val likes = comment.relationship.liked
+    val saved = comment.relationship.saved
     Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-        UpButton(comment.data.likes) { viewModel.upvote(comment.data.name) }
-        DownButton(comment.data.likes) { viewModel.downvote(comment.data.name) }
-        SavedButton(comment.data.saved) { viewModel.save(comment.data.name) }
+        UpButton(likes) { viewModel.upvote(comment.name, likes) }
+        DownButton(likes) { viewModel.downvote(comment.name, likes) }
+        SavedButton(saved) { viewModel.save(comment.name, saved) }
     }
 }
 
 @Composable
-fun TopRow(comment: Thing.Comment, modifier: Modifier = Modifier) {
-    val timeString = formatElapsedTimeLocalized(comment.data.created_utc)
+fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
+    val timeString = formatElapsedTimeLocalized(comment.createdUtc)
     val rightString = buildAnnotatedString {
-        append("${comment.data.ups}")
+        append("${comment.score.ups}")
         append(" · ")
         append(timeString)
     }
     Row(modifier = modifier, horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(comment.data.author, color = MaterialTheme.colorScheme.primary)
+        Text(comment.author.username, color = MaterialTheme.colorScheme.primary)
         Spacer(modifier = Modifier.weight(1f))
         Text(rightString)
     }

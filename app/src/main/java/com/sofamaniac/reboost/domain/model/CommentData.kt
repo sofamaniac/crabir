@@ -1,10 +1,25 @@
 package com.sofamaniac.reboost.domain.model
 
+import com.sofamaniac.reboost.data.remote.dto.Thing
 import kotlin.time.Instant
 
-sealed class CommentReply() {
-    data class Comment(val comment: CommentData) : CommentReply()
-    data class More(val more: String) : CommentReply()
+sealed class CommentType() {
+    data class Comment(val comment: CommentData) : CommentType()
+    data class More(val more: Thing.More) : CommentType()
+
+    val name: String
+        get() =
+            when (this) {
+                is Comment -> comment.name
+                is More -> more.data.name
+            }
+
+    val depth: Int
+        get() =
+            when (this) {
+                is Comment -> comment.depth
+                is More -> more.data.depth
+            }
 }
 
 data class CommentData(
@@ -15,7 +30,7 @@ data class CommentData(
     val bodyHtml: String,
     val parentId: String,
     val permalink: String,
-    val replies: List<CommentReply>,
+    val replies: List<CommentType>,
     val author: AuthorInfo,
     override val relationship: Relationship,
     val subredditInfo: SubredditInfo,
@@ -26,4 +41,6 @@ data class CommentData(
 ) : VotableData {
     override fun copy(relationship: Relationship?, score: Score?): CommentData =
         copy(relationship = relationship ?: this.relationship, score = score ?: this.score)
+
+    fun updateReplies(replies: List<CommentType>): CommentData = copy(replies = replies)
 }

@@ -1,6 +1,5 @@
 package com.sofamaniac.reboost.ui.thread
 
-import android.util.Log
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,12 +10,9 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.sofamaniac.reboost.data.remote.dto.Thing
+import com.sofamaniac.reboost.domain.model.CommentType
 import com.sofamaniac.reboost.domain.model.Kind
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.markdown.SimpleMarkdown
@@ -34,7 +30,6 @@ fun CommentListRoot(
     rememberCoroutineScope()
     val listState = rememberLazyListState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
-    var fullscreenView: (@Composable () -> Unit)? by remember { mutableStateOf(null) }
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
@@ -48,21 +43,12 @@ fun CommentListRoot(
         LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
             // Show post
             item {
-                PostView(
-                    post,
-                    goFullscreen = { view -> fullscreenView = view },
-                    dismiss = { fullscreenView = null })
+                PostView(post)
             }
             items(comments.size) { index ->
                 when (val comment = comments[index]) {
-                    is Thing.Comment -> CommentView(comment, viewModel)
-                    is Thing.More -> MoreViewer(comment)
-                    else -> {
-                        Log.e(
-                            "CommentListRoot",
-                            "Unknown comment type: ${comment.javaClass.name}"
-                        )
-                    }
+                    is CommentType.Comment -> CommentView(comment, viewModel)
+                    is CommentType.More -> MoreViewer(comment)
                 }
             }
             item {
@@ -70,7 +56,6 @@ fun CommentListRoot(
             }
         }
     }
-    fullscreenView?.invoke()
 }
 
 @Composable
@@ -78,8 +63,6 @@ internal fun PostView(
     post: PostData,
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = true,
-    goFullscreen: (@Composable () -> Unit) -> Unit,
-    dismiss: () -> Unit
 ) {
     PostCard(post, clickable = false) {
         when (post.kind) {
@@ -95,8 +78,6 @@ internal fun PostView(
                 PostGallery(
                     post,
                     modifier.fillMaxWidth(),
-                    goFullscreen,
-                    dismiss,
                     canPlayVideo = canPlayVideo
                 )
             }
