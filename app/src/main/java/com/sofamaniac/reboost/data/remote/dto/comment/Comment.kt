@@ -12,6 +12,7 @@ import com.sofamaniac.reboost.data.remote.utils.FalseOrTimestampSerializer
 import com.sofamaniac.reboost.data.remote.utils.InstantAsFloatSerializer
 import com.sofamaniac.reboost.domain.model.AuthorInfo
 import com.sofamaniac.reboost.domain.model.CommentData
+import com.sofamaniac.reboost.domain.model.CommentType
 import com.sofamaniac.reboost.domain.model.Flair
 import com.sofamaniac.reboost.domain.model.Relationship
 import com.sofamaniac.reboost.domain.model.Score
@@ -135,10 +136,18 @@ object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
         CommentData::permalink fromProperty from::permalink
         CommentData::score fromValue from.toScore()
         CommentData::subredditInfo fromValue from.toSubredditInfo()
-        CommentData::replies fromValue emptyList()
+        CommentData::replies fromValue from.mapReplies()
         CommentData::createdUtc fromProperty from::created_utc
     }
 
+}
+
+private fun CommentDTO.mapReplies(): List<CommentType> = replies.data.children.map {
+    when (it) {
+        is Thing.Comment -> CommentType.Comment(CommentDataMapper.map(it.data))
+        is Thing.More -> CommentType.More(it)
+        else -> throw IllegalArgumentException("Unknown comment type: ${it.javaClass.name}")
+    }
 }
 
 

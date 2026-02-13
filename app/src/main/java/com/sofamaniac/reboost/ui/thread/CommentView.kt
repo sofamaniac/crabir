@@ -43,11 +43,13 @@ fun CommentView(comment: CommentType, viewModel: ThreadViewModel, modifier: Modi
                     viewModel = viewModel,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
-                for (reply in comment.comment.replies) {
-                    CommentView(reply, viewModel, modifier)
-                }
             } else {
                 Text("TODO MORE VIEW")
+            }
+        }
+        if (comment is CommentType.Comment) {
+            for (reply in comment.comment.replies) {
+                CommentView(reply, viewModel)
             }
         }
     }

@@ -53,8 +53,13 @@ fun BottomRow(comment: CommentData, viewModel: ThreadViewModel, modifier: Modifi
 @Composable
 fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
     val timeString = formatElapsedTimeLocalized(comment.createdUtc)
+    val delta = when (comment.relationship.liked) {
+        true -> 1
+        false -> -1
+        else -> 0
+    }
     val rightString = buildAnnotatedString {
-        append("${comment.score.ups}")
+        append("${comment.score.ups + delta}")
         append(" · ")
         append(timeString)
     }
