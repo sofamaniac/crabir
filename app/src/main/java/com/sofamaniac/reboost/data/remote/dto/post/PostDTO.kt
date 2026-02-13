@@ -211,7 +211,7 @@ data class PostDTO(
     @SerialName("num_reports") val numReports: Int? = null,
     @SerialName("pwls") val pwls: Int? = null,
     @SerialName("quarantine") val quarantine: Boolean = false,
-    @SerialName("report_reasons") val reportReasons: String? = null,
+    @SerialName("report_reasons") val reportReasons: List<String>? = null,
     @SerialName("send_replies") val sendReplies: Boolean = false,
     @SerialName("treatment_tags") val treatmentTags: List<String> = emptyList(),
     @SerialName("user_reports") val userReports: List<String> = emptyList(),

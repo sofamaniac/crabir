@@ -194,7 +194,6 @@ dependencies {
     implementation("io.noties.markwon:core:4.6.2")
     implementation("io.noties.markwon:ext-tables:4.6.2")
     implementation("io.noties.markwon:image:4.6.2")
-    implementation("io.noties.markwon:image-coil:4.6.2")
     implementation("io.noties.markwon:inline-parser:4.6.2")
     implementation("io.noties.markwon:simple-ext:4.6.2")
 }

@@ -18,10 +18,10 @@ class SpoilerInline(val content: String) : CustomNode()
 
 class SpoilerInlineProcessor : InlineProcessor() {
 
-    private val pattern = Pattern.compile("¤¤(.*?)¤¤", Pattern.DOTALL)
+    private val pattern = Pattern.compile("\ue000(.*?)\ue000", Pattern.DOTALL)
 
     override fun specialCharacter(): Char {
-        return '¤'
+        return '\ue000'
     }
 
     override fun parse(): Node? {
