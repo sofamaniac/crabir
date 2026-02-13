@@ -40,7 +40,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.sofamaniac.reboost.FullscreenManager
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
 import com.sofamaniac.reboost.domain.model.PostData
@@ -111,15 +111,15 @@ fun PostFeedViewer(
                         state = swipeToDismissBoxState,
                         backgroundContent = {},
                         onDismiss = {
-                            state.setFullscreenView(null)
+                            FullscreenManager.pop()
                         }) {
                         BackHandler {
-                            state.setFullscreenView(null)
+                            FullscreenManager.pop()
                         }
                         ThreadView(
                             permalink = post.permalink,
                             dismiss = {
-                                state.setFullscreenView(null)
+                                FullscreenManager.pop()
                             })
                     }
                 }
@@ -131,17 +131,13 @@ fun PostFeedViewer(
                     post,
                     showSubredditIcon = showSubredditIcon,
                     onClick = { post ->
-                        state.setFullscreenView { key(post.id) { threadView(post) } }
+                        FullscreenManager.push { threadView(post) }
                     },
                 ) {
                     PostBody(
                         post,
                         canPlayVideo = index == mostVisibleItemIndex,
-                        goFullscreen = {
-                            state.setFullscreenView(it)
-                        }, dismiss = {
-                            state.setFullscreenView(null)
-                        })
+                    )
                 }
             }
         }

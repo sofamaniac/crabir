@@ -8,7 +8,6 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -16,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.sofamaniac.reboost.FullscreenManager
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.VerticalSwipeToDismiss
 import com.sofamaniac.reboost.ui.media.image.FromPreview
@@ -24,18 +24,13 @@ import com.sofamaniac.reboost.ui.media.image.FromPreview
 fun PostImage(
     post: PostData,
     modifier: Modifier = Modifier,
-    goFullscreen: (@Composable () -> Unit) -> Unit = {},
-    dismiss: () -> Unit = {}
 ) {
     val goFullscreen = { view: @Composable BoxScope.() -> Unit ->
-        goFullscreen {
+        FullscreenManager.push {
             VerticalSwipeToDismiss(
-                onDismiss = dismiss,
                 modifier = modifier.fillMaxSize(),
                 backgroundContent = @Composable {
-                    Column() {
-                        Surface(color = Color.Black, modifier = Modifier.fillMaxSize()) {}
-                    }
+                    Surface(color = Color.Black, modifier = Modifier.fillMaxSize()) {}
                 },
             ) {
                 Box() {

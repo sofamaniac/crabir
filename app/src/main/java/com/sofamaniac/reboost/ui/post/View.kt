@@ -49,12 +49,10 @@ internal fun PostBody(
     post: PostData,
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = false,
-    goFullscreen: (@Composable () -> Unit) -> Unit,
-    dismiss: () -> Unit
 ) {
     when (post.kind) {
         Kind.Image -> {
-            PostImage(post, modifier.fillMaxWidth(), goFullscreen = goFullscreen, dismiss = dismiss)
+            PostImage(post, modifier.fillMaxWidth())
         }
 
         Kind.Video -> {
@@ -69,8 +67,6 @@ internal fun PostBody(
             PostGallery(
                 post,
                 modifier.fillMaxWidth(),
-                goFullscreen,
-                dismiss,
                 canPlayVideo = canPlayVideo
             )
         }

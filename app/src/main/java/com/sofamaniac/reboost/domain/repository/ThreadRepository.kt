@@ -7,18 +7,17 @@ import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.data.remote.api.UPVOTED
 import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
+import com.sofamaniac.reboost.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.reboost.data.remote.dto.comment.Sort
 import com.sofamaniac.reboost.data.remote.dto.post.PostDataMapper
+import com.sofamaniac.reboost.domain.model.CommentType
 import com.sofamaniac.reboost.domain.model.PostData
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 interface ThreadRepository {
     suspend fun getComments(
         permalink: String,
         sort: Sort, timeframe: Timeframe? = null
-    ): List<Thing>
+    ): List<CommentType>
 
     suspend fun getPost(id: String): PostData?
     suspend fun getMoreComments(more: Thing.More): List<Thing>
@@ -34,7 +33,6 @@ interface ThreadRepository {
     suspend fun save(id: String)
     suspend fun unsave(id: String)
 
-    val isRefreshing: StateFlow<Boolean>
 }
 
 class ThreadRepositoryImpl(
@@ -44,26 +42,28 @@ class ThreadRepositoryImpl(
 ) :
     ThreadRepository {
     private var post: PostData? = null
-    private var comments: List<Thing> = emptyList()
-    private var _isRefreshing = MutableStateFlow(false)
-    override val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+    private var comments: List<CommentType> = emptyList()
 
     suspend fun fetchThread(permalink: String, sort: Sort) {
         if (post != null && comments.isNotEmpty()) {
             return
         }
-        _isRefreshing.value = true
         val response = api.getThread(permalink, sort = sort)
         if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
                 val data = body.post.data.children.first()
                 post = PostDataMapper.map(data.data)
-                comments = body.comments.data.children
+                for (comment in body.comments.data.children) {
+                    if (comment is Thing.Comment) {
+                        comments += CommentType.Comment(CommentDataMapper.map(comment.data))
+                    } else {
+                        comments += CommentType.More(comment as Thing.More)
+                    }
+                }
                 postRepository.addPost(post!!)
             }
         }
-        _isRefreshing.value = false
     }
 
     override suspend fun getPost(id: String): PostData? {
@@ -79,7 +79,7 @@ class ThreadRepositoryImpl(
         permalink: String,
         sort: Sort,
         timeframe: Timeframe?
-    ): List<Thing> {
+    ): List<CommentType> {
         fetchThread(permalink, sort)
         return comments
     }
@@ -100,57 +100,22 @@ class ThreadRepositoryImpl(
 
     override suspend fun upvote(id: String) {
         api.vote(id, UPVOTED)
-        comments = comments.map {
-            if (it is Thing.Comment && it.data.id == id) {
-                it.copy(data = it.data.copy(likes = true))
-            } else {
-                it
-            }
-        }
     }
 
     override suspend fun neutralVote(id: String) {
         api.vote(id, NEUTRAL)
-        comments = comments.map {
-            if (it is Thing.Comment && it.data.id == id) {
-                it.copy(data = it.data.copy(likes = null))
-            } else {
-                it
-            }
-        }
     }
 
     override suspend fun downvote(id: String) {
         api.vote(id, DOWNVOTED)
-        comments = comments.map {
-            if (it is Thing.Comment && it.data.id == id) {
-                it.copy(data = it.data.copy(likes = false))
-            } else {
-                it
-            }
-        }
     }
 
     override suspend fun save(id: String) {
         api.save(id)
-        comments = comments.map {
-            if (it is Thing.Comment && it.data.id == id) {
-                it.copy(data = it.data.copy(saved = true))
-            } else {
-                it
-            }
-        }
     }
 
     override suspend fun unsave(id: String) {
         api.save(id)
-        comments = comments.map {
-            if (it is Thing.Comment && it.data.id == id) {
-                it.copy(data = it.data.copy(saved = false))
-            } else {
-                it
-            }
-        }
     }
 
 }

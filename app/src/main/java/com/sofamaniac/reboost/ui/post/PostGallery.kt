@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.reboost.FullscreenManager
 import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.reboost.domain.model.Gallery
 import com.sofamaniac.reboost.domain.model.PostData
@@ -52,8 +53,6 @@ import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayer
 fun PostGallery(
     post: PostData,
     modifier: Modifier = Modifier,
-    goFullscreen: (@Composable () -> Unit) -> Unit,
-    dismiss: () -> Unit,
     canPlayVideo: Boolean = false,
 ) {
     val gallery = post.gallery
@@ -68,7 +67,6 @@ fun PostGallery(
             post = post,
             gallery = gallery,
             state = state,
-            dismiss = dismiss
         )
     }
     EmbeddedGallery(
@@ -76,11 +74,10 @@ fun PostGallery(
         gallery,
         modifier = modifier
             .fillMaxSize()
-            .aspectRatio(gallery.aspectRatio)
-            .clickable(onClick = {
-                goFullscreen { fullscreenView() }
-            }),
-        goFullscreen = { goFullscreen { fullscreenView() } },
+            .aspectRatio(gallery.aspectRatio),
+        goFullscreen = {
+            FullscreenManager.push { fullscreenView() }
+        },
         canPlayVideo = canPlayVideo
     )
 }
@@ -94,7 +91,7 @@ fun EmbeddedGallery(
     canPlayVideo: Boolean = false,
 ) {
 
-    Box(modifier = modifier) {
+    Box(modifier = modifier.clickable { goFullscreen() }) {
         Gallery(
             gallery,
             modifier.aspectRatio(gallery.aspectRatio),
@@ -152,11 +149,9 @@ fun FullscreenGallery(
     post: PostData,
     state: PagerState,
     gallery: Gallery,
-    dismiss: () -> Unit,
 ) {
     var showDecorations by remember { mutableStateOf(true) }
     VerticalSwipeToDismiss(
-        onDismiss = dismiss,
         backgroundContent = @Composable {
             Column() {
                 Surface(color = Color.Black, modifier = Modifier.fillMaxSize()) {}
@@ -189,7 +184,7 @@ fun FullscreenGallery(
                             )
                         },
                         fullscreenButton = {
-                            IconButton(onClick = dismiss) {
+                            IconButton(onClick = FullscreenManager::pop) {
                                 Icon(
                                     Icons.Default.FullscreenExit,
                                     contentDescription = "Exit Fullscreen"
@@ -204,7 +199,7 @@ fun FullscreenGallery(
                     }
                 }
             }
-            FullscreenGalleryDecoration(post, state, showDecorations, dismiss = dismiss)
+            FullscreenGalleryDecoration(post, state, showDecorations)
         }
     }
 }
@@ -214,7 +209,6 @@ fun BoxScope.FullscreenGalleryDecoration(
     post: PostData,
     state: PagerState,
     enabled: Boolean,
-    dismiss: () -> Unit
 ) {
 
 
@@ -238,7 +232,7 @@ fun BoxScope.FullscreenGalleryDecoration(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
-            IconButton(onClick = dismiss) {
+            IconButton(onClick = FullscreenManager::pop) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Go back",

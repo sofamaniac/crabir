@@ -21,6 +21,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -33,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -58,6 +60,11 @@ import com.sofamaniac.reboost.ui.theme.ReboostTheme
 import com.sofamaniac.reboost.ui.thread.ThreadView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 
 
 @HiltAndroidApp
@@ -109,26 +116,55 @@ fun MainScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val drawerViewModel: DrawerViewModel = viewModel()
 
+    val fullScreenView by FullscreenManager.current.collectAsState(initial = null)
+
+
     DisposableEffect(Unit) {
         onDispose {
             VideoPlayerManager.releasePlayer()
         }
     }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerContent(
-                viewModel = drawerViewModel,
-                drawerState = drawerState,
+    Box {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                DrawerContent(
+                    viewModel = drawerViewModel,
+                    drawerState = drawerState,
+                )
+            },
+        ) {
+            NavigationGraph(
+                navController,
+                drawerState,
             )
-        },
-    ) {
-        NavigationGraph(
-            navController,
-            drawerState,
-        )
+        }
+
+        fullScreenView?.invoke()
     }
+
+}
+
+object FullscreenManager {
+    private var _fullscreenViews = MutableStateFlow(emptyList<@Composable () -> Unit>())
+
+    val current: Flow<@Composable (() -> Unit)?>
+        get() = _fullscreenViews.map { it.lastOrNull() }.distinctUntilChanged()
+
+
+    fun push(view: @Composable () -> Unit) {
+        _fullscreenViews.update {
+            it + view
+        }
+    }
+
+    fun pop() {
+        _fullscreenViews.update {
+            it.dropLast(1)
+        }
+    }
+
 }
 
 
