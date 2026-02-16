@@ -32,6 +32,10 @@ fun CommentNode(comment: CommentData, viewModel: ThreadViewModel, modifier: Modi
         TopRow(comment)
         SimpleMarkdown(
             comment.bodyMd,
+            modifier = Modifier.fillMaxWidth(),
+            mediaMetadata = comment.mediaMetadata,
+            rememberedHeight = viewModel.commentsHeight[comment.id],
+            onHeightMeasured = { height -> viewModel.setCommentHeight(comment.id, height) }
         )
         AnimatedVisibility(showBottomBar) {
             BottomRow(comment, viewModel)

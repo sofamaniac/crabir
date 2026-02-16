@@ -375,6 +375,15 @@ data class RedditVideo(
 @Serializable(with = MediaMetadataSerializer::class)
 @JsonClassDiscriminator("e")
 sealed class MediaMetadata() {
+
+    abstract val ratio: Float
+    abstract val width: Int
+    abstract val height: Int
+
+    abstract fun toMediaResource(): MediaResource?
+
+
+
     @Serializable
     @SerialName("Image")
     data class Image(
@@ -385,10 +394,14 @@ sealed class MediaMetadata() {
         @SerialName("s") val source: MediaPreview? = null,
         @SerialName("o") val obfuscated: List<MediaPreview>? = emptyList(),
     ) : MediaMetadata() {
-        val ratio: Float
+        override val ratio: Float
             get() = source?.ratio ?: 1f
+        override val width: Int
+            get() = source?.width ?: 0
+        override val height: Int
+            get() = source?.height ?: 0
 
-        fun toMediaResource() = MediaResource(source!!.url!!, ratio)
+        override fun toMediaResource() = MediaResource(source!!.url!!, ratio)
     }
 
     @Serializable
@@ -401,15 +414,28 @@ sealed class MediaMetadata() {
         @SerialName("s") val source: MediaPreviewGifSource? = null,
         @SerialName("o") val obfuscated: List<MediaPreview> = emptyList(),
     ) : MediaMetadata() {
-        val ratio: Float
+        override val ratio: Float
             get() = source?.ratio ?: 1f
+        override val width: Int
+            get() = source?.width ?: 0
+        override val height: Int
+            get() = source?.height ?: 0
 
-        fun toMediaResource() = MediaResource(source!!.mp4Url!!, ratio)
+        override fun toMediaResource() = MediaResource(source!!.mp4Url!!, ratio)
     }
 
     @Serializable
     @SerialName("Invalid")
-    object Invalid : MediaMetadata()
+    object Invalid : MediaMetadata() {
+        override val ratio: Float
+            get() = 0f
+        override val width: Int
+            get() = 0
+        override val height: Int
+            get() = 0
+
+        override fun toMediaResource(): MediaResource? = null
+    }
 }
 
 @Serializable

@@ -6,6 +6,7 @@ package com.sofamaniac.reboost.data.remote.dto.comment
 
 import com.sofamaniac.reboost.data.remote.dto.LinkFlairRichtext
 import com.sofamaniac.reboost.data.remote.dto.Thing
+import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditId
 import com.sofamaniac.reboost.data.remote.utils.EmptyStringOrListingSerializer
 import com.sofamaniac.reboost.data.remote.utils.FalseOrTimestampSerializer
@@ -43,6 +44,7 @@ data class CommentDTO(
     val permalink: String,
     @Serializable(with = EmptyStringOrListingSerializer::class)
     val replies: Thing.Listing<Thing>,
+    val media_metadata: Map<String, MediaMetadata> = emptyMap(),
 
     // ================================================ //
     // AUTHOR INFORMATION
@@ -112,7 +114,7 @@ data class CommentDTO(
     val no_follow: Boolean,
     val num_reports: Int? = null,
     val removal_reason: String? = null,
-    val report_reasons: String? = null,
+    // val report_reasons: String? = null,
     val score_hidden: Boolean,
     val send_replies: Boolean,
     val stickied: Boolean,
@@ -138,6 +140,7 @@ object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
         CommentData::subredditInfo fromValue from.toSubredditInfo()
         CommentData::replies fromValue from.mapReplies()
         CommentData::createdUtc fromProperty from::created_utc
+        CommentData::mediaMetadata fromProperty from::media_metadata
     }
 
 }

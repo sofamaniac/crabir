@@ -194,6 +194,13 @@ dependencies {
     implementation("io.noties.markwon:core:4.6.2")
     implementation("io.noties.markwon:ext-tables:4.6.2")
     implementation("io.noties.markwon:image:4.6.2")
+    implementation("io.noties.markwon:html:4.6.2")
+    implementation("io.noties.markwon:image-coil:4.6.2")
+    implementation("io.noties.markwon:image-glide:4.6.2")
+    implementation("io.coil-kt.coil3:coil:3.3.0")
     implementation("io.noties.markwon:inline-parser:4.6.2")
     implementation("io.noties.markwon:simple-ext:4.6.2")
+
+    implementation("com.github.bumptech.glide:glide:4.14.2")
+    annotationProcessor("com.github.bumptech.glide:glide:4.14.2")
 }

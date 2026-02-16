@@ -1,6 +1,7 @@
 package com.sofamaniac.reboost.domain.model
 
 import com.sofamaniac.reboost.data.remote.dto.Thing
+import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
 import kotlin.time.Instant
 
 sealed class CommentType() {
@@ -38,6 +39,7 @@ data class CommentData(
     val collapsed: Boolean,
     val createdUtc: Instant,
     val edited: Instant?,
+    val mediaMetadata: Map<String, MediaMetadata>
 ) : VotableData {
     override fun copy(relationship: Relationship?, score: Score?): CommentData =
         copy(relationship = relationship ?: this.relationship, score = score ?: this.score)

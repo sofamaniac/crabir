@@ -4,28 +4,37 @@
 
 package com.sofamaniac.reboost.ui.markdown
 
-import android.graphics.Rect
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.text.Spannable
-import android.text.method.LinkMovementMethod
-import android.text.method.MovementMethod
-import android.text.style.ClickableSpan
-import android.view.MotionEvent
+import android.util.Log
+import android.view.ViewGroup
 import android.widget.TextView
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.net.toUri
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.target.Target
+import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
-import io.noties.markwon.MarkwonConfiguration
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.ext.tables.TablePlugin
-import io.noties.markwon.image.ImageSize
-import io.noties.markwon.image.ImageSizeResolverDef
-import io.noties.markwon.image.ImagesPlugin
+import io.noties.markwon.html.HtmlPlugin
+import io.noties.markwon.image.AsyncDrawable
+import io.noties.markwon.image.glide.GlideImagesPlugin
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 
 
@@ -37,11 +46,18 @@ import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
          *
          * If [maxLines] is different from [Int.MAX_VALUE], the link in the text will not be clickable
          */
-fun SimpleMarkdown(markdown: String, modifier: Modifier = Modifier, maxLines: Int = Int.MAX_VALUE) {
+fun SimpleMarkdown(
+    markdown: String,
+    modifier: Modifier = Modifier,
+    maxLines: Int = Int.MAX_VALUE,
+    mediaMetadata: Map<String, MediaMetadata> = emptyMap(),
+    rememberedHeight: Int? = null,
+    onHeightMeasured: (Int) -> Unit = {},
+) {
     val colorScheme = MaterialTheme.colorScheme
 
-    val processedSpoiler = markdown.replace(">!", "\ue000").replace("!<", "\ue000")
-    val processedMarkdown = convertRedditPreviewLinks(processedSpoiler)
+
+    val processedMarkdown = markdown.convertRedditSpoilers().convertRedditPreviewLinks()
 
     class MarkdownTheme : AbstractMarkwonPlugin() {
         override fun configureTheme(builder: MarkwonTheme.Builder) {
@@ -57,121 +73,126 @@ fun SimpleMarkdown(markdown: String, modifier: Modifier = Modifier, maxLines: In
     }
 
     val context = LocalContext.current
-    val markwonReddit = Markwon.builder(context)
-        .usePlugin(MarkwonInlineParserPlugin.create())
-        .useRedditSpoilers()
-        .usePlugin(TablePlugin.create(context))
-        .usePlugin(MarkdownTheme())
-        .usePlugin(object : AbstractMarkwonPlugin() {
-            override fun configureConfiguration(builder: MarkwonConfiguration.Builder) {
-                builder.imageSizeResolver(object : ImageSizeResolverDef() {
-                    override fun resolveImageSize(
-                        imageSize: ImageSize?,
-                        imageBounds: Rect,
-                        canvasWidth: Int,
-                        textSize: Float
-                    ): Rect {
-                        return if (imageSize == null) {
-                            fitWidth(imageBounds, canvasWidth)
-                        } else {
-                            super.resolveImageSize(imageSize, imageBounds, canvasWidth, textSize)
+    val textView = remember { TextView(context) }
+    val markwonReddit = remember {
+        Log.d("SimpleMarkdown", "markwon")
+        Markwon.builder(context)
+            .usePlugin(MarkwonInlineParserPlugin.create())
+            .useRedditSpoilers()
+            .usePlugin(HtmlPlugin.create())
+            .usePlugin(TablePlugin.create(context))
+            .usePlugin(MarkdownTheme())
+            .usePlugin(
+                GlideImagesPlugin.create(
+                    object : GlideImagesPlugin.GlideStore {
+                        override fun load(drawable: AsyncDrawable): RequestBuilder<Drawable?> {
+                            val metadata = drawable.getMetadata(mediaMetadata)!!
+                            Log.d("SimpleMarkdown", metadata.toString())
+                            val placeholder =
+                                Color.YELLOW.toDrawable()
+                            placeholder.setBounds(0, 0, metadata.width, metadata.height)
+                            return Glide.with(context).load(metadata.toMediaResource()!!.url)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .skipMemoryCache(false)
+                                .onlyRetrieveFromCache(true)
+                                .placeholder(
+                                    placeholder
+                                )
+                        }
+
+                        override fun cancel(target: Target<*>) {
+                            Glide.with(context).clear(target)
                         }
                     }
 
-                    fun fitWidth(imageBounds: Rect, canvasWidth: Int): Rect {
-                        val ratio = imageBounds.width().toFloat() / imageBounds.height().toFloat()
-                        val newHeight = (canvasWidth / ratio).toInt()
-                        return Rect(0, 0, canvasWidth, newHeight)
-                    }
-                });
-            }
-        })
-        .usePlugin(ImagesPlugin.create())
+                ))
+            //.usePlugin(FullWidthImagePlugin(mediaMetadata))
+            .build()
+    }
+    // Parse markdown once and remember it
+    val parsedMarkdown = remember(processedMarkdown, markwonReddit) {
+        markwonReddit.parse(processedMarkdown)
+    }
 
-        .build()
-
-    val textView = TextView(context)
-
+    val spanned = remember(parsedMarkdown, markwonReddit) {
+        markwonReddit.render(parsedMarkdown)
+    }
     AndroidView(
         factory = { context ->
+            Log.d("SimpleMarkdown", "factory")
             textView.apply {
                 setTextColor(colorScheme.onBackground.toArgb())
                 setLinkTextColor(colorScheme.primary.toArgb())
                 movementMethod = LinkTouchMovementMethod.getInstance()
                 this.maxLines = maxLines
+                //textView.text = content
+                markwonReddit.setMarkdown(textView, processedMarkdown)
+                // Disable link when truncating view and allow clicks to be passed to parent view.
+                if (maxLines != Int.MAX_VALUE) {
+                    textView.movementMethod = null
+                } else {
+                    textView.movementMethod = LinkTouchMovementMethod.getInstance()
+                }
+                markwonReddit.setParsedMarkdown(textView, spanned)
+                textView.tag = markdown
+
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
             }
         },
-        modifier = Modifier.pointerInteropFilter { event ->
-            LinkTouchMovementMethod.getInstance().onTouchEvent(
-                textView,
-                textView.text as? Spannable ?: return@pointerInteropFilter false,
-                event
-            )
-        },
+        modifier = modifier
+            .onSizeChanged { size ->
+                Log.d("SimpleMarkdown", "onSizeChanged $size")
+                onHeightMeasured(size.height)
+            }
+            .let { mod ->
+                rememberedHeight?.let { size ->
+                    mod.then(Modifier.height(with(LocalDensity.current) { size.toDp() }))
+                } ?: mod
+            }
+            .pointerInteropFilter { event ->
+                LinkTouchMovementMethod.getInstance().onTouchEvent(
+                    textView,
+                    textView.text as? Spannable ?: return@pointerInteropFilter false,
+                    event
+                )
+            },
         update = { textView ->
-            markwonReddit.setMarkdown(textView, processedMarkdown)
-            // Disable link when truncating view and allow clicks to be passed to parent view.
-            if (maxLines != Int.MAX_VALUE) {
-                textView.movementMethod = null
-            } else {
-                textView.movementMethod = LinkTouchMovementMethod.getInstance()
+            Log.d("SimpleMarkdown", "update $processedMarkdown")
+            //textView.text = content
+            if (textView.tag != markdown) {
+                textView.tag = markdown
+                markwonReddit.setParsedMarkdown(textView, spanned)
             }
-            //textView.text = processedMarkdown
-            //textView.movementMethod = null
         }
     )
 }
 
-// Code produced by Claude
-class LinkTouchMovementMethod : LinkMovementMethod() {
-    override fun onTouchEvent(widget: TextView, buffer: Spannable, event: MotionEvent): Boolean {
-        val action = event.action
-
-        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN) {
-            var x = event.x.toInt()
-            var y = event.y.toInt()
-
-            x -= widget.totalPaddingLeft
-            y -= widget.totalPaddingTop
-
-            x += widget.scrollX
-            y += widget.scrollY
-
-            val layout = widget.layout
-            val line = layout.getLineForVertical(y)
-            val off = layout.getOffsetForHorizontal(line, x.toFloat())
-
-            // Check for URLSpan specifically (actual links), not all ClickableSpans
-            val links = buffer.getSpans(off, off, ClickableSpan::class.java)
-
-            if (links.isNotEmpty()) {
-                return super.onTouchEvent(widget, buffer, event)
-            }
-        }
-
-        // No link at touch position, don't consume the event
-        return false
+fun AsyncDrawable.getMetadata(mediaMetadata: Map<String, MediaMetadata>): MediaMetadata? {
+    // Handle destination of the form `giphy|xxxx`
+    if (destination.contains('|')) {
+        return mediaMetadata[destination]
     }
-
-    companion object {
-        private var sInstance: LinkTouchMovementMethod? = null
-
-        fun getInstance(): MovementMethod {
-            if (sInstance == null) {
-                sInstance = LinkTouchMovementMethod()
-            }
-            return sInstance!!
-        }
-    }
+    // Otherwise assume destination is a link
+    val url = destination.toUri()
+    val filename = url.pathSegments.last().split('.').first()
+    return mediaMetadata[filename]
 }
 
-fun convertRedditPreviewLinks(markdown: String): String {
+private fun String.convertRedditSpoilers(): String {
+    return this.replace(">!", " \ue000 ").replace("!<", " \ue000 ")
+}
+
+private fun String.convertRedditPreviewLinks(): String {
     // Match Reddit preview links that aren't already in markdown syntax
     val redditPreviewPattern = Regex(
         """(?<!]\()https://preview\.redd\.it/[^\s)]+(?!\))"""
     )
 
-    return redditPreviewPattern.replace(markdown) { matchResult ->
+    return redditPreviewPattern.replace(this) { matchResult ->
+        //"<img width=\"100%\" src=\"${matchResult.value}\"/>"
         "![](${matchResult.value})"
     }
 }

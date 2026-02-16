@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,6 +21,7 @@ import com.sofamaniac.reboost.ui.post.PostCard
 import com.sofamaniac.reboost.ui.post.PostGallery
 import com.sofamaniac.reboost.ui.post.PostImage
 import com.sofamaniac.reboost.ui.post.PostVideo
+import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,17 +40,25 @@ fun CommentListRoot(
         },
         modifier = modifier.fillMaxSize()
     ) {
-        val comments by viewModel.comments.collectAsState()
+        val comments by viewModel.comments.map { it.flattenComments() }
+            .collectAsState(initial = emptyList())
         val post = viewModel.getPost()
         LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
             // Show post
             item {
                 PostView(post)
             }
-            items(comments.size) { index ->
+            items(comments.size, key = { index -> comments[index].name }) { index ->
                 when (val comment = comments[index]) {
-                    is CommentType.Comment -> CommentView(comment, viewModel)
+                    is CommentType.Comment -> CommentView(
+                        comment,
+                        viewModel,
+                    )
+
                     is CommentType.More -> MoreViewer(comment)
+                }
+                if ((comments.getOrNull(index + 1)?.depth ?: 0) == 0) {
+                    HorizontalDivider()
                 }
             }
             item {
@@ -90,4 +100,15 @@ internal fun PostView(
             SimpleMarkdown(selftext)
         }
     }
+}
+
+fun List<CommentType>.flattenComments(): List<CommentType> {
+    val comments = emptyList<CommentType>().toMutableList()
+    for (comment in this) {
+        comments += comment
+        if (comment is CommentType.Comment) {
+            comments += comment.comment.replies.flattenComments()
+        }
+    }
+    return comments
 }
