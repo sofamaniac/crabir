@@ -7,7 +7,6 @@ package com.sofamaniac.reboost.ui.markdown
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.text.Spannable
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.compose.foundation.layout.height
@@ -78,7 +77,6 @@ fun SimpleMarkdown(
     val context = LocalContext.current
     val textView = remember { TextView(context) }
     val markwonReddit = remember {
-        Log.d("SimpleMarkdown", "markwon")
         Markwon.builder(context)
             .usePlugin(MarkwonInlineParserPlugin.create())
             .useRedditSpoilers()
@@ -89,11 +87,12 @@ fun SimpleMarkdown(
                 GlideImagesPlugin.create(
                     object : GlideImagesPlugin.GlideStore {
                         override fun load(drawable: AsyncDrawable): RequestBuilder<Drawable?> {
-                            val metadata = drawable.getMetadata(mediaMetadata)!!
+                            val metadata = drawable.getMetadata(mediaMetadata)
                             val placeholder =
                                 Color.GRAY.toDrawable()
-                            placeholder.setBounds(0, 0, metadata.width, metadata.height)
-                            return Glide.with(context).load(metadata.toMediaResource()!!.url)
+                            placeholder.setBounds(0, 0, metadata?.width ?: 0, metadata?.height ?: 0)
+                            return Glide.with(context)
+                                .load(metadata?.toMediaResource()?.url ?: drawable.destination)
                                 .placeholder(
                                     placeholder
                                 )
@@ -146,7 +145,6 @@ fun SimpleMarkdown(
         },
         modifier = modifier
             .onSizeChanged { size ->
-                Log.d("SimpleMarkdown", "onSizeChanged $size")
                 viewModel.height = size.height
             }
             .let { mod ->
@@ -162,7 +160,6 @@ fun SimpleMarkdown(
                 )
             },
         update = { textView ->
-            Log.d("SimpleMarkdown", "update $processedMarkdown")
             //textView.text = content
             if (textView.tag != markdown) {
                 textView.tag = markdown
