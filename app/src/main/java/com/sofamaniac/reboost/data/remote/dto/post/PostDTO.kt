@@ -54,7 +54,7 @@ data class PostDTO(
 
     @SerialName("id") val id: String,
     @SerialName("name") val fullname: String,
-    @SerialName("url") val url: String,
+    @SerialName("url") val url: String = "",
     @SerialName("title") val title: String = "",
     @SerialName("suggested_sort") val suggestedSort: String? = null,
     @SerialName("num_comments") val numComments: Int = 0,

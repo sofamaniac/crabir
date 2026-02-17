@@ -30,6 +30,7 @@ import net.openid.appauth.AuthState
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Collections.emptyList
+import javax.inject.Singleton
 
 @Serializable
 data class Accounts(
@@ -69,6 +70,7 @@ object AccountsSerializer : Serializer<Accounts> {
 
 }
 
+@Singleton
 class AccountsRepositoryImpl(
     context: Context,
     private val coroutineScope: CoroutineScope
@@ -91,8 +93,18 @@ class AccountsRepositoryImpl(
         initialValue = emptyList()
     )
 
-    override val activeAccount: StateFlow<RedditAccount>
-        get() = accounts.combine(activeAccountId) { accounts, activeId ->
+    override val activeAccountId: StateFlow<Int> = accountsData.map { accounts ->
+        Log.d("AccountsRepositoryImpl", "activeId: ${accounts.activeId}")
+        accounts.activeId
+    }.stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.Eagerly,
+        initialValue = -1
+    )
+
+
+    override val activeAccount: StateFlow<RedditAccount> =
+        accounts.combine(activeAccountId) { accounts, activeId ->
             if (activeId >= accounts.size || activeId < 0) {
                 if (activeId >= accounts.size) {
                     Log.e("AccountsRepositoryImpl", "Invalid id: activeId: ${activeId}")
@@ -107,16 +119,6 @@ class AccountsRepositoryImpl(
             scope = coroutineScope,
             started = SharingStarted.Eagerly,
             initialValue = RedditAccount.anonymous()
-        )
-
-    override val activeAccountId: StateFlow<Int>
-        get() = accountsData.map { accounts ->
-            Log.d("AccountsRepositoryImpl", "activeId: ${accounts.activeId}")
-            accounts.activeId
-        }.stateIn(
-            scope = coroutineScope,
-            started = SharingStarted.Eagerly,
-            initialValue = -1
         )
 
     override suspend fun addAccount(account: RedditAccount) {

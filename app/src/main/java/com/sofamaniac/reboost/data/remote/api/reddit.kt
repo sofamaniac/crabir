@@ -15,7 +15,6 @@ import com.sofamaniac.reboost.data.remote.dto.Thing.More
 import com.sofamaniac.reboost.data.remote.dto.Thing.Post
 import com.sofamaniac.reboost.data.remote.dto.Thing.Subreddit
 import com.sofamaniac.reboost.data.remote.dto.post.PostId
-import com.sofamaniac.reboost.data.remote.dto.user.User
 import com.sofamaniac.reboost.data.remote.utils.CommentsResponseSerializer
 import kotlinx.serialization.Serializable
 import retrofit2.Response
@@ -29,22 +28,9 @@ import com.sofamaniac.reboost.data.remote.dto.post.Sort as PostSort
 private const val BASE_URL = "https://oauth.reddit.com/"
 
 
-private const val API_LIMIT = 100
+internal const val API_LIMIT = 100
 
-interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi {
-
-    @GET("api/v1/me.json")
-    suspend fun getIdentity(): Response<User>
-
-    @GET("user/{user}/saved.json")
-    suspend fun getSaved(
-        @Path("user") user: String,
-        @Query("sort") sort: PostSort = PostSort.New,
-        @Query("t") timeframe: PostTimeframe? = null,
-        @Query("after") after: String? = null,
-        @Query("count") count: Int = 0,
-        @Query("limit") limit: Int = API_LIMIT,
-    ): Response<Listing<Thing.Votable>>
+interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI {
 
     @GET("{sort}.json")
     suspend fun getHome(
@@ -92,17 +78,6 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi {
     suspend fun getMultireddits(
         @Query("expand_srs") expandSrs: Boolean = true,
     ): Response<List<Thing.Multi>>
-
-    @GET("/user/{username}/saved.json")
-    suspend fun getSaved(
-        @Path("username") username: String,
-        @Query("after") after: String? = null,
-        @Query("before") before: String? = null,
-        @Query("count") count: Int = 0,
-        @Query("limit") limit: Int = API_LIMIT,
-        @Query("t") timeframe: PostTimeframe? = null,
-        @Query("sr_detail") srDetail: Boolean = true,
-    ): Response<Listing<Thing>>
 
     /** Get the post of a given multi.
      *

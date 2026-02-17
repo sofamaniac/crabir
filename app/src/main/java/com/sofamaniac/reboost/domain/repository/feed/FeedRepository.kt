@@ -64,7 +64,7 @@ abstract class FeedRepositoryCommon(
         return postRepository.unsave(id)
     }
 
-    protected suspend fun <T : Thing.Votable> makeRequest(
+    protected suspend fun <T : Thing> makeRequest(
         request: suspend () -> Response<Thing.Listing<T>>
     ): PagedResponse<String> {
         val response = request()

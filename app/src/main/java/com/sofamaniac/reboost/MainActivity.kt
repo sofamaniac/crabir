@@ -48,7 +48,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.sofamaniac.reboost.ui.ProfileView
 import com.sofamaniac.reboost.ui.drawer.DrawerContent
 import com.sofamaniac.reboost.ui.drawer.DrawerViewModel
 import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayerManager
@@ -58,6 +57,7 @@ import com.sofamaniac.reboost.ui.subreddit.SubredditViewer
 import com.sofamaniac.reboost.ui.subredditList.SubredditListViewer
 import com.sofamaniac.reboost.ui.theme.ReboostTheme
 import com.sofamaniac.reboost.ui.thread.ThreadView
+import com.sofamaniac.reboost.ui.user.ProfileView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.flow.Flow

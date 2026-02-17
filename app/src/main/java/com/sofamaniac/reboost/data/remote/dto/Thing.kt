@@ -23,11 +23,10 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @JsonClassDiscriminator("kind")
 sealed class Thing {
 
-    interface Votable
 
     @Serializable
     @SerialName("t1")
-    data class Comment(val data: CommentDTO) : Thing(), Votable
+    data class Comment(val data: CommentDTO) : Thing()
 
     @Serializable
     @SerialName("t2")
@@ -35,7 +34,7 @@ sealed class Thing {
 
     @Serializable
     @SerialName("t3")
-    data class Post(val data: PostDTO) : Thing(), Votable
+    data class Post(val data: PostDTO) : Thing()
 
     @Serializable
     @SerialName("t5")
@@ -68,7 +67,6 @@ sealed class Thing {
     data class Multi(val data: MultiData) : Thing()
 
 }
-
 
 fun emptyListing(): Thing.Listing<Thing> {
     return Thing.Listing(data = ListingData())

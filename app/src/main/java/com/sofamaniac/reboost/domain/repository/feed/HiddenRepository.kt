@@ -4,7 +4,6 @@
 
 package com.sofamaniac.reboost.domain.repository.feed
 
-import android.util.Log
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
@@ -16,7 +15,7 @@ import jakarta.inject.Singleton
 import kotlinx.coroutines.flow.first
 
 @Singleton
-class SavedRepository @Inject constructor(
+class HiddenRepository @Inject constructor(
     postRepository: PostRepository,
     api: RedditAPIService,
     private val accountsRepository: AccountsRepository
@@ -26,15 +25,10 @@ class SavedRepository @Inject constructor(
         sort: Sort,
         timeframe: Timeframe?
     ): PagedResponse<String> {
-//        val user = accountsRepository.activeAccount.last()
-//        if (user.isAnonymous()) {
-//            Log.w("SavedRepository", "getPosts: User is anonymous")
-//            return PagedResponse()
-//        }
+        val user = accountsRepository.activeAccount.first()
+        if (user.isAnonymous()) return PagedResponse()
         return makeRequest {
-            val user = accountsRepository.activeAccount.first()
-            Log.d("SavedRepository", "getPosts: $user")
-            api.getSaved(
+            api.getHidden(
                 user = user.username,
                 after = after,
             )

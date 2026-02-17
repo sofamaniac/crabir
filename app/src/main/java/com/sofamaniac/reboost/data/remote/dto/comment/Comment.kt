@@ -38,7 +38,7 @@ data class CommentDTO(
     val body: String,
     @SerialName("body_html")
     val bodyHtml: String,
-    val depth: Int,
+    val depth: Int = -1,
     @SerialName("parent_id")
     val parentId: String,
     val permalink: String,
