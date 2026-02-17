@@ -34,8 +34,7 @@ fun CommentNode(comment: CommentData, viewModel: ThreadViewModel, modifier: Modi
             comment.bodyMd,
             modifier = Modifier.fillMaxWidth(),
             mediaMetadata = comment.mediaMetadata,
-            rememberedHeight = viewModel.commentsHeight[comment.id],
-            onHeightMeasured = { height -> viewModel.setCommentHeight(comment.id, height) }
+            key = comment.id
         )
         AnimatedVisibility(showBottomBar) {
             BottomRow(comment, viewModel)

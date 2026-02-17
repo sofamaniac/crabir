@@ -34,16 +34,6 @@ class ThreadViewModel @AssistedInject constructor(
     val isRefreshing: StateFlow<Boolean>
         get() = _isRefreshing.asStateFlow()
 
-    private var _commentsHeight = HashMap<String, Int>()
-    val commentsHeight: HashMap<String, Int>
-        get() = _commentsHeight
-
-    fun setCommentHeight(id: String, height: Int) {
-        _commentsHeight[id] = height
-    }
-
-
-
     private var _comments = MutableStateFlow<List<CommentType>>(emptyList())
     val comments: StateFlow<List<CommentType>> = _comments.asStateFlow()
 
