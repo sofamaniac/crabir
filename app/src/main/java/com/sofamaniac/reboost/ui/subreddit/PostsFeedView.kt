@@ -36,14 +36,16 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -57,6 +59,7 @@ import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.post.PostBody
 import com.sofamaniac.reboost.ui.post.PostCard
 import com.sofamaniac.reboost.ui.thread.ThreadView
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
@@ -77,18 +80,30 @@ fun PostFeedViewer(
     val posts = state.data.collectAsLazyPagingItems()
     val listState = state.listState
 
-    val mostVisibleItemIndex by remember {
-        derivedStateOf {
-            listState.layoutInfo.visibleItemsInfo
-                .maxByOrNull { item ->
-                    val size = item.size
-                    val itemTop = maxOf(item.offset, 0)
-                    val itemBottom =
-                        minOf(item.offset + item.size, listState.layoutInfo.viewportEndOffset)
-                    (itemBottom - itemTop).toFloat() / max(item.size, 1).toFloat()
-                }?.index ?: 0
+
+    var mostVisibleItemIndex by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            if (!listState.isScrollInProgress) {
+                listState.layoutInfo.visibleItemsInfo
+                    .maxByOrNull { item ->
+                        val size = item.size
+                        val itemTop = maxOf(item.offset, 0)
+                        val itemBottom =
+                            minOf(item.offset + item.size, listState.layoutInfo.viewportEndOffset)
+                        (itemBottom - itemTop).toFloat() / max(item.size, 1).toFloat()
+                    }?.index ?: 0
+            } else {
+                null
+            }
         }
+            .filterNotNull()
+            .collect { index ->
+                mostVisibleItemIndex = index
+            }
     }
+
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,
         onRefresh = {
