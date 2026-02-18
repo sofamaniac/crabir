@@ -50,7 +50,9 @@ fun VideoPlayer(
 
     val context = LocalContext.current
     val player = remember { VideoPlayerManager.getInstance(context) }
-    val currentUrl = VideoPlayerManager.currentUrl.collectAsState()
+    val currentUrl by VideoPlayerManager.currentUrl.collectAsState()
+    val hasFirstFrame by VideoPlayerManager.hasFirstFrame.collectAsState()
+
 
     LaunchedEffect(startPlaying, currentUrl) {
         if (startPlaying) {
@@ -61,7 +63,7 @@ fun VideoPlayer(
 
     DisposableEffect(Unit) {
         onDispose {
-            if (currentUrl.value == media.url) {
+            if (currentUrl == media.url) {
                 VideoPlayerManager.stopPlayer()
             }
         }
@@ -75,7 +77,7 @@ fun VideoPlayer(
             .clickable(onClick = { showControls = !showControls })
     ) {
 
-        if (currentUrl.value == media.url) {
+        if (currentUrl == media.url) {
             ContentFrame(
                 player = player,
                 modifier = Modifier
@@ -87,6 +89,9 @@ fun VideoPlayer(
 
             } else {
                 AlwaysOnInfo(player, modifier = Modifier.align(Alignment.BottomCenter))
+            }
+            if (!hasFirstFrame) {
+                placeholder?.invoke()
             }
         } else {
             placeholder?.invoke()

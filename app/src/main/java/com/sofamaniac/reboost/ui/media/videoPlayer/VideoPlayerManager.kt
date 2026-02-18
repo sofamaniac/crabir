@@ -8,6 +8,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 object VideoPlayerManager {
     private var player: ExoPlayer? = null
@@ -15,11 +16,20 @@ object VideoPlayerManager {
     private var _currentUrl: MutableStateFlow<String?> = MutableStateFlow(null)
 
     var currentUrl: StateFlow<String?> = _currentUrl.asStateFlow()
+    private var _hasFirstFrame = MutableStateFlow(false)
+    val hasFirstFrame = _hasFirstFrame.asStateFlow()
 
     fun getInstance(context: Context): ExoPlayer {
         if (player == null) {
             player = ExoPlayer.Builder(context).build().apply {
                 repeatMode = REPEAT_MODE_ONE
+                addListener(object : androidx.media3.common.Player.Listener {
+                    override fun onRenderedFirstFrame() {
+                        super.onRenderedFirstFrame()
+                        Log.d("VideoPlayerManager", "First frame rendered for $currentUrl")
+                        _hasFirstFrame.update { true }
+                    }
+                })
             }
         }
         return player!!
@@ -32,26 +42,15 @@ object VideoPlayerManager {
         val mediaItem = MediaItem.fromUri(uri)
         player?.apply {
             setMediaItem(mediaItem)
+            _hasFirstFrame.update { false }
             prepare()
         }
-        _currentUrl.value = uri
+        _currentUrl.update { uri }
         Log.d("VideoPlayerManager", "Setting media item $uri")
     }
 
-    fun playPlayer() {
-        player?.play()
-
-    }
-
-    fun resumePlayer() {
-        player?.play()
-    }
-
-    fun pausePlayer() {
-        player?.pause()
-    }
-
     fun releasePlayer() {
+        stopPlayer()
         player?.release()
         player = null
     }
@@ -59,7 +58,8 @@ object VideoPlayerManager {
     fun stopPlayer() {
         Log.d("VideoPlayerManager", "Stopping player")
         player?.stop()
-        _currentUrl.value = null
+        _currentUrl.update { null }
+        _hasFirstFrame.update { false }
     }
 
 
