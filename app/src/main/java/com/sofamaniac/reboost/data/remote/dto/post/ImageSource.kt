@@ -13,5 +13,5 @@ data class PostImageSource(
     val width: Int = 0,
     val height: Int = 1,
 ) {
-    fun toMediaResource() = MediaResource(url, width.toFloat() / height.toFloat())
+    fun toMediaResource() = MediaResource(url, width.toFloat() / height.toFloat(), width, height)
 }

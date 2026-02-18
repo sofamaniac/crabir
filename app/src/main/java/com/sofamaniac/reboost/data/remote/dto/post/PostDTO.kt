@@ -66,7 +66,6 @@ data class PostDTO(
     @SerialName("crosspost_parent_list") val crosspostParentList: List<PostDTO> = emptyList(),
 
 
-
     // ================================================ //
     // AUTHOR INFORMATION
     // ================================================ //
@@ -368,7 +367,8 @@ data class RedditVideo(
     @SerialName("hls_url") val hlsUrl: String? = null,
     @SerialName("is_gif") val isGif: Boolean = false,
 ) {
-    fun toMediaResource() = MediaResource(fallbackUrl, width.toFloat() / height.toFloat())
+    fun toMediaResource() =
+        MediaResource(fallbackUrl, width.toFloat() / height.toFloat(), width, height)
 }
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -381,7 +381,6 @@ sealed class MediaMetadata() {
     abstract val height: Int
 
     abstract fun toMediaResource(): MediaResource?
-
 
 
     @Serializable
@@ -401,7 +400,7 @@ sealed class MediaMetadata() {
         override val height: Int
             get() = source?.height ?: 0
 
-        override fun toMediaResource() = MediaResource(source!!.url!!, ratio)
+        override fun toMediaResource() = MediaResource(source!!.url!!, ratio, width, height)
     }
 
     @Serializable
@@ -421,7 +420,7 @@ sealed class MediaMetadata() {
         override val height: Int
             get() = source?.height ?: 0
 
-        override fun toMediaResource() = MediaResource(source!!.mp4Url!!, ratio)
+        override fun toMediaResource() = MediaResource(source!!.mp4Url!!, ratio, width, height)
     }
 
     @Serializable
@@ -461,6 +460,6 @@ data class MediaPreview(
         get() = width.toFloat() / height.toFloat()
 
     fun toMediaResource(): MediaResource {
-        return MediaResource(url!!, ratio)
+        return MediaResource(url!!, ratio, width, height)
     }
 }

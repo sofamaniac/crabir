@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.text.Layout
 import android.text.TextUtils
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.ViewTreeObserver
 import android.widget.TextView
 import androidx.compose.foundation.layout.height
@@ -29,8 +30,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
+import com.sofamaniac.reboost.domain.model.MediaResource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
@@ -167,20 +173,45 @@ private fun redditMarkwonBuilder(
         .usePlugin(
             GlideImagesPlugin.create(
                 object : GlideImagesPlugin.GlideStore {
+
+                    private val requestManager = Glide.with(context).apply {
+                        addDefaultRequestListener(object : RequestListener<Any> {
+                            override fun onLoadFailed(
+                                e: GlideException?,
+                                model: Any,
+                                target: Target<Any>,
+                                isFirstResource: Boolean
+                            ): Boolean = false
+
+                            override fun onResourceReady(
+                                resource: Any,
+                                model: Any,
+                                target: Target<Any>,
+                                dataSource: DataSource,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                (resource as? GifDrawable)?.start()
+                                return false
+                            }
+                        })
+                    }
+
+
                     override fun load(drawable: AsyncDrawable): RequestBuilder<Drawable?> {
                         val metadata = drawable.getMetadata(mediaMetadata)
                         val placeholder =
                             Color.GRAY.toDrawable()
                         placeholder.setBounds(0, 0, metadata?.width ?: 0, metadata?.height ?: 0)
-                        return Glide.with(context)
-                            .load(metadata?.toMediaResource()?.url ?: drawable.destination)
+
+                        return requestManager
+                            .load(metadata?.url ?: drawable.destination)
                             .placeholder(
                                 placeholder
                             )
                     }
 
                     override fun cancel(target: Target<*>) {
-                        Glide.with(context).clear(target)
+                        requestManager.clear(target)
                     }
                 }
 
@@ -189,15 +220,23 @@ private fun redditMarkwonBuilder(
         .build()
 }
 
-private fun AsyncDrawable.getMetadata(mediaMetadata: Map<String, MediaMetadata>): MediaMetadata? {
+private fun AsyncDrawable.getMetadata(mediaMetadata: Map<String, MediaMetadata>): MediaResource? {
     // Handle destination of the form `giphy|xxxx`
     if (destination.contains('|')) {
-        return mediaMetadata[destination]
+        Log.d("SimpleMarkdown", "Handling destination $destination")
+        Log.d("SimpleMarkdown", "Media metadata ${mediaMetadata[destination]}")
+        val metadata = mediaMetadata[destination]
+        if (metadata != null && metadata !is MediaMetadata.Invalid) {
+            return metadata.toMediaResource()
+        } else {
+            val filename = destination.split('|').last()
+            return MediaResource("https://media.giphy.com/media/$filename/giphy.gif", 1f, 0, 0)
+        }
     }
     // Otherwise assume destination is a link
     val url = destination.toUri()
     val filename = url.pathSegments.last().split('.').first()
-    return mediaMetadata[filename]
+    return mediaMetadata[filename]?.toMediaResource()
 }
 
 private fun String.convertRedditSpoilers(): String {
