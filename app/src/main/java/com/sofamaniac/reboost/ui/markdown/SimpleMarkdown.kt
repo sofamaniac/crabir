@@ -7,7 +7,6 @@ package com.sofamaniac.reboost.ui.markdown
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.text.Spannable
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
@@ -136,11 +135,6 @@ fun SimpleMarkdown(
                 }
                 markwonReddit.setParsedMarkdown(textView, spanned)
                 textView.tag = markdown
-
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
             }
         },
         modifier = modifier
@@ -164,6 +158,12 @@ fun SimpleMarkdown(
             if (textView.tag != markdown) {
                 textView.tag = markdown
                 markwonReddit.setParsedMarkdown(textView, spanned)
+                // Disable link when truncating view and allow clicks to be passed to parent view.
+                if (maxLines != Int.MAX_VALUE) {
+                    textView.movementMethod = null
+                } else {
+                    textView.movementMethod = LinkTouchMovementMethod.getInstance()
+                }
             }
         }
     )
