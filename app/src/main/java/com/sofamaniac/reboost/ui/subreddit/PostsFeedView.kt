@@ -124,6 +124,7 @@ fun PostFeedViewer(
                     val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
                     SwipeToDismissBox(
                         state = swipeToDismissBoxState,
+                        enableDismissFromEndToStart = false,
                         backgroundContent = {},
                         onDismiss = {
                             FullscreenManager.pop()

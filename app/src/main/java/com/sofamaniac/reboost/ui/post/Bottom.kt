@@ -39,6 +39,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
 @HiltViewModel(assistedFactory = ButtonViewModel.Factory::class)
@@ -112,8 +113,14 @@ fun BottomRow(
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 @Composable
 private fun PostOptions(post: PostData, modifier: Modifier = Modifier) {
+    val prettyJson = Json { // this returns the JsonBuilder
+        prettyPrint = true
+        // optional: specify indent
+        prettyPrintIndent = " "
+    }
     var showOptions by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { showOptions = true }) {
@@ -122,7 +129,7 @@ private fun PostOptions(post: PostData, modifier: Modifier = Modifier) {
         DropdownMenu(expanded = showOptions, onDismissRequest = { showOptions = false }) {
             if (BuildConfig.DEBUG) {
                 DropdownMenuItem(text = { Text("Post content") }, onClick = {
-                    Log.d("Post", Json.encodeToString(post))
+                    Log.d("Post", prettyJson.encodeToString(post))
                 })
             }
         }
