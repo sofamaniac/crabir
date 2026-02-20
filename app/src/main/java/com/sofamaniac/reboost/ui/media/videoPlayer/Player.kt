@@ -92,6 +92,9 @@ fun VideoPlayer(
             }
             if (!hasFirstFrame) {
                 placeholder?.invoke()
+                Box(modifier = Modifier.align(Alignment.TopEnd)) {
+                    cartouche?.invoke()
+                }
             }
         } else {
             placeholder?.invoke()
