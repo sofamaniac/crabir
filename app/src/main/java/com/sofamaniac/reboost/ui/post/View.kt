@@ -9,7 +9,6 @@
 package com.sofamaniac.reboost.ui.post
 
 import android.icu.text.CompactDecimalFormat
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -117,9 +116,8 @@ fun PostInfo(
             Text(post.scoreString(), style = MaterialTheme.typography.bodyMedium)
         }
         if (hasThumbnail) {
-            val thumbnailURL = post.thumbnail.uri.toHttpUrlOrNull()
+            val thumbnailURL = post.thumbnail.uri
             val uriHandler = LocalUriHandler.current
-            Log.d("PostInfo", "Rendering thumbnail $thumbnailURL")
             AsyncImage(
                 model = thumbnailURL,
                 contentDescription = post.title,
