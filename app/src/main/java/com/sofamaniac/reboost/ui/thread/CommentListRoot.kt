@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +29,7 @@ import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.markdown.SimpleMarkdown
 import com.sofamaniac.reboost.ui.post.PostCard
 import com.sofamaniac.reboost.ui.post.PostGallery
+import com.sofamaniac.reboost.ui.post.PostHeader
 import com.sofamaniac.reboost.ui.post.PostImage
 import com.sofamaniac.reboost.ui.post.PostInfo
 import com.sofamaniac.reboost.ui.post.PostVideo
@@ -52,11 +54,13 @@ fun CommentListRoot(
     ) {
         val comments by viewModel.comments.map { it.flattenComments() }
             .collectAsState(initial = emptyList())
-        val post = viewModel.getPost()
+        val post by viewModel.post.collectAsState(initial = null)
         LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
             // Show post
             item {
-                PostView(post)
+                if (post != null) {
+                    PostView(post!!)
+                }
             }
             items(comments.size, key = { index -> comments[index].name }) { index ->
                 when (val comment = comments[index]) {
@@ -138,11 +142,14 @@ internal fun CrossPostView(
     post: PostData,
     modifier: Modifier = Modifier,
 ) {
-    PostInfo(
-        post,
-        modifier = modifier,
-        enablePreview = true,
-    )
+    Column {
+        PostHeader(post, showSubredditIcon = false)
+        PostInfo(
+            post,
+            modifier = modifier,
+            enablePreview = true,
+        )
+    }
 }
 
 fun List<CommentType>.flattenComments(): List<CommentType> {

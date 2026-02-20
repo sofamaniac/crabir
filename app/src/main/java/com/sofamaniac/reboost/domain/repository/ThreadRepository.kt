@@ -70,7 +70,7 @@ class ThreadRepositoryImpl(
         if (post != null) {
             return post
         } else {
-            post = postRepository.getPost(id) as PostData
+            post = postRepository.getPost(id) as? PostData?
         }
         return post
     }

@@ -37,6 +37,9 @@ class ThreadViewModel @AssistedInject constructor(
     private var _comments = MutableStateFlow<List<CommentType>>(emptyList())
     val comments: StateFlow<List<CommentType>> = _comments.asStateFlow()
 
+    private var _post = MutableStateFlow<PostData?>(null)
+    val post: StateFlow<PostData?> = _post.asStateFlow()
+
     private var _openComment = MutableStateFlow<String?>(null)
 
     /** Id of the comment currently open */
@@ -55,16 +58,18 @@ class ThreadViewModel @AssistedInject constructor(
     val sort: StateFlow<Sort> = _sort.asStateFlow()
 
     init {
+        // try initializing post
+        _post.value = getPost()
         fetchComments()
     }
 
-    fun getPost(): PostData {
+    private fun getPost(): PostData? {
         val post = runBlocking(Dispatchers.IO) {
             val post = repository.getPost(id) ?: visitedPostsDao.getPost(id)?.toDomainModel()
             if (post == null) {
                 Log.e("ThreadViewModel", "getPost: Post not found in database ($id)")
             }
-            post!!
+            post
         }
         return post
     }
@@ -73,6 +78,8 @@ class ThreadViewModel @AssistedInject constructor(
         viewModelScope.launch {
             _isRefreshing.value = true
             _comments.value = repository.getComments(permalink, sort = _sort.value)
+            // If post was not found set it here.
+            _post.value = _post.value ?: getPost()
             _isRefreshing.value = false
         }
     }

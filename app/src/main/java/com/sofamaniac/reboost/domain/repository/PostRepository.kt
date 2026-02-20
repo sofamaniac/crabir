@@ -28,11 +28,12 @@ class PostRepository(private val api: RedditAPIService) {
         _cache.value += newEntries
     }
 
-    fun getPost(id: String): VotableData = _cache.value[id]!!
+    fun getPost(id: String): VotableData? = _cache.value[id]
 
 
     suspend fun vote(id: String, upvote: Boolean): Result<Unit> {
-        val post: VotableData = _cache.value[id]!!
+        val post: VotableData? = _cache.value[id]
+        if (post == null) return Result.failure(Exception("Post not found"))
         lateinit var res: Response<Unit>
         val newLike = if (post.relationship.liked == upvote) null else upvote
         val dir = when (newLike) {
@@ -67,7 +68,8 @@ class PostRepository(private val api: RedditAPIService) {
     }
 
     suspend fun saveHelper(id: String, target: Boolean): Result<Unit> {
-        val post: VotableData = _cache.value[id]!!
+        val post: VotableData? = _cache.value[id]
+        if (post == null) return Result.failure(Exception("Post not found"))
         try {
             val res = if (target) api.save(post.name) else api.unsave(post.name)
             if (res.isSuccessful) {
