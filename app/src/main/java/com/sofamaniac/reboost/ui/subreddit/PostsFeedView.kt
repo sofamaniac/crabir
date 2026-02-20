@@ -8,7 +8,6 @@
 
 package com.sofamaniac.reboost.ui.subreddit
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -129,9 +128,6 @@ fun PostFeedViewer(
                         onDismiss = {
                             FullscreenManager.pop()
                         }) {
-                        BackHandler {
-                            FullscreenManager.pop()
-                        }
                         ThreadView(
                             permalink = post.permalink,
                             dismiss = {
@@ -218,8 +214,8 @@ fun TopBar(
 
 @Composable
 fun SortMenu(state: PostFeedViewModel) {
-    var sortExpanded = remember { mutableStateOf(false) }
-    var timeframeExpanded = remember { mutableStateOf(false) }
+    val sortExpanded = remember { mutableStateOf(false) }
+    val timeframeExpanded = remember { mutableStateOf(false) }
     var chosenSort by remember { mutableStateOf(state.params.value.sort) }
     Box {
         IconButton(onClick = { sortExpanded.value = true }) {

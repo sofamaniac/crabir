@@ -1,6 +1,5 @@
 package com.sofamaniac.reboost.ui
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
@@ -52,9 +51,6 @@ fun VerticalSwipeToDismiss(
         }
     }
 
-    BackHandler() {
-        FullscreenManager.pop()
-    }
     Box(
         modifier = Modifier
             .anchoredDraggable(

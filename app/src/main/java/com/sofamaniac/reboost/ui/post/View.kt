@@ -91,6 +91,11 @@ internal fun PostBody(
 }
 
 
+/** Show a post title and thumbnail.
+ * @param post The post to show.
+ * @param modifier The modifier to apply to the root layout.
+ * @param enablePreview Whether to enable the preview of the thumbnail. Defaults to true.
+ * */
 @Composable
 fun PostInfo(
     post: PostData,

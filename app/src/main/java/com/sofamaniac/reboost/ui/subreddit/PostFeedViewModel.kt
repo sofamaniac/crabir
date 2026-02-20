@@ -10,7 +10,6 @@ package com.sofamaniac.reboost.ui.subreddit
 
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -41,10 +40,6 @@ abstract class PostFeedViewModel(
 
     var listState by mutableStateOf(LazyListState())
 
-    private var _fullscreenView = MutableStateFlow<(@Composable () -> Unit)?>(null)
-
-    val fullscreenView = _fullscreenView.asStateFlow()
-
     data class FeedParams(
         val sort: Sort,
         val timeframe: Timeframe?
@@ -58,17 +53,6 @@ abstract class PostFeedViewModel(
     )
     val params: StateFlow<FeedParams> = _params.asStateFlow()
 
-    fun setFullscreenView(view: @Composable (() -> Unit)?) {
-        _fullscreenView.value = view
-    }
-
-
-    fun scrollToTop() {
-        viewModelScope.launch {
-            listState.scrollToItem(0)
-        }
-    }
-
     fun refresh() {
         postsSource?.invalidate()
         repository.refresh()
@@ -76,8 +60,8 @@ abstract class PostFeedViewModel(
     }
 
     private var postsSource: PostsSource? = null
-    var data = Pager(
-        config = PagingConfig(pageSize = 100),
+    val data = Pager(
+        config = PagingConfig(pageSize = 100, prefetchDistance = 10, initialLoadSize = 100),
         initialKey = "",
         pagingSourceFactory = {
             PostsSource(
