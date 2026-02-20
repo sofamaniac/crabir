@@ -55,10 +55,10 @@ class ThreadRepositoryImpl(
                 val data = body.post.data.children.first()
                 post = PostDataMapper.map(data.data)
                 for (comment in body.comments.data.children) {
-                    if (comment is Thing.Comment) {
-                        comments += CommentType.Comment(CommentDataMapper.map(comment.data))
+                    comments += if (comment is Thing.Comment) {
+                        CommentType.Comment(CommentDataMapper.map(comment.data))
                     } else {
-                        comments += CommentType.More(comment as Thing.More)
+                        CommentType.More(comment as Thing.More)
                     }
                 }
                 postRepository.addPost(post!!)

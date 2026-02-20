@@ -124,14 +124,12 @@ data class SubredditData(
     val user_is_contributor: Boolean = false,
     val allow_predictions_tournament: Boolean = false
 ) {
-    val icon: SubredditIcon
-        get() {
-            return when {
-                community_icon != null -> SubredditIcon.Icon(community_icon)
-                icon_img != null -> SubredditIcon.Icon(icon_img)
-                key_color != null -> SubredditIcon.Color(key_color)
-                primary_color != null -> SubredditIcon.Color(primary_color)
-                else -> SubredditIcon.Color("black")
-            }
+    val icon: SubredditIcon =
+        when {
+            !community_icon.isNullOrBlank() -> SubredditIcon.Icon(community_icon)
+            !icon_img.isNullOrBlank() -> SubredditIcon.Icon(icon_img)
+            !key_color.isNullOrBlank() -> SubredditIcon.Color(key_color)
+            !primary_color.isNullOrBlank() -> SubredditIcon.Color(primary_color)
+            else -> SubredditIcon.Color("black")
         }
 }

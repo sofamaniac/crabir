@@ -117,7 +117,8 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI {
         @Query("comment") comment: String? = null,
         @Query("context") context: Int? = null,
         @Query("depth") depth: Int? = null,
-        @Query("limit") limit: Int? = null,
+        @Query("limit") limit: Int? = API_LIMIT,
+        @Query("sr_detail") srDetail: Boolean = true,
     ): Response<CommentsResponse>
 
     @GET("{permalink}.json")
@@ -132,6 +133,7 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI {
         @Query("context") context: Int? = 0,
         @Query("depth") depth: Int? = null,
         @Query("limit") limit: Int = API_LIMIT,
+        @Query("sr_detail") srDetail: Boolean = true,
     ): Response<CommentsResponse>
 }
 

@@ -89,18 +89,18 @@ data class SubredditDetails(
     @SerialName("user_is_subscriber")
     val userIsSubscriber: Boolean?
 ) {
-    val icon: SubredditIcon
-        get() {
-            return when {
-                communityIcon != null -> SubredditIcon.Icon(communityIcon)
-                iconImg != null -> SubredditIcon.Icon(iconImg)
-                keyColor != null -> SubredditIcon.Color(keyColor)
-                primaryColor != null -> SubredditIcon.Color(primaryColor)
-                else -> SubredditIcon.Color("black")
-            }
+    val icon: SubredditIcon =
+        when {
+            !communityIcon.isNullOrBlank() -> SubredditIcon.Icon(communityIcon)
+            !iconImg.isNullOrBlank() -> SubredditIcon.Icon(iconImg)
+            !keyColor.isNullOrBlank() -> SubredditIcon.Color(keyColor)
+            !primaryColor.isNullOrBlank() -> SubredditIcon.Color(primaryColor)
+            else -> SubredditIcon.Color("black")
         }
+
 }
 
+@Serializable
 sealed class SubredditIcon {
     data class Icon(val url: String) : SubredditIcon()
     data class Color(val color: String) : SubredditIcon()
