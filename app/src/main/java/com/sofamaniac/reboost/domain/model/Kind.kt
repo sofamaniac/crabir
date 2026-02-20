@@ -13,21 +13,29 @@ enum class Kind {
     Video,
     Gallery,
     Meta,
-    Link
+    Link,
+    YoutubeVideo,
 }
 
 fun isVideoPost(post: PostDTO): Boolean {
-    return post.isVideo || (post.postHint == "image" && isVideoUrl(post.url))
+    return post.isVideo || (post.postHint == "image" && isVideoUrl(post.url)) ||
+            (post.preview?.images?.any { it.variants?.mp4 != null } ?: false)
 }
 
 fun getKind(post: PostDTO): Kind {
     if (isVideoPost(post)) return Kind.Video
+
+    if (post.crosspostParentList.isNotEmpty()) return getKind(post.crosspostParentList.first())
 
     val kind = if (post.isSelfPost) Kind.Self
     else if (post.isVideo) Kind.Video
     else if (post.isGallery || post.galleryData != null) Kind.Gallery
     else if (post.isMeta) Kind.Meta
     else null
+
+    if (post.domain.contains("youtube") || post.domain.contains("youtu.be")) {
+        return Kind.YoutubeVideo
+    }
 
     if (kind != null) return kind
 

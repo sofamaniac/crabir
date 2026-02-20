@@ -18,7 +18,9 @@ fun FromPreview(
     modifier: Modifier = Modifier,
     allowTransformation: Boolean = true
 ) {
-    val images = post.preview!!
+    if (post.preview == null) return
+
+    val images = post.preview
     val image = images.images[0].source
     val url = image.url
     val x = image.width

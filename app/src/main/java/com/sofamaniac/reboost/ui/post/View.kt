@@ -70,6 +70,13 @@ internal fun PostBody(
             )
         }
 
+        Kind.YoutubeVideo -> {
+            YoutubeVideo(
+                post,
+                modifier.fillMaxWidth(),
+            )
+        }
+
         else -> {
             val selftext = post.selftext.markdown
             if (selftext.isNotBlank()) {

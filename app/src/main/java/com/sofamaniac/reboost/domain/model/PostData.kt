@@ -34,10 +34,8 @@ data class PostData(
     val gallery: Gallery?,
     //val status: Status
 ) : VotableData {
-    val isCrosspost: Boolean
-        get() {
-            return crosspostParentList.isNotEmpty()
-        }
+    val isCrosspost: Boolean =
+        crosspostParentList.isNotEmpty()
 
     override fun copy(relationship: Relationship?, score: Score?): VotableData {
         return copy(relationship = relationship ?: this.relationship, score = score ?: this.score)
