@@ -7,6 +7,7 @@ import android.view.View
 
 class SpoilerSpan : ClickableSpan() {
     private var isRevealed = false
+    private var startingTextColor = Color.WHITE
 
     override fun onClick(widget: View) {
         isRevealed = true
@@ -15,13 +16,15 @@ class SpoilerSpan : ClickableSpan() {
 
     override fun updateDrawState(ds: TextPaint) {
         if (!isRevealed) {
+            // Save original text color
+            startingTextColor = ds.color
             // Hide text by making it same color as background
-            ds.bgColor = 0xFF2D2D2D.toInt()
-            ds.color = 0xFF333333.toInt()
+            ds.bgColor = Color.GRAY
+            ds.color = Color.GRAY
         } else {
             // Reveal text
-            ds.bgColor = 0xFF2D2D2D.toInt()
-            ds.color = Color.WHITE
+            ds.bgColor = Color.TRANSPARENT
+            ds.color = startingTextColor
         }
     }
 }
