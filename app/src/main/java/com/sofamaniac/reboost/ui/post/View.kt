@@ -215,6 +215,7 @@ fun PostData.scoreString(): AnnotatedString {
  * @param post The [Post] data to display.
  * @param selected A [MutableIntState] that holds the index of the current tab.
  * @param modifier Modifier for the root layout of the post.
+ * @param enableThumbnail Whether to enable the thumbnail preview. Defaults to true. The thumbnail is shown only if there is one and the post if a link.
  * @param showSubredditIcon Whether to display the subreddit icon in the header. Defaults to true.
  * @param clickable Whether the post is clickable to navigate to the thread view. Defaults to true.
  * @param onClick A lambda that takes a [Post] and is called before navigating to the post.
@@ -224,6 +225,7 @@ fun PostData.scoreString(): AnnotatedString {
 fun PostCard(
     post: PostData,
     modifier: Modifier = Modifier,
+    enableThumbnail: Boolean = true,
     showSubredditIcon: Boolean = true,
     clickable: Boolean = true,
     onClick: (PostData) -> Unit = {},
@@ -252,7 +254,7 @@ fun PostCard(
         PostInfo(
             post,
             modifier = modifier,
-            enablePreview = enablePreview,
+            enablePreview = enablePreview && enableThumbnail,
         )
         body()
         BottomRow(post, modifier, visitPost = onClick)

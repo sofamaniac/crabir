@@ -88,7 +88,7 @@ internal fun PostView(
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = true,
 ) {
-    PostCard(post, clickable = false) {
+    PostCard(post, clickable = false, enableThumbnail = !post.isCrosspost) {
         if (!post.isCrosspost) {
             when (post.kind) {
                 Kind.Image -> {
@@ -112,7 +112,7 @@ internal fun PostView(
             // always show selftext if there is one
             val selftext = post.selftext.markdown
             if (selftext.isNotBlank()) {
-                SimpleMarkdown(selftext)
+                SimpleMarkdown(selftext, modifier = Modifier.padding(horizontal = 8.dp))
             }
         } else {
             val parent = post.crosspostParentList.first()
