@@ -9,6 +9,7 @@
 package com.sofamaniac.reboost.ui.post
 
 import android.icu.text.CompactDecimalFormat
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -26,17 +28,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sofamaniac.reboost.domain.model.Kind
 import com.sofamaniac.reboost.domain.model.PostData
+import com.sofamaniac.reboost.ui.Cartouche
 import com.sofamaniac.reboost.ui.Flair
 import com.sofamaniac.reboost.ui.markdown.SimpleMarkdown
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -123,9 +128,46 @@ fun PostInfo(
                 modifier = titleModifier.fillMaxWidth(),
                 textAlign = TextAlign.Start,
             )
-            // TODO make clickable
-            Flair(post.linkFlair)
-            Text(post.scoreString(), style = MaterialTheme.typography.bodyMedium)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                if (post.spoiler) {
+                    Cartouche(
+                        backgroundColor = Color.Transparent,
+                        modifier = Modifier.border(
+                            width = 1.dp,
+                            color = Color.Red,
+                            shape = RoundedCornerShape(corner = CornerSize(2.dp)),
+                        )
+                    ) {
+                        Text(
+                            "SPOILER",
+                            style = MaterialTheme.typography.labelSmall.copy(color = Color.Red)
+                        )
+                    }
+                }
+                // TODO make clickable
+                Flair(post.linkFlair)
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                Text(post.scoreString(), style = MaterialTheme.typography.bodyMedium)
+                if (post.over18) {
+                    Cartouche(
+                        backgroundColor = Color.Red,
+                    ) {
+                        Text(
+                            "NSFW", fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.labelSmall.copy(color = Color.White)
+                        )
+                    }
+
+                }
+            }
         }
         if (hasThumbnail) {
             val thumbnailURL = post.thumbnail.uri
@@ -160,7 +202,7 @@ fun PostData.scoreString(): AnnotatedString {
             append(formatter.format(score))
         }
         append(" · ")
-        append("${numComments} comments")
+        append("$numComments comments")
     }
 }
 
@@ -190,16 +232,15 @@ fun PostCard(
     // We do not apply the padding on the column, but on each of its children except [body]
     // to have images that take the full width
     val modifier = Modifier.padding(horizontal = 16.dp)
-    val cardModifier = if (clickable) {
-        Modifier
-            .fillMaxWidth()
-            .clickable(onClick = { onClick(post) })
+    val onClickCard = if (clickable) {
+        { onClick(post) }
     } else {
-        Modifier.fillMaxWidth()
+        {}
     }
     Card(
         shape = RoundedCornerShape(0),
-        modifier = cardModifier,
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClickCard,
     ) {
         PostHeader(
             post,

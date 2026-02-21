@@ -23,6 +23,7 @@ data class PostData(
     val suggestedSort: String,
     val numComments: Int,
     val over18: Boolean,
+    val spoiler: Boolean,
     val preview: Preview?,
     val crosspostParentList: List<PostData>,
     val subredditDetails: SubredditDetails?,

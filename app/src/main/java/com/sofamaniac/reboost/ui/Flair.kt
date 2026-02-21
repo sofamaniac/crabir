@@ -96,7 +96,6 @@ fun Flair(flair: Flair) {
     val l2 = textColor.luminance() + 0.05
     val contrastRatio = max(l1, l2) / min(l1, l2)
     if (contrastRatio < 4.5) {
-        Log.i("Flair", "Inverting color for $flair")
         textColor = textColor.invert()
     }
     Cartouche(backgroundColor = backgroundColor) {
