@@ -1,19 +1,24 @@
 package com.sofamaniac.reboost.ui.thread
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.unit.dp
 import com.sofamaniac.reboost.domain.model.CommentData
 import com.sofamaniac.reboost.ui.formatElapsedTimeLocalized
 import com.sofamaniac.reboost.ui.markdown.SimpleMarkdown
@@ -24,15 +29,22 @@ import kotlinx.coroutines.flow.map
 
 @Composable
 fun CommentNode(comment: CommentData, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
-    val showBottomBar by viewModel.openComment.map { it == comment.id }
-        .collectAsState(initial = false)
+    val showBottomBar by remember(comment.name) {
+        viewModel.openComment.map { it == comment.name }
+    }.collectAsState(initial = false)
+
+    val innerModifier = Modifier
+        .padding(horizontal = 8.dp)
+        .padding(bottom = 8.dp)
     Column(
-        modifier = modifier.clickable(onClick = { viewModel.toggleComment(comment.id) })
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = { viewModel.toggleComment(comment.name) }),
     ) {
-        TopRow(comment)
+        TopRow(comment, modifier = innerModifier)
         SimpleMarkdown(
             comment.bodyMd,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = innerModifier,
             mediaMetadata = comment.mediaMetadata,
             key = comment.id
         )
@@ -46,7 +58,12 @@ fun CommentNode(comment: CommentData, viewModel: ThreadViewModel, modifier: Modi
 fun BottomRow(comment: CommentData, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
     val likes = comment.relationship.liked
     val saved = comment.relationship.saved
-    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = Color.Gray.copy(alpha = 0.2f)),
+        horizontalArrangement = Arrangement.End
+    ) {
         UpButton(likes) { viewModel.upvote(comment.name, likes) }
         DownButton(likes) { viewModel.downvote(comment.name, likes) }
         SavedButton(saved) { viewModel.save(comment.name, saved) }
