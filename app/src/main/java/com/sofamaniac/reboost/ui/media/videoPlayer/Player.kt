@@ -23,7 +23,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.ContentFrame
 import androidx.media3.ui.compose.state.rememberPlayPauseButtonState
 import com.sofamaniac.reboost.domain.model.MediaResource
-import com.sofamaniac.reboost.ui.Cartouche
+import com.sofamaniac.reboost.ui.cartouche
 import com.sofamaniac.reboost.ui.media.videoPlayer.controls.AlwaysOnInfo
 import com.sofamaniac.reboost.ui.media.videoPlayer.controls.Controls
 
@@ -39,9 +39,7 @@ fun VideoPlayer(
         }
     },
     cartouche: @Composable (() -> Unit)? = {
-        Cartouche(backgroundColor = Color.Cyan) {
-            Text("Gif")
-        }
+        Text("Gif", modifier = Modifier.cartouche(Color.Cyan))
     },
     fullscreenButton: @Composable (() -> Unit)? = null,
     startPlaying: Boolean = false,

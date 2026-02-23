@@ -43,8 +43,8 @@ import com.sofamaniac.reboost.FullscreenManager
 import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.reboost.domain.model.Gallery
 import com.sofamaniac.reboost.domain.model.PostData
-import com.sofamaniac.reboost.ui.Cartouche
 import com.sofamaniac.reboost.ui.VerticalSwipeToDismiss
+import com.sofamaniac.reboost.ui.cartouche
 import com.sofamaniac.reboost.ui.media.gallery.Gallery
 import com.sofamaniac.reboost.ui.media.image.ImageView
 import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayer
@@ -130,16 +130,13 @@ fun EmbeddedGallery(
                 }
             }
         }
-        Cartouche(
-            backgroundColor = Color.Black.copy(alpha = 0.6f),
+        Text(
+            "${state.currentPage + 1}/${gallery.images.size}",
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(all = 4.dp)
-        ) {
-            Text(
-                "${state.currentPage + 1}/${gallery.images.size}",
-            )
-        }
+                .cartouche(Color.Black.copy(alpha = 0.6f))
+        )
     }
 }
 

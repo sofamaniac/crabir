@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import com.sofamaniac.reboost.domain.model.MediaResource
 import com.sofamaniac.reboost.domain.model.PostData
-import com.sofamaniac.reboost.ui.Cartouche
+import com.sofamaniac.reboost.ui.cartouche
 import com.sofamaniac.reboost.ui.media.image.FromPreview
 import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayer
 
@@ -63,14 +63,13 @@ fun YoutubeVideo(post: PostData, modifier: Modifier = Modifier) {
                 .align(Alignment.Center),
             allowTransformation = false
         )
-        Cartouche(
-            backgroundColor = Color.Red,
+        Text(
+            "Youtube",
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(8.dp)
-        ) {
-            Text("Youtube")
-        }
+                .cartouche(Color.Red)
+        )
     }
 }
 

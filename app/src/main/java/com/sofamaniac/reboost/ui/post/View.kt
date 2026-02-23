@@ -48,9 +48,9 @@ import com.sofamaniac.reboost.domain.model.Kind
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.settings.DefaultReboostTheme
 import com.sofamaniac.reboost.settings.themeDataStore
-import com.sofamaniac.reboost.ui.Cartouche
 import com.sofamaniac.reboost.ui.Flair
-import com.sofamaniac.reboost.ui.markdown.SimpleMarkdown
+import com.sofamaniac.reboost.ui.cartouche
+import com.sofamaniac.reboost.ui.markdown.RedditMarkdown
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.util.Locale
 
@@ -92,7 +92,7 @@ internal fun PostBody(
         else -> {
             val selftext = post.selftext.markdown
             if (selftext.isNotBlank()) {
-                SimpleMarkdown(
+                RedditMarkdown(
                     markdown = selftext,
                     maxLines = 6,
                     modifier = modifier.padding(horizontal = 16.dp),
@@ -140,19 +140,17 @@ fun PostInfo(
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 if (post.spoiler) {
-                    Cartouche(
-                        backgroundColor = Color.Transparent,
-                        modifier = Modifier.border(
-                            width = 1.dp,
-                            color = Color.Red,
-                            shape = RoundedCornerShape(corner = CornerSize(2.dp)),
-                        )
-                    ) {
-                        Text(
-                            "SPOILER",
-                            style = MaterialTheme.typography.labelSmall.copy(color = Color.Red)
-                        )
-                    }
+                    Text(
+                        "SPOILER",
+                        style = MaterialTheme.typography.labelSmall.copy(color = Color.Red),
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = Color.Red,
+                                shape = RoundedCornerShape(corner = CornerSize(2.dp)),
+                            )
+                            .cartouche(Color.Transparent)
+                    )
                 }
                 // TODO make clickable
                 Flair(post.linkFlair)
@@ -164,15 +162,11 @@ fun PostInfo(
             ) {
                 Text(post.scoreString(), style = MaterialTheme.typography.bodyMedium)
                 if (post.over18) {
-                    Cartouche(
-                        backgroundColor = Color.Red,
-                    ) {
-                        Text(
-                            "NSFW", fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.labelSmall.copy(color = Color.White)
-                        )
-                    }
-
+                    Text(
+                        "NSFW", fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.labelSmall.copy(color = Color.White),
+                        modifier = Modifier.cartouche(Color.Red)
+                    )
                 }
             }
         }
@@ -240,7 +234,9 @@ fun PostCard(
 ) {
     // We do not apply the padding on the column, but on each of its children except [body]
     // to have images that take the full width
-    val modifier = Modifier.padding(horizontal = 16.dp)
+    val modifier = Modifier
+        .padding(horizontal = 16.dp)
+        .padding(bottom = 4.dp)
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val themeDataStore = remember(context) { context.themeDataStore }

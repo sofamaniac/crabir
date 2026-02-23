@@ -5,9 +5,9 @@
 package com.sofamaniac.reboost.ui
 
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,7 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import coil3.compose.AsyncImage
 import com.sofamaniac.reboost.data.remote.dto.LinkFlairRichtext
@@ -27,23 +32,49 @@ import kotlin.math.min
 
 
 @Composable
-fun FlairRichtext(richText: List<LinkFlairRichtext>, color: Color) {
-    for (i in richText) {
-        when (i) {
-            is LinkFlairRichtextText -> {
-                Text(i.text, style = MaterialTheme.typography.labelSmall.copy(color = color))
-            }
+fun FlairRichtext(richText: List<LinkFlairRichtext>, color: Color, modifier: Modifier = Modifier) {
+    val annotatedString = buildAnnotatedString {
+        for (e in richText) {
+            when (e) {
+                is LinkFlairRichtextText -> {
+                    append(e.text)
+                }
 
-            is LinkFlairRichtextEmoji -> {
-                AsyncImage(
-                    model = i.url,
-                    contentDescription = i.emoji,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.height(16.dp)
-                )
+                is LinkFlairRichtextEmoji -> {
+                    appendInlineContent(e.url, e.emoji)
+                }
+
             }
         }
     }
+    val inlineContent: MutableMap<String, InlineTextContent> = mutableMapOf()
+    for (e in richText) {
+        if (e is LinkFlairRichtextEmoji) {
+            inlineContent +=
+                e.url to InlineTextContent(
+                    placeholder = Placeholder(
+                        width = 16.sp,
+                        height = 16.sp,
+                        placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
+                    )
+                ) {
+                    AsyncImage(
+                        model = e.url,
+                        contentDescription = e.emoji,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.height(16.dp)
+                    )
+                }
+        }
+    }
+    Text(
+        annotatedString,
+        inlineContent = inlineContent,
+        color = color,
+        modifier = modifier,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
 }
 
 /** Parse the color string to a Color object using [String.toColorInt]. If the string is empty or could not be parsed,
@@ -86,9 +117,8 @@ fun Color.invert(bw: Boolean = true): Color {
 }
 
 
-
 @Composable
-fun Flair(flair: Flair) {
+fun Flair(flair: Flair, modifier: Modifier = Modifier) {
     if (flair.text.isEmpty() && flair.richText.isEmpty()) return
     val backgroundColor = mapColor(flair.backgroundColor, default = Color.DarkGray)
     var textColor = mapColor(flair.textColor, default = backgroundColor.invert(bw = true))
@@ -98,29 +128,28 @@ fun Flair(flair: Flair) {
     if (contrastRatio < 4.5) {
         textColor = textColor.invert()
     }
-    Cartouche(backgroundColor = backgroundColor) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            when (flair.type) {
-                "richtext" -> {
-                    if (flair.richText.isNotEmpty()) {
-                        FlairRichtext(flair.richText, textColor)
-                    } else {
-                        Text(
-                            text = flair.text,
-                            style = MaterialTheme.typography.labelSmall.copy(color = textColor)
-                        )
-                    }
-                }
-
-                "text" -> {
-                    Text(
-                        text = flair.text,
-                        style = MaterialTheme.typography.labelSmall.copy(color = textColor)
-                    )
-                }
+    val modifier = modifier.cartouche(backgroundColor)
+    when (flair.type) {
+        "richtext" -> {
+            if (flair.richText.isNotEmpty()) {
+                FlairRichtext(flair.richText, textColor, modifier)
+            } else {
+                Text(
+                    text = flair.text,
+                    style = MaterialTheme.typography.labelSmall.copy(color = textColor),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = modifier,
+                )
             }
+        }
+
+        "text" -> {
+            Text(
+                text = flair.text,
+                style = MaterialTheme.typography.labelSmall.copy(color = textColor),
+                modifier = modifier,
+            )
         }
     }
 }

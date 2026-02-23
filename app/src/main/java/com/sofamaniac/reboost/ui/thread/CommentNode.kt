@@ -4,10 +4,12 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,10 +28,10 @@ import com.sofamaniac.reboost.ProfileRoute
 import com.sofamaniac.reboost.domain.model.CommentData
 import com.sofamaniac.reboost.settings.DefaultReboostTheme
 import com.sofamaniac.reboost.settings.themeDataStore
-import com.sofamaniac.reboost.ui.Cartouche
 import com.sofamaniac.reboost.ui.Flair
+import com.sofamaniac.reboost.ui.cartouche
 import com.sofamaniac.reboost.ui.formatElapsedTimeLocalized
-import com.sofamaniac.reboost.ui.markdown.SimpleMarkdown
+import com.sofamaniac.reboost.ui.markdown.RedditMarkdown
 import com.sofamaniac.reboost.ui.post.DownButton
 import com.sofamaniac.reboost.ui.post.SavedButton
 import com.sofamaniac.reboost.ui.post.UpButton
@@ -45,20 +47,23 @@ fun CommentNode(comment: CommentData, viewModel: ThreadViewModel, modifier: Modi
     }.collectAsState(initial = false)
 
     val innerModifier = Modifier
-        .padding(horizontal = 8.dp)
-        .padding(vertical = 8.dp)
+        .padding(horizontal = 16.dp)
+    //.padding(bottom = 8.dp)
     Column(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = { viewModel.toggleComment(comment.name) }),
     ) {
+        Spacer(modifier = Modifier.height(8.dp))
         TopRow(comment, modifier = innerModifier)
-        SimpleMarkdown(
+        Spacer(modifier = Modifier.height(8.dp))
+        RedditMarkdown(
             comment.bodyMd,
             modifier = innerModifier,
             mediaMetadata = comment.mediaMetadata,
             key = comment.id
         )
+        Spacer(modifier = Modifier.height(8.dp))
         AnimatedVisibility(showBottomBar) {
             BottomRow(comment, viewModel)
         }
@@ -113,14 +118,18 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (comment.isSubmitter) {
-            Cartouche(backgroundColor = Color(0xFF2196F3)) {
-                Text(comment.author.username, color = Color.White, modifier = authorModifier)
-            }
+            Text(
+                comment.author.username,
+                color = Color.White,
+                modifier = authorModifier.cartouche(Color(0xFF2196F3))
+            )
         } else {
             Text(comment.author.username, color = theme.highlight, modifier = authorModifier)
         }
-        Flair(comment.author.flair)
+        Box(modifier = Modifier.weight(10f)) {
+            Flair(comment.author.flair)
+        }
         Spacer(modifier = Modifier.weight(1f))
-        Text(rightString)
+        Text(rightString, maxLines = 1)
     }
 }

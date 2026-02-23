@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
 import androidx.media3.ui.compose.material3.buttons.MuteButton
-import com.sofamaniac.reboost.ui.Cartouche
+import com.sofamaniac.reboost.ui.cartouche
 
 @Composable
 fun AlwaysOnInfo(player: Player, modifier: Modifier = Modifier) {
@@ -24,11 +24,10 @@ fun AlwaysOnInfo(player: Player, modifier: Modifier = Modifier) {
             .padding(horizontal = 8.dp)
             .fillMaxWidth()
     ) {
-        Cartouche(backgroundColor = backgroundColor) {
-            MuteButton(player)
-        }
-        Cartouche(backgroundColor = backgroundColor) {
-            RemainingTimeText(player, style = MaterialTheme.typography.labelMedium)
-        }
+        MuteButton(player, modifier = Modifier.cartouche(backgroundColor))
+        RemainingTimeText(
+            player, style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.cartouche(backgroundColor)
+        )
     }
 }

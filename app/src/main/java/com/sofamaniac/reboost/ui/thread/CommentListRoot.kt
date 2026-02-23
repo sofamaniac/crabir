@@ -26,7 +26,7 @@ import com.sofamaniac.reboost.FullscreenManager
 import com.sofamaniac.reboost.domain.model.CommentType
 import com.sofamaniac.reboost.domain.model.Kind
 import com.sofamaniac.reboost.domain.model.PostData
-import com.sofamaniac.reboost.ui.markdown.SimpleMarkdown
+import com.sofamaniac.reboost.ui.markdown.RedditMarkdown
 import com.sofamaniac.reboost.ui.post.PostCard
 import com.sofamaniac.reboost.ui.post.PostGallery
 import com.sofamaniac.reboost.ui.post.PostHeader
@@ -112,7 +112,7 @@ internal fun PostView(
             // always show selftext if there is one
             val selftext = post.selftext.markdown
             if (selftext.isNotBlank()) {
-                SimpleMarkdown(selftext, modifier = Modifier.padding(horizontal = 8.dp))
+                RedditMarkdown(selftext, modifier = Modifier.padding(horizontal = 16.dp))
             }
         } else {
             val parent = post.crosspostParentList.first()

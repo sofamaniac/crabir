@@ -17,7 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onSizeChanged
@@ -37,6 +40,9 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.reboost.domain.model.MediaResource
+import com.sofamaniac.reboost.settings.DefaultReboostTheme
+import com.sofamaniac.reboost.settings.ReboostTheme
+import com.sofamaniac.reboost.settings.themeDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
@@ -58,7 +64,7 @@ import jakarta.inject.Inject
  * If [maxLines] is different from [Int.MAX_VALUE], the link in the text will not be clickable
  */
 @Composable
-fun SimpleMarkdown(
+fun RedditMarkdown(
     markdown: String,
     modifier: Modifier = Modifier,
     maxLines: Int = Int.MAX_VALUE,
@@ -96,7 +102,13 @@ fun SimpleMarkdown(
             }
         });
 
-    val markwonReddit = remember(redditMarkwonBuilder(context, colorScheme, mediaMetadata))
+    val coroutineScope = rememberCoroutineScope()
+    val themeDataStore = remember(context) { context.themeDataStore }
+    val theme by themeDataStore.data.collectAsState(
+        initial = DefaultReboostTheme,
+        coroutineScope.coroutineContext
+    )
+    val markwonReddit = remember(redditMarkwonBuilder(context, colorScheme, theme, mediaMetadata))
     // Parse markdown once and remember it
     val parsedMarkdown = remember(processedMarkdown, markwonReddit) {
         markwonReddit.parse(processedMarkdown)
@@ -160,15 +172,17 @@ fun SimpleMarkdown(
 private fun redditMarkwonBuilder(
     context: Context,
     colorScheme: ColorScheme,
+    theme: ReboostTheme,
     mediaMetadata: Map<String, MediaMetadata>
 ): () -> Markwon = {
+
     Markwon.builder(context)
         .usePlugin(MarkwonInlineParserPlugin.create())
         .usePlugin(StrikethroughPlugin.create())
         .useRedditSpoilers()
         .usePlugin(HtmlPlugin.create())
         .usePlugin(TablePlugin.create(context))
-        .usePlugin(MarkdownTheme(colorScheme))
+        .usePlugin(MarkdownTheme(colorScheme, theme))
         .usePlugin(HtmlPlugin.create())
         .usePlugin(
             GlideImagesPlugin.create(
@@ -277,14 +291,15 @@ class MarkdownViewModel @Inject constructor() : ViewModel() {
     }
 }
 
-class MarkdownTheme(val colorScheme: ColorScheme) : AbstractMarkwonPlugin() {
+class MarkdownTheme(val colorScheme: ColorScheme, val theme: ReboostTheme) :
+    AbstractMarkwonPlugin() {
     override fun configureTheme(builder: MarkwonTheme.Builder) {
         builder
-            .linkColor(colorScheme.primary.toArgb())
+            .linkColor(theme.linkColor.toArgb())
             .codeTextColor(colorScheme.onBackground.toArgb())
             .codeBackgroundColor(colorScheme.background.toArgb())
             .codeBlockBackgroundColor(colorScheme.background.toArgb())
-            .blockQuoteColor(colorScheme.primary.toArgb())
+            .blockQuoteColor(theme.highlight.toArgb())
             // Disable ruler under titles ?
             .headingBreakColor(colorScheme.background.toArgb())
     }
