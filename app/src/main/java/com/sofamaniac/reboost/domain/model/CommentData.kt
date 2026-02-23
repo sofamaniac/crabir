@@ -33,6 +33,7 @@ data class CommentData(
     val permalink: String,
     val replies: List<CommentType>,
     val author: AuthorInfo,
+    val isSubmitter: Boolean,
     override val relationship: Relationship,
     val subredditInfo: SubredditInfo,
     override val score: Score,

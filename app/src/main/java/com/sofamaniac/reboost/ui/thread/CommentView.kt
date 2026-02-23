@@ -1,7 +1,5 @@
 package com.sofamaniac.reboost.ui.thread
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -16,23 +14,17 @@ import com.sofamaniac.reboost.domain.model.CommentType
 
 @Composable
 fun CommentView(comment: CommentType, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth(),
-        //.padding(horizontal = 16.dp)
-        //.height(IntrinsicSize.Min),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
 
-        if (comment is CommentType.Comment) {
-            CommentNode(
-                comment.comment,
-                viewModel = viewModel,
-                modifier = Modifier.depthIndent(comment.depth, color = Color.Gray)
-            )
-        } else {
-            Text("TODO MORE VIEW")
-        }
+    if (comment is CommentType.Comment) {
+        CommentNode(
+            comment.comment,
+            viewModel = viewModel,
+            modifier = Modifier
+                .fillMaxWidth()
+                .depthIndent(comment.depth, color = Color.Gray)
+        )
+    } else {
+        Text("TODO MORE VIEW")
     }
 }
 
@@ -40,7 +32,7 @@ private fun Modifier.depthIndent(
     depth: Int,
     color: Color = Color.Gray,
     lineWidth: Dp = 1.dp,
-    spacing: Dp = 8.dp,
+    spacing: Dp = 16.dp,
 ): Modifier {
     return this
         .drawBehind {

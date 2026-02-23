@@ -141,6 +141,7 @@ object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
         CommentData::replies fromValue from.mapReplies()
         CommentData::createdUtc fromProperty from::created_utc
         CommentData::mediaMetadata fromProperty from::media_metadata
+        CommentData::isSubmitter fromProperty from::is_submitter
     }
 
 }
