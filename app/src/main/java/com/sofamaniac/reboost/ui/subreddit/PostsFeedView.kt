@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import com.sofamaniac.reboost.FullscreenManager
+import com.sofamaniac.reboost.LocalFullscreenHandler
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
 import com.sofamaniac.reboost.domain.model.PostData
@@ -103,6 +103,8 @@ fun PostFeedViewer(
             }
     }
 
+    val fullscreenManager = LocalFullscreenHandler.current!!
+
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,
         onRefresh = {
@@ -126,12 +128,12 @@ fun PostFeedViewer(
                         enableDismissFromEndToStart = false,
                         backgroundContent = {},
                         onDismiss = {
-                            FullscreenManager.pop()
+                            fullscreenManager.pop()
                         }) {
                         ThreadView(
                             permalink = post.permalink,
                             dismiss = {
-                                FullscreenManager.pop()
+                                fullscreenManager.pop()
                             })
                     }
                 }
@@ -143,7 +145,7 @@ fun PostFeedViewer(
                     post,
                     showSubredditIcon = showSubredditIcon,
                     onClick = { post ->
-                        FullscreenManager.push { threadView(post) }
+                        fullscreenManager.push { threadView(post) }
                     },
                 ) {
                     PostBody(

@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.IntOffset
-import com.sofamaniac.reboost.FullscreenManager
+import com.sofamaniac.reboost.LocalFullscreenHandler
 import kotlin.math.roundToInt
 
 @Composable
@@ -44,10 +44,11 @@ fun VerticalSwipeToDismiss(
                 })
         )
     }
+    val fullscreenManager = LocalFullscreenHandler.current!!
 
     LaunchedEffect(state.currentValue) {
         if (state.currentValue != DismissValue.Default) {
-            FullscreenManager.pop()
+            fullscreenManager.pop()
         }
     }
 

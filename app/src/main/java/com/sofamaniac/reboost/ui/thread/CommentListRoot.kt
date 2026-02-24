@@ -22,7 +22,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.sofamaniac.reboost.FullscreenManager
+import com.sofamaniac.reboost.LocalFullscreenHandler
 import com.sofamaniac.reboost.domain.model.CommentType
 import com.sofamaniac.reboost.domain.model.Kind
 import com.sofamaniac.reboost.domain.model.PostData
@@ -116,16 +116,17 @@ internal fun PostView(
             }
         } else {
             val parent = post.crosspostParentList.first()
+            val fullscreenManager = LocalFullscreenHandler.current!!
             Box(
                 modifier = Modifier
                     .padding(8.dp)
                     .border(BorderStroke(1.dp, Color.Gray), shape = ShapeDefaults.Medium)
                     .clickable(onClick = {
-                        FullscreenManager.push {
+                        fullscreenManager.push {
                             ThreadView(
                                 permalink = parent.permalink,
                                 dismiss = {
-                                    FullscreenManager.pop()
+                                    fullscreenManager.pop()
                                 })
                         }
                     })

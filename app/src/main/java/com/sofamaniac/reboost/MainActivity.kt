@@ -12,7 +12,6 @@ import android.app.Application
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -23,7 +22,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -36,7 +34,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -63,12 +60,6 @@ import com.sofamaniac.reboost.ui.thread.ThreadView
 import com.sofamaniac.reboost.ui.user.ProfileView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 
 @HiltAndroidApp
@@ -120,8 +111,8 @@ fun MainScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val drawerViewModel: DrawerViewModel = viewModel()
 
-    val fullScreenView by FullscreenManager.current.collectAsState(initial = null)
-    val fullScreenDepth by FullscreenManager.size.collectAsState(initial = 0)
+//    val fullScreenView by FullscreenManager.current.collectAsState(initial = null)
+//    val fullScreenDepth by FullscreenManager.size.collectAsState(initial = 0)
 
 
     DisposableEffect(Unit) {
@@ -132,65 +123,38 @@ fun MainScreen(
 
     val scope = rememberCoroutineScope()
     val activity = LocalActivity.current
-    BackHandler() {
-        if (drawerState.isOpen) {
-            scope.launch {
-                drawerState.close()
-            }
-        } else if (fullScreenDepth > 0) {
-            FullscreenManager.pop()
-        } else {
-            // TODO: ask for confirmation and exit the app
-            if (navController.previousBackStackEntry != null) {
-                navController.popBackStack()
-            } else {
-                activity?.finish()
-            }
-        }
-    }
+//    BackHandler() {
+//        if (drawerState.isOpen) {
+//            scope.launch {
+//                drawerState.close()
+//            }
+//        } else if (fullScreenDepth > 0) {
+//            FullscreenManager.pop()
+//        } else {
+//            // TODO: ask for confirmation and exit the app
+//            if (navController.previousBackStackEntry != null) {
+//                navController.popBackStack()
+//            } else {
+//                activity?.finish()
+//            }
+//        }
+//    }
 
-    Box {
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-                DrawerContent(
-                    viewModel = drawerViewModel,
-                    drawerState = drawerState,
-                )
-            },
-        ) {
-            NavigationGraph(
-                navController,
-                drawerState,
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            DrawerContent(
+                viewModel = drawerViewModel,
+                drawerState = drawerState,
             )
-        }
-
-        fullScreenView?.invoke()
+        },
+    ) {
+        NavigationGraph(
+            navController,
+            drawerState,
+        )
     }
 
-}
-
-object FullscreenManager {
-    private var _fullscreenViews = MutableStateFlow(emptyList<@Composable () -> Unit>())
-
-    val current: Flow<@Composable (() -> Unit)?> =
-        _fullscreenViews.map { it.lastOrNull() }.distinctUntilChanged()
-
-    val size: Flow<Int> = _fullscreenViews.map { it.size }.distinctUntilChanged()
-
-
-
-    fun push(view: @Composable () -> Unit) {
-        _fullscreenViews.update {
-            it + view
-        }
-    }
-
-    fun pop() {
-        _fullscreenViews.update {
-            it.dropLast(1)
-        }
-    }
 
 }
 

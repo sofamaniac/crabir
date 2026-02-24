@@ -79,6 +79,9 @@ fun RedditMarkdown(
         .convertRedditSpoilers()
         .convertRedditPreviewLinks()
         .convertRedditSuperscript()
+    //.convertNewLines()
+
+    Log.d("RedditMarkdown", "Markdown: $processedMarkdown")
 
 
     val context = LocalContext.current
@@ -256,6 +259,14 @@ private fun AsyncDrawable.getMetadata(mediaMetadata: Map<String, MediaMetadata>)
 private fun String.convertRedditSpoilers(): String {
     return this.replace(">!", " \ue000 ").replace("!<", " \ue000 ")
 }
+
+private fun String.convertNewLines(): String {
+    val regex = Regex("(\n+)")
+    return regex.replace(this) { matchResult ->
+        "\n".repeat(matchResult.value.length / 2)
+    }
+}
+
 
 private fun String.convertRedditPreviewLinks(): String {
     // Match Reddit preview links that aren't already in markdown syntax

@@ -39,7 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.sofamaniac.reboost.FullscreenManager
+import com.sofamaniac.reboost.LocalFullscreenHandler
 import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.reboost.domain.model.Gallery
 import com.sofamaniac.reboost.domain.model.PostData
@@ -69,6 +69,7 @@ fun PostGallery(
             state = state,
         )
     }
+    val fullscreenManager = LocalFullscreenHandler.current!!
     EmbeddedGallery(
         state,
         gallery,
@@ -76,7 +77,7 @@ fun PostGallery(
             .fillMaxSize()
             .aspectRatio(gallery.aspectRatio),
         goFullscreen = {
-            FullscreenManager.push { fullscreenView() }
+            fullscreenManager.push { fullscreenView() }
         },
         canPlayVideo = canPlayVideo
     )
@@ -148,6 +149,7 @@ fun FullscreenGallery(
     gallery: Gallery,
 ) {
     var showDecorations by remember { mutableStateOf(true) }
+    val fullscreenManager = LocalFullscreenHandler.current!!
     VerticalSwipeToDismiss(
         backgroundContent = @Composable {
             Column() {
@@ -181,7 +183,7 @@ fun FullscreenGallery(
                             )
                         },
                         fullscreenButton = {
-                            IconButton(onClick = FullscreenManager::pop) {
+                            IconButton(onClick = fullscreenManager::pop) {
                                 Icon(
                                     Icons.Default.FullscreenExit,
                                     contentDescription = "Exit Fullscreen"
@@ -209,6 +211,7 @@ fun BoxScope.FullscreenGalleryDecoration(
 ) {
 
 
+    val fullscreenManager = LocalFullscreenHandler.current!!
     AnimatedContent(
         targetState = enabled,
         modifier = Modifier
@@ -229,7 +232,7 @@ fun BoxScope.FullscreenGalleryDecoration(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
-            IconButton(onClick = FullscreenManager::pop) {
+            IconButton(onClick = fullscreenManager::pop) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Go back",

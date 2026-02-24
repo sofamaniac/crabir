@@ -6,6 +6,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.sofamaniac.reboost.FullscreenHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -15,16 +16,18 @@ fun FullFeedView(
     viewModel: PostFeedViewModel,
     modifier: Modifier = Modifier,
 ) {
-    Box {
-        Scaffold(
-            topBar = topBar,
-            bottomBar = bottomBar,
-            modifier = modifier,
-        ) { innerPadding ->
-            PostFeedViewer(
-                viewModel,
-                modifier = Modifier.padding(innerPadding)
-            )
+    FullscreenHandler {
+        Box {
+            Scaffold(
+                topBar = topBar,
+                bottomBar = bottomBar,
+                modifier = modifier,
+            ) { innerPadding ->
+                PostFeedViewer(
+                    viewModel,
+                    modifier = Modifier.padding(innerPadding)
+                )
+            }
         }
     }
 }

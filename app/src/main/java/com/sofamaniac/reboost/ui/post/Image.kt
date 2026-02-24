@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
-import com.sofamaniac.reboost.FullscreenManager
+import com.sofamaniac.reboost.LocalFullscreenHandler
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.VerticalSwipeToDismiss
 import com.sofamaniac.reboost.ui.media.image.FromPreview
@@ -28,8 +28,9 @@ fun PostImage(
     post: PostData,
     modifier: Modifier = Modifier,
 ) {
+    val fullscreenManager = LocalFullscreenHandler.current!!
     val goFullscreen = { view: @Composable BoxScope.() -> Unit ->
-        FullscreenManager.push {
+        fullscreenManager.push {
             VerticalSwipeToDismiss(
                 modifier = modifier.fillMaxSize(),
                 backgroundContent = @Composable {
