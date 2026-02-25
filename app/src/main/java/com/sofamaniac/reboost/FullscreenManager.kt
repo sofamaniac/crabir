@@ -1,5 +1,6 @@
 package com.sofamaniac.reboost
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -44,7 +45,11 @@ fun FullscreenHandler(content: @Composable () -> Unit) {
         FullscreenManager()
     }
     val fullscreenView by fullscreenManager.current.collectAsState(null)
+    val backHandlerActive by fullscreenManager.size.map { it > 0 }.collectAsState(false)
     CompositionLocalProvider(LocalFullscreenHandler provides fullscreenManager) {
+        BackHandler(enabled = backHandlerActive) {
+            fullscreenManager.pop()
+        }
         Box() {
             content()
             fullscreenView?.invoke()
