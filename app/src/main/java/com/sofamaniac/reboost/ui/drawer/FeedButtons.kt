@@ -22,5 +22,5 @@ enum class FeedButtons(val icon: ImageVector, val route: Route) {
     All(Icons.Default.BarChart, SubredditRoute("all")),
     Saved(Icons.Default.BookmarkBorder, SavedRoute),
     History(Icons.Default.History, HomeRoute),
-    Search(Icons.Default.Search, SearchRoute),
+    Search(Icons.Default.Search, SearchRoute()),
 }

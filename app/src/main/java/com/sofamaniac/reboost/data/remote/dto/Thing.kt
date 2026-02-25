@@ -12,6 +12,7 @@ import com.sofamaniac.reboost.data.remote.dto.comment.CommentDTO
 import com.sofamaniac.reboost.data.remote.dto.post.PostDTO
 import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.reboost.data.remote.dto.subreddit.dummySubredditData
+import com.sofamaniac.reboost.data.remote.dto.user.UserDTO
 import com.sofamaniac.reboost.reddit.ListingData
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
@@ -23,29 +24,40 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @JsonClassDiscriminator("kind")
 sealed class Thing {
 
+    abstract val id: String
 
     @Serializable
     @SerialName("t1")
-    data class Comment(val data: CommentDTO) : Thing()
+    data class Comment(val data: CommentDTO) : Thing() {
+        override val id: String = data.id
+    }
 
     @Serializable
     @SerialName("t2")
-    data class User(val data: String) : Thing()
+    data class User(val data: UserDTO) : Thing() {
+        override val id: String = data.id
+    }
 
     @Serializable
     @SerialName("t3")
-    data class Post(val data: PostDTO) : Thing()
+    data class Post(val data: PostDTO) : Thing() {
+        override val id: String = data.id
+    }
 
     @Serializable
     @SerialName("t5")
     data class Subreddit(val data: SubredditData = dummySubredditData()) :
-        Thing()
+        Thing() {
+        override val id: String = data.id.id
+    }
 
     @Serializable
     @SerialName("Listing")
     data class Listing<T>(
         val data: ListingData<T>
     ) : Thing(), Iterable<T> {
+
+        override val id: String = data.after ?: ""
 
         val size: Int get() = data.children.size
 
@@ -60,11 +72,15 @@ sealed class Thing {
 
     @Serializable
     @SerialName("more")
-    data class More(val data: MoreData) : Thing()
+    data class More(val data: MoreData) : Thing() {
+        override val id: String = data.name
+    }
 
     @Serializable
     @SerialName("LabeledMulti")
-    data class Multi(val data: MultiData) : Thing()
+    data class Multi(val data: MultiData) : Thing() {
+        override val id: String = data.name
+    }
 
 }
 

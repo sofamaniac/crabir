@@ -81,8 +81,6 @@ fun RedditMarkdown(
         .convertRedditSuperscript()
     //.convertNewLines()
 
-    Log.d("RedditMarkdown", "Markdown: $processedMarkdown")
-
 
     val context = LocalContext.current
     val textView = remember { PassThroughTextView(context) }
@@ -149,7 +147,7 @@ fun RedditMarkdown(
                 viewModel.height = size.height
             }
             .let { mod ->
-                if (maxLines != Int.MAX_VALUE) {
+                if (mediaMetadata.isEmpty()) {
                     return@let mod
                 }
                 viewModel.height?.let { size ->

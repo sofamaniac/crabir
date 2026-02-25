@@ -45,7 +45,7 @@ object SubscriptionsRoute : Route {
 }
 
 @Serializable
-object SearchRoute : Route {
+class SearchRoute(val subreddit: String = "", val flair: String = "") : Route {
     override val route: String = RouteType.Search.name
     override val title: String = "Search"
 }

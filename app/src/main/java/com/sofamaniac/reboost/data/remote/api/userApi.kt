@@ -6,7 +6,7 @@ package com.sofamaniac.reboost.data.remote.api
 
 import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.remote.dto.Thing.Listing
-import com.sofamaniac.reboost.data.remote.dto.user.User
+import com.sofamaniac.reboost.data.remote.dto.user.UserDTO
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -18,10 +18,10 @@ import com.sofamaniac.reboost.data.remote.dto.post.Sort as PostSort
 interface UserAPI {
 
     @GET("/user/{username}/about.json")
-    suspend fun getUser(@Path("username") username: String): User
+    suspend fun getUser(@Path("username") username: String): UserDTO
 
     @GET("api/v1/me.json")
-    suspend fun getIdentity(): Response<User>
+    suspend fun getIdentity(): Response<UserDTO>
 
     @GET("user/{user}/saved.json")
     suspend fun getSaved(

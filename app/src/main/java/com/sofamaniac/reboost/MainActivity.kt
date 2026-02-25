@@ -12,6 +12,7 @@ import android.app.Application
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -51,6 +52,7 @@ import androidx.navigation.toRoute
 import com.sofamaniac.reboost.ui.drawer.DrawerContent
 import com.sofamaniac.reboost.ui.drawer.DrawerViewModel
 import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayerManager
+import com.sofamaniac.reboost.ui.search.SearchTab
 import com.sofamaniac.reboost.ui.subreddit.HomeViewer
 import com.sofamaniac.reboost.ui.subreddit.MultiView
 import com.sofamaniac.reboost.ui.subreddit.SubredditViewer
@@ -60,6 +62,7 @@ import com.sofamaniac.reboost.ui.thread.ThreadView
 import com.sofamaniac.reboost.ui.user.ProfileView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.launch
 
 
 @HiltAndroidApp
@@ -123,22 +126,20 @@ fun MainScreen(
 
     val scope = rememberCoroutineScope()
     val activity = LocalActivity.current
-//    BackHandler() {
-//        if (drawerState.isOpen) {
-//            scope.launch {
-//                drawerState.close()
-//            }
-//        } else if (fullScreenDepth > 0) {
-//            FullscreenManager.pop()
-//        } else {
-//            // TODO: ask for confirmation and exit the app
-//            if (navController.previousBackStackEntry != null) {
-//                navController.popBackStack()
-//            } else {
-//                activity?.finish()
-//            }
-//        }
-//    }
+    BackHandler() {
+        if (drawerState.isOpen) {
+            scope.launch {
+                drawerState.close()
+            }
+        } else {
+            // TODO: ask for confirmation and exit the app
+            if (navController.previousBackStackEntry != null) {
+                navController.popBackStack()
+            } else {
+                activity?.finish()
+            }
+        }
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -220,12 +221,9 @@ fun NavigationGraph(
         composable<SubscriptionsRoute> {
             SubredditListViewer(navController = navController)
         }
-        composable<SearchRoute> {
-            SubredditViewer(
-                "artknights",
-                selected,
-                drawerState,
-            )
+        composable<SearchRoute> { navBackStackEntry ->
+            val search = navBackStackEntry.toRoute<SearchRoute>()
+            SearchTab(search)
         }
         composable<InboxRoute> {
             SubredditViewer(

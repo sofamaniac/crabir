@@ -44,6 +44,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.sofamaniac.reboost.LocalNavController
+import com.sofamaniac.reboost.SearchRoute
 import com.sofamaniac.reboost.domain.model.Kind
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.settings.DefaultReboostTheme
@@ -115,6 +117,7 @@ fun PostInfo(
     enablePreview: Boolean = true,
 ) {
     val hasThumbnail = enablePreview && post.thumbnail.uri.toHttpUrlOrNull() != null
+    val navController = LocalNavController.current!!
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -153,7 +156,14 @@ fun PostInfo(
                     )
                 }
                 // TODO make clickable
-                Flair(post.linkFlair)
+                Flair(post.linkFlair, modifier = Modifier.clickable {
+                    navController.navigate(
+                        SearchRoute(
+                            subreddit = post.subreddit.name,
+                            flair = post.linkFlair.text
+                        )
+                    )
+                })
             }
 
             Row(

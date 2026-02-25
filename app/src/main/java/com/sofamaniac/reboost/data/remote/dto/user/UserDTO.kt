@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class User(
+data class UserDTO(
     @SerialName("accept_followers")
     val acceptFollowers: Boolean = false,
     @SerialName("awardee_karma")

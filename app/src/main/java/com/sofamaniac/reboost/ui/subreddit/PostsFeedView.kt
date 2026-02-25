@@ -71,7 +71,7 @@ import kotlin.math.max
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostFeedViewer(
-    state: PostFeedViewModel,
+    state: FeedViewModelInterface,
     modifier: Modifier = Modifier,
     showSubredditIcon: Boolean = true
 ) {

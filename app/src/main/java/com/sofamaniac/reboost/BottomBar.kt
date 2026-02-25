@@ -39,7 +39,7 @@ fun BottomBar(
 ) {
     val tabs = listOf(
         Pair(Icons.Filled.Home, HomeRoute),
-        Pair(Icons.Default.Search, SearchRoute),
+        Pair(Icons.Default.Search, SearchRoute()),
         Pair(Icons.AutoMirrored.Outlined.List, SubscriptionsRoute),
         Pair(Icons.Default.Email, InboxRoute),
         Pair(Icons.Filled.Person, ProfileRoute("me"))

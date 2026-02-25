@@ -4,7 +4,6 @@
 
 package com.sofamaniac.reboost.domain.repository.feed
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
@@ -15,16 +14,15 @@ import com.sofamaniac.reboost.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
 import com.sofamaniac.reboost.domain.model.PagedResponse
 import com.sofamaniac.reboost.domain.model.VotableData
+import com.sofamaniac.reboost.domain.repository.ListingRepository
 import com.sofamaniac.reboost.domain.repository.PostRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import retrofit2.Response
 
-interface FeedRepository {
+interface FeedRepository<Params> {
     suspend fun getPosts(
         after: String,
-        sort: Sort,
-        timeframe: Timeframe? = null
+        params: Params,
     ): PagedResponse<String>
 
     suspend fun upvote(id: String): Result<Unit>
@@ -33,16 +31,10 @@ interface FeedRepository {
     suspend fun unsave(id: String): Result<Unit>
 }
 
-abstract class FeedRepositoryCommon(
+abstract class FeedRepositoryCommon<Params>(
     val postRepository: PostRepository,
     val api: RedditAPIService,
-) : FeedRepository {
-
-    private var _seenPosts: Set<String> = emptySet()
-
-    fun refresh() {
-        _seenPosts = emptySet()
-    }
+) : FeedRepository<Params>, ListingRepository() {
 
     fun observePost(id: String): Flow<VotableData> {
         return postRepository.observePost(id)
@@ -64,55 +56,34 @@ abstract class FeedRepositoryCommon(
         return postRepository.unsave(id)
     }
 
-    protected suspend fun <T : Thing> makeRequest(
-        request: suspend () -> Response<Thing.Listing<T>>
-    ): PagedResponse<String> {
-        val response = request()
-        if (response.isSuccessful) {
-            Log.d("makeRequest", "code ${response.code()}")
-            val listing = response.body()
-            listing?.let {
-                val posts = listing.data.children.map { thing ->
-                    when (thing) {
-                        is Thing.Post -> {
-                            PostDataMapper.map(thing.data)
-                        }
-
-                        is Thing.Comment -> {
-                            CommentDataMapper.map(thing.data)
-                        }
-
-                        else -> {
-                            throw IllegalArgumentException("Unreachable code")
-                        }
+    override fun onResponseSuccess(
+        things: List<Thing>
+    ) {
+        val posts =
+            things.map { thing ->
+                when (thing) {
+                    is Thing.Post -> {
+                        PostDataMapper.map(thing.data)
                     }
-                }.filter { thing ->
-                    !_seenPosts.contains(thing.id)
+
+                    is Thing.Comment -> {
+                        CommentDataMapper.map(thing.data)
+                    }
+
+                    else -> {
+                        throw IllegalArgumentException("Unreachable code")
+                    }
                 }
-                postRepository.addPosts(posts)
-                posts.forEach { data ->
-                    _seenPosts += data.id
-                }
-                val postsIds = posts.map { post ->
-                    post.id
-                }
-                return PagedResponse(
-                    data = postsIds,
-                    after = it.data.after,
-                    total = it.size
-                )
             }
-            return PagedResponse()
-        }
-        Log.e("makeRequest", "Error making request : ${response.errorBody()}")
-        return PagedResponse()
+        postRepository.addPosts(posts)
     }
 }
 
-class PostsSource(
-    private val repository: FeedRepositoryCommon,
-    private val sort: Sort,
-    private val timeframe: Timeframe?,
+data class FeedParams(val sort: Sort, val timeframe: Timeframe?)
+
+class FeedSource<Params>(
+    private val repository: FeedRepositoryCommon<Params>,
+    private val params: Params,
 ) : PagingSource<String, VotableData>() {
 
 
@@ -122,7 +93,7 @@ class PostsSource(
 
     override suspend fun load(params: LoadParams<String>): LoadResult<String, VotableData> {
         val postsId = if (params.key != null) {
-            getPosts(params.key!!, sort, timeframe)
+            getPosts(params.key!!)
         } else {
             PagedResponse()
         }
@@ -138,10 +109,8 @@ class PostsSource(
 
     private suspend fun getPosts(
         after: String,
-        sort: Sort = Sort.Best,
-        timeframe: Timeframe? = null
     ): PagedResponse<String> {
-        return repository.getPosts(after, sort, timeframe)
+        return repository.getPosts(after, params)
     }
 
 }

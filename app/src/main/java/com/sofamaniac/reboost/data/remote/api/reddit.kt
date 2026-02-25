@@ -30,7 +30,7 @@ private const val BASE_URL = "https://oauth.reddit.com/"
 
 internal const val API_LIMIT = 100
 
-interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI {
+interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, SearchAPI {
 
     @GET("{sort}.json")
     suspend fun getHome(

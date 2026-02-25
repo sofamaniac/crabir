@@ -13,7 +13,7 @@ import com.sofamaniac.reboost.FullscreenHandler
 fun FullFeedView(
     topBar: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit,
-    viewModel: PostFeedViewModel,
+    viewModel: FeedViewModelInterface,
     modifier: Modifier = Modifier,
 ) {
     FullscreenHandler {
