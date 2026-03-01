@@ -1,5 +1,6 @@
 package com.sofamaniac.reboost.domain.model
 
+import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.reboost.data.remote.dto.post.Preview
 import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditDetails
 import com.sofamaniac.reboost.reddit.Thumbnail
@@ -29,6 +30,7 @@ data class PostData(
     val subredditDetails: SubredditDetails?,
     val thumbnail: Thumbnail,
     val selftext: Selftext,
+    val mediaMetadata: Map<String, MediaMetadata>,
     val kind: Kind,
     val linkFlair: Flair,
     val media: MediaInfo,

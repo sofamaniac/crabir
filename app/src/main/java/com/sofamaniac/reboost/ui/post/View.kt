@@ -98,6 +98,7 @@ internal fun PostBody(
                     markdown = selftext,
                     maxLines = 6,
                     modifier = modifier.padding(horizontal = 16.dp),
+                    mediaMetadata = post.mediaMetadata
                 )
             }
         }

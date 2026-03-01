@@ -112,7 +112,11 @@ internal fun PostView(
             // always show selftext if there is one
             val selftext = post.selftext.markdown
             if (selftext.isNotBlank()) {
-                RedditMarkdown(selftext, modifier = Modifier.padding(horizontal = 16.dp))
+                RedditMarkdown(
+                    selftext,
+                    mediaMetadata = post.mediaMetadata,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
             }
         } else {
             val parent = post.crosspostParentList.first()

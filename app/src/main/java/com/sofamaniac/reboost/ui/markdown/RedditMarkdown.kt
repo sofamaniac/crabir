@@ -74,18 +74,17 @@ fun RedditMarkdown(
 ) {
     val colorScheme = MaterialTheme.colorScheme
 
-
     val processedMarkdown = markdown
+        .extractLinks()
         .convertRedditSpoilers()
-        .convertRedditPreviewLinks()
+        .convertRedditPreviewLinks(mediaMetadata)
         .convertRedditSuperscript()
-    //.convertNewLines()
-
+        .fuseQuote()
 
     val context = LocalContext.current
     val textView = remember { PassThroughTextView(context) }
 
-    // Fix missing ellipsis https://github.com/noties/Markwon/issues/180
+    // this code fixes missing ellipsis https://github.com/noties/Markwon/issues/180
     textView.getViewTreeObserver()
         .addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -181,7 +180,6 @@ private fun redditMarkwonBuilder(
         .usePlugin(MarkwonInlineParserPlugin.create())
         .usePlugin(StrikethroughPlugin.create())
         .useRedditSpoilers()
-        .usePlugin(HtmlPlugin.create())
         .usePlugin(TablePlugin.create(context))
         .usePlugin(MarkdownTheme(colorScheme, theme))
         .usePlugin(HtmlPlugin.create())
@@ -258,28 +256,31 @@ private fun String.convertRedditSpoilers(): String {
     return this.replace(">!", " \ue000 ").replace("!<", " \ue000 ")
 }
 
-private fun String.convertNewLines(): String {
-    val regex = Regex("(\n+)")
-    return regex.replace(this) { matchResult ->
-        "\n".repeat(matchResult.value.length / 2)
-    }
-}
 
-
-private fun String.convertRedditPreviewLinks(): String {
-    // Match Reddit preview links that aren't already in markdown syntax
+/** Convert all markdown links that correspond to some media metadata to a markdown image */
+private fun String.convertRedditPreviewLinks(mediaMetadata: Map<String, MediaMetadata>): String {
     val redditPreviewPattern = Regex(
-        """(?<!]\()https://preview\.redd\.it/[^\s)]+(?!\))"""
+        """\[(.*)]\((https://preview\.redd\.it/[^\s)]+)\)"""
     )
 
     return redditPreviewPattern.replace(this) { matchResult ->
-        //"<img width=\"100%\" src=\"${matchResult.value}\"/>"
-        "![](${matchResult.value})"
+        Log.d("SimpleMarkdown", "Converting link ${matchResult.value}")
+        val alttext = matchResult.groupValues[1]
+        val url = matchResult.groupValues[2]
+
+        val filename = url.toUri().lastPathSegment?.split('.')?.first()
+
+        val metadata = mediaMetadata[filename]
+        if (metadata != null) {
+            "![$alttext]($url)"
+        } else {
+            matchResult.value
+        }
     }
 }
 
 private fun String.convertRedditSuperscript(): String {
-    // Match Reddit preview links that aren't already in markdown syntax
+    // Convert reddit superscript to tag based superscript
     val redditSuperscriptPattern = Regex(
         """\^\(([^)]+)\)|\^\^(\S+)"""
     )
@@ -288,6 +289,23 @@ private fun String.convertRedditSuperscript(): String {
         "<sup>${
             matchResult.groupValues[1].ifEmpty { matchResult.groupValues[2] }
         }</sup > "
+    }
+}
+
+private fun String.extractLinks(): String {
+    val linksPattern = Regex("^https?://\\S+| https?://\\S+")
+    val res = linksPattern.replace(this) { matchResult ->
+        "[${matchResult.value}](${matchResult.value})"
+    }
+    Log.d("SimpleMarkdown", "Extracted links: $res")
+    return res
+}
+
+private fun String.fuseQuote(): String {
+    val quotePattern = Regex(">(.*)\n(\n+)>")
+    return quotePattern.replace(this) { matchResult ->
+        val newLines = ">\n".repeat(matchResult.groupValues[2].length)
+        ">${matchResult.groupValues[1]}\n$newLines>"
     }
 }
 
