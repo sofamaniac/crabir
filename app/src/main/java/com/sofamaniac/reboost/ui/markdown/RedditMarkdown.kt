@@ -216,7 +216,7 @@ private fun redditMarkwonBuilder(
                         val metadata = drawable.getMetadata(mediaMetadata)
                         val placeholder =
                             Color.GRAY.toDrawable()
-                        placeholder.setBounds(0, 0, metadata?.width ?: 0, metadata?.height ?: 0)
+                        placeholder.setBounds(0, 0, metadata?.width ?: 100, metadata?.height ?: 100)
 
                         return requestManager
                             .load(metadata?.url ?: drawable.destination)
@@ -245,7 +245,7 @@ private fun AsyncDrawable.getMetadata(mediaMetadata: Map<String, MediaMetadata>)
             return metadata.toMediaResource()
         } else {
             val filename = destination.split('|').last()
-            return MediaResource("https://media.giphy.com/media/$filename/giphy.gif", 1f, 0, 0)
+            return MediaResource("https://media.giphy.com/media/$filename/giphy.gif", 1f, 100, 100)
         }
     }
     // Otherwise assume destination is a link

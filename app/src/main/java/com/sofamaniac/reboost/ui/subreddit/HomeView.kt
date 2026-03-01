@@ -14,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.sofamaniac.reboost.data.local.dao.VisitedCommunityDao
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
 import com.sofamaniac.reboost.domain.repository.feed.HomeRepository
 import com.sofamaniac.reboost.ui.TabBar
@@ -52,7 +53,9 @@ fun HomeViewer(
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     repository: HomeRepository,
-    visitedPostsDao: VisitedPostsDao
-) : PostFeedViewModel(repository, visitedPostsDao)
+    visitedPostsDao: VisitedPostsDao,
+    visitedCommunityDao: VisitedCommunityDao,
+) : PostFeedViewModel(id = "_HOME", repository, visitedPostsDao, visitedCommunityDao) {
+}
 
 

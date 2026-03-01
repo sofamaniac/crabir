@@ -4,6 +4,7 @@
 
 package com.sofamaniac.reboost.ui.user
 
+import com.sofamaniac.reboost.data.local.dao.VisitedCommunityDao
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
 import com.sofamaniac.reboost.domain.repository.feed.CommentsRepository
 import com.sofamaniac.reboost.domain.repository.feed.DownvotedRepository
@@ -17,29 +18,34 @@ import jakarta.inject.Inject
 @HiltViewModel
 class SavedViewModel @Inject constructor(
     repository: SavedRepository,
-    visitedPostsDao: VisitedPostsDao
-) : PostFeedViewModel(repository, visitedPostsDao)
+    visitedPostsDao: VisitedPostsDao,
+    visitedCommunityDao: VisitedCommunityDao
+) : PostFeedViewModel(id = null, repository, visitedPostsDao, visitedCommunityDao)
 
 @HiltViewModel
 class CommentsViewModel @Inject constructor(
     repository: CommentsRepository,
-    visitedPostsDao: VisitedPostsDao
-) : PostFeedViewModel(repository, visitedPostsDao)
+    visitedPostsDao: VisitedPostsDao,
+    visitedCommunityDao: VisitedCommunityDao
+) : PostFeedViewModel(id = null, repository, visitedPostsDao, visitedCommunityDao)
 
 @HiltViewModel
 class UpvotedViewModel @Inject constructor(
     repository: UpvotedRepository,
-    visitedPostsDao: VisitedPostsDao
-) : PostFeedViewModel(repository, visitedPostsDao)
+    visitedPostsDao: VisitedPostsDao,
+    visitedCommunityDao: VisitedCommunityDao
+) : PostFeedViewModel(id = null, repository, visitedPostsDao, visitedCommunityDao)
 
 @HiltViewModel
 class DownvotedViewModel @Inject constructor(
     repository: DownvotedRepository,
-    visitedPostsDao: VisitedPostsDao
-) : PostFeedViewModel(repository, visitedPostsDao)
+    visitedPostsDao: VisitedPostsDao,
+    visitedCommunityDao: VisitedCommunityDao
+) : PostFeedViewModel(id = null, repository, visitedPostsDao, visitedCommunityDao)
 
 @HiltViewModel
 class HiddenViewModel @Inject constructor(
     repository: HiddenRepository,
-    visitedPostsDao: VisitedPostsDao
-) : PostFeedViewModel(repository, visitedPostsDao)
+    visitedPostsDao: VisitedPostsDao,
+    visitedCommunityDao: VisitedCommunityDao
+) : PostFeedViewModel(id = null, repository, visitedPostsDao, visitedCommunityDao)

@@ -14,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.sofamaniac.reboost.data.local.dao.VisitedCommunityDao
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
 import com.sofamaniac.reboost.domain.repository.feed.SubredditPostsRepository
 import com.sofamaniac.reboost.ui.TabBar
@@ -59,8 +60,9 @@ fun SubredditViewer(
 class SubredditViewModel @AssistedInject constructor(
     repository: SubredditPostsRepository,
     visitedPostsDao: VisitedPostsDao,
+    visitedCommunityDao: VisitedCommunityDao,
     @Assisted private val subredditName: String
-) : PostFeedViewModel(repository, visitedPostsDao) {
+) : PostFeedViewModel(id = subredditName, repository, visitedPostsDao, visitedCommunityDao) {
 
     init {
         repository.updateSubreddit(subredditName)

@@ -19,7 +19,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.sofamaniac.reboost.data.local.dao.VisitedCommunityDao
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
+import com.sofamaniac.reboost.data.local.entities.VisitedCommunityEntity
 import com.sofamaniac.reboost.data.local.entities.toEntity
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
@@ -44,9 +46,24 @@ interface FeedViewModelInterface {
 }
 
 abstract class PostFeedViewModel(
+    private val id: String?,
     private val repository: FeedRepositoryCommon<FeedParams>,
-    private val visitedPostsDao: VisitedPostsDao
+    private val visitedPostsDao: VisitedPostsDao,
+    private val visitedCommunityDao: VisitedCommunityDao,
 ) : ViewModel(), FeedViewModelInterface {
+
+    init {
+        if (id != null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val entity = visitedCommunityDao.getCommunity(id!!)
+                if (entity != null) {
+                    _params.update {
+                        it.copy(sort = entity.sort, timeframe = entity.timeframe)
+                    }
+                }
+            }
+        }
+    }
 
     override var listState by mutableStateOf(LazyListState())
     private val _params = MutableStateFlow(
@@ -55,6 +72,7 @@ abstract class PostFeedViewModel(
             timeframe = null,
         )
     )
+
     val params: StateFlow<FeedParams> = _params.asStateFlow()
 
     override fun refresh() {
@@ -87,6 +105,12 @@ abstract class PostFeedViewModel(
             }
         }
         if (needRefresh) {
+            if (id != null) {
+                Log.d("PostFeedViewModel", "updateSort: Updating sort to $sort")
+                viewModelScope.launch(Dispatchers.IO) {
+                    visitedCommunityDao.insert(VisitedCommunityEntity(id!!, sort, timeframe))
+                }
+            }
             refresh()
         }
     }

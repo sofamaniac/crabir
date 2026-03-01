@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.sofamaniac.reboost.FullscreenHandler
 import com.sofamaniac.reboost.ui.TabBar
 import com.sofamaniac.reboost.ui.subreddit.PostFeedViewModel
 import com.sofamaniac.reboost.ui.subreddit.PostFeedViewer
@@ -92,59 +93,64 @@ fun ProfileView(
     )
 
 
-    Scaffold(
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            TopAppBar(
-                scrollBehavior = scrollBehavior,
-                title = {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(user)
-                    }
+    FullscreenHandler {
+        Scaffold(
+            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                TopAppBar(
+                    scrollBehavior = scrollBehavior,
+                    title = {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Text(user)
+                        }
 
-                },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(
-                            Icons.Default.Menu,
-                            "Open Drawer"
-                        )
-                    }
-                },
-                actions = {}
-            )
-        },
-        bottomBar = {
-            TabBar(selected = selected)
-        }
-    ) { innerPadding ->
-        Column(verticalArrangement = Arrangement.Top, modifier = Modifier.padding(innerPadding)) {
-            SecondaryScrollableTabRow(
-                selectedTabIndex = currentTab.currentPage,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                edgePadding = 0.dp
-            ) {
-                tabs.forEachIndexed { index, tab ->
-                    Tab(
-                        selected = index == currentTab.currentPage,
-                        onClick = {
-                            scope.launch { currentTab.animateScrollToPage(index) }
-                        },
-                        text = { Text(tab.name) })
-                }
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(
+                                Icons.Default.Menu,
+                                "Open Drawer"
+                            )
+                        }
+                    },
+                    actions = {}
+                )
+            },
+            bottomBar = {
+                TabBar(selected = selected)
             }
-            HorizontalPager(
-                state = currentTab,
-                modifier = Modifier.Companion
-                    .fillMaxSize()
+        ) { innerPadding ->
+            Column(
+                verticalArrangement = Arrangement.Top,
+                modifier = Modifier.padding(innerPadding)
             ) {
-                val page = tabs[it]
-                val viewModel = viewModels[page]
-                if (viewModel != null) {
-                    PostFeedViewer(state = viewModel)
-                } else {
-                    Text("TODO")
+                SecondaryScrollableTabRow(
+                    selectedTabIndex = currentTab.currentPage,
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    edgePadding = 0.dp
+                ) {
+                    tabs.forEachIndexed { index, tab ->
+                        Tab(
+                            selected = index == currentTab.currentPage,
+                            onClick = {
+                                scope.launch { currentTab.animateScrollToPage(index) }
+                            },
+                            text = { Text(tab.name) })
+                    }
+                }
+                HorizontalPager(
+                    state = currentTab,
+                    modifier = Modifier.Companion
+                        .fillMaxSize()
+                ) {
+                    val page = tabs[it]
+                    val viewModel = viewModels[page]
+                    if (viewModel != null) {
+                        PostFeedViewer(state = viewModel)
+                    } else {
+                        Text("TODO")
+                    }
                 }
             }
         }

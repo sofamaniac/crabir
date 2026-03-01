@@ -10,6 +10,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.sofamaniac.reboost.data.local.dao.VisitedCommunityDao
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
 import com.sofamaniac.reboost.domain.repository.feed.MultiPostsRepository
 import com.sofamaniac.reboost.ui.TabBar
@@ -61,8 +62,9 @@ fun MultiView(
 class MultiViewModel @AssistedInject constructor(
     repository: MultiPostsRepository,
     visitedPostsDao: VisitedPostsDao,
+    visitedCommunityDao: VisitedCommunityDao,
     @Assisted private val multiPath: String
-) : PostFeedViewModel(repository, visitedPostsDao) {
+) : PostFeedViewModel(id = multiPath, repository, visitedPostsDao, visitedCommunityDao) {
 
     init {
         repository.updateMulti(multiPath)
