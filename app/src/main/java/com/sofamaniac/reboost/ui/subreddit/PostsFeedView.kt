@@ -105,10 +105,22 @@ fun PostFeedViewer(
 
     val fullscreenManager = LocalFullscreenHandler.current!!
 
+    var needScrollToTop by remember { mutableStateOf(false) }
+
+    // Reset list state after refresh
+    LaunchedEffect(posts.loadState.refresh) {
+        if (posts.loadState.refresh != LoadState.Loading && needScrollToTop) {
+            state.listState.scrollToItem(0)
+            needScrollToTop = false
+        }
+    }
+
+
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,
         onRefresh = {
             state.refresh()
+            needScrollToTop = true
         },
         modifier = modifier.fillMaxSize(),
     ) {
