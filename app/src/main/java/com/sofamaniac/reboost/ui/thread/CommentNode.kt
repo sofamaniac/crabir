@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,10 +23,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.reboost.LocalNavController
+import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.ProfileRoute
 import com.sofamaniac.reboost.domain.model.CommentData
-import com.sofamaniac.reboost.settings.DefaultReboostTheme
-import com.sofamaniac.reboost.settings.themeDataStore
 import com.sofamaniac.reboost.ui.Flair
 import com.sofamaniac.reboost.ui.cartouche
 import com.sofamaniac.reboost.ui.formatElapsedTimeLocalized
@@ -88,14 +86,8 @@ fun BottomRow(comment: CommentData, viewModel: ThreadViewModel, modifier: Modifi
 
 @Composable
 fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val themeDataStore = remember(context) { context.themeDataStore }
-    val theme by themeDataStore.data.collectAsState(
-        initial = DefaultReboostTheme,
-        coroutineScope.coroutineContext
-    )
 
+    val theme = LocalTheme.current
     val timeString = formatElapsedTimeLocalized(comment.createdUtc)
     val delta = when (comment.relationship.liked) {
         true -> 1

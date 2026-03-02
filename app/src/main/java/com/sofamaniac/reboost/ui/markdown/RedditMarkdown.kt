@@ -10,17 +10,13 @@ import android.graphics.drawable.Drawable
 import android.text.Layout
 import android.text.TextUtils
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.ViewTreeObserver
 import android.widget.TextView
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onSizeChanged
@@ -38,11 +34,10 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.reboost.domain.model.MediaResource
-import com.sofamaniac.reboost.settings.DefaultReboostTheme
 import com.sofamaniac.reboost.settings.ReboostTheme
-import com.sofamaniac.reboost.settings.themeDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
@@ -102,12 +97,7 @@ fun RedditMarkdown(
             }
         });
 
-    val coroutineScope = rememberCoroutineScope()
-    val themeDataStore = remember(context) { context.themeDataStore }
-    val theme by themeDataStore.data.collectAsState(
-        initial = DefaultReboostTheme,
-        coroutineScope.coroutineContext
-    )
+    val theme = LocalTheme.current
     val markwonReddit = remember(redditMarkwonBuilder(context, colorScheme, theme, mediaMetadata))
     // Parse markdown once and remember it
     val parsedMarkdown = remember(processedMarkdown, markwonReddit) {
@@ -236,8 +226,6 @@ private fun redditMarkwonBuilder(
 private fun AsyncDrawable.getMetadata(mediaMetadata: Map<String, MediaMetadata>): MediaResource? {
     // Handle destination of the form `giphy|xxxx`
     if (destination.contains('|')) {
-        Log.d("SimpleMarkdown", "Handling destination $destination")
-        Log.d("SimpleMarkdown", "Media metadata ${mediaMetadata[destination]}")
         val metadata = mediaMetadata[destination]
         if (metadata != null && metadata !is MediaMetadata.Invalid) {
             return metadata.toMediaResource()
@@ -264,7 +252,6 @@ private fun String.convertRedditPreviewLinks(mediaMetadata: Map<String, MediaMet
     )
 
     return redditPreviewPattern.replace(this) { matchResult ->
-        Log.d("SimpleMarkdown", "Converting link ${matchResult.value}")
         val alttext = matchResult.groupValues[1]
         val url = matchResult.groupValues[2]
 
@@ -297,7 +284,6 @@ private fun String.extractLinks(): String {
     val res = linksPattern.replace(this) { matchResult ->
         "[${matchResult.value}](${matchResult.value})"
     }
-    Log.d("SimpleMarkdown", "Extracted links: $res")
     return res
 }
 

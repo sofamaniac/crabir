@@ -14,6 +14,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.sofamaniac.reboost.HomeRoute
 import com.sofamaniac.reboost.InboxRoute
 import com.sofamaniac.reboost.LocalNavController
@@ -35,10 +36,14 @@ fun TabBar(
         Pair(Icons.Filled.Person, ProfileRoute("me"))
     )
     val navController = LocalNavController.current!!
-    PrimaryTabRow(selectedTabIndex = selected.value, modifier = modifier.navigationBarsPadding()) {
+    PrimaryTabRow(
+        selectedTabIndex = selected.value,
+        modifier = modifier.navigationBarsPadding(),
+        indicator = {}) {
         for ((index, tab) in tabs.withIndex()) {
             Tab(
                 selected = selected.value == index,
+                unselectedContentColor = Color.Gray,
                 onClick = {
                     Log.d("TabBar", "Clicked on tab ${tab.second.title}")
                     if (onTabReselect != null && selected.value == index)

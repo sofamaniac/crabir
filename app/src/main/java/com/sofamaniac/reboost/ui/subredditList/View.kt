@@ -8,7 +8,6 @@
 
 package com.sofamaniac.reboost.ui.subredditList
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +20,6 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -119,7 +117,7 @@ fun SubredditListViewer(
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.background)
+                    //.background(MaterialTheme.colorScheme.background)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 state = listState

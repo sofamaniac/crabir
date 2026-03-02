@@ -52,6 +52,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.sofamaniac.reboost.LocalFullscreenHandler
+import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
 import com.sofamaniac.reboost.domain.model.PostData
@@ -180,11 +181,14 @@ fun TopBar(
 ) {
     val scope = rememberCoroutineScope()
     val params = state.params.collectAsState()
+    val theme = LocalTheme.current
+
     TopAppBar(
         scrollBehavior = scrollBehavior,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.primary,
+            containerColor = theme.toolbarBackground,
+            scrolledContainerColor = theme.toolbarBackground,
+            titleContentColor = theme.toolbarText,
         ),
         title = {
             Column {

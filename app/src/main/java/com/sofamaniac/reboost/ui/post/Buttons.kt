@@ -9,24 +9,12 @@ import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import com.sofamaniac.reboost.settings.DefaultReboostTheme
-import com.sofamaniac.reboost.settings.themeDataStore
+import com.sofamaniac.reboost.LocalTheme
 
 @Composable
 fun UpButton(likes: Boolean?, onClick: () -> Unit) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val themeDataStore = remember(context) { context.themeDataStore }
-    val theme by themeDataStore.data.collectAsState(
-        initial = DefaultReboostTheme,
-        coroutineScope.coroutineContext
-    )
+    val theme = LocalTheme.current
 
     val buttonColor = animateColorAsState(
         targetValue = if (likes == true) theme.primaryColor else Color.Gray,
@@ -41,13 +29,7 @@ fun UpButton(likes: Boolean?, onClick: () -> Unit) {
 
 @Composable
 fun DownButton(likes: Boolean?, onClick: () -> Unit) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val themeDataStore = remember(context) { context.themeDataStore }
-    val theme by themeDataStore.data.collectAsState(
-        initial = DefaultReboostTheme,
-        coroutineScope.coroutineContext
-    )
+    val theme = LocalTheme.current
 
     val buttonColor = animateColorAsState(
         targetValue = if (likes == false) theme.downvote else Color.Gray,

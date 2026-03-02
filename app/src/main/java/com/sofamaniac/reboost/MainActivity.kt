@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
@@ -35,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -49,6 +49,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.sofamaniac.reboost.settings.DefaultReboostTheme
+import com.sofamaniac.reboost.settings.ProvideReboostTheme
+import com.sofamaniac.reboost.settings.ReboostTheme
+import com.sofamaniac.reboost.settings.rememberAppTheme
 import com.sofamaniac.reboost.ui.drawer.DrawerContent
 import com.sofamaniac.reboost.ui.drawer.DrawerViewModel
 import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayerManager
@@ -57,7 +61,6 @@ import com.sofamaniac.reboost.ui.subreddit.HomeViewer
 import com.sofamaniac.reboost.ui.subreddit.MultiView
 import com.sofamaniac.reboost.ui.subreddit.SubredditViewer
 import com.sofamaniac.reboost.ui.subredditList.SubredditListViewer
-import com.sofamaniac.reboost.ui.theme.ReboostTheme
 import com.sofamaniac.reboost.ui.thread.ThreadView
 import com.sofamaniac.reboost.ui.user.ProfileView
 import dagger.hilt.android.AndroidEntryPoint
@@ -81,6 +84,9 @@ interface Tab {
     )
 }
 
+val LocalTheme = compositionLocalOf<ReboostTheme> { DefaultReboostTheme }
+
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -89,17 +95,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ReboostTheme {
-                MaterialTheme {
+            ProvideReboostTheme {
                     val navController = rememberNavController()
                     // Setup nav controller
                     CompositionLocalProvider(LocalNavController provides navController) {
-                        MainScreen(
-                            navController = navController,
-                        )
+                        val theme = rememberAppTheme()
+                        CompositionLocalProvider(LocalTheme provides theme) {
+                            MainScreen(
+                                navController = navController,
+                            )
+                        }
                     }
                 }
-            }
         }
     }
 }

@@ -25,17 +25,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
@@ -45,11 +41,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sofamaniac.reboost.LocalNavController
+import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.SearchRoute
 import com.sofamaniac.reboost.domain.model.Kind
 import com.sofamaniac.reboost.domain.model.PostData
-import com.sofamaniac.reboost.settings.DefaultReboostTheme
-import com.sofamaniac.reboost.settings.themeDataStore
 import com.sofamaniac.reboost.ui.Flair
 import com.sofamaniac.reboost.ui.cartouche
 import com.sofamaniac.reboost.ui.markdown.RedditMarkdown
@@ -248,13 +243,7 @@ fun PostCard(
     val modifier = Modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val themeDataStore = remember(context) { context.themeDataStore }
-    val theme by themeDataStore.data.collectAsState(
-        initial = DefaultReboostTheme,
-        coroutineScope.coroutineContext
-    )
+    val theme = LocalTheme.current
     val onClickCard = if (clickable) {
         { onClick(post) }
     } else {
