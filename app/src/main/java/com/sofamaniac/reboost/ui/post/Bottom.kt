@@ -26,69 +26,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.sofamaniac.reboost.BuildConfig
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.domain.model.PostData
-import com.sofamaniac.reboost.domain.repository.VotableRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import com.sofamaniac.reboost.ui.votable.DownButton
+import com.sofamaniac.reboost.ui.votable.SavedButton
+import com.sofamaniac.reboost.ui.votable.UpButton
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
-@HiltViewModel(assistedFactory = ButtonViewModel.Factory::class)
-class ButtonViewModel @AssistedInject constructor(
-    @Assisted val postId: String,
-    private val posts: VotableRepository,
-) : ViewModel() {
-
-    val likes = posts.observePost(postId).map { it?.relationship?.liked }
-    val saved = posts.observePost(postId).map { it?.relationship?.saved ?: false }
-
-    fun upvote() {
-        viewModelScope.launch {
-            posts.upvote(postId)
-        }
-    }
-
-    fun downvote() {
-        viewModelScope.launch {
-            posts.downvote(postId)
-        }
-    }
-
-    fun save(target: Boolean) {
-        viewModelScope.launch {
-            if (target) {
-                posts.save(postId)
-            } else {
-                posts.unsave(postId)
-            }
-        }
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(postId: String): ButtonViewModel
-    }
-
-}
 
 @Composable
 fun BottomRow(
     post: PostData,
     modifier: Modifier = Modifier,
-    viewModel: ButtonViewModel = hiltViewModel(
-        key = post.id,
-        creationCallback = { factory: ButtonViewModel.Factory ->
-            factory.create(post.id)
-        }),
+    viewModel: VotableViewModel,
     visitPost: (PostData) -> Unit = {},
 ) {
     val navController = LocalNavController.current!!

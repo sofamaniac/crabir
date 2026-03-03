@@ -1,4 +1,4 @@
-package com.sofamaniac.reboost.ui.post
+package com.sofamaniac.reboost.ui.votable
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -44,12 +44,12 @@ fun UpButton(likes: Boolean?, onClick: () -> Unit) {
     }
 
     val buttonColor = animateColorAsState(
-        targetValue = if (likes == true) theme.primaryColor else Color.Gray,
+        targetValue = if (likes == true) theme.primaryColor else Color.Companion.Gray,
         label = "button color"
     )
     IconButton(
         onClick = onClick,
-        modifier = Modifier.offset(y = offset.value.dp)
+        modifier = Modifier.Companion.offset(y = offset.value.dp)
     ) {
         Icon(Icons.Filled.ThumbUp, "upvote", tint = buttonColor.value)
     }
@@ -72,10 +72,10 @@ fun DownButton(likes: Boolean?, onClick: () -> Unit) {
     }
 
     val buttonColor = animateColorAsState(
-        targetValue = if (likes == false) theme.downvote else Color.Gray,
+        targetValue = if (likes == false) theme.downvote else Color.Companion.Gray,
         label = "button color"
     )
-    IconButton(onClick = onClick, modifier = Modifier.offset(y = offset.value.dp)) {
+    IconButton(onClick = onClick, modifier = Modifier.Companion.offset(y = offset.value.dp)) {
         Icon(Icons.Filled.ThumbDown, "downvote", tint = buttonColor.value)
     }
 }
@@ -99,7 +99,7 @@ fun SavedButton(saved: Boolean, onClick: () -> Unit) {
     IconButton(onClick = {
         scope.launch { animate(!saved) }
         onClick()
-    }, modifier = Modifier.scale(scale.value)) {
+    }, modifier = Modifier.Companion.scale(scale.value)) {
         if (saved) {
             Icon(Icons.Filled.Bookmark, "save", tint = buttonColor.value)
         } else {

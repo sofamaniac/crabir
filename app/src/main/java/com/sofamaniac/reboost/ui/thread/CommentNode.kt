@@ -30,9 +30,10 @@ import com.sofamaniac.reboost.ui.Flair
 import com.sofamaniac.reboost.ui.cartouche
 import com.sofamaniac.reboost.ui.formatElapsedTimeLocalized
 import com.sofamaniac.reboost.ui.markdown.RedditMarkdown
-import com.sofamaniac.reboost.ui.post.DownButton
-import com.sofamaniac.reboost.ui.post.SavedButton
-import com.sofamaniac.reboost.ui.post.UpButton
+import com.sofamaniac.reboost.ui.votable.DownButton
+import com.sofamaniac.reboost.ui.votable.SavedButton
+import com.sofamaniac.reboost.ui.votable.ScoreString
+import com.sofamaniac.reboost.ui.votable.UpButton
 import kotlinx.coroutines.flow.map
 
 @Composable
@@ -94,13 +95,7 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
 
     val theme = LocalTheme.current
     val timeString = formatElapsedTimeLocalized(comment.createdUtc)
-    val delta = when (comment.relationship.liked) {
-        true -> 1
-        false -> -1
-        else -> 0
-    }
     val rightString = buildAnnotatedString {
-        append("${comment.score.ups + delta}")
         append(" · ")
         append(timeString)
     }
@@ -127,6 +122,7 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
             Flair(comment.author.flair)
         }
         Spacer(modifier = Modifier.weight(1f))
+        ScoreString(comment.score.ups, comment.relationship.liked, hidden = comment.score.hideScore)
         Text(rightString, maxLines = 1)
     }
 }

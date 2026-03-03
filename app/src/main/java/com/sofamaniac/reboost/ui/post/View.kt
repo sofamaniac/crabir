@@ -8,7 +8,6 @@
 
 package com.sofamaniac.reboost.ui.post
 
-import android.icu.text.CompactDecimalFormat
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,31 +24,39 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.SearchRoute
 import com.sofamaniac.reboost.domain.model.Kind
 import com.sofamaniac.reboost.domain.model.PostData
+import com.sofamaniac.reboost.domain.repository.VotableRepository
 import com.sofamaniac.reboost.ui.Flair
 import com.sofamaniac.reboost.ui.cartouche
 import com.sofamaniac.reboost.ui.markdown.RedditMarkdown
+import com.sofamaniac.reboost.ui.votable.ScoreString
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import java.util.Locale
 
 
 @Composable
@@ -111,10 +118,14 @@ fun PostInfo(
     post: PostData,
     modifier: Modifier = Modifier,
     enablePreview: Boolean = true,
+    viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(key = post.id) { factory ->
+        factory.create(post.id)
+    },
 ) {
     val hasThumbnail = enablePreview && post.thumbnail.uri.toHttpUrlOrNull() != null
     val navController = LocalNavController.current!!
     val theme = LocalTheme.current
+    val likes by viewModel.likes.collectAsState(initial = post.relationship.liked)
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -167,7 +178,15 @@ fun PostInfo(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(1.dp)
             ) {
-                Text(post.scoreString(), style = MaterialTheme.typography.bodyMedium)
+                ScoreString(post.score.score, likes)
+                Text(
+                    buildAnnotatedString {
+                        append(" · ")
+                        append("${post.numComments} comments")
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = theme.secondaryText
+                )
                 if (post.over18) {
                     Text(
                         "NSFW", fontWeight = FontWeight.Bold,
@@ -196,24 +215,6 @@ fun PostInfo(
     }
 }
 
-@Composable
-fun PostData.scoreString(): AnnotatedString {
-    val scoreStyle =
-        MaterialTheme.typography.titleMedium.toSpanStyle()
-    val score = score.score
-    val locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
-    val formatter = remember(locale) {
-        CompactDecimalFormat.getInstance(locale, CompactDecimalFormat.CompactStyle.SHORT)
-    }
-    return buildAnnotatedString {
-        withStyle(style = scoreStyle) {
-            append(formatter.format(score))
-        }
-        append(" · ")
-        append("$numComments comments")
-    }
-}
-
 /**
  * Composable function that displays a single post in a Card format.
  *
@@ -237,6 +238,11 @@ fun PostCard(
     showSubredditIcon: Boolean = true,
     clickable: Boolean = true,
     onClick: (PostData) -> Unit = {},
+    viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
+        key = post.id,
+        creationCallback = { factory ->
+            factory.create(post.id)
+        }),
     body: @Composable () -> Unit,
 ) {
     // We do not apply the padding on the column, but on each of its children except [body]
@@ -267,8 +273,47 @@ fun PostCard(
             post,
             modifier = modifier,
             enablePreview = enablePreview && enableThumbnail,
+            viewModel = viewModel,
         )
         body()
-        BottomRow(post, modifier, visitPost = onClick)
+        BottomRow(post, modifier, visitPost = onClick, viewModel = viewModel)
     }
+}
+
+@HiltViewModel(assistedFactory = VotableViewModel.Factory::class)
+class VotableViewModel @AssistedInject constructor(
+    @Assisted val id: String,
+    private val posts: VotableRepository,
+) : ViewModel() {
+
+    val likes = posts.observePost(id).map { it?.relationship?.liked }
+    val saved = posts.observePost(id).map { it?.relationship?.saved ?: false }
+
+    fun upvote() {
+        viewModelScope.launch {
+            posts.upvote(id)
+        }
+    }
+
+    fun downvote() {
+        viewModelScope.launch {
+            posts.downvote(id)
+        }
+    }
+
+    fun save(target: Boolean) {
+        viewModelScope.launch {
+            if (target) {
+                posts.save(id)
+            } else {
+                posts.unsave(id)
+            }
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(postId: String): VotableViewModel
+    }
+
 }
