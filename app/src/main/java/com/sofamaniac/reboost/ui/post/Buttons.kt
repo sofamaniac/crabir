@@ -1,6 +1,13 @@
 package com.sofamaniac.reboost.ui.post
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.ThumbDown
@@ -9,19 +16,40 @@ import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.sofamaniac.reboost.LocalTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun UpButton(likes: Boolean?, onClick: () -> Unit) {
     val theme = LocalTheme.current
+
+    val offset = remember { Animatable(0f) }
+
+    LaunchedEffect(likes) {
+        if (likes == true) {
+            offset.animateTo(-20f, animationSpec = tween(50, easing = EaseIn))
+            offset.animateTo(
+                0f,
+                animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium)
+            )
+            //offset.animateTo(0f, animationSpec = tween(100, easing = EaseIn))
+        }
+    }
 
     val buttonColor = animateColorAsState(
         targetValue = if (likes == true) theme.primaryColor else Color.Gray,
         label = "button color"
     )
     IconButton(
-        onClick = onClick
+        onClick = onClick,
+        modifier = Modifier.offset(y = offset.value.dp)
     ) {
         Icon(Icons.Filled.ThumbUp, "upvote", tint = buttonColor.value)
     }
@@ -30,23 +58,48 @@ fun UpButton(likes: Boolean?, onClick: () -> Unit) {
 @Composable
 fun DownButton(likes: Boolean?, onClick: () -> Unit) {
     val theme = LocalTheme.current
+    val offset = remember { Animatable(0f) }
+
+    LaunchedEffect(likes) {
+        if (likes == false) {
+            offset.animateTo(20f, animationSpec = tween(50, easing = EaseIn))
+            offset.animateTo(
+                0f,
+                animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium)
+            )
+            //offset.animateTo(0f, animationSpec = tween(100, easing = EaseIn))
+        }
+    }
 
     val buttonColor = animateColorAsState(
         targetValue = if (likes == false) theme.downvote else Color.Gray,
         label = "button color"
     )
-    IconButton(onClick = onClick) {
+    IconButton(onClick = onClick, modifier = Modifier.offset(y = offset.value.dp)) {
         Icon(Icons.Filled.ThumbDown, "downvote", tint = buttonColor.value)
     }
 }
 
 @Composable
 fun SavedButton(saved: Boolean, onClick: () -> Unit) {
+    val scale = remember { Animatable(1f) }
     val buttonColor = animateColorAsState(
         targetValue = if (saved) Color.Yellow else Color.Gray,
         label = "button color"
     )
-    IconButton(onClick = onClick) {
+
+    suspend fun animate(saved: Boolean) {
+        if (saved) {
+            scale.animateTo(1.7f, animationSpec = tween(100, easing = EaseOut))
+            scale.animateTo(1f, animationSpec = tween(100, easing = EaseIn))
+        }
+    }
+
+    val scope = rememberCoroutineScope()
+    IconButton(onClick = {
+        scope.launch { animate(!saved) }
+        onClick()
+    }, modifier = Modifier.scale(scale.value)) {
         if (saved) {
             Icon(Icons.Filled.Bookmark, "save", tint = buttonColor.value)
         } else {
