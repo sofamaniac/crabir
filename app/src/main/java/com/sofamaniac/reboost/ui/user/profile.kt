@@ -42,26 +42,15 @@ fun TopBar(
     showSort: Boolean = true
 ) {
     val scope = rememberCoroutineScope()
-    TopAppBar(
-        title = {},
-        navigationIcon = {
-            IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                Icon(Icons.Default.Menu, "Open Drawer")
-            }
-        },
-        actions = {}
-    )
+    TopAppBar(title = {}, navigationIcon = {
+        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+            Icon(Icons.Default.Menu, "Open Drawer")
+        }
+    }, actions = {})
 }
 
 enum class ProfileTabs {
-    Overview,
-    About,
-    Posts,
-    Comments,
-    Saved,
-    Upvoted,
-    Downvoted,
-    Hidden;
+    Overview, About, Posts, Comments, Saved, Upvoted, Downvoted, Hidden;
 
     val publicTabs get() = listOf(Overview, About, Posts, Comments)
 }
@@ -94,55 +83,38 @@ fun ProfileView(
 
 
     FullscreenHandler {
-        Scaffold(
-            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                TopAppBar(
-                    scrollBehavior = scrollBehavior,
-                    title = {
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            Text(user)
-                        }
+        Scaffold(modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
+            TopAppBar(scrollBehavior = scrollBehavior, title = {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(user)
+                }
 
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(
-                                Icons.Default.Menu,
-                                "Open Drawer"
-                            )
-                        }
-                    },
-                    actions = {}
-                )
-            },
-            bottomBar = {
-                TabBar(selected = selected)
-            }
-        ) { innerPadding ->
+            }, navigationIcon = {
+                IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                    Icon(
+                        Icons.Default.Menu, "Open Drawer"
+                    )
+                }
+            }, actions = {})
+        }, bottomBar = {
+            TabBar(selected = selected)
+        }) { innerPadding ->
             Column(
-                verticalArrangement = Arrangement.Top,
-                modifier = Modifier.padding(innerPadding)
+                verticalArrangement = Arrangement.Top, modifier = Modifier.padding(innerPadding)
             ) {
                 SecondaryScrollableTabRow(
                     selectedTabIndex = currentTab.currentPage,
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     edgePadding = 0.dp
                 ) {
                     tabs.forEachIndexed { index, tab ->
-                        Tab(
-                            selected = index == currentTab.currentPage,
-                            onClick = {
-                                scope.launch { currentTab.animateScrollToPage(index) }
-                            },
-                            text = { Text(tab.name) })
+                        Tab(selected = index == currentTab.currentPage, onClick = {
+                            scope.launch { currentTab.animateScrollToPage(index) }
+                        }, text = { Text(tab.name) })
                     }
                 }
                 HorizontalPager(
-                    state = currentTab,
-                    modifier = Modifier.Companion
-                        .fillMaxSize()
+                    state = currentTab, modifier = Modifier.fillMaxSize()
                 ) {
                     val page = tabs[it]
                     val viewModel = viewModels[page]

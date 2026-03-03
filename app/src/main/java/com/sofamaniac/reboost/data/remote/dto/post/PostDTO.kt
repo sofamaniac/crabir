@@ -298,6 +298,9 @@ private fun PostDTO.getGalleryData(): Gallery? {
     return crosspostParentList.firstOrNull()?.getGalleryData()
 }
 
+private fun PostDTO.isDistinguished() = pinned || stickied || distinguished == "moderator"
+
+
 object PostDataMapper : ObjectMappie<PostDTO, PostData>() {
 
     override fun map(from: PostDTO) = mapping {
@@ -323,6 +326,7 @@ object PostDataMapper : ObjectMappie<PostDTO, PostData>() {
         PostData::edited fromProperty from::edited
 
         PostData::gallery fromValue from.getGalleryData()
+        PostData::isDistinguished fromValue from.isDistinguished()
     }
 }
 

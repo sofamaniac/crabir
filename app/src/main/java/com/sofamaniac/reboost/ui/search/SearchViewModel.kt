@@ -12,10 +12,13 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
-import com.sofamaniac.reboost.domain.repository.PostSearchParams
-import com.sofamaniac.reboost.domain.repository.PostSearchRepository
-import com.sofamaniac.reboost.domain.repository.feed.FeedSource
-import com.sofamaniac.reboost.ui.subreddit.FeedViewModelInterface
+import com.sofamaniac.reboost.data.remote.dto.Thing
+import com.sofamaniac.reboost.domain.repository.ListingSource
+import com.sofamaniac.reboost.domain.repository.search.SearchParams
+import com.sofamaniac.reboost.domain.repository.search.SearchRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -24,36 +27,34 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class SearchViewModel @Inject constructor(
-    val repository: PostSearchRepository,
+@HiltViewModel(assistedFactory = SearchViewModel.Factory::class)
+class SearchViewModel @AssistedInject constructor(
+    val repository: SearchRepository,
     val visitedPostsDao: VisitedPostsDao,
-) : ViewModel(),
-    FeedViewModelInterface {
+    @Assisted val initialParams: SearchParams,
+) : ViewModel() {
     private val queryState = TextFieldState()
 
-    override var listState by mutableStateOf(LazyListState())
+    var listState by mutableStateOf(LazyListState())
 
 
     val query: String get() = queryState.text as String
 
     private var searchJob: Job? = null
 
-    private var _params = MutableStateFlow(
-        PostSearchParams(
-            query = ""
-        )
-    )
-    val params: StateFlow<PostSearchParams> = _params.asStateFlow()
 
-    private var feedSource: FeedSource<PostSearchParams>? = null
-    override val data = Pager(
+    private var _params = MutableStateFlow(
+        initialParams
+    )
+    val params: StateFlow<SearchParams> = _params.asStateFlow()
+
+    private var feedSource: ListingSource<SearchParams, Thing>? = null
+    val data = Pager(
         config = PagingConfig(pageSize = 100, prefetchDistance = 10, initialLoadSize = 100),
         initialKey = "",
         pagingSourceFactory = {
-            FeedSource(
+            ListingSource(
                 repository,
                 params.value,
             ).also { feedSource = it }
@@ -64,6 +65,7 @@ class SearchViewModel @Inject constructor(
         )
 
     fun onQueryUpdate(q: String) {
+        if (queryState.text as String == q) return
         queryState.edit { replace(0, length, q) }
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
@@ -72,11 +74,6 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun setSubreddit(subreddit: String) {
-        _params.update {
-            it.copy(subreddit = subreddit)
-        }
-    }
 
     private fun search() {
         Log.d("SearchViewModel", "search: ${queryState.text}")
@@ -86,10 +83,30 @@ class SearchViewModel @Inject constructor(
         refresh()
     }
 
-    override fun refresh() {
+    fun refresh() {
         feedSource?.invalidate()
         repository.refresh()
         listState = LazyListState()
     }
 
+    fun setSubreddit(subreddit: String) {
+        _params.update {
+            it.copy(subreddit = subreddit, restrictSubreddit = true)
+        }
+        refresh()
+    }
+
+    fun setRestrictSubreddit(restrict: Boolean) {
+        _params.update {
+            it.copy(restrictSubreddit = restrict)
+        }
+        refresh()
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            params: SearchParams
+        ): SearchViewModel
+    }
 }

@@ -8,7 +8,7 @@ import android.util.Log
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.domain.model.PagedResponse
 import com.sofamaniac.reboost.domain.repository.AccountsRepository
-import com.sofamaniac.reboost.domain.repository.PostRepository
+import com.sofamaniac.reboost.domain.repository.VotableRepository
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import kotlinx.coroutines.flow.first
@@ -16,11 +16,11 @@ import retrofit2.Response
 
 @Singleton
 class SavedRepository @Inject constructor(
-    postRepository: PostRepository,
+    votableRepository: VotableRepository,
     api: RedditAPIService,
     private val accountsRepository: AccountsRepository
-) : FeedRepositoryCommon<FeedParams>(postRepository, api) {
-    override suspend fun getPosts(
+) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
+    override suspend fun getThings(
         after: String,
         params: FeedParams
     ): PagedResponse<String> {

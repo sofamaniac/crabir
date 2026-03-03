@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import retrofit2.Response
 
-class PostRepository(private val api: RedditAPIService) {
+class VotableRepository(private val api: RedditAPIService) {
     private val _cache =
         MutableStateFlow(emptyMap<String, VotableData>())
 
-    fun observePost(id: String): Flow<VotableData> = _cache.map { it[id]!! }
+    fun observePost(id: String): Flow<VotableData?> = _cache.map { it[id] }
         .distinctUntilChanged()
 
     /** Returns true if the post was added, false if it already existed */

@@ -6,20 +6,20 @@ package com.sofamaniac.reboost.domain.repository.feed
 
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.domain.model.PagedResponse
-import com.sofamaniac.reboost.domain.repository.PostRepository
+import com.sofamaniac.reboost.domain.repository.VotableRepository
 import jakarta.inject.Inject
 
 class SubredditPostsRepository @Inject constructor(
-    postRepository: PostRepository,
+    votableRepository: VotableRepository,
     api: RedditAPIService,
-) : FeedRepositoryCommon<FeedParams>(postRepository, api) {
+) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
     private var currentSubreddit: String? = null
 
     fun updateSubreddit(subreddit: String) {
         currentSubreddit = subreddit
     }
 
-    override suspend fun getPosts(
+    override suspend fun getThings(
         after: String,
         params: FeedParams
     ): PagedResponse<String> {

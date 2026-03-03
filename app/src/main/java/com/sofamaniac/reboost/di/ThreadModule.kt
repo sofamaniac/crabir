@@ -2,9 +2,9 @@ package com.sofamaniac.reboost.di
 
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
-import com.sofamaniac.reboost.domain.repository.PostRepository
 import com.sofamaniac.reboost.domain.repository.ThreadRepository
 import com.sofamaniac.reboost.domain.repository.ThreadRepositoryImpl
+import com.sofamaniac.reboost.domain.repository.VotableRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,9 +18,9 @@ object ThreadModule {
     fun provideThreadRepository(
         api: RedditAPIService,
         visitedPostsDao: VisitedPostsDao,
-        postRepository: PostRepository
+        votableRepository: VotableRepository
     ): ThreadRepository {
-        return ThreadRepositoryImpl(api, visitedPostsDao, postRepository)
+        return ThreadRepositoryImpl(api, visitedPostsDao, votableRepository)
     }
 
 }

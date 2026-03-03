@@ -32,7 +32,7 @@ import androidx.lifecycle.viewModelScope
 import com.sofamaniac.reboost.BuildConfig
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.domain.model.PostData
-import com.sofamaniac.reboost.domain.repository.PostRepository
+import com.sofamaniac.reboost.domain.repository.VotableRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -45,11 +45,11 @@ import kotlinx.serialization.json.Json
 @HiltViewModel(assistedFactory = ButtonViewModel.Factory::class)
 class ButtonViewModel @AssistedInject constructor(
     @Assisted val postId: String,
-    private val posts: PostRepository,
+    private val posts: VotableRepository,
 ) : ViewModel() {
 
-    val likes = posts.observePost(postId).map { it.relationship.liked }
-    val saved = posts.observePost(postId).map { it.relationship.saved }
+    val likes = posts.observePost(postId).map { it?.relationship?.liked }
+    val saved = posts.observePost(postId).map { it?.relationship?.saved ?: false }
 
     fun upvote() {
         viewModelScope.launch {

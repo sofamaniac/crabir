@@ -9,47 +9,39 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SearchAPI {
-    @GET("/subreddit/search.json")
-    suspend fun searchCommunities(
-        @Query("q") query: String,
-        @Query("sort") sort: CommunitySearchSort = CommunitySearchSort.Relevance,
-        @Query("after") after: String? = null,
-        @Query("before") before: String? = null,
-        @Query("count") count: Int = 0,
-        @Query("limit") limit: Int = API_LIMIT,
-        @Query("sr_detail") srDetail: Boolean = true,
-    ): Response<Listing<Thing>>
-
-
     @GET("/r/{subreddit}/search.json")
-    suspend fun searchPosts(
+    suspend fun search(
         @Path("subreddit") subreddit: String = "",
         @Query("restrict_sr") restrictSubreddit: Boolean = true,
         @Query("q") query: String,
-        @Query("sort") sort: PostSearchSort = PostSearchSort.Relevance,
+        @Query("sort") sort: SearchSort = PostSearchSort.Relevance,
         @Query("t") timeframe: Timeframe? = null,
         @Query("after") after: String? = null,
         @Query("before") before: String? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
+        @Query("type") type: String,
     ): Response<Listing<Thing>>
 
     @GET("search.json")
-    suspend fun searchPosts(
+    suspend fun search(
         @Query("q") query: String,
-        @Query("sort") sort: PostSearchSort = PostSearchSort.Relevance,
+        @Query("sort") sort: SearchSort = PostSearchSort.Relevance,
         @Query("t") timeframe: Timeframe? = null,
         @Query("after") after: String? = null,
         @Query("before") before: String? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
+        @Query("type") type: String,
     ): Response<Listing<Thing>>
 }
 
+interface SearchSort
 
-enum class CommunitySearchSort {
+
+enum class CommunitySearchSort : SearchSort {
     Relevance,
     Activity;
 
@@ -58,7 +50,7 @@ enum class CommunitySearchSort {
     }
 }
 
-enum class PostSearchSort {
+enum class PostSearchSort : SearchSort {
     Relevance,
     Hot,
     Top,

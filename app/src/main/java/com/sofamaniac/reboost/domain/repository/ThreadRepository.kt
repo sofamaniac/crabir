@@ -38,7 +38,7 @@ interface ThreadRepository {
 class ThreadRepositoryImpl(
     val api: RedditAPIService,
     val visitedPostsDao: VisitedPostsDao,
-    val postRepository: PostRepository
+    val votableRepository: VotableRepository
 ) :
     ThreadRepository {
     private var post: PostData? = null
@@ -61,7 +61,7 @@ class ThreadRepositoryImpl(
                         CommentType.More(comment as Thing.More)
                     }
                 }
-                postRepository.addPost(post!!)
+                votableRepository.addPost(post!!)
             }
         }
     }
@@ -70,7 +70,7 @@ class ThreadRepositoryImpl(
         if (post != null) {
             return post
         } else {
-            post = postRepository.getPost(id) as? PostData?
+            post = votableRepository.getPost(id) as? PostData?
         }
         return post
     }

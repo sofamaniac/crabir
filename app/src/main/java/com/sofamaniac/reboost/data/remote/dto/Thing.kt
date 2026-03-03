@@ -13,6 +13,7 @@ import com.sofamaniac.reboost.data.remote.dto.post.PostDTO
 import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.reboost.data.remote.dto.subreddit.dummySubredditData
 import com.sofamaniac.reboost.data.remote.dto.user.UserDTO
+import com.sofamaniac.reboost.domain.repository.DataInterface
 import com.sofamaniac.reboost.reddit.ListingData
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
@@ -22,9 +23,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonClassDiscriminator("kind")
-sealed class Thing {
-
-    abstract val id: String
+sealed class Thing : DataInterface {
 
     @Serializable
     @SerialName("t1")

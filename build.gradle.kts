@@ -12,6 +12,7 @@ plugins {
     id("com.jaredsburrows.license") version "0.9.8" apply false
     id("com.google.dagger.hilt.android") version "2.59" apply false
     id("tech.mappie.plugin") version "2.3.0-2.3.1" apply true
+    id("androidx.room") version "2.8.4" apply false
 
 }
 

@@ -32,6 +32,7 @@ data class PostData(
     val selftext: Selftext,
     val mediaMetadata: Map<String, MediaMetadata>,
     val kind: Kind,
+    val isDistinguished: Boolean,
     val linkFlair: Flair,
     val media: MediaInfo,
     val gallery: Gallery?,

@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -34,6 +35,7 @@ import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.ProfileRoute
 import com.sofamaniac.reboost.SubredditRoute
+import com.sofamaniac.reboost.domain.model.Kind
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.formatElapsedTimeLocalized
 import com.sofamaniac.reboost.ui.subreddit.SubredditIcon
@@ -76,23 +78,22 @@ fun PostHeader(
             ) {
                 append(post.subreddit.name)
             }
-            append(" · ")
-            withLink(
-                LinkAnnotation.Clickable(
-                    tag = "User",
-                    styles = TextLinkStyles(style = SpanStyle(color = theme.secondaryText)),
-                    linkInteractionListener = {
-                        navController.navigate(ProfileRoute(post.author.username))
-                    })
-            ) {
-                append(post.author.username)
+            withSeparator {
+                withLink(
+                    LinkAnnotation.Clickable(
+                        tag = "User",
+                        styles = TextLinkStyles(style = SpanStyle(color = theme.secondaryText)),
+                        linkInteractionListener = {
+                            navController.navigate(ProfileRoute(post.author.username))
+                        })
+                ) {
+                    append(post.author.username)
+                }
             }
-            if (!post.domain.contains("reddit") && !post.domain.endsWith("redd.it")) {
-                append(" · ")
-                append(post.domain)
+            if (post.kind != Kind.Self && !post.domain.contains("reddit") && !post.domain.endsWith("redd.it")) {
+                withSeparator { append(post.domain) }
             }
-            append(" · ")
-            append(formatElapsedTimeLocalized(post.createdUtc))
+            withSeparator { append(formatElapsedTimeLocalized(post.createdUtc)) }
         }
         Text(text, style = MaterialTheme.typography.bodySmall.copy(color = theme.secondaryText))
         if (post.isCrosspost) Icon(
@@ -103,4 +104,12 @@ fun PostHeader(
         )
         // TODO: take last edit into account
     }
+}
+
+fun <R : Any> AnnotatedString.Builder.withSeparator(
+    separator: String = " · ",
+    block: AnnotatedString.Builder.() -> R
+): R {
+    append(separator)
+    return block(this)
 }

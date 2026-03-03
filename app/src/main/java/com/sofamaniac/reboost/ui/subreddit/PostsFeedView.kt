@@ -48,6 +48,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
@@ -55,9 +56,11 @@ import com.sofamaniac.reboost.LocalFullscreenHandler
 import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
+import com.sofamaniac.reboost.domain.model.CommentData
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.post.PostBody
 import com.sofamaniac.reboost.ui.post.PostCard
+import com.sofamaniac.reboost.ui.thread.CommentNode
 import com.sofamaniac.reboost.ui.thread.ThreadView
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -150,21 +153,24 @@ fun PostFeedViewer(
                             })
                     }
                 }
-                if (post !is PostData) {
-                    // TODO: show comment
-                    return@items
-                }
-                PostCard(
-                    post,
-                    showSubredditIcon = showSubredditIcon,
-                    onClick = { post ->
-                        fullscreenManager.push { threadView(post) }
-                    },
-                ) {
-                    PostBody(
-                        post,
-                        canPlayVideo = index == mostVisibleItemIndex,
-                    )
+                when (post) {
+                    is PostData ->
+                        PostCard(
+                            post,
+                            showSubredditIcon = showSubredditIcon,
+                            onClick = { post ->
+                                fullscreenManager.push { threadView(post) }
+                            },
+                        ) {
+                            PostBody(
+                                post,
+                                canPlayVideo = index == mostVisibleItemIndex,
+                            )
+                        }
+
+                    is CommentData -> {
+                        CommentNode(comment = post, viewModel = hiltViewModel())
+                    }
                 }
             }
         }

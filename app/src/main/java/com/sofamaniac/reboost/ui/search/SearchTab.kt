@@ -1,49 +1,156 @@
 package com.sofamaniac.reboost.ui.search
 
-import android.util.Log
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberSearchBarState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
+import com.sofamaniac.reboost.FullscreenHandler
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.SearchRoute
-import com.sofamaniac.reboost.ui.subreddit.FullFeedView
+import com.sofamaniac.reboost.data.remote.api.CommunitySearchSort
+import com.sofamaniac.reboost.data.remote.api.PostSearchSort
+import com.sofamaniac.reboost.data.remote.dto.Thing
+import com.sofamaniac.reboost.domain.repository.search.SearchParams
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchTab(
     searchQuery: SearchRoute,
     modifier: Modifier = Modifier,
-    viewModel: SearchViewModel = hiltViewModel(),
 ) {
-    LaunchedEffect(searchQuery) {
-        Log.d("SearchTab", "SearchTab: ${searchQuery.flair}")
-        if (searchQuery.subreddit.isNotBlank()) viewModel.setSubreddit(searchQuery.subreddit)
-        if (searchQuery.flair.isNotBlank()) viewModel.onQueryUpdate("flair:\"${searchQuery.flair}\"")
-    }
-    FullFeedView(
-        topBar = { TopBar(viewModel) },
-        bottomBar = {},
-        modifier = modifier,
-        viewModel = viewModel
+    val viewModels = listOf(
+        hiltViewModel<SearchViewModel, SearchViewModel.Factory>(key = "PostSearch") { factory ->
+            val query = if (searchQuery.flair.isNotBlank()) "flair:\"${searchQuery.flair}\"" else ""
+            val subreddit = searchQuery.subreddit.ifBlank { null }
+            val params = SearchParams(
+                query = query,
+                subreddit = subreddit,
+                restrictSubreddit = subreddit != null,
+                type = "link",
+                sort = PostSearchSort.Relevance
+            )
+            factory.create(params)
+        },
+        hiltViewModel<SearchViewModel, SearchViewModel.Factory>(key = "CommunitySearch") { factory ->
+            val params = SearchParams(
+                query = "",
+                type = "sr",
+                sort = CommunitySearchSort.Relevance
+            )
+            factory.create(params)
+        },
+        hiltViewModel<SearchViewModel, SearchViewModel.Factory>(key = "UserSearch") { factory ->
+            val params = SearchParams(
+                query = "",
+                type = "user",
+                sort = CommunitySearchSort.Relevance
+            )
+            factory.create(params)
+        },
+        hiltViewModel<SearchViewModel, SearchViewModel.Factory>(key = "CommentSearch") { factory ->
+            val params = SearchParams(
+                query = "",
+                type = "comment",
+                sort = CommunitySearchSort.Relevance
+            )
+            factory.create(params)
+        },
     )
+    val tabs = listOf("Posts", "Communities", "Users", "Comments")
+    val scope = rememberCoroutineScope()
+    val currentTab = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    FullscreenHandler {
+        Box {
+            Scaffold(
+                topBar = { TopBar(viewModels[currentTab.currentPage], scrollBehavior) },
+                bottomBar = {},
+                modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            ) { innerPadding ->
+                Column(modifier = Modifier
+                    .padding(paddingValues = innerPadding)
+                    .fillMaxSize()) {
+                    SecondaryTabRow(
+                        selectedTabIndex = currentTab.currentPage,
+                    ) {
+                        tabs.forEachIndexed { index, tab ->
+                            Tab(
+                                selected = index == currentTab.currentPage,
+                                onClick = {
+                                    val query = viewModels[currentTab.currentPage].query
+                                    viewModels[index].onQueryUpdate(query)
+                                    scope.launch { currentTab.animateScrollToPage(index) }
+                                },
+                                text = { Text(tab) })
+                        }
+                    }
+                    HorizontalPager(
+                        state = currentTab,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) { index ->
+                        val viewModel = viewModels[index]
+                        InnerTab(viewModel)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InnerTab(viewModel: SearchViewModel) {
+    val things = viewModel.data.collectAsLazyPagingItems()
+    val listState = viewModel.listState
+    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+        items(
+            count = things.itemCount,
+            key = things.itemKey { p -> p.id }) { index ->
+            val post = things[index]!!
+            when (post) {
+                is Thing.Post -> Text(post.data.title)
+                is Thing.Subreddit -> Text(post.data.display_name)
+                is Thing.Comment -> Text(post.data.body)
+                else -> Text("Unknown type")
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(viewModel: SearchViewModel) {
+fun TopBar(viewModel: SearchViewModel, scrollBehavior: TopAppBarScrollBehavior? = null) {
     val navController = LocalNavController.current!!
     val state = rememberSearchBarState()
     TopAppBar(
+        scrollBehavior = scrollBehavior,
         title = {
             SearchBar(
                 state,

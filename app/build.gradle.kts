@@ -18,6 +18,7 @@ plugins {
     id("com.jaredsburrows.license")
     id("com.google.dagger.hilt.android")
     id("tech.mappie.plugin")
+    id("androidx.room")
 }
 
 android {
@@ -71,6 +72,9 @@ android {
         buildConfig = true
     }
 
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 
     packaging {
         resources {

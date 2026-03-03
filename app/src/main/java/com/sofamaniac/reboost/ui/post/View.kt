@@ -114,6 +114,7 @@ fun PostInfo(
 ) {
     val hasThumbnail = enablePreview && post.thumbnail.uri.toHttpUrlOrNull() != null
     val navController = LocalNavController.current!!
+    val theme = LocalTheme.current
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -130,6 +131,7 @@ fun PostInfo(
             val titleModifier = Modifier.fillMaxWidth(fraction = width)
             Text(
                 post.title,
+                color = if (post.isDistinguished) theme.announcement else theme.postTitle,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = titleModifier.fillMaxWidth(),
                 textAlign = TextAlign.Start,
@@ -151,7 +153,6 @@ fun PostInfo(
                             .cartouche(Color.Transparent)
                     )
                 }
-                // TODO make clickable
                 Flair(post.linkFlair, modifier = Modifier.clickable {
                     navController.navigate(
                         SearchRoute(

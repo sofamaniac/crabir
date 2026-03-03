@@ -1,7 +1,8 @@
 package com.sofamaniac.reboost.domain.model
 
-interface VotableData {
-    val id: String
+import com.sofamaniac.reboost.domain.repository.DataInterface
+
+interface VotableData : DataInterface {
     val name: String
     val relationship: Relationship
     val score: Score

@@ -2,51 +2,50 @@ package com.sofamaniac.reboost.di
 
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.domain.repository.AccountsRepository
-import com.sofamaniac.reboost.domain.repository.PostRepository
-import com.sofamaniac.reboost.domain.repository.PostSearchRepository
+import com.sofamaniac.reboost.domain.repository.VotableRepository
 import com.sofamaniac.reboost.domain.repository.feed.HomeRepository
 import com.sofamaniac.reboost.domain.repository.feed.SavedRepository
 import com.sofamaniac.reboost.domain.repository.feed.SubredditPostsRepository
+import com.sofamaniac.reboost.domain.repository.search.SearchRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.components.ViewModelComponent
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object RepositoryModule {
 
     @Provides
     fun provideHomeRepository(
-        postRepository: PostRepository,
+        votableRepository: VotableRepository,
         api: RedditAPIService
     ): HomeRepository {
-        return HomeRepository(postRepository, api)
+        return HomeRepository(votableRepository, api)
     }
 
     @Provides
     fun provideSubredditPostsRepository(
-        postRepository: PostRepository,
+        votableRepository: VotableRepository,
         api: RedditAPIService
     ): SubredditPostsRepository {
-        return SubredditPostsRepository(postRepository, api)
+        return SubredditPostsRepository(votableRepository, api)
     }
 
     @Provides
     fun provideSavedRepository(
-        postRepository: PostRepository,
+        votableRepository: VotableRepository,
         api: RedditAPIService,
         accountsRepository: AccountsRepository
     ): SavedRepository {
-        return SavedRepository(postRepository, api, accountsRepository)
+        return SavedRepository(votableRepository, api, accountsRepository)
     }
 
     @Provides
     fun provideSearchPostRepository(
-        postRepository: PostRepository,
         api: RedditAPIService
-    ): PostSearchRepository {
-        return PostSearchRepository(api = api, postRepository = postRepository)
+    ): SearchRepository {
+        return SearchRepository(api = api)
     }
 
 }
