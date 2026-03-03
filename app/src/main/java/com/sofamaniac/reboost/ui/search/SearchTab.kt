@@ -33,10 +33,11 @@ import androidx.paging.compose.itemKey
 import com.sofamaniac.reboost.FullscreenHandler
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.SearchRoute
-import com.sofamaniac.reboost.data.remote.api.CommunitySearchSort
 import com.sofamaniac.reboost.data.remote.api.PostSearchSort
-import com.sofamaniac.reboost.data.remote.dto.Thing
+import com.sofamaniac.reboost.domain.repository.DataInterface
 import com.sofamaniac.reboost.domain.repository.search.SearchParams
+import com.sofamaniac.reboost.ui.subreddit.PostFeedViewer
+import com.sofamaniac.reboost.ui.subredditList.Tile
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +47,7 @@ fun SearchTab(
     modifier: Modifier = Modifier,
 ) {
     val viewModels = listOf(
-        hiltViewModel<SearchViewModel, SearchViewModel.Factory>(key = "PostSearch") { factory ->
+        hiltViewModel<PostSearchViewModel, PostSearchViewModel.Factory>(key = "PostSearch") { factory ->
             val query = if (searchQuery.flair.isNotBlank()) "flair:\"${searchQuery.flair}\"" else ""
             val subreddit = searchQuery.subreddit.ifBlank { null }
             val params = SearchParams(
@@ -58,35 +59,14 @@ fun SearchTab(
             )
             factory.create(params)
         },
-        hiltViewModel<SearchViewModel, SearchViewModel.Factory>(key = "CommunitySearch") { factory ->
-            val params = SearchParams(
-                query = "",
-                type = "sr",
-                sort = CommunitySearchSort.Relevance
-            )
-            factory.create(params)
-        },
-        hiltViewModel<SearchViewModel, SearchViewModel.Factory>(key = "UserSearch") { factory ->
-            val params = SearchParams(
-                query = "",
-                type = "user",
-                sort = CommunitySearchSort.Relevance
-            )
-            factory.create(params)
-        },
-        hiltViewModel<SearchViewModel, SearchViewModel.Factory>(key = "CommentSearch") { factory ->
-            val params = SearchParams(
-                query = "",
-                type = "comment",
-                sort = CommunitySearchSort.Relevance
-            )
-            factory.create(params)
-        },
+        hiltViewModel<CommunitySearchViewModel>(key = "CommunitySearch"),
+        hiltViewModel<UserSearchViewModel>(key = "UserSearch"),
+        hiltViewModel<CommentSearchViewModel>(key = "CommentSearch"),
     )
     val tabs = listOf("Posts", "Communities", "Users", "Comments")
     val scope = rememberCoroutineScope()
     val currentTab = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     FullscreenHandler {
         Box {
             Scaffold(
@@ -94,9 +74,11 @@ fun SearchTab(
                 bottomBar = {},
                 modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             ) { innerPadding ->
-                Column(modifier = Modifier
-                    .padding(paddingValues = innerPadding)
-                    .fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues = innerPadding)
+                        .fillMaxSize()
+                ) {
                     SecondaryTabRow(
                         selectedTabIndex = currentTab.currentPage,
                     ) {
@@ -117,7 +99,19 @@ fun SearchTab(
                             .fillMaxSize()
                     ) { index ->
                         val viewModel = viewModels[index]
-                        InnerTab(viewModel)
+                        when (viewModel) {
+                            is PostSearchViewModel ->
+                                InnerTab(viewModel)
+
+                            is CommunitySearchViewModel ->
+                                InnerTab(viewModel)
+
+                            is UserSearchViewModel ->
+                                InnerTab(viewModel)
+
+                            is CommentSearchViewModel ->
+                                InnerTab(viewModel)
+                        }
                     }
                 }
             }
@@ -126,27 +120,58 @@ fun SearchTab(
 }
 
 @Composable
-private fun InnerTab(viewModel: SearchViewModel) {
-    val things = viewModel.data.collectAsLazyPagingItems()
+private fun InnerTab(viewModel: PostSearchViewModel) {
+    PostFeedViewer(viewModel)
+}
+
+@Composable
+private fun InnerTab(viewModel: CommunitySearchViewModel) {
+    val things = viewModel.items.collectAsLazyPagingItems()
     val listState = viewModel.listState
     LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
         items(
             count = things.itemCount,
             key = things.itemKey { p -> p.id }) { index ->
-            val post = things[index]!!
-            when (post) {
-                is Thing.Post -> Text(post.data.title)
-                is Thing.Subreddit -> Text(post.data.display_name)
-                is Thing.Comment -> Text(post.data.body)
-                else -> Text("Unknown type")
-            }
+            val subreddit = things[index]!!
+            Tile(subreddit)
+        }
+    }
+}
+
+@Composable
+private fun InnerTab(viewModel: UserSearchViewModel) {
+    val things = viewModel.items.collectAsLazyPagingItems()
+    val listState = viewModel.listState
+    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+        items(
+            count = things.itemCount,
+            key = things.itemKey { p -> p.id }) { index ->
+            val user = things[index]!!
+            Text(user.name)
+        }
+    }
+}
+
+@Composable
+private fun InnerTab(viewModel: CommentSearchViewModel) {
+    val things = viewModel.items.collectAsLazyPagingItems()
+    val listState = viewModel.listState
+    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+        items(
+            count = things.itemCount,
+            key = things.itemKey { p -> p.id }) { index ->
+            val comment = things[index]!!
+            Text(comment.name)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(viewModel: SearchViewModel, scrollBehavior: TopAppBarScrollBehavior? = null) {
+fun TopBar(
+    viewModel: SearchViewModel<out DataInterface>,
+    scrollBehavior: TopAppBarScrollBehavior? = null
+) {
     val navController = LocalNavController.current!!
     val state = rememberSearchBarState()
     TopAppBar(

@@ -123,7 +123,7 @@ fun SubredditListViewer(
                 state = listState
             ) {
                 items(count = sortedSubs.size) { index ->
-                    Tile(sortedSubs[index])
+                    Tile(sortedSubs[index].data)
                 }
             }
         }

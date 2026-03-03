@@ -62,6 +62,7 @@ import com.sofamaniac.reboost.ui.post.PostBody
 import com.sofamaniac.reboost.ui.post.PostCard
 import com.sofamaniac.reboost.ui.thread.CommentNode
 import com.sofamaniac.reboost.ui.thread.ThreadView
+import com.sofamaniac.reboost.ui.thread.ThreadViewModel
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlin.math.max
@@ -169,7 +170,11 @@ fun PostFeedViewer(
                         }
 
                     is CommentData -> {
-                        CommentNode(comment = post, viewModel = hiltViewModel())
+                        CommentNode(
+                            comment = post,
+                            viewModel = hiltViewModel<ThreadViewModel, ThreadViewModel.Factory> { factory ->
+                                factory.create(post.permalink)
+                            })
                     }
                 }
             }

@@ -19,7 +19,7 @@ import com.sofamaniac.reboost.data.remote.dto.Thing.Subreddit
 
 @Entity
 data class SubredditEntity(
-    @PrimaryKey val id: SubredditId,
+    @PrimaryKey val id: String,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "display_name") val displayName: String,
     @ColumnInfo(name = "display_name_prefixed") val displayNamePrefixed: String,

@@ -13,11 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.reboost.LocalNavController
-import com.sofamaniac.reboost.data.remote.dto.Thing
+import com.sofamaniac.reboost.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.reboost.ui.subreddit.SubredditIcon
 
 @Composable
-fun Tile(subreddit: Thing.Subreddit) {
+fun Tile(subreddit: SubredditData) {
     val navController = LocalNavController.current!!
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -25,18 +25,18 @@ fun Tile(subreddit: Thing.Subreddit) {
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         SubredditIcon(
-            subreddit.data.display_name,
-            subreddit.data.icon,
+            subreddit.display_name,
+            subreddit.icon,
             modifier = Modifier
                 .size(32.dp)
                 .clip(CircleShape)
         )
         Text(
-            text = subreddit.data.display_name,
+            text = subreddit.display_name,
             modifier = Modifier.clickable {
                 navController.navigate(
                     com.sofamaniac.reboost.SubredditRoute(
-                        subreddit.data.display_name
+                        subreddit.display_name
                     )
                 )
             }

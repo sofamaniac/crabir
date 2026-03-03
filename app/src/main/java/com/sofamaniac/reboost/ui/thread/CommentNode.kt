@@ -36,12 +36,17 @@ import com.sofamaniac.reboost.ui.post.UpButton
 import kotlinx.coroutines.flow.map
 
 @Composable
-fun CommentNode(comment: CommentData, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
+fun CommentNode(
+    comment: CommentData,
+    viewModel: ThreadViewModel,
+    modifier: Modifier = Modifier,
+    enableAnimation: Boolean = true
+) {
 
 
     val context = LocalContext.current
     val showBottomBar by remember(comment.name, context) {
-        viewModel.openComment.map { it == comment.name }
+        viewModel.openComment.map { it == comment.name || !enableAnimation }
     }.collectAsState(initial = false)
 
     val innerModifier = Modifier

@@ -6,7 +6,10 @@ import com.sofamaniac.reboost.domain.repository.VotableRepository
 import com.sofamaniac.reboost.domain.repository.feed.HomeRepository
 import com.sofamaniac.reboost.domain.repository.feed.SavedRepository
 import com.sofamaniac.reboost.domain.repository.feed.SubredditPostsRepository
-import com.sofamaniac.reboost.domain.repository.search.SearchRepository
+import com.sofamaniac.reboost.domain.repository.search.CommentSearchRepository
+import com.sofamaniac.reboost.domain.repository.search.CommunitySearchRepository
+import com.sofamaniac.reboost.domain.repository.search.PostSearchRepository
+import com.sofamaniac.reboost.domain.repository.search.UserSearchRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -44,8 +47,25 @@ object RepositoryModule {
     @Provides
     fun provideSearchPostRepository(
         api: RedditAPIService
-    ): SearchRepository {
-        return SearchRepository(api = api)
+    ): PostSearchRepository {
+        return PostSearchRepository(api = api)
+    }
+
+    @Provides
+    fun provideSearchCommunityRepository(
+        api: RedditAPIService
+    ): CommunitySearchRepository {
+        return CommunitySearchRepository(api = api)
+    }
+
+    @Provides
+    fun provideSearchUserRepository(api: RedditAPIService): UserSearchRepository {
+        return UserSearchRepository(api = api)
+    }
+
+    @Provides
+    fun provideSearchCommentRepository(api: RedditAPIService): CommentSearchRepository {
+        return CommentSearchRepository(api = api)
     }
 
 }

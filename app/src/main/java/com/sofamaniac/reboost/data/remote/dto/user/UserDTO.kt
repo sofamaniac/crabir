@@ -1,5 +1,6 @@
 package com.sofamaniac.reboost.data.remote.dto.user
 
+import com.sofamaniac.reboost.domain.repository.DataInterface
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -60,7 +61,7 @@ data class UserDTO(
     @SerialName("icon_img")
     val iconImg: String = "",
     @SerialName("id")
-    val id: String = "",
+    override val id: String = "",
     @SerialName("in_beta")
     val inBeta: Boolean = false,
     @SerialName("in_redesign_beta")
@@ -129,4 +130,4 @@ data class UserDTO(
     val totalKarma: Int = 0,
     @SerialName("verified")
     val verified: Boolean = false
-)
+) : DataInterface

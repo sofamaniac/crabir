@@ -8,6 +8,7 @@
 
 package com.sofamaniac.reboost.data.remote.dto.subreddit
 
+import com.sofamaniac.reboost.domain.repository.DataInterface
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -23,7 +24,7 @@ data class CommentContributionSettings(
 fun dummySubredditData(): SubredditData {
     return SubredditData(
         display_name = "",
-        id = SubredditId(""),
+        id = "",
         icon_img = "",
         primary_color = "black",
         key_color = "black",
@@ -111,7 +112,6 @@ data class SubredditData(
     val subreddit_type: String = "",
     val banner_img: String? = null,
     val show_media: Boolean = false,
-    val id: SubredditId = SubredditId(""),
     val user_is_moderator: Boolean = false,
     val over18: Boolean = false,
     val header_title: String? = null,
@@ -122,8 +122,8 @@ data class SubredditData(
     val created_utc: Double = 0.0,
     val mobile_banner_image: String? = null,
     val user_is_contributor: Boolean = false,
-    val allow_predictions_tournament: Boolean = false
-) {
+    val allow_predictions_tournament: Boolean = false, override val id: String
+) : DataInterface {
     val icon: SubredditIcon =
         when {
             !community_icon.isNullOrBlank() -> SubredditIcon.Icon(community_icon)

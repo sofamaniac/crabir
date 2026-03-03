@@ -47,7 +47,7 @@ sealed class Thing : DataInterface {
     @SerialName("t5")
     data class Subreddit(val data: SubredditData = dummySubredditData()) :
         Thing() {
-        override val id: String = data.id.id
+        override val id: String = data.id
     }
 
     @Serializable

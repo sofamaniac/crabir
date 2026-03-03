@@ -17,11 +17,6 @@ import com.sofamaniac.reboost.domain.repository.VotableRepository
 import kotlinx.coroutines.flow.Flow
 
 interface FeedRepository<Params> {
-//    suspend fun getPosts(
-//        after: String,
-//        params: Params,
-//    ): PagedResponse<String>
-
     suspend fun upvote(id: String): Result<Unit>
     suspend fun downvote(id: String): Result<Unit>
     suspend fun save(id: String): Result<Unit>
