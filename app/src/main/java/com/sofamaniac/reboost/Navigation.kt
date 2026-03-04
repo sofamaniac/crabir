@@ -70,8 +70,13 @@ class MultiRoute(val displayName: String, val permalink: String) : Route {
 
 @Serializable
 class PostRoute(val postPermalink: String) : Route {
-    override val route: String = RouteType.Post.name
+    //override val route: String = RouteType.Post.name
     override val title: String = "Post"
+    override val route = "r/{subreddit}/comments/{id}/{title}"
+
+    companion object {
+        val routeString = "r/{subreddit}/comments/{id}/{title}"
+    }
 }
 
 @Serializable

@@ -18,11 +18,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -40,14 +35,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.sofamaniac.reboost.settings.DefaultReboostTheme
 import com.sofamaniac.reboost.settings.ProvideReboostTheme
@@ -96,17 +93,17 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ProvideReboostTheme {
-                    val navController = rememberNavController()
-                    // Setup nav controller
-                    CompositionLocalProvider(LocalNavController provides navController) {
-                        val theme = rememberAppTheme()
-                        CompositionLocalProvider(LocalTheme provides theme) {
-                            MainScreen(
-                                navController = navController,
-                            )
-                        }
+                val navController = rememberNavController()
+                // Setup nav controller
+                CompositionLocalProvider(LocalNavController provides navController) {
+                    val theme = rememberAppTheme()
+                    CompositionLocalProvider(LocalTheme provides theme) {
+                        MainScreen(
+                            navController = navController,
+                        )
                     }
                 }
+            }
         }
     }
 }
@@ -208,22 +205,27 @@ fun NavigationGraph(
                 drawerState, selected
             )
         }
-        composable<PostRoute>(
-            enterTransition = {
-                fadeIn(animationSpec = tween(500)) +
-                        slideIn(animationSpec = tween(500)) { fullSize ->
-                            IntOffset(fullSize.width, 0)
-                        }
-            },
-            exitTransition = {
-                fadeOut(animationSpec = tween(500)) +
-                        slideOut(animationSpec = tween(500)) { fullSize ->
-                            IntOffset(fullSize.width, 0)
-                        }
-            },
+        composable(
+            route = PostRoute.routeString,
+            deepLinks = listOf(
+                navDeepLink<PostRoute>(basePath = "https://www.reddit.com/r/{subreddit}/comments/{id}/{title}")
+            ),
+            arguments = listOf(
+                navArgument("subreddit") { type = NavType.StringType },
+                navArgument("id") { type = NavType.StringType },
+                navArgument("title") { type = NavType.StringType },
+            )
         )
         {
-            ThreadView(dismiss = { navController.popBackStack() })
+            val subreddit = it.arguments?.getString("subreddit")
+            val id = it.arguments?.getString("id")
+            val title = it.arguments?.getString("title")
+            val permalink = if (subreddit != null && id != null && title != null) {
+                "/r/$subreddit/comments/$id/$title"
+            } else {
+                null
+            }
+            ThreadView(permalink = permalink, dismiss = { navController.popBackStack() })
         }
         composable<SubscriptionsRoute> {
             SubredditListViewer(navController = navController)
@@ -239,7 +241,12 @@ fun NavigationGraph(
                 drawerState,
             )
         }
-        composable<SubredditRoute> { navBackStackEntry ->
+        composable<SubredditRoute>(
+            deepLinks = listOf(
+                navDeepLink<SubredditRoute>(basePath = "https://www.reddit.com/r")
+            )
+        )
+        { navBackStackEntry ->
             val subreddit = navBackStackEntry.toRoute<SubredditRoute>().subreddit
             SubredditViewer(
                 subreddit,
