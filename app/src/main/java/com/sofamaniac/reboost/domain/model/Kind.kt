@@ -4,7 +4,6 @@
 
 package com.sofamaniac.reboost.domain.model
 
-import android.util.Log
 import com.sofamaniac.reboost.data.remote.dto.post.PostDTO
 
 enum class Kind {
@@ -15,6 +14,7 @@ enum class Kind {
     Meta,
     Link,
     YoutubeVideo,
+    Unknown,
 }
 
 fun isVideoPost(post: PostDTO): Boolean {
@@ -51,8 +51,7 @@ fun getKind(post: PostDTO): Kind {
             } else if (isImageUrl(post.url)) {
                 return Kind.Image
             }
-            Log.d("getKind", "Unknown post hint: ${post.postHint}")
-            Kind.Self
+            Kind.Unknown
         }
     }
 

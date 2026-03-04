@@ -90,7 +90,7 @@ fun PostHeader(
                     append(post.author.username)
                 }
             }
-            if (post.kind != Kind.Self && !post.domain.contains("reddit") && !post.domain.endsWith("redd.it")) {
+            if (post.kind != Kind.Self) {
                 withSeparator { append(post.domain) }
             }
             withSeparator { append(formatElapsedTimeLocalized(post.createdUtc)) }

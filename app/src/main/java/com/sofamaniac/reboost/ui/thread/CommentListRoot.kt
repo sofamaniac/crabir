@@ -152,7 +152,7 @@ internal fun CrossPostView(
         PostInfo(
             post,
             modifier = modifier,
-            enablePreview = true,
+            enableThumbnail = true,
         )
     }
 }
