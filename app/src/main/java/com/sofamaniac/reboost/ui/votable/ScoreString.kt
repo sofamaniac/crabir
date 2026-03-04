@@ -11,7 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -51,13 +53,18 @@ fun ScoreString(score: Int, likes: Boolean?, hidden: Boolean = false) {
         },
         label = "score color"
     )
+    var previousLike by remember { mutableStateOf(likes) }
 
     val scale = remember { Animatable(1f) }
     LaunchedEffect(likes) {
-        if (likes == true) {
+        val trigger = previousLike != true
+        previousLike = likes
+
+        if (likes == true && trigger) {
             scale.animateTo(1.7f, animationSpec = tween(100, easing = EaseOut))
             scale.animateTo(1f, animationSpec = tween(100, easing = EaseIn))
         }
     }
+
     Text(text, color = color, modifier = Modifier.scale(scale.value))
 }

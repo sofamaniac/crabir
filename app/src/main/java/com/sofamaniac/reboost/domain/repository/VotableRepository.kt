@@ -41,19 +41,21 @@ class VotableRepository(private val api: RedditAPIService) {
             true -> 1
             false -> -1
         }
+        val score = post.score.copy(score = post.score.score + dir)
+        val relationship = post.relationship.copy(liked = newLike)
+        val newPost = post.copy(score = score, relationship = relationship)
+        _cache.value += (id to newPost)
         try {
             res = api.vote(post.name, dir)
-            val score = post.score.copy(score = post.score.score + dir)
-            val relationship = post.relationship.copy(liked = newLike)
             if (res.isSuccessful) {
-                val newPost = post.copy(score = score, relationship = relationship)
-                _cache.value += (id to newPost)
                 return Result.success(Unit)
             } else {
+                _cache.value += (id to post)
                 Log.e("PostRepository", "Error upvoting post: ${res.errorBody()}")
                 return Result.failure(Exception("Error upvoting post"))
             }
         } catch (e: Exception) {
+            _cache.value += (id to post)
             Log.e("PostRepository", "Error upvoting post: ${e.message}")
             return Result.failure(e)
         }
@@ -70,17 +72,19 @@ class VotableRepository(private val api: RedditAPIService) {
     suspend fun saveHelper(id: String, target: Boolean): Result<Unit> {
         val post: VotableData? = _cache.value[id]
         if (post == null) return Result.failure(Exception("Post not found"))
+        val relationship = post.relationship.copy(saved = target)
+        _cache.value += (id to post.copy(relationship = relationship))
         try {
             val res = if (target) api.save(post.name) else api.unsave(post.name)
             if (res.isSuccessful) {
-                val relationship = post.relationship.copy(saved = target)
-                _cache.value += (id to post.copy(relationship = relationship))
                 return Result.success(Unit)
             } else {
+                _cache.value += (id to post)
                 Log.e("PostRepository", "Error saving post: ${res.errorBody()}")
                 return Result.failure(Exception("Error saving post"))
             }
         } catch (e: Exception) {
+            _cache.value += (id to post)
             Log.e("PostRepository", "Error saving post: ${e.message}")
             return Result.failure(e)
         }
