@@ -27,7 +27,7 @@ object HomeRoute : Route {
 }
 
 @Serializable
-class ProfileRoute(val author: String, val isMe: Boolean = false) : Route {
+class ProfileRoute(val author: String) : Route {
     override val route: String = RouteType.Profile.name
     override val title: String = "Profile"
 }

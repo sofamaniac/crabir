@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -73,12 +72,10 @@ object AccountsSerializer : Serializer<Accounts> {
 @Singleton
 class AccountsRepositoryImpl(
     context: Context,
-    private val coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope
 ) : AccountsRepository {
     private val dataStore: DataStore<Accounts> = context.dataStore
-    private val accountsData: StateFlow<Accounts> = dataStore.data.onEach {
-        Log.d("AccountsRepositoryImpl", "accountsData emitted: ${it.activeId}")
-    }.stateIn(
+    private val accountsData: StateFlow<Accounts> = dataStore.data.stateIn(
         scope = coroutineScope,
         started = SharingStarted.Eagerly,
         initialValue = Accounts(emptyList(), -1)

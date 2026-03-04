@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,6 +51,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.sofamaniac.reboost.LocalDrawerState
 import com.sofamaniac.reboost.LocalFullscreenHandler
 import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
@@ -187,12 +187,12 @@ fun PostFeedViewer(
 fun TopBar(
     title: String,
     state: PostFeedViewModel,
-    drawerState: DrawerState,
     scrollBehavior: TopAppBarScrollBehavior?,
 ) {
     val scope = rememberCoroutineScope()
     val params = state.params.collectAsState()
     val theme = LocalTheme.current
+    val drawerState = LocalDrawerState.current
 
     TopAppBar(
         scrollBehavior = scrollBehavior,

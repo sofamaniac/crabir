@@ -22,15 +22,23 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import com.sofamaniac.reboost.FullscreenHandler
+import com.sofamaniac.reboost.LocalDrawerState
+import com.sofamaniac.reboost.domain.repository.AccountsRepository
 import com.sofamaniac.reboost.ui.TabBar
 import com.sofamaniac.reboost.ui.subreddit.PostFeedViewer
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,10 +74,10 @@ fun ProfileInfo(modifier: Modifier = Modifier) {
 fun ProfileView(
     user: String,
     selected: State<Int>,
-    drawerState: DrawerState,
-    modifier: Modifier = Modifier.Companion,
-    isConnectedUser: Boolean = false,
+    modifier: Modifier = Modifier,
+    viewModel: ProfileViewModel = hiltViewModel()
 ) {
+    val isConnectedUser by viewModel.currentUser.map { it == user }.collectAsState(false)
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val tabs = if (isConnectedUser) ProfileTabs.entries else ProfileTabs.publicTabs
     val currentTab = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
@@ -104,6 +112,7 @@ fun ProfileView(
 
         )
 
+    val drawerState = LocalDrawerState.current
 
     FullscreenHandler {
         Scaffold(modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
@@ -150,4 +159,10 @@ fun ProfileView(
             }
         }
     }
+}
+
+@HiltViewModel
+class ProfileViewModel @Inject constructor(accountsRepository: AccountsRepository) :
+    ViewModel() {
+    val currentUser = accountsRepository.activeAccount.map { it.username }
 }

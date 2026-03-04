@@ -1,6 +1,5 @@
 package com.sofamaniac.reboost.ui.subreddit
 
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -26,7 +25,6 @@ fun MultiView(
     name: String,
     permalink: String,
     selected: State<Int>,
-    drawerState: DrawerState,
     modifier: Modifier = Modifier,
     viewModel: MultiViewModel = hiltViewModel<MultiViewModel, MultiViewModel.Factory> { factory ->
         factory.create(permalink)
@@ -38,7 +36,6 @@ fun MultiView(
         TopBar(
             name,
             viewModel,
-            drawerState,
             scrollBehavior,
         )
     }

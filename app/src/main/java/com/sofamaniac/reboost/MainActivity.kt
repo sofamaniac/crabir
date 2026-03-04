@@ -33,7 +33,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -49,7 +48,6 @@ import com.sofamaniac.reboost.settings.ProvideReboostTheme
 import com.sofamaniac.reboost.settings.ReboostTheme
 import com.sofamaniac.reboost.settings.rememberAppTheme
 import com.sofamaniac.reboost.ui.drawer.DrawerContent
-import com.sofamaniac.reboost.ui.drawer.DrawerViewModel
 import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayerManager
 import com.sofamaniac.reboost.ui.search.SearchTab
 import com.sofamaniac.reboost.ui.subreddit.HomeViewer
@@ -67,6 +65,8 @@ import kotlinx.coroutines.launch
 class ReboostApp : Application()
 
 val LocalTheme = compositionLocalOf<ReboostTheme> { DefaultReboostTheme }
+val LocalDrawerState = compositionLocalOf<DrawerState> { error("No drawer state provided") }
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -77,13 +77,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             ProvideReboostTheme {
                 val navController = rememberNavController()
+                val drawerState = rememberDrawerState(DrawerValue.Closed)
                 // Setup nav controller
                 CompositionLocalProvider(LocalNavController provides navController) {
                     val theme = rememberAppTheme()
                     CompositionLocalProvider(LocalTheme provides theme) {
-                        MainScreen(
-                            navController = navController,
-                        )
+                        CompositionLocalProvider(LocalDrawerState provides drawerState) {
+                            MainScreen(
+                                navController = navController,
+                            )
+                        }
                     }
                 }
             }
@@ -98,12 +101,6 @@ fun MainScreen(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val drawerViewModel: DrawerViewModel = viewModel()
-
-//    val fullScreenView by FullscreenManager.current.collectAsState(initial = null)
-//    val fullScreenDepth by FullscreenManager.size.collectAsState(initial = 0)
-
 
     DisposableEffect(Unit) {
         onDispose {
@@ -113,6 +110,7 @@ fun MainScreen(
 
     val scope = rememberCoroutineScope()
     val activity = LocalActivity.current
+    val drawerState = LocalDrawerState.current
     BackHandler {
         if (drawerState.isOpen) {
             scope.launch {
@@ -129,17 +127,13 @@ fun MainScreen(
     }
 
     ModalNavigationDrawer(
-        drawerState = drawerState,
+        drawerState = LocalDrawerState.current,
         drawerContent = {
-            DrawerContent(
-                viewModel = drawerViewModel,
-                drawerState = drawerState,
-            )
+            DrawerContent()
         },
     ) {
         NavigationGraph(
             navController,
-            drawerState,
         )
     }
 
@@ -168,7 +162,6 @@ inline fun <reified T : Any> makeDeepLinks(url: String): List<NavDeepLink> {
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
-    drawerState: DrawerState,
     modifier: Modifier = Modifier
 ) {
     //val selected = remember { mutableIntStateOf(0) }
@@ -202,7 +195,7 @@ fun NavigationGraph(
     ) {
         composable<HomeRoute> {
             HomeViewer(
-                drawerState, selected
+                selected
             )
         }
         composable(
@@ -236,7 +229,6 @@ fun NavigationGraph(
             SubredditViewer(
                 "artknights",
                 selected,
-                drawerState,
             )
         }
         composable<SubredditRoute>(
@@ -247,7 +239,6 @@ fun NavigationGraph(
             SubredditViewer(
                 subreddit,
                 selected,
-                drawerState,
             )
         }
         composable<MultiRoute> { navBackStackEntry ->
@@ -257,18 +248,15 @@ fun NavigationGraph(
                 name,
                 permalink,
                 selected,
-                drawerState,
             )
         }
         composable<ProfileRoute>(
-            deepLinks = makeDeepLinks<ProfileRoute>(url = "u")
+            deepLinks = makeDeepLinks<ProfileRoute>(url = "user/{author}")
         ) { navBackStackEntry ->
             val params = navBackStackEntry.toRoute<ProfileRoute>()
             ProfileView(
                 params.author,
                 selected = selected,
-                drawerState = rememberDrawerState(DrawerValue.Closed),
-                isConnectedUser = params.isMe
             )
         }
         composable<LicensesRoute> {

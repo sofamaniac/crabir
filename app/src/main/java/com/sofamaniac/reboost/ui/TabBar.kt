@@ -50,7 +50,7 @@ fun TabBar(
         Pair(Icons.Default.Search, SearchRoute()),
         Pair(Icons.AutoMirrored.Outlined.List, SubscriptionsRoute),
         Pair(Icons.Default.Email, InboxRoute),
-        Pair(Icons.Filled.Person, ProfileRoute(user.username, isMe = true))
+        Pair(Icons.Filled.Person, ProfileRoute(user.username))
     )
     val navController = LocalNavController.current!!
     PrimaryTabRow(

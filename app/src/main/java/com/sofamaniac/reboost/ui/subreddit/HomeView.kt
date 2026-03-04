@@ -4,7 +4,6 @@
 
 package com.sofamaniac.reboost.ui.subreddit
 
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -26,14 +25,13 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeViewer(
-    drawerState: DrawerState,
     selected: State<Int>,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
-    val topBar = @Composable { TopBar("Home", viewModel, drawerState, scrollBehavior) }
+    val topBar = @Composable { TopBar("Home", viewModel, scrollBehavior) }
     val bottomBar = @Composable {
         TabBar(selected, onTabReselect = {
             scope.launch {

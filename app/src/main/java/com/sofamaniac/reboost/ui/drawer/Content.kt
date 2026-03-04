@@ -23,7 +23,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,8 +37,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sofamaniac.reboost.LicensesRoute
+import com.sofamaniac.reboost.LocalDrawerState
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.domain.model.RedditAccount
 import com.sofamaniac.reboost.ui.subreddit.SubredditIcon
@@ -48,8 +49,7 @@ import java.util.Collections.emptyList
 
 @Composable
 fun DrawerContent(
-    viewModel: DrawerViewModel,
-    drawerState: DrawerState,
+    viewModel: DrawerViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
     val navController = LocalNavController.current!!
@@ -59,6 +59,7 @@ fun DrawerContent(
     val rotation =
         animateFloatAsState(targetValue = if (selectingAccount) 180f else 0f, label = "rotation")
     val coroutineScope = rememberCoroutineScope()
+    val drawerState = LocalDrawerState.current
     ModalDrawerSheet {
         Column(
             modifier = modifier
