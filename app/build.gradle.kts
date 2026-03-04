@@ -205,6 +205,7 @@ dependencies {
     implementation("io.coil-kt.coil3:coil:3.3.0")
     implementation("io.noties.markwon:inline-parser:4.6.2")
     implementation("io.noties.markwon:simple-ext:4.6.2")
+    implementation("io.noties.markwon:linkify:4.6.2")
 
     implementation("com.github.bumptech.glide:glide:4.14.2")
     annotationProcessor("com.github.bumptech.glide:glide:4.14.2")

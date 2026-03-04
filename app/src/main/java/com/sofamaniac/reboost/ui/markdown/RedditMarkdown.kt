@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.text.Layout
 import android.text.TextUtils
 import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
 import android.view.ViewTreeObserver
 import android.widget.TextView
 import androidx.compose.foundation.layout.height
@@ -48,6 +49,7 @@ import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.image.glide.GlideImagesPlugin
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
+import io.noties.markwon.linkify.LinkifyPlugin
 import jakarta.inject.Inject
 
 
@@ -70,7 +72,7 @@ fun RedditMarkdown(
     val colorScheme = MaterialTheme.colorScheme
 
     val processedMarkdown = markdown
-        .extractLinks()
+        .extractRedditLinks()
         .convertRedditSpoilers()
         .convertRedditPreviewLinks(mediaMetadata)
         .convertRedditSuperscript()
@@ -173,6 +175,7 @@ private fun redditMarkwonBuilder(
         .usePlugin(TablePlugin.create(context))
         .usePlugin(MarkdownTheme(colorScheme, theme))
         .usePlugin(HtmlPlugin.create())
+        .usePlugin(LinkifyPlugin.create(Linkify.WEB_URLS))
         .usePlugin(
             GlideImagesPlugin.create(
                 object : GlideImagesPlugin.GlideStore {
@@ -280,9 +283,17 @@ private fun String.convertRedditSuperscript(): String {
 }
 
 private fun String.extractLinks(): String {
-    val linksPattern = Regex("^https?://\\S+| https?://\\S+")
+    val linksPattern = Regex("(?<!\\w)(?<!]\\()(?<link>https?://\\S+)")
     val res = linksPattern.replace(this) { matchResult ->
-        "[${matchResult.value}](${matchResult.value})"
+        "[${matchResult.groups["link"]!!.value}](${matchResult.groups["link"]!!.value})"
+    }
+    return res
+}
+
+private fun String.extractRedditLinks(): String {
+    val redditLinksPattern = Regex("(?<!\\w)/?[r|u]/\\S+")
+    val res = redditLinksPattern.replace(this) { matchResult ->
+        "[${matchResult.value}](https://reddit.com/${matchResult.value})"
     }
     return res
 }
