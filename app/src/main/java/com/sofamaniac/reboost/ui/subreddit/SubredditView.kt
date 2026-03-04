@@ -11,7 +11,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -38,7 +37,6 @@ fun SubredditViewer(
 ) {
     Log.d("SubredditViewer", "subreddit: $subreddit")
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    val scope = rememberCoroutineScope()
     val topBar = @Composable {
         TopBar(
             subreddit,

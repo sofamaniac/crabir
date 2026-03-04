@@ -29,7 +29,7 @@ android {
         minSdk = 31
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -175,7 +175,7 @@ dependencies {
     // Images
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
-    implementation("net.engawapg.lib:zoomable:2.9.0")
+    implementation(libs.zoomable)
 
     // Video player
     implementation(libs.androidx.media3.exoplayer)
@@ -190,23 +190,20 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     // Render markdown
-//    implementation("com.mikepenz:multiplatform-markdown-renderer-android:0.39.0")
-//    implementation("com.mikepenz:multiplatform-markdown-renderer-m3:0.39.0")
-    //implementation("com.github.jeziellago:compose-markdown:0.5.8")
-    implementation("org.jetbrains:markdown:0.7.3")
+    implementation(libs.markdown)
 
-    implementation("io.noties.markwon:core:4.6.2")
-    implementation("io.noties.markwon:ext-tables:4.6.2")
-    implementation("io.noties.markwon:ext-strikethrough:4.6.2")
-    implementation("io.noties.markwon:image:4.6.2")
-    implementation("io.noties.markwon:html:4.6.2")
-    implementation("io.noties.markwon:image-coil:4.6.2")
-    implementation("io.noties.markwon:image-glide:4.6.2")
-    implementation("io.coil-kt.coil3:coil:3.3.0")
-    implementation("io.noties.markwon:inline-parser:4.6.2")
-    implementation("io.noties.markwon:simple-ext:4.6.2")
-    implementation("io.noties.markwon:linkify:4.6.2")
+    implementation(libs.core)
+    implementation(libs.ext.tables)
+    implementation(libs.ext.strikethrough)
+    implementation(libs.image)
+    implementation(libs.html)
+    implementation(libs.image.coil)
+    implementation(libs.image.glide)
+    implementation(libs.coil)
+    implementation(libs.inline.parser)
+    implementation(libs.simple.ext)
+    implementation(libs.linkify)
 
-    implementation("com.github.bumptech.glide:glide:4.14.2")
-    annotationProcessor("com.github.bumptech.glide:glide:4.14.2")
+    implementation(libs.glide)
+    annotationProcessor(libs.glide)
 }

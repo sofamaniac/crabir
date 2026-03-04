@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun TopBar(
     drawerState: DrawerState,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     showSettings: Boolean = true,
     showSort: Boolean = true
 ) {
@@ -57,7 +57,7 @@ enum class ProfileTabs {
 }
 
 @Composable
-fun ProfileInfo(modifier: Modifier = Modifier.Companion) {
+fun ProfileInfo(modifier: Modifier = Modifier) {
     Text("WIP")
 }
 

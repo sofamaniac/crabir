@@ -23,12 +23,10 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -36,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -69,25 +66,10 @@ import kotlinx.coroutines.launch
 @HiltAndroidApp
 class ReboostApp : Application()
 
-interface Tab {
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun TopBar(drawerState: DrawerState, scrollBehavior: TopAppBarScrollBehavior?)
-
-    @Composable
-    fun Content(
-        navController: NavController,
-        selected: MutableIntState,
-        modifier: Modifier = Modifier
-    )
-}
-
 val LocalTheme = compositionLocalOf<ReboostTheme> { DefaultReboostTheme }
-
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -131,7 +113,7 @@ fun MainScreen(
 
     val scope = rememberCoroutineScope()
     val activity = LocalActivity.current
-    BackHandler() {
+    BackHandler {
         if (drawerState.isOpen) {
             scope.launch {
                 drawerState.close()

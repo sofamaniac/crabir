@@ -55,7 +55,6 @@ class HomeViewModel @Inject constructor(
     repository: HomeRepository,
     visitedPostsDao: VisitedPostsDao,
     visitedCommunityDao: VisitedCommunityDao,
-) : PostFeedViewModel(id = "_HOME", repository, visitedPostsDao, visitedCommunityDao) {
-}
+) : PostFeedViewModel(id = "_HOME", repository, visitedPostsDao, visitedCommunityDao)
 
 

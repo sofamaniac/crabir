@@ -43,7 +43,7 @@ fun BottomRow(
     viewModel: VotableViewModel,
     visitPost: (PostData) -> Unit = {},
 ) {
-    val navController = LocalNavController.current!!
+    LocalNavController.current!!
     val uriHandler = LocalUriHandler.current
     val likes by viewModel.likes.collectAsState(initial = post.relationship.liked)
     val saved by viewModel.saved.collectAsState(initial = post.relationship.saved)

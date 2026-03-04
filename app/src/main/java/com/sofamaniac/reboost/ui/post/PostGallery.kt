@@ -152,12 +152,12 @@ fun FullscreenGallery(
     val fullscreenManager = LocalFullscreenHandler.current!!
     VerticalSwipeToDismiss(
         backgroundContent = @Composable {
-            Column() {
+            Column {
                 Surface(color = Color.Black, modifier = Modifier.fillMaxSize()) {}
             }
         },
     ) {
-        Box() {
+        Box {
             Gallery(
                 gallery,
                 modifier = Modifier

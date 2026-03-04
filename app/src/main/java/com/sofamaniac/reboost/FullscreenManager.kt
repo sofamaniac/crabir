@@ -50,7 +50,7 @@ fun FullscreenHandler(content: @Composable () -> Unit) {
         BackHandler(enabled = backHandlerActive) {
             fullscreenManager.pop()
         }
-        Box() {
+        Box {
             content()
             fullscreenView?.invoke()
         }

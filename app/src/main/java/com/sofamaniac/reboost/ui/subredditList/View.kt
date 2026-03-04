@@ -94,18 +94,11 @@ fun SubredditListViewer(
 
     val sortedSubs =
         subscriptions?.sortedBy { it.data.display_name.lowercase() } ?: emptyList()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    val scope = rememberCoroutineScope()
+    TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    rememberCoroutineScope()
     val listState = rememberLazyListState()
 
-    Scaffold(
-//        topBar = {
-//            TopBar(
-//                drawerState = rememberDrawerState(DrawerValue.Closed),
-//                scrollBehavior = scrollBehavior
-//            )
-//        }
-    ) { innerPadding ->
+    Scaffold { innerPadding ->
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh = {

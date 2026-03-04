@@ -25,7 +25,7 @@ fun TopBar(
     scrollBehavior: TopAppBarScrollBehavior?,
     dismiss: () -> Unit
 ) {
-    val navController = LocalNavController.current!!
+    LocalNavController.current!!
     val sort: Sort by viewModel.sort.collectAsState()
     TopAppBar(
         scrollBehavior = scrollBehavior,

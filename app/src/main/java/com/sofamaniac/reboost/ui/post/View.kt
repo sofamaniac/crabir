@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableIntState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -88,13 +87,12 @@ internal fun PostBody(
  * This function creates a view for a given [Post], including its header,
  * content, and bottom row of actions.
  *
- * @param post The [Post] data to display.
- * @param selected A [MutableIntState] that holds the index of the current tab.
+ * @param post The [PostData] data to display.
  * @param modifier Modifier for the root layout of the post.
  * @param enableThumbnail Whether to enable the thumbnail preview. Defaults to true. The thumbnail is shown only if there is one and the post if a link.
  * @param showSubredditIcon Whether to display the subreddit icon in the header. Defaults to true.
  * @param clickable Whether the post is clickable to navigate to the thread view. Defaults to true.
- * @param onClick A lambda that takes a [Post] and is called before navigating to the post.
+ * @param onClick A lambda that takes a [PostData] and is called before navigating to the post.
  * @param body A composable lambda that defines the main content/body of the post (e.g., text, image). It should manage the horizontal padding itself
  */
 @Composable

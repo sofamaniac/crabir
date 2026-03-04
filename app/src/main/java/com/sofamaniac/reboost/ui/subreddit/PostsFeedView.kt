@@ -92,7 +92,7 @@ fun PostFeedViewer(
             if (!listState.isScrollInProgress) {
                 listState.layoutInfo.visibleItemsInfo
                     .maxByOrNull { item ->
-                        val size = item.size
+                        item.size
                         val itemTop = maxOf(item.offset, 0)
                         val itemBottom =
                             minOf(item.offset + item.size, listState.layoutInfo.viewportEndOffset)

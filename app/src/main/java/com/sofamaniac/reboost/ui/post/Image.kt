@@ -37,7 +37,7 @@ fun PostImage(
                     Surface(color = Color.Black, modifier = Modifier.fillMaxSize()) {}
                 },
             ) {
-                Box() {
+                Box {
                     view()
                 }
             }

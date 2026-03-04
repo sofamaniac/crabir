@@ -98,8 +98,7 @@ fun SearchTab(
                         modifier = Modifier
                             .fillMaxSize()
                     ) { index ->
-                        val viewModel = viewModels[index]
-                        when (viewModel) {
+                        when (val viewModel = viewModels[index]) {
                             is PostSearchViewModel ->
                                 InnerTab(viewModel)
 

@@ -43,7 +43,7 @@ fun UpButton(likes: Boolean?, onClick: () -> Unit) {
     }
 
     val buttonColor = animateColorAsState(
-        targetValue = if (likes == true) theme.primaryColor else Color.Companion.Gray,
+        targetValue = if (likes == true) theme.primaryColor else Color.Gray,
         label = "button color"
     )
 
@@ -76,13 +76,13 @@ fun DownButton(likes: Boolean?, onClick: () -> Unit) {
     val scope = rememberCoroutineScope()
 
     val buttonColor = animateColorAsState(
-        targetValue = if (likes == false) theme.downvote else Color.Companion.Gray,
+        targetValue = if (likes == false) theme.downvote else Color.Gray,
         label = "button color"
     )
     IconButton(onClick = {
         scope.launch { animate(likes) }
         onClick()
-    }, modifier = Modifier.Companion.offset(y = offset.value.dp)) {
+    }, modifier = Modifier.offset(y = offset.value.dp)) {
         Icon(Icons.Filled.ThumbDown, "downvote", tint = buttonColor.value)
     }
 }
@@ -106,7 +106,7 @@ fun SavedButton(saved: Boolean, onClick: () -> Unit) {
     IconButton(onClick = {
         scope.launch { animate(!saved) }
         onClick()
-    }, modifier = Modifier.Companion.scale(scale.value)) {
+    }, modifier = Modifier.scale(scale.value)) {
         if (saved) {
             Icon(Icons.Filled.Bookmark, "save", tint = buttonColor.value)
         } else {

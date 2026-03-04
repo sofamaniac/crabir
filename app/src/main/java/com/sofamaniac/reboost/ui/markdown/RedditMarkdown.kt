@@ -90,19 +90,19 @@ fun RedditMarkdown(
     textView.getViewTreeObserver()
         .addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                textView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                textView.getViewTreeObserver().removeOnGlobalLayoutListener(this)
                 val max = textView.maxLines
                 val layout: Layout? = textView.layout
                 if ((layout?.lineCount ?: 0) > max) {
-                    val end = layout!!.getLineEnd(max - 1);
+                    val end = layout!!.getLineEnd(max - 1)
                     textView.setText(
                         textView.getText().subSequence(0, end - 3),
                         TextView.BufferType.SPANNABLE
-                    );
-                    textView.append("...");
+                    )
+                    textView.append("...")
                 }
             }
-        });
+        })
 
     val theme = LocalTheme.current
     val markwonReddit = remember(redditMarkwonBuilder(context, colorScheme, theme, mediaMetadata))
@@ -120,7 +120,7 @@ fun RedditMarkdown(
 //            markwonReddit.setParsedMarkdown(textView, spanned)
 //            textView.tag = markdown
 //        },
-        factory = { context ->
+        factory = {
             textView.apply {
                 setTextColor(colorScheme.onBackground.toArgb())
                 setLinkTextColor(colorScheme.primary.toArgb())
