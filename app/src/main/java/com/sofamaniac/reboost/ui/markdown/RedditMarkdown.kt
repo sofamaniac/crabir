@@ -11,6 +11,7 @@ import android.text.Layout
 import android.text.TextUtils
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
+import android.view.ContextThemeWrapper
 import android.view.ViewTreeObserver
 import android.widget.TextView
 import androidx.compose.foundation.layout.height
@@ -79,7 +80,11 @@ fun RedditMarkdown(
         .fuseQuote()
 
     val context = LocalContext.current
-    val textView = remember { PassThroughTextView(context) }
+    val textView = remember {
+        val contextWrapper =
+            ContextThemeWrapper(context, androidx.appcompat.R.style.Theme_AppCompat)
+        PassThroughTextView(contextWrapper)
+    }
 
     // this code fixes missing ellipsis https://github.com/noties/Markwon/issues/180
     textView.getViewTreeObserver()
@@ -282,18 +287,10 @@ private fun String.convertRedditSuperscript(): String {
     }
 }
 
-private fun String.extractLinks(): String {
-    val linksPattern = Regex("(?<!\\w)(?<!]\\()(?<link>https?://\\S+)")
-    val res = linksPattern.replace(this) { matchResult ->
-        "[${matchResult.groups["link"]!!.value}](${matchResult.groups["link"]!!.value})"
-    }
-    return res
-}
-
 private fun String.extractRedditLinks(): String {
-    val redditLinksPattern = Regex("(?<!\\w)/?[r|u]/\\S+")
+    val redditLinksPattern = Regex("(?<!\\S)/?([ru]/[A-Za-z0-9_]+)")
     val res = redditLinksPattern.replace(this) { matchResult ->
-        "[${matchResult.value}](https://reddit.com/${matchResult.value})"
+        "[${matchResult.value}](https://www.reddit.com/${matchResult.value})"
     }
     return res
 }
