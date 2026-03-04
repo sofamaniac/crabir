@@ -37,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavDeepLink
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -163,6 +164,23 @@ fun MainScreen(
 
 }
 
+val BASE_URL = listOf(
+    "https://reddit.com",
+    "https://www.reddit.com",
+    "https://old.reddit.com",
+    "https://new.reddit.com",
+    "http://reddit.com",
+    "http://www.reddit.com",
+    "http://old.reddit.com",
+    "http://new.reddit.com",
+)
+
+
+inline fun <reified T : Any> makeDeepLinks(url: String): List<NavDeepLink> {
+    return BASE_URL.map {
+        navDeepLink<T>(basePath = "$it/$url")
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -207,9 +225,7 @@ fun NavigationGraph(
         }
         composable(
             route = PostRoute.routeString,
-            deepLinks = listOf(
-                navDeepLink<PostRoute>(basePath = "https://www.reddit.com/r/{subreddit}/comments/{id}/{title}")
-            ),
+            deepLinks = makeDeepLinks<PostRoute>(url = "r/{subreddit}/comments/{id}/{title}"),
             arguments = listOf(
                 navArgument("subreddit") { type = NavType.StringType },
                 navArgument("id") { type = NavType.StringType },
@@ -242,9 +258,7 @@ fun NavigationGraph(
             )
         }
         composable<SubredditRoute>(
-            deepLinks = listOf(
-                navDeepLink<SubredditRoute>(basePath = "https://www.reddit.com/r")
-            )
+            deepLinks = makeDeepLinks<SubredditRoute>(url = "r")
         )
         { navBackStackEntry ->
             val subreddit = navBackStackEntry.toRoute<SubredditRoute>().subreddit
@@ -264,7 +278,9 @@ fun NavigationGraph(
                 drawerState,
             )
         }
-        composable<ProfileRoute> { navBackStackEntry ->
+        composable<ProfileRoute>(
+            deepLinks = makeDeepLinks<ProfileRoute>(url = "u")
+        ) { navBackStackEntry ->
             val user = navBackStackEntry.toRoute<ProfileRoute>().author
             ProfileView(
                 user,
