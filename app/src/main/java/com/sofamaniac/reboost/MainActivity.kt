@@ -281,11 +281,12 @@ fun NavigationGraph(
         composable<ProfileRoute>(
             deepLinks = makeDeepLinks<ProfileRoute>(url = "u")
         ) { navBackStackEntry ->
-            val user = navBackStackEntry.toRoute<ProfileRoute>().author
+            val params = navBackStackEntry.toRoute<ProfileRoute>()
             ProfileView(
-                user,
+                params.author,
                 selected = selected,
-                drawerState = rememberDrawerState(DrawerValue.Closed)
+                drawerState = rememberDrawerState(DrawerValue.Closed),
+                isConnectedUser = params.isMe
             )
         }
         composable<LicensesRoute> {

@@ -147,7 +147,7 @@ class DrawerViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val accounts = accountsRepository.accounts.first()
-                val newAccount = RedditAccount.unitialized(accounts.size, authState)
+                val newAccount = RedditAccount.uninitialized(accounts.size, authState)
                 accountsRepository.addAccount(newAccount)
                 accountsRepository.setActiveAccount(accounts.size)
                 try {

@@ -38,10 +38,13 @@ data class RedditAccount(
     val auth: AuthState,
 ) {
     companion object {
+
+        const val ANONYMOUS = "Anonymous"
         fun anonymous(): RedditAccount {
-            return RedditAccount(-1, "Anonymous", "", AuthState())
+            return RedditAccount(-1, ANONYMOUS, "", AuthState())
         }
-        fun unitialized(id: Int, authState: AuthState): RedditAccount {
+
+        fun uninitialized(id: Int, authState: AuthState): RedditAccount {
             return RedditAccount(id, "", "", authState)
         }
     }

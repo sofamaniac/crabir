@@ -7,6 +7,7 @@ package com.sofamaniac.reboost.data.remote.api
 import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.remote.dto.Thing.Listing
 import com.sofamaniac.reboost.data.remote.dto.user.UserDTO
+import com.sofamaniac.reboost.domain.repository.profile.CommentSort
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -50,6 +51,8 @@ interface UserAPI {
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
+        @Query("sort") sort: CommentSort = CommentSort.Top,
+        @Query("t") timeframe: PostTimeframe? = null,
     ): Response<Listing<Thing>>
 
     @GET("user/{user}/hidden.json")

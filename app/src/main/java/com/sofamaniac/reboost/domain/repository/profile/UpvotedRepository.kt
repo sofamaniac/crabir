@@ -2,32 +2,29 @@
  * Copyright (c) 2025 Antoine Grimod
  */
 
-package com.sofamaniac.reboost.domain.repository.feed
+package com.sofamaniac.reboost.domain.repository.profile
 
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.domain.model.PagedResponse
-import com.sofamaniac.reboost.domain.repository.AccountsRepository
+import com.sofamaniac.reboost.domain.model.RedditAccount
 import com.sofamaniac.reboost.domain.repository.VotableRepository
+import com.sofamaniac.reboost.domain.repository.feed.FeedRepositoryCommon
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
-import kotlinx.coroutines.flow.first
 
 @Singleton
-class DownvotedRepository @Inject constructor(
+class UpvotedRepository @Inject constructor(
     votableRepository: VotableRepository,
     api: RedditAPIService,
-    private val accountsRepository: AccountsRepository
-) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
-
+) : FeedRepositoryCommon<ProfileFeedParams>(votableRepository, api) {
     override suspend fun getThings(
         after: String,
-        params: FeedParams,
+        params: ProfileFeedParams
     ): PagedResponse<String> {
-        val user = accountsRepository.activeAccount.first()
-        if (user.isAnonymous()) return PagedResponse()
+        if (params.username == RedditAccount.ANONYMOUS) return PagedResponse()
         return makeRequest {
-            api.getDownvoted(
-                user = user.username,
+            api.getUpvoted(
+                user = params.username,
                 after = after,
             )
         }

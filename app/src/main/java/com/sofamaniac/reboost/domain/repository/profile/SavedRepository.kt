@@ -2,37 +2,35 @@
  * Copyright (c) 2025 Antoine Grimod
  */
 
-package com.sofamaniac.reboost.domain.repository.feed
+package com.sofamaniac.reboost.domain.repository.profile
 
 import android.util.Log
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.domain.model.PagedResponse
-import com.sofamaniac.reboost.domain.repository.AccountsRepository
+import com.sofamaniac.reboost.domain.model.RedditAccount
 import com.sofamaniac.reboost.domain.repository.VotableRepository
+import com.sofamaniac.reboost.domain.repository.feed.FeedRepositoryCommon
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
-import kotlinx.coroutines.flow.first
 import retrofit2.Response
 
 @Singleton
 class SavedRepository @Inject constructor(
     votableRepository: VotableRepository,
     api: RedditAPIService,
-    private val accountsRepository: AccountsRepository
-) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
+) : FeedRepositoryCommon<ProfileFeedParams>(votableRepository, api) {
     override suspend fun getThings(
         after: String,
-        params: FeedParams
+        params: ProfileFeedParams
     ): PagedResponse<String> {
         return makeRequest {
-            val user = accountsRepository.activeAccount.first()
-            if (user.isAnonymous()) {
+            if (params.username == RedditAccount.ANONYMOUS) {
                 Log.w("SavedRepository", "getPosts: User is anonymous")
                 return@makeRequest Response.success(null)
             }
-            Log.d("SavedRepository", "getPosts: $user")
+            Log.d("SavedRepository", "getPosts: ${params.username}")
             api.getSaved(
-                user = user.username,
+                user = params.username,
                 after = after,
             )
         }

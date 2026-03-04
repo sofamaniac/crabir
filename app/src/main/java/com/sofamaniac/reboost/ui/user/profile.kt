@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.reboost.FullscreenHandler
 import com.sofamaniac.reboost.ui.TabBar
-import com.sofamaniac.reboost.ui.subreddit.PostFeedViewModel
 import com.sofamaniac.reboost.ui.subreddit.PostFeedViewer
 import kotlinx.coroutines.launch
 
@@ -52,7 +51,9 @@ fun TopBar(
 enum class ProfileTabs {
     Overview, About, Posts, Comments, Saved, Upvoted, Downvoted, Hidden;
 
-    val publicTabs get() = listOf(Overview, About, Posts, Comments)
+    companion object {
+        val publicTabs get() = listOf(Overview, About, Posts, Comments)
+    }
 }
 
 @Composable
@@ -67,19 +68,41 @@ fun ProfileView(
     selected: State<Int>,
     drawerState: DrawerState,
     modifier: Modifier = Modifier.Companion,
+    isConnectedUser: Boolean = false,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    val tabs = ProfileTabs.entries
+    val tabs = if (isConnectedUser) ProfileTabs.entries else ProfileTabs.publicTabs
     val currentTab = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
     val scope = rememberCoroutineScope()
 
-    val viewModels: Map<ProfileTabs, PostFeedViewModel> = mapOf(
-        ProfileTabs.Saved to hiltViewModel<SavedViewModel>(),
-        ProfileTabs.Comments to hiltViewModel<CommentsViewModel>(),
-        ProfileTabs.Upvoted to hiltViewModel<UpvotedViewModel>(),
-        ProfileTabs.Downvoted to hiltViewModel<DownvotedViewModel>(),
-        ProfileTabs.Hidden to hiltViewModel<HiddenViewModel>(),
-    )
+    val viewModels: Map<ProfileTabs, ProfileFeedViewModel> = mapOf(
+        ProfileTabs.Saved to hiltViewModel<SavedViewModel, SavedViewModel.Factory> { factory ->
+            factory.create(
+                user
+            )
+        },
+        ProfileTabs.Comments to hiltViewModel<CommentsViewModel, CommentsViewModel.Factory> { factory ->
+            factory.create(
+                user
+            )
+        },
+        ProfileTabs.Upvoted to hiltViewModel<UpvotedViewModel, UpvotedViewModel.Factory> { factory ->
+            factory.create(
+                user
+            )
+        },
+        ProfileTabs.Downvoted to hiltViewModel<DownvotedViewModel, DownvotedViewModel.Factory> { factory ->
+            factory.create(
+                user
+            )
+        },
+        ProfileTabs.Hidden to hiltViewModel<HiddenViewModel, HiddenViewModel.Factory> { factory ->
+            factory.create(
+                user
+            )
+        },
+
+        )
 
 
     FullscreenHandler {

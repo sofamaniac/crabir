@@ -1,10 +1,8 @@
 package com.sofamaniac.reboost.di
 
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
-import com.sofamaniac.reboost.domain.repository.AccountsRepository
 import com.sofamaniac.reboost.domain.repository.VotableRepository
 import com.sofamaniac.reboost.domain.repository.feed.HomeRepository
-import com.sofamaniac.reboost.domain.repository.feed.SavedRepository
 import com.sofamaniac.reboost.domain.repository.feed.SubredditPostsRepository
 import com.sofamaniac.reboost.domain.repository.search.CommentSearchRepository
 import com.sofamaniac.reboost.domain.repository.search.CommunitySearchRepository
@@ -18,7 +16,6 @@ import dagger.hilt.android.components.ViewModelComponent
 @Module
 @InstallIn(ViewModelComponent::class)
 object RepositoryModule {
-
     @Provides
     fun provideHomeRepository(
         votableRepository: VotableRepository,
@@ -33,15 +30,6 @@ object RepositoryModule {
         api: RedditAPIService
     ): SubredditPostsRepository {
         return SubredditPostsRepository(votableRepository, api)
-    }
-
-    @Provides
-    fun provideSavedRepository(
-        votableRepository: VotableRepository,
-        api: RedditAPIService,
-        accountsRepository: AccountsRepository
-    ): SavedRepository {
-        return SavedRepository(votableRepository, api, accountsRepository)
     }
 
     @Provides
