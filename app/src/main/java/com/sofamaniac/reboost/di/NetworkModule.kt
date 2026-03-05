@@ -3,6 +3,7 @@ package com.sofamaniac.reboost.di
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.sofamaniac.reboost.data.remote.api.RedditAPIService
 import com.sofamaniac.reboost.data.remote.api.auth.RedditAuthenticator
+import com.sofamaniac.reboost.data.remote.interceptors.AnalyticsInterceptor
 import com.sofamaniac.reboost.data.remote.interceptors.ForceJsonInterceptor
 import com.sofamaniac.reboost.data.remote.interceptors.RateLimitInterceptor
 import com.sofamaniac.reboost.data.remote.interceptors.loggingInterceptor
@@ -55,18 +56,27 @@ object NetworkModule {
         return ForceJsonInterceptor()
     }
 
+
+    @Provides
+    @Singleton
+    fun provideAnalyticsInterceptor(): AnalyticsInterceptor {
+        return AnalyticsInterceptor()
+    }
+
     @Provides
     @Singleton
     fun provideOkHttpClient(
         authInterceptor: RedditAuthenticator,
         rateLimitInterceptor: RateLimitInterceptor,
         forceJsonInterceptor: ForceJsonInterceptor,
+        analyticsInterceptor: AnalyticsInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(rateLimitInterceptor)
             .addInterceptor(forceJsonInterceptor)
             .addInterceptor(loggingInterceptor)
+            .addInterceptor(analyticsInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .build()

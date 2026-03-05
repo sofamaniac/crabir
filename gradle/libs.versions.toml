@@ -7,6 +7,7 @@ commonsText = "1.15.0"
 datastorePreferences = "1.2.0"
 extTables = "4.6.2"
 extStrikethrough = "4.6.2"
+firebaseBom = "34.10.0"
 glide = "5.0.5"
 hiltAndroid = "2.59.2"
 hiltAndroidCompiler = "2.59.2"
@@ -35,6 +36,7 @@ retrofit2KotlinxSerializationConverter = "1.0.0"
 room = "2.8.4"
 foundationLayout = "1.10.4"
 zoomable = "2.11.1"
+firebaseAuthKtx = "24.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -59,6 +61,11 @@ commons-text = { module = "org.apache.commons:commons-text", version.ref = "comm
 ext-strikethrough = { module = "io.noties.markwon:ext-strikethrough", version.ref = "extStrikethrough" }
 ext-tables = { module = "io.noties.markwon:ext-tables", version.ref = "extTables" }
 core = { module = "io.noties.markwon:core", version.ref = "markwon" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-database = { module = "com.google.firebase:firebase-database" }
+firebase-perf = { module = "com.google.firebase:firebase-perf" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
@@ -95,6 +102,7 @@ retrofit2-kotlinx-serialization-converter = { group = "com.jakewharton.retrofit"
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 simple-ext = { module = "io.noties.markwon:simple-ext", version.ref = "markwon" }
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

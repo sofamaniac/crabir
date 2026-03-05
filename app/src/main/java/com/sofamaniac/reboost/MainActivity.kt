@@ -43,6 +43,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
+import com.google.firebase.FirebaseApp
 import com.sofamaniac.reboost.settings.DefaultReboostTheme
 import com.sofamaniac.reboost.settings.ProvideReboostTheme
 import com.sofamaniac.reboost.settings.ReboostTheme
@@ -73,6 +74,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
         setContent {
             ProvideReboostTheme {
