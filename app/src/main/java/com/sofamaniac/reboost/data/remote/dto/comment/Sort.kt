@@ -4,18 +4,41 @@
 
 package com.sofamaniac.reboost.data.remote.dto.comment
 
-enum class Sort {
-    Confidence,
-    Top,
-    Best,
-    New,
-    Controversial,
-    Old,
-    Random,
-    Qa,
-    Live;
+import com.sofamaniac.reboost.R
+import com.sofamaniac.reboost.data.remote.dto.SortInterface
+
+enum class Sort : SortInterface {
+    Confidence {
+        override val representation: Int = R.string.SortConfidence
+    },
+    Top {
+        override val representation: Int = R.string.SortTop
+    },
+    Best {
+        override val representation: Int = R.string.SortBest
+    },
+    New {
+        override val representation: Int = R.string.SortNew
+    },
+    Controversial {
+        override val representation: Int = R.string.SortControversial
+    },
+    Old {
+        override val representation: Int = R.string.SortOld
+    },
+    Random {
+        override val representation: Int = R.string.SortRandom
+    },
+    Qa {
+        override val representation: Int = R.string.SortQa
+    },
+    Live {
+        override val representation: Int = R.string.SortLive
+    };
 
     override fun toString(): String {
         return super.toString().lowercase()
     }
+    override val entries: List<SortInterface> = Sort.entries
+    override val isTimeframe: Boolean = false
 }

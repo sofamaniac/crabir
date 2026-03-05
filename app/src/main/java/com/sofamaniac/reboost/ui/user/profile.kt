@@ -7,31 +7,27 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.sofamaniac.reboost.FullscreenHandler
-import com.sofamaniac.reboost.LocalDrawerState
 import com.sofamaniac.reboost.domain.repository.AccountsRepository
 import com.sofamaniac.reboost.ui.TabBar
 import com.sofamaniac.reboost.ui.subreddit.PostFeedViewer
@@ -40,21 +36,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopBar(
-    drawerState: DrawerState,
-    modifier: Modifier = Modifier,
-    showSettings: Boolean = true,
-    showSort: Boolean = true
-) {
-    val scope = rememberCoroutineScope()
-    TopAppBar(title = {}, navigationIcon = {
-        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-            Icon(Icons.Default.Menu, "Open Drawer")
-        }
-    }, actions = {})
-}
 
 enum class ProfileTabs {
     Overview, About, Posts, Comments, Saved, Upvoted, Downvoted, Hidden;
@@ -116,23 +97,12 @@ fun ProfileView(
         }
     )
 
-
-    val drawerState = LocalDrawerState.current
+    var activeTab by remember { mutableStateOf(tabs[currentTab.currentPage]) }
 
     FullscreenHandler {
         Scaffold(modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
-            TopAppBar(scrollBehavior = scrollBehavior, title = {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(user)
-                }
+            TopBar(scrollBehavior, user, viewModel = viewModels[activeTab])
 
-            }, navigationIcon = {
-                IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                    Icon(
-                        Icons.Default.Menu, "Open Drawer"
-                    )
-                }
-            }, actions = {})
         }, bottomBar = {
             TabBar(selected = selected)
         }) { innerPadding ->
@@ -155,6 +125,7 @@ fun ProfileView(
                 ) {
                     val page = tabs[it]
                     val viewModel = viewModels[page]
+                    activeTab = page
                     if (viewModel != null) {
                         PostFeedViewer(state = viewModel)
                     } else {

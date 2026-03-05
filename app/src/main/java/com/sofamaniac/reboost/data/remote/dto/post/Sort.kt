@@ -1,21 +1,35 @@
 package com.sofamaniac.reboost.data.remote.dto.post
 
-enum class Sort {
-    Hot,
-    Best,
-    New,
-    Rising,
-    Top,
-    Controversial;
+import com.sofamaniac.reboost.R
+import com.sofamaniac.reboost.data.remote.dto.SortInterface
+
+enum class Sort : SortInterface {
+    Hot {
+        override val representation: Int = R.string.SortHot
+    },
+    Best {
+        override val representation: Int = R.string.SortBest
+    },
+    New {
+        override val representation: Int = R.string.SortNew
+    },
+    Rising {
+        override val representation: Int = R.string.SortRising
+    },
+    Top {
+        override val isTimeframe: Boolean = true
+        override val representation: Int = R.string.SortTop
+    },
+    Controversial {
+        override val isTimeframe: Boolean = true
+        override val representation: Int = R.string.SortControversial
+    };
+
+    override val entries: List<SortInterface> = Sort.entries
 
     override fun toString(): String {
         return super.toString().lowercase()
     }
 
-    fun isTimeframe(): Boolean {
-        return when (this) {
-            Hot, Best, New, Rising -> false
-            Top, Controversial -> true
-        }
-    }
+    override val isTimeframe: Boolean = false
 }

@@ -10,14 +10,12 @@ package com.sofamaniac.reboost.ui.subreddit
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
@@ -35,7 +33,6 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -54,10 +51,10 @@ import androidx.paging.compose.itemKey
 import com.sofamaniac.reboost.LocalDrawerState
 import com.sofamaniac.reboost.LocalFullscreenHandler
 import com.sofamaniac.reboost.LocalTheme
-import com.sofamaniac.reboost.data.remote.dto.Timeframe
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
 import com.sofamaniac.reboost.domain.model.CommentData
 import com.sofamaniac.reboost.domain.model.PostData
+import com.sofamaniac.reboost.ui.SortMenu
 import com.sofamaniac.reboost.ui.post.PostBody
 import com.sofamaniac.reboost.ui.post.PostCard
 import com.sofamaniac.reboost.ui.thread.CommentNode
@@ -236,55 +233,9 @@ fun TopBar(
                 DropdownMenuItem(onClick = { }, text = { Text("Info") })
                 DropdownMenuItem(onClick = { state.refresh() }, text = { Text("Refresh") })
             }
-            SortMenu(state)
-        }
-    )
-}
-
-@Composable
-fun SortMenu(state: PostFeedViewModel) {
-    val sortExpanded = remember { mutableStateOf(false) }
-    val timeframeExpanded = remember { mutableStateOf(false) }
-    var chosenSort by remember { mutableStateOf(state.params.value.sort) }
-    Box {
-        IconButton(onClick = { sortExpanded.value = true }) {
-            Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "Sort")
-        }
-        DropdownMenu(
-            expanded = sortExpanded.value,
-            onDismissRequest = { sortExpanded.value = false }) {
-            Sort.entries.forEach { sort ->
-                if (sort.isTimeframe()) {
-                    DropdownMenuItem(text = { Text(sort.toString()) }, onClick = {
-                        timeframeExpanded.value = true
-                        chosenSort = sort
-                    })
-                } else {
-                    DropdownMenuItem(text = { Text(sort.toString()) }, onClick = {
-                        state.updateSort(sort)
-                        sortExpanded.value = false
-                    })
-                }
+            SortMenu<Sort> { sort, timeframe ->
+                state.updateSort(sort, timeframe)
             }
         }
-        TimeframeMenu(state, sortExpanded, timeframeExpanded, chosenSort)
-    }
-}
-
-@Composable
-fun TimeframeMenu(
-    state: PostFeedViewModel,
-    sortExpanded: MutableState<Boolean>,
-    expanded: MutableState<Boolean>,
-    sort: Sort
-) {
-    DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
-        Timeframe.entries.forEach {
-            DropdownMenuItem(text = { Text(it.toString()) }, onClick = {
-                state.updateSort(sort, it)
-                expanded.value = false
-                sortExpanded.value = false
-            })
-        }
-    }
+    )
 }

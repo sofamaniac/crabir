@@ -60,11 +60,25 @@ class CommentsViewModel @AssistedInject constructor(
     @Assisted username: String,
     repository: CommentsRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel(username, repository, visitedPostsDao) {
+) : ProfileFeedViewModel(username, repository, visitedPostsDao), SortProfileTab {
     @AssistedFactory
     interface Factory {
         fun create(username: String): CommentsViewModel
     }
+
+    override fun updateSort(sort: ProfileSort, timeframe: Timeframe?) {
+        val needRefresh = params.value.sort != sort || params.value.timeframe != timeframe
+        _params.update {
+            if (!needRefresh) it
+            else {
+                it.copy(sort = sort, timeframe = timeframe)
+            }
+        }
+        if (needRefresh) {
+            refresh()
+        }
+    }
+
 }
 
 @HiltViewModel(assistedFactory = UpvotedViewModel.Factory::class)
@@ -108,10 +122,23 @@ class SubmittedViewModel @AssistedInject constructor(
     @Assisted username: String,
     repository: SubmittedRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel(username, repository, visitedPostsDao) {
+) : ProfileFeedViewModel(username, repository, visitedPostsDao), SortProfileTab {
     @AssistedFactory
     interface Factory {
         fun create(username: String): SubmittedViewModel
+    }
+
+    override fun updateSort(sort: ProfileSort, timeframe: Timeframe?) {
+        val needRefresh = params.value.sort != sort || params.value.timeframe != timeframe
+        _params.update {
+            if (!needRefresh) it
+            else {
+                it.copy(sort = sort, timeframe = timeframe)
+            }
+        }
+        if (needRefresh) {
+            refresh()
+        }
     }
 }
 
@@ -123,7 +150,7 @@ abstract class ProfileFeedViewModel(
 
 
     override var listState by mutableStateOf(LazyListState())
-    private val _params = MutableStateFlow(
+    protected val _params = MutableStateFlow(
         ProfileFeedParams(
             username = username,
             sort = ProfileSort.New,
@@ -154,23 +181,14 @@ abstract class ProfileFeedViewModel(
             viewModelScope
         )
 
-    fun updateSort(sort: ProfileSort, timeframe: Timeframe? = null) {
-        val needRefresh = params.value.sort != sort || params.value.timeframe != timeframe
-        _params.update {
-            if (!needRefresh) it
-            else {
-                it.copy(sort = sort, timeframe = timeframe)
-            }
-        }
-        if (needRefresh) {
-            refresh()
-        }
-    }
-
     fun visitPost(post: PostData) {
         viewModelScope.launch(Dispatchers.IO) {
             visitedPostsDao.insert(post.toEntity())
             Log.d("PostFeedViewModel", "visitPost: Post visited (${post.id})")
         }
     }
+}
+
+interface SortProfileTab {
+    fun updateSort(sort: ProfileSort, timeframe: Timeframe? = null)
 }

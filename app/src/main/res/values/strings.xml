@@ -4,4 +4,15 @@
 
 <resources>
     <string name="app_name">Reboost</string>
+    <string name="SortTop">Top</string>
+    <string name="SortControversial">Controversial</string>
+    <string name="SortHot">Hot</string>
+    <string name="SortBest">Best</string>
+    <string name="SortNew">New</string>
+    <string name="SortRising">Rising</string>
+    <string name="SortConfidence">Confidence</string>
+    <string name="SortOld">Old</string>
+    <string name="SortRandom">Random</string>
+    <string name="SortQa">QA</string>
+    <string name="SortLive">Live</string>
 </resources>

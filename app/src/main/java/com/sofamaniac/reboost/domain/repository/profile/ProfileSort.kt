@@ -1,15 +1,26 @@
 package com.sofamaniac.reboost.domain.repository.profile
 
-import com.sofamaniac.reboost.domain.repository.profile.ProfileSort.Top
+import com.sofamaniac.reboost.R
+import com.sofamaniac.reboost.data.remote.dto.SortInterface
 
 
-/** Only [Top] accepts a [com.sofamaniac.reboost.data.remote.dto.Timeframe]*/
-enum class ProfileSort {
-    Top,
-    New,
-    Hot;
+enum class ProfileSort : SortInterface {
+    Top {
+        override val isTimeframe: Boolean = true
+        override val representation: Int = R.string.SortTop
+    },
+    New {
+        override val representation: Int = R.string.SortNew
+    },
+    Hot {
+        override val representation: Int = R.string.SortHot
+    };
 
     override fun toString(): String {
         return super.toString().lowercase()
     }
+
+    override val entries: List<SortInterface> = ProfileSort.entries
+    override val isTimeframe: Boolean = false
+
 }
