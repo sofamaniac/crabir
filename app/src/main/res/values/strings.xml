@@ -15,4 +15,7 @@
     <string name="SortRandom">Random</string>
     <string name="SortQa">QA</string>
     <string name="SortLive">Live</string>
+    <string name="SortRelevance">Relevance</string>
+    <string name="SortComments">Comments</string>
+    <string name="SortActivity">Activity</string>
 </resources>

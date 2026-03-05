@@ -18,10 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
@@ -97,11 +94,10 @@ fun ProfileView(
         }
     )
 
-    var activeTab by remember { mutableStateOf(tabs[currentTab.currentPage]) }
 
     FullscreenHandler {
         Scaffold(modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
-            TopBar(scrollBehavior, user, viewModel = viewModels[activeTab])
+            TopBar(scrollBehavior, user, viewModel = viewModels[tabs[currentTab.currentPage]])
 
         }, bottomBar = {
             TabBar(selected = selected)
@@ -125,7 +121,6 @@ fun ProfileView(
                 ) {
                     val page = tabs[it]
                     val viewModel = viewModels[page]
-                    activeTab = page
                     if (viewModel != null) {
                         PostFeedViewer(state = viewModel)
                     } else {
