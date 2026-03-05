@@ -83,6 +83,7 @@ abstract class SearchViewModel<Data : DataInterface>(
     fun onQueryUpdate(q: String) {
         if (queryState.text as String == q) return
         queryState.edit { replace(0, length, q) }
+        if (q.length < 3) return
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             delay(500)
