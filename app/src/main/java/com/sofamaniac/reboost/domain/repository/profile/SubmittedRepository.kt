@@ -10,24 +10,24 @@ import com.sofamaniac.reboost.domain.model.RedditAccount
 import com.sofamaniac.reboost.domain.repository.VotableRepository
 import com.sofamaniac.reboost.domain.repository.feed.FeedRepositoryCommon
 import jakarta.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
-class CommentsRepository @Inject constructor(
+class SubmittedRepository @Inject constructor(
     votableRepository: VotableRepository,
     api: RedditAPIService,
 ) : FeedRepositoryCommon<ProfileFeedParams>(votableRepository, api) {
     override suspend fun getThings(
         after: String,
-        params: ProfileFeedParams,
+        params: ProfileFeedParams
     ): PagedResponse<String> {
         if (params.username == RedditAccount.ANONYMOUS) return PagedResponse()
-
         return makeRequest {
-            api.getComments(
+            api.getSubmitted(
                 user = params.username,
                 after = after,
             )
         }
     }
+
 }

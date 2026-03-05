@@ -77,7 +77,7 @@ fun ProfileView(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val isConnectedUser by viewModel.currentUser.map { it == user }.collectAsState(false)
+    val isConnectedUser by viewModel.currentUser.map { it == user }.collectAsState(true)
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val tabs = if (isConnectedUser) ProfileTabs.entries else ProfileTabs.publicTabs
     val currentTab = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
@@ -109,8 +109,13 @@ fun ProfileView(
                 user
             )
         },
+        ProfileTabs.Posts to hiltViewModel<SubmittedViewModel, SubmittedViewModel.Factory> { factory ->
+            factory.create(
+                user
+            )
+        }
+    )
 
-        )
 
     val drawerState = LocalDrawerState.current
 

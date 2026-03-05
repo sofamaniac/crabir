@@ -22,12 +22,13 @@ import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.domain.model.VotableData
 import com.sofamaniac.reboost.domain.repository.feed.FeedRepositoryCommon
 import com.sofamaniac.reboost.domain.repository.feed.FeedSource
-import com.sofamaniac.reboost.domain.repository.profile.CommentSort
 import com.sofamaniac.reboost.domain.repository.profile.CommentsRepository
 import com.sofamaniac.reboost.domain.repository.profile.DownvotedRepository
 import com.sofamaniac.reboost.domain.repository.profile.HiddenRepository
 import com.sofamaniac.reboost.domain.repository.profile.ProfileFeedParams
+import com.sofamaniac.reboost.domain.repository.profile.ProfileSort
 import com.sofamaniac.reboost.domain.repository.profile.SavedRepository
+import com.sofamaniac.reboost.domain.repository.profile.SubmittedRepository
 import com.sofamaniac.reboost.domain.repository.profile.UpvotedRepository
 import com.sofamaniac.reboost.ui.subreddit.FeedViewModelInterface
 import dagger.assisted.Assisted
@@ -102,6 +103,18 @@ class HiddenViewModel @AssistedInject constructor(
     }
 }
 
+@HiltViewModel(assistedFactory = SubmittedViewModel.Factory::class)
+class SubmittedViewModel @AssistedInject constructor(
+    @Assisted username: String,
+    repository: SubmittedRepository,
+    visitedPostsDao: VisitedPostsDao,
+) : ProfileFeedViewModel(username, repository, visitedPostsDao) {
+    @AssistedFactory
+    interface Factory {
+        fun create(username: String): SubmittedViewModel
+    }
+}
+
 abstract class ProfileFeedViewModel(
     val username: String,
     private val repository: FeedRepositoryCommon<ProfileFeedParams>,
@@ -113,7 +126,7 @@ abstract class ProfileFeedViewModel(
     private val _params = MutableStateFlow(
         ProfileFeedParams(
             username = username,
-            sort = CommentSort.New,
+            sort = ProfileSort.New,
             timeframe = null
         )
     )
@@ -141,7 +154,7 @@ abstract class ProfileFeedViewModel(
             viewModelScope
         )
 
-    fun updateSort(sort: CommentSort, timeframe: Timeframe? = null) {
+    fun updateSort(sort: ProfileSort, timeframe: Timeframe? = null) {
         val needRefresh = params.value.sort != sort || params.value.timeframe != timeframe
         _params.update {
             if (!needRefresh) it

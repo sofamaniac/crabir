@@ -11,11 +11,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.sofamaniac.reboost.LocalNavController
+import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.data.remote.dto.comment.Sort
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,14 +26,19 @@ fun TopBar(
     scrollBehavior: TopAppBarScrollBehavior?,
     dismiss: () -> Unit
 ) {
-    LocalNavController.current!!
     val sort: Sort by viewModel.sort.collectAsState()
+    val theme = LocalTheme.current
     TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = theme.toolbarBackground,
+            scrolledContainerColor = theme.toolbarBackground,
+            titleContentColor = theme.toolbarText,
+        ),
         scrollBehavior = scrollBehavior,
         navigationIcon = {
             IconButton(
                 onClick = dismiss,
-                ) {
+            ) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
             }
         },
