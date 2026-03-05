@@ -20,28 +20,23 @@ import androidx.media3.common.util.UnstableApi
 import com.sofamaniac.reboost.domain.model.MediaResource
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.cartouche
-import com.sofamaniac.reboost.ui.media.image.FromPreview
+import com.sofamaniac.reboost.ui.media.image.ImageView
 import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayer
 
 @OptIn(UnstableApi::class)
 @Composable
 fun PostVideo(post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boolean = false) {
-    val source = getVideoUrl(post)
-    if (source != null) {
-        VideoPlayer(
-            source, startPlaying = canPlayVideo,
-            placeholder = {
-                PostImage(post)
-            })
-    } else if (post.media.media?.redditVideo != null) {
-        val video = post.media.media.redditVideo.toMediaResource()
-        VideoPlayer(
-            video, startPlaying = canPlayVideo,
-            placeholder = {
-                PostImage(post)
-            })
+    val video = getVideoUrl(post)
+    val placeholder = @Composable { ImageView(post, allowTransformation = false) }
+
+    if (video == null) {
+        Text("Could not load video")
     } else {
-        PostImage(post)
+        VideoPlayer(
+            video,
+            startPlaying = canPlayVideo,
+            placeholder = placeholder
+        )
     }
 
 }
@@ -56,7 +51,7 @@ fun YoutubeVideo(post: PostData, modifier: Modifier = Modifier) {
                 uriHandler.openUri(post.url)
             })
     ) {
-        FromPreview(
+        ImageView(
             post,
             modifier = Modifier
                 .fillMaxSize()
