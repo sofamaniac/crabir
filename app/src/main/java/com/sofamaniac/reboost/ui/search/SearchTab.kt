@@ -33,9 +33,11 @@ import androidx.paging.compose.itemKey
 import com.sofamaniac.reboost.FullscreenHandler
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.SearchRoute
+import com.sofamaniac.reboost.data.remote.api.CommunitySearchSort
 import com.sofamaniac.reboost.data.remote.api.PostSearchSort
 import com.sofamaniac.reboost.domain.repository.DataInterface
 import com.sofamaniac.reboost.domain.repository.search.SearchParams
+import com.sofamaniac.reboost.ui.SortMenu
 import com.sofamaniac.reboost.ui.subreddit.PostFeedViewer
 import com.sofamaniac.reboost.ui.subredditList.Tile
 import kotlinx.coroutines.launch
@@ -197,5 +199,21 @@ fun TopBar(
                 )
             }
         },
+        actions = {
+            when (viewModel) {
+                is PostSearchViewModel -> {
+                    SortMenu<PostSearchSort> { sort, timeframe ->
+                        viewModel.setSort(sort, timeframe)
+                    }
+                }
+
+                is CommunitySearchViewModel -> {
+                    SortMenu<CommunitySearchSort> { sort, _ ->
+                        viewModel.setSort(sort)
+                    }
+                }
+
+            }
+        }
     )
 }
