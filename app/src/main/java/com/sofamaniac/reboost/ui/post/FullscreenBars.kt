@@ -1,19 +1,15 @@
 package com.sofamaniac.reboost.ui.post
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.Comment
@@ -41,21 +37,15 @@ fun ColumnScope.FullscreenTopBar(
     actions: @Composable () -> Unit = {}
 ) {
     val fullscreenManager = LocalFullscreenHandler.current!!
-    AnimatedContent(
-        targetState = enabled,
+    AnimatedVisibility(
+        visible = enabled,
         modifier = Modifier
             .fillMaxWidth()
             .align(Alignment.CenterHorizontally)
             .background(color = Color.Black.copy(alpha = 0.6f))
-            .safeContentPadding(),
-        transitionSpec = {
-            (fadeIn() + slideInVertically()).togetherWith(fadeOut() + slideOutVertically())
-        },
+            .statusBarsPadding(),
         label = "decoration animation"
-    ) { enabled ->
-        if (!enabled) {
-            return@AnimatedContent
-        }
+    ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -79,26 +69,21 @@ fun ColumnScope.FullscreenBottomBar(
     enabled: Boolean,
 ) {
     val theme = LocalTheme.current
-    AnimatedContent(
-        targetState = enabled,
+    AnimatedVisibility(
+        visible = enabled,
         modifier = Modifier
             .fillMaxWidth()
             .align(Alignment.CenterHorizontally)
             .background(color = Color.Black.copy(alpha = 0.6f))
-            .safeContentPadding(),
-        transitionSpec = {
-            (fadeIn() + slideInVertically()).togetherWith(fadeOut() + slideOutVertically())
-        },
-        label = "decoration bottom animation"
-    ) { enabled ->
-        if (!enabled) {
-            return@AnimatedContent
-        }
+            .navigationBarsPadding(),
+        label = "decoration animation"
+    ) {
 
-        Column {
+        Column(verticalArrangement = Arrangement.Bottom) {
             Text(
                 post.title,
                 style = MaterialTheme.typography.labelLarge.copy(color = Color.White),
+                modifier = Modifier.padding(start = 8.dp)
             )
 
             Row(
