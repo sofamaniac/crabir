@@ -26,6 +26,8 @@ class SubmittedRepository @Inject constructor(
             api.getSubmitted(
                 user = params.username,
                 after = after,
+                sort = params.sort,
+                timeframe = params.timeframe,
             )
         }
     }

@@ -25,8 +25,6 @@ enum class Sort : SortInterface {
         override val representation: Int = R.string.SortControversial
     };
 
-    override val entries: List<SortInterface> = Sort.entries
-
     override fun toString(): String {
         return super.toString().lowercase()
     }

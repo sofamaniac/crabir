@@ -39,6 +39,6 @@ enum class Sort : SortInterface {
     override fun toString(): String {
         return super.toString().lowercase()
     }
-    override val entries: List<SortInterface> = Sort.entries
+
     override val isTimeframe: Boolean = false
 }

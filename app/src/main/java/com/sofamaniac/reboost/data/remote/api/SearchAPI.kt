@@ -1,5 +1,7 @@
 package com.sofamaniac.reboost.data.remote.api
 
+import com.sofamaniac.reboost.R
+import com.sofamaniac.reboost.data.remote.dto.SortInterface
 import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.remote.dto.Thing.Listing
 import com.sofamaniac.reboost.data.remote.dto.Timeframe
@@ -38,33 +40,46 @@ interface SearchAPI {
     ): Response<Listing<Thing>>
 }
 
-interface SearchSort
+interface SearchSort : SortInterface
 
 
 enum class CommunitySearchSort : SearchSort {
-    Relevance,
-    Activity;
+    Relevance {
+        override val representation: Int = R.string.SortRelevance
+    },
+    Activity {
+        override val representation: Int = R.string.SortActivity
+    };
 
     override fun toString(): String {
         return super.toString().lowercase()
     }
+
+    override val isTimeframe: Boolean = false
 }
 
 enum class PostSearchSort : SearchSort {
-    Relevance,
-    Hot,
-    Top,
-    New,
-    Comments;
+    Relevance {
+        override val representation: Int = R.string.SortRelevance
+    },
+    Hot {
+        override val representation: Int = R.string.SortHot
+    },
+    Comments {
+        override val representation: Int = R.string.SortComments
+    },
+    Top {
+        override val representation: Int = R.string.SortTop
+        override val isTimeframe: Boolean = false
+    },
+    New {
+        override val representation: Int = R.string.SortNew
+        override val isTimeframe: Boolean = false
+    };
 
     override fun toString(): String {
         return super.toString().lowercase()
     }
 
-    fun isTimeframe(): Boolean {
-        return when (this) {
-            Relevance, Hot, Comments -> true
-            else -> false
-        }
-    }
+    override val isTimeframe: Boolean = true
 }

@@ -19,7 +19,6 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("tech.mappie.plugin")
     id("androidx.room")
-    id("com.google.gms.google-services")
 }
 
 android {
@@ -207,10 +206,4 @@ dependencies {
 
     implementation(libs.glide)
     annotationProcessor(libs.glide)
-
-
-    // Firebase to monitor reddit API usage
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.database)
-    implementation(libs.firebase.perf)
 }

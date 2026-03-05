@@ -27,6 +27,8 @@ class CommentsRepository @Inject constructor(
             api.getComments(
                 user = params.username,
                 after = after,
+                sort = params.sort,
+                timeframe = params.timeframe,
             )
         }
     }

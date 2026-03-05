@@ -20,7 +20,6 @@ enum class ProfileSort : SortInterface {
         return super.toString().lowercase()
     }
 
-    override val entries: List<SortInterface> = ProfileSort.entries
     override val isTimeframe: Boolean = false
 
 }
