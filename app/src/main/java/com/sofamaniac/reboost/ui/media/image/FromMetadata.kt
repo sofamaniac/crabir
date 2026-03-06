@@ -10,10 +10,6 @@ import coil3.compose.AsyncImage
 import com.sofamaniac.reboost.data.remote.dto.post.Preview
 import com.sofamaniac.reboost.domain.model.MediaResource
 import com.sofamaniac.reboost.domain.model.PostData
-import java.lang.Float
-import kotlin.Boolean
-import kotlin.String
-import kotlin.Unit
 
 @Composable
 fun FromPreview(
@@ -24,15 +20,12 @@ fun FromPreview(
     onClick: () -> Unit = {}
 ) {
 
-    val image = preview.images[0].source
-    val url = image.url
-    val x = image.width
-    val y = Float.max(image.height.toFloat(), 1.0.toFloat())
+    val image = preview.images[0].source.toMediaResource()
     val modifier = modifier
         .fillMaxWidth()
-        .aspectRatio(x / y)
+        .aspectRatio(image.aspectRatio)
     TransformableImage(
-        url,
+        image,
         contentDescription = contentDescription,
         modifier = modifier,
         enabled = allowTransformation,
@@ -47,13 +40,11 @@ fun ImageView(
     allowTransformation: Boolean = true,
     onClick: () -> Unit = {}
 ) {
-    val url = media.url
-    val ratio = media.aspectRatio
     val modifier = Modifier
         .fillMaxWidth()
-        .aspectRatio(ratio)
+        .aspectRatio(media.aspectRatio)
     TransformableImage(
-        url,
+        media,
         contentDescription = "Image",
         contentScale = ContentScale.Fit,
         modifier = modifier,
