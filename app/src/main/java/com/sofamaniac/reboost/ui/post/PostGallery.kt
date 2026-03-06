@@ -32,7 +32,7 @@ import com.sofamaniac.reboost.ui.VerticalSwipeToDismiss
 import com.sofamaniac.reboost.ui.cartouche
 import com.sofamaniac.reboost.ui.media.gallery.Gallery
 import com.sofamaniac.reboost.ui.media.image.ImageView
-import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayer
+import com.sofamaniac.reboost.ui.media.videoPlayer.DecoratedVideoPlayer
 
 @Composable
 fun PostGallery(
@@ -90,7 +90,7 @@ fun EmbeddedGallery(
                 )
 
                 is MediaMetadata.Gif ->
-                    VideoPlayer(
+                    DecoratedVideoPlayer(
                         media = metadata.toMediaResource(),
                         modifier = Modifier.fillMaxSize(),
                         startPlaying = canPlayVideo && state.currentPage == page,
@@ -167,7 +167,7 @@ fun FullscreenGallery(
                     onClick = onClick
                 )
 
-                is MediaMetadata.Gif -> VideoPlayer(
+                is MediaMetadata.Gif -> DecoratedVideoPlayer(
                     media = metadata.toMediaResource(),
                     modifier = Modifier.fillMaxSize(),
                     startPlaying = state.currentPage == page,

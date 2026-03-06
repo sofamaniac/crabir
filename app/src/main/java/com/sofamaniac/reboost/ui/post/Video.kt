@@ -21,7 +21,7 @@ import com.sofamaniac.reboost.domain.model.MediaResource
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.cartouche
 import com.sofamaniac.reboost.ui.media.image.ImageView
-import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayer
+import com.sofamaniac.reboost.ui.media.videoPlayer.DecoratedVideoPlayer
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -32,7 +32,7 @@ fun PostVideo(post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boole
     if (video == null) {
         Text("Could not load video")
     } else {
-        VideoPlayer(
+        DecoratedVideoPlayer(
             video,
             startPlaying = canPlayVideo,
             placeholder = placeholder

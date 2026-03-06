@@ -2,6 +2,7 @@ package com.sofamaniac.reboost.ui.media.videoPlayer.controls
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -9,6 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderColors
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,7 +26,10 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SeekProgressBar(player: Player, modifier: Modifier = Modifier) {
+fun SeekProgressBar(
+    player: Player, modifier: Modifier = Modifier,
+    sliderColors: SliderColors = SliderDefaults.colors()
+) {
     var sliderState by remember { mutableFloatStateOf(0f) }
 
     LaunchedEffect(player) {
@@ -35,6 +41,7 @@ fun SeekProgressBar(player: Player, modifier: Modifier = Modifier) {
 
     Slider(
         value = sliderState,
+        colors = sliderColors,
         onValueChange = {
             sliderState = it
             player.seekTo((it * player.duration).toLong())
@@ -51,19 +58,30 @@ fun SeekProgressBar(player: Player, modifier: Modifier = Modifier) {
                     .size(
                         24.dp
                     )
-                    .background(color = MaterialTheme.colorScheme.primary),
+                    .background(color = sliderColors.thumbColor),
             )
         },
         track = {
-            Box(
-                modifier = Modifier
-                    .clip(shape = MaterialTheme.shapes.extraLarge)
-                    .height(
-                        8.dp
-                    )
-                    .fillMaxWidth()
-                    .background(color = MaterialTheme.colorScheme.primaryContainer),
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Box(
+                    modifier = Modifier
+                        .clip(shape = MaterialTheme.shapes.extraLarge)
+                        .height(
+                            8.dp
+                        )
+                        .fillMaxWidth(sliderState)
+                        .background(color = sliderColors.activeTrackColor),
+                )
+                Box(
+                    modifier = Modifier
+                        .clip(shape = MaterialTheme.shapes.extraLarge)
+                        .height(
+                            8.dp
+                        )
+                        .fillMaxWidth()
+                        .background(color = sliderColors.inactiveTrackColor),
+                )
+            }
         },
     )
 }

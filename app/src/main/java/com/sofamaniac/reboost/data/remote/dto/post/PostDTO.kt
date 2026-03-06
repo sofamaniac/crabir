@@ -372,7 +372,7 @@ data class RedditVideo(
     @SerialName("is_gif") val isGif: Boolean = false,
 ) {
     fun toMediaResource() =
-        MediaResource(fallbackUrl, width.toFloat() / height.toFloat(), width, height)
+        MediaResource(dashUrl, width.toFloat() / height.toFloat(), width, height)
 }
 
 @OptIn(ExperimentalSerializationApi::class)

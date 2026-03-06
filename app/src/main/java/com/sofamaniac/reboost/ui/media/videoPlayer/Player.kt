@@ -1,10 +1,15 @@
 package com.sofamaniac.reboost.ui.media.videoPlayer
 
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.ContentFrame
 import androidx.media3.ui.compose.state.rememberPlayPauseButtonState
@@ -30,10 +36,10 @@ import com.sofamaniac.reboost.ui.media.videoPlayer.controls.Controls
 
 @OptIn(UnstableApi::class)
 @Composable
-fun VideoPlayer(
+fun DecoratedVideoPlayer(
     media: MediaResource,
     modifier: Modifier = Modifier,
-    placeholder: @Composable (() -> Unit)? = {
+    placeholder: @Composable () -> Unit = {
         Surface(color = Color.Gray, modifier = Modifier.fillMaxSize()) {
             Text("LOADING")
         }
@@ -52,10 +58,11 @@ fun VideoPlayer(
     val hasFirstFrame by VideoPlayerManager.hasFirstFrame.collectAsState()
 
 
-    LaunchedEffect(startPlaying, currentUrl) {
+    LaunchedEffect(startPlaying) {
         if (startPlaying) {
             VideoPlayerManager.setMediaItem(media.url)
             player.playWhenReady = true
+            player.mute()
         }
     }
 
@@ -68,11 +75,95 @@ fun VideoPlayer(
     }
 
     val playing = rememberPlayPauseButtonState(player).showPlay
+
+    @Composable
+    fun BoxScope.loadDecoration() {
+        if (!playing) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+            ) {
+                cartouche?.invoke()
+            }
+        }
+        if (!hasFirstFrame) {
+            CircularProgressIndicator(
+                color = Color.White,
+                trackColor = Color.White,
+                modifier = Modifier
+                    .size(16.dp)
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp)
+            )
+        }
+    }
     Box(
         modifier = modifier
             .fillMaxSize()
             .aspectRatio(media.aspectRatio)
-            .clickable(onClick = { showControls = !showControls })
+            .clickable(onClick = {
+                Log.d("VideoPlayer", "click")
+                VideoPlayerManager.setMediaItem(media.url)
+                showControls = !showControls
+            })
+    ) {
+
+        VideoPlayer(media, placeholder = placeholder, startPlaying = startPlaying)
+
+        if (currentUrl == media.url && hasFirstFrame) {
+            if (showControls) {
+                Controls(
+                    fullscreenButton = fullscreenButton,
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
+            } else {
+                AlwaysOnInfo(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(all = 8.dp)
+                )
+            }
+        } else {
+            loadDecoration()
+        }
+    }
+}
+
+@OptIn(UnstableApi::class)
+@Composable
+fun VideoPlayer(
+    media: MediaResource,
+    modifier: Modifier = Modifier,
+    placeholder: @Composable () -> Unit = {},
+    startPlaying: Boolean = false,
+) {
+    val context = LocalContext.current
+    val player = remember { VideoPlayerManager.getInstance(context) }
+    val currentUrl by VideoPlayerManager.currentUrl.collectAsState()
+    val hasFirstFrame by VideoPlayerManager.hasFirstFrame.collectAsState()
+
+
+    LaunchedEffect(startPlaying) {
+        if (startPlaying) {
+            VideoPlayerManager.setMediaItem(media.url)
+            player.playWhenReady = true
+            player.mute()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (currentUrl == media.url) {
+                VideoPlayerManager.stopPlayer()
+            }
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .aspectRatio(media.aspectRatio)
     ) {
 
         if (currentUrl == media.url) {
@@ -82,25 +173,9 @@ fun VideoPlayer(
                     .fillMaxSize()
                     .align(Alignment.Center)
             )
-            if (showControls) {
-                Controls(fullscreenButton = fullscreenButton)
-
-            } else {
-                AlwaysOnInfo(player, modifier = Modifier.align(Alignment.BottomCenter))
-            }
-            if (!hasFirstFrame) {
-                placeholder?.invoke()
-                Box(modifier = Modifier.align(Alignment.TopEnd)) {
-                    cartouche?.invoke()
-                }
-            }
-        } else {
-            placeholder?.invoke()
-            if (!playing) {
-                Box(modifier = Modifier.align(Alignment.TopEnd)) {
-                    cartouche?.invoke()
-                }
-            }
+        }
+        if (!hasFirstFrame || currentUrl != media.url) {
+            placeholder()
         }
     }
 }
