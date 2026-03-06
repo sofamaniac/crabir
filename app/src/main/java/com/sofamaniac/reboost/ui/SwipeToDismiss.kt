@@ -1,5 +1,7 @@
 package com.sofamaniac.reboost.ui
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.gestures.AnchoredDraggableState
@@ -10,6 +12,8 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
@@ -24,6 +28,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import com.sofamaniac.reboost.LocalFullscreenHandler
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -41,21 +46,30 @@ fun VerticalSwipeToDismiss(
     }
 
 
-    val state by remember {
+    val decayAnimationSpec = rememberSplineBasedDecay<Float>()
+    val density = LocalDensity.current
+    @Suppress("DEPRECATION") val state by remember {
         mutableStateOf(
             AnchoredDraggableState(
                 initialValue = DismissValue.Default,
+                velocityThreshold = { with(density) { 1000.dp.toPx() } },
+                positionalThreshold = positionalThreshold,
+                snapAnimationSpec = tween(),
+                decayAnimationSpec = decayAnimationSpec,
                 anchors = DraggableAnchors {
                     DismissValue.Default at 0f
-                    DismissValue.DismissedUp at -screenHeight
-                    DismissValue.DismissedDown at screenHeight
-                })
+                    DismissValue.DismissedStart at -screenHeight
+                    DismissValue.DismissedEnd at screenHeight
+                }
+            )
         )
     }
+
+
     val fullscreenManager = LocalFullscreenHandler.current!!
 
-    LaunchedEffect(state.currentValue) {
-        if (state.currentValue != DismissValue.Default) {
+    LaunchedEffect(state.settledValue) {
+        if (state.settledValue != DismissValue.Default) {
             fullscreenManager.pop()
         }
     }
@@ -105,6 +119,60 @@ fun VerticalSwipeToDismiss(
 
 enum class DismissValue {
     Default,
-    DismissedUp,
-    DismissedDown
+    DismissedStart,
+    DismissedEnd
+}
+
+@Composable
+fun HorizontalSwipeToDismiss(
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit,
+) {
+    val positionalThreshold = { distance: Float -> distance * 0.5f }
+    val screenWidth = with(LocalDensity.current) {
+        LocalResources.current.displayMetrics.widthPixels.toFloat()
+    }
+    val decayAnimationSpec = rememberSplineBasedDecay<Float>()
+    val density = LocalDensity.current
+    @Suppress("DEPRECATION") val state by remember {
+        mutableStateOf(
+            AnchoredDraggableState(
+                initialValue = DismissValue.Default,
+                velocityThreshold = { with(density) { 1000.dp.toPx() } },
+                positionalThreshold = positionalThreshold,
+                snapAnimationSpec = tween(),
+                decayAnimationSpec = decayAnimationSpec,
+                anchors = DraggableAnchors {
+                    DismissValue.Default at 0f
+                    //DismissValue.DismissedStart at -screenWidth
+                    DismissValue.DismissedEnd at screenWidth
+                }
+            )
+        )
+    }
+
+
+    val fullscreenManager = LocalFullscreenHandler.current!!
+    LaunchedEffect(state.settledValue) {
+        if (state.settledValue != DismissValue.Default) {
+            fullscreenManager.pop()
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .anchoredDraggable(
+                state = state,
+                orientation = Orientation.Horizontal,
+                flingBehavior = AnchoredDraggableDefaults.flingBehavior(state, positionalThreshold)
+            ),
+    ) {
+        Row(
+            content = content,
+            modifier = Modifier
+                .offset { IntOffset(state.requireOffset().roundToInt(), 0) }
+        )
+
+    }
 }

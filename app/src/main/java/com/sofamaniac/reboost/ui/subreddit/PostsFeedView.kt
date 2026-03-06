@@ -24,13 +24,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,6 +52,7 @@ import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
 import com.sofamaniac.reboost.domain.model.CommentData
 import com.sofamaniac.reboost.domain.model.PostData
+import com.sofamaniac.reboost.ui.HorizontalSwipeToDismiss
 import com.sofamaniac.reboost.ui.SortMenu
 import com.sofamaniac.reboost.ui.post.PostBody
 import com.sofamaniac.reboost.ui.post.PostCard
@@ -136,14 +135,7 @@ fun PostFeedViewer(
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
                 val post = posts[index]!!
                 val threadView = @Composable { post: PostData ->
-                    val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
-                    SwipeToDismissBox(
-                        state = swipeToDismissBoxState,
-                        enableDismissFromEndToStart = false,
-                        backgroundContent = {},
-                        onDismiss = {
-                            fullscreenManager.pop()
-                        }) {
+                    HorizontalSwipeToDismiss {
                         ThreadView(
                             permalink = post.permalink,
                             dismiss = {
