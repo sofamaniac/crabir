@@ -12,6 +12,7 @@ import com.sofamaniac.reboost.data.remote.dto.comment.Sort
 import com.sofamaniac.reboost.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.reboost.domain.model.CommentType
 import com.sofamaniac.reboost.domain.model.PostData
+import com.sofamaniac.reboost.ui.thread.updateComment
 
 interface ThreadRepository {
     suspend fun getComments(
@@ -20,7 +21,7 @@ interface ThreadRepository {
     ): List<CommentType>
 
     suspend fun getPost(id: String): PostData?
-    suspend fun getMoreComments(more: Thing.More): List<Thing>
+    suspend fun getMoreComments(more: CommentType.More): List<CommentType>
 
     /** Extract id from post permalink. */
     fun getPostId(permalink: String): String
@@ -58,7 +59,7 @@ class ThreadRepositoryImpl(
                     comments += if (comment is Thing.Comment) {
                         CommentType.Comment(CommentDataMapper.map(comment.data))
                     } else {
-                        CommentType.More(comment as Thing.More)
+                        CommentType.More((comment as Thing.More).data)
                     }
                 }
                 votableRepository.addPost(post!!)
@@ -90,8 +91,41 @@ class ThreadRepositoryImpl(
         return segments[index + 1]
     }
 
-    override suspend fun getMoreComments(more: Thing.More): List<Thing.Comment> {
-        TODO("Not yet implemented")
+    override suspend fun getMoreComments(more: CommentType.More): List<CommentType> {
+        val response = api.getMoreComments(
+            post!!.name,
+            more.data.children.take(100).joinToString(",")
+        )
+        if (response.isSuccessful) {
+            val body = response.body()
+            if (body != null) {
+                val children = body.json.data.things.map { comment ->
+                    if (comment is Thing.Comment) {
+                        CommentType.Comment(CommentDataMapper.map(comment.data))
+                    } else {
+                        CommentType.More((comment as Thing.More).data)
+                    }
+                }
+                comments = comments.updateComment(more.data.parent_id) { comment ->
+                    if (comment is CommentType.Comment) {
+                        var replies = comment.comment.replies
+                        replies = replies.filter {
+                            when (it) {
+                                is CommentType.Comment -> true
+                                is CommentType.More -> it.name != more.data.name
+                            }
+                        }
+                        comment.copy(
+                            comment = comment.comment.copy(replies = replies + children)
+                        )
+
+                    } else {
+                        comment
+                    }
+                }
+            }
+        }
+        return comments
     }
 
     override fun refresh() {

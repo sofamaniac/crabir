@@ -84,6 +84,12 @@ class ThreadViewModel @AssistedInject constructor(
         }
     }
 
+    fun fetchMoreComments(more: CommentType.More) {
+        viewModelScope.launch {
+            _comments.value = repository.getMoreComments(more)
+        }
+    }
+
     fun setSort(sort: Sort) {
         _sort.value = sort
         refresh()
@@ -103,9 +109,8 @@ class ThreadViewModel @AssistedInject constructor(
                     repository.neutralVote(name)
                 }
                 _comments.update {
-                    it.updateComment(name, { c ->
+                    it.updateComment(name) { c ->
                         val comment = (c as CommentType.Comment).comment
-                        // TODO: update score
                         CommentType.Comment(
                             comment.copy(
                                 relationship = comment.relationship.copy(
@@ -117,7 +122,7 @@ class ThreadViewModel @AssistedInject constructor(
                                 )
                             )
                         )
-                    })
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("ThreadViewModel", "upvote: $e")
@@ -134,9 +139,8 @@ class ThreadViewModel @AssistedInject constructor(
                     repository.neutralVote(name)
                 }
                 _comments.update {
-                    it.updateComment(name, { c ->
+                    it.updateComment(name) { c ->
                         val comment = (c as CommentType.Comment).comment
-                        // TODO: update score
                         CommentType.Comment(
                             comment.copy(
                                 relationship = comment.relationship.copy(
@@ -148,7 +152,7 @@ class ThreadViewModel @AssistedInject constructor(
                                 )
                             )
                         )
-                    })
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("ThreadViewModel", "downvote: $e")
@@ -166,7 +170,7 @@ class ThreadViewModel @AssistedInject constructor(
                 }
             }
             _comments.update {
-                it.updateComment(name, { c ->
+                it.updateComment(name) { c ->
                     val comment = (c as CommentType.Comment).comment
                     CommentType.Comment(
                         comment.copy(
@@ -175,7 +179,7 @@ class ThreadViewModel @AssistedInject constructor(
                             )
                         )
                     )
-                })
+                }
             }
         } catch (e: Exception) {
             Log.e("ThreadViewModel", "save: $e")

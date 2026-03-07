@@ -1,5 +1,6 @@
 package com.sofamaniac.reboost.ui.thread
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,6 +12,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -87,6 +92,9 @@ fun BottomRow(comment: CommentData, viewModel: ThreadViewModel, modifier: Modifi
         UpButton(likes) { viewModel.upvote(comment.name, likes) }
         DownButton(likes) { viewModel.downvote(comment.name, likes) }
         SavedButton(saved) { viewModel.save(comment.name, saved) }
+        IconButton(onClick = {
+            Log.d("CommentNode", "$comment")
+        }) { Icon(Icons.Default.BugReport, contentDescription = null) }
     }
 }
 

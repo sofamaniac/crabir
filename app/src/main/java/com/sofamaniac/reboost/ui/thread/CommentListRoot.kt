@@ -52,7 +52,9 @@ fun CommentListRoot(
         },
         modifier = modifier.fillMaxSize()
     ) {
-        val comments by viewModel.comments.map { it.flattenComments() }
+        val comments by viewModel.comments.map {
+            it.flattenComments()
+        }
             .collectAsState(initial = emptyList())
         val post by viewModel.post.collectAsState(initial = null)
         LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
@@ -64,12 +66,22 @@ fun CommentListRoot(
             }
             items(comments.size, key = { index -> comments[index].name }) { index ->
                 when (val comment = comments[index]) {
-                    is CommentType.Comment -> CommentView(
-                        comment,
+                    is CommentType.Comment -> CommentNode(
+                        comment.comment,
                         viewModel,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .depthIndent(comment.depth, color = Color.Gray)
                     )
 
-                    is CommentType.More -> MoreViewer(comment)
+                    is CommentType.More -> MoreViewer(
+                        comment,
+                        viewModel,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .depthIndent(comment.depth)
+                            .padding(8.dp)
+                    )
                 }
                 if ((comments.getOrNull(index + 1)?.depth ?: 0) == 0) {
                     HorizontalDivider()

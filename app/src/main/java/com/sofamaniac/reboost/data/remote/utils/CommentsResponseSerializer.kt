@@ -7,7 +7,6 @@ package com.sofamaniac.reboost.data.remote.utils
 import com.sofamaniac.reboost.data.remote.api.CommentsResponse
 import com.sofamaniac.reboost.data.remote.dto.Thing
 import com.sofamaniac.reboost.data.remote.dto.Thing.Listing
-import com.sofamaniac.reboost.data.remote.dto.Thing.More
 import com.sofamaniac.reboost.data.remote.dto.Thing.Post
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
@@ -45,14 +44,7 @@ object CommentsResponseSerializer : KSerializer<CommentsResponse> {
                         element[1]
                     )
 
-                    val more = if (commentListing.data.children.lastOrNull() is More) {
-                        val last = commentListing.data.children.last() as More
-                        last
-                    } else {
-                        null
-                    }
-
-                    CommentsResponse(postListing, commentListing, more)
+                    CommentsResponse(postListing, commentListing)
                 } else {
                     throw SerializationException("Expected 2 elements in the array")
                 }

@@ -149,7 +149,7 @@ object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
 private fun CommentDTO.mapReplies(): List<CommentType> = replies.data.children.map {
     when (it) {
         is Thing.Comment -> CommentType.Comment(CommentDataMapper.map(it.data))
-        is Thing.More -> CommentType.More(it)
+        is Thing.More -> CommentType.More(it.data)
         else -> throw IllegalArgumentException("Unknown comment type: ${it.javaClass.name}")
     }
 }

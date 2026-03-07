@@ -124,10 +124,10 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
     @GET("{permalink}.json")
     suspend fun getThread(
         @Path(value = "permalink", encoded = true) permalink: String,
-        @Query("showedits") showEdits: Boolean = false,
-        @Query("showmore") showMore: Boolean = false,
-        @Query("showmedia") showMedia: Boolean = false,
-        @Query("showtitle") showTitle: Boolean = false,
+        @Query("showedits") showEdits: Boolean = true,
+        @Query("showmore") showMore: Boolean = true,
+        @Query("showmedia") showMedia: Boolean = true,
+        @Query("showtitle") showTitle: Boolean = true,
         @Query("sort") sort: CommentSort = CommentSort.Best,
         @Query("comment") comment: String? = null,
         @Query("context") context: Int? = 0,
@@ -135,14 +135,40 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
     ): Response<CommentsResponse>
+
+    /** Get comments for a [Thing.More]
+     *
+     * @param parentId The id of the parent comment
+     * @param children A comma separated list of comments id to get. Max 100.
+     */
+    @GET("api/morechildren.json")
+    suspend fun getMoreComments(
+        @Query("link_id") parentId: String,
+        @Query("children") children: String,
+        @Query("api_type") apiType: String = "json",
+        @Query("sort") sort: CommentSort? = null,
+    ): Response<MoreResponseOuter>
 }
 
 @Serializable(with = CommentsResponseSerializer::class)
 data class CommentsResponse(
     /** Contains only 1 (one) [Post] */
     val post: Listing<Post>,
-    /** List of [com.sofamaniac.reboost.data.remote.dto.Comment] and [More] */
+    /** List of [Thing.Comment] and [More] */
     val comments: Listing<Thing>,
-    val more: More? = null,
 )
 
+@Serializable
+data class MoreResponseOuter(
+    val json: MoreResponse
+)
+
+@Serializable
+data class MoreResponse(
+    val data: MoreResponseData
+)
+
+@Serializable
+data class MoreResponseData(
+    val things: List<Thing>
+)

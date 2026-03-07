@@ -1,25 +1,25 @@
 package com.sofamaniac.reboost.domain.model
 
-import com.sofamaniac.reboost.data.remote.dto.Thing
+import com.sofamaniac.reboost.data.remote.dto.MoreData
 import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
 import kotlin.time.Instant
 
 sealed class CommentType() {
     data class Comment(val comment: CommentData) : CommentType()
-    data class More(val more: Thing.More) : CommentType()
+    data class More(val data: MoreData) : CommentType()
 
     val name: String
         get() =
             when (this) {
                 is Comment -> comment.name
-                is More -> more.data.name
+                is More -> data.name
             }
 
     val depth: Int
         get() =
             when (this) {
                 is Comment -> comment.depth
-                is More -> more.data.depth
+                is More -> data.depth
             }
 }
 
