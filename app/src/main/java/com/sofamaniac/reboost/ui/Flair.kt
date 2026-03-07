@@ -148,6 +148,8 @@ fun Flair(flair: Flair, modifier: Modifier = Modifier) {
             Text(
                 text = flair.text,
                 style = MaterialTheme.typography.labelSmall.copy(color = textColor),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = modifier,
             )
         }
