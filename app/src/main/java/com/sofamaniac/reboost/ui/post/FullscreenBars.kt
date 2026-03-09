@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.reboost.LocalFullscreenHandler
 import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.domain.model.PostData
@@ -67,6 +68,12 @@ fun ColumnScope.FullscreenTopBar(
 fun ColumnScope.FullscreenBottomBar(
     post: PostData,
     enabled: Boolean,
+    viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
+        key = post.id,
+        creationCallback = { factory ->
+            factory.create(post.id)
+        }),
+    title: @Composable () -> Unit = {}
 ) {
     val theme = LocalTheme.current
     AnimatedVisibility(
@@ -80,6 +87,8 @@ fun ColumnScope.FullscreenBottomBar(
     ) {
 
         Column(verticalArrangement = Arrangement.Bottom) {
+            title()
+
             Text(
                 post.title,
                 style = MaterialTheme.typography.labelLarge.copy(color = Color.White),
@@ -92,11 +101,11 @@ fun ColumnScope.FullscreenBottomBar(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    UpButton(post.relationship.liked) { }
+                    UpButton(post.relationship.liked) { viewModel.upvote() }
                     ScoreString(post.score.score, post.relationship.liked)
-                    DownButton(post.relationship.liked) { }
+                    DownButton(post.relationship.liked) { viewModel.downvote() }
                 }
-                SavedButton(post.relationship.saved) { }
+                SavedButton(post.relationship.saved) { viewModel.save(!post.relationship.saved) }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(
