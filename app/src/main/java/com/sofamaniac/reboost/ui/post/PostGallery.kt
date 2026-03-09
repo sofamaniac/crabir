@@ -1,10 +1,12 @@
 package com.sofamaniac.reboost.ui.post
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -76,7 +78,7 @@ fun EmbeddedGallery(
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = false,
 ) {
-
+    val media = gallery.images[state.currentPage]
     Box(modifier = modifier.clickable { goFullscreen() }) {
         Gallery(
             gallery,
@@ -114,6 +116,7 @@ fun EmbeddedGallery(
                 else -> {
                     Text("No luck my friend (${metadata.javaClass.simpleName})")
                 }
+
             }
         }
         Text(
@@ -123,6 +126,15 @@ fun EmbeddedGallery(
                 .padding(all = 4.dp)
                 .cartouche(Color.Black.copy(alpha = 0.6f))
         )
+        if (media.caption != null) {
+            Text(
+                media.caption,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomStart)
+                    .background(Color.Black.copy(0.6f))
+            )
+        }
     }
 }
 
@@ -147,7 +159,18 @@ fun FullscreenGallery(
                 )
             }
         },
-        bottomBar = { FullscreenBottomBar(post, showDecorations) },
+        bottomBar = {
+            FullscreenBottomBar(post, showDecorations) {
+                val title = gallery.images[state.currentPage].caption
+                if (title != null) {
+                    Text(
+                        title,
+                        style = MaterialTheme.typography.labelLarge.copy(color = Color.White),
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+        },
         modifier = Modifier
             .fillMaxSize()
             .clickable {
