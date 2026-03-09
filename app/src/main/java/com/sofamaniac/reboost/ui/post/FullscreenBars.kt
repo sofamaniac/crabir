@@ -19,6 +19,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -76,6 +78,8 @@ fun ColumnScope.FullscreenBottomBar(
     title: @Composable () -> Unit = {}
 ) {
     val theme = LocalTheme.current
+    val likes by viewModel.likes.collectAsState(post.relationship.liked)
+    val saved by viewModel.saved.collectAsState(post.relationship.saved)
     AnimatedVisibility(
         visible = enabled,
         modifier = Modifier
@@ -101,11 +105,11 @@ fun ColumnScope.FullscreenBottomBar(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    UpButton(post.relationship.liked) { viewModel.upvote() }
-                    ScoreString(post.score.score, post.relationship.liked)
-                    DownButton(post.relationship.liked) { viewModel.downvote() }
+                    UpButton(likes) { viewModel.upvote() }
+                    ScoreString(post.score.score, likes)
+                    DownButton(likes) { viewModel.downvote() }
                 }
-                SavedButton(post.relationship.saved) { viewModel.save(!post.relationship.saved) }
+                SavedButton(saved) { viewModel.save(!saved) }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(
