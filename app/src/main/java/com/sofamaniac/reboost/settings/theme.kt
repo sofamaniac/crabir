@@ -3,7 +3,6 @@
 package com.sofamaniac.reboost.settings
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -148,7 +147,7 @@ data class ReboostTheme(
     }
 }
 
-val DefaultReboostTheme = ReboostTheme(
+val DefaultDarkTheme = ReboostTheme(
     background = Color.Black,
     cardBackground = Color.Black,
     toolbarBackground = Color.Black,
@@ -164,11 +163,38 @@ val DefaultReboostTheme = ReboostTheme(
     downvote = Color(0xFF448AFF),
 )
 
+val DefaultLightTheme = ReboostTheme(
+    background = Color.White,
+    cardBackground = Color.White,
+    toolbarBackground = Color.White,
+    toolbarText = Color.Black,
+    primaryColor = Color(0xffff6e40),
+    secondaryText = Color(0xffb7b8bc),
+    highlight = Color(0xffff0000),
+    postTitle = Color.Black,
+    readPost = Color(0xffb7b8bc),
+    announcement = Color(0xff00ff00),
+    contentColor = Color.Black,
+    linkColor = Color(0xff4b91e2),
+    downvote = Color(0xFF448AFF),
+)
+
+@Serializable
+data class ThemeSettings(
+    val dark: ReboostTheme,
+    val light: ReboostTheme,
+    val darkModeEnabled: Boolean,
+) {
+    companion object {
+        val DEFAULT = ThemeSettings(DefaultDarkTheme, DefaultLightTheme, true)
+    }
+}
+
 val Context.themeDataStore by dataStore(
     fileName = "reboost_theme.json",
     serializer = DataStoreJsonSerializer(
-        serializer = ReboostTheme.serializer(),
-        defaultValue = DefaultReboostTheme
+        serializer = ThemeSettings.serializer(),
+        defaultValue = ThemeSettings.DEFAULT
     )
 )
 
@@ -189,10 +215,9 @@ fun rememberAppTheme(): ReboostTheme {
     val context = LocalContext.current
     val themeDataStore = remember(context) { context.themeDataStore }
     val theme by themeDataStore.data.collectAsState(
-        initial = DefaultReboostTheme,
+        initial = ThemeSettings.DEFAULT,
     )
-    Log.d("Theme", "recompose $theme")
-    return theme
+    return if (theme.darkModeEnabled) theme.dark else theme.light
 }
 
 @Composable
@@ -226,9 +251,10 @@ fun ProvideReboostTheme(
 fun ThemeEditor() {
     val context = LocalContext.current
     val themeDataStore = remember(context) { context.themeDataStore }
-    val theme by themeDataStore.data.collectAsState(
-        initial = DefaultReboostTheme
+    val themeSettings by themeDataStore.data.collectAsState(
+        initial = ThemeSettings.DEFAULT,
     )
+    val theme = if (themeSettings.darkModeEnabled) themeSettings.dark else themeSettings.light
     var activeColorField by remember { mutableStateOf<ColorFields?>(null) }
     val scope = rememberCoroutineScope()
     Scaffold(
@@ -248,7 +274,21 @@ fun ThemeEditor() {
                 applyChanges = {
                     scope.launch {
                         themeDataStore.updateData {
-                            theme.updateFieldValue(field, currentColor)
+                            if (themeSettings.darkModeEnabled) {
+                                themeSettings.copy(
+                                    dark = theme.updateFieldValue(
+                                        field,
+                                        currentColor
+                                    )
+                                )
+                            } else {
+                                themeSettings.copy(
+                                    light = theme.updateFieldValue(
+                                        field,
+                                        currentColor
+                                    )
+                                )
+                            }
                         }
                         activeColorField = null
                     }
@@ -259,7 +299,7 @@ fun ThemeEditor() {
             ThemePreviewer { activeColorField = it }
             TextButton(onClick = {
                 scope.launch {
-                    themeDataStore.updateData { DefaultReboostTheme }
+                    themeDataStore.updateData { ThemeSettings.DEFAULT }
                 }
             }) {
                 Text("Reset to default")

@@ -43,7 +43,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import com.sofamaniac.reboost.settings.DefaultReboostTheme
+import com.sofamaniac.reboost.settings.DefaultDarkTheme
 import com.sofamaniac.reboost.settings.ProvideReboostTheme
 import com.sofamaniac.reboost.settings.ReboostTheme
 import com.sofamaniac.reboost.settings.SettingsPage
@@ -66,7 +66,7 @@ import kotlinx.coroutines.launch
 @HiltAndroidApp
 class ReboostApp : Application()
 
-val LocalTheme = compositionLocalOf<ReboostTheme> { DefaultReboostTheme }
+val LocalTheme = compositionLocalOf<ReboostTheme> { DefaultDarkTheme }
 val LocalDrawerState = compositionLocalOf<DrawerState> { error("No drawer state provided") }
 
 
