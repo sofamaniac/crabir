@@ -46,6 +46,8 @@ import androidx.navigation.toRoute
 import com.sofamaniac.reboost.settings.DefaultReboostTheme
 import com.sofamaniac.reboost.settings.ProvideReboostTheme
 import com.sofamaniac.reboost.settings.ReboostTheme
+import com.sofamaniac.reboost.settings.SettingsPage
+import com.sofamaniac.reboost.settings.ThemeEditor
 import com.sofamaniac.reboost.settings.rememberAppTheme
 import com.sofamaniac.reboost.ui.drawer.DrawerContent
 import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayerManager
@@ -261,6 +263,12 @@ fun NavigationGraph(
         }
         composable<LicensesRoute> {
             LicenseWebView()
+        }
+        composable<SettingsRoute> {
+            SettingsPage()
+        }
+        composable<ThemeRoute> {
+            ThemeEditor()
         }
     }
 }

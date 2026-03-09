@@ -85,6 +85,18 @@ object LicensesRoute : Route {
     override val title: String = "Licenses"
 }
 
+@Serializable
+object SettingsRoute : Route {
+    override val route: String = "Settings"
+    override val title: String = "Settings"
+}
+
+@Serializable
+object ThemeRoute : Route {
+    override val route: String = "Theme"
+    override val title: String = "Theme"
+}
+
 interface Route {
 
     val route: String

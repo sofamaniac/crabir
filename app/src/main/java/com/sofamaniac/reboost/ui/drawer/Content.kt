@@ -11,10 +11,8 @@ package com.sofamaniac.reboost.ui.drawer
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -22,10 +20,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
@@ -39,9 +36,9 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.sofamaniac.reboost.LicensesRoute
 import com.sofamaniac.reboost.LocalDrawerState
 import com.sofamaniac.reboost.LocalNavController
+import com.sofamaniac.reboost.SettingsRoute
 import com.sofamaniac.reboost.domain.model.RedditAccount
 import com.sofamaniac.reboost.ui.subreddit.SubredditIcon
 import kotlinx.coroutines.launch
@@ -108,13 +105,16 @@ fun DrawerContent(
                     }
                 })
             }
-
-            Spacer(modifier = Modifier.padding(16.dp))
-            IconButton(onClick = {
-                navController.navigate(LicensesRoute)
-            }) {
-                Icon(Icons.Default.Info, contentDescription = "About")
-            }
+            NavigationDrawerItem(
+                label = { Text("Settings") },
+                icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                selected = false,
+                onClick = {
+                    navController.navigate(SettingsRoute)
+                    coroutineScope.launch {
+                        drawerState.close()
+                    }
+                })
             HorizontalDivider()
             for (multi in viewModel.multis.collectAsState(initial = emptyList()).value) {
                 NavigationDrawerItem(
