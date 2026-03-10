@@ -54,7 +54,6 @@ import com.sofamaniac.reboost.domain.model.CommentData
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.ui.HorizontalSwipeToDismiss
 import com.sofamaniac.reboost.ui.SortMenu
-import com.sofamaniac.reboost.ui.post.PostBody
 import com.sofamaniac.reboost.ui.post.PostCard
 import com.sofamaniac.reboost.ui.thread.CommentNode
 import com.sofamaniac.reboost.ui.thread.ThreadView
@@ -147,16 +146,11 @@ fun PostFeedViewer(
                     is PostData ->
                         PostCard(
                             post,
-                            showSubredditIcon = showSubredditIcon,
                             onClick = { post ->
                                 fullscreenManager.push { threadView(post) }
                             },
-                        ) {
-                            PostBody(
-                                post,
-                                canPlayVideo = index == mostVisibleItemIndex,
-                            )
-                        }
+                            canStartVideo = index == mostVisibleItemIndex,
+                        )
 
                     is CommentData -> {
                         CommentNode(

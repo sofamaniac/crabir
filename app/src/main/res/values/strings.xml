@@ -22,4 +22,11 @@
     <string name="LightMode">Light</string>
     <string name="SystemMode">Follow system</string>
     <string name="ScheduledMode">Scheduled</string>
+    <string name="ViewCard">Card</string>
+    <string name="ViewCompact">Compact</string>
+    <string name="ViewSmallCard">Small card</string>
+    <string name="ViewDense">Dense</string>
+    <string name="ViewColumns">Columns</string>
+    <string name="ViewImage">Images</string>
+    <string name="ViewSwipe">Swipe</string>
 </resources>

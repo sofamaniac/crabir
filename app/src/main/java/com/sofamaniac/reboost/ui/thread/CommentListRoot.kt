@@ -5,12 +5,16 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ShapeDefaults
@@ -22,17 +26,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.reboost.LocalFullscreenHandler
+import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.domain.model.CommentType
 import com.sofamaniac.reboost.domain.model.Kind
 import com.sofamaniac.reboost.domain.model.PostData
-import com.sofamaniac.reboost.ui.markdown.RedditMarkdown
-import com.sofamaniac.reboost.ui.post.PostCard
-import com.sofamaniac.reboost.ui.post.PostGallery
+import com.sofamaniac.reboost.ui.post.BottomRow
+import com.sofamaniac.reboost.ui.post.PostBody
 import com.sofamaniac.reboost.ui.post.PostHeader
-import com.sofamaniac.reboost.ui.post.PostImage
 import com.sofamaniac.reboost.ui.post.PostInfo
-import com.sofamaniac.reboost.ui.post.PostVideo
+import com.sofamaniac.reboost.ui.post.VotableViewModel
 import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,36 +104,15 @@ internal fun PostView(
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = true,
 ) {
-    PostCard(post, clickable = false, enableThumbnail = !post.isCrosspost) {
+    PostCard(post) {
         if (!post.isCrosspost) {
-            when (post.kind) {
-                Kind.Image -> {
-                    PostImage(post, modifier.fillMaxWidth())
-                }
-
-                Kind.Video -> {
-                    PostVideo(post, modifier.fillMaxWidth(), canPlayVideo = canPlayVideo)
-                }
-
-                Kind.Gallery -> {
-                    PostGallery(
-                        post,
-                        modifier.fillMaxWidth(),
-                        canPlayVideo = canPlayVideo
-                    )
-                }
-
-                else -> {}
-            }
-            // always show selftext if there is one
-            val selftext = post.selftext.markdown
-            if (selftext.isNotBlank()) {
-                RedditMarkdown(
-                    selftext,
-                    mediaMetadata = post.mediaMetadata,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-            }
+            PostBody(
+                post,
+                canPlayVideo = canPlayVideo,
+                maxLines = Int.MAX_VALUE,
+                forceShowSelftext = true,
+                enableLinkFullSizePreview = false,
+            )
         } else {
             val parent = post.crosspostParentList.first()
             val fullscreenManager = LocalFullscreenHandler.current!!
@@ -166,6 +149,43 @@ internal fun CrossPostView(
             modifier = modifier,
             enableThumbnail = true,
         )
+    }
+}
+
+@Composable
+fun PostCard(
+    post: PostData,
+    modifier: Modifier = Modifier,
+    viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
+        key = post.id,
+        creationCallback = { factory ->
+            factory.create(post.id)
+        }
+    ),
+    body: @Composable ColumnScope.() -> Unit,
+) {
+    val theme = LocalTheme.current
+    val modifier = modifier
+        .padding(horizontal = 16.dp)
+        .padding(bottom = 4.dp)
+    Card(
+        shape = RoundedCornerShape(0),
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors().copy(containerColor = theme.cardBackground)
+    ) {
+        PostHeader(
+            post,
+            modifier = modifier.padding(vertical = 8.dp)
+        )
+        val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
+        PostInfo(
+            post,
+            modifier = modifier,
+            enableThumbnail = !post.isCrosspost,
+            viewModel = viewModel,
+        )
+        body()
+        BottomRow(post, modifier, visitPost = {}, viewModel = viewModel)
     }
 }
 

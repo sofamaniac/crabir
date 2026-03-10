@@ -46,6 +46,7 @@ fun PostHeader(
     post: PostData,
     modifier: Modifier = Modifier,
     showSubredditIcon: Boolean = true,
+    showPrefix: Boolean = false,
 ) {
     val navController = LocalNavController.current!!
     val theme = LocalTheme.current
@@ -76,7 +77,10 @@ fun PostHeader(
                         navController.navigate(SubredditRoute(post.subreddit.name))
                     })
             ) {
-                append(post.subreddit.name)
+                append(
+                    if (showPrefix) post.subreddit.subredditPrefixed
+                    else post.subreddit.name
+                )
             }
             withSeparator {
                 withLink(

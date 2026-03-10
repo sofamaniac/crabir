@@ -8,18 +8,14 @@
 
 package com.sofamaniac.reboost.ui.post
 
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.domain.model.Kind
 import com.sofamaniac.reboost.domain.model.PostData
 import com.sofamaniac.reboost.domain.repository.VotableRepository
@@ -33,11 +29,25 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-internal fun PostBody(
+internal fun ColumnScope.PostBody(
     post: PostData,
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = false,
+    enableFullHeightImage: Boolean = true,
+    enableTextPreview: Boolean = true,
+    maxLines: Int = 5,
+    enableLinkFullSizePreview: Boolean = true,
+    forceShowSelftext: Boolean = false,
 ) {
+    val selftextView = @Composable {
+        val selftext = post.selftext.markdown
+        RedditMarkdown(
+            markdown = selftext,
+            maxLines = maxLines,
+            modifier = modifier.padding(horizontal = 16.dp),
+            mediaMetadata = post.mediaMetadata
+        )
+    }
     when (post.kind) {
         Kind.Image -> {
             PostImage(post, modifier.fillMaxWidth())
@@ -48,7 +58,9 @@ internal fun PostBody(
         }
 
         Kind.Link -> {
-            // TODO check if there is a preview, if not show the link
+            if (enableLinkFullSizePreview) {
+                PostImage(post, modifier.fillMaxWidth(), enabled = false)
+            }
         }
 
         Kind.Gallery -> {
@@ -68,81 +80,20 @@ internal fun PostBody(
 
         else -> {
             val selftext = post.selftext.markdown
-            if (selftext.isNotBlank()) {
-                RedditMarkdown(
-                    markdown = selftext,
-                    maxLines = 6,
-                    modifier = modifier.padding(horizontal = 16.dp),
-                    mediaMetadata = post.mediaMetadata
-                )
+            if (selftext.isNotBlank() && enableTextPreview) {
+                selftextView()
+                return
             }
+        }
+    }
+    if (forceShowSelftext) {
+        val selftext = post.selftext.markdown
+        if (selftext.isNotBlank() && enableTextPreview) {
+            selftextView()
         }
     }
 }
 
-
-/**
- * Composable function that displays a single post in a Card format.
- *
- * This function creates a view for a given [Post], including its header,
- * content, and bottom row of actions.
- *
- * @param post The [PostData] data to display.
- * @param modifier Modifier for the root layout of the post.
- * @param enableThumbnail Whether to enable the thumbnail preview. Defaults to true. The thumbnail is shown only if there is one and the post if a link.
- * @param showSubredditIcon Whether to display the subreddit icon in the header. Defaults to true.
- * @param clickable Whether the post is clickable to navigate to the thread view. Defaults to true.
- * @param onClick A lambda that takes a [PostData] and is called before navigating to the post.
- * @param body A composable lambda that defines the main content/body of the post (e.g., text, image). It should manage the horizontal padding itself
- */
-@Composable
-fun PostCard(
-    post: PostData,
-    modifier: Modifier = Modifier,
-    enableThumbnail: Boolean = true,
-    showSubredditIcon: Boolean = true,
-    clickable: Boolean = true,
-    onClick: (PostData) -> Unit = {},
-    viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
-        key = post.id,
-        creationCallback = { factory ->
-            factory.create(post.id)
-        }),
-    body: @Composable () -> Unit,
-) {
-    // We do not apply the padding on the column, but on each of its children except [body]
-    // to have images that take the full width
-    val modifier = Modifier
-        .padding(horizontal = 16.dp)
-        .padding(bottom = 4.dp)
-    val theme = LocalTheme.current
-    val onClickCard = if (clickable) {
-        { onClick(post) }
-    } else {
-        {}
-    }
-    Card(
-        shape = RoundedCornerShape(0),
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClickCard,
-        colors = CardDefaults.cardColors().copy(containerColor = theme.cardBackground)
-    ) {
-        PostHeader(
-            post,
-            showSubredditIcon = showSubredditIcon,
-            modifier = modifier.padding(vertical = 8.dp)
-        )
-        val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
-        PostInfo(
-            post,
-            modifier = modifier,
-            enableThumbnail = enablePreview && enableThumbnail,
-            viewModel = viewModel,
-        )
-        body()
-        BottomRow(post, modifier, visitPost = onClick, viewModel = viewModel)
-    }
-}
 
 @HiltViewModel(assistedFactory = VotableViewModel.Factory::class)
 class VotableViewModel @AssistedInject constructor(

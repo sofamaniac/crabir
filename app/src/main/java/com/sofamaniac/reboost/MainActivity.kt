@@ -50,6 +50,7 @@ import com.sofamaniac.reboost.settings.theme.ReboostTheme
 import com.sofamaniac.reboost.settings.theme.ThemeEditor
 import com.sofamaniac.reboost.settings.theme.ThemeSettingsPage
 import com.sofamaniac.reboost.settings.theme.rememberAppTheme
+import com.sofamaniac.reboost.settings.views.ViewsSettingsPage
 import com.sofamaniac.reboost.ui.drawer.DrawerContent
 import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayerManager
 import com.sofamaniac.reboost.ui.search.SearchTab
@@ -274,6 +275,9 @@ fun NavigationGraph(
         }
         composable<ThemeEditorRoute> {
             ThemeEditor()
+        }
+        composable<ViewsSettingRoute> {
+            ViewsSettingsPage()
         }
     }
 }
