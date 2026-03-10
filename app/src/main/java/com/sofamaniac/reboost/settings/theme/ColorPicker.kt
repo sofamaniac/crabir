@@ -1,4 +1,4 @@
-package com.sofamaniac.reboost.settings
+package com.sofamaniac.reboost.settings.theme
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

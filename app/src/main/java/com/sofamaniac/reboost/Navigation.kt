@@ -97,6 +97,12 @@ object ThemeRoute : Route {
     override val title: String = "Theme"
 }
 
+@Serializable
+object ThemeEditorRoute : Route {
+    override val route: String = "ThemeEditor"
+    override val title: String = "ThemeEditor"
+}
+
 interface Route {
 
     val route: String

@@ -48,7 +48,8 @@ import com.sofamaniac.reboost.LocalDrawerState
 import com.sofamaniac.reboost.LocalNavController
 import com.sofamaniac.reboost.SettingsRoute
 import com.sofamaniac.reboost.domain.model.RedditAccount
-import com.sofamaniac.reboost.settings.themeDataStore
+import com.sofamaniac.reboost.settings.theme.ThemeMode
+import com.sofamaniac.reboost.settings.theme.themeDataStore
 import com.sofamaniac.reboost.ui.subreddit.SubredditIcon
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -69,8 +70,8 @@ fun DrawerContent(
     val drawerState = LocalDrawerState.current
     val context = LocalContext.current
     val themeDataStore = remember { context.themeDataStore }
-    val darkModeEnabled by themeDataStore.data.map { it.darkModeEnabled }
-        .collectAsState(initial = false)
+    val themeMode by themeDataStore.data.map { it.mode }
+        .collectAsState(initial = ThemeMode.System)
     ModalDrawerSheet {
         Column(
             modifier = modifier
@@ -127,17 +128,23 @@ fun DrawerContent(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text("Settings")
-                        IconButton(onClick = {
-                            coroutineScope.launch {
-                                themeDataStore.updateData {
-                                    it.copy(darkModeEnabled = !it.darkModeEnabled)
+                        if (themeMode == ThemeMode.Dark || themeMode == ThemeMode.Light) {
+                            IconButton(onClick = {
+                                coroutineScope.launch {
+                                    themeDataStore.updateData {
+                                        if (themeMode == ThemeMode.Dark) {
+                                            it.copy(mode = ThemeMode.Light)
+                                        } else {
+                                            it.copy(mode = ThemeMode.Dark)
+                                        }
+                                    }
                                 }
-                            }
-                        }) {
-                            if (darkModeEnabled) {
-                                Icon(Icons.Default.LightMode, contentDescription = "Light mode")
-                            } else {
-                                Icon(Icons.Default.DarkMode, contentDescription = "Dark mode")
+                            }) {
+                                if (themeMode == ThemeMode.Dark) {
+                                    Icon(Icons.Default.LightMode, contentDescription = "Light mode")
+                                } else {
+                                    Icon(Icons.Default.DarkMode, contentDescription = "Dark mode")
+                                }
                             }
                         }
                     }

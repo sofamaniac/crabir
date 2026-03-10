@@ -43,12 +43,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import com.sofamaniac.reboost.settings.DefaultDarkTheme
-import com.sofamaniac.reboost.settings.ProvideReboostTheme
-import com.sofamaniac.reboost.settings.ReboostTheme
 import com.sofamaniac.reboost.settings.SettingsPage
-import com.sofamaniac.reboost.settings.ThemeEditor
-import com.sofamaniac.reboost.settings.rememberAppTheme
+import com.sofamaniac.reboost.settings.theme.ConfigureMaterialTheme
+import com.sofamaniac.reboost.settings.theme.DefaultDarkTheme
+import com.sofamaniac.reboost.settings.theme.ReboostTheme
+import com.sofamaniac.reboost.settings.theme.ThemeEditor
+import com.sofamaniac.reboost.settings.theme.ThemeSettingsPage
+import com.sofamaniac.reboost.settings.theme.rememberAppTheme
 import com.sofamaniac.reboost.ui.drawer.DrawerContent
 import com.sofamaniac.reboost.ui.media.videoPlayer.VideoPlayerManager
 import com.sofamaniac.reboost.ui.search.SearchTab
@@ -77,12 +78,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ProvideReboostTheme {
+            ConfigureMaterialTheme {
                 val navController = rememberNavController()
                 val drawerState = rememberDrawerState(DrawerValue.Closed)
                 // Setup nav controller
                 CompositionLocalProvider(LocalNavController provides navController) {
                     val theme = rememberAppTheme()
+                    Log.d("MainActivity", "onCreate: $theme")
                     CompositionLocalProvider(LocalTheme provides theme) {
                         CompositionLocalProvider(LocalDrawerState provides drawerState) {
                             MainScreen(
@@ -268,6 +270,9 @@ fun NavigationGraph(
             SettingsPage()
         }
         composable<ThemeRoute> {
+            ThemeSettingsPage()
+        }
+        composable<ThemeEditorRoute> {
             ThemeEditor()
         }
     }

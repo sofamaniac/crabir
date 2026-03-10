@@ -18,4 +18,8 @@
     <string name="SortRelevance">Relevance</string>
     <string name="SortComments">Comments</string>
     <string name="SortActivity">Activity</string>
+    <string name="DarkMode">Dark</string>
+    <string name="LightMode">Light</string>
+    <string name="SystemMode">Follow system</string>
+    <string name="ScheduledMode">Scheduled</string>
 </resources>

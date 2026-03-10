@@ -39,7 +39,7 @@ import com.bumptech.glide.request.target.Target
 import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.reboost.domain.model.MediaResource
-import com.sofamaniac.reboost.settings.ReboostTheme
+import com.sofamaniac.reboost.settings.theme.ReboostTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
