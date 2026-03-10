@@ -145,7 +145,7 @@ fun EmbeddedGallery(
 @Composable
 fun FullscreenGallery(
     post: PostData,
-    state: PagerState,
+    state: PagerState = rememberPagerState(pageCount = { gallery.images.size }),
     gallery: Gallery,
 ) {
     var showDecorations by remember { mutableStateOf(true) }

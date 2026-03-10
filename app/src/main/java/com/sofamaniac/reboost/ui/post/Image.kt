@@ -27,22 +27,7 @@ fun PostImage(
     val fullscreenManager = LocalFullscreenHandler.current!!
     val goFullscreen = {
         fullscreenManager.push {
-            var showDecorations by remember { mutableStateOf(true) }
-            VerticalSwipeToDismiss(
-                topBar = {
-                    FullscreenTopBar(showDecorations, actions = {})
-                },
-                bottomBar = { FullscreenBottomBar(post, showDecorations) },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable {
-                        showDecorations = !showDecorations
-                    },
-            ) {
-                ImageView(post, modifier = Modifier.fillMaxSize(), onClick = {
-                    showDecorations = !showDecorations
-                })
-            }
+            FullscreenImageView(post)
         }
     }
     ImageView(
@@ -56,3 +41,22 @@ fun PostImage(
 
 }
 
+@Composable
+fun FullscreenImageView(post: PostData) {
+    var showDecorations by remember { mutableStateOf(true) }
+    VerticalSwipeToDismiss(
+        topBar = {
+            FullscreenTopBar(showDecorations, actions = {})
+        },
+        bottomBar = { FullscreenBottomBar(post, showDecorations) },
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable {
+                showDecorations = !showDecorations
+            },
+    ) {
+        ImageView(post, modifier = Modifier.fillMaxSize(), onClick = {
+            showDecorations = !showDecorations
+        })
+    }
+}

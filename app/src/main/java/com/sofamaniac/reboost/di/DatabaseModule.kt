@@ -2,8 +2,6 @@ package com.sofamaniac.reboost.di
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.sofamaniac.reboost.data.local.dao.AccountsDao
 import com.sofamaniac.reboost.data.local.dao.VisitedCommunityDao
 import com.sofamaniac.reboost.data.local.dao.VisitedPostsDao
@@ -28,10 +26,7 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "reddit_app_database"
-        ).addMigrations(
-            MIGRATION_1_2,
-            MIGRATION_2_3
-        )
+        ).fallbackToDestructiveMigration(false)
             .build()
     }
 
@@ -50,34 +45,4 @@ object DatabaseModule {
         return database.visitedCommunityDao()
     }
 
-}
-
-val MIGRATION_1_2 = object : Migration(1, 2) {
-    override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL(
-            """
-            CREATE TABLE posts_new (
-                id TEXT PRIMARY KEY NOT NULL,
-                post TEXT NOT NULL
-            )
-        """
-        )
-        db.execSQL("""DROP TABLE visitedPosts""")
-        db.execSQL("""ALTER TABLE posts_new RENAME TO visitedPosts""")
-    }
-}
-
-val MIGRATION_2_3 = object : Migration(2, 3) {
-    override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL(
-            """
-            CREATE TABLE IF NOT EXISTS `visitedCommunity` (
-                `id` TEXT NOT NULL,
-                `sort` TEXT NOT NULL,
-                `timeframe` TEXT,
-                PRIMARY KEY(`id`)
-            )
-            """.trimIndent()
-        )
-    }
 }

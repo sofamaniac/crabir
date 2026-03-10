@@ -52,8 +52,11 @@ import com.sofamaniac.reboost.LocalTheme
 import com.sofamaniac.reboost.data.remote.dto.post.Sort
 import com.sofamaniac.reboost.domain.model.CommentData
 import com.sofamaniac.reboost.domain.model.PostData
+import com.sofamaniac.reboost.settings.views.Views
+import com.sofamaniac.reboost.settings.views.rememberViewSettings
 import com.sofamaniac.reboost.ui.HorizontalSwipeToDismiss
 import com.sofamaniac.reboost.ui.SortMenu
+import com.sofamaniac.reboost.ui.post.CompactView
 import com.sofamaniac.reboost.ui.post.PostCard
 import com.sofamaniac.reboost.ui.thread.CommentNode
 import com.sofamaniac.reboost.ui.thread.ThreadView
@@ -107,6 +110,8 @@ fun PostFeedViewer(
 
     var needScrollToTop by remember { mutableStateOf(false) }
 
+    val viewSettings = rememberViewSettings()
+
     // Reset list state after refresh
     LaunchedEffect(posts.loadState.refresh) {
         if (posts.loadState.refresh != LoadState.Loading && needScrollToTop) {
@@ -143,14 +148,34 @@ fun PostFeedViewer(
                     }
                 }
                 when (post) {
-                    is PostData ->
-                        PostCard(
-                            post,
-                            onClick = { post ->
-                                fullscreenManager.push { threadView(post) }
-                            },
-                            canStartVideo = index == mostVisibleItemIndex,
-                        )
+                    is PostData -> {
+                        val onClick = { post: PostData ->
+                            fullscreenManager.push { threadView(post) }
+                        }
+                        val canStartVideo = index == mostVisibleItemIndex
+                        when (viewSettings.defaultView) {
+                            Views.Card -> PostCard(
+                                post,
+                                onClick = onClick,
+                                canStartVideo = canStartVideo
+                            )
+
+                            Views.Compact -> CompactView(
+                                post,
+                                onClick = onClick,
+                                canStartVideo = canStartVideo
+                            )
+
+                            else ->
+                                PostCard(
+                                    post,
+                                    onClick = { post ->
+                                        fullscreenManager.push { threadView(post) }
+                                    },
+                                    canStartVideo = index == mostVisibleItemIndex,
+                                )
+                        }
+                    }
 
                     is CommentData -> {
                         CommentNode(

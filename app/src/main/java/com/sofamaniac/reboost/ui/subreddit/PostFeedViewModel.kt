@@ -56,9 +56,9 @@ abstract class PostFeedViewModel(
         if (id != null) {
             viewModelScope.launch(Dispatchers.IO) {
                 val entity = visitedCommunityDao.getCommunity(id!!)
-                if (entity != null) {
+                if (entity?.sort != null) {
                     _params.update {
-                        it.copy(sort = entity.sort, timeframe = entity.timeframe)
+                        it.copy(sort = entity.sort!!, timeframe = entity.timeframe)
                     }
                 }
             }
@@ -108,7 +108,7 @@ abstract class PostFeedViewModel(
             if (id != null) {
                 Log.d("PostFeedViewModel", "updateSort: Updating sort to $sort")
                 viewModelScope.launch(Dispatchers.IO) {
-                    visitedCommunityDao.insert(VisitedCommunityEntity(id!!, sort, timeframe))
+                    visitedCommunityDao.insert(VisitedCommunityEntity(id!!, sort, timeframe, null))
                 }
             }
             refresh()

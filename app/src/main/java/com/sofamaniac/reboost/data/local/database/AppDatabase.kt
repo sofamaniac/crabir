@@ -11,7 +11,7 @@ import com.sofamaniac.reboost.data.local.entities.VisitedPostEntity
 
 @Database(
     entities = [RedditAccountEntity::class, VisitedPostEntity::class, VisitedCommunityEntity::class],
-    version = 3
+    version = 4
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun accountsDao(): AccountsDao
