@@ -72,6 +72,7 @@ fun FlairRichtext(richText: List<LinkFlairRichtext>, color: Color, modifier: Mod
         inlineContent = inlineContent,
         color = color,
         modifier = modifier,
+        style = MaterialTheme.typography.labelSmall.copy(color = color),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
