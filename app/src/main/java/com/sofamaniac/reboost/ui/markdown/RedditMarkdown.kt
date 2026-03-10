@@ -8,12 +8,15 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.text.Layout
+import android.text.Spanned
 import android.text.TextUtils
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.view.ContextThemeWrapper
+import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.TextView
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -80,29 +83,6 @@ fun RedditMarkdown(
         .fuseQuote()
 
     val context = LocalContext.current
-    val textView = remember {
-        val contextWrapper =
-            ContextThemeWrapper(context, androidx.appcompat.R.style.Theme_AppCompat)
-        PassThroughTextView(contextWrapper)
-    }
-
-    // this code fixes missing ellipsis https://github.com/noties/Markwon/issues/180
-    textView.getViewTreeObserver()
-        .addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                textView.getViewTreeObserver().removeOnGlobalLayoutListener(this)
-                val max = textView.maxLines
-                val layout: Layout? = textView.layout
-                if ((layout?.lineCount ?: 0) > max) {
-                    val end = layout!!.getLineEnd(max - 1)
-                    textView.setText(
-                        textView.getText().subSequence(0, end - 3),
-                        TextView.BufferType.SPANNABLE
-                    )
-                    textView.append("...")
-                }
-            }
-        })
 
     val theme = LocalTheme.current
     val markwonReddit = remember(redditMarkwonBuilder(context, colorScheme, theme, mediaMetadata))
@@ -120,24 +100,7 @@ fun RedditMarkdown(
 //            markwonReddit.setParsedMarkdown(textView, spanned)
 //            textView.tag = markdown
 //        },
-        factory = {
-            textView.apply {
-                setTextColor(colorScheme.onBackground.toArgb())
-                setLinkTextColor(colorScheme.primary.toArgb())
-                //this.movementMethod = LinkTouchMovementMethod.getInstance()
-                this.maxLines = maxLines
-                markwonReddit.setParsedMarkdown(textView, spanned)
-
-                // Disable link when truncating view and allow clicks to be passed to parent view.
-                if (maxLines != Int.MAX_VALUE) {
-                    textView.movementMethod = null
-                    textView.ellipsize = TextUtils.TruncateAt.END
-                } else {
-                    textView.movementMethod = LinkMovementMethod.getInstance()
-                }
-                textView.tag = markdown
-            }
-        },
+        factory = { ctx -> initTextView(ctx, maxLines, markdown, markwonReddit, spanned) },
         modifier = modifier
             .onSizeChanged { size ->
                 viewModel.height = size.height
@@ -149,20 +112,71 @@ fun RedditMarkdown(
                 viewModel.height?.let { size ->
                     mod.then(Modifier.height(with(LocalDensity.current) { size.toDp() }))
                 } ?: mod
-            },
+            }
+            .fillMaxWidth(),
         update = { textView ->
             if (textView.tag != markdown) {
                 textView.tag = markdown
                 markwonReddit.setParsedMarkdown(textView, spanned)
                 // Disable link when truncating view and allow clicks to be passed to parent view.
+                textView.maxLines = maxLines
                 if (maxLines != Int.MAX_VALUE) {
                     textView.movementMethod = null
+                    textView.ellipsize = TextUtils.TruncateAt.END
                 } else {
                     textView.movementMethod = LinkMovementMethod.getInstance()
                 }
             }
         }
     )
+}
+
+fun initTextView(
+    ctx: Context,
+    maxLines: Int,
+    markdown: String,
+    markwonReddit: Markwon,
+    spanned: Spanned
+): TextView {
+    val contextWrapper =
+        ContextThemeWrapper(ctx, androidx.appcompat.R.style.Theme_AppCompat)
+    val textView = PassThroughTextView(contextWrapper)
+
+    return textView.apply {
+        layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        this.maxLines = maxLines
+        movementMethod = if (maxLines == Int.MAX_VALUE)
+            LinkMovementMethod.getInstance() else null
+        if (maxLines != Int.MAX_VALUE)
+            ellipsize = TextUtils.TruncateAt.END
+        markwonReddit.setParsedMarkdown(this, spanned)
+        tag = markdown
+
+        viewTreeObserver.addOnGlobalLayoutListener(
+            object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    textView.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                    val max = textView.maxLines
+                    val layout: Layout? = textView.layout
+                    if ((layout?.lineCount ?: 0) > max) {
+                        val end = layout!!.getLineEnd(max)
+                        val text = textView.text
+                        textView.setText(
+                            text.subSequence(
+                                0,
+                                (end - 3).coerceAtLeast(0)
+                            ),
+                            TextView.BufferType.SPANNABLE
+                        )
+                        textView.append("...")
+                    }
+                }
+            }
+        )
+    }
 }
 
 @Composable
