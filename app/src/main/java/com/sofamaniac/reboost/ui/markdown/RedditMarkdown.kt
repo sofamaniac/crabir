@@ -100,7 +100,7 @@ fun RedditMarkdown(
 //            markwonReddit.setParsedMarkdown(textView, spanned)
 //            textView.tag = markdown
 //        },
-        factory = { ctx -> initTextView(ctx, maxLines, markdown, markwonReddit, spanned) },
+        factory = { ctx -> initTextView(ctx, theme, maxLines, markdown, markwonReddit, spanned) },
         modifier = modifier
             .onSizeChanged { size ->
                 viewModel.height = size.height
@@ -133,6 +133,7 @@ fun RedditMarkdown(
 
 fun initTextView(
     ctx: Context,
+    colorScheme: ReboostTheme,
     maxLines: Int,
     markdown: String,
     markwonReddit: Markwon,
@@ -147,6 +148,7 @@ fun initTextView(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
+        setTextColor(colorScheme.contentColor.toArgb())
         this.maxLines = maxLines
         movementMethod = if (maxLines == Int.MAX_VALUE)
             LinkMovementMethod.getInstance() else null
