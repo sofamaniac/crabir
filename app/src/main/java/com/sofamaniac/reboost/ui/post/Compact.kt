@@ -47,9 +47,9 @@ fun CompactView(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                UpButton(post.relationship.liked) { }
+                UpButton(viewModel)
                 ScoreString(post.score.score, post.relationship.liked)
-                DownButton(post.relationship.liked) { }
+                DownButton(viewModel)
             }
             Column {
                 PostInfo(post, modifier, enableThumbnail = true, viewModel = viewModel)

@@ -105,11 +105,11 @@ fun ColumnScope.FullscreenBottomBar(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    UpButton(likes) { viewModel.upvote() }
+                    UpButton(viewModel)
                     ScoreString(post.score.score, likes)
-                    DownButton(likes) { viewModel.downvote() }
+                    DownButton(viewModel)
                 }
-                SavedButton(saved) { viewModel.save(!saved) }
+                SavedButton(viewModel)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(

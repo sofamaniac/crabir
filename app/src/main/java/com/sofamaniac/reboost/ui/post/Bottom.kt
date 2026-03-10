@@ -19,7 +19,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,12 +44,10 @@ fun BottomRow(
 ) {
     LocalNavController.current!!
     val uriHandler = LocalUriHandler.current
-    val likes by viewModel.likes.collectAsState(initial = post.relationship.liked)
-    val saved by viewModel.saved.collectAsState(initial = post.relationship.saved)
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-        UpButton(likes) { viewModel.upvote() }
-        DownButton(likes) { viewModel.downvote() }
-        SavedButton(saved) { viewModel.save(!saved) }
+        UpButton(viewModel)
+        DownButton(viewModel)
+        SavedButton(viewModel)
         IconButton(onClick = {
             visitPost(post)
         }) {

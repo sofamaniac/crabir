@@ -24,6 +24,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -94,29 +95,37 @@ internal fun ColumnScope.PostBody(
     }
 }
 
+interface VotableInteraction {
+    val likes: Flow<Boolean?>
+    val saved: Flow<Boolean>
+    fun upvote()
+    fun downvote()
+    fun save(target: Boolean)
+}
+
 
 @HiltViewModel(assistedFactory = VotableViewModel.Factory::class)
 class VotableViewModel @AssistedInject constructor(
     @Assisted val id: String,
     private val posts: VotableRepository,
-) : ViewModel() {
+) : ViewModel(), VotableInteraction {
 
-    val likes = posts.observePost(id).map { it?.relationship?.liked }
-    val saved = posts.observePost(id).map { it?.relationship?.saved ?: false }
+    override val likes = posts.observePost(id).map { it?.relationship?.liked }
+    override val saved = posts.observePost(id).map { it?.relationship?.saved ?: false }
 
-    fun upvote() {
+    override fun upvote() {
         viewModelScope.launch {
             posts.upvote(id)
         }
     }
 
-    fun downvote() {
+    override fun downvote() {
         viewModelScope.launch {
             posts.downvote(id)
         }
     }
 
-    fun save(target: Boolean) {
+    override fun save(target: Boolean) {
         viewModelScope.launch {
             if (target) {
                 posts.save(id)

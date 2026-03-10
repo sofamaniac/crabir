@@ -35,10 +35,13 @@ import com.sofamaniac.reboost.ui.Flair
 import com.sofamaniac.reboost.ui.cartouche
 import com.sofamaniac.reboost.ui.formatElapsedTimeLocalized
 import com.sofamaniac.reboost.ui.markdown.RedditMarkdown
+import com.sofamaniac.reboost.ui.post.VotableInteraction
 import com.sofamaniac.reboost.ui.votable.DownButton
 import com.sofamaniac.reboost.ui.votable.SavedButton
 import com.sofamaniac.reboost.ui.votable.ScoreString
 import com.sofamaniac.reboost.ui.votable.UpButton
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 @Composable
@@ -83,15 +86,33 @@ fun CommentNode(
 fun BottomRow(comment: CommentData, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
     val likes = comment.relationship.liked
     val saved = comment.relationship.saved
+    val votable = remember(comment) {
+        object : VotableInteraction {
+            override val likes: Flow<Boolean?> = flowOf(likes)
+            override val saved: Flow<Boolean> = flowOf(saved)
+
+            override fun upvote() {
+                viewModel.upvote(comment.name, likes)
+            }
+
+            override fun downvote() {
+                viewModel.downvote(comment.name, likes)
+            }
+
+            override fun save(target: Boolean) {
+                viewModel.save(comment.name, saved)
+            }
+        }
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(color = Color.Gray.copy(alpha = 0.2f)),
         horizontalArrangement = Arrangement.End
     ) {
-        UpButton(likes) { viewModel.upvote(comment.name, likes) }
-        DownButton(likes) { viewModel.downvote(comment.name, likes) }
-        SavedButton(saved) { viewModel.save(comment.name, saved) }
+        UpButton(votable)
+        DownButton(votable)
+        SavedButton(votable)
         IconButton(onClick = {
             Log.d("CommentNode", "$comment")
         }) { Icon(Icons.Default.BugReport, contentDescription = null) }
