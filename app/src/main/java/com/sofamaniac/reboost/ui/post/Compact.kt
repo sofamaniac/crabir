@@ -8,6 +8,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -32,23 +34,25 @@ fun CompactView(
         }),
 ) {
     val theme = LocalTheme.current
-    val onClick = {
+    val onClick = { post: PostData ->
         if (clickable) {
             onClick(post)
         }
     }
+    val likes by viewModel.likes.collectAsState(post.relationship.liked)
     Card(
         shape = RoundedCornerShape(0.dp),
         colors = CardDefaults.cardColors().copy(containerColor = theme.cardBackground),
         onClick = { onClick(post) },
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top,
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 UpButton(viewModel)
-                ScoreString(post.score.score, post.relationship.liked)
+                ScoreString(post.score.score, likes)
                 DownButton(viewModel)
             }
             Column {
