@@ -161,10 +161,10 @@ fun initTextView(
             object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     textView.getViewTreeObserver().removeOnGlobalLayoutListener(this)
-                    val max = textView.maxLines
+                    val max = textView.maxLines.coerceAtLeast(1)
                     val layout: Layout? = textView.layout
                     if ((layout?.lineCount ?: 0) > max) {
-                        val end = layout!!.getLineEnd(max)
+                        val end = layout!!.getLineEnd(max - 1)
                         val text = textView.text
                         textView.setText(
                             text.subSequence(
