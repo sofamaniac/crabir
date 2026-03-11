@@ -23,9 +23,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <data
-                    android:host="www.reddit.com"
-                    android:scheme="https" />
             </intent-filter>
 
             <intent-filter android:autoVerify="false">

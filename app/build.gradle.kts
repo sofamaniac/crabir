@@ -26,9 +26,9 @@ android {
     compileSdk = 36
     defaultConfig {
         applicationId = "com.sofamaniac.crabir"
-        minSdk = 31
+        minSdk = 24
         targetSdk = 36
-        versionCode = 7
+        versionCode = 9
         versionName = "0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
