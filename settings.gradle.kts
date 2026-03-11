@@ -24,5 +24,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Reboost"
+rootProject.name = "Crabir"
 include(":app")

@@ -1,0 +1,31 @@
+/*
+ * Copyright (c) 2025 Antoine Grimod
+ */
+
+package com.sofamaniac.crabir.domain.repository.feed
+
+import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.domain.model.PagedResponse
+import com.sofamaniac.crabir.domain.repository.VotableRepository
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class HomeRepository @Inject constructor(
+    votableRepository: VotableRepository,
+    api: RedditAPIService
+) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
+
+    override suspend fun getThings(
+        after: String,
+        params: FeedParams
+    ): PagedResponse<String> {
+        return makeRequest {
+            api.getHome(
+                sort = params.sort,
+                timeframe = params.timeframe,
+                after = after
+            )
+        }
+    }
+}

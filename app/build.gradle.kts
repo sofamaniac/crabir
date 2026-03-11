@@ -22,18 +22,18 @@ plugins {
 }
 
 android {
-    namespace = "com.sofamaniac.reboost"
+    namespace = "com.sofamaniac.crabir"
     compileSdk = 36
     defaultConfig {
-        applicationId = "com.sofamaniac.reboost"
+        applicationId = "com.sofamaniac.crabir"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1"
+        versionCode = 7
+        versionName = "0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        manifestPlaceholders["appAuthRedirectScheme"] = "com.sofamaniac.reboost"
+        manifestPlaceholders["appAuthRedirectScheme"] = "com.sofamaniac.crabir"
 
         val keystoreFile = project.rootProject.file("apikeys.properties")
         val properties = Properties()
@@ -51,7 +51,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

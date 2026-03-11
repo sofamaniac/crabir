@@ -3,7 +3,7 @@
   -->
 
 <resources>
-    <string name="app_name">Reboost</string>
+    <string name="app_name">Crabir</string>
     <string name="SortTop">Top</string>
     <string name="SortControversial">Controversial</string>
     <string name="SortHot">Hot</string>
