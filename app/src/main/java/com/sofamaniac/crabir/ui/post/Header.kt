@@ -39,6 +39,7 @@ import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
+import com.sofamaniac.crabir.ui.user.ProfileTabs
 
 
 @Composable
@@ -88,7 +89,12 @@ fun PostHeader(
                         tag = "User",
                         styles = TextLinkStyles(style = SpanStyle(color = theme.secondaryText)),
                         linkInteractionListener = {
-                            navController.navigate(ProfileRoute(post.author.username))
+                            navController.navigate(
+                                ProfileRoute(
+                                    post.author.username,
+                                    ProfileTabs.Overview.toString()
+                                )
+                            )
                         })
                 ) {
                     append(post.author.username)

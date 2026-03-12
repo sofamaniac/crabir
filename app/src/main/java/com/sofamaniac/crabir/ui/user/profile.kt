@@ -38,6 +38,18 @@ enum class ProfileTabs {
 
     companion object {
         val publicTabs get() = listOf(Overview, About, Posts, Comments)
+        fun fromString(string: String): ProfileTabs {
+            return when (string.lowercase()) {
+                "about" -> About
+                "submitted" -> Posts
+                "comments" -> Comments
+                "saved" -> Saved
+                "upvoted" -> Upvoted
+                "downvoted" -> Downvoted
+                "hidden" -> Hidden
+                else -> Overview
+            }
+        }
     }
 }
 
@@ -51,12 +63,14 @@ fun ProfileInfo(modifier: Modifier = Modifier) {
 fun ProfileView(
     user: String,
     modifier: Modifier = Modifier,
+    initialTab: ProfileTabs = ProfileTabs.Overview,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val isConnectedUser by viewModel.currentUser.map { it == user }.collectAsState(true)
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val tabs = if (isConnectedUser) ProfileTabs.entries else ProfileTabs.publicTabs
-    val currentTab = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
+    val initialIndex = tabs.indexOf(initialTab).coerceIn(0, tabs.size)
+    val currentTab = rememberPagerState(initialPage = initialIndex, pageCount = { tabs.size })
     val scope = rememberCoroutineScope()
 
     val viewModels: Map<ProfileTabs, ProfileFeedViewModel> = mapOf(

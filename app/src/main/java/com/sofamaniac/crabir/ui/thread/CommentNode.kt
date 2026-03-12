@@ -36,6 +36,7 @@ import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import com.sofamaniac.crabir.ui.post.VotableInteraction
+import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.SavedButton
 import com.sofamaniac.crabir.ui.votable.ScoreString
@@ -131,7 +132,12 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
 
     val navController = LocalNavController.current!!
     val authorModifier = Modifier.clickable {
-        navController.navigate(ProfileRoute(comment.author.username))
+        navController.navigate(
+            ProfileRoute(
+                comment.author.username,
+                ProfileTabs.Overview.toString()
+            )
+        )
     }
     Row(
         modifier = modifier,

@@ -15,16 +15,21 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.sofamaniac.crabir.HomeRoute
 import com.sofamaniac.crabir.InboxRoute
 import com.sofamaniac.crabir.LocalNavController
 import com.sofamaniac.crabir.ProfileRoute
+import com.sofamaniac.crabir.R
+import com.sofamaniac.crabir.Route
 import com.sofamaniac.crabir.SearchRoute
 import com.sofamaniac.crabir.SubscriptionsRoute
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
+import com.sofamaniac.crabir.ui.user.ProfileTabs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -34,6 +39,8 @@ class TabBarViewModel @Inject constructor(
 ) : ViewModel() {
     val currentUser = accountsRepository.activeAccount
 }
+
+internal class TabRepresentation(val icon: ImageVector, val label: Int, val route: Route)
 
 
 @Composable
@@ -45,11 +52,18 @@ fun TabBar(
 ) {
     val user by viewModel.currentUser.collectAsState(initial = RedditAccount.anonymous())
     val tabs = listOf(
-        Pair(Icons.Filled.Home, HomeRoute),
-        Pair(Icons.Default.Search, SearchRoute()),
-        Pair(Icons.AutoMirrored.Outlined.List, SubscriptionsRoute),
-        Pair(Icons.Default.Email, InboxRoute),
-        Pair(Icons.Filled.Person, ProfileRoute(user.username))
+        TabRepresentation(Icons.Filled.Home, R.string.Home, HomeRoute),
+        TabRepresentation(Icons.Default.Search, R.string.Search, SearchRoute()),
+        TabRepresentation(
+            Icons.AutoMirrored.Outlined.List, R.string.Subscriptions,
+            SubscriptionsRoute
+        ),
+        TabRepresentation(Icons.Default.Email, R.string.Inbox, InboxRoute),
+        TabRepresentation(
+            Icons.Filled.Person,
+            R.string.Profile,
+            ProfileRoute(user.username, ProfileTabs.Overview.toString())
+        )
     )
     val navController = LocalNavController.current!!
     PrimaryTabRow(
@@ -64,14 +78,14 @@ fun TabBar(
                     if (onTabReselect != null && selected == index) {
                         return@Tab onTabReselect()
                     }
-                    navController.navigate(tab.second) {
+                    navController.navigate(tab.route) {
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = index == 0
                         }
                         launchSingleTop = true
                     }
                 },
-                icon = { Icon(tab.first, contentDescription = tab.second.title) },
+                icon = { Icon(tab.icon, contentDescription = stringResource(tab.label)) },
             )
         }
     }

@@ -29,4 +29,9 @@
     <string name="ViewColumns">Columns</string>
     <string name="ViewImage">Images</string>
     <string name="ViewSwipe">Swipe</string>
+    <string name="Home">Home</string>
+    <string name="Search">Search</string>
+    <string name="Subscriptions">Subscriptions</string>
+    <string name="Inbox">Inbox</string>
+    <string name="Profile">Profile</string>
 </resources>

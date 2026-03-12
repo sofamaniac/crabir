@@ -8,118 +8,56 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation.NavController
 import kotlinx.serialization.Serializable
 
-enum class RouteType {
-    Home,
-    Search,
-    Subscriptions,
-    Inbox,
-    Profile,
-    Subreddit,
-    Post,
-    Saved,
-    Multi,
-}
+@Serializable
+object HomeRoute : Route
 
 @Serializable
-object HomeRoute : Route {
-    override val route: String = RouteType.Home.name
-    override val title: String = "Home"
-}
+class ProfileRoute(val author: String, val tab: String) : Route
 
 @Serializable
-class ProfileRoute(val author: String) : Route {
-    override val route: String = RouteType.Profile.name
-    override val title: String = "Profile"
-}
+object SavedRoute : Route
 
 @Serializable
-object SavedRoute : Route {
-    override val route: String = RouteType.Saved.name
-    override val title: String = "Saved"
-}
+object SubscriptionsRoute : Route
 
 @Serializable
-object SubscriptionsRoute : Route {
-    override val route: String = RouteType.Subscriptions.name
-    override val title: String = "Subscriptions"
-}
+class SearchRoute(val subreddit: String = "", val flair: String = "") : Route
 
 @Serializable
-class SearchRoute(val subreddit: String = "", val flair: String = "") : Route {
-    override val route: String = RouteType.Search.name
-    override val title: String = "Search"
-}
+object InboxRoute : Route
 
 @Serializable
-object InboxRoute : Route {
-    override val route: String = RouteType.Inbox.name
-    override val title: String = "Inbox"
-}
+object HistoryRoute : Route
 
 @Serializable
-object HistoryRoute : Route {
-    override val route: String = "History"
-    override val title: String = "History"
-}
+class SubredditRoute(val subreddit: String) : Route
 
 @Serializable
-class SubredditRoute(val subreddit: String) : Route {
-    override val route: String = RouteType.Subreddit.name
-    override val title: String = "Subreddit"
-}
-
-@Serializable
-class MultiRoute(val displayName: String, val permalink: String) : Route {
-    override val route: String = RouteType.Multi.name
-    override val title: String = "Multi"
-}
+class MultiRoute(val displayName: String, val permalink: String) : Route
 
 @Serializable
 class PostRoute(val postPermalink: String) : Route {
-    //override val route: String = RouteType.Post.name
-    override val title: String = "Post"
-    override val route = ROUTE
-
     companion object {
         const val ROUTE = "r/{subreddit}/comments/{id}/{title}"
     }
 }
 
 @Serializable
-object LicensesRoute : Route {
-    override val route: String = "Licenses"
-    override val title: String = "Licenses"
-}
+object LicensesRoute : Route
 
 @Serializable
-object SettingsRoute : Route {
-    override val route: String = "Settings"
-    override val title: String = "Settings"
-}
+object SettingsRoute : Route
 
 @Serializable
-object ThemeRoute : Route {
-    override val route: String = "Theme"
-    override val title: String = "Theme"
-}
+object ThemeRoute : Route
 
 @Serializable
-object ThemeEditorRoute : Route {
-    override val route: String = "ThemeEditor"
-    override val title: String = "ThemeEditor"
-}
+object ThemeEditorRoute : Route
 
 @Serializable
-object ViewsSettingRoute : Route {
-    override val route: String = "Views"
-    override val title: String = "Views"
-}
+object ViewsSettingRoute : Route
 
-interface Route {
-
-    val route: String
-    val title: String
-}
+interface Route
 
 // TODO move closer in the navgraph. Maybe one per tab ? Or move its initalisation to the tabs ?
 val LocalNavController = compositionLocalOf<NavController?> { null }
