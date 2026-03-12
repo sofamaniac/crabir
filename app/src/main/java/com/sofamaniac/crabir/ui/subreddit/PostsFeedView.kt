@@ -75,13 +75,17 @@ import kotlin.math.max
 @Composable
 fun PostFeedViewer(
     state: FeedViewModelInterface,
-    modifier: Modifier = Modifier,
-    showSubredditIcon: Boolean = true
+    modifier: Modifier = Modifier
 ) {
 
     val posts = state.data.collectAsLazyPagingItems()
     val listState = state.listState
 
+    LaunchedEffect(posts.loadState.refresh) {
+        if (posts.loadState.refresh is LoadState.NotLoading) {
+            listState.scrollToItem(0)
+        }
+    }
 
     var mostVisibleItemIndex by remember { mutableIntStateOf(0) }
 
@@ -107,25 +111,12 @@ fun PostFeedViewer(
     }
 
     val fullscreenManager = LocalFullscreenHandler.current!!
-
-    var needScrollToTop by remember { mutableStateOf(false) }
-
     val viewSettings = rememberViewSettings()
-
-    // Reset list state after refresh
-    LaunchedEffect(posts.loadState.refresh) {
-        if (posts.loadState.refresh != LoadState.Loading && needScrollToTop) {
-            state.listState.scrollToItem(0)
-            needScrollToTop = false
-        }
-    }
-
 
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,
         onRefresh = {
             state.refresh()
-            needScrollToTop = true
         },
         modifier = modifier.fillMaxSize(),
     ) {

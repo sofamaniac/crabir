@@ -35,7 +35,6 @@ abstract class ListingRepository<Params, Data : DataInterface> {
     ): PagedResponse<String> {
         val response = request()
         if (response.isSuccessful) {
-            Log.d("makeRequest", "code ${response.code()}")
             val listing = response.body()
             listing?.let {
                 val things = listing.data.children

@@ -10,9 +10,6 @@ package com.sofamaniac.crabir.ui.subreddit
 
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -40,7 +37,7 @@ import kotlinx.coroutines.launch
 
 
 interface FeedViewModelInterface {
-    var listState: LazyListState
+    val listState: LazyListState
     val data: Flow<PagingData<VotableData>>
     fun refresh()
 }
@@ -55,7 +52,7 @@ abstract class PostFeedViewModel(
     init {
         if (id != null) {
             viewModelScope.launch(Dispatchers.IO) {
-                val entity = visitedCommunityDao.getCommunity(id!!)
+                val entity = visitedCommunityDao.getCommunity(id)
                 if (entity?.sort != null) {
                     _params.update {
                         it.copy(sort = entity.sort!!, timeframe = entity.timeframe)
@@ -65,7 +62,9 @@ abstract class PostFeedViewModel(
         }
     }
 
-    override var listState by mutableStateOf(LazyListState())
+    override val listState = LazyListState()
+
+    private var goToTop = false
     private val _params = MutableStateFlow(
         FeedParams(
             sort = Sort.Best,
@@ -76,9 +75,9 @@ abstract class PostFeedViewModel(
     val params: StateFlow<FeedParams> = _params.asStateFlow()
 
     override fun refresh() {
+        goToTop = true
         feedSource?.invalidate()
         repository.refresh()
-        listState = LazyListState()
     }
 
     private var feedSource: FeedSource<FeedParams>? = null
@@ -91,7 +90,8 @@ abstract class PostFeedViewModel(
                 params.value,
             ).also { feedSource = it }
         }
-    )
+    ).apply {
+    }
         .flow.cachedIn(
             viewModelScope
         )

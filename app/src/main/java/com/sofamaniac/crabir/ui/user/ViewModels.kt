@@ -6,9 +6,6 @@ package com.sofamaniac.crabir.ui.user
 
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -149,7 +146,7 @@ abstract class ProfileFeedViewModel(
 ) : ViewModel(), FeedViewModelInterface {
 
 
-    override var listState by mutableStateOf(LazyListState())
+    override val listState = LazyListState()
     protected val _params = MutableStateFlow(
         ProfileFeedParams(
             username = username,
@@ -163,7 +160,6 @@ abstract class ProfileFeedViewModel(
     override fun refresh() {
         feedSource?.invalidate()
         repository.refresh()
-        listState = LazyListState()
     }
 
     private var feedSource: FeedSource<ProfileFeedParams>? = null
