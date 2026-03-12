@@ -106,21 +106,18 @@ class ThreadRepositoryImpl(
                         CommentType.More((comment as Thing.More).data)
                     }
                 }
-                comments = comments.updateComment(more.data.parent_id) { comment ->
-                    if (comment is CommentType.Comment) {
-                        var replies = comment.comment.replies
-                        replies = replies.filter {
-                            when (it) {
-                                is CommentType.Comment -> true
-                                is CommentType.More -> it.name != more.data.name
-                            }
+                if (more.data.parent_id == post!!.name) {
+                    comments = comments.replaceMore(more, children)
+                } else {
+                    comments = comments.updateComment(more.data.parent_id) { comment ->
+                        if (comment is CommentType.Comment) {
+                            val replies = comment.comment.replies.replaceMore(more, children)
+                            comment.copy(
+                                comment = comment.comment.copy(replies = replies)
+                            )
+                        } else {
+                            comment
                         }
-                        comment.copy(
-                            comment = comment.comment.copy(replies = replies + children)
-                        )
-
-                    } else {
-                        comment
                     }
                 }
             }
@@ -152,5 +149,18 @@ class ThreadRepositoryImpl(
         api.save(id)
     }
 
+}
+
+fun List<CommentType>.replaceMore(
+    more: CommentType.More,
+    children: List<CommentType>
+): List<CommentType> {
+    val withoutMore = filter {
+        when (it) {
+            is CommentType.Comment -> true
+            is CommentType.More -> it.name != more.name
+        }
+    }
+    return withoutMore + children
 }
 

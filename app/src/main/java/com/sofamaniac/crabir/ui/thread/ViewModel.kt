@@ -208,7 +208,6 @@ fun List<CommentType>.updateComment(
                         )
                     )
                 )
-
             else -> comment
         }
     }
