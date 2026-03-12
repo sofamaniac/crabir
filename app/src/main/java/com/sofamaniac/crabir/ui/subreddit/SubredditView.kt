@@ -41,7 +41,7 @@ fun SubredditViewer(
         )
     }
     val bottomBar = @Composable {
-        TabBar(3)
+        TabBar(2)
     }
     FullFeedView(
         topBar, bottomBar, viewModel,
