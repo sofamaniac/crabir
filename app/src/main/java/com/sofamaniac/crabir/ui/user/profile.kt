@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,7 +50,6 @@ fun ProfileInfo(modifier: Modifier = Modifier) {
 @Composable
 fun ProfileView(
     user: String,
-    selected: State<Int>,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -100,7 +98,7 @@ fun ProfileView(
             TopBar(scrollBehavior, user, viewModel = viewModels[tabs[currentTab.currentPage]])
 
         }, bottomBar = {
-            TabBar(selected = selected)
+            TabBar(selected = 4)
         }) { innerPadding ->
             Column(
                 verticalArrangement = Arrangement.Top, modifier = Modifier.padding(innerPadding)

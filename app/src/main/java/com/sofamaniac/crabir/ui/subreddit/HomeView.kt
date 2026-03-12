@@ -8,7 +8,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -25,7 +24,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeViewer(
-    selected: State<Int>,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -33,7 +31,7 @@ fun HomeViewer(
     val scope = rememberCoroutineScope()
     val topBar = @Composable { TopBar("Home", viewModel, scrollBehavior) }
     val bottomBar = @Composable {
-        TabBar(selected, onTabReselect = {
+        TabBar(0, onTabReselect = {
             scope.launch {
                 viewModel.listState.animateScrollToItem(0)
             }

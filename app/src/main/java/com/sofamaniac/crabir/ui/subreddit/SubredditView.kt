@@ -9,7 +9,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -27,7 +26,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 @Composable
 fun SubredditViewer(
     subreddit: String,
-    selected: State<Int>,
     modifier: Modifier = Modifier,
     viewModel: SubredditViewModel = hiltViewModel<SubredditViewModel, SubredditViewModel.Factory> { factory ->
         factory.create(subreddit)
@@ -43,9 +41,7 @@ fun SubredditViewer(
         )
     }
     val bottomBar = @Composable {
-        TabBar(
-            selected,
-        )
+        TabBar(3)
     }
     FullFeedView(
         topBar, bottomBar, viewModel,

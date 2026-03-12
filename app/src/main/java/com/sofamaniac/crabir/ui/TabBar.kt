@@ -11,7 +11,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -39,7 +38,7 @@ class TabBarViewModel @Inject constructor(
 
 @Composable
 fun TabBar(
-    selected: State<Int>,
+    selected: Int,
     modifier: Modifier = Modifier,
     onTabReselect: (() -> Unit)? = null,
     viewModel: TabBarViewModel = hiltViewModel()
@@ -54,15 +53,15 @@ fun TabBar(
     )
     val navController = LocalNavController.current!!
     PrimaryTabRow(
-        selectedTabIndex = selected.value,
+        selectedTabIndex = selected,
         modifier = modifier.navigationBarsPadding(),
         indicator = {}) {
         for ((index, tab) in tabs.withIndex()) {
             Tab(
-                selected = selected.value == index,
+                selected = selected == index,
                 unselectedContentColor = Color.Gray,
                 onClick = {
-                    if (onTabReselect != null && selected.value == index) {
+                    if (onTabReselect != null && selected == index) {
                         return@Tab onTabReselect()
                     }
                     navController.navigate(tab.second) {

@@ -28,9 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDeepLink
@@ -38,7 +35,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
@@ -51,6 +47,7 @@ import com.sofamaniac.crabir.settings.theme.ThemeEditor
 import com.sofamaniac.crabir.settings.theme.ThemeSettingsPage
 import com.sofamaniac.crabir.settings.theme.rememberAppTheme
 import com.sofamaniac.crabir.settings.views.ViewsSettingsPage
+import com.sofamaniac.crabir.ui.InboxView
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 import com.sofamaniac.crabir.ui.search.SearchTab
@@ -169,27 +166,6 @@ fun NavigationGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    //val selected = remember { mutableIntStateOf(0) }
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val selected = remember(navBackStackEntry) {
-        val currentRoute = navBackStackEntry?.destination?.route
-        derivedStateOf {
-            when {
-                currentRoute?.contains(HomeRoute::class.qualifiedName ?: "") == true -> 0
-                currentRoute?.contains(SearchRoute::class.qualifiedName ?: "") == true -> 1
-                currentRoute?.contains(SubredditRoute::class.qualifiedName ?: "") == true -> 2
-                currentRoute?.contains(SubscriptionsRoute::class.qualifiedName ?: "") == true -> 2
-                currentRoute?.contains(MultiRoute::class.qualifiedName ?: "") == true -> 2
-                currentRoute?.contains(InboxRoute::class.qualifiedName ?: "") == true -> 3
-                currentRoute?.contains(ProfileRoute::class.qualifiedName ?: "") == true -> 4
-                else -> {
-                    Log.w("NavigationGraph", "Unknown route: $currentRoute")
-                    0
-                }
-            }
-        }
-    }
-
 
     NavHost(
         navController = navController,
@@ -199,9 +175,7 @@ fun NavigationGraph(
         exitTransition = { ExitTransition.None }
     ) {
         composable<HomeRoute> {
-            HomeViewer(
-                selected
-            )
+            HomeViewer()
         }
         composable(
             route = PostRoute.routeString,
@@ -231,10 +205,8 @@ fun NavigationGraph(
             SearchTab(search)
         }
         composable<InboxRoute> {
-            SubredditViewer(
-                "artknights",
-                selected,
-            )
+            InboxView()
+
         }
         composable<SubredditRoute>(
             deepLinks = makeDeepLinks<SubredditRoute>(url = "r")
@@ -243,7 +215,6 @@ fun NavigationGraph(
             val subreddit = navBackStackEntry.toRoute<SubredditRoute>().subreddit
             SubredditViewer(
                 subreddit,
-                selected,
             )
         }
         composable<MultiRoute> { navBackStackEntry ->
@@ -252,7 +223,6 @@ fun NavigationGraph(
             MultiView(
                 name,
                 permalink,
-                selected,
             )
         }
         composable<ProfileRoute>(
@@ -261,7 +231,6 @@ fun NavigationGraph(
             val params = navBackStackEntry.toRoute<ProfileRoute>()
             ProfileView(
                 params.author,
-                selected = selected,
             )
         }
         composable<LicensesRoute> {

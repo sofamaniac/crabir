@@ -4,7 +4,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -24,7 +23,6 @@ import kotlinx.coroutines.launch
 fun MultiView(
     name: String,
     permalink: String,
-    selected: State<Int>,
     modifier: Modifier = Modifier,
     viewModel: MultiViewModel = hiltViewModel<MultiViewModel, MultiViewModel.Factory> { factory ->
         factory.create(permalink)
@@ -41,7 +39,7 @@ fun MultiView(
     }
     val bottomBar = @Composable {
         TabBar(
-            selected,
+            2,
             onTabReselect = {
                 scope.launch {
                     viewModel.listState.animateScrollToItem(0)
