@@ -11,14 +11,14 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.devtools.ksp")
-    id("com.jaredsburrows.license")
     id("com.google.dagger.hilt.android")
     id("tech.mappie.plugin")
     id("androidx.room")
+    id("com.mikepenz.aboutlibraries.plugin")
+    id("com.mikepenz.aboutlibraries.plugin.android")
 }
 
 android {
@@ -60,10 +60,10 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
+//    compileOptions {
+//        sourceCompatibility = JavaVersion.VERSION_21
+//        targetCompatibility = JavaVersion.VERSION_21
+//    }
 //    kotlinOptions {
 //        jvmTarget = "21"
 //    }
@@ -71,10 +71,6 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
-    }
-
-    room {
-        schemaDirectory("$projectDir/schemas")
     }
 
     packaging {
@@ -89,6 +85,10 @@ android {
 }
 
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 // Avoid duplicate annotations https://stackoverflow.com/a/58909363
 configurations {
     all {
@@ -96,28 +96,11 @@ configurations {
     }
 }
 
-
-licenseReport {
-    // Generate reports
-    generateCsvReport = false
-    generateHtmlReport = true
-    generateJsonReport = false
-    generateTextReport = false
-
-    // Copy reports - These options are ignored for Java projects
-    copyCsvReportToAssets = false
-    copyHtmlReportToAssets = true
-    copyJsonReportToAssets = false
-    copyTextReportToAssets = false
-    useVariantSpecificAssetDirs = false
-
-    // Ignore licenses for certain artifact patterns
-    //ignoredPatterns = emptyList()
-
-    // Show versions in the report - default is false
-    showVersions = true
+aboutLibraries {
+    library {
+        duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
+    }
 }
-
 
 dependencies {
 
@@ -207,4 +190,8 @@ dependencies {
 
     implementation(libs.glide)
     annotationProcessor(libs.glide)
+
+    implementation(libs.aboutlibraries.core)
+    implementation(libs.aboutlibraries.compose.core)
+    implementation(libs.aboutlibraries.compose.m3)
 }

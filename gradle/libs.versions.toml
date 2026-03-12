@@ -1,4 +1,5 @@
 [versions]
+aboutLibraries = "13.2.1"
 agp = "9.0.1"
 appauth = "0.11.1"
 coil = "3.4.0"
@@ -36,7 +37,6 @@ retrofit2KotlinxSerializationConverter = "1.0.0"
 room = "2.8.4"
 foundationLayout = "1.10.4"
 zoomable = "2.11.1"
-firebaseAuthKtx = "24.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -61,11 +61,6 @@ commons-text = { module = "org.apache.commons:commons-text", version.ref = "comm
 ext-strikethrough = { module = "io.noties.markwon:ext-strikethrough", version.ref = "extStrikethrough" }
 ext-tables = { module = "io.noties.markwon:ext-tables", version.ref = "extTables" }
 core = { module = "io.noties.markwon:core", version.ref = "markwon" }
-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
-firebase-auth = { module = "com.google.firebase:firebase-auth" }
-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
-firebase-database = { module = "com.google.firebase:firebase-database" }
-firebase-perf = { module = "com.google.firebase:firebase-perf" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
@@ -102,10 +97,11 @@ retrofit2-kotlinx-serialization-converter = { group = "com.jakewharton.retrofit"
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 simple-ext = { module = "io.noties.markwon:simple-ext", version.ref = "markwon" }
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
-firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
+aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose-core", version.ref = "aboutLibraries" } # Common compose core
+aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }      # Material 3 UI
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibraries" }

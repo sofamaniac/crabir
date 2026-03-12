@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class SubscriptionViewModel @Inject constructor(private val subscriptionsRepository: SubscriptionsRepository) :
+class SubscriptionViewModel @Inject constructor(subscriptionsRepository: SubscriptionsRepository) :
     ViewModel() {
 
     val subscriptions: StateFlow<List<Thing.Subreddit>?> = subscriptionsRepository.subscriptions

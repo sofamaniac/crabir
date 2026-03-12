@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDeepLink
@@ -39,6 +40,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
+import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
+import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.sofamaniac.crabir.settings.SettingsPage
 import com.sofamaniac.crabir.settings.theme.ConfigureMaterialTheme
 import com.sofamaniac.crabir.settings.theme.CrabirTheme
@@ -235,7 +238,8 @@ fun NavigationGraph(
             )
         }
         composable<LicensesRoute> {
-            LicenseWebView()
+            val libraries by produceLibraries(R.raw.aboutlibraries)
+            LibrariesContainer(libraries, modifier = Modifier.fillMaxSize())
         }
         composable<SettingsRoute> {
             SettingsPage()
