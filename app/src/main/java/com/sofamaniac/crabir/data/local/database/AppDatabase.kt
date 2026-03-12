@@ -11,7 +11,7 @@ import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 
 @Database(
     entities = [RedditAccountEntity::class, VisitedPostEntity::class, VisitedCommunityEntity::class],
-    version = 4
+    version = 5
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun accountsDao(): AccountsDao

@@ -6,16 +6,21 @@ import com.sofamaniac.crabir.domain.model.PostData
 import kotlinx.serialization.json.Json
 
 @Entity(tableName = "visitedPosts")
-class VisitedPostEntity (
+data class VisitedPostEntity(
     @PrimaryKey
-    var id: String = "",
-    var post: String,
+    val id: String = "",
+    val post: String,
+    val visitedAt: Long,
 )
 
 fun VisitedPostEntity.toDomainModel(): PostData {
     return Json.decodeFromString(post)
 }
 
-fun PostData.toEntity(): VisitedPostEntity {
-    return VisitedPostEntity(id = id, post = Json.encodeToString(this))
+fun PostData.toEntity(timestamp: Long = System.currentTimeMillis()): VisitedPostEntity {
+    return VisitedPostEntity(
+        id = id,
+        visitedAt = timestamp,
+        post = Json.encodeToString(this),
+    )
 }

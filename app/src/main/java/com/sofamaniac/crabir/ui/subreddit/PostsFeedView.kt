@@ -70,17 +70,17 @@ import kotlin.math.max
 /**
  * Composable function to display a list of posts from a subreddit.
  *
- * @param state The current state of the SubredditViewer, including subreddit, sort order, and timeframe.
+ * @param viewModel The current state of the SubredditViewer, including subreddit, sort order, and timeframe.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostFeedViewer(
-    state: FeedViewModelInterface,
+    viewModel: FeedViewModelInterface,
     modifier: Modifier = Modifier
 ) {
 
-    val posts = state.data.collectAsLazyPagingItems()
-    val listState = state.listState
+    val posts = viewModel.data.collectAsLazyPagingItems()
+    val listState = viewModel.listState
 
     LaunchedEffect(posts.loadState.refresh) {
         if (posts.loadState.refresh is LoadState.NotLoading) {
@@ -120,7 +120,7 @@ fun PostFeedViewer(
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,
         onRefresh = {
-            state.refresh()
+            viewModel.refresh()
         },
         modifier = modifier.fillMaxSize(),
     ) {
@@ -148,21 +148,25 @@ fun PostFeedViewer(
                 when (post) {
                     is PostData -> {
                         val onClick = { post: PostData ->
+                            viewModel.visitPost(post)
                             fullscreenManager.push { threadView(post) }
                         }
                         val canStartVideo =
                             viewSettings.defaultColumns == 1 && index == mostVisibleItemIndex
+                        val wasRead = viewModel.isPostRead(post)
                         when (viewSettings.defaultView) {
                             Views.Card -> PostCard(
                                 post,
                                 onClick = onClick,
-                                canStartVideo = canStartVideo
+                                canStartVideo = canStartVideo,
+                                read = wasRead,
                             )
 
                             Views.Compact -> CompactView(
                                 post,
                                 onClick = onClick,
-                                canStartVideo = canStartVideo
+                                canStartVideo = canStartVideo,
+                                read = wasRead,
                             )
 
                             else ->
@@ -181,7 +185,8 @@ fun PostFeedViewer(
                             comment = post,
                             viewModel = hiltViewModel<ThreadViewModel, ThreadViewModel.Factory> { factory ->
                                 factory.create(post.permalink)
-                            })
+                            }
+                        )
                     }
                 }
             }

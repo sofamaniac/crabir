@@ -106,10 +106,10 @@ class ThreadRepositoryImpl(
                         CommentType.More((comment as Thing.More).data)
                     }
                 }
-                if (more.data.parent_id == post!!.name) {
-                    comments = comments.replaceMore(more, children)
+                comments = if (more.data.parent_id == post!!.name) {
+                    comments.replaceMore(more, children)
                 } else {
-                    comments = comments.updateComment(more.data.parent_id) { comment ->
+                    comments.updateComment(more.data.parent_id) { comment ->
                         if (comment is CommentType.Comment) {
                             val replies = comment.comment.replies.replaceMore(more, children)
                             comment.copy(

@@ -27,6 +27,7 @@ fun CompactView(
     clickable: Boolean = true,
     onClick: (PostData) -> Unit = {},
     canStartVideo: Boolean = false,
+    read: Boolean = false,
     viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
@@ -56,7 +57,13 @@ fun CompactView(
                 DownButton(viewModel)
             }
             Column {
-                PostInfo(post, modifier, enableThumbnail = true, viewModel = viewModel)
+                PostInfo(
+                    post,
+                    modifier,
+                    enableThumbnail = true,
+                    viewModel = viewModel,
+                    read = read,
+                )
                 PostHeader(post, showSubredditIcon = false, modifier = modifier)
             }
         }

@@ -51,6 +51,7 @@ import com.sofamaniac.crabir.ui.InboxView
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 import com.sofamaniac.crabir.ui.search.SearchTab
+import com.sofamaniac.crabir.ui.subreddit.HistoryViewer
 import com.sofamaniac.crabir.ui.subreddit.HomeViewer
 import com.sofamaniac.crabir.ui.subreddit.MultiView
 import com.sofamaniac.crabir.ui.subreddit.SubredditViewer
@@ -178,7 +179,7 @@ fun NavigationGraph(
             HomeViewer()
         }
         composable(
-            route = PostRoute.routeString,
+            route = PostRoute.ROUTE,
             deepLinks = makeDeepLinks<PostRoute>(url = "r/{subreddit}/comments/{id}/{title}"),
             arguments = listOf(
                 navArgument("subreddit") { type = NavType.StringType },
@@ -247,6 +248,9 @@ fun NavigationGraph(
         }
         composable<ViewsSettingRoute> {
             ViewsSettingsPage()
+        }
+        composable<HistoryRoute> {
+            HistoryViewer()
         }
     }
 }

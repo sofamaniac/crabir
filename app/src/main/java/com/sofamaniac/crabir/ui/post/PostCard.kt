@@ -35,6 +35,7 @@ fun PostCard(
     clickable: Boolean = true,
     onClick: (PostData) -> Unit = {},
     canStartVideo: Boolean = false,
+    read: Boolean = false,
     viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
@@ -71,6 +72,7 @@ fun PostCard(
             modifier = modifier,
             enableThumbnail = enablePreview && settings.cardSettings.thumbnailForLinkPreview,
             viewModel = viewModel,
+            read = read,
         )
         PostBody(
             post,

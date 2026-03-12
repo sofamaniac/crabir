@@ -29,7 +29,6 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.ui.Flair
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.votable.ScoreString
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 /** Show a post title and thumbnail.
  * @param post The post to show.
@@ -41,6 +40,7 @@ fun PostInfo(
     post: PostData,
     modifier: Modifier = Modifier,
     enableThumbnail: Boolean = true,
+    read: Boolean = false,
     viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(key = post.id) { factory ->
         factory.create(post.id)
     },
@@ -62,9 +62,14 @@ fun PostInfo(
         ) {
             val width = if (enableThumbnail) 0.8f else 1f
             val titleModifier = Modifier.fillMaxWidth(fraction = width)
+            val titleColor = when {
+                post.isDistinguished -> theme.announcement
+                read -> theme.readPost
+                else -> theme.postTitle
+            }
             Text(
                 post.title,
-                color = if (post.isDistinguished) theme.announcement else theme.postTitle,
+                color = titleColor,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = titleModifier.fillMaxWidth(),
                 textAlign = TextAlign.Start,
@@ -122,11 +127,4 @@ fun PostInfo(
             Thumbnail(post)
         }
     }
-}
-
-private fun PostData.getThumbnailUrl(): String? {
-    val thumbnailUrl = thumbnail.uri.toHttpUrlOrNull()
-    val previewUrl =
-        preview?.images?.firstOrNull()?.resolutions?.firstOrNull()?.url?.toHttpUrlOrNull()
-    return thumbnailUrl?.toString() ?: previewUrl?.toString()
 }

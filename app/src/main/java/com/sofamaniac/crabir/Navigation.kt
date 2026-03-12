@@ -57,6 +57,12 @@ object InboxRoute : Route {
 }
 
 @Serializable
+object HistoryRoute : Route {
+    override val route: String = "History"
+    override val title: String = "History"
+}
+
+@Serializable
 class SubredditRoute(val subreddit: String) : Route {
     override val route: String = RouteType.Subreddit.name
     override val title: String = "Subreddit"
@@ -72,10 +78,10 @@ class MultiRoute(val displayName: String, val permalink: String) : Route {
 class PostRoute(val postPermalink: String) : Route {
     //override val route: String = RouteType.Post.name
     override val title: String = "Post"
-    override val route = "r/{subreddit}/comments/{id}/{title}"
+    override val route = ROUTE
 
     companion object {
-        val routeString = "r/{subreddit}/comments/{id}/{title}"
+        const val ROUTE = "r/{subreddit}/comments/{id}/{title}"
     }
 }
 

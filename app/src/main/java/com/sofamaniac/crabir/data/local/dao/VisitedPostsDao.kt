@@ -13,4 +13,7 @@ interface VisitedPostsDao {
 
     @Query("SELECT * FROM visitedPosts WHERE id = :id")
     fun getPost(id: String): VisitedPostEntity?
+
+    @Query("SELECT * FROM visitedPosts WHERE visitedAt < :before ORDER BY visitedAt DESC LIMIT 100")
+    suspend fun getHistory(before: Long = System.currentTimeMillis()): List<VisitedPostEntity>
 }

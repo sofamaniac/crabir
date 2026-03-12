@@ -11,6 +11,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
+import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.data.remote.api.CommunitySearchSort
 import com.sofamaniac.crabir.data.remote.api.PostSearchSort
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
@@ -32,6 +33,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +43,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 abstract class SearchViewModel<Data : DataInterface>(
@@ -138,6 +141,18 @@ class PostSearchViewModel @AssistedInject constructor(
             it.copy(sort = sort, timeframe = timeframe)
         }
         refresh()
+    }
+
+    override fun visitPost(post: PostData) {
+        viewModelScope.launch {
+            visitedPostsDao.insert(post.toEntity())
+        }
+    }
+
+    override fun isPostRead(post: PostData): Boolean {
+        return runBlocking(Dispatchers.IO) {
+            visitedPostsDao.getPost(post.id) != null
+        }
     }
 
     @AssistedFactory

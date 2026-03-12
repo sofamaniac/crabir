@@ -34,12 +34,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 interface FeedViewModelInterface {
     val listState: LazyStaggeredGridState
     val data: Flow<PagingData<VotableData>>
     fun refresh()
+    fun visitPost(post: PostData)
+
+    fun isPostRead(post: PostData): Boolean
 }
 
 abstract class PostFeedViewModel(
@@ -115,10 +119,16 @@ abstract class PostFeedViewModel(
         }
     }
 
-    fun visitPost(post: PostData) {
+    override fun visitPost(post: PostData) {
         viewModelScope.launch(Dispatchers.IO) {
             visitedPostsDao.insert(post.toEntity())
             Log.d("PostFeedViewModel", "visitPost: Post visited (${post.id})")
+        }
+    }
+
+    override fun isPostRead(post: PostData): Boolean {
+        return runBlocking(Dispatchers.IO) {
+            visitedPostsDao.getPost(post.id) != null
         }
     }
 }

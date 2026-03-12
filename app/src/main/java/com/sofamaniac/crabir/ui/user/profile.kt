@@ -120,7 +120,7 @@ fun ProfileView(
                     val page = tabs[it]
                     val viewModel = viewModels[page]
                     if (viewModel != null) {
-                        PostFeedViewer(state = viewModel)
+                        PostFeedViewer(viewModel = viewModel)
                     } else {
                         Text("TODO")
                     }
