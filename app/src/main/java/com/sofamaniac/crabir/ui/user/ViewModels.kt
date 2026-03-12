@@ -5,7 +5,7 @@
 package com.sofamaniac.crabir.ui.user
 
 import android.util.Log
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -146,7 +146,7 @@ abstract class ProfileFeedViewModel(
 ) : ViewModel(), FeedViewModelInterface {
 
 
-    override val listState = LazyListState()
+    override val listState = LazyStaggeredGridState()
     protected val _params = MutableStateFlow(
         ProfileFeedParams(
             username = username,

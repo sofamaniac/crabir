@@ -1,11 +1,8 @@
 package com.sofamaniac.crabir.ui.search
 
 import android.util.Log
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -52,7 +49,7 @@ abstract class SearchViewModel<Data : DataInterface>(
 ) : ViewModel() {
     private val queryState = TextFieldState()
 
-    var listState by mutableStateOf(LazyListState())
+    val listState = LazyStaggeredGridState()
 
 
     val query: String get() = queryState.text as String
@@ -103,7 +100,6 @@ abstract class SearchViewModel<Data : DataInterface>(
     fun refresh() {
         feedSource?.invalidate()
         repository.refresh()
-        listState = LazyListState()
     }
 
 }

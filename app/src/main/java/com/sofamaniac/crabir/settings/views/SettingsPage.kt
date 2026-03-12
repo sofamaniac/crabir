@@ -12,6 +12,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -48,6 +49,25 @@ fun ViewsSettingsPage() {
                             it.copy(defaultView = target)
                         }
                     }
+                }
+            )
+
+            ListItem(
+                headlineContent = { Text("Default number of columns") },
+                trailingContent = { Text(viewSettings.defaultColumns.toString()) },
+                supportingContent = {
+                    Slider(
+                        value = viewSettings.defaultColumns.toFloat(),
+                        valueRange = 1f..3f,
+                        steps = 1,
+                        onValueChange = { target ->
+                            scope.launch {
+                                settingsDataStore.updateData {
+                                    it.copy(defaultColumns = target.toInt())
+                                }
+                            }
+                        }
+                    )
                 }
             )
 

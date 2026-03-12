@@ -9,7 +9,7 @@
 package com.sofamaniac.crabir.ui.subreddit
 
 import android.util.Log
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 
 
 interface FeedViewModelInterface {
-    val listState: LazyListState
+    val listState: LazyStaggeredGridState
     val data: Flow<PagingData<VotableData>>
     fun refresh()
 }
@@ -62,7 +62,7 @@ abstract class PostFeedViewModel(
         }
     }
 
-    override val listState = LazyListState()
+    override val listState = LazyStaggeredGridState()
 
     private var goToTop = false
     private val _params = MutableStateFlow(

@@ -14,7 +14,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
@@ -95,10 +96,13 @@ fun PostFeedViewer(
                 listState.layoutInfo.visibleItemsInfo
                     .maxByOrNull { item ->
                         item.size
-                        val itemTop = maxOf(item.offset, 0)
+                        val itemTop = maxOf(item.offset.y, 0)
                         val itemBottom =
-                            minOf(item.offset + item.size, listState.layoutInfo.viewportEndOffset)
-                        (itemBottom - itemTop).toFloat() / max(item.size, 1).toFloat()
+                            minOf(
+                                item.offset.y + item.size.height,
+                                listState.layoutInfo.viewportEndOffset
+                            )
+                        (itemBottom - itemTop).toFloat() / max(item.size.height, 1).toFloat()
                     }?.index ?: 0
             } else {
                 null
@@ -120,11 +124,14 @@ fun PostFeedViewer(
         },
         modifier = modifier.fillMaxSize(),
     ) {
-        LazyColumn(
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(viewSettings.defaultColumns),
+            verticalItemSpacing = 8.dp,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            //verticalArrangement = Arrangement.spacedBy(8.dp),
             state = listState,
         ) {
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
@@ -143,7 +150,8 @@ fun PostFeedViewer(
                         val onClick = { post: PostData ->
                             fullscreenManager.push { threadView(post) }
                         }
-                        val canStartVideo = index == mostVisibleItemIndex
+                        val canStartVideo =
+                            viewSettings.defaultColumns == 1 && index == mostVisibleItemIndex
                         when (viewSettings.defaultView) {
                             Views.Card -> PostCard(
                                 post,
@@ -163,7 +171,7 @@ fun PostFeedViewer(
                                     onClick = { post ->
                                         fullscreenManager.push { threadView(post) }
                                     },
-                                    canStartVideo = index == mostVisibleItemIndex,
+                                    canStartVideo = canStartVideo,
                                 )
                         }
                     }

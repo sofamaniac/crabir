@@ -4,7 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -27,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
@@ -129,7 +131,11 @@ private fun InnerTab(viewModel: PostSearchViewModel) {
 private fun InnerTab(viewModel: CommunitySearchViewModel) {
     val things = viewModel.items.collectAsLazyPagingItems()
     val listState = viewModel.listState
-    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Fixed(1),
+        verticalItemSpacing = 8.dp,
+        state = listState, modifier = Modifier.fillMaxSize()
+    ) {
         items(
             count = things.itemCount,
             key = things.itemKey { p -> p.id }) { index ->
@@ -143,7 +149,11 @@ private fun InnerTab(viewModel: CommunitySearchViewModel) {
 private fun InnerTab(viewModel: UserSearchViewModel) {
     val things = viewModel.items.collectAsLazyPagingItems()
     val listState = viewModel.listState
-    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Fixed(1),
+        verticalItemSpacing = 8.dp,
+        state = listState, modifier = Modifier.fillMaxSize()
+    ) {
         items(
             count = things.itemCount,
             key = things.itemKey { p -> p.id }) { index ->
@@ -157,7 +167,11 @@ private fun InnerTab(viewModel: UserSearchViewModel) {
 private fun InnerTab(viewModel: CommentSearchViewModel) {
     val things = viewModel.items.collectAsLazyPagingItems()
     val listState = viewModel.listState
-    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Fixed(1),
+        verticalItemSpacing = 8.dp,
+        state = listState, modifier = Modifier.fillMaxSize()
+    ) {
         items(
             count = things.itemCount,
             key = things.itemKey { p -> p.id }) { index ->

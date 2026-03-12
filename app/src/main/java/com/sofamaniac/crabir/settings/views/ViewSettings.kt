@@ -15,7 +15,6 @@ enum class Views {
     Compact,
     SmallCard,
     Dense,
-    Columns,
     Image,
     Swipe;
 
@@ -25,7 +24,6 @@ enum class Views {
             Compact -> R.string.ViewCompact
             SmallCard -> R.string.ViewSmallCard
             Dense -> R.string.ViewDense
-            Columns -> R.string.ViewColumns
             Image -> R.string.ViewImage
             Swipe -> R.string.ViewSwipe
         }
@@ -35,6 +33,7 @@ enum class Views {
 @Serializable
 data class ViewSettings(
     val defaultView: Views = Views.Card,
+    val defaultColumns: Int = 1,
     val rememberView: Boolean = true,
 //    val postFontSettings: FontSettings = FontSettings(),
 //    val commentFontSettings: FontSettings = FontSettings(),
