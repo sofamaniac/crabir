@@ -129,7 +129,7 @@ fun EmbeddedGallery(
                 .padding(all = 4.dp)
                 .cartouche(Color.Black.copy(alpha = 0.6f))
         )
-        if (media.caption != null) {
+        if (!media.caption.isNullOrBlank()) {
             Text(
                 media.caption,
                 modifier = Modifier
@@ -165,7 +165,7 @@ fun FullscreenGallery(
         bottomBar = {
             FullscreenBottomBar(post, showDecorations) {
                 val title = gallery.images[state.currentPage].caption
-                if (title != null) {
+                if (!title.isNullOrBlank()) {
                     Text(
                         title,
                         style = MaterialTheme.typography.labelLarge.copy(color = Color.White),
