@@ -118,14 +118,14 @@ fun RedditMarkdown(
             if (textView.tag != markdown) {
                 textView.tag = markdown
                 markwonReddit.setParsedMarkdown(textView, spanned)
-                // Disable link when truncating view and allow clicks to be passed to parent view.
-                textView.maxLines = maxLines
-                if (maxLines != Int.MAX_VALUE) {
-                    textView.movementMethod = null
-                    textView.ellipsize = TextUtils.TruncateAt.END
-                } else {
-                    textView.movementMethod = LinkMovementMethod.getInstance()
-                }
+            }
+            // Disable link when truncating view and allow clicks to be passed to parent view.
+            textView.maxLines = maxLines
+            if (maxLines != Int.MAX_VALUE) {
+                textView.movementMethod = null
+                textView.ellipsize = TextUtils.TruncateAt.END
+            } else {
+                textView.movementMethod = LinkMovementMethod.getInstance()
             }
         }
     )
