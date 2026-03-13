@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.toDomainModel
+import com.sofamaniac.crabir.data.remote.dto.Thing
+import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.PostData
@@ -109,6 +111,34 @@ class ThreadViewModel @AssistedInject constructor(
 
     fun refresh() {
         repository.refresh()
+    }
+
+    fun postComment(parentId: String, comment: String) {
+        viewModelScope.launch {
+            val response = repository.postComment(parentId, comment)
+            if (!response.isSuccessful) {
+                return@launch
+            }
+            val comment = response.body()?.json?.data?.things?.firstOrNull() ?: return@launch
+            val commentDTO = comment as Thing.Comment
+            var commentData = CommentDataMapper.map(commentDTO.data)
+            commentData =
+                commentData.copy(relationship = commentData.relationship.copy(liked = true))
+            if (parentId == post.value?.name) {
+                _comments.update {
+                    it + CommentType.Comment(commentData.copy(depth = 0))
+                }
+            } else {
+                _comments.update {
+                    it.updateComment(parentId) { c ->
+                        c as CommentType.Comment
+                        val replies =
+                            c.comment.replies + CommentType.Comment(commentData.copy(depth = c.depth + 1))
+                        c.copy(comment = c.comment.copy(replies = replies))
+                    }
+                }
+            }
+        }
     }
 
     fun upvote(name: String, likes: Boolean?) {

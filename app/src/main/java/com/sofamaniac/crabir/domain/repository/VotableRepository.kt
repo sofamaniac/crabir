@@ -42,7 +42,10 @@ class VotableRepository(private val api: RedditAPIService) {
             false -> -1
         }
         val relationship = post.relationship.copy(liked = newLike)
-        val newPost = post.copy(relationship = relationship)
+        val newPost = post.copy(
+            relationship = relationship,
+            score = post.score.copy(score = post.score.score + dir)
+        )
         _cache.value += (id to newPost)
         try {
             res = api.vote(post.name, dir)

@@ -2,9 +2,11 @@ package com.sofamaniac.crabir.domain.repository
 
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.remote.api.DOWNVOTED
+import com.sofamaniac.crabir.data.remote.api.MoreResponseOuter
 import com.sofamaniac.crabir.data.remote.api.NEUTRAL
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.api.UPVOTED
+import com.sofamaniac.crabir.data.remote.api.postCommentBody
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
@@ -13,6 +15,7 @@ import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.ui.thread.updateComment
+import retrofit2.Response
 
 interface ThreadRepository {
     suspend fun getComments(
@@ -23,8 +26,11 @@ interface ThreadRepository {
     suspend fun getPost(id: String): PostData?
     suspend fun getMoreComments(more: CommentType.More): List<CommentType>
 
+    suspend fun postComment(parentId: String, comment: String): Response<MoreResponseOuter>
+
     /** Extract id from post permalink. */
     fun getPostId(permalink: String): String
+
 
     fun refresh()
 
@@ -123,6 +129,14 @@ class ThreadRepositoryImpl(
             }
         }
         return comments
+    }
+
+    override suspend fun postComment(
+        parentId: String,
+        comment: String
+    ): Response<MoreResponseOuter> {
+        val body = postCommentBody(parentId, comment)
+        return api.postComment(body)
     }
 
     override fun refresh() {

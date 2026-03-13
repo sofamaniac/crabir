@@ -24,11 +24,6 @@ import java.util.Locale
 
 @Composable
 fun ScoreString(score: Int, likes: Boolean?, hidden: Boolean = false) {
-    val score = when (likes) {
-        true -> score + 1
-        false -> score - 1
-        else -> score
-    }
     val scoreStyle =
         MaterialTheme.typography.titleMedium.toSpanStyle()
     val locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()

@@ -17,8 +17,12 @@ import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
 import com.sofamaniac.crabir.data.remote.dto.post.PostId
 import com.sofamaniac.crabir.data.remote.utils.CommentsResponseSerializer
 import kotlinx.serialization.Serializable
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import com.sofamaniac.crabir.data.remote.dto.Timeframe as PostTimeframe
@@ -148,6 +152,20 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
         @Query("api_type") apiType: String = "json",
         @Query("sort") sort: CommentSort? = null,
     ): Response<MoreResponseOuter>
+
+    @POST("api/comment")
+    suspend fun postComment(
+        @Body body: RequestBody
+    ): Response<MoreResponseOuter>
+}
+
+fun postCommentBody(parentId: String, text: String): RequestBody {
+    return MultipartBody.Builder().setType(MultipartBody.FORM)
+        .addFormDataPart("api_type", "json")
+        .addFormDataPart("text", text)
+        .addFormDataPart("thing_id", parentId)
+        .addFormDataPart("raw_json", "1")
+        .build()
 }
 
 @Serializable(with = CommentsResponseSerializer::class)

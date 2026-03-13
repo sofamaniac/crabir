@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
@@ -40,7 +39,7 @@ fun BottomRow(
     post: PostData,
     modifier: Modifier = Modifier,
     viewModel: VotableViewModel,
-    visitPost: (PostData) -> Unit = {},
+    action: @Composable () -> Unit = {},
 ) {
     LocalNavController.current!!
     val uriHandler = LocalUriHandler.current
@@ -48,11 +47,7 @@ fun BottomRow(
         UpButton(viewModel)
         DownButton(viewModel)
         SavedButton(viewModel)
-        IconButton(onClick = {
-            visitPost(post)
-        }) {
-            Icon(Icons.AutoMirrored.Outlined.Chat, "comments")
-        }
+        action()
         IconButton(onClick = {
             uriHandler.openUri(post.url.toString())
         }) {

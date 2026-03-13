@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalNavController
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.ProfileRoute
@@ -58,14 +59,8 @@ fun CommentNode(
     modifier: Modifier = Modifier,
     enableAnimation: Boolean = true
 ) {
-    val context = LocalContext.current
-    val showBottomBar by remember(comment.name, context) {
-        viewModel.openComment.map { it == comment.name || !enableAnimation }
-    }.collectAsState(initial = false)
-
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
-    //.padding(bottom = 8.dp)
     Column {
         ThemedCard(
             shape = RoundedCornerShape(0),
@@ -78,7 +73,7 @@ fun CommentNode(
                 ),
         ) {
             if (comment.collapsed) {
-                CollapsedComment(comment, modifier = innerModifier)
+                CollapsedComment(comment, modifier = innerModifier.padding(vertical = 8.dp))
             } else {
                 OpenedComment(comment, viewModel, modifier = innerModifier, enableAnimation)
             }
@@ -114,10 +109,14 @@ private fun CollapsedComment(
     val theme = LocalTheme.current
     val timeString = formatElapsedTimeLocalized(comment.createdUtc)
     val rightString = buildAnnotatedString {
-        append(" · ")
+        append("· ")
         append(timeString)
     }
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         Text("[+] ${comment.author.username}", color = theme.secondaryText)
         Spacer(modifier = Modifier.weight(1f))
         Text(
@@ -192,9 +191,21 @@ fun BottomRow(comment: CommentData, viewModel: ThreadViewModel, modifier: Modifi
         UpButton(votable)
         DownButton(votable)
         SavedButton(votable)
-        IconButton(onClick = {
-            Log.d("CommentNode", "$comment")
-        }) { Icon(Icons.Default.BugReport, contentDescription = null) }
+        ReplyButton(parentId = comment.name, threadViewModel = viewModel) {
+            ThemedCard(modifier = Modifier.padding(all = 16.dp)) {
+                Text(comment.author.username, modifier = modifier)
+                RedditMarkdown(
+                    comment.bodyMd,
+                    maxLines = 5,
+                    modifier = modifier
+                )
+            }
+        }
+        if (BuildConfig.DEBUG) {
+            IconButton(onClick = {
+                Log.d("CommentNode", "$comment")
+            }) { Icon(Icons.Default.BugReport, contentDescription = null) }
+        }
     }
 }
 
@@ -204,7 +215,7 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
     val theme = LocalTheme.current
     val timeString = formatElapsedTimeLocalized(comment.createdUtc)
     val rightString = buildAnnotatedString {
-        append(" · ")
+        append("· ")
         append(timeString)
     }
 
