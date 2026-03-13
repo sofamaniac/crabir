@@ -42,7 +42,7 @@ class ThreadViewModel @AssistedInject constructor(
 
     private var _openComment = MutableStateFlow<String?>(null)
 
-    /** Id of the comment currently open */
+    /** Id of the comment of which the bottom bar is currently open */
     val openComment: StateFlow<String?> = _openComment.asStateFlow()
 
     /** If [openComment] is equal to [id], close it. Otherwise, open it. */
@@ -72,6 +72,17 @@ class ThreadViewModel @AssistedInject constructor(
             post
         }
         return post
+    }
+
+    fun collapseComment(name: String, collapsed: Boolean) {
+        viewModelScope.launch {
+            _comments.update { comments ->
+                comments.updateComment(name) {
+                    val comment = (it as CommentType.Comment).comment
+                    CommentType.Comment(comment.copy(collapsed = collapsed))
+                }
+            }
+        }
     }
 
     fun fetchComments() {
@@ -208,6 +219,7 @@ fun List<CommentType>.updateComment(
                         )
                     )
                 )
+
             else -> comment
         }
     }

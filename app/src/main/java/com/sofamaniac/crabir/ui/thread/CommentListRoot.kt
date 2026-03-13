@@ -36,7 +36,6 @@ import com.sofamaniac.crabir.ui.post.PostBody
 import com.sofamaniac.crabir.ui.post.PostHeader
 import com.sofamaniac.crabir.ui.post.PostInfo
 import com.sofamaniac.crabir.ui.post.VotableViewModel
-import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,9 +54,7 @@ fun CommentListRoot(
         },
         modifier = modifier.fillMaxSize()
     ) {
-        val comments by viewModel.comments.map {
-            it.flattenComments()
-        }
+        val comments by viewModel.comments
             .collectAsState(initial = emptyList())
         val post by viewModel.post.collectAsState(initial = null)
         LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
@@ -192,7 +189,9 @@ fun List<CommentType>.flattenComments(): List<CommentType> {
     for (comment in this) {
         comments += comment
         if (comment is CommentType.Comment) {
-            comments += comment.comment.replies.flattenComments()
+            if (!comment.comment.collapsed) {
+                comments += comment.comment.replies.flattenComments()
+            }
         }
     }
     return comments

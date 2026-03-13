@@ -4,8 +4,11 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -31,6 +35,7 @@ import com.sofamaniac.crabir.LocalNavController
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.ProfileRoute
 import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.ui.Flair
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.cartouche
@@ -53,8 +58,6 @@ fun CommentNode(
     modifier: Modifier = Modifier,
     enableAnimation: Boolean = true
 ) {
-
-
     val context = LocalContext.current
     val showBottomBar by remember(comment.name, context) {
         viewModel.openComment.map { it == comment.name || !enableAnimation }
@@ -63,25 +66,98 @@ fun CommentNode(
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
     //.padding(bottom = 8.dp)
-    ThemedCard(
-        shape = RoundedCornerShape(0),
-        modifier = modifier
-            .fillMaxWidth(),
-        onClick = { viewModel.toggleComment(comment.name) }
-    ) {
-        Spacer(modifier = Modifier.height(8.dp))
-        TopRow(comment, modifier = innerModifier)
-        Spacer(modifier = Modifier.height(8.dp))
-        RedditMarkdown(
-            comment.bodyMd,
-            modifier = innerModifier,
-            mediaMetadata = comment.mediaMetadata,
-            key = comment.id
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        AnimatedVisibility(showBottomBar) {
-            BottomRow(comment, viewModel)
+    Column {
+        ThemedCard(
+            shape = RoundedCornerShape(0),
+            modifier = modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = { if (!comment.collapsed) viewModel.toggleComment(comment.name) },
+                    onLongClick = { viewModel.collapseComment(comment.name, !comment.collapsed) },
+                    onLongClickLabel = "Collapse comment"
+                ),
+        ) {
+            if (comment.collapsed) {
+                CollapsedComment(comment, modifier = innerModifier)
+            } else {
+                OpenedComment(comment, viewModel, modifier = innerModifier, enableAnimation)
+            }
         }
+        AnimatedVisibility(!comment.collapsed) {
+            Column {
+                for (reply in comment.replies) {
+                    when (reply) {
+                        is CommentType.Comment -> CommentNode(
+                            reply.comment,
+                            viewModel,
+                            modifier = modifier.depthIndent(1),
+                        )
+
+                        is CommentType.More -> MoreViewer(
+                            reply,
+                            viewModel,
+                            modifier = modifier.depthIndent(1)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+@Composable
+private fun CollapsedComment(
+    comment: CommentData,
+    modifier: Modifier = Modifier,
+) {
+    val theme = LocalTheme.current
+    val timeString = formatElapsedTimeLocalized(comment.createdUtc)
+    val rightString = buildAnnotatedString {
+        append(" · ")
+        append(timeString)
+    }
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        Text("[+] ${comment.author.username}", color = theme.secondaryText)
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            "+${comment.replies.size}",
+            color = Color.White,
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.cartouche(backgroundColor = Color.Green)
+        )
+        ScoreString(comment.score.score, comment.relationship.liked)
+        Text(rightString)
+    }
+}
+
+@Composable
+private fun ColumnScope.OpenedComment(
+    comment: CommentData,
+    viewModel: ThreadViewModel,
+    modifier: Modifier = Modifier,
+    enableAnimation: Boolean = true
+) {
+    val context = LocalContext.current
+    val showBottomBar by remember(comment.name, context) {
+        viewModel.openComment.map { it == comment.name || !enableAnimation }
+    }.collectAsState(initial = false)
+
+    val innerModifier = Modifier
+        .padding(horizontal = 16.dp)
+    //.padding(bottom = 8.dp)
+    Spacer(modifier = Modifier.height(8.dp))
+    TopRow(comment, modifier = innerModifier)
+    Spacer(modifier = Modifier.height(8.dp))
+    RedditMarkdown(
+        comment.bodyMd,
+        modifier = innerModifier,
+        mediaMetadata = comment.mediaMetadata,
+        key = comment.id
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    AnimatedVisibility(showBottomBar) {
+        BottomRow(comment, viewModel)
     }
 }
 
