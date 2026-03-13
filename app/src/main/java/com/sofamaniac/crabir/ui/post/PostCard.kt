@@ -3,8 +3,6 @@ package com.sofamaniac.crabir.ui.post
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -13,6 +11,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
+import com.sofamaniac.crabir.ui.ThemedCard
 
 /**
  * Composable function that displays a single post in a Card format.
@@ -54,11 +53,10 @@ fun PostCard(
     } else {
         {}
     }
-    Card(
+    ThemedCard(
         shape = RoundedCornerShape(0),
         modifier = Modifier.fillMaxWidth(),
         onClick = onClickCard,
-        colors = CardDefaults.cardColors().copy(containerColor = theme.cardBackground)
     ) {
         PostHeader(
             post,

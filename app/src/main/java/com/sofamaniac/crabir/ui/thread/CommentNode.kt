@@ -6,12 +6,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material3.Icon
@@ -32,6 +32,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.ProfileRoute
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.ui.Flair
+import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
@@ -62,10 +63,11 @@ fun CommentNode(
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
     //.padding(bottom = 8.dp)
-    Column(
+    ThemedCard(
+        shape = RoundedCornerShape(0),
         modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = { viewModel.toggleComment(comment.name) }),
+            .fillMaxWidth(),
+        onClick = { viewModel.toggleComment(comment.name) }
     ) {
         Spacer(modifier = Modifier.height(8.dp))
         TopRow(comment, modifier = innerModifier)

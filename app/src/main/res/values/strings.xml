@@ -34,4 +34,8 @@
     <string name="Subscriptions">Subscriptions</string>
     <string name="Inbox">Inbox</string>
     <string name="Profile">Profile</string>
+    <plurals name="MoreComments">
+        <item quantity="one">%d more reply</item>
+        <item quantity="other">%d more replies</item>
+    </plurals>
 </resources>

@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.ui.thread
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ShapeDefaults
@@ -22,7 +21,6 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -32,6 +30,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.post.BottomRow
 import com.sofamaniac.crabir.ui.post.PostBody
 import com.sofamaniac.crabir.ui.post.PostHeader
@@ -45,9 +44,9 @@ fun CommentListRoot(
     viewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
 ) {
-    rememberCoroutineScope()
     val listState = rememberLazyListState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val theme = LocalTheme.current
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
@@ -75,6 +74,7 @@ fun CommentListRoot(
                         viewModel,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .background(color = theme.cardBackground)
                             .depthIndent(comment.depth, color = Color.Gray)
                     )
 
@@ -83,8 +83,8 @@ fun CommentListRoot(
                         viewModel,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .depthIndent(comment.depth)
-                            .padding(8.dp)
+                            .background(color = theme.cardBackground)
+                            .depthIndent(comment.depth, color = Color.Gray)
                     )
                 }
                 if ((comments.getOrNull(index + 1)?.depth ?: 0) == 0) {
@@ -164,14 +164,12 @@ fun PostCard(
     ),
     body: @Composable ColumnScope.() -> Unit,
 ) {
-    val theme = LocalTheme.current
     val modifier = modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
-    Card(
+    ThemedCard(
         shape = RoundedCornerShape(0),
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors().copy(containerColor = theme.cardBackground)
     ) {
         PostHeader(
             post,
