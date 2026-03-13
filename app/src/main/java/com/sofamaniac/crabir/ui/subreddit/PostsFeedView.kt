@@ -8,6 +8,7 @@
 
 package com.sofamaniac.crabir.ui.subreddit
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -83,7 +84,8 @@ fun PostFeedViewer(
     val listState = viewModel.listState
 
     LaunchedEffect(posts.loadState.refresh) {
-        if (posts.loadState.refresh is LoadState.NotLoading) {
+        if (posts.loadState.refresh is LoadState.NotLoading && viewModel.needScrollToTop) {
+            Log.d("PostFeedViewer", "Refreshing list")
             listState.scrollToItem(0)
         }
     }

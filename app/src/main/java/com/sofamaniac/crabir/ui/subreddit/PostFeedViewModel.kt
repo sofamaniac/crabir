@@ -40,6 +40,9 @@ import kotlinx.coroutines.runBlocking
 interface FeedViewModelInterface {
     val listState: LazyStaggeredGridState
     val data: Flow<PagingData<VotableData>>
+
+    val needScrollToTop: Boolean
+
     fun refresh()
     fun visitPost(post: PostData)
 
@@ -67,8 +70,7 @@ abstract class PostFeedViewModel(
     }
 
     override val listState = LazyStaggeredGridState()
-
-    private var goToTop = false
+    override var needScrollToTop = false
     private val _params = MutableStateFlow(
         FeedParams(
             sort = Sort.Best,
@@ -79,7 +81,7 @@ abstract class PostFeedViewModel(
     val params: StateFlow<FeedParams> = _params.asStateFlow()
 
     override fun refresh() {
-        goToTop = true
+        needScrollToTop = true
         feedSource?.invalidate()
         repository.refresh()
     }

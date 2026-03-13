@@ -122,6 +122,8 @@ class PostSearchViewModel @AssistedInject constructor(
         initialValue = PagingData.empty()
     )
 
+    override var needScrollToTop = false
+
     fun setSubreddit(subreddit: String) {
         _params.update {
             it.copy(subreddit = subreddit, restrictSubreddit = true)

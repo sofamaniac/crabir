@@ -148,6 +148,7 @@ abstract class ProfileFeedViewModel(
 
 
     override val listState = LazyStaggeredGridState()
+    override var needScrollToTop = false
     protected val _params = MutableStateFlow(
         ProfileFeedParams(
             username = username,
@@ -159,6 +160,7 @@ abstract class ProfileFeedViewModel(
     val params: StateFlow<ProfileFeedParams> = _params.asStateFlow()
 
     override fun refresh() {
+        needScrollToTop = true
         feedSource?.invalidate()
         repository.refresh()
     }
