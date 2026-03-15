@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.subredditList
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -17,12 +16,12 @@ import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 
 @Composable
-fun Tile(subreddit: SubredditData) {
+fun Tile(subreddit: SubredditData, modifier: Modifier = Modifier) {
     val navController = LocalNavController.current!!
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         SubredditIcon(
             subreddit.display_name,
@@ -31,15 +30,6 @@ fun Tile(subreddit: SubredditData) {
                 .size(32.dp)
                 .clip(CircleShape)
         )
-        Text(
-            text = subreddit.display_name,
-            modifier = Modifier.clickable {
-                navController.navigate(
-                    com.sofamaniac.crabir.SubredditRoute(
-                        subreddit.display_name
-                    )
-                )
-            }
-        )
+        Text(text = subreddit.display_name)
     }
 }

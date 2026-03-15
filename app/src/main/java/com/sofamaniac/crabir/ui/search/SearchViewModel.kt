@@ -22,6 +22,7 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.DataInterface
 import com.sofamaniac.crabir.domain.repository.ListingSource
+import com.sofamaniac.crabir.domain.repository.SubscriptionsRepository
 import com.sofamaniac.crabir.domain.repository.search.CommentSearchRepository
 import com.sofamaniac.crabir.domain.repository.search.CommunitySearchRepository
 import com.sofamaniac.crabir.domain.repository.search.PostSearchRepository
@@ -168,6 +169,7 @@ class PostSearchViewModel @AssistedInject constructor(
 @HiltViewModel
 class CommunitySearchViewModel @Inject constructor(
     repository: CommunitySearchRepository,
+    private val subscriptionsRepository: SubscriptionsRepository,
 ) : SearchViewModel<SubredditData>(
     repository, initialParams =
         SearchParams(
@@ -176,6 +178,7 @@ class CommunitySearchViewModel @Inject constructor(
             sort = CommunitySearchSort.Relevance
         )
 ) {
+    val subscriptions = subscriptionsRepository.subscriptions
     fun setSort(sort: CommunitySearchSort) {
         _params.update {
             it.copy(sort = sort)

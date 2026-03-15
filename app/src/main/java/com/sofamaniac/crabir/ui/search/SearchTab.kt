@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.search
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -130,6 +131,7 @@ private fun InnerTab(viewModel: PostSearchViewModel) {
 @Composable
 private fun InnerTab(viewModel: CommunitySearchViewModel) {
     val things = viewModel.items.collectAsLazyPagingItems()
+    val navController = LocalNavController.current!!
     val listState = viewModel.listState
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(1),
@@ -140,7 +142,16 @@ private fun InnerTab(viewModel: CommunitySearchViewModel) {
             count = things.itemCount,
             key = things.itemKey { p -> p.id }) { index ->
             val subreddit = things[index]!!
-            Tile(subreddit)
+            Tile(
+                subreddit,
+                modifier = Modifier.clickable {
+                    navController.navigate(
+                        com.sofamaniac.crabir.SubredditRoute(
+                            subreddit.display_name
+                        )
+                    )
+                }
+            )
         }
     }
 }
