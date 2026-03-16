@@ -134,7 +134,7 @@ fun Fab(viewModel: FeedViewModelInterface, toggleBottomSheet: () -> Unit) {
         derivedStateOf {
             !viewModel.listState.canScrollBackward
                     || !viewModel.listState.canScrollForward
-                    || viewModel.listState.lastScrolledForward
+                    || viewModel.listState.lastScrolledBackward
         }
     }
     FloatingActionButtonMenu(
