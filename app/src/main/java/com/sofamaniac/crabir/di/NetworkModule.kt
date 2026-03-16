@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.sofamaniac.crabir.data.remote.api.MediaUploadInterface
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.api.auth.RedditAuthenticator
 import com.sofamaniac.crabir.data.remote.interceptors.ForceJsonInterceptor
@@ -18,8 +19,10 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.ClientAuthentication
+import nl.adaptivity.xmlutil.serialization.XML
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import java.net.URI
 import java.net.URL
@@ -100,6 +103,25 @@ object NetworkModule {
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
             .create(RedditAPIService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun mediaUploaderService(): MediaUploadInterface {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.HEADERS
+        }
+        val client = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(
+                XML.v1.asConverterFactory("application/xml".toMediaType())
+            )
+            .client(client).build().create(MediaUploadInterface::class.java)
     }
 }
 

@@ -195,4 +195,6 @@ dependencies {
     implementation(libs.aboutlibraries.core)
     implementation(libs.aboutlibraries.compose.core)
     implementation(libs.aboutlibraries.compose.m3)
+
+    implementation("io.github.pdvrieze.xmlutil:serialization:1.0.0-rc2")
 }

@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.markdown
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -23,6 +24,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun Editor(
@@ -35,7 +37,12 @@ fun Editor(
         topBar = topBar, modifier = modifier,
         bottomBar = { BottomBar(state) }
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             beforeEditor()
             TextField(
                 label = { Text("Type Comment") },

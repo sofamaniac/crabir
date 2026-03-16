@@ -42,7 +42,7 @@ import androidx.compose.ui.semantics.stateDescription
 import com.sofamaniac.crabir.FullscreenHandler
 import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.domain.model.Kind
-import com.sofamaniac.crabir.ui.PostCreator
+import com.sofamaniac.crabir.ui.postEditor.PostCreator
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)

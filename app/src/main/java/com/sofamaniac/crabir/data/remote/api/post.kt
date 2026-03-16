@@ -4,13 +4,26 @@
 
 package com.sofamaniac.crabir.data.remote.api
 
+import android.content.Context
+import android.net.Uri
 import com.sofamaniac.crabir.data.remote.dto.post.PostFullname
 import com.sofamaniac.crabir.domain.model.Kind
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import nl.adaptivity.xmlutil.serialization.XmlElement
+import nl.adaptivity.xmlutil.serialization.XmlSerialName
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.Field
 import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface PostAPI {
 
@@ -23,50 +36,194 @@ interface PostAPI {
     @FormUrlEncoded
     @POST("api/submit")
     suspend fun submitPost(@FieldMap post: Map<String, String>): Response<Unit>
+
+    @POST("api/submit_gallery_post.json")
+    suspend fun submitGalleryPost(
+        @Body body: GallerySubmission
+    ): Response<Unit>
+
+    @FormUrlEncoded
+    @POST("api/media/asset.json")
+    suspend fun uploadMedia(
+        @Field("filepath") filepath: String,
+        @Field("mimetype") mimetype: String
+    ): Response<MediaUploadResponse>
+
 }
 
-class PostSubmissionBuilder() {
-    var title: String = ""
-    var text: String? = null
-    var subreddit: String = ""
-    var nsfw: Boolean = false
-    var spoiler: Boolean = false
-    var sendReplies: Boolean = false
-    var flairId: String? = null
-    var flairText: String? = null
-    var url: String? = null
-    var kind: Kind = Kind.Self
+interface MediaUploadInterface {
+    @POST
+    suspend fun pushMedia(@Url url: String, @Body body: RequestBody): Response<MediaPushResponse>
+}
+
+
+@Serializable
+@XmlSerialName("PostResponse")
+data class MediaPushResponse(
+    @XmlSerialName("Location") @XmlElement(true) val location: String,
+    @XmlSerialName("Bucket") @XmlElement(true) val bucket: String,
+    @XmlSerialName("Key") @XmlElement(true) val key: String,
+    @XmlSerialName("ETag") @XmlElement(true) val etag: String
+)
+
+@Serializable
+data class MediaUploadResponse(
+    val args: Args,
+    val asset: Asset
+)
+
+@Serializable
+data class Asset(
+    @SerialName("asset_id") val assetId: String,
+)
+
+
+@Serializable
+data class Args(
+    val action: String,
+    val fields: List<MediaField>
+)
+
+@Serializable
+data class MediaField(
+    val name: String,
+    val value: String,
+)
+
+sealed class SubmissionBuilderError(message: String, cause: Throwable? = null) :
+    Exception(message, cause)
+
+class MissingTitle(cause: Throwable? = null) : SubmissionBuilderError("Missing title", cause)
+class MissingCommunity(cause: Throwable? = null) :
+    SubmissionBuilderError("Missing community", cause)
+
+class MissingUrl(cause: Throwable? = null) : SubmissionBuilderError("Missing url", cause)
+class InvalidUrl(cause: Throwable? = null) : SubmissionBuilderError("Invalid url", cause)
+class MissingText(cause: Throwable? = null) : SubmissionBuilderError("Missing text", cause)
+class MissingGallery(cause: Throwable? = null) : SubmissionBuilderError("Missing gallery", cause)
+
+@Serializable
+data class GalleryItem(
+    val caption: String = "",
+    @SerialName("outbound_url") val outboundUrl: String = "",
+    @SerialName("media_id") val mediaId: String
+)
+
+@Serializable
+data class GallerySubmission(
+    val title: String = "",
+    @SerialName("sr") val subreddit: String = "",
+    val nsfw: Boolean = false,
+    val spoiler: Boolean = false,
+    @SerialName("sendreplies") val sendReplies: Boolean = false,
+    @SerialName("flair_id") val flairId: String? = null,
+    @SerialName("flair_text") val flairText: String? = null,
+    val items: List<GalleryItem> = emptyList(),
+    @SerialName("api_type") val apiType: String = "json",
+    @SerialName("show_error_list") val showErrorList: Boolean = true,
+    @SerialName("validate_on_submit") val validateOnSubmit: Boolean = true,
+)
+
+
+@Serializable
+data class PostSubmissionBuilder(
+    val title: String = "",
+    val text: String? = null,
+    @SerialName("sr") val subreddit: String = "",
+    val nsfw: Boolean = false,
+    val spoiler: Boolean = false,
+    @SerialName("sendreplies") val sendReplies: Boolean = false,
+    val flairId: String? = null,
+    val flairText: String? = null,
+    val url: String? = null,
+    val kind: Kind = Kind.Self,
+) {
+
+    fun toGallerySubmission(): GallerySubmission {
+        return GallerySubmission(
+            title = title,
+            subreddit = subreddit,
+            nsfw = nsfw,
+            spoiler = spoiler,
+            sendReplies = sendReplies,
+            flairId = flairId,
+            flairText = flairText,
+        )
+    }
+
 
     fun build(): Result<Map<String, String>> {
-        if (title.isBlank()) return Result.failure(Exception("Title cannot be empty"))
-        else if (subreddit.isBlank()) return Result.failure(Exception("Subreddit cannot be empty"))
-        else if (text.isNullOrBlank() && url.isNullOrBlank()) return Result.failure(Exception("Text or url must not be empty"))
-        else if (kind == Kind.Link && url.isNullOrBlank()) return Result.failure(Exception("Url must not be empty"))
+        if (title.isBlank()) return Result.failure(MissingTitle())
+        else if (subreddit.isBlank()) return Result.failure(MissingCommunity())
+        else if (kind == Kind.Link && url.isNullOrBlank()) return Result.failure(MissingUrl())
+        else if (text.isNullOrBlank() && url.isNullOrBlank() && kind != Kind.Gallery) return Result.failure(
+            MissingText()
+        )
+        else if (kind == Kind.Link) {
+            try {
+                url!!.toHttpUrl()
+            } catch (e: Exception) {
+                return Result.failure(InvalidUrl())
+            }
+        }
 
         return Result.success(
             buildMap {
                 put("api_type", "json")
-                put("kind", kind.toApiString())
+                kind.toApiString()?.let {
+                    put("kind", it)
+                }
                 put("title", title)
                 put("sr", subreddit)
-                put("sendReplies", sendReplies.toString())
+                put("sendreplies", sendReplies.toString())
                 put("nsfw", nsfw.toString())
                 put("spoiler", spoiler.toString())
-                text?.let { put("text", it) }
-                url?.let { put("url", it) }
-                flairId?.let { put("flair_id", it) }
-                flairText?.let { put("flair_text", it) }
+                put("show_error_list", true.toString())
+                put("validate_on_submit", true.toString())
+                if (!text.isNullOrBlank()) {
+                    put("text", text)
+                }
+                if (!url.isNullOrBlank()) {
+                    put("url", url)
+                }
+                if (flairId != null) {
+                    put("flair_id", flairId)
+                }
+                if (flairText != null) {
+                    put("flair_text", flairText)
+                }
             }
         )
     }
 }
 
-internal fun Kind.toApiString(): String {
+internal fun Kind.toApiString(): String? {
     return when (this) {
         Kind.Self -> "self"
         Kind.Image -> "image"
         Kind.Video -> "video"
         Kind.Link -> "link"
+        Kind.Gallery -> null
         else -> "link"
     }
+}
+
+fun makeMediaUploadBody(context: Context, uri: Uri, data: List<MediaField>): RequestBody {
+    val file = context.contentResolver.openInputStream(uri)?.use {
+        it.buffered().readBytes()
+    }!!
+    return MultipartBody.Builder()
+        .apply {
+            // Must come before the file because amazon stop reading form after the file
+            var builder = this
+            data.forEach { field ->
+                builder = builder.addFormDataPart(field.name, field.value)
+            }
+        }
+        .addFormDataPart(
+            name = "file",
+            filename = uri.toString(),
+            body = file.toRequestBody()
+        )
+        .build()
 }
