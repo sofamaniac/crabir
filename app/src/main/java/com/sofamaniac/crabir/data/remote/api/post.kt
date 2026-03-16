@@ -185,6 +185,9 @@ data class PostSubmissionBuilder(
                 }
                 if (!url.isNullOrBlank()) {
                     put("url", url)
+                    if (kind == Kind.Video) {
+                        put("video_poster_url", url)
+                    }
                 }
                 if (flairId != null) {
                     put("flair_id", flairId)

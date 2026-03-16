@@ -20,6 +20,7 @@ import com.sofamaniac.crabir.data.remote.api.makeMediaUploadBody
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.domain.model.Kind
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -43,6 +44,7 @@ class PostCreatorViewModel @Inject constructor(
 
     var media: List<Uri> by mutableStateOf(emptyList())
     var captions: MutableMap<Uri, String> = mutableMapOf()
+    var loading by mutableStateOf(false)
 
     fun setKind(context: Context) {
         if (media.size > 1) {
@@ -92,6 +94,7 @@ class PostCreatorViewModel @Inject constructor(
     }
 
     fun submit(context: Context, onSucceed: () -> Unit) {
+        loading = true
         state = state.copy(
             title = titleState.text as String,
             text = textState.text as String,
@@ -99,11 +102,12 @@ class PostCreatorViewModel @Inject constructor(
             subreddit = community?.display_name ?: ""
         )
         setKind(context)
-        viewModelScope.launch {
-            val submission = state.build()
+        viewModelScope.launch(Dispatchers.IO) {
+            var submission = state.build()
             if (submission.isFailure) {
                 Log.e("PostCreatorViewModel", "submit: ${submission.exceptionOrNull()}")
                 error = submission.exceptionOrNull() as SubmissionBuilderError?
+                loading = false
             } else {
                 val mediaIds = uploadMedia(
                     context,
@@ -114,6 +118,7 @@ class PostCreatorViewModel @Inject constructor(
                 }
                 if (mediaIds.size == 1) {
                     state = state.copy(url = mediaIds[0])
+                    submission = state.build()
                 }
                 val res = if (state.kind == Kind.Gallery) {
                     val gallery = state.toGallerySubmission()
@@ -122,6 +127,7 @@ class PostCreatorViewModel @Inject constructor(
                 } else {
                     api.submitPost(submission.getOrThrow())
                 }
+                loading = false
                 if (res.isSuccessful) {
                     onSucceed()
                 }

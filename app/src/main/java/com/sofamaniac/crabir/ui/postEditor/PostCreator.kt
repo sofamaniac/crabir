@@ -23,10 +23,12 @@ import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -77,88 +79,95 @@ fun PostCreator(
     }
     val fullscreenManager = LocalFullscreenHandler.current!!
     val context = LocalContext.current
-    Editor(state = viewModel.textState, topBar = {
-        TopAppBar(
-            navigationIcon = {
-                IconButton(onClick = { fullscreenManager.pop() }) {
-                    Icon(Icons.Default.Close, contentDescription = "Close")
-                }
-            },
-            title = { Text("Create post") },
-            actions = {
-                IconButton(onClick = {
-                    viewModel.submit(context) { fullscreenManager.pop() }
-                }) {
-                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
-                }
-            }
-        )
-    }) {
-        CommunitySelector(viewModel)
-        Column() {
-            TextField(
-                state = viewModel.titleState,
-                label = { Text("Title") },
-                inputTransformation = InputTransformation.maxLength(300),
-                modifier = Modifier.fillMaxWidth(),
-                isError = viewModel.error is MissingTitle,
-                supportingText = {
-                    if (viewModel.error is MissingTitle)
-                        Text("Missing title", color = MaterialTheme.colorScheme.error)
+    Box {
+        Editor(state = viewModel.textState, topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = { fullscreenManager.pop() }) {
+                        Icon(Icons.Default.Close, contentDescription = "Close")
+                    }
                 },
-                trailingIcon = {
-                    if (viewModel.error is MissingTitle)
-                        Icon(
-                            Icons.Filled.Error,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error
-                        )
+                title = { Text("Create post") },
+                actions = {
+                    IconButton(onClick = {
+                        viewModel.submit(context) { fullscreenManager.pop() }
+                    }) {
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+                    }
                 }
             )
-            Text(
-                "${viewModel.titleState.text.length}/300",
-                modifier = Modifier.align(Alignment.End)
-            )
-        }
-        if (viewModel.flairs.isNotEmpty()) {
-            TextButton(onClick = {}) {
-                Text("Flair")
+        }) {
+            CommunitySelector(viewModel)
+            Column() {
+                TextField(
+                    state = viewModel.titleState,
+                    label = { Text("Title") },
+                    inputTransformation = InputTransformation.maxLength(300),
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = viewModel.error is MissingTitle,
+                    supportingText = {
+                        if (viewModel.error is MissingTitle)
+                            Text("Missing title", color = MaterialTheme.colorScheme.error)
+                    },
+                    trailingIcon = {
+                        if (viewModel.error is MissingTitle)
+                            Icon(
+                                Icons.Filled.Error,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                    }
+                )
+                Text(
+                    "${viewModel.titleState.text.length}/300",
+                    modifier = Modifier.align(Alignment.End)
+                )
             }
-        }
-        when (viewModel.state.kind) {
-            Kind.Link -> {
-                UrlField(viewModel)
+            if (viewModel.flairs.isNotEmpty()) {
+                TextButton(onClick = {}) {
+                    Text("Flair")
+                }
+            }
+            when (viewModel.state.kind) {
+                Kind.Link -> {
+                    UrlField(viewModel)
+                }
+
+                Kind.Image, Kind.Video -> {
+                    MediaPicker(viewModel)
+                }
+
+                else -> {}
             }
 
-            Kind.Image, Kind.Video -> {
-                MediaPicker(viewModel)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(
+                    onClick = {
+                        viewModel.state = viewModel.state.copy(nsfw = !viewModel.state.nsfw)
+                    },
+                    selected = viewModel.state.nsfw,
+                    colors = FilterChipDefaults.filterChipColors().copy(
+                        selectedContainerColor = Color.Red,
+                    ),
+                    label = {
+                        Text("NSFW")
+                    },
+                )
+                FilterChip(
+                    onClick = {
+                        viewModel.state = viewModel.state.copy(spoiler = !viewModel.state.spoiler)
+                    },
+                    selected = viewModel.state.spoiler,
+                    label = {
+                        Text("SPOILER")
+                    }
+                )
             }
-
-            else -> {}
         }
-
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(
-                onClick = {
-                    viewModel.state = viewModel.state.copy(nsfw = !viewModel.state.nsfw)
-                },
-                selected = viewModel.state.nsfw,
-                colors = FilterChipDefaults.filterChipColors().copy(
-                    selectedContainerColor = Color.Red,
-                ),
-                label = {
-                    Text("NSFW")
-                },
-            )
-            FilterChip(
-                onClick = {
-                    viewModel.state = viewModel.state.copy(spoiler = !viewModel.state.spoiler)
-                },
-                selected = viewModel.state.spoiler,
-                label = {
-                    Text("SPOILER")
-                }
-            )
+        if (viewModel.loading) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
         }
     }
 }
@@ -197,12 +206,39 @@ fun UrlField(viewModel: PostCreatorViewModel) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaPicker(viewModel: PostCreatorViewModel) {
-    val maxMedia = 20
+    val maxMedia = when (viewModel.state.kind) {
+        Kind.Image, Kind.Gallery -> 20
+        Kind.Video -> 1
+        else -> 0
+    }
     val remaining = maxMedia - viewModel.media.size
-    val pickMedia =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(remaining)) { uris ->
+    val request = when (viewModel.state.kind) {
+        Kind.Image, Kind.Gallery -> PickVisualMediaRequest(
+            ActivityResultContracts.PickVisualMedia.ImageOnly,
+            maxItems = remaining
+        )
+
+        Kind.Video -> PickVisualMediaRequest(
+            ActivityResultContracts.PickVisualMedia.VideoOnly,
+        )
+
+        else -> throw Exception("Invalid kind")
+    }
+    val picker = when (viewModel.state.kind) {
+        Kind.Image, Kind.Gallery -> rememberLauncherForActivityResult(
+            ActivityResultContracts.PickMultipleVisualMedia(
+                maxItems = remaining
+            )
+        ) { uris ->
             viewModel.media += uris
         }
+
+        else -> rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) {
+                viewModel.media += uri
+            }
+        }
+    }
     val stroke =
         Stroke(width = 1.dp.value, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f)))
     var editIndex by remember { mutableStateOf<Int?>(null) }
@@ -231,36 +267,27 @@ fun MediaPicker(viewModel: PostCreatorViewModel) {
                 )
             }
         }
-        item {
-            Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .drawBehind {
-                        drawRoundRect(color = Color.Gray, style = stroke)
-                    }
-                    .clickable {
-                        pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
-                    }
-            ) {
-                Text("Add")
+        if (remaining > 0) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .drawBehind {
+                            drawRoundRect(color = Color.Gray, style = stroke)
+                        }
+                        .clickable {
+                            picker.launch(request)
+                        }
+                ) {
+
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "Add media",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
             }
         }
-//        item {
-//            val context = LocalContext.current
-//            Box(
-//                modifier = Modifier
-//                    .size(100.dp)
-//                    .drawBehind {
-//                        drawRoundRect(color = Color.Gray, style = stroke)
-//                    }
-//                    .clickable {
-//                        viewModel.uploadMedia(context)
-//                    }
-//            ) {
-//                Text("Upload")
-//            }
-//
-//        }
     }
     if (editIndex != null) {
         val uri = viewModel.media[editIndex!!]
