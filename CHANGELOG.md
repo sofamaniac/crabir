@@ -1,10 +1,13 @@
-## [0.3] - 2026-03-12
+## [0.4] - 2026-03-16
 
 ### 🚀 Features
 
 - Support for multi column view
 - History
 - New license screen
+- Collapse comments
+- Comment on posts and reply to comments
+- Post creator
 
 ### 🐛 Bug Fixes
 
@@ -15,3 +18,13 @@
 - Tapping "More" in thread not always working
 - Wrong icon selected in tab row when viewing subreddit
 - Navigation to user profile from outside link
+- Feed going back to beginning when going back
+- Incorrect comment background color
+- Selftext is sometimes cut in thread view
+- Prevent videos from being added to gallery
+- Floating action button appearing on wrong scroll direction
+- Floating action button colors
+
+### 💼 Other
+
+- Version code & name
