@@ -41,6 +41,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import com.sofamaniac.crabir.FullscreenHandler
 import com.sofamaniac.crabir.LocalFullscreenHandler
+import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.ui.postEditor.PostCreator
 import kotlinx.coroutines.launch
@@ -137,10 +138,12 @@ fun Fab(viewModel: FeedViewModelInterface, toggleBottomSheet: () -> Unit) {
                     || viewModel.listState.lastScrolledBackward
         }
     }
+    val theme = LocalTheme.current
     FloatingActionButtonMenu(
         expanded = expandFab,
         button = {
             ToggleFloatingActionButton(
+                containerColor = { theme.highlight },
                 modifier = Modifier
                     .semantics {
                         stateDescription =
@@ -170,6 +173,7 @@ fun Fab(viewModel: FeedViewModelInterface, toggleBottomSheet: () -> Unit) {
     ) {
         FloatingActionButtonMenuItem(
             onClick = { scope.launch { viewModel.listState.scrollToItem(0) } },
+            containerColor = theme.highlight,
             icon = {
                 Icon(
                     Icons.Default.KeyboardDoubleArrowUp,
@@ -180,6 +184,7 @@ fun Fab(viewModel: FeedViewModelInterface, toggleBottomSheet: () -> Unit) {
         )
         FloatingActionButtonMenuItem(
             onClick = { toggleBottomSheet() },
+            containerColor = theme.highlight,
             icon = {
                 Icon(
                     Icons.Default.Edit,
