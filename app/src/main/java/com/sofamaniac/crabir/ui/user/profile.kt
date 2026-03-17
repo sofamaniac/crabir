@@ -17,6 +17,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -24,9 +25,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.sofamaniac.crabir.FullscreenHandler
+import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.ui.TabBar
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
+import com.sofamaniac.crabir.ui.subreddit.PostFeedViewerDefaults
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -66,7 +69,7 @@ fun ProfileView(
     initialTab: ProfileTabs = ProfileTabs.Overview,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val isConnectedUser by viewModel.currentUser.map { it == user }.collectAsState(true)
+    val isConnectedUser by remember { viewModel.currentUser.map { it == user } }.collectAsState(true)
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val tabs = if (isConnectedUser) ProfileTabs.entries else ProfileTabs.publicTabs
     val initialIndex = tabs.indexOf(initialTab).coerceIn(0, tabs.size)
@@ -133,8 +136,12 @@ fun ProfileView(
                 ) {
                     val page = tabs[it]
                     val viewModel = viewModels[page]
+                    val filter = when (page) {
+                        ProfileTabs.Hidden -> { data: VotableData? -> true }
+                        else -> PostFeedViewerDefaults::hiddenFilter
+                    }
                     if (viewModel != null) {
-                        PostFeedViewer(viewModel = viewModel)
+                        PostFeedViewer(viewModel = viewModel, filter = filter)
                     } else {
                         Text("TODO")
                     }

@@ -56,6 +56,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.HorizontalSwipeToDismiss
@@ -69,6 +70,17 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
+object PostFeedViewerDefaults {
+    fun hiddenFilter(votableData: VotableData?): Boolean {
+        return when (votableData) {
+            is PostData -> {
+                !votableData.relationship.hidden
+            }
+
+            else -> true
+        }
+    }
+}
 
 /**
  * Composable function to display a list of posts from a subreddit.
@@ -79,7 +91,8 @@ import kotlin.math.max
 @Composable
 fun PostFeedViewer(
     viewModel: FeedViewModelInterface,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    filter: (VotableData?) -> Boolean = PostFeedViewerDefaults::hiddenFilter
 ) {
 
     val posts = viewModel.data.collectAsLazyPagingItems()
@@ -120,6 +133,7 @@ fun PostFeedViewer(
 
     val fullscreenManager = LocalFullscreenHandler.current!!
     val viewSettings = rememberViewSettings()
+    val postItems = posts.itemSnapshotList.filter { post -> filter(post) }
 
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,

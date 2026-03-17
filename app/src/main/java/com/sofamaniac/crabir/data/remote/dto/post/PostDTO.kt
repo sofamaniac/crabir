@@ -287,7 +287,8 @@ private fun PostDTO.toRelationship() = Relationship(
     clicked = clicked,
     visited = visited,
     saved = saved,
-    liked = likes
+    liked = likes,
+    hidden = hidden
 )
 
 private fun PostDTO.getPreview() = preview ?: crosspostParentList.firstOrNull()?.preview

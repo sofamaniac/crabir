@@ -176,7 +176,8 @@ private fun CommentDTO.toRelationship() = Relationship(
     clicked = false,
     visited = false,
     saved = saved,
-    liked = likes
+    liked = likes,
+    hidden = false,
 )
 
 

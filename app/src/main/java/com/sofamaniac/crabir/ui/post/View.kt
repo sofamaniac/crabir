@@ -101,6 +101,9 @@ interface VotableInteraction {
     fun upvote()
     fun downvote()
     fun save(target: Boolean)
+
+    fun hide() {}
+    fun unhide() {}
 }
 
 
@@ -134,6 +137,21 @@ class VotableViewModel @AssistedInject constructor(
             }
         }
     }
+
+    override fun hide() {
+        viewModelScope.launch {
+            val id = if (id.startsWith("t3")) id else "t3_$id"
+            posts.hide(id)
+        }
+    }
+
+    override fun unhide() {
+        viewModelScope.launch {
+            val id = if (id.startsWith("t3")) id else "t3_$id"
+            posts.unhide(id)
+        }
+    }
+
 
     @AssistedFactory
     interface Factory {

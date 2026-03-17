@@ -3,10 +3,6 @@ package com.sofamaniac.crabir.ui.post
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Comment
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -85,9 +81,7 @@ fun PostCard(
             enableLinkFullSizePreview = !settings.cardSettings.thumbnailForLinkPreview
         )
         BottomRow(post, modifier, viewModel = viewModel) {
-            IconButton(onClick = { onClick(post) }) {
-                Icon(Icons.AutoMirrored.Filled.Comment, contentDescription = "Go to comments")
-            }
+            OpenThreadButton(post, onClick = onClick)
         }
     }
 }

@@ -36,10 +36,15 @@ data class PostData(
     val linkFlair: Flair,
     val media: MediaInfo,
     val gallery: Gallery?,
+    val locked: Boolean,
+    val isCrosspostable: Boolean,
+    val canModPost: Boolean,
     //val status: Status
 ) : VotableData {
     val isCrosspost: Boolean =
         crosspostParentList.isNotEmpty()
+
+    val shortlink = "https://redd.it/$id"
 
     override fun copy(relationship: Relationship?, score: Score?): VotableData {
         return copy(relationship = relationship ?: this.relationship, score = score ?: this.score)

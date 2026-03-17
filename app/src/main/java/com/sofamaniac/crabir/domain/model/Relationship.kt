@@ -7,5 +7,6 @@ data class Relationship(
     val clicked: Boolean,
     val visited: Boolean,
     val saved: Boolean,
-    val liked: Boolean?
+    val liked: Boolean?,
+    val hidden: Boolean,
 )

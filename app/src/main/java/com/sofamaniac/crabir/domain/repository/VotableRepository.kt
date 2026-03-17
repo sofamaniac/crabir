@@ -2,6 +2,7 @@ package com.sofamaniac.crabir.domain.repository
 
 import android.util.Log
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.data.remote.dto.post.PostFullname
 import com.sofamaniac.crabir.domain.model.VotableData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,6 +71,31 @@ class VotableRepository(private val api: RedditAPIService) {
     suspend fun downvote(id: String): Result<Unit> {
         return vote(id, false)
     }
+
+    suspend fun hide(id: String): Result<Unit> {
+        val res = api.hide(PostFullname(id))
+        if (!res.isSuccessful) {
+            return Result.failure(Exception("Error hiding post"))
+        }
+        val post: VotableData? = _cache.value[id]
+        if (post == null) return Result.success(Unit)
+        val relationship = post.relationship.copy(hidden = true)
+        _cache.value += (id to post.copy(relationship = relationship))
+        return Result.success(Unit)
+    }
+
+    suspend fun unhide(id: String): Result<Unit> {
+        val res = api.unhide(PostFullname(id))
+        if (!res.isSuccessful) {
+            return Result.failure(Exception("Error unhiding post"))
+        }
+        val post: VotableData? = _cache.value[id]
+        if (post == null) return Result.success(Unit)
+        val relationship = post.relationship.copy(hidden = false)
+        _cache.value += (id to post.copy(relationship = relationship))
+        return Result.success(Unit)
+    }
+
 
     suspend fun saveHelper(id: String, target: Boolean): Result<Unit> {
         val post: VotableData? = _cache.value[id]
