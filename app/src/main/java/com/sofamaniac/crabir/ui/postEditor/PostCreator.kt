@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.postEditor
 
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -61,20 +62,20 @@ import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.data.remote.api.InvalidUrl
 import com.sofamaniac.crabir.data.remote.api.MissingTitle
 import com.sofamaniac.crabir.data.remote.api.MissingUrl
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.ui.markdown.Editor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCreator(
-    community: String? = null,
+    community: SubredditData? = null,
     kind: Kind = Kind.Self,
     viewModel: PostCreatorViewModel = hiltViewModel()
 ) {
     LaunchedEffect(community, kind) {
-        if (community != null) {
-            viewModel.state = viewModel.state.copy(subreddit = community)
-        }
+        Log.d("PostCreator", "PostCreator: $community $kind")
+        viewModel.community = community
         viewModel.state = viewModel.state.copy(kind = kind)
     }
     val fullscreenManager = LocalFullscreenHandler.current!!

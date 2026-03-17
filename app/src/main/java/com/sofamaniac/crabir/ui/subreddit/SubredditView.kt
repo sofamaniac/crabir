@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.domain.repository.feed.SubredditPostsRepository
@@ -20,6 +21,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,11 +56,16 @@ class SubredditViewModel @AssistedInject constructor(
     repository: SubredditPostsRepository,
     visitedPostsDao: VisitedPostsDao,
     visitedCommunityDao: VisitedCommunityDao,
+    /** Subreddit's display name */
     @Assisted private val subredditName: String
 ) : PostFeedViewModel(id = subredditName, repository, visitedPostsDao, visitedCommunityDao) {
 
     init {
         repository.updateSubreddit(subredditName)
+        viewModelScope.launch {
+            val data = repository.getInfo()
+            updateData(data)
+        }
     }
 
     @AssistedFactory

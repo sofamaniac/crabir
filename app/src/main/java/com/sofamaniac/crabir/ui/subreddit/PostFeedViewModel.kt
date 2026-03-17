@@ -22,6 +22,7 @@ import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
 import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
@@ -32,6 +33,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -41,6 +44,8 @@ interface FeedViewModelInterface {
     val listState: LazyStaggeredGridState
     val data: Flow<PagingData<VotableData>>
     val needScrollToTop: Boolean
+    val entity: Flow<VisitedCommunityEntity?>
+
     fun refresh()
     fun visitPost(post: PostData)
 
@@ -48,20 +53,21 @@ interface FeedViewModelInterface {
 }
 
 abstract class PostFeedViewModel(
-    private val id: String?,
+    private val id: String,
     private val repository: FeedRepositoryCommon<FeedParams>,
     private val visitedPostsDao: VisitedPostsDao,
     private val visitedCommunityDao: VisitedCommunityDao,
 ) : ViewModel(), FeedViewModelInterface {
 
+
+    override val entity = visitedCommunityDao.getCommunityFlow(id)
+
     init {
-        if (id != null) {
-            viewModelScope.launch(Dispatchers.IO) {
-                val entity = visitedCommunityDao.getCommunity(id)
-                if (entity?.sort != null) {
-                    _params.update {
-                        it.copy(sort = entity.sort!!, timeframe = entity.timeframe)
-                    }
+        viewModelScope.launch(Dispatchers.IO) {
+            val e = entity.firstOrNull()
+            if (e?.sort != null) {
+                _params.update {
+                    it.copy(sort = e.sort, timeframe = e.timeframe)
                 }
             }
         }
@@ -94,11 +100,30 @@ abstract class PostFeedViewModel(
                 params.value,
             ).also { feedSource = it }
         }
-    ).apply {
-    }
+    )
         .flow.cachedIn(
             viewModelScope
         )
+
+    fun updateData(data: SubredditData?) {
+        Log.d("PostFeedViewModel", "updateData: $data")
+        if (data == null) return
+        viewModelScope.launch(Dispatchers.IO) {
+            val e = entity.first()?.copy(data = data)
+            if (e != null) {
+                visitedCommunityDao.upsert(e)
+            } else {
+                visitedCommunityDao.insert(
+                    VisitedCommunityEntity(
+                        id = data.display_name,
+                        data = null
+                    ).copy(
+                        data = data,
+                    )
+                )
+            }
+        }
+    }
 
     fun updateSort(sort: Sort, timeframe: Timeframe? = null) {
         val needRefresh = params.value.sort != sort || params.value.timeframe != timeframe
@@ -109,11 +134,25 @@ abstract class PostFeedViewModel(
             }
         }
         if (needRefresh) {
-            if (id != null) {
-                Log.d("PostFeedViewModel", "updateSort: Updating sort to $sort")
-                viewModelScope.launch(Dispatchers.IO) {
-                    visitedCommunityDao.insert(VisitedCommunityEntity(id!!, sort, timeframe, null))
+            Log.d("PostFeedViewModel", "updateSort: Updating sort to $sort")
+            viewModelScope.launch(Dispatchers.IO) {
+                val e = entity.first()
+                    ?.let { it.copy(sort = sort, timeframe = timeframe, data = it.data) }
+                if (e != null) {
+                    visitedCommunityDao.upsert(e)
+                } else {
+                    visitedCommunityDao.insert(
+                        VisitedCommunityEntity(
+                            id,
+                            sort,
+                            timeframe,
+                            null,
+                            null,
+                            null
+                        )
+                    )
                 }
+
             }
             refresh()
         }

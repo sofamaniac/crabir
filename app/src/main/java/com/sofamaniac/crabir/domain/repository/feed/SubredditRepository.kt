@@ -5,6 +5,7 @@
 package com.sofamaniac.crabir.domain.repository.feed
 
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.repository.VotableRepository
 import jakarta.inject.Inject
@@ -14,6 +15,17 @@ class SubredditPostsRepository @Inject constructor(
     api: RedditAPIService,
 ) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
     private var currentSubreddit: String? = null
+
+    suspend fun getInfo(): SubredditData? {
+        if (currentSubreddit == null) {
+            return null
+        }
+        val res = api.getSubInfo(currentSubreddit!!)
+        if (!res.isSuccessful) {
+            return null
+        }
+        return res.body()?.data
+    }
 
     fun updateSubreddit(subreddit: String) {
         currentSubreddit = subreddit

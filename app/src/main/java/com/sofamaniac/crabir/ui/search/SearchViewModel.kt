@@ -11,6 +11,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
+import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
 import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.data.remote.api.CommunitySearchSort
 import com.sofamaniac.crabir.data.remote.api.PostSearchSort
@@ -37,9 +38,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -114,7 +117,7 @@ class PostSearchViewModel @AssistedInject constructor(
     val visitedPostsDao: VisitedPostsDao,
     @Assisted initialParams: SearchParams
 ) : SearchViewModel<PostData>(repository, initialParams), FeedViewModelInterface {
-
+    override val entity: Flow<VisitedCommunityEntity?> = flowOf(null)
     override val data: StateFlow<PagingData<VotableData>> = items.map { pagingData ->
         pagingData.map { it as VotableData }
     }.stateIn(

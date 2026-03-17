@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.subreddit
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -27,6 +28,7 @@ import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
 import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,10 +73,12 @@ fun FullFeedView(
 
     FullscreenHandler {
         val fullscreenManager = LocalFullscreenHandler.current!!
+        val entity by viewModel.entity.collectAsState(initial = null)
+        Log.d("FullFeedView", "entity: $entity")
         fun createPost(kind: Kind) {
             showBottomSheet = false
             fullscreenManager.push {
-                PostCreator(kind = kind)
+                PostCreator(kind = kind, community = entity?.getData())
             }
         }
         Box {

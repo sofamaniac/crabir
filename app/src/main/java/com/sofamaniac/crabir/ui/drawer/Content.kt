@@ -57,8 +57,8 @@ import java.util.Collections.emptyList
 
 @Composable
 fun DrawerContent(
-    viewModel: DrawerViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
+    viewModel: DrawerViewModel = hiltViewModel(),
 ) {
     val navController = LocalNavController.current!!
     val subscriptions = viewModel.subscriptions.collectAsState(initial = emptyList())
@@ -70,7 +70,9 @@ fun DrawerContent(
     val drawerState = LocalDrawerState.current
     val context = LocalContext.current
     val themeDataStore = remember { context.themeDataStore }
-    val themeMode by themeDataStore.data.map { it.mode }
+    val themeMode by remember {
+        themeDataStore.data.map { it.mode }
+    }
         .collectAsState(initial = ThemeMode.System)
     ModalDrawerSheet {
         Column(
@@ -197,6 +199,7 @@ fun DrawerContent(
                         )
                     },
                     onClick = {
+                        viewModel.visitCommunity(subreddit.data)
                         navController.navigate(
                             com.sofamaniac.crabir.SubredditRoute(
                                 subreddit.data.display_name

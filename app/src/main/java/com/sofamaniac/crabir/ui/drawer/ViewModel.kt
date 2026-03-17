@@ -12,10 +12,13 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
+import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.api.auth.AuthConfig
 import com.sofamaniac.crabir.data.remote.api.auth.BasicAuthClient
 import com.sofamaniac.crabir.data.remote.dto.Thing
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.SubscriptionsRepository
@@ -46,6 +49,7 @@ class DrawerViewModel @Inject constructor(
     private val accountsRepository: AccountsRepository,
     private val subsRepository: SubscriptionsRepository,
     private val redditApi: RedditAPIService,
+    private val visitedCommunityDao: VisitedCommunityDao,
 ) : ViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
@@ -145,6 +149,14 @@ class DrawerViewModel @Inject constructor(
                 }
 
             }
+        }
+    }
+
+    fun visitCommunity(data: SubredditData) {
+        viewModelScope.launch {
+            val entity = visitedCommunityDao.getCommunity(data.display_name)?.copy(data = data)
+                ?: VisitedCommunityEntity(id = data.display_name, data = null).copy(data = data)
+            visitedCommunityDao.upsert(entity)
         }
     }
 
