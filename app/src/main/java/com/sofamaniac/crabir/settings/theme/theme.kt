@@ -3,6 +3,7 @@
 package com.sofamaniac.crabir.settings.theme
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
@@ -232,7 +233,7 @@ fun rememberAppTheme(): CrabirTheme {
     val colorScheme = MaterialTheme.colorScheme
     val dynamicTheme = CrabirTheme.fromColorScheme(colorScheme)
 
-    if (theme.dynamicColor) {
+    if (theme.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         return dynamicTheme
     }
     Log.d("rememberAppTheme", "rememberAppTheme: ${theme.mode}")
@@ -264,8 +265,7 @@ fun ConfigureMaterialTheme(
 
 
     val colorScheme = when {
-        themeSettings.dynamicColor -> {
-            val context = LocalContext.current
+        themeSettings.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (darkModeEnabled) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
                 context
             )
@@ -283,5 +283,3 @@ fun ConfigureMaterialTheme(
         content = content
     )
 }
-
-

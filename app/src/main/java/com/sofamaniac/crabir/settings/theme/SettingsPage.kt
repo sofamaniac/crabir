@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.settings.theme
 
+import android.os.Build
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -65,20 +66,22 @@ fun ThemeSettingsPage() {
                 optionLabel = { stringResource(id = it.toStringResource()) },
                 modifier = Modifier.fillMaxWidth()
             )
-            SwitchTile(
-                headlineContent = { Text("Dynamic color") },
-                checked = settings.dynamicColor,
-                onCheckedChange = { target ->
-                    scope.launch {
-                        themeDataStore.updateData {
-                            it.copy(dynamicColor = target)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                SwitchTile(
+                    headlineContent = { Text("Dynamic color") },
+                    checked = settings.dynamicColor,
+                    onCheckedChange = { target ->
+                        scope.launch {
+                            themeDataStore.updateData {
+                                it.copy(dynamicColor = target)
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
             ConditionalListItem(
                 text = "Edit Colors",
-                enabled = !settings.dynamicColor,
+                enabled = !settings.dynamicColor || Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
                 onClick = {
                     navController.navigate(ThemeEditorRoute)
                 },
