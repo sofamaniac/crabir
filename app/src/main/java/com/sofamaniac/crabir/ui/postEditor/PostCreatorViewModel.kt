@@ -15,6 +15,7 @@ import com.sofamaniac.crabir.data.remote.api.GalleryItem
 import com.sofamaniac.crabir.data.remote.api.MediaUploadInterface
 import com.sofamaniac.crabir.data.remote.api.PostSubmissionBuilder
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.data.remote.api.Rules
 import com.sofamaniac.crabir.data.remote.api.SubmissionBuilderError
 import com.sofamaniac.crabir.data.remote.api.makeMediaUploadBody
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
@@ -33,7 +34,7 @@ class PostCreatorViewModel @Inject constructor(
     var state by mutableStateOf(PostSubmissionBuilder())
     var community: SubredditData? by mutableStateOf(null)
 
-    var rules: List<String> by mutableStateOf(emptyList())
+    var rules: Rules by mutableStateOf(Rules())
     var flairs: List<String> by mutableStateOf(emptyList())
 
     var error: SubmissionBuilderError? by mutableStateOf(null)
@@ -45,6 +46,16 @@ class PostCreatorViewModel @Inject constructor(
     var media: List<Uri> by mutableStateOf(emptyList())
     var captions: MutableMap<Uri, String> = mutableMapOf()
     var loading by mutableStateOf(false)
+
+    fun getRules() {
+        if (rules.siteRules.isNotEmpty()) return
+        viewModelScope.launch(Dispatchers.IO) {
+            val res = api.getRules(community!!.display_name)
+            if (res.isSuccessful) {
+                rules = res.body()!!
+            }
+        }
+    }
 
     fun setKind(context: Context) {
         if (media.size > 1) {

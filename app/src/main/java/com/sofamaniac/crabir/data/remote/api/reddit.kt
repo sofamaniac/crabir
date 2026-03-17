@@ -16,6 +16,7 @@ import com.sofamaniac.crabir.data.remote.dto.Thing.Post
 import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
 import com.sofamaniac.crabir.data.remote.dto.post.PostId
 import com.sofamaniac.crabir.data.remote.utils.CommentsResponseSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -157,6 +158,10 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
     suspend fun postComment(
         @Body body: RequestBody
     ): Response<MoreResponseOuter>
+
+    @GET("r/{subreddit}/about/rules.json")
+    suspend fun getRules(@Path("subreddit") subreddit: String): Response<Rules>
+
 }
 
 fun postCommentBody(parentId: String, text: String): RequestBody {
@@ -189,4 +194,19 @@ data class MoreResponse(
 @Serializable
 data class MoreResponseData(
     val things: List<Thing>
+)
+
+@Serializable
+data class Rules(
+    val rules: List<Rule> = emptyList(),
+    @SerialName("site_rules") val siteRules: List<String> = emptyList()
+)
+
+@Serializable
+data class Rule(
+    val kind: String,
+    val description: String,
+    @SerialName("short_name") val shortName: String,
+    @SerialName("violation_reason") val violationReason: String,
+    val priority: Int,
 )
