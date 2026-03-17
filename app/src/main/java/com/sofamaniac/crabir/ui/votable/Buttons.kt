@@ -15,6 +15,12 @@ import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,7 +29,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.IntOffset
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.ui.post.VotableInteraction
 import kotlinx.coroutines.launch
@@ -52,14 +58,23 @@ fun UpButton(viewModel: VotableInteraction) {
     )
 
     val scope = rememberCoroutineScope()
-    IconButton(
-        onClick = {
-            scope.launch { animate(likes) }
-            viewModel.upvote()
-        },
-        modifier = Modifier.offset(y = offset.value.dp)
+    val description = if (likes == true) "Neutral vote" else "Upvote"
+    TooltipBox(
+        tooltip = { PlainTooltip { Text(description) } },
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+            TooltipAnchorPosition.Above
+        ),
+        state = rememberTooltipState()
     ) {
-        Icon(Icons.Filled.ThumbUp, "upvote", tint = buttonColor.value)
+        IconButton(
+            onClick = {
+                scope.launch { animate(likes) }
+                viewModel.upvote()
+            },
+            modifier = Modifier.offset { IntOffset(0, offset.value.toInt()) }
+        ) {
+            Icon(Icons.Filled.ThumbUp, description, tint = buttonColor.value)
+        }
     }
 }
 
@@ -84,11 +99,23 @@ fun DownButton(viewModel: VotableInteraction) {
         targetValue = if (likes == false) theme.downvote else Color.Gray,
         label = "button color"
     )
-    IconButton(onClick = {
-        scope.launch { animate(likes) }
-        viewModel.downvote()
-    }, modifier = Modifier.offset(y = offset.value.dp)) {
-        Icon(Icons.Filled.ThumbDown, "downvote", tint = buttonColor.value)
+    val description = if (likes == false) "Neutral vote" else "Downvote"
+    TooltipBox(
+        tooltip = { PlainTooltip { Text(description) } },
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+            TooltipAnchorPosition.Above
+        ),
+        state = rememberTooltipState()
+    ) {
+        IconButton(
+            onClick = {
+                scope.launch { animate(likes) }
+                viewModel.downvote()
+            },
+            modifier = Modifier.offset { IntOffset(0, offset.value.toInt()) }
+        ) {
+            Icon(Icons.Filled.ThumbDown, description, tint = buttonColor.value)
+        }
     }
 }
 
@@ -109,14 +136,23 @@ fun SavedButton(viewModel: VotableInteraction) {
     }
 
     val scope = rememberCoroutineScope()
-    IconButton(onClick = {
-        scope.launch { animate(!saved) }
-        viewModel.save(!saved)
-    }, modifier = Modifier.scale(scale.value)) {
-        if (saved) {
-            Icon(Icons.Filled.Bookmark, "save", tint = buttonColor.value)
-        } else {
-            Icon(Icons.Outlined.BookmarkBorder, "save", tint = buttonColor.value)
+    val description = if (saved) "Unsave" else "Save"
+    TooltipBox(
+        tooltip = { PlainTooltip { Text(description) } },
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+            TooltipAnchorPosition.Above
+        ),
+        state = rememberTooltipState()
+    ) {
+        IconButton(onClick = {
+            scope.launch { animate(!saved) }
+            viewModel.save(!saved)
+        }, modifier = Modifier.scale(scale.value)) {
+            if (saved) {
+                Icon(Icons.Filled.Bookmark, description, tint = buttonColor.value)
+            } else {
+                Icon(Icons.Outlined.BookmarkBorder, description, tint = buttonColor.value)
+            }
         }
     }
 }
