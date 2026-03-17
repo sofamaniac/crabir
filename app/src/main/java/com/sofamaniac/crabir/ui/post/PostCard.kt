@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
@@ -38,7 +37,7 @@ fun PostCard(
     viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
-            factory.create(post.id)
+            factory.create(post.id, post.subreddit.name)
         }),
 ) {
     val settings = rememberViewSettings()
@@ -47,7 +46,6 @@ fun PostCard(
     val modifier = Modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
-    val theme = LocalTheme.current
     val onClickCard = if (clickable) {
         { onClick(post) }
     } else {

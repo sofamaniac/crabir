@@ -2,6 +2,7 @@ package com.sofamaniac.crabir.domain.repository
 
 import android.util.Log
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.data.remote.api.Rules
 import com.sofamaniac.crabir.data.remote.dto.post.PostFullname
 import com.sofamaniac.crabir.domain.model.VotableData
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +18,25 @@ class VotableRepository(private val api: RedditAPIService) {
     fun observePost(id: String): Flow<VotableData?> = _cache.map { it[id] }
         .distinctUntilChanged()
 
+    suspend fun getRules(subreddit: String): Rules {
+        val res = api.getRules(subreddit)
+        return if (res.isSuccessful) {
+            res.body()!!
+        } else {
+            Rules()
+        }
+    }
+
+    suspend fun report(id: String, reason: String): Result<Unit> {
+        val res = api.report(id, reason)
+        if (res.isSuccessful) {
+            return Result.success(Unit)
+        } else {
+            Log.e("PostRepository", "Error reporting post: ${res.errorBody()}")
+            return Result.failure(Exception("Error reporting post"))
+        }
+    }
+
     /** Returns true if the post was added, false if it already existed */
     fun addPost(post: VotableData): Boolean {
         val exists = _cache.value.containsKey(post.id)
@@ -30,7 +50,6 @@ class VotableRepository(private val api: RedditAPIService) {
     }
 
     fun getPost(id: String): VotableData? = _cache.value[id]
-
 
     suspend fun vote(id: String, upvote: Boolean): Result<Unit> {
         val post: VotableData? = _cache.value[id]
@@ -72,27 +91,27 @@ class VotableRepository(private val api: RedditAPIService) {
         return vote(id, false)
     }
 
-    suspend fun hide(id: String): Result<Unit> {
-        val res = api.hide(PostFullname(id))
+    suspend fun hide(fullname: String): Result<Unit> {
+        val res = api.hide(PostFullname(fullname))
         if (!res.isSuccessful) {
             return Result.failure(Exception("Error hiding post"))
         }
-        val post: VotableData? = _cache.value[id]
+        val post: VotableData? = _cache.value[fullname]
         if (post == null) return Result.success(Unit)
         val relationship = post.relationship.copy(hidden = true)
-        _cache.value += (id to post.copy(relationship = relationship))
+        _cache.value += (fullname to post.copy(relationship = relationship))
         return Result.success(Unit)
     }
 
-    suspend fun unhide(id: String): Result<Unit> {
-        val res = api.unhide(PostFullname(id))
+    suspend fun unhide(fullname: String): Result<Unit> {
+        val res = api.unhide(PostFullname(fullname))
         if (!res.isSuccessful) {
             return Result.failure(Exception("Error unhiding post"))
         }
-        val post: VotableData? = _cache.value[id]
+        val post: VotableData? = _cache.value[fullname]
         if (post == null) return Result.success(Unit)
         val relationship = post.relationship.copy(hidden = false)
-        _cache.value += (id to post.copy(relationship = relationship))
+        _cache.value += (fullname to post.copy(relationship = relationship))
         return Result.success(Unit)
     }
 

@@ -22,6 +22,8 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -161,6 +163,14 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
 
     @GET("r/{subreddit}/about/rules.json")
     suspend fun getRules(@Path("subreddit") subreddit: String): Response<Rules>
+
+    @FormUrlEncoded
+    @POST("api/report")
+    suspend fun report(
+        @Field("thing_id") id: String,
+        @Field("reason") reason: String,
+        @Field("api_type") apiType: String = "json"
+    ): Response<Unit>
 
 }
 

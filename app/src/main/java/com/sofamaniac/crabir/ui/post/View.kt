@@ -12,10 +12,14 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sofamaniac.crabir.data.remote.api.Rules
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.VotableRepository
@@ -109,12 +113,30 @@ interface VotableInteraction {
 
 @HiltViewModel(assistedFactory = VotableViewModel.Factory::class)
 class VotableViewModel @AssistedInject constructor(
-    @Assisted val id: String,
+    @Assisted("fullname") val fullname: String,
+    @Assisted("subreddit") val subreddit: String,
     private val posts: VotableRepository,
 ) : ViewModel(), VotableInteraction {
 
+    val id = fullname.subSequence(3, fullname.length).toString()
+
     override val likes = posts.observePost(id).map { it?.relationship?.liked }
     override val saved = posts.observePost(id).map { it?.relationship?.saved ?: false }
+
+    var rules by mutableStateOf(Rules())
+
+    fun getRules() {
+        if (rules.rules.isNotEmpty()) return
+        viewModelScope.launch {
+            rules = posts.getRules(subreddit)
+        }
+    }
+
+    fun report(reason: String) {
+        viewModelScope.launch {
+            posts.report(fullname, reason)
+        }
+    }
 
     override fun upvote() {
         viewModelScope.launch {
@@ -140,22 +162,23 @@ class VotableViewModel @AssistedInject constructor(
 
     override fun hide() {
         viewModelScope.launch {
-            val id = if (id.startsWith("t3")) id else "t3_$id"
-            posts.hide(id)
+            posts.hide(fullname)
         }
     }
 
     override fun unhide() {
         viewModelScope.launch {
-            val id = if (id.startsWith("t3")) id else "t3_$id"
-            posts.unhide(id)
+            posts.unhide(fullname)
         }
     }
 
 
     @AssistedFactory
     interface Factory {
-        fun create(postId: String): VotableViewModel
+        fun create(
+            @Assisted("fullname") fullname: String,
+            @Assisted("subreddit") subreddit: String
+        ): VotableViewModel
     }
 
 }

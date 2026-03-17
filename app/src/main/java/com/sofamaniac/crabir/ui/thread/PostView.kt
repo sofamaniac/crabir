@@ -91,7 +91,7 @@ fun PostCard(
     viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
-            factory.create(post.id)
+            factory.create(post.name, post.subreddit.name)
         }
     ),
     threadViewModel: ThreadViewModel,

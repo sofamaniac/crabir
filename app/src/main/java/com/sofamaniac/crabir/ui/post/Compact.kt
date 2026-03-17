@@ -31,7 +31,7 @@ fun CompactView(
     viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
-            factory.create(post.id)
+            factory.create(post.name, post.subreddit.name)
         }),
 ) {
     val theme = LocalTheme.current

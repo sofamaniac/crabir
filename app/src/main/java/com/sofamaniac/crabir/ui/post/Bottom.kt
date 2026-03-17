@@ -11,8 +11,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CallSplit
 import androidx.compose.material.icons.automirrored.filled.Comment
@@ -28,7 +32,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
@@ -45,6 +51,7 @@ import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.BuildConfig
@@ -135,6 +142,7 @@ private fun PostOptions(
     val scope = rememberCoroutineScope()
     var showDialog by remember { mutableStateOf(false) }
     var showShareDialog by remember { mutableStateOf(false) }
+    var showReportDialog by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { showOptions = true }) {
             Icon(Icons.Default.MoreVert, "more", tint = Color.Gray)
@@ -182,7 +190,10 @@ private fun PostOptions(
                     viewModel.hide()
                 }
             })
-            DropdownMenuItem(text = { Text("Report") }, onClick = {})
+            DropdownMenuItem(text = { Text("Report") }, onClick = {
+                viewModel.getRules()
+                showReportDialog = true
+            })
             DropdownMenuItem(text = { Text("Mute") }, onClick = {})
             DropdownMenuItem(text = { Text("Share") }, onClick = {
                 showShareDialog = true
@@ -204,6 +215,11 @@ private fun PostOptions(
     if (showShareDialog) {
         ShareMenu(post) {
             showShareDialog = false
+        }
+    }
+    if (showReportDialog) {
+        ReportMenu(viewModel) {
+            showReportDialog = false
         }
     }
 }
@@ -269,6 +285,64 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
                     context.startActivity(intent)
                 }
             )
+        }
+    }
+}
+
+@Composable
+fun ReportMenu(viewModel: VotableViewModel, onDismissRequest: () -> Unit) {
+    val rules = viewModel.rules
+    val (selectedOption, setSelectedOption) = remember { mutableStateOf(rules.siteRules.firstOrNull()) }
+    Dialog(onDismissRequest) {
+        Card(modifier = Modifier.padding(16.dp)) {
+            LazyColumn(modifier = Modifier.selectableGroup()) {
+                items(rules.rules.size) { index ->
+                    ListItem(
+                        modifier = Modifier.selectable(
+                            selected = selectedOption == rules.rules[index].violationReason,
+                            onClick = { setSelectedOption(rules.rules[index].violationReason) },
+                            role = Role.RadioButton
+                        ),
+                        leadingContent = {
+                            RadioButton(
+                                selected = selectedOption == rules.rules[index].violationReason,
+                                onClick = null
+                            )
+                        },
+                        headlineContent = { Text(rules.rules[index].shortName) }
+                    )
+                }
+                items(rules.siteRules.size) { index ->
+                    ListItem(
+                        modifier = Modifier.selectable(
+                            selected = selectedOption == rules.siteRules[index],
+                            onClick = { setSelectedOption(rules.siteRules[index]) },
+                            role = Role.RadioButton
+                        ),
+                        leadingContent = {
+                            RadioButton(
+                                selected = selectedOption == rules.siteRules[index],
+                                onClick = null
+                            )
+                        },
+                        headlineContent = { Text(rules.siteRules[index]) }
+                    )
+                }
+            }
+
+            Row {
+                TextButton(onClick = onDismissRequest) {
+                    Text("Cancel")
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                TextButton(onClick = {
+                    if (selectedOption == null) return@TextButton
+                    viewModel.report(selectedOption)
+                    onDismissRequest()
+                }) {
+                    Text("Report")
+                }
+            }
         }
     }
 }
