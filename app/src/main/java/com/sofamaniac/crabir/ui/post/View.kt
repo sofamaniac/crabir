@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.remote.api.Rules
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.VotableRepository
@@ -113,15 +114,20 @@ interface VotableInteraction {
 
 @HiltViewModel(assistedFactory = VotableViewModel.Factory::class)
 class VotableViewModel @AssistedInject constructor(
-    @Assisted("fullname") val fullname: String,
+    @Assisted("fullname") name: String,
     @Assisted("subreddit") val subreddit: String,
     private val posts: VotableRepository,
 ) : ViewModel(), VotableInteraction {
 
-    val id = fullname.subSequence(3, fullname.length).toString()
+    val fullname =
+        Fullname(name)
 
-    override val likes = posts.observePost(id).map { it?.relationship?.liked }
-    override val saved = posts.observePost(id).map { it?.relationship?.saved ?: false }
+    init {
+        require(name.contains("_"))
+    }
+
+    override val likes = posts.observePost(fullname).map { it?.relationship?.liked }
+    override val saved = posts.observePost(fullname).map { it?.relationship?.saved ?: false }
 
     var rules by mutableStateOf(Rules())
 
@@ -140,22 +146,22 @@ class VotableViewModel @AssistedInject constructor(
 
     override fun upvote() {
         viewModelScope.launch {
-            posts.upvote(id)
+            posts.upvote(fullname)
         }
     }
 
     override fun downvote() {
         viewModelScope.launch {
-            posts.downvote(id)
+            posts.downvote(fullname)
         }
     }
 
     override fun save(target: Boolean) {
         viewModelScope.launch {
             if (target) {
-                posts.save(id)
+                posts.save(fullname)
             } else {
-                posts.unsave(id)
+                posts.unsave(fullname)
             }
         }
     }
@@ -176,6 +182,8 @@ class VotableViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
+            // Because fullname is a value class it cannot be used in a factory
+            // https://github.com/google/dagger/issues/4613
             @Assisted("fullname") fullname: String,
             @Assisted("subreddit") subreddit: String
         ): VotableViewModel

@@ -5,6 +5,7 @@ import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -73,12 +74,12 @@ class SubscriptionsRepository(
         return PagedResponse()
     }
 
-    suspend fun getSubreddits(after: String): PagedResponse<Subreddit> {
+    suspend fun getSubreddits(after: Fullname): PagedResponse<Subreddit> {
         return makeRequest { api.getSubreddits(after = after) }
     }
 
     suspend fun loadSubscriptions(): List<Subreddit> {
-        var after: String? = ""
+        var after: Fullname? = Fullname("")
         var subs: List<Subreddit> = emptyList()
         while (after != null) {
             val response = getSubreddits(after)

@@ -12,6 +12,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.VotableRepository
@@ -66,14 +67,14 @@ class HistoryRepository @Inject constructor(
     val json = Json { ignoreUnknownKeys = true }
 
     override suspend fun getThings(
-        after: String,
+        after: Fullname,
         params: FeedParams
-    ): PagedResponse<String> {
+    ): PagedResponse<Fullname> {
         val timestamp = try {
-            if (after.isBlank()) {
+            if (after.name.isBlank()) {
                 System.currentTimeMillis()
             } else {
-                after.toLong()
+                after.name.toLong()
             }
         } catch (e: NumberFormatException) {
             return PagedResponse(
@@ -87,10 +88,10 @@ class HistoryRepository @Inject constructor(
             visitedPostsDao.getHistory(before = timestamp)
         cache.putAll(entities.map {
             json.decodeFromString<PostData>(it.post)
-        }.associateBy { it.id })
+        }.associateBy { it.name })
         return PagedResponse(
             data = entities.map { it.id },
-            after = entities.lastOrNull()?.visitedAt.toString(),
+            after = Fullname(entities.lastOrNull()?.visitedAt.toString()),
             total = entities.size
         )
     }

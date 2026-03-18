@@ -13,12 +13,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.sofamaniac.crabir.LocalFullscreenHandler
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.ui.markdown.Editor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReplyButton(
-    parentId: String, threadViewModel: ThreadViewModel, modifier: Modifier = Modifier.Companion,
+    parentId: Fullname,
+    threadViewModel: ThreadViewModel,
+    modifier: Modifier = Modifier.Companion,
     parentPreview: @Composable () -> Unit = {}
 ) {
     val fullscreenManager = LocalFullscreenHandler.current!!

@@ -16,11 +16,12 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
+import com.sofamaniac.crabir.domain.model.Fullname
 
 @Entity
 data class SubredditEntity(
     @PrimaryKey val id: String,
-    @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "name") val name: Fullname,
     @ColumnInfo(name = "display_name") val displayName: String,
     @ColumnInfo(name = "display_name_prefixed") val displayNamePrefixed: String,
     @ColumnInfo(name = "icon_img") val iconImg: String,

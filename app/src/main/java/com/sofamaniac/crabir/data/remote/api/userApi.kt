@@ -8,6 +8,7 @@ import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.repository.profile.ProfileSort
 import retrofit2.Response
 import retrofit2.http.GET
@@ -26,7 +27,7 @@ interface UserAPI {
     @GET("user/{user}/saved.json")
     suspend fun getSaved(
         @Path("user") user: String,
-        @Query("after") after: String? = null,
+        @Query("after") after: Fullname? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
@@ -37,7 +38,7 @@ interface UserAPI {
         @Path("user") user: String,
         @Query("sort") sort: ProfileSort = ProfileSort.New,
         @Query("t") timeframe: Timeframe? = null,
-        @Query("after") after: String? = null,
+        @Query("after") after: Fullname? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
@@ -46,7 +47,7 @@ interface UserAPI {
     @GET("user/{user}/comments.json")
     suspend fun getComments(
         @Path("user") user: String,
-        @Query("after") after: String? = null,
+        @Query("after") after: Fullname? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
@@ -57,7 +58,7 @@ interface UserAPI {
     @GET("user/{user}/hidden.json")
     suspend fun getHidden(
         @Path("user") user: String,
-        @Query("after") after: String? = null,
+        @Query("after") after: Fullname? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
@@ -66,7 +67,7 @@ interface UserAPI {
     @GET("user/{user}/upvoted.json")
     suspend fun getUpvoted(
         @Path("user") user: String,
-        @Query("after") after: String? = null,
+        @Query("after") after: Fullname? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
@@ -75,7 +76,7 @@ interface UserAPI {
     @GET("user/{user}/downvoted.json")
     suspend fun getDownvoted(
         @Path("user") user: String,
-        @Query("after") after: String? = null,
+        @Query("after") after: Fullname? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,

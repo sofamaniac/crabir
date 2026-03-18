@@ -7,6 +7,7 @@ import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.DataInterface
@@ -15,7 +16,7 @@ import com.sofamaniac.crabir.domain.repository.ListingRepository
 abstract class SearchRepositoryGeneric<Data : DataInterface>(private val api: RedditAPIService) :
     ListingRepository<SearchParams, Data>() {
 
-    override suspend fun getThings(after: String, params: SearchParams): PagedResponse<String> {
+    override suspend fun getThings(after: Fullname, params: SearchParams): PagedResponse<Fullname> {
         return makeRequest {
             api.search(
                 subreddit = params.subreddit ?: "all",

@@ -16,6 +16,7 @@ import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
 import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.feed.FeedRepositoryCommon
@@ -171,7 +172,7 @@ abstract class ProfileFeedViewModel(
     private var feedSource: FeedSource<ProfileFeedParams>? = null
     override val data: Flow<PagingData<VotableData>> = Pager(
         config = PagingConfig(pageSize = 100, prefetchDistance = 10, initialLoadSize = 100),
-        initialKey = "",
+        initialKey = Fullname(""),
         pagingSourceFactory = {
             FeedSource(
                 repository,
@@ -192,7 +193,7 @@ abstract class ProfileFeedViewModel(
 
     override fun isPostRead(post: PostData): Boolean {
         return runBlocking(Dispatchers.IO) {
-            visitedPostsDao.getPost(post.id) != null
+            visitedPostsDao.getPost(post.name) != null
         }
     }
 }

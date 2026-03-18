@@ -23,6 +23,7 @@ import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
@@ -93,7 +94,7 @@ abstract class PostFeedViewModel(
     private var feedSource: FeedSource<FeedParams>? = null
     override val data: Flow<PagingData<VotableData>> = Pager(
         config = PagingConfig(pageSize = 100, prefetchDistance = 10, initialLoadSize = 100),
-        initialKey = "",
+        initialKey = Fullname(""),
         pagingSourceFactory = {
             FeedSource(
                 repository,
@@ -167,7 +168,7 @@ abstract class PostFeedViewModel(
 
     override fun isPostRead(post: PostData): Boolean {
         return runBlocking(Dispatchers.IO) {
-            visitedPostsDao.getPost(post.id) != null
+            visitedPostsDao.getPost(post.name) != null
         }
     }
 }

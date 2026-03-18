@@ -37,7 +37,7 @@ fun PostCard(
     viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
-            factory.create(post.id, post.subreddit.name)
+            factory.create(post.name.name, post.subreddit.name)
         }),
 ) {
     val settings = rememberViewSettings()

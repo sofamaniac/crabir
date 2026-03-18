@@ -8,6 +8,7 @@
 
 package com.sofamaniac.crabir.data.remote.dto.subreddit
 
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.repository.DataInterface
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -28,6 +29,7 @@ fun dummySubredditData(): SubredditData {
         icon_img = "",
         primary_color = "black",
         key_color = "black",
+        name = Fullname(""),
     )
 }
 // TODO sometimes, id, display_name and icon_img are missing
@@ -59,7 +61,7 @@ data class SubredditData(
     val subscribers: Int = 0,
     val videostream_links_count: Int = 0,
     /** The string "t2_[id]" */
-    val name: String = "",
+    override val name: Fullname,
     val quarantine: Boolean = false,
     val hide_ads: Boolean = false,
     val prediction_leaderboard_entry_type: Int = 0,

@@ -16,6 +16,7 @@ import com.sofamaniac.crabir.data.remote.dto.Thing.Post
 import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
 import com.sofamaniac.crabir.data.remote.dto.post.PostId
 import com.sofamaniac.crabir.data.remote.utils.CommentsResponseSerializer
+import com.sofamaniac.crabir.domain.model.Fullname
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import okhttp3.MultipartBody
@@ -43,7 +44,7 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
     suspend fun getHome(
         @Path("sort") sort: PostSort,
         @Query("t") timeframe: PostTimeframe? = null,
-        @Query("after") after: String? = null,
+        @Query("after") after: Fullname? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
@@ -58,7 +59,7 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
     /** Get the list of subreddits the user is subscribed to. */
     @GET("/subreddits/mine/subscriber")
     suspend fun getSubreddits(
-        @Query("after") after: String? = null,
+        @Query("after") after: Fullname? = null,
         @Query("before") before: String? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
@@ -72,7 +73,7 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
     suspend fun getSubreddit(
         @Path("subreddit") subreddit: String,
         @Path("sort") sort: PostSort = PostSort.Best,
-        @Query("after") after: String? = null,
+        @Query("after") after: Fullname? = null,
         @Query("before") before: String? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
@@ -94,7 +95,7 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
     suspend fun getMultreddit(
         @Path("path", encoded = true) path: String,
         @Path("sort") sort: PostSort = PostSort.Best,
-        @Query("after") after: String? = null,
+        @Query("after") after: Fullname? = null,
         @Query("before") before: String? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
@@ -150,7 +151,7 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
      */
     @GET("api/morechildren.json")
     suspend fun getMoreComments(
-        @Query("link_id") parentId: String,
+        @Query("link_id") parentId: Fullname,
         @Query("children") children: String,
         @Query("api_type") apiType: String = "json",
         @Query("sort") sort: CommentSort? = null,
@@ -167,18 +168,18 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
     @FormUrlEncoded
     @POST("api/report")
     suspend fun report(
-        @Field("thing_id") id: String,
+        @Field("thing_id") id: Fullname,
         @Field("reason") reason: String,
         @Field("api_type") apiType: String = "json"
     ): Response<Unit>
 
 }
 
-fun postCommentBody(parentId: String, text: String): RequestBody {
+fun postCommentBody(parentId: Fullname, text: String): RequestBody {
     return MultipartBody.Builder().setType(MultipartBody.FORM)
         .addFormDataPart("api_type", "json")
         .addFormDataPart("text", text)
-        .addFormDataPart("thing_id", parentId)
+        .addFormDataPart("thing_id", parentId.name)
         .addFormDataPart("raw_json", "1")
         .build()
 }

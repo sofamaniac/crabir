@@ -19,6 +19,7 @@ plugins {
     id("androidx.room")
     id("com.mikepenz.aboutlibraries.plugin")
     id("com.mikepenz.aboutlibraries.plugin.android")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -93,6 +94,7 @@ room {
 configurations {
     all {
         exclude(group = "org.jetbrains", module = "annotations-java5")
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-android-extensions-runtime")
     }
 }
 

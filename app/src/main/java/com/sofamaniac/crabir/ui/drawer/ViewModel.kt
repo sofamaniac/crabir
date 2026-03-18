@@ -24,6 +24,7 @@ import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.SubscriptionsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -153,7 +154,7 @@ class DrawerViewModel @Inject constructor(
     }
 
     fun visitCommunity(data: SubredditData) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val entity = visitedCommunityDao.getCommunity(data.display_name)?.copy(data = data)
                 ?: VisitedCommunityEntity(id = data.display_name, data = null).copy(data = data)
             visitedCommunityDao.upsert(entity)
@@ -174,7 +175,7 @@ class DrawerViewModel @Inject constructor(
                         accountsRepository.updateAccount(
                             accounts.size,
                             newAccount.copy(
-                                username = identity.name,
+                                username = identity.username,
                                 thumbnailUrl = identity.iconImg
                             )
                         )

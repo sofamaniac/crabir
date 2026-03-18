@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.data.remote.dto.user
 
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.repository.DataInterface
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -87,7 +88,7 @@ data class UserDTO(
     @SerialName("modhash")
     val modhash: String = "",
     @SerialName("name")
-    val name: String = "",
+    val username: String,
     @SerialName("new_modmail_exists")
     val newModmailExists: Boolean? = null,
     @SerialName("num_friends")
@@ -129,5 +130,7 @@ data class UserDTO(
     @SerialName("total_karma")
     val totalKarma: Int = 0,
     @SerialName("verified")
-    val verified: Boolean = false
+    val verified: Boolean = false,
+    @SerialName("fullname")
+    override val name: Fullname = Fullname("t2_$id")
 ) : DataInterface

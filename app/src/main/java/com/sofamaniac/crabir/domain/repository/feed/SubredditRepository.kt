@@ -6,6 +6,7 @@ package com.sofamaniac.crabir.domain.repository.feed
 
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.repository.VotableRepository
 import jakarta.inject.Inject
@@ -32,9 +33,9 @@ class SubredditPostsRepository @Inject constructor(
     }
 
     override suspend fun getThings(
-        after: String,
+        after: Fullname,
         params: FeedParams
-    ): PagedResponse<String> {
+    ): PagedResponse<Fullname> {
         val subreddit = currentSubreddit ?: return PagedResponse()
         return makeRequest {
             api.getSubreddit(

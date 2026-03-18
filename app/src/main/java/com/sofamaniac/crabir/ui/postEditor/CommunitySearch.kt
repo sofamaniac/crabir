@@ -79,7 +79,7 @@ internal fun CommunitySearch(
             if (searchedCommunities.itemCount > 0) {
                 items(
                     count = searchedCommunities.itemCount,
-                    key = searchedCommunities.itemKey { p -> p.id }) { index ->
+                    key = searchedCommunities.itemKey { p -> p.name }) { index ->
                     val subreddit = searchedCommunities[index]!!
                     Tile(subreddit, modifier = Modifier.clickable {
                         viewModel.community = subreddit

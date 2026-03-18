@@ -5,6 +5,7 @@
 package com.sofamaniac.crabir.domain.repository.profile
 
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.VotableRepository
@@ -18,9 +19,9 @@ class UpvotedRepository @Inject constructor(
     api: RedditAPIService,
 ) : FeedRepositoryCommon<ProfileFeedParams>(votableRepository, api) {
     override suspend fun getThings(
-        after: String,
+        after: Fullname,
         params: ProfileFeedParams
-    ): PagedResponse<String> {
+    ): PagedResponse<Fullname> {
         if (params.username == RedditAccount.ANONYMOUS) return PagedResponse()
         return makeRequest {
             api.getUpvoted(

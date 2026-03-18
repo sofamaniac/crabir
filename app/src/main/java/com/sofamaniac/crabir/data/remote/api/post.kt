@@ -6,7 +6,7 @@ package com.sofamaniac.crabir.data.remote.api
 
 import android.content.Context
 import android.net.Uri
-import com.sofamaniac.crabir.data.remote.dto.post.PostFullname
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -28,10 +28,10 @@ import retrofit2.http.Url
 interface PostAPI {
 
     @POST("/api/hide")
-    suspend fun hide(@Query("id") postFullname: PostFullname): Response<Unit>
+    suspend fun hide(@Query("id") postFullname: Fullname): Response<Unit>
 
     @POST("/api/unhide")
-    suspend fun unhide(@Query("id") postFullname: PostFullname): Response<Unit>
+    suspend fun unhide(@Query("id") postFullname: Fullname): Response<Unit>
 
     @FormUrlEncoded
     @POST("api/submit")

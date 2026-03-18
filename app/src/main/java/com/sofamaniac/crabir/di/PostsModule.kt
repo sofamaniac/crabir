@@ -17,6 +17,5 @@ object PostsModule {
         api: RedditAPIService,
     ): VotableRepository {
         return VotableRepository(api)
-
     }
 }

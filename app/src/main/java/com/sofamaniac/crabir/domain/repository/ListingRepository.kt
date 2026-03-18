@@ -4,16 +4,18 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.sofamaniac.crabir.data.remote.dto.Thing
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import retrofit2.Response
 
 interface DataInterface {
     val id: String
+    val name: Fullname
 }
 
 abstract class ListingRepository<Params, Data : DataInterface> {
-    private var _seenThings: Set<String> = emptySet()
-    var cache = mutableMapOf<String, Data>()
+    private var _seenThings: Set<Fullname> = emptySet()
+    var cache = mutableMapOf<Fullname, Data>()
         private set
 
     fun refresh() {
@@ -22,32 +24,32 @@ abstract class ListingRepository<Params, Data : DataInterface> {
 
     open fun onResponseSuccess(things: List<Thing>) {
         val data = things.mapNotNull { thing -> thingToData(thing) }
-        cache.putAll(data.associateBy { it.id })
+        cache.putAll(data.associateBy { it.name })
     }
 
     abstract fun thingToData(thing: Thing): Data?
 
-    abstract suspend fun getThings(after: String, params: Params): PagedResponse<String>
+    abstract suspend fun getThings(after: Fullname, params: Params): PagedResponse<Fullname>
 
 
     protected suspend fun <T : Thing> makeRequest(
         request: suspend () -> Response<Thing.Listing<T>>
-    ): PagedResponse<String> {
+    ): PagedResponse<Fullname> {
         val response = request()
         if (response.isSuccessful) {
             val listing = response.body()
             listing?.let {
                 val things = listing.data.children
-                    .filter { thing -> !_seenThings.contains(thing.id) }
+                    .filter { thing -> !_seenThings.contains(thing.name) }
                 things.forEach { data ->
-                    _seenThings += data.id
+                    _seenThings += data.name
                 }
                 onResponseSuccess(things)
-                val thingIds = things.map { thing ->
-                    thing.id
+                val thingsName = things.map { thing ->
+                    thing.name
                 }
                 return PagedResponse(
-                    data = thingIds,
+                    data = thingsName,
                     after = it.data.after,
                     total = it.size
                 )
@@ -62,14 +64,14 @@ abstract class ListingRepository<Params, Data : DataInterface> {
 class ListingSource<Params, Data : DataInterface>(
     private val repository: ListingRepository<Params, Data>,
     private val params: Params,
-) : PagingSource<String, Data>() {
+) : PagingSource<Fullname, Data>() {
 
 
-    override fun getRefreshKey(state: PagingState<String, Data>): String {
-        return ""
+    override fun getRefreshKey(state: PagingState<Fullname, Data>): Fullname {
+        return Fullname("")
     }
 
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, Data> {
+    override suspend fun load(params: LoadParams<Fullname>): LoadResult.Page<Fullname, Data> {
         val page = if (params.key != null) {
             getThings(params.key!!)
         } else {
@@ -85,7 +87,7 @@ class ListingSource<Params, Data : DataInterface>(
         )
     }
 
-    private suspend fun getThings(after: String): PagedResponse<String> {
+    private suspend fun getThings(after: Fullname): PagedResponse<Fullname> {
         return repository.getThings(after, params)
     }
 }

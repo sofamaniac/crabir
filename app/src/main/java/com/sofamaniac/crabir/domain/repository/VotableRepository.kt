@@ -3,7 +3,7 @@ package com.sofamaniac.crabir.domain.repository
 import android.util.Log
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.api.Rules
-import com.sofamaniac.crabir.data.remote.dto.post.PostFullname
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.VotableData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,9 +13,9 @@ import retrofit2.Response
 
 class VotableRepository(private val api: RedditAPIService) {
     private val _cache =
-        MutableStateFlow(emptyMap<String, VotableData>())
+        MutableStateFlow(emptyMap<Fullname, VotableData>())
 
-    fun observePost(id: String): Flow<VotableData?> = _cache.map { it[id] }
+    fun observePost(name: Fullname): Flow<VotableData?> = _cache.map { it[name] }
         .distinctUntilChanged()
 
     suspend fun getRules(subreddit: String): Rules {
@@ -27,8 +27,8 @@ class VotableRepository(private val api: RedditAPIService) {
         }
     }
 
-    suspend fun report(id: String, reason: String): Result<Unit> {
-        val res = api.report(id, reason)
+    suspend fun report(name: Fullname, reason: String): Result<Unit> {
+        val res = api.report(name, reason)
         if (res.isSuccessful) {
             return Result.success(Unit)
         } else {
@@ -39,21 +39,24 @@ class VotableRepository(private val api: RedditAPIService) {
 
     /** Returns true if the post was added, false if it already existed */
     fun addPost(post: VotableData): Boolean {
-        val exists = _cache.value.containsKey(post.id)
-        _cache.value += (post.id to post)
+        val exists = _cache.value.containsKey(post.name)
+        _cache.value += (post.name to post)
         return exists
     }
 
     fun addPosts(posts: List<VotableData>) {
-        val newEntries = posts.associateBy { it.id }
+        val newEntries = posts.associateBy { it.name }
         _cache.value += newEntries
     }
 
-    fun getPost(id: String): VotableData? = _cache.value[id]
+    fun getPost(name: Fullname): VotableData? = _cache.value[name]
 
-    suspend fun vote(id: String, upvote: Boolean): Result<Unit> {
-        val post: VotableData? = _cache.value[id]
-        if (post == null) return Result.failure(Exception("Post not found"))
+    suspend fun vote(name: Fullname, upvote: Boolean): Result<Unit> {
+        val post: VotableData? = _cache.value[name]
+        if (post == null) {
+            Log.e("PostRepository", "Post not found in cache")
+            return Result.failure(Exception("Post not found"))
+        }
         lateinit var res: Response<Unit>
         val newLike = if (post.relationship.liked == upvote) null else upvote
         val dir = when (newLike) {
@@ -66,33 +69,33 @@ class VotableRepository(private val api: RedditAPIService) {
             relationship = relationship,
             score = post.score.copy(score = post.score.score + dir)
         )
-        _cache.value += (id to newPost)
+        _cache.value += (name to newPost)
         try {
             res = api.vote(post.name, dir)
             if (res.isSuccessful) {
                 return Result.success(Unit)
             } else {
-                _cache.value += (id to post)
+                _cache.value += (name to post)
                 Log.e("PostRepository", "Error upvoting post: ${res.errorBody()}")
                 return Result.failure(Exception("Error upvoting post"))
             }
         } catch (e: Exception) {
-            _cache.value += (id to post)
+            _cache.value += (name to post)
             Log.e("PostRepository", "Error upvoting post: ${e.message}")
             return Result.failure(e)
         }
     }
 
-    suspend fun upvote(id: String): Result<Unit> {
-        return vote(id, true)
+    suspend fun upvote(name: Fullname): Result<Unit> {
+        return vote(name, true)
     }
 
-    suspend fun downvote(id: String): Result<Unit> {
-        return vote(id, false)
+    suspend fun downvote(name: Fullname): Result<Unit> {
+        return vote(name, false)
     }
 
-    suspend fun hide(fullname: String): Result<Unit> {
-        val res = api.hide(PostFullname(fullname))
+    suspend fun hide(fullname: Fullname): Result<Unit> {
+        val res = api.hide(fullname)
         if (!res.isSuccessful) {
             return Result.failure(Exception("Error hiding post"))
         }
@@ -103,8 +106,8 @@ class VotableRepository(private val api: RedditAPIService) {
         return Result.success(Unit)
     }
 
-    suspend fun unhide(fullname: String): Result<Unit> {
-        val res = api.unhide(PostFullname(fullname))
+    suspend fun unhide(fullname: Fullname): Result<Unit> {
+        val res = api.unhide(fullname)
         if (!res.isSuccessful) {
             return Result.failure(Exception("Error unhiding post"))
         }
@@ -116,33 +119,33 @@ class VotableRepository(private val api: RedditAPIService) {
     }
 
 
-    suspend fun saveHelper(id: String, target: Boolean): Result<Unit> {
-        val post: VotableData? = _cache.value[id]
+    suspend fun saveHelper(name: Fullname, target: Boolean): Result<Unit> {
+        val post: VotableData? = _cache.value[name]
         if (post == null) return Result.failure(Exception("Post not found"))
         val relationship = post.relationship.copy(saved = target)
-        _cache.value += (id to post.copy(relationship = relationship))
+        _cache.value += (name to post.copy(relationship = relationship))
         try {
             val res = if (target) api.save(post.name) else api.unsave(post.name)
             if (res.isSuccessful) {
                 return Result.success(Unit)
             } else {
-                _cache.value += (id to post)
+                _cache.value += (name to post)
                 Log.e("PostRepository", "Error saving post: ${res.errorBody()}")
                 return Result.failure(Exception("Error saving post"))
             }
         } catch (e: Exception) {
-            _cache.value += (id to post)
+            _cache.value += (name to post)
             Log.e("PostRepository", "Error saving post: ${e.message}")
             return Result.failure(e)
         }
     }
 
-    suspend fun save(id: String): Result<Unit> {
-        return saveHelper(id, true)
+    suspend fun save(name: Fullname): Result<Unit> {
+        return saveHelper(name, true)
     }
 
-    suspend fun unsave(id: String): Result<Unit> {
-        return saveHelper(id, false)
+    suspend fun unsave(name: Fullname): Result<Unit> {
+        return saveHelper(name, false)
     }
 
 }

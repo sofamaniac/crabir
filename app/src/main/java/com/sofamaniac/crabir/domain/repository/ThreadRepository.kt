@@ -13,6 +13,7 @@ import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.crabir.domain.model.CommentType
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.ui.thread.updateComment
 import retrofit2.Response
@@ -23,22 +24,22 @@ interface ThreadRepository {
         sort: Sort, timeframe: Timeframe? = null
     ): List<CommentType>
 
-    suspend fun getPost(id: String): PostData?
+    suspend fun getPost(name: Fullname): PostData?
     suspend fun getMoreComments(more: CommentType.More): List<CommentType>
 
-    suspend fun postComment(parentId: String, comment: String): Response<MoreResponseOuter>
+    suspend fun postComment(parentId: Fullname, comment: String): Response<MoreResponseOuter>
 
-    /** Extract id from post permalink. */
-    fun getPostId(permalink: String): String
+    /** Extract fullname from post permalink. */
+    fun getPostId(permalink: String): Fullname
 
 
     fun refresh()
 
-    suspend fun upvote(id: String)
-    suspend fun neutralVote(id: String)
-    suspend fun downvote(id: String)
-    suspend fun save(id: String)
-    suspend fun unsave(id: String)
+    suspend fun upvote(fullname: Fullname)
+    suspend fun neutralVote(fullname: Fullname)
+    suspend fun downvote(fullname: Fullname)
+    suspend fun save(fullname: Fullname)
+    suspend fun unsave(fullname: Fullname)
 
 }
 
@@ -73,11 +74,11 @@ class ThreadRepositoryImpl(
         }
     }
 
-    override suspend fun getPost(id: String): PostData? {
+    override suspend fun getPost(name: Fullname): PostData? {
         if (post != null) {
             return post
         } else {
-            post = votableRepository.getPost(id) as? PostData?
+            post = votableRepository.getPost(name) as? PostData?
         }
         return post
     }
@@ -91,10 +92,10 @@ class ThreadRepositoryImpl(
         return comments
     }
 
-    override fun getPostId(permalink: String): String {
+    override fun getPostId(permalink: String): Fullname {
         val segments = permalink.split("/")
         val index = segments.indexOf("comments")
-        return segments[index + 1]
+        return Fullname("t3_${segments[index + 1]}")
     }
 
     override suspend fun getMoreComments(more: CommentType.More): List<CommentType> {
@@ -112,10 +113,10 @@ class ThreadRepositoryImpl(
                         CommentType.More((comment as Thing.More).data)
                     }
                 }
-                comments = if (more.data.parent_id == post!!.name) {
+                comments = if (more.data.parentId == post!!.name) {
                     comments.replaceMore(more, children)
                 } else {
-                    comments.updateComment(more.data.parent_id) { comment ->
+                    comments.updateComment(more.data.parentId) { comment ->
                         if (comment is CommentType.Comment) {
                             val replies = comment.comment.replies.replaceMore(more, children)
                             comment.copy(
@@ -132,7 +133,7 @@ class ThreadRepositoryImpl(
     }
 
     override suspend fun postComment(
-        parentId: String,
+        parentId: Fullname,
         comment: String
     ): Response<MoreResponseOuter> {
         val body = postCommentBody(parentId, comment)
@@ -143,24 +144,24 @@ class ThreadRepositoryImpl(
         comments = emptyList()
     }
 
-    override suspend fun upvote(id: String) {
-        api.vote(id, UPVOTED)
+    override suspend fun upvote(fullname: Fullname) {
+        api.vote(fullname, UPVOTED)
     }
 
-    override suspend fun neutralVote(id: String) {
-        api.vote(id, NEUTRAL)
+    override suspend fun neutralVote(fullname: Fullname) {
+        api.vote(fullname, NEUTRAL)
     }
 
-    override suspend fun downvote(id: String) {
-        api.vote(id, DOWNVOTED)
+    override suspend fun downvote(fullname: Fullname) {
+        api.vote(fullname, DOWNVOTED)
     }
 
-    override suspend fun save(id: String) {
-        api.save(id)
+    override suspend fun save(fullname: Fullname) {
+        api.save(fullname)
     }
 
-    override suspend fun unsave(id: String) {
-        api.save(id)
+    override suspend fun unsave(fullname: Fullname) {
+        api.save(fullname)
     }
 
 }

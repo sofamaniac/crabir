@@ -15,6 +15,7 @@ import com.sofamaniac.crabir.domain.model.AuthorInfo
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Flair
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Relationship
 import com.sofamaniac.crabir.domain.model.Score
 import com.sofamaniac.crabir.domain.model.SubredditInfo
@@ -34,7 +35,7 @@ value class CommentFullname(val id: String)
 @Serializable
 data class CommentDTO(
     val id: String,
-    val name: String,
+    val name: Fullname,
     val body: String,
     @SerialName("body_html")
     val bodyHtml: String,

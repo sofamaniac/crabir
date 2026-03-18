@@ -1,12 +1,13 @@
 package com.sofamaniac.crabir.data.remote.dto
 
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetails
+import com.sofamaniac.crabir.domain.model.Fullname
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class MultiData(
-    val name: String,
+    val name: Fullname,
     @SerialName("display_name") val displayName: String,
     @SerialName("description_md") val descriptionMd: String,
     @SerialName("description_html") val descriptionHtml: String,

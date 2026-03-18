@@ -5,6 +5,7 @@
 package com.sofamaniac.crabir.domain.repository.feed
 
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.repository.VotableRepository
 import javax.inject.Inject
@@ -17,9 +18,9 @@ class HomeRepository @Inject constructor(
 ) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
 
     override suspend fun getThings(
-        after: String,
+        after: Fullname,
         params: FeedParams
-    ): PagedResponse<String> {
+    ): PagedResponse<Fullname> {
         return makeRequest {
             api.getHome(
                 sort = params.sort,

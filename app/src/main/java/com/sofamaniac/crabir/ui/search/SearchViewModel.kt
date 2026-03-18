@@ -19,6 +19,7 @@ import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.DataInterface
@@ -72,7 +73,7 @@ abstract class SearchViewModel<Data : DataInterface>(
     private var feedSource: ListingSource<SearchParams, Data>? = null
     val items = Pager(
         config = PagingConfig(pageSize = 100, prefetchDistance = 10, initialLoadSize = 100),
-        initialKey = "",
+        initialKey = Fullname(""),
         pagingSourceFactory = {
             ListingSource(
                 repository,
@@ -157,7 +158,7 @@ class PostSearchViewModel @AssistedInject constructor(
 
     override fun isPostRead(post: PostData): Boolean {
         return runBlocking(Dispatchers.IO) {
-            visitedPostsDao.getPost(post.id) != null
+            visitedPostsDao.getPost(post.name) != null
         }
     }
 

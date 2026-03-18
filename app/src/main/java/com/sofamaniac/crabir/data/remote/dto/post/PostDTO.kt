@@ -17,6 +17,7 @@ import com.sofamaniac.crabir.data.remote.utils.MediaMetadataSerializer
 import com.sofamaniac.crabir.data.remote.utils.RedditVideoSerializer
 import com.sofamaniac.crabir.domain.model.AuthorInfo
 import com.sofamaniac.crabir.domain.model.Flair
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Gallery
 import com.sofamaniac.crabir.domain.model.MediaInfo
 import com.sofamaniac.crabir.domain.model.MediaResource
@@ -53,7 +54,7 @@ value class PostFullname(val id: String)
 data class PostDTO(
 
     @SerialName("id") val id: String,
-    @SerialName("name") val fullname: String,
+    @SerialName("name") val fullname: Fullname,
     @SerialName("url") val url: String = "",
     @SerialName("title") val title: String = "",
     @SerialName("suggested_sort") val suggestedSort: String? = null,
@@ -300,7 +301,6 @@ private fun PostDTO.getGalleryData(): Gallery? {
 }
 
 private fun PostDTO.isDistinguished() = pinned || stickied || distinguished == "moderator"
-
 
 object PostDataMapper : ObjectMappie<PostDTO, PostData>() {
 

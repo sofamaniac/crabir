@@ -41,6 +41,7 @@ import com.sofamaniac.crabir.data.remote.api.PostSearchSort
 import com.sofamaniac.crabir.domain.repository.DataInterface
 import com.sofamaniac.crabir.domain.repository.search.SearchParams
 import com.sofamaniac.crabir.ui.SortMenu
+import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subredditList.Tile
 import kotlinx.coroutines.launch
@@ -169,7 +170,7 @@ private fun InnerTab(viewModel: UserSearchViewModel) {
             count = things.itemCount,
             key = things.itemKey { p -> p.id }) { index ->
             val user = things[index]!!
-            Text(user.name)
+            Text(user.username)
         }
     }
 }
@@ -187,7 +188,7 @@ private fun InnerTab(viewModel: CommentSearchViewModel) {
             count = things.itemCount,
             key = things.itemKey { p -> p.id }) { index ->
             val comment = things[index]!!
-            Text(comment.name)
+            RedditMarkdown(comment.bodyMd)
         }
     }
 }

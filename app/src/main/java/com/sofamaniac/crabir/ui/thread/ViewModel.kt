@@ -9,6 +9,7 @@ import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.domain.model.CommentType
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
 import dagger.assisted.Assisted
@@ -30,7 +31,7 @@ class ThreadViewModel @AssistedInject constructor(
     @Assisted val permalink: String,
 ) : ViewModel() {
 
-    var id: String = repository.getPostId(permalink)
+    var name: Fullname = repository.getPostId(permalink)
 
     private var _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean>
@@ -42,17 +43,17 @@ class ThreadViewModel @AssistedInject constructor(
     private var _post = MutableStateFlow<PostData?>(null)
     val post: StateFlow<PostData?> = _post.asStateFlow()
 
-    private var _openComment = MutableStateFlow<String?>(null)
+    private var _openComment = MutableStateFlow<Fullname?>(null)
 
     /** Id of the comment of which the bottom bar is currently open */
-    val openComment: StateFlow<String?> = _openComment.asStateFlow()
+    val openComment: StateFlow<Fullname?> = _openComment.asStateFlow()
 
-    /** If [openComment] is equal to [id], close it. Otherwise, open it. */
-    fun toggleComment(id: String) {
-        if (_openComment.value == id) {
+    /** If [openComment] is equal to [name], close it. Otherwise, open it. */
+    fun toggleComment(name: Fullname) {
+        if (_openComment.value == name) {
             _openComment.value = null
         } else {
-            _openComment.value = id
+            _openComment.value = name
         }
     }
 
@@ -67,16 +68,16 @@ class ThreadViewModel @AssistedInject constructor(
 
     private fun getPost(): PostData? {
         val post = runBlocking(Dispatchers.IO) {
-            val post = repository.getPost(id) ?: visitedPostsDao.getPost(id)?.toDomainModel()
+            val post = repository.getPost(name) ?: visitedPostsDao.getPost(name)?.toDomainModel()
             if (post == null) {
-                Log.e("ThreadViewModel", "getPost: Post not found in database ($id)")
+                Log.e("ThreadViewModel", "getPost: Post not found in database ($name)")
             }
             post
         }
         return post
     }
 
-    fun collapseComment(name: String, collapsed: Boolean) {
+    fun collapseComment(name: Fullname, collapsed: Boolean) {
         viewModelScope.launch {
             _comments.update { comments ->
                 comments.updateComment(name) {
@@ -113,7 +114,7 @@ class ThreadViewModel @AssistedInject constructor(
         repository.refresh()
     }
 
-    fun postComment(parentId: String, comment: String) {
+    fun postComment(parentId: Fullname, comment: String) {
         viewModelScope.launch {
             val response = repository.postComment(parentId, comment)
             if (!response.isSuccessful) {
@@ -141,7 +142,7 @@ class ThreadViewModel @AssistedInject constructor(
         }
     }
 
-    fun upvote(name: String, likes: Boolean?) {
+    fun upvote(name: Fullname, likes: Boolean?) {
         viewModelScope.launch {
             try {
                 if (likes != true) {
@@ -171,7 +172,7 @@ class ThreadViewModel @AssistedInject constructor(
         }
     }
 
-    fun downvote(name: String, likes: Boolean?) {
+    fun downvote(name: Fullname, likes: Boolean?) {
         viewModelScope.launch {
             try {
                 if (likes != false) {
@@ -201,7 +202,7 @@ class ThreadViewModel @AssistedInject constructor(
         }
     }
 
-    fun save(name: String, saved: Boolean) {
+    fun save(name: Fullname, saved: Boolean) {
         try {
             viewModelScope.launch {
                 if (saved) {
@@ -234,7 +235,7 @@ class ThreadViewModel @AssistedInject constructor(
 }
 
 fun List<CommentType>.updateComment(
-    name: String,
+    name: Fullname,
     update: (CommentType) -> CommentType
 ): List<CommentType> {
     return map { comment ->

@@ -10,7 +10,7 @@ import kotlin.time.Instant
 @Serializable
 data class PostData(
     override val id: String,
-    override val name: String,
+    override val name: Fullname,
     override val relationship: Relationship,
     val createdUtc: Instant,
     val edited: Instant?,

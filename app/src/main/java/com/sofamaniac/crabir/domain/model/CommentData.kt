@@ -8,7 +8,7 @@ sealed class CommentType() {
     data class Comment(val comment: CommentData) : CommentType()
     data class More(val data: MoreData) : CommentType()
 
-    val name: String
+    val name: Fullname
         get() =
             when (this) {
                 is Comment -> comment.name
@@ -25,7 +25,7 @@ sealed class CommentType() {
 
 data class CommentData(
     override val id: String,
-    override val name: String,
+    override val name: Fullname,
     val depth: Int,
     val bodyMd: String,
     val bodyHtml: String,

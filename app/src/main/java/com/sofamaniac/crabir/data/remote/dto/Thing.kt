@@ -13,6 +13,7 @@ import com.sofamaniac.crabir.data.remote.dto.post.PostDTO
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.data.remote.dto.subreddit.dummySubredditData
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.repository.DataInterface
 import com.sofamaniac.crabir.reddit.ListingData
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -29,18 +30,21 @@ sealed class Thing : DataInterface {
     @SerialName("t1")
     data class Comment(val data: CommentDTO) : Thing() {
         override val id: String = data.id
+        override val name: Fullname = data.name
     }
 
     @Serializable
     @SerialName("t2")
     data class User(val data: UserDTO) : Thing() {
         override val id: String = data.id
+        override val name: Fullname = data.name
     }
 
     @Serializable
     @SerialName("t3")
     data class Post(val data: PostDTO) : Thing() {
         override val id: String = data.id
+        override val name: Fullname = data.fullname
     }
 
     @Serializable
@@ -48,6 +52,7 @@ sealed class Thing : DataInterface {
     data class Subreddit(val data: SubredditData = dummySubredditData()) :
         Thing() {
         override val id: String = data.id
+        override val name: Fullname = data.name
     }
 
     @Serializable
@@ -56,7 +61,8 @@ sealed class Thing : DataInterface {
         val data: ListingData<T>
     ) : Thing(), Iterable<T> {
 
-        override val id: String = data.after ?: ""
+        override val id: String = "Listing"
+        override val name: Fullname = Fullname("Listing")
 
         val size: Int get() = data.children.size
 
@@ -72,13 +78,15 @@ sealed class Thing : DataInterface {
     @Serializable
     @SerialName("more")
     data class More(val data: MoreData) : Thing() {
-        override val id: String = data.name
+        override val id: String = data.id
+        override val name: Fullname = data.name
     }
 
     @Serializable
     @SerialName("LabeledMulti")
     data class Multi(val data: MultiData) : Thing() {
-        override val id: String = data.name
+        override val id: String = data.name.name
+        override val name: Fullname = data.name
     }
 
 }
@@ -90,9 +98,9 @@ fun emptyListing(): Thing.Listing<Thing> {
 @Serializable
 data class MoreData(
     val count: Int,
-    val name: String,
+    val name: Fullname,
     val id: String,
-    val parent_id: String,
+    @SerialName("parent_id") val parentId: Fullname,
     val depth: Int,
     val children: List<String>,
 )
