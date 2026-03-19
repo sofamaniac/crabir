@@ -12,6 +12,7 @@ import android.text.Spanned
 import android.text.TextUtils
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
+import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
@@ -82,6 +83,9 @@ fun RedditMarkdown(
         .convertRedditSuperscript()
         .fuseQuote()
 
+    Log.d("RedditMarkdown", "Processed markdown: $processedMarkdown")
+
+
     val context = LocalContext.current
 
     val theme = LocalTheme.current
@@ -96,19 +100,14 @@ fun RedditMarkdown(
     }
 
     AndroidView(
-//        onReset = {
-//            markwonReddit.setParsedMarkdown(textView, spanned)
-//            textView.tag = markdown
-//        },
         factory = { ctx -> initTextView(ctx, theme, maxLines, markdown, markwonReddit, spanned) },
         modifier = modifier
             .onSizeChanged { size ->
-                viewModel.height = size.height
+                if (size.height > (viewModel.height ?: 0)) {
+                    viewModel.height = size.height
+                }
             }
             .let { mod ->
-                if (mediaMetadata.isEmpty()) {
-                    return@let mod
-                }
                 viewModel.height?.let { size ->
                     mod.then(Modifier.height(with(LocalDensity.current) { size.toDp() }))
                 } ?: mod
@@ -228,7 +227,14 @@ private fun redditMarkwonBuilder(
                         val metadata = drawable.getMetadata(mediaMetadata)
                         val placeholder =
                             Color.GRAY.toDrawable()
-                        placeholder.setBounds(0, 0, metadata?.width ?: 100, metadata?.height ?: 100)
+                        if (metadata != null) {
+                            placeholder.setBounds(
+                                0,
+                                0,
+                                metadata.width,
+                                metadata.height
+                            )
+                        }
 
                         return requestManager
                             .load(metadata?.url ?: drawable.destination)
@@ -271,11 +277,12 @@ private fun String.convertRedditSpoilers(): String {
 
 /** Convert all markdown links that correspond to some media metadata to a markdown image */
 private fun String.convertRedditPreviewLinks(mediaMetadata: Map<String, MediaMetadata>): String {
-    val redditPreviewPattern = Regex(
+    val redditPreviewPatternAltText = Regex(
         """\[(.*)]\((https://preview\.redd\.it/[^\s)]+)\)"""
     )
+    val redditPreviewPattern = Regex("(?<!\\S)(https://preview\\.redd\\.it/[^\\s)]+)")
 
-    return redditPreviewPattern.replace(this) { matchResult ->
+    val s = redditPreviewPatternAltText.replace(this) { matchResult ->
         val alttext = matchResult.groupValues[1]
         val url = matchResult.groupValues[2]
 
@@ -287,6 +294,9 @@ private fun String.convertRedditPreviewLinks(mediaMetadata: Map<String, MediaMet
         } else {
             matchResult.value
         }
+    }
+    return redditPreviewPattern.replace(s) { matchResult ->
+        "![Preview](${matchResult.groupValues[1]})"
     }
 }
 
@@ -304,7 +314,7 @@ private fun String.convertRedditSuperscript(): String {
 }
 
 private fun String.extractRedditLinks(): String {
-    val redditLinksPattern = Regex("(?<!\\S)/?([ru]/[A-Za-z0-9_]+)")
+    val redditLinksPattern = Regex("(?<!\\S)/?([ru]/[A-Za-z0-9_]+/?)")
     val res = redditLinksPattern.replace(this) { matchResult ->
         "[${matchResult.value}](https://www.reddit.com/${matchResult.value})"
     }

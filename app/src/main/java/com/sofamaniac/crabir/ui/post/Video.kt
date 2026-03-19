@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.media3.common.util.UnstableApi
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
@@ -28,9 +29,23 @@ import com.sofamaniac.crabir.ui.media.videoPlayer.DecoratedVideoPlayer
 fun PostVideo(post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boolean = false) {
     val video = getVideoUrl(post)
     val placeholder = @Composable { ImageView(post, allowTransformation = false) }
+    val uriHandler = LocalUriHandler.current
 
     if (video == null) {
-        Text("Could not load video")
+        val host = post.url.toUri().host
+        val domain = host?.removePrefix("www.")?.split(".")?.firstOrNull()
+        Box(modifier = Modifier.clickable {
+            uriHandler.openUri(post.url)
+        }) {
+            placeholder()
+            Text(
+                domain ?: "Video",
+                modifier = Modifier
+                    .padding(8.dp)
+                    .cartouche(backgroundColor = Color(64, 196, 255, 255))
+                    .align(Alignment.TopEnd)
+            )
+        }
     } else {
         DecoratedVideoPlayer(
             video,
