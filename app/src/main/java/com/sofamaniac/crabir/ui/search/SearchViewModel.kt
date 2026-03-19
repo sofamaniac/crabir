@@ -55,7 +55,7 @@ abstract class SearchViewModel<Data : DataInterface>(
     val repository: SearchRepositoryGeneric<Data>,
     val initialParams: SearchParams,
 ) : ViewModel() {
-    private val queryState = TextFieldState()
+    private val queryState = TextFieldState(initialText = initialParams.query)
 
     val listState = LazyStaggeredGridState()
 
