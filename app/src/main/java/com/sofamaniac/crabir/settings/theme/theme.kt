@@ -2,6 +2,7 @@
 
 package com.sofamaniac.crabir.settings.theme
 
+import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.util.Log
@@ -18,6 +19,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import androidx.datastore.dataStore
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.settings.DataStoreJsonSerializer
@@ -232,11 +235,27 @@ fun rememberAppTheme(): CrabirTheme {
     )
     val colorScheme = MaterialTheme.colorScheme
     val dynamicTheme = CrabirTheme.fromColorScheme(colorScheme)
-
+    val view = LocalView.current
+    val window = (view.context as? Activity)?.window
+    val windowInsetsController =
+        WindowCompat.getInsetsController(window!!, window.decorView)
     if (theme.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         return dynamicTheme
     }
     Log.d("rememberAppTheme", "rememberAppTheme: ${theme.mode}")
+    when (theme.mode) {
+        ThemeMode.Dark -> {
+            windowInsetsController.isAppearanceLightStatusBars = false
+            windowInsetsController.isAppearanceLightNavigationBars = false
+        }
+
+        ThemeMode.Light -> {
+            windowInsetsController.isAppearanceLightStatusBars = true
+            windowInsetsController.isAppearanceLightNavigationBars = true
+        }
+
+        else -> {}
+    }
 
     return when (theme.mode) {
         ThemeMode.Dark -> theme.dark
