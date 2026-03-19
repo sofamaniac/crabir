@@ -13,14 +13,19 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,15 +52,13 @@ fun PostGallery(
         return
     }
 
-    val state = rememberPagerState(initialPage = 0, pageCount = { gallery.images.size })
+    var currentPage by rememberSaveable { mutableIntStateOf(0) }
+    val state = rememberPagerState(initialPage = currentPage, pageCount = { gallery.images.size })
 
-    val fullscreenView = @Composable {
-        FullscreenGallery(
-            post = post,
-            gallery = gallery,
-            state = state,
-        )
+    LaunchedEffect(state.currentPage) {
+        currentPage = state.currentPage
     }
+
     val fullscreenManager = LocalFullscreenHandler.current!!
     EmbeddedGallery(
         state,
@@ -64,7 +67,14 @@ fun PostGallery(
             .fillMaxSize()
             .aspectRatio(gallery.aspectRatio),
         goFullscreen = {
-            fullscreenManager.push { fullscreenView() }
+            fullscreenManager.push {
+                FullscreenGallery(
+                    post = post,
+                    gallery = gallery,
+                    initialPage = currentPage,
+                    onPageChanged = { currentPage = it }
+                )
+            }
         },
         canPlayVideo = canPlayVideo
     )
@@ -117,7 +127,12 @@ fun EmbeddedGallery(
 
 
                 else -> {
-                    Text("No luck my friend (${metadata.javaClass.simpleName})")
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = Color(154, 154, 154, 255)
+                    ) {
+                        Icon(Icons.Default.Warning, contentDescription = "Content not found")
+                    }
                 }
 
             }
@@ -145,13 +160,19 @@ fun EmbeddedGallery(
 @Composable
 fun FullscreenGallery(
     post: PostData,
-    state: PagerState = rememberPagerState(pageCount = { gallery.images.size }),
     gallery: Gallery,
+    initialPage: Int = 0,
+    onPageChanged: (Int) -> Unit = {},
 ) {
+    val state: PagerState =
+        rememberPagerState(initialPage = initialPage, pageCount = { gallery.images.size })
     var showDecorations by remember { mutableStateOf(true) }
     val fullscreenManager = LocalFullscreenHandler.current!!
     val onClick = {
         showDecorations = !showDecorations
+    }
+    LaunchedEffect(state.currentPage) {
+        onPageChanged(state.currentPage)
     }
     VerticalSwipeToDismiss(
         topBar = {

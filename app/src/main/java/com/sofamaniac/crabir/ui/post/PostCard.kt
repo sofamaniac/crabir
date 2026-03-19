@@ -74,7 +74,7 @@ fun PostCard(
             post,
             canPlayVideo = canStartVideo,
             enableFullHeightImage = settings.cardSettings.enableFullHeightImage,
-            enableTextPreview = settings.cardSettings.enableTextPreview,
+            enableTextPreview = settings.cardSettings.enableTextPreview && !post.spoiler,
             maxLines = settings.cardSettings.maxLines,
             enableLinkFullSizePreview = !settings.cardSettings.thumbnailForLinkPreview
         )
