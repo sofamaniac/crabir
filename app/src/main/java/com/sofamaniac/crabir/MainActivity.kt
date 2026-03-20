@@ -43,6 +43,7 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
+import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
 import com.sofamaniac.crabir.settings.SettingsPage
 import com.sofamaniac.crabir.settings.theme.ConfigureMaterialTheme
 import com.sofamaniac.crabir.settings.theme.CrabirTheme
@@ -272,6 +273,14 @@ fun NavigationGraph(
             ProfileView(
                 author,
             )
+        }
+        composable<SavedRoute> {
+            val currentAccount = rememberCurrentAccount()
+            if (currentAccount.isAnonymous()) {
+                // TODO: ask user to log in
+                return@composable
+            }
+            ProfileView(currentAccount.username, initialTab = ProfileTabs.Saved)
         }
         composable<LicensesRoute> {
             val libraries by produceLibraries(R.raw.aboutlibraries)

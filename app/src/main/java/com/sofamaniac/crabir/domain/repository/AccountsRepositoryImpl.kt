@@ -10,6 +10,11 @@ package com.sofamaniac.crabir.domain.repository
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.util.fastFirstOrNull
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
@@ -35,10 +40,18 @@ import javax.inject.Singleton
 data class Accounts(
     val accounts: List<RedditAccount>,
     val activeId: Int,
-)
+) {
+    fun getCurrent(): RedditAccount {
+        return if (activeId < 0) {
+            RedditAccount.anonymous()
+        } else {
+            accounts[activeId]
+        }
+    }
+}
 
 
-val Context.dataStore: DataStore<Accounts> by dataStore(
+val Context.accountsDataStore: DataStore<Accounts> by dataStore(
     fileName = "accounts.json",
     AccountsSerializer
 )
@@ -69,12 +82,22 @@ object AccountsSerializer : Serializer<Accounts> {
 
 }
 
+@Composable
+fun rememberCurrentAccount(): RedditAccount {
+    val context = LocalContext.current
+    val dataStore = remember(context) { context.accountsDataStore }
+    val accounts by dataStore.data.collectAsState(
+        initial = Accounts(emptyList(), -1)
+    )
+    return accounts.getCurrent()
+}
+
 @Singleton
 class AccountsRepositoryImpl(
     context: Context,
     coroutineScope: CoroutineScope
 ) : AccountsRepository {
-    private val dataStore: DataStore<Accounts> = context.dataStore
+    private val dataStore: DataStore<Accounts> = context.accountsDataStore
     private val accountsData: StateFlow<Accounts> = dataStore.data.stateIn(
         scope = coroutineScope,
         started = SharingStarted.Eagerly,

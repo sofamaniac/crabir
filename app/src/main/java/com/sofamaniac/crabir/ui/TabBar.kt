@@ -11,14 +11,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
 import com.sofamaniac.crabir.HomeRoute
 import com.sofamaniac.crabir.InboxRoute
 import com.sofamaniac.crabir.LocalNavController
@@ -27,18 +23,8 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.Route
 import com.sofamaniac.crabir.SearchRoute
 import com.sofamaniac.crabir.SubscriptionsRoute
-import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.domain.repository.AccountsRepository
+import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
 import com.sofamaniac.crabir.ui.user.ProfileTabs
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-
-@HiltViewModel
-class TabBarViewModel @Inject constructor(
-    val accountsRepository: AccountsRepository
-) : ViewModel() {
-    val currentUser = accountsRepository.activeAccount
-}
 
 internal class TabRepresentation(val icon: ImageVector, val label: Int, val route: Route)
 
@@ -48,9 +34,8 @@ fun TabBar(
     selected: Int,
     modifier: Modifier = Modifier,
     onTabReselect: (() -> Unit)? = null,
-    viewModel: TabBarViewModel = hiltViewModel()
 ) {
-    val user by viewModel.currentUser.collectAsState(initial = RedditAccount.anonymous())
+    val user = rememberCurrentAccount()
     val tabs = listOf(
         TabRepresentation(Icons.Filled.Home, R.string.Home, HomeRoute),
         TabRepresentation(Icons.Default.Search, R.string.Search, SearchRoute()),
@@ -77,6 +62,10 @@ fun TabBar(
                 onClick = {
                     if (onTabReselect != null && selected == index) {
                         return@Tab onTabReselect()
+                    }
+                    if (index == 4 && user.isAnonymous()) {
+                        // TODO: ask user to log in
+                        return@Tab
                     }
                     navController.navigate(tab.route) {
                         popUpTo(navController.graph.startDestinationId) {
