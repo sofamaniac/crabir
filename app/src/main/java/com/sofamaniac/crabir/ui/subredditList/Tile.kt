@@ -27,7 +27,7 @@ fun Tile(subreddit: SubredditData, modifier: Modifier = Modifier) {
             subreddit.display_name,
             subreddit.icon,
             modifier = Modifier
-                .size(32.dp)
+                .size(40.dp)
                 .clip(CircleShape)
         )
         Text(text = subreddit.display_name)

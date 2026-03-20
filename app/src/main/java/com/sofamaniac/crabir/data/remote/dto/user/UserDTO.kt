@@ -122,7 +122,7 @@ data class UserDTO(
     @SerialName("snoovatar_img")
     val snoovatarImg: String = "",
     @SerialName("snoovatar_size")
-    val snoovatarSize: String? = null,
+    val snoovatarSize: List<Int>? = null,
     @SerialName("subreddit")
     val subreddit: Subreddit = Subreddit(),
     @SerialName("suspension_expiration_utc")

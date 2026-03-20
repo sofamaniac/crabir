@@ -34,6 +34,12 @@
     <string name="Subscriptions">Subscriptions</string>
     <string name="Inbox">Inbox</string>
     <string name="Profile">Profile</string>
+    <string name="hour">Hour</string>
+    <string name="day">Day</string>
+    <string name="week">Week</string>
+    <string name="month">Month</string>
+    <string name="year">Year</string>
+    <string name="all_time">All</string>
     <plurals name="MoreComments">
         <item quantity="one">%d more reply</item>
         <item quantity="other">%d more replies</item>

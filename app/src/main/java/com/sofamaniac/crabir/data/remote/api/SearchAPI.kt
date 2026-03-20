@@ -39,6 +39,13 @@ interface SearchAPI {
         @Query("sr_detail") srDetail: Boolean = true,
         @Query("type") type: String,
     ): Response<Listing<Thing>>
+
+    @GET("api/search_subreddits")
+    suspend fun searchSubreddits(
+        @Query("query") query: String,
+        @Query("include_over_18") includeOver18: Boolean = false,
+        @Query("exact") exact: Boolean = false,
+    ): Response<Listing<Thing>>
 }
 
 interface SearchSort : SortInterface

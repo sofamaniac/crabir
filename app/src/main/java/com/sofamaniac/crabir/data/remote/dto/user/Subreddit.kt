@@ -12,7 +12,7 @@ data class Subreddit(
     @SerialName("banner_img")
     val bannerImg: String = "",
     @SerialName("banner_size")
-    val bannerSize: String? = null,
+    val bannerSize: List<Int>? = null,
     @SerialName("coins")
     val coins: Int = 0,
     @SerialName("community_icon")

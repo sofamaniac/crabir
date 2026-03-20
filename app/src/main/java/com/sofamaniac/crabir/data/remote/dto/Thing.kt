@@ -20,6 +20,8 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
@@ -36,7 +38,9 @@ sealed class Thing : DataInterface {
     @Serializable
     @SerialName("t2")
     data class User(val data: UserDTO) : Thing() {
-        override val id: String = data.id
+        @OptIn(ExperimentalUuidApi::class)
+        override val id: String
+            get() = data.id.ifBlank { Uuid.random().toString() }
         override val name: Fullname = data.name
     }
 

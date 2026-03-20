@@ -18,18 +18,17 @@ import com.sofamaniac.crabir.data.remote.api.PostSearchSort
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
-import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.DataInterface
+import com.sofamaniac.crabir.domain.repository.ListingRepository
 import com.sofamaniac.crabir.domain.repository.ListingSource
 import com.sofamaniac.crabir.domain.repository.SubscriptionsRepository
-import com.sofamaniac.crabir.domain.repository.search.CommentSearchRepository
+import com.sofamaniac.crabir.domain.repository.search.CommunitySearchParams
 import com.sofamaniac.crabir.domain.repository.search.CommunitySearchRepository
+import com.sofamaniac.crabir.domain.repository.search.PostSearchParams
 import com.sofamaniac.crabir.domain.repository.search.PostSearchRepository
-import com.sofamaniac.crabir.domain.repository.search.SearchParams
-import com.sofamaniac.crabir.domain.repository.search.SearchRepositoryGeneric
 import com.sofamaniac.crabir.domain.repository.search.UserSearchRepository
 import com.sofamaniac.crabir.ui.subreddit.FeedViewModelInterface
 import dagger.assisted.Assisted
@@ -51,13 +50,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-abstract class SearchViewModel<Data : DataInterface>(
-    val repository: SearchRepositoryGeneric<Data>,
-    val initialParams: SearchParams,
+interface SearchParams<This> {
+    val query: String
+    fun copy(query: String = this.query): This
+}
+
+abstract class SearchViewModel<Params : SearchParams<Params>, Data : DataInterface>(
+    val repository: ListingRepository<Params, Data>,
+    val initialParams: Params,
 ) : ViewModel() {
     private val queryState = TextFieldState(initialText = initialParams.query)
+    var showSettings = MutableStateFlow(false)
 
     val listState = LazyStaggeredGridState()
+
 
 
     val query: String get() = queryState.text as String
@@ -68,9 +74,9 @@ abstract class SearchViewModel<Data : DataInterface>(
     internal var _params = MutableStateFlow(
         initialParams
     )
-    val params: StateFlow<SearchParams> = _params.asStateFlow()
+    val params: StateFlow<Params> = _params.asStateFlow()
 
-    private var feedSource: ListingSource<SearchParams, Data>? = null
+    private var feedSource: ListingSource<Params, Data>? = null
     val items = Pager(
         config = PagingConfig(pageSize = 100, prefetchDistance = 10, initialLoadSize = 100),
         initialKey = Fullname(""),
@@ -116,8 +122,8 @@ abstract class SearchViewModel<Data : DataInterface>(
 class PostSearchViewModel @AssistedInject constructor(
     repository: PostSearchRepository,
     val visitedPostsDao: VisitedPostsDao,
-    @Assisted initialParams: SearchParams
-) : SearchViewModel<PostData>(repository, initialParams), FeedViewModelInterface {
+    @Assisted initialParams: PostSearchParams,
+) : SearchViewModel<PostSearchParams, PostData>(repository, initialParams), FeedViewModelInterface {
     override val entity: Flow<VisitedCommunityEntity?> = flowOf(null)
     override val data: StateFlow<PagingData<VotableData>> = items.map { pagingData ->
         pagingData.map { it as VotableData }
@@ -165,7 +171,7 @@ class PostSearchViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            params: SearchParams
+            params: PostSearchParams
         ): PostSearchViewModel
     }
 }
@@ -174,11 +180,10 @@ class PostSearchViewModel @AssistedInject constructor(
 class CommunitySearchViewModel @Inject constructor(
     repository: CommunitySearchRepository,
     private val subscriptionsRepository: SubscriptionsRepository,
-) : SearchViewModel<SubredditData>(
+) : SearchViewModel<CommunitySearchParams, SubredditData>(
     repository, initialParams =
-        SearchParams(
+        CommunitySearchParams(
             query = "",
-            type = "sr",
             sort = CommunitySearchSort.Relevance
         )
 ) {
@@ -194,23 +199,23 @@ class CommunitySearchViewModel @Inject constructor(
 @HiltViewModel
 class UserSearchViewModel @Inject constructor(
     repository: UserSearchRepository,
-) : SearchViewModel<UserDTO>(
+) : SearchViewModel<PostSearchParams, UserDTO>(
     repository, initialParams =
-        SearchParams(
+        PostSearchParams(
             query = "",
             type = "user",
-            sort = CommunitySearchSort.Relevance
+            sort = PostSearchSort.Relevance
         )
 )
 
-@HiltViewModel
-class CommentSearchViewModel @Inject constructor(
-    repository: CommentSearchRepository,
-) : SearchViewModel<CommentData>(
-    repository, initialParams =
-        SearchParams(
-            query = "",
-            type = "comment",
-            sort = CommunitySearchSort.Relevance
-        )
-)
+//@HiltViewModel
+//class CommentSearchViewModel @Inject constructor(
+//    repository: CommentSearchRepository,
+//) : SearchViewModel<CommentData>(
+//    repository, initialParams =
+//        SearchParams(
+//            query = "",
+//            type = "comment",
+//            sort = CommunitySearchSort.Relevance
+//        )
+//)

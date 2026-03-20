@@ -45,7 +45,7 @@ fun FullscreenHandler(content: @Composable () -> Unit) {
         FullscreenManager()
     }
     val fullscreenView by fullscreenManager.current.collectAsState(null)
-    val backHandlerActive by fullscreenManager.size.map { it > 0 }.collectAsState(false)
+    val backHandlerActive by remember { fullscreenManager.size.map { it > 0 } }.collectAsState(false)
     CompositionLocalProvider(LocalFullscreenHandler provides fullscreenManager) {
         BackHandler(enabled = backHandlerActive) {
             fullscreenManager.pop()

@@ -5,7 +5,6 @@ import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.domain.repository.VotableRepository
 import com.sofamaniac.crabir.domain.repository.feed.HomeRepository
 import com.sofamaniac.crabir.domain.repository.feed.SubredditPostsRepository
-import com.sofamaniac.crabir.domain.repository.search.CommentSearchRepository
 import com.sofamaniac.crabir.domain.repository.search.CommunitySearchRepository
 import com.sofamaniac.crabir.domain.repository.search.PostSearchRepository
 import com.sofamaniac.crabir.domain.repository.search.UserSearchRepository
@@ -62,10 +61,10 @@ object RepositoryModule {
         return UserSearchRepository(api = api)
     }
 
-    @Provides
-    fun provideSearchCommentRepository(api: RedditAPIService): CommentSearchRepository {
-        return CommentSearchRepository(api = api)
-    }
+//    @Provides
+//    fun provideSearchCommentRepository(api: RedditAPIService): CommentSearchRepository {
+//        return CommentSearchRepository(api = api)
+//    }
 
 }
 
