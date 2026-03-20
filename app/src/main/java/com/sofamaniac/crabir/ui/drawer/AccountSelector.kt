@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.drawer
 
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -61,6 +62,7 @@ fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: () -> Unit) 
             label = { Text("Add account") },
             selected = false,
             onClick = {
+                Log.d("DrawerContent", "Launching auth intent")
                 val authIntent = viewModel.createAuthIntent()
                 authLauncher.launch(authIntent)
             }
