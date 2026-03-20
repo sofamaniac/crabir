@@ -149,7 +149,7 @@ fun PostFeedViewer(
     ) {
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Fixed(viewSettings.defaultColumns),
-            verticalItemSpacing = 8.dp,
+            verticalItemSpacing = 2.dp,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
