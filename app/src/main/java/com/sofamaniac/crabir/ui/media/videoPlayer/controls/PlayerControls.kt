@@ -2,7 +2,6 @@ package com.sofamaniac.crabir.ui.media.videoPlayer.controls
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
@@ -16,7 +15,7 @@ import androidx.media3.ui.compose.material3.buttons.PlayPauseButton
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 
 @Composable
-fun BoxScope.Controls(
+fun PlayerControls(
     modifier: Modifier = Modifier,
     fullscreenButton: @Composable (() -> Unit)? = null
 ) {
@@ -28,9 +27,11 @@ fun BoxScope.Controls(
         modifier = modifier
             .background(color = Color.Black.copy(alpha = 0.3f))
     ) {
-        PlayPauseButton(player = player)
+        PlayPauseButton(player = player, tint = Color.White)
         SeekProgressBar(
-            player, Modifier.fillMaxWidth(0.75f),
+            player, Modifier
+                .weight(1f)
+                .fillMaxWidth(),
             sliderColors = SliderDefaults.colors().copy(
                 thumbColor = Color.White,
                 activeTrackColor = Color.White,
@@ -39,7 +40,7 @@ fun BoxScope.Controls(
         )
         PositionDurationTimeText(
             player = player,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelLarge.copy(color = Color.White),
         )
         fullscreenButton?.invoke()
     }

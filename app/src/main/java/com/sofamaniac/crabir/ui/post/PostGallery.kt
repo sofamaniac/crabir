@@ -29,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalFullscreenHandler
@@ -63,6 +64,7 @@ fun PostGallery(
     EmbeddedGallery(
         state,
         gallery,
+        blur = post.spoiler || post.over18,
         modifier = modifier
             .fillMaxSize()
             .aspectRatio(gallery.aspectRatio),
@@ -87,13 +89,20 @@ fun EmbeddedGallery(
     goFullscreen: () -> Unit,
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = false,
+    blur: Boolean = false,
 ) {
     val media = gallery.images[state.currentPage]
+    val modifier = if (blur) {
+        modifier.blur(40.dp)
+    } else {
+        modifier
+    }
     Box(modifier = modifier.clickable { goFullscreen() }) {
         Gallery(
             gallery,
             modifier.aspectRatio(gallery.aspectRatio),
             state,
+            enableScroll = !blur,
         ) { metadata, page ->
             when (metadata) {
                 is MediaMetadata.Image -> ImageView(
@@ -137,12 +146,20 @@ fun EmbeddedGallery(
 
             }
         }
+        val text = if (blur) {
+            "${gallery.images.size} images"
+        } else {
+            "${state.currentPage + 1}/${gallery.images.size}"
+        }
         Text(
-            "${state.currentPage + 1}/${gallery.images.size}",
+            text,
+            color = Color.White,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(all = 4.dp)
-                .cartouche(Color.Black.copy(alpha = 0.6f))
+                .cartouche(
+                    Color.Black.copy(alpha = 0.6f)
+                )
         )
         if (!media.caption.isNullOrBlank()) {
             Text(

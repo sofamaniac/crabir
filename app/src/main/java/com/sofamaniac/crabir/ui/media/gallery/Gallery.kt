@@ -11,8 +11,10 @@ import com.sofamaniac.crabir.domain.model.Gallery
 
 @Composable
 fun Gallery(
-    gallery: Gallery, modifier: Modifier = Modifier,
+    gallery: Gallery,
+    modifier: Modifier = Modifier,
     state: PagerState = rememberPagerState(initialPage = 0, pageCount = { gallery.images.size }),
+    enableScroll: Boolean = true,
     content: @Composable (MediaMetadata, page: Int) -> Unit,
 ) {
     HorizontalPager(state = state, modifier = Modifier.fillMaxSize()) { page ->

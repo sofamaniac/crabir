@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,11 +28,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.ContentFrame
-import androidx.media3.ui.compose.state.rememberPlayPauseButtonState
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.AlwaysOnInfo
-import com.sofamaniac.crabir.ui.media.videoPlayer.controls.Controls
+import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
 
 
 @OptIn(UnstableApi::class)
@@ -49,6 +49,7 @@ fun DecoratedVideoPlayer(
     },
     fullscreenButton: @Composable (() -> Unit)? = null,
     startPlaying: Boolean = false,
+    clickable: Boolean = true,
 ) {
     var showControls by remember { mutableStateOf(false) }
 
@@ -74,11 +75,9 @@ fun DecoratedVideoPlayer(
         }
     }
 
-    val playing = rememberPlayPauseButtonState(player).showPlay
-
     @Composable
     fun BoxScope.loadDecoration() {
-        if (!playing) {
+        if (!hasFirstFrame || !startPlaying) {
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -87,10 +86,11 @@ fun DecoratedVideoPlayer(
                 cartouche?.invoke()
             }
         }
-        if (!hasFirstFrame) {
+        if (!hasFirstFrame && startPlaying) {
             CircularProgressIndicator(
                 color = Color.White,
                 trackColor = Color.White,
+                strokeWidth = 2.dp,
                 modifier = Modifier
                     .size(16.dp)
                     .align(Alignment.BottomEnd)
@@ -98,24 +98,34 @@ fun DecoratedVideoPlayer(
             )
         }
     }
-    Box(
-        modifier = modifier
+
+    val modifier = remember {
+        val mod = modifier
             .fillMaxSize()
             .aspectRatio(media.aspectRatio)
-            .clickable(onClick = {
+        if (clickable) {
+            mod.clickable {
                 Log.d("VideoPlayer", "click")
                 VideoPlayerManager.setMediaItem(media.url)
                 showControls = !showControls
-            })
+            }
+        } else {
+            mod
+        }
+    }
+    Box(
+        modifier = modifier
     ) {
 
         VideoPlayer(media, placeholder = placeholder, startPlaying = startPlaying)
 
         if (currentUrl == media.url && hasFirstFrame) {
             if (showControls) {
-                Controls(
+                PlayerControls(
                     fullscreenButton = fullscreenButton,
-                    modifier = Modifier.align(Alignment.BottomCenter)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
                 )
             } else {
                 AlwaysOnInfo(
