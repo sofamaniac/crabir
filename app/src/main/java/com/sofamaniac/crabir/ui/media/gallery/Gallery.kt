@@ -18,8 +18,7 @@ fun Gallery(
     content: @Composable (MediaMetadata, page: Int) -> Unit,
 ) {
     HorizontalPager(state = state, modifier = Modifier.fillMaxSize()) { page ->
-        val mediaId = gallery.images[page].mediaId
-        val metadata: MediaMetadata? = gallery.mediaMetadata[mediaId]
+        val metadata: MediaMetadata? = gallery.get(page)
         if (metadata != null) {
             content(metadata, page)
         }

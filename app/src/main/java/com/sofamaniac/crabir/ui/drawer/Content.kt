@@ -10,9 +10,7 @@ package com.sofamaniac.crabir.ui.drawer
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
@@ -22,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Settings
@@ -30,13 +29,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
@@ -48,6 +47,7 @@ import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalNavController
 import com.sofamaniac.crabir.SettingsRoute
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.settings.filtersDataStore
 import com.sofamaniac.crabir.settings.theme.ThemeMode
 import com.sofamaniac.crabir.settings.theme.themeDataStore
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
@@ -68,12 +68,7 @@ fun DrawerContent(
         animateFloatAsState(targetValue = if (selectingAccount) 180f else 0f, label = "rotation")
     val coroutineScope = rememberCoroutineScope()
     val drawerState = LocalDrawerState.current
-    val context = LocalContext.current
-    val themeDataStore = remember { context.themeDataStore }
-    val themeMode by remember {
-        themeDataStore.data.map { it.mode }
-    }
-        .collectAsState(initial = ThemeMode.System)
+
     ModalDrawerSheet {
         Column(
             modifier = modifier
@@ -122,43 +117,9 @@ fun DrawerContent(
                     }
                 })
             }
-            NavigationDrawerItem(
-                label = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Settings")
-                        if (themeMode == ThemeMode.Dark || themeMode == ThemeMode.Light) {
-                            IconButton(onClick = {
-                                coroutineScope.launch {
-                                    themeDataStore.updateData {
-                                        if (themeMode == ThemeMode.Dark) {
-                                            it.copy(mode = ThemeMode.Light)
-                                        } else {
-                                            it.copy(mode = ThemeMode.Dark)
-                                        }
-                                    }
-                                }
-                            }) {
-                                if (themeMode == ThemeMode.Dark) {
-                                    Icon(Icons.Default.LightMode, contentDescription = "Light mode")
-                                } else {
-                                    Icon(Icons.Default.DarkMode, contentDescription = "Dark mode")
-                                }
-                            }
-                        }
-                    }
-                },
-                icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-                selected = false,
-                onClick = {
-                    navController.navigate(SettingsRoute)
-                    coroutineScope.launch {
-                        drawerState.close()
-                    }
-                })
+            HorizontalDivider()
+            BlurTile()
+            SettingsTile()
             HorizontalDivider()
             for (multi in viewModel.multis.collectAsState(initial = emptyList()).value) {
                 NavigationDrawerItem(
@@ -212,5 +173,85 @@ fun DrawerContent(
             }
         }
     }
+}
+
+@Composable
+fun SettingsTile() {
+    val coroutineScope = rememberCoroutineScope()
+    val drawerState = LocalDrawerState.current
+    val navController = LocalNavController.current!!
+    val context = LocalContext.current
+    val themeDataStore = remember { context.themeDataStore }
+    val themeMode by remember {
+        themeDataStore.data.map { it.mode }
+    }
+        .collectAsState(initial = ThemeMode.System)
+    NavigationDrawerItem(
+        label = {
+            Text("Settings")
+        },
+        badge = {
+            if (themeMode == ThemeMode.Dark || themeMode == ThemeMode.Light) {
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        themeDataStore.updateData {
+                            if (themeMode == ThemeMode.Dark) {
+                                it.copy(mode = ThemeMode.Light)
+                            } else {
+                                it.copy(mode = ThemeMode.Dark)
+                            }
+                        }
+                    }
+                }) {
+                    if (themeMode == ThemeMode.Dark) {
+                        Icon(Icons.Default.LightMode, contentDescription = "Light mode")
+                    } else {
+                        Icon(Icons.Default.DarkMode, contentDescription = "Dark mode")
+                    }
+                }
+            }
+        },
+        icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+        selected = false,
+        onClick = {
+            navController.navigate(SettingsRoute)
+            coroutineScope.launch {
+                drawerState.close()
+            }
+        }
+    )
+}
+
+@Composable
+fun BlurTile() {
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val filtersDataStore = remember { context.filtersDataStore }
+    val blur by remember {
+        filtersDataStore.data.map { it.blurNSFW }
+    }.collectAsState(initial = false)
+
+    fun toggle() {
+        coroutineScope.launch {
+            filtersDataStore.updateData {
+                it.copy(blurNSFW = !it.blurNSFW)
+            }
+        }
+    }
+    NavigationDrawerItem(
+        selected = false,
+        icon = { Icon(Icons.Default.BlurOn, contentDescription = "Blur NSFW") },
+        label = {
+            Text("Blur NSFW")
+        },
+        badge = {
+            Switch(
+                blur, onCheckedChange = {
+                    toggle()
+                }
+            )
+        },
+        onClick = { toggle() }
+    )
 }
 

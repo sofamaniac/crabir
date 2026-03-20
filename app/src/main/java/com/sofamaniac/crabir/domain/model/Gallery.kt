@@ -10,6 +10,11 @@ data class Gallery(
     val mediaMetadata: Map<String, MediaMetadata>
 ) {
 
+    fun get(index: Int): MediaMetadata? {
+        val image = images[index]
+        return mediaMetadata[image.mediaId]
+    }
+
     val aspectRatio = mediaMetadata.map { metadata ->
         when (val data = metadata.value) {
             is MediaMetadata.Image -> {

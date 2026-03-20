@@ -32,6 +32,7 @@ import androidx.media3.common.util.UnstableApi
 import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.settings.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.media.image.ImageView
@@ -43,7 +44,8 @@ import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
 @Composable
 fun PostVideo(post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boolean = false) {
     val video = getVideoUrl(post)
-    val blur = post.spoiler || post.over18
+    val filters = rememberFiltersSettings()
+    val blur = post.spoiler || (post.over18 && filters.blurNSFW)
     val placeholderModifier = if (blur) Modifier.blur(40.dp) else Modifier
     val placeholder =
         @Composable { ImageView(post, allowTransformation = false, modifier = placeholderModifier) }

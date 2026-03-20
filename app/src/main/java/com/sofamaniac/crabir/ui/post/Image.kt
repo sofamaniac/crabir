@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.settings.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.image.ImageView
 
@@ -31,7 +32,8 @@ fun PostImage(
             FullscreenImageView(post)
         }
     }
-    val blur = post.spoiler || post.over18
+    val filters = rememberFiltersSettings()
+    val blur = post.spoiler || (post.over18 && filters.blurNSFW)
     val modifier = if (blur) {
         modifier.blur(40.dp)
     } else {

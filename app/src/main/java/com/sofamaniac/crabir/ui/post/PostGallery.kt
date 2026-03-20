@@ -31,16 +31,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.domain.model.Gallery
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.settings.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.media.gallery.Gallery
 import com.sofamaniac.crabir.ui.media.image.ImageView
 import com.sofamaniac.crabir.ui.media.videoPlayer.DecoratedVideoPlayer
+import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayer
+import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
 
 @Composable
 fun PostGallery(
@@ -61,10 +66,12 @@ fun PostGallery(
     }
 
     val fullscreenManager = LocalFullscreenHandler.current!!
+    val filters = rememberFiltersSettings()
+    val blur = post.spoiler || (post.over18 && filters.blurNSFW)
     EmbeddedGallery(
         state,
         gallery,
-        blur = post.spoiler || post.over18,
+        blur = blur,
         modifier = modifier
             .fillMaxSize()
             .aspectRatio(gallery.aspectRatio),
@@ -98,6 +105,30 @@ fun EmbeddedGallery(
         modifier
     }
     Box(modifier = modifier.clickable { goFullscreen() }) {
+        val backgroundUrl = when (val current = gallery.get(state.currentPage)) {
+            is MediaMetadata.Gif -> {
+                val resource = current.preview.lastOrNull()?.toMediaResource()
+                resource?.url
+            }
+
+            is MediaMetadata.Image -> {
+                current.preview!!.last().url
+            }
+
+            else -> null
+        }
+
+        if (backgroundUrl != null) {
+            AsyncImage(
+                backgroundUrl,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(40.dp),
+                contentScale = ContentScale.FillBounds,
+                contentDescription = null,
+            )
+        }
+
         Gallery(
             gallery,
             modifier.aspectRatio(gallery.aspectRatio),
@@ -114,7 +145,8 @@ fun EmbeddedGallery(
                     DecoratedVideoPlayer(
                         media = metadata.toMediaResource(),
                         modifier = Modifier.fillMaxSize(),
-                        startPlaying = canPlayVideo && state.currentPage == page,
+                        startPlaying = canPlayVideo && state.currentPage == page && !blur,
+                        clickable = !blur,
                         placeholder = {
                             val resource = metadata.preview.lastOrNull()?.toMediaResource()
                             if (resource != null) {
@@ -188,8 +220,10 @@ fun FullscreenGallery(
     val onClick = {
         showDecorations = !showDecorations
     }
+    var showControls by remember { mutableStateOf(false) }
     LaunchedEffect(state.currentPage) {
         onPageChanged(state.currentPage)
+        showControls = gallery.get(state.currentPage) is MediaMetadata.Gif
     }
     VerticalSwipeToDismiss(
         topBar = {
@@ -203,6 +237,16 @@ fun FullscreenGallery(
         bottomBar = {
             FullscreenBottomBar(post, showDecorations) {
                 val title = gallery.images[state.currentPage].caption
+                if (showControls) {
+                    PlayerControls() {
+                        IconButton(onClick = fullscreenManager::pop) {
+                            Icon(
+                                Icons.Default.FullscreenExit,
+                                contentDescription = "Exit Fullscreen"
+                            )
+                        }
+                    }
+                }
                 if (!title.isNullOrBlank()) {
                     Text(
                         title,
@@ -225,35 +269,34 @@ fun FullscreenGallery(
             state = state,
         ) { metadata, page ->
             when (metadata) {
-                is MediaMetadata.Image -> ImageView(
-                    metadata.toMediaResource(),
-                    allowTransformation = true,
-                    onClick = onClick
-                )
+                is MediaMetadata.Image ->
+                    ImageView(
+                        metadata.toMediaResource(),
+                        allowTransformation = true,
+                        onClick = onClick
+                    )
 
-                is MediaMetadata.Gif -> DecoratedVideoPlayer(
-                    media = metadata.toMediaResource(),
-                    modifier = Modifier.fillMaxSize(),
-                    startPlaying = state.currentPage == page,
-                    placeholder = {
-                        ImageView(
-                            metadata.preview.last().toMediaResource(),
-                            allowTransformation = false,
-                        )
-                    },
-                    fullscreenButton = {
-                        IconButton(onClick = fullscreenManager::pop) {
-                            Icon(
-                                Icons.Default.FullscreenExit,
-                                contentDescription = "Exit Fullscreen"
+                is MediaMetadata.Gif ->
+                    VideoPlayer(
+                        media = metadata.toMediaResource(),
+                        modifier = Modifier.fillMaxSize(),
+                        startPlaying = state.currentPage == page,
+                        placeholder = {
+                            ImageView(
+                                metadata.preview.last().toMediaResource(),
+                                allowTransformation = false,
                             )
-                        }
-                    }
-                )
+                        },
+                    )
 
 
                 else -> {
-                    Text("No luck my friend (${metadata.javaClass.simpleName})")
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = Color(154, 154, 154, 255)
+                    ) {
+                        Icon(Icons.Default.Warning, contentDescription = "Content not found")
+                    }
                 }
             }
         }
