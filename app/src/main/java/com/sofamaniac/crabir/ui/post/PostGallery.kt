@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.post
 
+import android.os.Build
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -118,7 +119,7 @@ fun EmbeddedGallery(
             else -> null
         }
 
-        if (backgroundUrl != null) {
+        if (backgroundUrl != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             AsyncImage(
                 backgroundUrl,
                 modifier = Modifier
