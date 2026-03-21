@@ -1,5 +1,7 @@
 package com.sofamaniac.crabir.ui.user
 
+import android.os.Parcelable
+import androidx.annotation.Keep
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,10 +35,15 @@ import com.sofamaniac.crabir.ui.subreddit.PostFeedViewerDefaults
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import javax.inject.Inject
 
 
-enum class ProfileTabs {
+@Serializable
+@Parcelize
+@Keep
+enum class ProfileTabs : Parcelable {
     Overview, About, Posts, Comments, Saved, Upvoted, Downvoted, Hidden;
 
     companion object {
