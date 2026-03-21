@@ -12,7 +12,6 @@ import android.text.Spanned
 import android.text.TextUtils
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
-import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
@@ -22,7 +21,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onSizeChanged
@@ -76,17 +80,17 @@ fun RedditMarkdown(
 ) {
     val colorScheme = MaterialTheme.colorScheme
 
-    val processedMarkdown = markdown
-        .extractRedditLinks()
-        .convertRedditSpoilers()
-        .convertRedditPreviewLinks(mediaMetadata)
-        .convertRedditSuperscript()
-        .fuseQuote()
-
-    Log.d("RedditMarkdown", "Processed markdown: $processedMarkdown")
-
 
     val context = LocalContext.current
+
+    val processedMarkdown = remember(context) {
+        markdown
+            .extractRedditLinks()
+            .convertRedditSpoilers()
+            .convertRedditPreviewLinks(mediaMetadata)
+            .convertRedditSuperscript()
+            .fuseQuote()
+    }
 
     val theme = LocalTheme.current
     val markwonReddit = remember(redditMarkwonBuilder(context, colorScheme, theme, mediaMetadata))
@@ -95,40 +99,56 @@ fun RedditMarkdown(
         markwonReddit.parse(processedMarkdown)
     }
 
-    val spanned = remember(parsedMarkdown, markwonReddit) {
+    val spanned = remember(parsedMarkdown, markwonReddit, maxLines) {
         markwonReddit.render(parsedMarkdown)
     }
+    LaunchedEffect(maxLines) {
+        viewModel.reset()
+    }
 
-    AndroidView(
-        factory = { ctx -> initTextView(ctx, theme, maxLines, markdown, markwonReddit, spanned) },
-        modifier = modifier
-            .onSizeChanged { size ->
-                if (size.height > (viewModel.height ?: 0)) {
-                    viewModel.height = size.height
+    key(maxLines) {
+        AndroidView(
+            factory = { ctx ->
+                initTextView(
+                    ctx,
+                    theme,
+                    maxLines,
+                    markdown,
+                    markwonReddit,
+                    spanned
+                )
+            },
+            modifier = modifier
+                .onSizeChanged { size ->
+                    if (size.height > (viewModel.height ?: 0)) {
+                        viewModel.setHeight(size.height)
+                    }
+                }
+                .let { mod ->
+                    viewModel.height?.let { size ->
+                        mod.then(Modifier.height(with(LocalDensity.current) { size.toDp() }))
+                    } ?: mod
+                }
+                .fillMaxWidth(),
+            update = { textView ->
+                markwonReddit.setParsedMarkdown(textView, spanned)
+                if (textView.maxLines != maxLines) {
+                    textView.maxLines = maxLines
+                    textView.invalidate()
+                }
+                // Disable link when truncating view and allow clicks to be passed to parent view.
+                if (maxLines != Int.MAX_VALUE) {
+                    textView.movementMethod = null
+                    textView.ellipsize = TextUtils.TruncateAt.END
+                } else {
+                    textView.ellipsize = null
+                    textView.movementMethod = LinkMovementMethod.getInstance()
                 }
             }
-            .let { mod ->
-                viewModel.height?.let { size ->
-                    mod.then(Modifier.height(with(LocalDensity.current) { size.toDp() }))
-                } ?: mod
-            }
-            .fillMaxWidth(),
-        update = { textView ->
-            if (textView.tag != markdown) {
-                textView.tag = markdown
-                markwonReddit.setParsedMarkdown(textView, spanned)
-            }
-            // Disable link when truncating view and allow clicks to be passed to parent view.
-            textView.maxLines = maxLines
-            if (maxLines != Int.MAX_VALUE) {
-                textView.movementMethod = null
-                textView.ellipsize = TextUtils.TruncateAt.END
-            } else {
-                textView.movementMethod = LinkMovementMethod.getInstance()
-            }
-        }
-    )
+        )
+    }
 }
+
 
 fun initTextView(
     ctx: Context,
@@ -331,10 +351,14 @@ private fun String.fuseQuote(): String {
 
 @HiltViewModel
 class MarkdownViewModel @Inject constructor() : ViewModel() {
-    var height: Int? = null
+    private var _height by mutableStateOf<Int?>(null)
+    val height = _height
+    fun reset() {
+        _height = null
+    }
 
-    init {
-        height = null
+    fun setHeight(height: Int) {
+        _height = height
     }
 }
 
