@@ -1,30 +1,31 @@
-## [0.4] - 2026-03-16
+## [0.5] - 2026-03-21
 
 ### 🚀 Features
 
-- Support for multi column view
-- History
-- New license screen
-- Collapse comments
-- Comment on posts and reply to comments
-- Post creator
+- Hide / unhide post, share post, copy post title
+- Show rules in post creator
+- Can now report posts
+- Fully functional search tab
+- Fullscreen video player & blur nsfw / spoiler
+- Blur NSFW switch
 
 ### 🐛 Bug Fixes
 
-- Missing app launcher
-- Wrong icon selected in bottom bar
-- Go to top of feed when changing sort
-- Do not show black bar at the bottom of gallery if there is no caption
-- Tapping "More" in thread not always working
-- Wrong icon selected in tab row when viewing subreddit
-- Navigation to user profile from outside link
-- Feed going back to beginning when going back
-- Incorrect comment background color
-- Selftext is sometimes cut in thread view
-- Prevent videos from being added to gallery
-- Floating action button appearing on wrong scroll direction
-- Floating action button colors
+- Dynamic theme crashing app on api < 31
+- Set community when creating post from subreddit
+- Switch to linear progress indicator
+- *(a11y)* Add tooltip to vote/save buttons
+- Gallery broken after exiting fullscreen
+- Show placeholder for video posts without supported video
+- Query not properly showing when searching flair
+- System bar colors
+- Add text when there is no comment to display
+- Spacing between posts
+- Disable blur background on pre android 12
+- Markdown not properly displaying when viewing thread
 
-### 💼 Other
+### 🚜 Refactor
 
-- Version code & name
+- Introduce Fullname type to avoid confusion between things id / name
+- Provide easy access to current account
+- Changed a lot of things

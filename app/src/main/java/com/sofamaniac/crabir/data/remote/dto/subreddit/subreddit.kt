@@ -63,11 +63,11 @@ data class SubredditDTO(
     val iconSize: List<Int>? = null,
     /** Primary color in the form "#ffffff" */
     @SerialName("primary_color")
-    val primaryColor: String?,
+    val primaryColor: String? = null,
     @SerialName("active_user_count")
     val activeUserCount: Int? = null,
     @SerialName("icon_img")
-    val iconImg: String?,
+    val iconImg: String? = null,
     /** The name of the subreddit with the 'r/' prefix (e.g. "r/unixporn") */
     @SerialName("display_name_prefixed")
     val displayNamePrefixed: String = "",
