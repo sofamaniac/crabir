@@ -18,8 +18,8 @@ import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.api.Rules
 import com.sofamaniac.crabir.data.remote.api.SubmissionBuilderError
 import com.sofamaniac.crabir.data.remote.api.makeMediaUploadBody
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.domain.model.SubredditData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,7 +50,7 @@ class PostCreatorViewModel @Inject constructor(
     fun getRules() {
         if (rules.siteRules.isNotEmpty()) return
         viewModelScope.launch(Dispatchers.IO) {
-            val res = api.getRules(community!!.display_name)
+            val res = api.getRules(community!!.displayName)
             if (res.isSuccessful) {
                 rules = res.body()!!
             }
@@ -110,7 +110,7 @@ class PostCreatorViewModel @Inject constructor(
             title = titleState.text as String,
             text = textState.text as String,
             url = urlState.text as String,
-            subreddit = community?.display_name ?: ""
+            subreddit = community?.displayName ?: ""
         )
         setKind(context)
         viewModelScope.launch(Dispatchers.IO) {

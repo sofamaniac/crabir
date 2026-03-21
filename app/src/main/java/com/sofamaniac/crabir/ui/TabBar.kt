@@ -15,15 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import com.sofamaniac.crabir.HomeRoute
-import com.sofamaniac.crabir.InboxRoute
-import com.sofamaniac.crabir.LocalNavController
-import com.sofamaniac.crabir.ProfileRoute
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.Route
-import com.sofamaniac.crabir.SearchRoute
-import com.sofamaniac.crabir.SubscriptionsRoute
 import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
+import com.sofamaniac.crabir.navigation.HomeRoute
+import com.sofamaniac.crabir.navigation.InboxRoute
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.ProfileRoute
+import com.sofamaniac.crabir.navigation.Route
+import com.sofamaniac.crabir.navigation.SearchRoute
+import com.sofamaniac.crabir.navigation.SubscriptionsRoute
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 
 internal class TabRepresentation(val icon: ImageVector, val label: Int, val route: Route)
@@ -47,7 +47,7 @@ fun TabBar(
         TabRepresentation(
             Icons.Filled.Person,
             R.string.Profile,
-            ProfileRoute(user.username, ProfileTabs.Overview.toString())
+            ProfileRoute(user.username, ProfileTabs.Overview)
         )
     )
     val navController = LocalNavController.current!!

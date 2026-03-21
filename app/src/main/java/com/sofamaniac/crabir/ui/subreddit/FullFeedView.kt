@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.subreddit
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -55,6 +54,7 @@ fun FullFeedView(
     bottomBar: @Composable () -> Unit,
     viewModel: FeedViewModelInterface,
     modifier: Modifier = Modifier,
+    feedInfo: (@Composable () -> Unit)? = null,
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
@@ -74,7 +74,6 @@ fun FullFeedView(
     FullscreenHandler {
         val fullscreenManager = LocalFullscreenHandler.current!!
         val entity by viewModel.entity.collectAsState(initial = null)
-        Log.d("FullFeedView", "entity: $entity")
         fun createPost(kind: Kind) {
             showBottomSheet = false
             fullscreenManager.push {
@@ -98,6 +97,7 @@ fun FullFeedView(
             ) { innerPadding ->
                 PostFeedViewer(
                     viewModel,
+                    feedInfo = feedInfo,
                     modifier = Modifier.padding(innerPadding)
                 )
 

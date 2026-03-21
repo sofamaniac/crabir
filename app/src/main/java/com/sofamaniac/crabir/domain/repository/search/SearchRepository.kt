@@ -3,11 +3,12 @@ package com.sofamaniac.crabir.domain.repository.search
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.ListingRepository
 
 class PostSearchRepository(private val api: RedditAPIService) :
@@ -40,7 +41,7 @@ class CommunitySearchRepository(private val api: RedditAPIService) :
     ListingRepository<CommunitySearchParams, SubredditData>() {
     override fun thingToData(thing: Thing): SubredditData? {
         if (thing !is Thing.Subreddit) return null
-        return thing.data
+        return SubredditDetailsMapper.map(thing.data)
     }
 
     override suspend fun getThings(

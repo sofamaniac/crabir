@@ -30,15 +30,15 @@ data class SubredditEntity(
     companion object {
         fun fromSubreddit(subreddit: Subreddit): SubredditEntity {
             val iconUrl: String =
-                subreddit.data.community_icon ?: subreddit.data.icon_img
+                subreddit.data.communityIcon ?: subreddit.data.iconImg
                 ?: ""
             return SubredditEntity(
                 id = subreddit.data.id,
                 name = subreddit.data.name,
-                displayName = subreddit.data.display_name,
-                displayNamePrefixed = subreddit.data.display_name_prefixed,
+                displayName = subreddit.data.displayName,
+                displayNamePrefixed = subreddit.data.displayNamePrefixed,
                 iconImg = iconUrl,
-                primaryColor = subreddit.data.primary_color
+                primaryColor = subreddit.data.primaryColor
             )
         }
     }

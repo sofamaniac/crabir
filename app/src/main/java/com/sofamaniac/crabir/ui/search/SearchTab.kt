@@ -63,15 +63,16 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.FullscreenHandler
-import com.sofamaniac.crabir.LocalNavController
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.ProfileRoute
-import com.sofamaniac.crabir.SearchRoute
 import com.sofamaniac.crabir.data.remote.api.CommunitySearchSort
 import com.sofamaniac.crabir.data.remote.api.PostSearchSort
 import com.sofamaniac.crabir.data.remote.dto.SortInterface
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.domain.repository.search.PostSearchParams
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.ProfileRoute
+import com.sofamaniac.crabir.navigation.SearchRoute
+import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.ui.TimeframeMenu
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subredditList.Tile
@@ -236,8 +237,8 @@ private fun InnerTab(viewModel: CommunitySearchViewModel) {
                         .background(color = theme.cardBackground)
                         .clickable {
                             navController.navigate(
-                                com.sofamaniac.crabir.SubredditRoute(
-                                    subreddit.display_name
+                                SubredditRoute(
+                                    subreddit.displayName
                                 )
                             )
                         }
@@ -287,7 +288,7 @@ private fun InnerTab(viewModel: UserSearchViewModel) {
                         navController.navigate(
                             ProfileRoute(
                                 user.username,
-                                ProfileTabs.Overview.toString(),
+                                ProfileTabs.Overview,
                             )
                         )
                     },

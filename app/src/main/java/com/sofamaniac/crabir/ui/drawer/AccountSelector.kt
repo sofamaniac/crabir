@@ -20,9 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.sofamaniac.crabir.HomeRoute
-import com.sofamaniac.crabir.LocalNavController
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.navigation.HomeRoute
+import com.sofamaniac.crabir.navigation.LocalNavController
 import java.util.Collections
 
 @Composable

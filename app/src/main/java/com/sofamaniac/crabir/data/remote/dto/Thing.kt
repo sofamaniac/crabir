@@ -10,7 +10,7 @@ package com.sofamaniac.crabir.data.remote.dto
 
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDTO
 import com.sofamaniac.crabir.data.remote.dto.post.PostDTO
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTO
 import com.sofamaniac.crabir.data.remote.dto.subreddit.dummySubredditData
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -53,7 +53,7 @@ sealed class Thing : DataInterface {
 
     @Serializable
     @SerialName("t5")
-    data class Subreddit(val data: SubredditData = dummySubredditData()) :
+    data class Subreddit(val data: SubredditDTO = dummySubredditData()) :
         Thing() {
         override val id: String = data.id
         override val name: Fullname = data.name

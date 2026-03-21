@@ -32,11 +32,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.BuildConfig
-import com.sofamaniac.crabir.LocalNavController
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.ProfileRoute
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.CommentType
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.ui.Flair
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.cartouche
@@ -224,7 +224,7 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
         navController.navigate(
             ProfileRoute(
                 comment.author.username,
-                ProfileTabs.Overview.toString()
+                ProfileTabs.Overview
             )
         )
     }

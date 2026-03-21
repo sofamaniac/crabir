@@ -1,8 +1,4 @@
-/*
- * Copyright (c) 2025 Antoine Grimod
- */
-
-package com.sofamaniac.crabir
+package com.sofamaniac.crabir.navigation
 
 import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation.NavController
@@ -10,12 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 object HomeRoute : Route
-
-@Serializable
-class ProfileRoute(val author: String, val tab: String) : Route
-
-@Serializable
-object SavedRoute : Route
 
 @Serializable
 object SubscriptionsRoute : Route
@@ -34,13 +24,6 @@ class SubredditRoute(val subreddit: String) : Route
 
 @Serializable
 class MultiRoute(val displayName: String, val permalink: String) : Route
-
-@Serializable
-class PostRoute(val postPermalink: String) : Route {
-    companion object {
-        const val ROUTE = "r/{subreddit}/comments/{id}/{title}"
-    }
-}
 
 @Serializable
 object LicensesRoute : Route

@@ -15,10 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.sofamaniac.crabir.LicensesRoute
-import com.sofamaniac.crabir.LocalNavController
-import com.sofamaniac.crabir.ThemeRoute
-import com.sofamaniac.crabir.ViewsSettingRoute
+import com.sofamaniac.crabir.navigation.LicensesRoute
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.ThemeRoute
+import com.sofamaniac.crabir.navigation.ViewsSettingRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

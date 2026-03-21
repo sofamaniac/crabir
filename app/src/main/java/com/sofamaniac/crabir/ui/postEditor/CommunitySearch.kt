@@ -26,6 +26,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.data.remote.api.Rules
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
 import com.sofamaniac.crabir.ui.search.CommunitySearchViewModel
 import com.sofamaniac.crabir.ui.subredditList.Tile
 
@@ -88,11 +89,11 @@ internal fun CommunitySearch(
                     })
                 }
             } else {
-                val subs = subscriptions.sortedBy { it.data.display_name.lowercase() }
+                val subs = subscriptions.sortedBy { it.data.displayName.lowercase() }
                 items(
                     count = subs.size,
                     key = { subs[it].id }) { index ->
-                    val subreddit = subs[index].data
+                    val subreddit = SubredditDetailsMapper.map(subs[index].data)
                     Tile(subreddit, modifier = Modifier.clickable {
                         viewModel.community = subreddit
                         fullscreenManager.pop()

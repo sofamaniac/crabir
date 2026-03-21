@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
+import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.settings.views.Views
 import kotlinx.serialization.json.Json
 

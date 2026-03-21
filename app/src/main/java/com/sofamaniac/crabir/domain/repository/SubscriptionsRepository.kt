@@ -5,8 +5,10 @@ import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
+import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,10 +19,14 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import retrofit2.Response
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class SubscriptionsRepository(
+@Singleton
+class SubscriptionsRepository @Inject constructor(
     val api: RedditAPIService,
     val accountsRepository: AccountsRepository,
+    val subredditCache: SubredditCache,
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     val subscriptions: StateFlow<List<Subreddit>> =
@@ -90,6 +96,10 @@ class SubscriptionsRepository(
             "SubscriptionsRepository",
             "loadSubscriptions: ${subs.size} subreddits loaded"
         )
+        for (sub in subs) {
+            val mapped = SubredditDetailsMapper.map(sub.data)
+            subredditCache.save(mapped)
+        }
         return subs
     }
 

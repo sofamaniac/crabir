@@ -22,10 +22,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.sofamaniac.crabir.LocalNavController
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.SearchRoute
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.ui.Flair
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.votable.ScoreString

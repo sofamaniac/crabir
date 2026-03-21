@@ -44,9 +44,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalDrawerState
-import com.sofamaniac.crabir.LocalNavController
-import com.sofamaniac.crabir.SettingsRoute
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.MultiRoute
+import com.sofamaniac.crabir.navigation.SettingsRoute
+import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.filtersDataStore
 import com.sofamaniac.crabir.settings.theme.ThemeMode
 import com.sofamaniac.crabir.settings.theme.themeDataStore
@@ -62,7 +65,7 @@ fun DrawerContent(
 ) {
     val navController = LocalNavController.current!!
     val subscriptions = viewModel.subscriptions.collectAsState(initial = emptyList())
-    val sortedSubscriptions = subscriptions.value?.sortedBy { it.data.display_name.lowercase() }
+    val sortedSubscriptions = subscriptions.value?.sortedBy { it.data.displayName.lowercase() }
     val selectingAccount by viewModel.selectingAccount.collectAsState()
     val rotation =
         animateFloatAsState(targetValue = if (selectingAccount) 180f else 0f, label = "rotation")
@@ -136,7 +139,7 @@ fun DrawerContent(
                     },
                     onClick = {
                         navController.navigate(
-                            com.sofamaniac.crabir.MultiRoute(
+                            MultiRoute(
                                 multi.data.displayName,
                                 multi.data.permalink,
                             )
@@ -148,11 +151,11 @@ fun DrawerContent(
             }
             for (subreddit in sortedSubscriptions ?: emptyList()) {
                 NavigationDrawerItem(
-                    label = { Text(subreddit.data.display_name) },
+                    label = { Text(subreddit.data.displayName) },
                     selected = false,
                     icon = {
                         SubredditIcon(
-                            subreddit.data.display_name,
+                            subreddit.data.displayName,
                             subreddit.data.icon,
                             modifier = Modifier
                                 .size(32.dp)
@@ -160,10 +163,14 @@ fun DrawerContent(
                         )
                     },
                     onClick = {
-                        viewModel.visitCommunity(subreddit.data)
+                        viewModel.visitCommunity(
+                            SubredditDetailsMapper.map(
+                                subreddit.data
+                            )
+                        )
                         navController.navigate(
-                            com.sofamaniac.crabir.SubredditRoute(
-                                subreddit.data.display_name
+                            SubredditRoute(
+                                subreddit.data.displayName
                             )
                         )
                         coroutineScope.launch {

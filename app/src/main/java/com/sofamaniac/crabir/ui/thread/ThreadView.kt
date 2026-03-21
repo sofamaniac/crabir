@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.toRoute
-import com.sofamaniac.crabir.LocalNavController
-import com.sofamaniac.crabir.PostRoute
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.PostRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

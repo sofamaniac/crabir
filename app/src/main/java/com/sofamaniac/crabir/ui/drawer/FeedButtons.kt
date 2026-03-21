@@ -9,12 +9,12 @@ import androidx.compose.material.icons.filled.Moving
 import androidx.compose.material.icons.filled.RssFeed
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.sofamaniac.crabir.HistoryRoute
-import com.sofamaniac.crabir.HomeRoute
-import com.sofamaniac.crabir.Route
-import com.sofamaniac.crabir.SavedRoute
-import com.sofamaniac.crabir.SearchRoute
-import com.sofamaniac.crabir.SubredditRoute
+import com.sofamaniac.crabir.navigation.HistoryRoute
+import com.sofamaniac.crabir.navigation.HomeRoute
+import com.sofamaniac.crabir.navigation.Route
+import com.sofamaniac.crabir.navigation.SavedRoute
+import com.sofamaniac.crabir.navigation.SearchRoute
+import com.sofamaniac.crabir.navigation.SubredditRoute
 
 enum class FeedButtons(val icon: ImageVector, val route: Route) {
     Home(Icons.Default.Home, HomeRoute),

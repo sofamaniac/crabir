@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,7 +94,7 @@ fun SubredditListViewer(
     val subscriptions by viewModel.subscriptions.collectAsState()
 
     val sortedSubs =
-        subscriptions?.sortedBy { it.data.display_name.lowercase() } ?: emptyList()
+        subscriptions?.sortedBy { it.data.displayName.lowercase() } ?: emptyList()
     TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     rememberCoroutineScope()
     val listState = rememberLazyListState()
@@ -116,7 +117,8 @@ fun SubredditListViewer(
                 state = listState
             ) {
                 items(count = sortedSubs.size) { index ->
-                    Tile(sortedSubs[index].data)
+                    val subreddit = SubredditDetailsMapper.map(sortedSubs[index].data)
+                    Tile(subreddit)
                 }
             }
         }

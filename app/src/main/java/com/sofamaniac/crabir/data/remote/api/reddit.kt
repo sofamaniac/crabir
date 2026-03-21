@@ -173,7 +173,28 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
         @Field("api_type") apiType: String = "json"
     ): Response<Unit>
 
+    @FormUrlEncoded
+    @POST("api/subscribe")
+    suspend fun subscribe(
+        @Field("action") action: SubscribeAction,
+        @Field("sr") subreddit: String,
+    ): Response<Unit>
+
 }
+
+enum class SubscribeAction {
+    SUBSCRIBE,
+    UNSUBSCRIBE;
+
+    override fun toString(): String {
+        return when (this) {
+            SUBSCRIBE -> "sub"
+            UNSUBSCRIBE -> "unsub"
+        }
+    }
+}
+
+
 
 fun postCommentBody(parentId: Fullname, text: String): RequestBody {
     return MultipartBody.Builder().setType(MultipartBody.FORM)

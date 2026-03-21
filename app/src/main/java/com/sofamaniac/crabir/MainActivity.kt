@@ -34,16 +34,27 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
-import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
+import com.sofamaniac.crabir.navigation.HistoryRoute
+import com.sofamaniac.crabir.navigation.HomeRoute
+import com.sofamaniac.crabir.navigation.InboxRoute
+import com.sofamaniac.crabir.navigation.LicensesRoute
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.SearchRoute
+import com.sofamaniac.crabir.navigation.SettingsRoute
+import com.sofamaniac.crabir.navigation.SubscriptionsRoute
+import com.sofamaniac.crabir.navigation.ThemeEditorRoute
+import com.sofamaniac.crabir.navigation.ThemeRoute
+import com.sofamaniac.crabir.navigation.ViewsSettingRoute
+import com.sofamaniac.crabir.navigation.postGraph
+import com.sofamaniac.crabir.navigation.profileGraph
+import com.sofamaniac.crabir.navigation.subredditGraph
 import com.sofamaniac.crabir.settings.SettingsPage
 import com.sofamaniac.crabir.settings.theme.ConfigureMaterialTheme
 import com.sofamaniac.crabir.settings.theme.CrabirTheme
@@ -58,12 +69,7 @@ import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 import com.sofamaniac.crabir.ui.search.SearchTab
 import com.sofamaniac.crabir.ui.subreddit.HistoryViewer
 import com.sofamaniac.crabir.ui.subreddit.HomeViewer
-import com.sofamaniac.crabir.ui.subreddit.MultiView
-import com.sofamaniac.crabir.ui.subreddit.SubredditViewer
 import com.sofamaniac.crabir.ui.subredditList.SubredditListViewer
-import com.sofamaniac.crabir.ui.thread.ThreadView
-import com.sofamaniac.crabir.ui.user.ProfileTabs
-import com.sofamaniac.crabir.ui.user.ProfileView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.launch
@@ -163,11 +169,28 @@ inline fun <reified T : Any> makeDeepLinks(url: String): List<NavDeepLink> {
     val links = BASE_URL.map {
         navDeepLink<T>(basePath = "$it/$url")
     }
+    val linksTrailing = BASE_URL.map {
+        navDeepLink<T>(basePath = "$it/$url/")
+    }
     Log.d("makeDeepLinks", "Generating links for $url")
     for (link in links) {
         Log.d("makeDeepLinks", link.uriPattern.toString())
     }
-    return links
+    return links + linksTrailing
+}
+
+fun stringLink(url: String): List<NavDeepLink> {
+    require(!url.startsWith("/"))
+    require(!url.endsWith("/"))
+    val links = BASE_URL.map {
+        navDeepLink { uriPattern = "$it/$url" }
+    }
+    val linksTrailing = BASE_URL.map { navDeepLink { uriPattern = "$it/$url/" } }
+    Log.d("makeDeepLinks", "Generating links for $url")
+    for (link in links) {
+        Log.d("makeDeepLinks", link.uriPattern.toString())
+    }
+    return links + linksTrailing
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -189,28 +212,11 @@ fun NavigationGraph(
         composable<HomeRoute> {
             HomeViewer()
         }
-        composable(
-            route = PostRoute.ROUTE,
-            deepLinks = makeDeepLinks<String>(url = "r/{subreddit}/comments/{id}/{title}"),
-            arguments = listOf(
-                navArgument("subreddit") { type = NavType.StringType },
-                navArgument("id") { type = NavType.StringType },
-                navArgument("title") { type = NavType.StringType },
-            )
-        )
-        {
-            val subreddit = it.arguments?.getString("subreddit")
-            val id = it.arguments?.getString("id")
-            val title = it.arguments?.getString("title")
-            val permalink = if (subreddit != null && id != null && title != null) {
-                "/r/$subreddit/comments/$id/$title"
-            } else {
-                null
-            }
-            FullscreenHandler {
-                ThreadView(permalink = permalink, dismiss = { navController.popBackStack() })
-            }
-        }
+
+        profileGraph(navController = navController)
+        postGraph(navController = navController)
+        subredditGraph(navController = navController)
+
         composable<SubscriptionsRoute> {
             SubredditListViewer(navController = navController)
         }
@@ -222,66 +228,8 @@ fun NavigationGraph(
             InboxView()
 
         }
-        composable<SubredditRoute>(
-            deepLinks = makeDeepLinks<SubredditRoute>(url = "r")
-        )
-        { navBackStackEntry ->
-            val subreddit = navBackStackEntry.toRoute<SubredditRoute>().subreddit
-            SubredditViewer(
-                subreddit,
-            )
-        }
-        composable<MultiRoute> { navBackStackEntry ->
-            val permalink = navBackStackEntry.toRoute<MultiRoute>().permalink
-            val name = navBackStackEntry.toRoute<MultiRoute>().displayName
-            MultiView(
-                name,
-                permalink,
-            )
-        }
-        composable(
-            route = "user/{author}",
-            deepLinks = makeDeepLinks<ProfileRoute>(url = "user/{author}"),
-            arguments = listOf(
-                navArgument("author") { type = NavType.StringType }
-            )
-        ) {
-            val params = it.toRoute<ProfileRoute>()
-            ProfileView(
-                params.author,
-            )
-        }
-        composable<ProfileRoute>(
-            deepLinks = makeDeepLinks<ProfileRoute>(url = "user")
-                    + makeDeepLinks<ProfileRoute>(url = "u")
-        ) { navBackStackEntry ->
-            val params = navBackStackEntry.toRoute<ProfileRoute>()
-            val tab = ProfileTabs.fromString(params.tab)
-            ProfileView(
-                params.author,
-                initialTab = tab
-            )
-        }
-        composable(
-            route = "user/{author}",
-            arguments = listOf(
-                navArgument("author") { type = NavType.StringType }
-            ),
-            deepLinks = makeDeepLinks<String>(url = "user/{author}")
-        ) { navBackStackEntry ->
-            val author = navBackStackEntry.arguments?.getString("author")!!
-            ProfileView(
-                author,
-            )
-        }
-        composable<SavedRoute> {
-            val currentAccount = rememberCurrentAccount()
-            if (currentAccount.isAnonymous()) {
-                // TODO: ask user to log in
-                return@composable
-            }
-            ProfileView(currentAccount.username, initialTab = ProfileTabs.Saved)
-        }
+
+
         composable<LicensesRoute> {
             val libraries by produceLibraries(R.raw.aboutlibraries)
             LibrariesContainer(libraries, modifier = Modifier.fillMaxSize())

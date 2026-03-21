@@ -23,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import com.sofamaniac.crabir.LocalNavController
-import com.sofamaniac.crabir.ThemeEditorRoute
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.ThemeEditorRoute
 import com.sofamaniac.crabir.settings.ui.ListSelector
 import com.sofamaniac.crabir.settings.ui.SwitchTile
 import kotlinx.coroutines.launch

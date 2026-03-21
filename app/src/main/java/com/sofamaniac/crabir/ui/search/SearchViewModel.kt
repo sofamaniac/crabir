@@ -16,10 +16,10 @@ import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.data.remote.api.CommunitySearchSort
 import com.sofamaniac.crabir.data.remote.api.PostSearchSort
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.DataInterface
 import com.sofamaniac.crabir.domain.repository.ListingRepository

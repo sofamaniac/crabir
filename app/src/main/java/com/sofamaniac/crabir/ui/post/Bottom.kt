@@ -32,6 +32,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -55,10 +56,10 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.BuildConfig
-import com.sofamaniac.crabir.LocalNavController
-import com.sofamaniac.crabir.ProfileRoute
-import com.sofamaniac.crabir.SubredditRoute
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.ProfileRoute
+import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.votable.DownButton
@@ -94,7 +95,7 @@ fun OpenInAppButton(
     val uriHandler = LocalUriHandler.current
     val description = "Open in app"
     TooltipBox(
-        tooltip = { Text(description) },
+        tooltip = { PlainTooltip { Text(description) } },
         state = rememberTooltipState(),
         positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
     ) {
@@ -110,7 +111,7 @@ fun OpenInAppButton(
 fun OpenThreadButton(post: PostData, onClick: (PostData) -> Unit) {
     val description = "Open comments"
     TooltipBox(
-        tooltip = { Text(description) },
+        tooltip = { PlainTooltip { Text(description) } },
         state = rememberTooltipState(),
         positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
     ) {
@@ -178,7 +179,7 @@ private fun PostOptions(
                     navController.navigate(
                         ProfileRoute(
                             author = post.author.username,
-                            tab = ProfileTabs.Overview.toString()
+                            tab = ProfileTabs.Overview
                         )
                     )
                 }

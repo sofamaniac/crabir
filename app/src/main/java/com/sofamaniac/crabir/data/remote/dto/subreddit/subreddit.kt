@@ -9,9 +9,11 @@
 package com.sofamaniac.crabir.data.remote.dto.subreddit
 
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.DataInterface
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import tech.mappie.api.ObjectMappie
 
 @Serializable
 @JvmInline
@@ -22,116 +24,233 @@ data class CommentContributionSettings(
     @SerialName("allowed_media_types") val allowedMediaTypes: List<String>? = null
 )
 
-fun dummySubredditData(): SubredditData {
-    return SubredditData(
-        display_name = "",
+fun dummySubredditData(): SubredditDTO {
+    return SubredditDTO(
+        displayName = "",
         id = "",
-        icon_img = "",
-        primary_color = "black",
-        key_color = "black",
+        iconImg = "",
+        primaryColor = "black",
+        keyColor = "black",
         name = Fullname(""),
     )
 }
 // TODO sometimes, id, display_name and icon_img are missing
 
 @Serializable
-data class SubredditData(
-    val user_flair_background_color: String? = null,
-    val submit_text_html: String? = null,
-    val restrict_posting: Boolean = false,
-    val user_is_banned: Boolean = false,
-    val free_form_reports: Boolean = false,
-    val wiki_enabled: Boolean? = null,
-    val user_is_muted: Boolean = false,
-    val user_can_flair_in_sr: Boolean? = null,
+data class SubredditDTO(
+    @SerialName("user_flair_background_color")
+    val userFlairBackgroundColor: String? = null,
+    @SerialName("submit_text_html")
+    val submitTextHtml: String? = null,
+    @SerialName("user_is_banned")
+    val userIsBanned: Boolean = false,
+    @SerialName("free_form_reports")
+    val freeFormReports: Boolean = false,
+    @SerialName("wiki_enabled")
+    val wikiEnabled: Boolean? = null,
+    @SerialName("user_is_muted")
+    val userIsMuted: Boolean = false,
+    @SerialName("user_can_flair_in_sr")
+    val userCanFlairInSr: Boolean? = null,
     /** The name of the subreddit (e.g. "unixporn") */
-    val display_name: String = "",
-    val header_img: String? = null,
+    @SerialName("display_name")
+    val displayName: String = "",
+    @SerialName("title")
     val title: String = "",
-    val allow_galleries: Boolean = false,
-    val icon_size: List<Int>? = null,
+    @SerialName("allow_galleries")
+    val allowGalleries: Boolean = false,
+    @SerialName("icon_size")
+    val iconSize: List<Int>? = null,
     /** Primary color in the form "#ffffff" */
-    val primary_color: String?,
-    val active_user_count: Int? = null,
-    val icon_img: String?,
+    @SerialName("primary_color")
+    val primaryColor: String?,
+    @SerialName("active_user_count")
+    val activeUserCount: Int? = null,
+    @SerialName("icon_img")
+    val iconImg: String?,
     /** The name of the subreddit with the 'r/' prefix (e.g. "r/unixporn") */
-    val display_name_prefixed: String = "",
-    val accounts_active: Int? = null,
-    val public_traffic: Boolean = false,
+    @SerialName("display_name_prefixed")
+    val displayNamePrefixed: String = "",
+    @SerialName("accounts_active")
+    val accountsActive: Int? = null,
+    @SerialName("public_traffic")
+    val publicTraffic: Boolean = false,
+    @SerialName("subscribers")
     val subscribers: Int = 0,
-    val videostream_links_count: Int = 0,
+    @SerialName("videostream_links_count")
+    val videostreamLinksCount: Int = 0,
     /** The string "t2_[id]" */
+    @SerialName("name")
     override val name: Fullname,
+    @SerialName("quarantine")
     val quarantine: Boolean = false,
-    val hide_ads: Boolean = false,
-    val prediction_leaderboard_entry_type: Int = 0,
-    val emojis_enabled: Boolean = false,
-    val advertiser_category: String = "",
-    val public_description: String = "",
-    val comment_score_hide_mins: Int = 0,
-    val allow_predictions: Boolean = false,
+    @SerialName("hide_ads")
+    val hideAds: Boolean = false,
+    @SerialName("prediction_leaderboard_entry_type")
+    val predictionLeaderboardEntryType: Int = 0,
+    @SerialName("emojis_enabled")
+    val emojisEnabled: Boolean = false,
+    @SerialName("advertiser_category")
+    val advertiserCategory: String = "",
+    @SerialName("public_description")
+    val publicDescription: String = "",
+    @SerialName("comment_score_hide_mins")
+    val commentScoreHideMins: Int = 0,
+    @SerialName("allow_predictions")
+    val allowPredictions: Boolean = false,
     /** Escaped HTML url */
-    val community_icon: String? = null,
-    val banner_background_image: String? = null,
-    val original_content_tag_enabled: Boolean = false,
-    val community_reviewed: Boolean = false,
-    val submit_text: String = "",
-    val description_html: String? = null,
-    val spoilers_enabled: Boolean = false,
-    val comment_contribution_settings: CommentContributionSettings? = null,
-    val allow_talks: Boolean = false,
-    val user_flair_position: String? = null,
-    val all_original_content: Boolean = false,
-    val has_menu_widget: Boolean = false,
-    val key_color: String?,
-    val can_assign_user_flair: Boolean = false,
+    @SerialName("community_icon")
+    val communityIcon: String? = null,
+    @SerialName("original_content_tag_enabled")
+    val originalContentTagEnabled: Boolean = false,
+    @SerialName("community_reviewed")
+    val communityReviewed: Boolean = false,
+    @SerialName("description_html")
+    val descriptionHtml: String? = null,
+    @SerialName("spoilers_enabled")
+    val spoilersEnabled: Boolean = false,
+    @SerialName("comment_contribution_settings")
+    val commentContributionSettings: CommentContributionSettings? = null,
+    @SerialName("allow_talks")
+    val allowTalks: Boolean = false,
+    @SerialName("user_flair_position")
+    val userFlairPosition: String? = null,
+    @SerialName("all_original_content")
+    val allOriginalContent: Boolean = false,
+    @SerialName("has_menu_widget")
+    val hasMenuWidget: Boolean = false,
+    @SerialName("key_color")
+    val keyColor: String = "",
+    @SerialName("can_assign_user_flair")
+    val canAssignUserFlair: Boolean = false,
+    @SerialName("created")
     val created: Double = 0.0,
-    val show_media_preview: Boolean = false,
-    val submission_type: String = "",
-    val user_is_subscriber: Boolean = false,
-    val allowed_media_in_comments: List<String>? = null,
-    val allow_videogifs: Boolean = false,
-    val should_archive_posts: Boolean = false,
-    val user_flair_type: String? = null,
-    val allow_polls: Boolean = false,
-    val collapse_deleted_comments: Boolean = false,
-    val emojis_custom_size: List<Int>? = null,
-    val public_description_html: String? = null,
-    val allow_videos: Boolean = false,
-    val notification_level: String? = null,
-    val should_show_media_in_comments_setting: Boolean = false,
-    val can_assign_link_flair: Boolean = false,
-    val accounts_active_is_fuzzed: Boolean = false,
-    val allow_prediction_contributors: Boolean = false,
-    val link_flair_position: String? = null,
-    val user_sr_flair_enabled: Boolean? = null,
-    val user_flair_enabled_in_sr: Boolean = false,
-    val allow_discovery: Boolean = false,
-    val accept_followers: Boolean = false,
-    val user_sr_theme_enabled: Boolean = false,
-    val link_flair_enabled: Boolean = false,
-    val disable_contributor_requests: Boolean = false,
-    val subreddit_type: String = "",
-    val banner_img: String? = null,
-    val show_media: Boolean = false,
-    val user_is_moderator: Boolean = false,
+    @SerialName("show_media_preview")
+    val showMediaPreview: Boolean = false,
+    @SerialName("submission_type")
+    val submissionType: String = "",
+    @SerialName("user_is_subscriber")
+    val userIsSubscriber: Boolean = false,
+    @SerialName("allowed_media_in_comments")
+    val allowedMediaInComments: List<String> = emptyList(),
+    @SerialName("allow_videogifs")
+    val allowVideogifs: Boolean = false,
+    @SerialName("should_archive_posts")
+    val shouldArchivePosts: Boolean = false,
+    @SerialName("user_flair_type")
+    val userFlairType: String? = null,
+    @SerialName("allow_polls")
+    val allowPolls: Boolean = false,
+    @SerialName("collapse_deleted_comments")
+    val collapseDeletedComments: Boolean = false,
+    @SerialName("emojis_custom_size")
+    val emojisCustomSize: List<Int>? = null,
+    @SerialName("public_description_html")
+    val publicDescriptionHtml: String? = null,
+    @SerialName("allow_videos")
+    val allowVideos: Boolean = false,
+    @SerialName("notification_level")
+    val notificationLevel: String? = null,
+    @SerialName("should_show_media_in_comments_setting")
+    val shouldShowMediaInCommentsSetting: Boolean = false,
+    @SerialName("can_assign_link_flair")
+    val canAssignLinkFlair: Boolean = false,
+    @SerialName("accounts_active_is_fuzzed")
+    val accountsActiveIsFuzzed: Boolean = false,
+    @SerialName("allow_prediction_contributors")
+    val allowPredictionContributors: Boolean = false,
+    @SerialName("link_flair_position")
+    val linkFlairPosition: String = "",
+    @SerialName("user_sr_flair_enabled")
+    val userSrFlairEnabled: Boolean? = null,
+    @SerialName("user_flair_enabled_in_sr")
+    val userFlairEnabledInSr: Boolean = false,
+    @SerialName("allow_discovery")
+    val allowDiscovery: Boolean = false,
+    @SerialName("accept_followers")
+    val acceptFollowers: Boolean = false,
+    @SerialName("user_sr_theme_enabled")
+    val userSrThemeEnabled: Boolean = false,
+    @SerialName("link_flair_enabled")
+    val linkFlairEnabled: Boolean = false,
+    @SerialName("disable_contributor_requests")
+    val disableContributorRequests: Boolean = false,
+    @SerialName("subreddit_type")
+    val subredditType: String = "",
+
+    // BANNER
+    @SerialName("banner_background_image")
+    val bannerBackgroundImage: String? = null,
+    @SerialName("banner_img")
+    val bannerImg: String = "",
+    @SerialName("banner_background_color")
+    val bannerBackgroundColor: String? = null,
+    @SerialName("banner_size")
+    val bannerSize: List<Int>? = null,
+    @SerialName("mobile_banner_image")
+    val mobileBannerImage: String? = null,
+
+
+    @SerialName("show_media")
+    val showMedia: Boolean = false,
+    @SerialName("user_is_moderator")
+    val userIsModerator: Boolean = false,
+    @SerialName("over18")
     val over18: Boolean = false,
-    val header_title: String? = null,
+
+    // HEADER
+    @SerialName("header_img")
+    val headerImg: String? = null,
+    @SerialName("header_title")
+    val headerTitle: String? = null,
+    @SerialName("header_size")
+    val headerSize: List<Int>? = null,
+
+    // SUBMIT TEXT
+    @SerialName("submit_text_label")
+    val submitTextLabel: String = "",
+    @SerialName("submit_text")
+    val submitText: String = "",
+    @SerialName("submit_link_label")
+    val submitLinkLabel: String = "",
+
+    @SerialName("description")
     val description: String = "",
-    val allow_images: Boolean = false,
+    @SerialName("allow_images")
+    val allowImages: Boolean = false,
+    @SerialName("lang")
     val lang: String = "",
+    @SerialName("url")
     val url: String = "",
-    val created_utc: Double = 0.0,
-    val mobile_banner_image: String? = null,
-    val user_is_contributor: Boolean = false,
-    val allow_predictions_tournament: Boolean = false, override val id: String
+    @SerialName("created_utc")
+    val createdUtc: Double = 0.0,
+    @SerialName("user_is_contributor")
+    val userIsContributor: Boolean = false,
+    @SerialName("allow_predictions_tournament")
+    val allowPredictionsTournament: Boolean = false,
+    @SerialName("id")
+    override val id: String,
+    @SerialName("restrict_posting")
+    val restrictPosting: Boolean = false,
+    @SerialName("restrict_commenting")
+    val restrictCommenting: Boolean = false,
 ) : DataInterface {
     val icon: SubredditIcon =
         when {
-            !community_icon.isNullOrBlank() -> SubredditIcon.Icon(community_icon)
-            !icon_img.isNullOrBlank() -> SubredditIcon.Icon(icon_img)
-            !key_color.isNullOrBlank() -> SubredditIcon.Color(key_color)
-            !primary_color.isNullOrBlank() -> SubredditIcon.Color(primary_color)
+            !communityIcon.isNullOrBlank() -> SubredditIcon.Icon(communityIcon)
+            !iconImg.isNullOrBlank() -> SubredditIcon.Icon(iconImg)
+            keyColor.isNotBlank() -> SubredditIcon.Color(keyColor)
+            !primaryColor.isNullOrBlank() -> SubredditIcon.Color(primaryColor)
             else -> SubredditIcon.Color("black")
         }
 }
+
+
+object SubredditDetailsMapper : ObjectMappie<SubredditDTO, SubredditData>() {
+    override fun map(from: SubredditDTO): SubredditData = mapping {
+        SubredditData::defaultSet fromValue false
+        SubredditData::previousNames fromValue emptyList()
+        SubredditData::iconColor fromProperty from::keyColor
+    }
+}
+

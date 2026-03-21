@@ -92,6 +92,7 @@ object PostFeedViewerDefaults {
 fun PostFeedViewer(
     viewModel: FeedViewModelInterface,
     modifier: Modifier = Modifier,
+    feedInfo: (@Composable () -> Unit)? = null,
     filter: (VotableData?) -> Boolean = PostFeedViewerDefaults::hiddenFilter
 ) {
 
@@ -157,6 +158,9 @@ fun PostFeedViewer(
             //verticalArrangement = Arrangement.spacedBy(8.dp),
             state = listState,
         ) {
+            if (feedInfo != null) {
+                item { feedInfo() }
+            }
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
                 val post = posts[index]!!
                 val threadView = @Composable { post: PostData ->

@@ -18,8 +18,8 @@ import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.api.auth.AuthConfig
 import com.sofamaniac.crabir.data.remote.api.auth.BasicAuthClient
 import com.sofamaniac.crabir.data.remote.dto.Thing
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.SubscriptionsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -155,8 +155,8 @@ class DrawerViewModel @Inject constructor(
 
     fun visitCommunity(data: SubredditData) {
         viewModelScope.launch(Dispatchers.IO) {
-            val entity = visitedCommunityDao.getCommunity(data.display_name)?.copy(data = data)
-                ?: VisitedCommunityEntity(id = data.display_name, data = null).copy(data = data)
+            val entity = visitedCommunityDao.getCommunity(data.displayName)?.copy(data = data)
+                ?: VisitedCommunityEntity(id = data.displayName, data = null).copy(data = data)
             visitedCommunityDao.upsert(entity)
         }
     }

@@ -62,8 +62,8 @@ import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.data.remote.api.InvalidUrl
 import com.sofamaniac.crabir.data.remote.api.MissingTitle
 import com.sofamaniac.crabir.data.remote.api.MissingUrl
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.ui.markdown.Editor
 
 @OptIn(ExperimentalMaterial3Api::class)

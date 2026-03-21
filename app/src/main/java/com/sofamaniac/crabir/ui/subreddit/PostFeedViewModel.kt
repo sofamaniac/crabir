@@ -22,9 +22,9 @@ import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
 import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditData
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.domain.repository.feed.FeedRepositoryCommon
@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -60,8 +61,7 @@ abstract class PostFeedViewModel(
     private val visitedCommunityDao: VisitedCommunityDao,
 ) : ViewModel(), FeedViewModelInterface {
 
-
-    override val entity = visitedCommunityDao.getCommunityFlow(id)
+    override val entity: Flow<VisitedCommunityEntity?> = flowOf(null)
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -116,7 +116,7 @@ abstract class PostFeedViewModel(
             } else {
                 visitedCommunityDao.insert(
                     VisitedCommunityEntity(
-                        id = data.display_name,
+                        id = data.displayName,
                         data = null
                     ).copy(
                         data = data,
