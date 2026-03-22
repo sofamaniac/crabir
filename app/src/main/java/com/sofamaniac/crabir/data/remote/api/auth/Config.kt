@@ -10,12 +10,14 @@ import com.sofamaniac.crabir.BuildConfig
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ClientAuthentication
+import net.openid.appauth.EndSessionRequest
 import net.openid.appauth.ResponseTypeValues
 
 class AuthConfig(
 ) {
-    val authorizationEndpoint = "https://old.reddit.com/api/v1/authorize.compact"
+    val authorizationEndpoint = "https://old.reddit.com/api/v1/authorize"
     private val tokenEndpoint = "https://www.reddit.com/api/v1/access_token"
+    private val logoutEndpoint = "https://www.reddit.com/api/v1/revoke_token"
     private val redirectUri = "com.sofamaniac.crabir://callback"
     private val clientId = BuildConfig.REDDIT_CLIENT_ID
 
@@ -34,9 +36,20 @@ class AuthConfig(
             ResponseTypeValues.CODE,
             redirectUri.toUri(),
         )
-            .setScopes(scopes)
+            .setScopes(scopes.joinToString(" "))
             .setAdditionalParameters(mapOf<String?, String?>("duration" to "permanent"))
             .build()
+    }
+
+    fun createLogoutRequest(): EndSessionRequest {
+        val serviceConfiguration = AuthorizationServiceConfiguration(
+            authorizationEndpoint.toUri(),
+            tokenEndpoint.toUri(),
+            null,
+            logoutEndpoint.toUri(),
+
+            )
+        return EndSessionRequest.Builder(serviceConfiguration).build()
     }
 }
 
@@ -44,7 +57,10 @@ class AuthConfig(
 class BasicAuthClient() : ClientAuthentication {
     override fun getRequestHeaders(clientId: String): MutableMap<String, String> {
         return mutableMapOf(
-            "Authorization" to "Basic " + Base64.encodeToString("$clientId:".toByteArray(), Base64.NO_WRAP)
+            "Authorization" to "Basic " + Base64.encodeToString(
+                "$clientId:".toByteArray(),
+                Base64.NO_WRAP
+            )
         )
     }
 

@@ -9,7 +9,6 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Header
 import retrofit2.http.POST
-import retrofit2.http.Query
 
 interface RedditAuthApi {
 
@@ -21,10 +20,11 @@ interface RedditAuthApi {
         @Header("Authorization") basicAuth: String = authorizationHeader,
     ): Call<TokenResponse>
 
-    @POST("/api/v1/revoke_token")
+    @FormUrlEncoded
+    @POST("https://www.reddit.com/api/v1/revoke_token")
     suspend fun logout(
-        @Query("token") token: String,
-        @Query("token_type_hint") tokenTypeHint: String = "access_token",
+        @Field("token") token: String,
+        //@Field("token_type_hint") tokenTypeHint: String = "access_token",
         @Header("Authorization") basicAuth: String = authorizationHeader,
     ): Response<Unit>
 }

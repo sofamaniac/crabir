@@ -84,8 +84,12 @@ class DrawerViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             try {
-                redditApi.logout(activeAccount.first().auth.accessToken!!)
-                accountsRepository.deleteAccount(activeAccount.first().id)
+                val res = redditApi.logout(activeAccount.first().auth.refreshToken!!)
+                if (res.isSuccessful) {
+                    accountsRepository.deleteAccount(activeAccount.first().id)
+                } else {
+                    throw Exception("Failed to logout: ${res.message()}")
+                }
             } catch (e: Exception) {
                 Log.e("LoginViewModel", "Failed to logout: $e")
             }

@@ -77,7 +77,9 @@ fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: () -> Unit) 
             },
             label = { Text("Logout") },
             selected = false,
-            onClick = { viewModel.logout() }
+            onClick = {
+                viewModel.logout()
+            }
         )
     }
 }

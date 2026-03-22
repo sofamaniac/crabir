@@ -39,6 +39,10 @@ class RedditAuthenticator @Inject constructor(
             // TODO
             //return null // Anonymous account
             return chain.proceed(chain.request())
+        } else if (chain.request().url.host.contains("www.reddit.com")) {
+            // Disable auth on non oauth endpoints
+            Log.w("RedditAuthenticator", "Non oauth endpoint")
+            return chain.proceed(chain.request())
         }
 
         val newAccessToken = if (activeAccount.auth.needsTokenRefresh) {
