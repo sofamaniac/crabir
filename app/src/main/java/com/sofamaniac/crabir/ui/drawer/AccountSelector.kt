@@ -21,7 +21,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.navigation.HomeRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import java.util.Collections
 
@@ -38,9 +37,9 @@ fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: () -> Unit) 
                 account,
                 onClick = {
                     viewModel.setActiveAccount(account.id)
-                    navController.navigate(HomeRoute) {
-                        restoreState = false
-                    }
+//                    navController.navigate(HomeRoute) {
+//                        restoreState = false
+//                    }
                     onAccountSelection()
                 },
                 iconModifier = iconModifier

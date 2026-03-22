@@ -32,6 +32,7 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -46,6 +47,7 @@ import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.navigation.HomeRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.MultiRoute
 import com.sofamaniac.crabir.navigation.SettingsRoute
@@ -71,6 +73,12 @@ fun DrawerContent(
         animateFloatAsState(targetValue = if (selectingAccount) 180f else 0f, label = "rotation")
     val coroutineScope = rememberCoroutineScope()
     val drawerState = LocalDrawerState.current
+    val account by viewModel.activeAccount.collectAsState(initial = RedditAccount.anonymous())
+    LaunchedEffect(account) {
+        navController.navigate(HomeRoute) {
+            restoreState = false
+        }
+    }
 
     ModalDrawerSheet {
         Column(
@@ -80,7 +88,6 @@ fun DrawerContent(
                 .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
         ) {
-            val account by viewModel.activeAccount.collectAsState(initial = RedditAccount.anonymous())
             AccountTile(
                 account,
                 onClick = viewModel::toggleSelectAccount,

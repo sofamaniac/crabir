@@ -45,7 +45,9 @@ data class Accounts(
         return if (activeId < 0) {
             RedditAccount.anonymous()
         } else {
-            accounts[activeId]
+            accounts.firstOrNull { it.id == activeId }
+                ?: accounts.lastOrNull()
+                ?: RedditAccount.anonymous()
         }
     }
 }
@@ -125,16 +127,8 @@ class AccountsRepositoryImpl(
 
     override val activeAccount: StateFlow<RedditAccount> =
         accounts.combine(activeAccountId) { accounts, activeId ->
-            if (activeId >= accounts.size || activeId < 0) {
-                if (activeId >= accounts.size) {
-                    Log.e("AccountsRepositoryImpl", "Invalid id: activeId: ${activeId}")
-                }
-                RedditAccount.anonymous()
-            } else {
-                Log.d("AccountsRepositoryImpl", "activeId: ${activeId}")
-                accounts[activeId]
-            }
-
+            accounts.firstOrNull { account -> account.id == activeId }
+                ?: RedditAccount.anonymous()
         }.stateIn(
             scope = coroutineScope,
             started = SharingStarted.Eagerly,
@@ -171,6 +165,17 @@ class AccountsRepositoryImpl(
 
     override suspend fun updateAccount(accountId: Int, account: RedditAccount) {
         dataStore.updateData { accounts ->
+            val duplicateIndex =
+                accounts.accounts.indexOfFirst { it.username == account.username }
+            if (duplicateIndex != -1 && duplicateIndex != accountId) {
+                Log.e("AccountsRepositoryImpl", "Account already exists: $account")
+                val accountsList = accounts.accounts.toMutableList()
+                accountsList[duplicateIndex] = account
+
+                return@updateData accounts.copy(
+                    accounts = accountsList.filter { it.username.isNotEmpty() }
+                )
+            }
             val accountIndex = accounts.accounts.indexOfFirst { it.id == accountId }
             if (accountIndex != -1) {
                 val accountsList = accounts.accounts.toMutableList()
