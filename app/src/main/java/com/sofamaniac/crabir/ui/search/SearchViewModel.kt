@@ -157,7 +157,7 @@ class PostSearchViewModel @AssistedInject constructor(
     }
 
     override fun visitPost(post: PostData) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             visitedPostsDao.insert(post.toEntity())
         }
     }
