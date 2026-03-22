@@ -126,6 +126,7 @@ enum class DismissValue {
 @Composable
 fun HorizontalSwipeToDismiss(
     modifier: Modifier = Modifier,
+    onDismiss: () -> Unit = {},
     content: @Composable RowScope.() -> Unit,
 ) {
     val positionalThreshold = { distance: Float -> distance * 0.5f }
@@ -152,10 +153,9 @@ fun HorizontalSwipeToDismiss(
     }
 
 
-    val fullscreenManager = LocalFullscreenHandler.current!!
     LaunchedEffect(state.settledValue) {
         if (state.settledValue != DismissValue.Default) {
-            fullscreenManager.pop()
+            onDismiss()
         }
     }
 

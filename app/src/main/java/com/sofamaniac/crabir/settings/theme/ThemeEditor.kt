@@ -93,7 +93,7 @@ fun ThemeEditor() {
                 }
             )
         }
-        Column(modifier = Modifier.Companion.padding(paddingValues)) {
+        Column(modifier = Modifier.padding(paddingValues)) {
             ThemePreviewer { activeColorField = it }
             TextButton(onClick = {
                 scope.launch {
@@ -109,7 +109,7 @@ fun ThemeEditor() {
                         headlineContent = { Text(field.name) },
                         trailingContent = {
                             Box(
-                                modifier = Modifier.Companion
+                                modifier = Modifier
                                     .size(16.dp)
                                     .clip(RoundedCornerShape(4.dp))
                                     .background(theme.getFieldValue(field))
@@ -122,7 +122,7 @@ fun ThemeEditor() {
                                     )
                             )
                         },
-                        modifier = Modifier.Companion.clickable {
+                        modifier = Modifier.clickable {
                             activeColorField = field
                         },
                     )
@@ -134,38 +134,38 @@ fun ThemeEditor() {
 
 @Composable
 fun ThemePreviewer(setActiveField: (ColorFields) -> Unit) {
-    val theme = rememberAppTheme()
+    val theme = rememberAppTheme()!!
     Card(
-        modifier = Modifier.Companion.padding(16.dp),
+        modifier = Modifier.padding(16.dp),
         colors = CardDefaults.cardColors(containerColor = theme.cardBackground)
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Post title", modifier = Modifier.Companion.clickable {
+            Text("Post title", modifier = Modifier.clickable {
                 setActiveField(ColorFields.PostTitle)
             }, color = theme.postTitle)
-            Text("Read", modifier = Modifier.Companion.clickable {
+            Text("Read", modifier = Modifier.clickable {
                 setActiveField(ColorFields.ReadPost)
             }, color = theme.readPost)
-            Text("Announcement", modifier = Modifier.Companion.clickable {
+            Text("Announcement", modifier = Modifier.clickable {
                 setActiveField(ColorFields.Announcement)
             }, color = theme.announcement)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Community", modifier = Modifier.Companion.clickable {
+            Text("Community", modifier = Modifier.clickable {
                 setActiveField(ColorFields.Highlight)
             }, color = theme.highlight)
-            Text("Secondary text", modifier = Modifier.Companion.clickable {
+            Text("Secondary text", modifier = Modifier.clickable {
                 setActiveField(ColorFields.SecondaryText)
             }, color = theme.secondaryText)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Content text", modifier = Modifier.Companion.clickable {
+            Text("Content text", modifier = Modifier.clickable {
                 setActiveField(ColorFields.ContentColor)
             }, color = theme.contentColor)
-            Text("Link", modifier = Modifier.Companion.clickable {
+            Text("Link", modifier = Modifier.clickable {
                 setActiveField(ColorFields.LinkColor)
             }, color = theme.linkColor)
-            Text("Downvote", modifier = Modifier.Companion.clickable {
+            Text("Downvote", modifier = Modifier.clickable {
                 setActiveField(ColorFields.Downvote)
             }, color = theme.downvote)
         }
@@ -183,7 +183,7 @@ fun ColorPickerDialogue(
     var advancedMode by remember { mutableStateOf(true) }
     Dialog(onDismissRequest) {
         Card(
-            modifier = Modifier.Companion
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp), shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
         ) {
@@ -196,7 +196,7 @@ fun ColorPickerDialogue(
                         Text("Custom")
                     }
                 }
-                Spacer(modifier = Modifier.Companion.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
                 TextButton(onClick = onDismissRequest) {
                     Text("Cancel")
                 }

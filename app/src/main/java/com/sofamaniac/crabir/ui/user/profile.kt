@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryScrollableTabRow
 import androidx.compose.material3.Tab
@@ -26,9 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.sofamaniac.crabir.FullscreenHandler
+import com.sofamaniac.crabir.LocalDrawerState
+import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.ui.TabBar
+import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewerDefaults
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -115,39 +119,57 @@ fun ProfileView(
 
 
     FullscreenHandler {
-        Scaffold(modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
-            TopBar(scrollBehavior, user, viewModel = viewModels[tabs[currentTab.currentPage]])
+        val drawerState = LocalDrawerState.current
+        val fullscreenManager = LocalFullscreenHandler.current!!
+        val enabledDrawer by remember { fullscreenManager.size.map { it == 0 } }.collectAsState(true)
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                DrawerContent()
+            },
+            gesturesEnabled = enabledDrawer
+        ) {
+            Scaffold(
+                modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                topBar = {
+                    TopBar(
+                        scrollBehavior,
+                        user,
+                        viewModel = viewModels[tabs[currentTab.currentPage]]
+                    )
 
-        }, bottomBar = {
-            TabBar(selected = 4)
-        }) { innerPadding ->
-            Column(
-                verticalArrangement = Arrangement.Top, modifier = Modifier.padding(innerPadding)
-            ) {
-                SecondaryScrollableTabRow(
-                    selectedTabIndex = currentTab.currentPage,
-                    modifier = Modifier.fillMaxWidth(),
-                    edgePadding = 0.dp
+                },
+                bottomBar = {
+                    TabBar(selected = 4)
+                }) { innerPadding ->
+                Column(
+                    verticalArrangement = Arrangement.Top, modifier = Modifier.padding(innerPadding)
                 ) {
-                    tabs.forEachIndexed { index, tab ->
-                        Tab(selected = index == currentTab.currentPage, onClick = {
-                            scope.launch { currentTab.animateScrollToPage(index) }
-                        }, text = { Text(tab.name) })
+                    SecondaryScrollableTabRow(
+                        selectedTabIndex = currentTab.currentPage,
+                        modifier = Modifier.fillMaxWidth(),
+                        edgePadding = 0.dp
+                    ) {
+                        tabs.forEachIndexed { index, tab ->
+                            Tab(selected = index == currentTab.currentPage, onClick = {
+                                scope.launch { currentTab.animateScrollToPage(index) }
+                            }, text = { Text(tab.name) })
+                        }
                     }
-                }
-                HorizontalPager(
-                    state = currentTab, modifier = Modifier.fillMaxSize()
-                ) {
-                    val page = tabs[it]
-                    val viewModel = viewModels[page]
-                    val filter = when (page) {
-                        ProfileTabs.Hidden -> { data: VotableData? -> true }
-                        else -> PostFeedViewerDefaults::hiddenFilter
-                    }
-                    if (viewModel != null) {
-                        PostFeedViewer(viewModel = viewModel, filter = filter)
-                    } else {
-                        Text("TODO")
+                    HorizontalPager(
+                        state = currentTab, modifier = Modifier.fillMaxSize()
+                    ) {
+                        val page = tabs[it]
+                        val viewModel = viewModels[page]
+                        val filter = when (page) {
+                            ProfileTabs.Hidden -> { data: VotableData? -> true }
+                            else -> PostFeedViewerDefaults::hiddenFilter
+                        }
+                        if (viewModel != null) {
+                            PostFeedViewer(viewModel = viewModel, filter = filter)
+                        } else {
+                            Text("TODO")
+                        }
                     }
                 }
             }

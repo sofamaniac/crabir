@@ -56,6 +56,7 @@ import com.sofamaniac.crabir.settings.filtersDataStore
 import com.sofamaniac.crabir.settings.theme.ThemeMode
 import com.sofamaniac.crabir.settings.theme.themeDataStore
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.Collections.emptyList
@@ -74,10 +75,16 @@ fun DrawerContent(
     val coroutineScope = rememberCoroutineScope()
     val drawerState = LocalDrawerState.current
     val account by viewModel.activeAccount.collectAsState(initial = RedditAccount.anonymous())
-    LaunchedEffect(account) {
-        navController.navigate(HomeRoute) {
-            restoreState = false
-        }
+    LaunchedEffect(Unit) {
+        // Reset when account changes
+        viewModel.activeAccount
+            .drop(1) // skip initial emission
+            .collect {
+                navController.navigate(HomeRoute) {
+                    popUpTo(0) { inclusive = true }
+                    //launchSingleTop = true
+                }
+            }
     }
 
     ModalDrawerSheet {

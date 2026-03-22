@@ -34,7 +34,7 @@ class AuthConfig(
             ResponseTypeValues.CODE,
             redirectUri.toUri(),
         )
-            .setScopes(scopes.joinToString(" "))
+            .setScopes(scopes)
             .setAdditionalParameters(mapOf<String?, String?>("duration" to "permanent"))
             .build()
     }

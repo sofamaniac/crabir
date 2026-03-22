@@ -18,27 +18,32 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavDeepLink
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
+import coil3.compose.AsyncImage
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.sofamaniac.crabir.navigation.HistoryRoute
@@ -64,7 +69,7 @@ import com.sofamaniac.crabir.settings.theme.ThemeSettingsPage
 import com.sofamaniac.crabir.settings.theme.rememberAppTheme
 import com.sofamaniac.crabir.settings.views.ViewsSettingsPage
 import com.sofamaniac.crabir.ui.InboxView
-import com.sofamaniac.crabir.ui.drawer.DrawerContent
+import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 import com.sofamaniac.crabir.ui.search.SearchTab
 import com.sofamaniac.crabir.ui.subreddit.HistoryViewer
@@ -91,15 +96,25 @@ class MainActivity : ComponentActivity() {
         //window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         setContent {
 
-            ConfigureMaterialTheme {
-                val navController = rememberNavController()
+            val navController = rememberNavController()
+            LaunchedEffect(navController) {
+                Log.d("MainActivity", "nav controller launched")
+            }
+
+            // Setup nav controller
+            CompositionLocalProvider(LocalNavController provides navController) {
+                Log.d("MainActivity", "nav controller")
                 val drawerState = rememberDrawerState(DrawerValue.Closed)
-                // Setup nav controller
-                CompositionLocalProvider(LocalNavController provides navController) {
+                ConfigureMaterialTheme {
+                    Log.d("MainActivity", "material")
                     val theme = rememberAppTheme()
-                    Log.d("MainActivity", "onCreate: $theme")
+                    if (theme == null) {
+                        return@ConfigureMaterialTheme
+                    }
                     CompositionLocalProvider(LocalTheme provides theme) {
+                        Log.d("MainActivity", "theme")
                         CompositionLocalProvider(LocalDrawerState provides drawerState) {
+                            Log.d("MainActivity", "Drawer state")
                             MainScreen(
                                 navController = navController,
                             )
@@ -136,6 +151,7 @@ fun MainScreen(
         } else {
             // TODO: ask for confirmation and exit the app
             if (navController.previousBackStackEntry != null) {
+                Log.d("MainScreen", "Popping back stack ${navController.currentBackStackEntry}")
                 navController.popBackStack()
             } else {
                 activity?.finish()
@@ -143,55 +159,13 @@ fun MainScreen(
         }
     }
 
-    ModalNavigationDrawer(
-        drawerState = LocalDrawerState.current,
-        drawerContent = {
-            DrawerContent()
-        },
-    ) {
-        NavigationGraph(
-            navController,
-        )
-    }
+    NavigationGraph(
+        navController,
+    )
 
 
 }
 
-val BASE_URL = listOf(
-    "reddit.com",
-    "www.reddit.com",
-    "old.reddit.com",
-    "new.reddit.com",
-)
-
-
-inline fun <reified T : Any> makeDeepLinks(url: String): List<NavDeepLink> {
-    val links = BASE_URL.map {
-        navDeepLink<T>(basePath = "$it/$url")
-    }
-    val linksTrailing = BASE_URL.map {
-        navDeepLink<T>(basePath = "$it/$url/")
-    }
-    Log.d("makeDeepLinks", "Generating links for $url")
-    for (link in links) {
-        Log.d("makeDeepLinks", link.uriPattern.toString())
-    }
-    return links + linksTrailing
-}
-
-fun stringLink(url: String): List<NavDeepLink> {
-    require(!url.startsWith("/"))
-    require(!url.endsWith("/"))
-    val links = BASE_URL.map {
-        navDeepLink { uriPattern = "$it/$url" }
-    }
-    val linksTrailing = BASE_URL.map { navDeepLink { uriPattern = "$it/$url/" } }
-    Log.d("makeDeepLinks", "Generating links for $url")
-    for (link in links) {
-        Log.d("makeDeepLinks", link.uriPattern.toString())
-    }
-    return links + linksTrailing
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -200,54 +174,85 @@ fun NavigationGraph(
     modifier: Modifier = Modifier
 ) {
 
-    NavHost(
-        navController = navController,
-        startDestination = HomeRoute,
-        modifier = modifier
-            .fillMaxSize()
-            .imePadding(),
-        enterTransition = { EnterTransition.None },
-        exitTransition = { ExitTransition.None }
-    ) {
-        composable<HomeRoute> {
-            HomeViewer()
-        }
+    CompositionLocalProvider(LocalNavController provides navController) {
+        NavHost(
+            navController = navController,
+            startDestination = HomeRoute,
+            modifier = modifier
+                .fillMaxSize()
+                .imePadding(),
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) {
+            composable<HomeRoute> {
+                Log.d("NavigationGraph", "HomeRoute")
+                HomeViewer()
+            }
 
-        profileGraph(navController = navController)
-        postGraph(navController = navController)
-        subredditGraph(navController = navController)
+            profileGraph(navController = navController)
+            postGraph(navController = navController)
+            subredditGraph(navController = navController)
 
-        composable<SubscriptionsRoute> {
-            SubredditListViewer(navController = navController)
-        }
-        composable<SearchRoute> { navBackStackEntry ->
-            val search = navBackStackEntry.toRoute<SearchRoute>()
-            SearchTab(search)
-        }
-        composable<InboxRoute> {
-            InboxView()
+            composable<SubscriptionsRoute> {
+                SubredditListViewer(navController = navController)
+            }
+            composable<SearchRoute> { navBackStackEntry ->
+                val search = navBackStackEntry.toRoute<SearchRoute>()
+                SearchTab(search)
+            }
+            composable<InboxRoute> {
+                InboxView()
 
-        }
+            }
 
 
-        composable<LicensesRoute> {
-            val libraries by produceLibraries(R.raw.aboutlibraries)
-            LibrariesContainer(libraries, modifier = Modifier.fillMaxSize())
-        }
-        composable<SettingsRoute> {
-            SettingsPage()
-        }
-        composable<ThemeRoute> {
-            ThemeSettingsPage()
-        }
-        composable<ThemeEditorRoute> {
-            ThemeEditor()
-        }
-        composable<ViewsSettingRoute> {
-            ViewsSettingsPage()
-        }
-        composable<HistoryRoute> {
-            HistoryViewer()
+            composable<LicensesRoute> {
+                val libraries by produceLibraries(R.raw.aboutlibraries)
+                LibrariesContainer(libraries, modifier = Modifier.fillMaxSize())
+            }
+            composable<SettingsRoute> {
+                SettingsPage()
+            }
+            composable<ThemeRoute> {
+                ThemeSettingsPage()
+            }
+            composable<ThemeEditorRoute> {
+                ThemeEditor()
+            }
+            composable<ViewsSettingRoute> {
+                ViewsSettingsPage()
+            }
+            composable<HistoryRoute> {
+                HistoryViewer()
+            }
+            composable(
+                route = "imagePreview?url={url}",
+                deepLinks = listOf(navDeepLink {
+                    uriPattern = "https://preview.redd.it/{url}"
+                }),
+                arguments = listOf(navArgument("url") {
+                    type = NavType.StringType
+                })
+            ) { navBackStackEntry ->
+                val url = navBackStackEntry.arguments?.getString("url")
+                Log.d("NavigationGraph", "Reddit Preview: $url")
+                if (url != null) {
+                    Log.d("NavigationGraph", "Reddit Preview: showing image")
+                    FullscreenHandler {
+                        VerticalSwipeToDismiss(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(color = Color.Black)
+                        ) {
+                            AsyncImage(
+                                model = "https://preview.redd.it/$url",
+                                contentDescription = null,
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

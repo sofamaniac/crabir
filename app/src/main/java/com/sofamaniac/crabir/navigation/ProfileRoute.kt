@@ -7,8 +7,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
-import com.sofamaniac.crabir.makeDeepLinks
-import com.sofamaniac.crabir.stringLink
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.user.ProfileView
 import kotlinx.serialization.Serializable

@@ -6,7 +6,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.toRoute
-import com.sofamaniac.crabir.stringLink
 import com.sofamaniac.crabir.ui.subreddit.MultiView
 import com.sofamaniac.crabir.ui.subreddit.SubredditViewer
 

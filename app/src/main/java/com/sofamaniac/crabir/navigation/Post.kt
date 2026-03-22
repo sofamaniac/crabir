@@ -6,7 +6,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.sofamaniac.crabir.FullscreenHandler
-import com.sofamaniac.crabir.stringLink
 import com.sofamaniac.crabir.ui.thread.ThreadView
 import kotlinx.serialization.Serializable
 

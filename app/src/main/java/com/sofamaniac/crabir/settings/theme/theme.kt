@@ -227,12 +227,21 @@ object ColorSerializer : KSerializer<Color> {
 }
 
 @Composable
-fun rememberAppTheme(): CrabirTheme {
+fun rememberThemeSettings(): ThemeSettings? {
     val context = LocalContext.current
     val themeDataStore = remember(context) { context.themeDataStore }
     val theme by themeDataStore.data.collectAsState(
-        initial = ThemeSettings.DEFAULT,
+        initial = null,
     )
+    return theme
+}
+
+@Composable
+fun rememberAppTheme(): CrabirTheme? {
+    val theme = rememberThemeSettings()
+    if (theme == null) {
+        return null
+    }
     val colorScheme = MaterialTheme.colorScheme
     val dynamicTheme = CrabirTheme.fromColorScheme(colorScheme)
     val view = LocalView.current
@@ -242,10 +251,10 @@ fun rememberAppTheme(): CrabirTheme {
     if (theme.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         return dynamicTheme
     }
-    Log.d("rememberAppTheme", "rememberAppTheme: ${theme.mode}")
-    val mode = when (theme.mode) {
+    Log.d("rememberAppTheme", "rememberAppTheme: ${theme!!.mode}")
+    val mode = when (theme!!.mode) {
         ThemeMode.System -> if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
-        else -> theme.mode
+        else -> theme!!.mode
     }
     when (mode) {
         ThemeMode.Dark -> {
@@ -262,9 +271,9 @@ fun rememberAppTheme(): CrabirTheme {
     }
 
     return when (mode) {
-        ThemeMode.Dark -> theme.dark
-        ThemeMode.Light -> theme.light
-        else -> theme.dark
+        ThemeMode.Dark -> theme!!.dark
+        ThemeMode.Light -> theme!!.light
+        else -> theme!!.dark
     }
 }
 
@@ -272,12 +281,12 @@ fun rememberAppTheme(): CrabirTheme {
 fun ConfigureMaterialTheme(
     content: @Composable () -> Unit
 ) {
-    val context = LocalContext.current
-    val themeDataStore = remember(context) { context.themeDataStore }
-    val themeSettings by themeDataStore.data.collectAsState(
-        initial = ThemeSettings.DEFAULT,
-    )
 
+    val themeSettings = rememberThemeSettings()
+    if (themeSettings == null) {
+        return
+    }
+    val context = LocalContext.current
     val darkModeEnabled = when (themeSettings.mode) {
         ThemeMode.Dark -> true
         ThemeMode.Light -> false
