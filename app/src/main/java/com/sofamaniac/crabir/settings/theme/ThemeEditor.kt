@@ -3,6 +3,7 @@ package com.sofamaniac.crabir.settings.theme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,8 +46,13 @@ fun ThemeEditor() {
     val themeSettings by themeDataStore.data.collectAsState(
         initial = ThemeSettings.DEFAULT,
     )
+    val mode = when (themeSettings.mode) {
+        ThemeMode.System, ThemeMode.Scheduled -> if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
+        else -> themeSettings.mode
+    }
+
     val theme =
-        if (themeSettings.mode == ThemeMode.Dark) themeSettings.dark else themeSettings.light
+        if (mode == ThemeMode.Dark) themeSettings.dark else themeSettings.light
     var activeColorField by remember { mutableStateOf<ColorFields?>(null) }
     val scope = rememberCoroutineScope()
     Scaffold(

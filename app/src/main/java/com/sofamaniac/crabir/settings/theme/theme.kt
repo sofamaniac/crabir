@@ -243,7 +243,11 @@ fun rememberAppTheme(): CrabirTheme {
         return dynamicTheme
     }
     Log.d("rememberAppTheme", "rememberAppTheme: ${theme.mode}")
-    when (theme.mode) {
+    val mode = when (theme.mode) {
+        ThemeMode.System -> if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
+        else -> theme.mode
+    }
+    when (mode) {
         ThemeMode.Dark -> {
             windowInsetsController.isAppearanceLightStatusBars = false
             windowInsetsController.isAppearanceLightNavigationBars = false
@@ -257,10 +261,9 @@ fun rememberAppTheme(): CrabirTheme {
         else -> {}
     }
 
-    return when (theme.mode) {
+    return when (mode) {
         ThemeMode.Dark -> theme.dark
         ThemeMode.Light -> theme.light
-        ThemeMode.System -> if (isSystemInDarkTheme()) theme.dark else theme.light
         else -> theme.dark
     }
 }
