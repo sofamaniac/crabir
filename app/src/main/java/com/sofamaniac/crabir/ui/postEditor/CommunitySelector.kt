@@ -37,7 +37,7 @@ import com.sofamaniac.crabir.ui.subredditList.Tile
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CommunitySelector(
-    viewModel: PostCreatorViewModel,
+    viewModel: CreatorViewModel,
     modifier: Modifier = Modifier,
 ) {
     val fullscreenManager = LocalFullscreenHandler.current!!

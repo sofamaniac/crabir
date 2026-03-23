@@ -59,10 +59,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.BuildConfig
+import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
+import com.sofamaniac.crabir.ui.postEditor.CrosspostCreator
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.votable.DownButton
@@ -244,6 +246,7 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             onDismissRequest()
         }
+    val fullscreenManager = LocalFullscreenHandler.current!!
     Dialog(onDismissRequest) {
         Card(modifier = Modifier.padding(16.dp)) {
             ListItem(
@@ -323,7 +326,13 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
                         contentDescription = null,
                     )
                 },
-                headlineContent = { Text("Crosspost") }
+                headlineContent = { Text("Crosspost") },
+                modifier = Modifier.clickable {
+                    onDismissRequest()
+                    fullscreenManager.push {
+                        CrosspostCreator(post)
+                    }
+                }
             )
             ListItem(
                 leadingContent = { Icon(Icons.Default.Link, contentDescription = null) },

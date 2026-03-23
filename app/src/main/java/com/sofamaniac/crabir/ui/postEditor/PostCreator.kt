@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +37,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -59,12 +61,15 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalFullscreenHandler
+import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.api.InvalidUrl
 import com.sofamaniac.crabir.data.remote.api.MissingTitle
 import com.sofamaniac.crabir.data.remote.api.MissingUrl
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.ui.markdown.Editor
+import com.sofamaniac.crabir.ui.thread.CrossPostView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,26 +85,31 @@ fun PostCreator(
     }
     val fullscreenManager = LocalFullscreenHandler.current!!
     val context = LocalContext.current
+    val theme = LocalTheme.current
     Box {
-        Editor(state = viewModel.textState, topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = { fullscreenManager.pop() }) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
+        Editor(
+            modifier = Modifier.background(theme.cardBackground),
+            state = viewModel.textState, topBar = {
+                TopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { fullscreenManager.pop() }) {
+                            Icon(Icons.Default.Close, contentDescription = "Close")
+                        }
+                    },
+                    title = { Text("Create post") },
+                    actions = {
+                        IconButton(onClick = {
+                            viewModel.submit(context) { fullscreenManager.pop() }
+                        }) {
+                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+                        }
                     }
-                },
-                title = { Text("Create post") },
-                actions = {
-                    IconButton(onClick = {
-                        viewModel.submit(context) { fullscreenManager.pop() }
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
-                    }
-                }
-            )
-        }) {
+                )
+            }) {
             CommunitySelector(viewModel)
-            Column() {
+            Column(
+                modifier = Modifier.background(theme.cardBackground),
+            ) {
                 TextField(
                     state = viewModel.titleState,
                     label = { Text("Title") },
@@ -172,6 +182,108 @@ fun PostCreator(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CrosspostCreator(
+    post: PostData,
+    viewModel: CrosspostCreatorViewModel = hiltViewModel<CrosspostCreatorViewModel, CrosspostCreatorViewModel.Factory> { factory ->
+        factory.create(post.name.name)
+    }
+) {
+    val fullscreenManager = LocalFullscreenHandler.current!!
+    val context = LocalContext.current
+    val theme = LocalTheme.current
+    Box {
+        Scaffold(
+            modifier = Modifier.background(theme.cardBackground),
+            topBar = {
+                TopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { fullscreenManager.pop() }) {
+                            Icon(Icons.Default.Close, contentDescription = "Close")
+                        }
+                    },
+                    title = { Text("Create post") },
+                    actions = {
+                        IconButton(onClick = {
+                            viewModel.submit(context) { fullscreenManager.pop() }
+                        }) {
+                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+                        }
+                    }
+                )
+            }) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .background(color = theme.cardBackground)
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp)
+            ) {
+                CommunitySelector(viewModel)
+                TextField(
+                    state = viewModel.titleState,
+                    label = { Text("Title") },
+                    inputTransformation = InputTransformation.maxLength(300),
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = viewModel.error is MissingTitle,
+                    supportingText = {
+                        if (viewModel.error is MissingTitle)
+                            Text("Missing title", color = MaterialTheme.colorScheme.error)
+                    },
+                    trailingIcon = {
+                        if (viewModel.error is MissingTitle)
+                            Icon(
+                                Icons.Filled.Error,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                    }
+                )
+                Text(
+                    "${viewModel.titleState.text.length}/300",
+                    modifier = Modifier.align(Alignment.End)
+                )
+                CrossPostView(post)
+            }
+            if (viewModel.flairs.isNotEmpty()) {
+                TextButton(onClick = {}) {
+                    Text("Flair")
+                }
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(
+                    onClick = {
+                        viewModel.state = viewModel.state.copy(nsfw = !viewModel.state.nsfw)
+                    },
+                    selected = viewModel.state.nsfw,
+                    colors = FilterChipDefaults.filterChipColors().copy(
+                        selectedContainerColor = Color.Red,
+                    ),
+                    label = {
+                        Text("NSFW")
+                    },
+                )
+                FilterChip(
+                    onClick = {
+                        viewModel.state = viewModel.state.copy(spoiler = !viewModel.state.spoiler)
+                    },
+                    selected = viewModel.state.spoiler,
+                    label = {
+                        Text("SPOILER")
+                    }
+                )
+            }
+        }
+        if (viewModel.loading) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+        }
+    }
+}
+
 
 @Composable
 fun UrlField(viewModel: PostCreatorViewModel) {

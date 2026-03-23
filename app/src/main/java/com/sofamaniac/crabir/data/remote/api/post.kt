@@ -200,6 +200,45 @@ data class PostSubmissionBuilder(
     }
 }
 
+@Serializable
+data class CrosspostSubmissionBuilder(
+    val crosspostFullname: Fullname,
+    val title: String = "",
+    @SerialName("sr") val subreddit: String = "",
+    val nsfw: Boolean = false,
+    val spoiler: Boolean = false,
+    @SerialName("sendreplies") val sendReplies: Boolean = false,
+    val flairId: String? = null,
+    val flairText: String? = null,
+) {
+
+    fun build(): Result<Map<String, String>> {
+        if (title.isBlank()) return Result.failure(MissingTitle())
+        else if (subreddit.isBlank()) return Result.failure(MissingCommunity())
+
+        return Result.success(
+            buildMap {
+                put("api_type", "json")
+                put("kind", "crosspost")
+                put("title", title)
+                put("sr", subreddit)
+                put("sendreplies", sendReplies.toString())
+                put("nsfw", nsfw.toString())
+                put("spoiler", spoiler.toString())
+                put("show_error_list", true.toString())
+                put("validate_on_submit", true.toString())
+                put("crosspost_fullname", crosspostFullname.name)
+                if (flairId != null) {
+                    put("flair_id", flairId)
+                }
+                if (flairText != null) {
+                    put("flair_text", flairText)
+                }
+            }
+        )
+    }
+}
+
 internal fun Kind.toApiString(): String? {
     return when (this) {
         Kind.Self -> "self"

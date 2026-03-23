@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
+import com.sofamaniac.crabir.data.remote.api.CrosspostSubmissionBuilder
 import com.sofamaniac.crabir.data.remote.api.GalleryItem
 import com.sofamaniac.crabir.data.remote.api.MediaUploadInterface
 import com.sofamaniac.crabir.data.remote.api.PostSubmissionBuilder
@@ -18,20 +19,18 @@ import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.api.Rules
 import com.sofamaniac.crabir.data.remote.api.SubmissionBuilderError
 import com.sofamaniac.crabir.data.remote.api.makeMediaUploadBody
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.SubredditData
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
-class PostCreatorViewModel @Inject constructor(
-    private val api: RedditAPIService,
-    private val mediaUploader: MediaUploadInterface
-) :
-    ViewModel() {
-    var state by mutableStateOf(PostSubmissionBuilder())
+abstract class CreatorViewModel(val api: RedditAPIService) : ViewModel() {
     var community: SubredditData? by mutableStateOf(null)
 
     var rules: Rules by mutableStateOf(Rules())
@@ -40,12 +39,6 @@ class PostCreatorViewModel @Inject constructor(
     var error: SubmissionBuilderError? by mutableStateOf(null)
 
     val titleState = TextFieldState()
-    val textState = TextFieldState()
-    val urlState = TextFieldState()
-
-    var media: List<Uri> by mutableStateOf(emptyList())
-    var captions: MutableMap<Uri, String> = mutableMapOf()
-    var loading by mutableStateOf(false)
 
     fun getRules() {
         if (rules.siteRules.isNotEmpty()) return
@@ -56,6 +49,20 @@ class PostCreatorViewModel @Inject constructor(
             }
         }
     }
+}
+
+@HiltViewModel
+class PostCreatorViewModel @Inject constructor(
+    api: RedditAPIService,
+    private val mediaUploader: MediaUploadInterface
+) : CreatorViewModel(api) {
+    var state by mutableStateOf(PostSubmissionBuilder())
+    val textState = TextFieldState()
+    val urlState = TextFieldState()
+
+    var media: List<Uri> by mutableStateOf(emptyList())
+    var captions: MutableMap<Uri, String> = mutableMapOf()
+    var loading by mutableStateOf(false)
 
     fun setKind(context: Context) {
         if (media.size > 1) {
@@ -144,6 +151,49 @@ class PostCreatorViewModel @Inject constructor(
                 }
             }
         }
+    }
+}
+
+@HiltViewModel(assistedFactory = CrosspostCreatorViewModel.Factory::class)
+class CrosspostCreatorViewModel @AssistedInject constructor(
+    @Assisted val parentFullname: String,
+    api: RedditAPIService,
+) : CreatorViewModel(api) {
+    var state by mutableStateOf(
+        CrosspostSubmissionBuilder(
+            crosspostFullname = Fullname(
+                parentFullname
+            )
+        )
+    )
+
+    var loading by mutableStateOf(false)
+
+    fun submit(context: Context, onSucceed: () -> Unit) {
+        loading = true
+        state = state.copy(
+            title = titleState.text as String,
+            subreddit = community?.displayName ?: ""
+        )
+        viewModelScope.launch(Dispatchers.IO) {
+            val submission = state.build()
+            if (submission.isFailure) {
+                Log.e("PostCreatorViewModel", "submit: ${submission.exceptionOrNull()}")
+                error = submission.exceptionOrNull() as SubmissionBuilderError?
+                loading = false
+            } else {
+                val res = api.submitPost(submission.getOrThrow())
+                loading = false
+                if (res.isSuccessful) {
+                    onSucceed()
+                }
+            }
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(parentFullname: String): CrosspostCreatorViewModel
     }
 }
 

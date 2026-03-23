@@ -33,7 +33,7 @@ import com.sofamaniac.crabir.ui.subredditList.Tile
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CommunitySearch(
-    viewModel: PostCreatorViewModel,
+    viewModel: CreatorViewModel,
     searchViewModel: CommunitySearchViewModel = hiltViewModel()
 ) {
     val searchState = rememberSearchBarState()
