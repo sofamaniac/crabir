@@ -27,8 +27,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Link
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +38,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -65,6 +68,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.api.InvalidUrl
 import com.sofamaniac.crabir.data.remote.api.MissingTitle
 import com.sofamaniac.crabir.data.remote.api.MissingUrl
+import com.sofamaniac.crabir.data.remote.api.PostSubmissionBuilder
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
@@ -80,13 +84,18 @@ fun PostCreator(
 ) {
     LaunchedEffect(community, kind) {
         Log.d("PostCreator", "PostCreator: $community $kind")
-        viewModel.community = community
+        viewModel.state = PostSubmissionBuilder()
+        if (community != null) {
+            viewModel.setSubreddit(community)
+        }
         viewModel.state = viewModel.state.copy(kind = kind)
     }
     val fullscreenManager = LocalFullscreenHandler.current!!
     val context = LocalContext.current
     val theme = LocalTheme.current
-    Box {
+    var showFlairDialog by remember { mutableStateOf(false) }
+    var showFlairEdit by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.background(color = theme.cardBackground)) {
         Editor(
             modifier = Modifier.background(theme.cardBackground),
             state = viewModel.textState, topBar = {
@@ -108,7 +117,6 @@ fun PostCreator(
             }) {
             CommunitySelector(viewModel)
             Column(
-                modifier = Modifier.background(theme.cardBackground),
             ) {
                 TextField(
                     state = viewModel.titleState,
@@ -134,10 +142,21 @@ fun PostCreator(
                     modifier = Modifier.align(Alignment.End)
                 )
             }
-            if (viewModel.flairs.isNotEmpty()) {
-                TextButton(onClick = {}) {
-                    Text("Flair")
+            if (viewModel.state.flairId != null) {
+                val flair = viewModel.flairs.find { it.id == viewModel.state.flairId }
+                val text = viewModel.state.flairText ?: flair?.text ?: ""
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text)
+                    if (flair?.textEditable == true) {
+                        Spacer(modifier = Modifier.weight(1f))
+                        TextButton(onClick = { showFlairEdit = true }) {
+                            Text("Edit flair")
+                        }
+                    }
                 }
+            }
+            TextButton(onClick = { showFlairDialog = true }) {
+                Text("Change Flair")
             }
             when (viewModel.state.kind) {
                 Kind.Link -> {
@@ -178,6 +197,90 @@ fun PostCreator(
         if (viewModel.loading) {
             Box(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+        }
+        if (showFlairDialog) {
+            FlairDialog(viewModel, onDismiss = { showFlairDialog = false })
+        }
+        if (showFlairEdit) {
+            FlairEditBox(viewModel, onDismiss = { showFlairEdit = false })
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FlairDialog(viewModel: PostCreatorViewModel, onDismiss: () -> Unit) {
+    var showEditBox by remember { mutableStateOf(false) }
+    LaunchedEffect(viewModel) {
+        viewModel.getFlairs()
+    }
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Card() {
+            Column {
+                for (flair in viewModel.flairs) {
+                    ListItem(
+                        modifier = Modifier.clickable {
+                            viewModel.state = viewModel.state.copy(flairId = flair.id)
+                            onDismiss()
+                        },
+                        headlineContent = { Text(flair.text) },
+                        trailingContent = {
+                            if (flair.textEditable) {
+                                IconButton(onClick = {
+                                    showEditBox = true
+                                    if (viewModel.state.flairText.isNullOrBlank()) {
+                                        viewModel.state =
+                                            viewModel.state.copy(flairText = flair.text)
+                                    }
+                                }) {
+                                    Icon(Icons.Default.Edit, contentDescription = null)
+                                }
+                            }
+                        }
+                    )
+                }
+                if (viewModel.flairs.isEmpty()) {
+                    Text("Community has no flair")
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FlairEditBox(viewModel: PostCreatorViewModel, onDismiss: () -> Unit) {
+    val fallbackText = viewModel.flairs.find { it.id == viewModel.state.flairId }?.text ?: ""
+    val textFieldState =
+        rememberTextFieldState(initialText = viewModel.state.flairText ?: fallbackText)
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Card() {
+            ListItem(headlineContent = {
+                Text(
+                    "Edit flair text",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            })
+            ListItem(
+                headlineContent = {
+                    TextField(
+                        state = textFieldState
+                    )
+                }
+            )
+            Row() {
+                TextButton(onClick = onDismiss) {
+                    Text("Cancel")
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                TextButton(onClick = {
+                    viewModel.state =
+                        viewModel.state.copy(flairText = textFieldState.text as String)
+                    onDismiss()
+                }) {
+                    Text("Confirm")
+                }
             }
         }
     }

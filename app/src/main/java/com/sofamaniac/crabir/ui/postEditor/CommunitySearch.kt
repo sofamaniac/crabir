@@ -25,7 +25,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.LocalFullscreenHandler
-import com.sofamaniac.crabir.data.remote.api.Rules
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
 import com.sofamaniac.crabir.ui.search.CommunitySearchViewModel
 import com.sofamaniac.crabir.ui.subredditList.Tile
@@ -83,8 +82,7 @@ internal fun CommunitySearch(
                     key = searchedCommunities.itemKey { p -> p.name }) { index ->
                     val subreddit = searchedCommunities[index]!!
                     Tile(subreddit, modifier = Modifier.clickable {
-                        viewModel.community = subreddit
-                        viewModel.rules = Rules()
+                        viewModel.setSubreddit(subreddit)
                         fullscreenManager.pop()
                     })
                 }
@@ -95,7 +93,7 @@ internal fun CommunitySearch(
                     key = { subs[it].id }) { index ->
                     val subreddit = SubredditDetailsMapper.map(subs[index].data)
                     Tile(subreddit, modifier = Modifier.clickable {
-                        viewModel.community = subreddit
+                        viewModel.setSubreddit(subreddit)
                         fullscreenManager.pop()
                     })
                 }

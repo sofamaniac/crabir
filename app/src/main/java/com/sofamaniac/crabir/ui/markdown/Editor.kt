@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.markdown
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.LocalTheme
 
 @Composable
 fun Editor(
@@ -33,15 +35,17 @@ fun Editor(
     topBar: @Composable () -> Unit = {},
     beforeEditor: @Composable () -> Unit = {},
 ) {
+    val theme = LocalTheme.current
     Scaffold(
         topBar = topBar, modifier = modifier,
         bottomBar = { BottomBar(state) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
+                .background(theme.cardBackground)
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             beforeEditor()
             TextField(

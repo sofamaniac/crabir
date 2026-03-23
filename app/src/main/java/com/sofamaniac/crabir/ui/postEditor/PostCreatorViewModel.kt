@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
 import com.sofamaniac.crabir.data.remote.api.CrosspostSubmissionBuilder
+import com.sofamaniac.crabir.data.remote.api.FlairInfo
 import com.sofamaniac.crabir.data.remote.api.GalleryItem
 import com.sofamaniac.crabir.data.remote.api.MediaUploadInterface
 import com.sofamaniac.crabir.data.remote.api.PostSubmissionBuilder
@@ -32,11 +33,15 @@ import javax.inject.Inject
 
 abstract class CreatorViewModel(val api: RedditAPIService) : ViewModel() {
     var community: SubredditData? by mutableStateOf(null)
+        private set
 
     var rules: Rules by mutableStateOf(Rules())
-    var flairs: List<String> by mutableStateOf(emptyList())
+        private set
+    var flairs: List<FlairInfo> by mutableStateOf(emptyList())
+        private set
 
     var error: SubmissionBuilderError? by mutableStateOf(null)
+        protected set
 
     val titleState = TextFieldState()
 
@@ -46,6 +51,22 @@ abstract class CreatorViewModel(val api: RedditAPIService) : ViewModel() {
             val res = api.getRules(community!!.displayName)
             if (res.isSuccessful) {
                 rules = res.body()!!
+            }
+        }
+    }
+
+    fun setSubreddit(subreddit: SubredditData) {
+        community = subreddit
+        getRules()
+        getFlairs()
+    }
+
+    fun getFlairs() {
+        if (flairs.isNotEmpty() || community == null) return
+        viewModelScope.launch(Dispatchers.IO) {
+            val res = api.getPostFlair(community!!.displayName)
+            if (res.isSuccessful) {
+                flairs = res.body()!!
             }
         }
     }

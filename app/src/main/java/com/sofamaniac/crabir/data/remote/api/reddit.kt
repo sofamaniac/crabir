@@ -9,6 +9,7 @@
 package com.sofamaniac.crabir.data.remote.api
 
 import com.sofamaniac.crabir.data.remote.api.auth.RedditAuthApi
+import com.sofamaniac.crabir.data.remote.dto.LinkFlairRichtext
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
 import com.sofamaniac.crabir.data.remote.dto.Thing.More
@@ -165,6 +166,9 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
     @GET("r/{subreddit}/about/rules.json")
     suspend fun getRules(@Path("subreddit") subreddit: String): Response<Rules>
 
+    @GET("r/{subreddit}/api/link_flair.json")
+    suspend fun getPostFlair(@Path("subreddit") subreddit: String): Response<List<FlairInfo>>
+
     @FormUrlEncoded
     @POST("api/report")
     suspend fun report(
@@ -241,4 +245,13 @@ data class Rule(
     @SerialName("short_name") val shortName: String,
     @SerialName("violation_reason") val violationReason: String,
     val priority: Int,
+)
+
+@Serializable
+data class FlairInfo(
+    val text: String,
+    val richtext: List<LinkFlairRichtext> = emptyList(),
+    @SerialName("text_editable") val textEditable: Boolean = false,
+    val type: String = "text",
+    val id: String,
 )
