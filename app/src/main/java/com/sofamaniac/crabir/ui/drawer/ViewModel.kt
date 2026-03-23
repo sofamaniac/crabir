@@ -81,6 +81,14 @@ class DrawerViewModel @Inject constructor(
             initialValue = emptyList<Thing.Multi>()
         )
 
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (activeAccount.first().username.isBlank()) {
+                fetchUserInfo()
+            }
+        }
+    }
+
     fun logout() {
         viewModelScope.launch {
             try {
@@ -97,8 +105,12 @@ class DrawerViewModel @Inject constructor(
     }
 
     fun setActiveAccount(accountId: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             accountsRepository.setActiveAccount(accountId)
+            Log.d("LoginViewModel", "Setting active account to '${activeAccount.first().username}'")
+            if (activeAccount.first().username.isBlank()) {
+                fetchUserInfo()
+            }
         }
     }
 
@@ -157,6 +169,27 @@ class DrawerViewModel @Inject constructor(
         }
     }
 
+    private suspend fun fetchUserInfo() {
+        val accounts = accountsRepository.accounts.first()
+        val currentAccount = accountsRepository.activeAccount.first()
+        val user = redditApi.getIdentity()
+        if (user.isSuccessful) {
+            val identity = user.body()!!
+            Log.d("LoginViewModel", "Updating ${currentAccount.id}")
+            accountsRepository.updateAccount(
+                currentAccount.id,
+                currentAccount.copy(
+                    username = identity.username,
+                    thumbnailUrl = identity.iconImg
+                )
+            )
+
+        } else {
+            Log.e("LoginViewModel", "Failed to get user info: ${user.message()}")
+            accountsRepository.deleteAccount(accounts.size)
+        }
+    }
+
     fun visitCommunity(data: SubredditData) {
         viewModelScope.launch(Dispatchers.IO) {
             val entity = visitedCommunityDao.getCommunity(data.displayName)?.copy(data = data)
@@ -172,25 +205,8 @@ class DrawerViewModel @Inject constructor(
                 val newAccount = RedditAccount.uninitialized(accounts.size, authState)
                 accountsRepository.addAccount(newAccount)
                 accountsRepository.setActiveAccount(accounts.size)
-                try {
-                    val user = redditApi.getIdentity()
-                    if (user.isSuccessful) {
-                        val identity = user.body()!!
-                        accountsRepository.updateAccount(
-                            accounts.size,
-                            newAccount.copy(
-                                username = identity.username,
-                                thumbnailUrl = identity.iconImg
-                            )
-                        )
-                    } else {
-                        Log.e("LoginViewModel", "Failed to get user info: ${user.message()}")
-                        accountsRepository.deleteAccount(accounts.size)
-                    }
-                } catch (e: Exception) {
-                    Log.e("LoginViewModel", "Failed to get user info: $e")
-                    accountsRepository.deleteAccount(accounts.size)
-                }
+                Log.d("LoginViewModel", "save: fetching user info")
+                fetchUserInfo()
             } catch (e: Exception) {
                 Log.e("LoginViewModel", "Failed to save account: $e")
                 _loginState.value = LoginState.Error("Failed to save account.")
