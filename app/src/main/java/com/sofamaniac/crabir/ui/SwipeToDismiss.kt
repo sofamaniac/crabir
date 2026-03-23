@@ -126,7 +126,6 @@ enum class DismissValue {
 @Composable
 fun HorizontalSwipeToDismiss(
     modifier: Modifier = Modifier,
-    onDismiss: () -> Unit = {},
     content: @Composable RowScope.() -> Unit,
 ) {
     val positionalThreshold = { distance: Float -> distance * 0.5f }
@@ -135,6 +134,7 @@ fun HorizontalSwipeToDismiss(
     }
     val decayAnimationSpec = rememberSplineBasedDecay<Float>()
     val density = LocalDensity.current
+    val fullscreenManager = LocalFullscreenHandler.current!!
     @Suppress("DEPRECATION") val state by remember {
         mutableStateOf(
             AnchoredDraggableState(
@@ -155,7 +155,7 @@ fun HorizontalSwipeToDismiss(
 
     LaunchedEffect(state.settledValue) {
         if (state.settledValue != DismissValue.Default) {
-            onDismiss()
+            fullscreenManager.pop()
         }
     }
 
