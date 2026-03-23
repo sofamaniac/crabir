@@ -166,7 +166,7 @@ class DrawerViewModel @Inject constructor(
     }
 
     private fun save(authState: AuthState) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val accounts = accountsRepository.accounts.first()
                 val newAccount = RedditAccount.uninitialized(accounts.size, authState)
