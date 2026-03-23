@@ -34,9 +34,10 @@ fun ThemeSettingsPage() {
     val context = LocalContext.current
     val themeDataStore = remember(context) { context.themeDataStore }
 
-    val settings by themeDataStore.data.collectAsState(initial = ThemeSettings.DEFAULT)
+    val settings by themeDataStore.data.collectAsState(initial = null)
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current!!
+    if (settings == null) return
 
     Scaffold { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
@@ -52,7 +53,7 @@ fun ThemeSettingsPage() {
                 options = ThemeMode.entries.toList(),
                 selectedOption = {
                     Text(
-                        stringResource(settings.mode.toStringResource()),
+                        stringResource(settings!!.mode.toStringResource()),
                         style = MaterialTheme.typography.titleMedium
                     )
                 },
@@ -69,7 +70,7 @@ fun ThemeSettingsPage() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 SwitchTile(
                     headlineContent = { Text("Dynamic color") },
-                    checked = settings.dynamicColor,
+                    checked = settings!!.dynamicColor,
                     onCheckedChange = { target ->
                         scope.launch {
                             themeDataStore.updateData {
@@ -81,7 +82,7 @@ fun ThemeSettingsPage() {
             }
             ConditionalListItem(
                 text = "Edit Colors",
-                enabled = !settings.dynamicColor || Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
+                enabled = !settings!!.dynamicColor || Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
                 onClick = {
                     navController.navigate(ThemeEditorRoute)
                 },

@@ -134,7 +134,8 @@ fun ThemeEditor() {
 
 @Composable
 fun ThemePreviewer(setActiveField: (ColorFields) -> Unit) {
-    val theme = rememberAppTheme()!!
+    val theme = rememberAppTheme()
+    if (theme == null) return
     Card(
         modifier = Modifier.padding(16.dp),
         colors = CardDefaults.cardColors(containerColor = theme.cardBackground)
