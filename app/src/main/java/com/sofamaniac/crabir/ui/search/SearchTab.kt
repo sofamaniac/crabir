@@ -4,11 +4,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.pager.HorizontalPager
@@ -29,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Switch
@@ -391,9 +394,10 @@ inline fun <reified Sort> SortMenu(
         trailingContent = {
             ExposedDropdownMenuBox(
                 expanded = showMenu,
-                onExpandedChange = { showMenu = true },
+                onExpandedChange = { showMenu = it },
+                modifier = Modifier.width(IntrinsicSize.Min)
             ) {
-                TextField(
+                OutlinedTextField(
                     value = currentValueString,
                     onValueChange = {},
                     readOnly = true,
@@ -402,11 +406,12 @@ inline fun <reified Sort> SortMenu(
                             expanded = showMenu
                         )
                     },
-                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                    modifier = Modifier.menuAnchor(
-                        ExposedDropdownMenuAnchorType.PrimaryNotEditable,
-                        showMenu
-                    )
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    modifier = Modifier
+                        .width(IntrinsicSize.Min)
+                        .menuAnchor(
+                            ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                        )
                 )
                 ExposedDropdownMenu(
                     expanded = showMenu,
@@ -455,7 +460,7 @@ fun SearchSettings(viewModel: PostSearchViewModel) {
     val params by viewModel.params.collectAsState()
     Column {
         SortMenu<PostSearchSort>(
-            params.sort as PostSearchSort,
+            params.sort,
             params.timeframe
         ) { sort, timeframe ->
             viewModel.setSort(sort, timeframe)
