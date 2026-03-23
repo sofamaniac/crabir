@@ -27,7 +27,7 @@ android {
     compileSdk = 36
     defaultConfig {
         applicationId = "com.sofamaniac.crabir"
-        minSdk = 31
+        minSdk = 28
         targetSdk = 36
         versionCode = 13
         versionName = "0.5.1"
