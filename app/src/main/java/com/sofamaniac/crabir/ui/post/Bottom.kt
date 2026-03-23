@@ -7,16 +7,19 @@ package com.sofamaniac.crabir.ui.post
 import android.content.ClipData
 import android.content.Intent
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CallSplit
 import androidx.compose.material.icons.automirrored.filled.Comment
@@ -25,9 +28,8 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,13 +48,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.BuildConfig
@@ -138,110 +141,128 @@ private fun PostOptions(
     }
     var showOptions by remember { mutableStateOf(false) }
     val navController = LocalNavController.current!!
-    val context = LocalContext.current
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
-    var showDialog by remember { mutableStateOf(false) }
     var showShareDialog by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
-    Box {
-        IconButton(onClick = { showOptions = true }) {
-            Icon(Icons.Default.MoreVert, "more", tint = Color.Gray)
-        }
-        DropdownMenu(expanded = showOptions, onDismissRequest = { showOptions = false }) {
-            if (post.canModPost) {
-                DropdownMenuItem(
-                    leadingIcon = {
-                        Icon(
-                            Icons.Default.Shield,
-                            contentDescription = null
+    IconButton(onClick = { showOptions = true }) {
+        Icon(Icons.Default.MoreVert, "more", tint = Color.Gray)
+    }
+    if (showOptions) {
+        Dialog(onDismissRequest = { showOptions = false }) {
+            Card {
+                if (post.canModPost) {
+                    ListItem(
+                        leadingContent = {
+                            Icon(
+                                Icons.Default.Shield,
+                                contentDescription = null
+                            )
+                        },
+                        headlineContent = { Text("Moderation") },
+                    )
+                }
+                ListItem(
+                    leadingContent = {
+                        SubredditIcon(
+                            post.subreddit.name,
+                            icon = post.subredditDetails?.icon,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
                         )
                     },
-                    text = { Text("Moderation") },
-                    onClick = {},
+                    headlineContent = { Text("Go to ${post.subreddit.name}") },
+                    modifier = Modifier.clickable {
+                        navController.navigate(SubredditRoute(post.subreddit.name))
+                    }
                 )
-            }
-            DropdownMenuItem(
-                leadingIcon = {
-                    SubredditIcon(
-                        post.subreddit.name,
-                        icon = post.subredditDetails?.icon
-                    )
-                },
-                text = { Text("Go to ${post.subreddit.name}") }, onClick = {
-                    navController.navigate(SubredditRoute(post.subreddit.name))
-                }
-            )
-            DropdownMenuItem(
-                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                text = { Text("Go to ${post.author.username} profile") },
-                onClick = {
-                    navController.navigate(
-                        ProfileRoute(
-                            author = post.author.username,
-                            tab = ProfileTabs.Overview
+                ListItem(
+                    leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
+                    headlineContent = { Text("Go to ${post.author.username} profile") },
+                    modifier = Modifier.clickable {
+                        navController.navigate(
+                            ProfileRoute(
+                                author = post.author.username,
+                                tab = ProfileTabs.Overview
+                            )
                         )
-                    )
-                }
-            )
-            DropdownMenuItem(text = { Text("Hide / Unhide post") }, onClick = {
-                if (post.relationship.hidden) {
-                    viewModel.unhide()
-                } else {
-                    viewModel.hide()
-                }
-            })
-            DropdownMenuItem(text = { Text("Report") }, onClick = {
-                viewModel.getRules()
-                showReportDialog = true
-            })
-            DropdownMenuItem(text = { Text("Mute") }, onClick = {})
-            DropdownMenuItem(text = { Text("Share") }, onClick = {
-                showShareDialog = true
-            })
-            DropdownMenuItem(text = { Text("Copy") }, onClick = {
-                scope.launch {
-                    val clipData = ClipData.newPlainText("Post URL", post.url.toString())
-                    val clipEntry = ClipEntry(clipData)
-                    clipboard.setClipEntry(clipEntry)
-                }
-            })
-            if (BuildConfig.DEBUG) {
-                DropdownMenuItem(text = { Text("Post content") }, onClick = {
-                    Log.d("Post", prettyJson.encodeToString(post))
+                    }
+                )
+                ListItem(
+                    headlineContent = { Text("Hide / Unhide post") },
+                    modifier = Modifier.clickable {
+                        if (post.relationship.hidden) {
+                            viewModel.unhide()
+                        } else {
+                            viewModel.hide()
+                        }
+                    })
+                ListItem(headlineContent = { Text("Report") }, modifier = Modifier.clickable {
+                    viewModel.getRules()
+                    showReportDialog = true
                 })
+                ListItem(headlineContent = { Text("Mute") }, modifier = Modifier.clickable {})
+                ListItem(headlineContent = { Text("Share") }, modifier = Modifier.clickable {
+                    showShareDialog = true
+                })
+                ListItem(headlineContent = { Text("Copy") }, modifier = Modifier.clickable {
+                    scope.launch {
+                        val clipData = ClipData.newPlainText("Post URL", post.url.toString())
+                        val clipEntry = ClipEntry(clipData)
+                        clipboard.setClipEntry(clipEntry)
+                    }
+                })
+                if (BuildConfig.DEBUG) {
+                    ListItem(
+                        headlineContent = { Text("Post content") },
+                        modifier = Modifier.clickable {
+                            Log.d("Post", prettyJson.encodeToString(post))
+                        })
+                }
             }
         }
     }
     if (showShareDialog) {
         ShareMenu(post) {
             showShareDialog = false
+            showOptions = false
         }
     }
     if (showReportDialog) {
         ReportMenu(viewModel) {
             showReportDialog = false
+            showOptions = false
         }
     }
 }
 
 @Composable
 fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
-    val context = LocalContext.current
     val permalink = "https://reddit.com${post.permalink}"
+    val shareLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            onDismissRequest()
+        }
     Dialog(onDismissRequest) {
         Card(modifier = Modifier.padding(16.dp)) {
             ListItem(
                 leadingContent = { Icon(Icons.Default.Link, contentDescription = null) },
                 headlineContent = { Text("Share link") },
-                supportingContent = { Text(post.url) },
+                supportingContent = {
+                    Text(
+                        post.url,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 modifier = Modifier.clickable {
                     val intent = Intent(Intent.ACTION_SEND).apply {
                         putExtra(Intent.EXTRA_TEXT, post.url.toString())
                         type = "text/plain"
-                        putExtra(Intent.EXTRA_TITLE, post.title)
                     }
-                    context.startActivity(intent)
+                    val shareIntent = Intent.createChooser(intent, null)
+                    shareLauncher.launch(shareIntent)
                 }
             )
             ListItem(
@@ -252,14 +273,45 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
                     )
                 },
                 headlineContent = { Text("Share post") },
-                supportingContent = { Text(permalink) },
+                supportingContent = {
+                    Text(
+                        permalink,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 modifier = Modifier.clickable {
                     val intent = Intent(Intent.ACTION_SEND).apply {
                         putExtra(Intent.EXTRA_TEXT, permalink)
                         type = "text/plain"
-                        putExtra(Intent.EXTRA_TITLE, post.title)
                     }
-                    context.startActivity(intent)
+                    val shareIntent = Intent.createChooser(intent, null)
+                    shareLauncher.launch(shareIntent)
+                }
+            )
+            val titleLink = "${post.title} $permalink"
+            ListItem(
+                leadingContent = {
+                    Icon(
+                        Icons.Default.TextFields,
+                        contentDescription = null
+                    )
+                },
+                headlineContent = { Text("Share title + post") },
+                supportingContent = {
+                    Text(
+                        titleLink,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
+                modifier = Modifier.clickable {
+                    val intent = Intent(Intent.ACTION_SEND).apply {
+                        putExtra(Intent.EXTRA_TEXT, titleLink)
+                        type = "text/plain"
+                    }
+                    val shareIntent = Intent.createChooser(intent, null)
+                    shareLauncher.launch(shareIntent)
                 }
             )
             HorizontalDivider()
@@ -276,14 +328,20 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
             ListItem(
                 leadingContent = { Icon(Icons.Default.Link, contentDescription = null) },
                 headlineContent = { Text("Share shortlink") },
-                supportingContent = { Text(post.shortlink) },
+                supportingContent = {
+                    Text(
+                        post.shortlink,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 modifier = Modifier.clickable {
                     val intent = Intent(Intent.ACTION_SEND).apply {
                         putExtra(Intent.EXTRA_TEXT, post.shortlink)
                         type = "text/plain"
-                        putExtra(Intent.EXTRA_TITLE, post.title)
                     }
-                    context.startActivity(intent)
+                    val shareIntent = Intent.createChooser(intent, null)
+                    shareLauncher.launch(shareIntent)
                 }
             )
         }
