@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -55,6 +56,7 @@ fun CommentListRoot(
             item {
                 if (post != null) {
                     PostView(post!!, threadViewModel = viewModel)
+                    HorizontalDivider()
                 }
             }
             if (comments.isEmpty() && !isRefreshing) {
@@ -93,6 +95,7 @@ fun CommentListRoot(
                             .depthIndent(comment.depth, color = Color.Gray)
                     )
                 }
+                HorizontalDivider()
             }
             item {
                 Spacer(modifier = Modifier.fillParentMaxHeight(0.1f))
