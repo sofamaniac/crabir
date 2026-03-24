@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationResponse
@@ -83,14 +84,18 @@ class DrawerViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            if (activeAccount.first().username.isBlank()) {
+            val activeAccount = accountsRepository.activeAccount.first()
+            if (activeAccount.isAnonymous()) {
+                return@launch
+            }
+            if (activeAccount.info?.username.isNullOrBlank()) {
                 fetchUserInfo()
             }
         }
     }
 
     fun logout() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val res = redditApi.logout(activeAccount.first().auth.refreshToken!!)
                 if (res.isSuccessful) {
@@ -107,8 +112,14 @@ class DrawerViewModel @Inject constructor(
     fun setActiveAccount(accountId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             accountsRepository.setActiveAccount(accountId)
-            Log.d("LoginViewModel", "Setting active account to '${activeAccount.first().username}'")
-            if (activeAccount.first().username.isBlank()) {
+            Log.d(
+                "LoginViewModel",
+                "Setting active account to '${activeAccount.first().info?.username ?: "Anonymous"}'"
+            )
+            if (accountId == -1) {
+                return@launch
+            }
+            if (activeAccount.first().info?.username.isNullOrBlank()) {
                 fetchUserInfo()
             }
         }
@@ -162,9 +173,10 @@ class DrawerViewModel @Inject constructor(
 
                 tokenResponse != null -> {
                     val authState = AuthState(authResponse, tokenResponse, null)
-                    save(authState)
+                    runBlocking(Dispatchers.IO) {
+                        save(authState)
+                    }
                 }
-
             }
         }
     }
@@ -179,14 +191,13 @@ class DrawerViewModel @Inject constructor(
             accountsRepository.updateAccount(
                 currentAccount.id,
                 currentAccount.copy(
-                    username = identity.username,
-                    thumbnailUrl = identity.iconImg
+                    info = identity,
                 )
             )
 
         } else {
             Log.e("LoginViewModel", "Failed to get user info: ${user.message()}")
-            accountsRepository.deleteAccount(accounts.size)
+            //accountsRepository.deleteAccount(accounts.size)
         }
     }
 
@@ -198,19 +209,17 @@ class DrawerViewModel @Inject constructor(
         }
     }
 
-    private fun save(authState: AuthState) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val accounts = accountsRepository.accounts.first()
-                val newAccount = RedditAccount.uninitialized(accounts.size, authState)
-                accountsRepository.addAccount(newAccount)
-                accountsRepository.setActiveAccount(accounts.size)
-                Log.d("LoginViewModel", "save: fetching user info")
-                fetchUserInfo()
-            } catch (e: Exception) {
-                Log.e("LoginViewModel", "Failed to save account: $e")
-                _loginState.value = LoginState.Error("Failed to save account.")
-            }
+    private suspend fun save(authState: AuthState) {
+        try {
+            val accounts = accountsRepository.accounts.first()
+            val newAccount = RedditAccount.uninitialized(accounts.size, authState)
+            accountsRepository.addAccount(newAccount)
+            accountsRepository.setActiveAccount(accounts.size)
+            Log.d("LoginViewModel", "save: fetching user info")
+            fetchUserInfo()
+        } catch (e: Exception) {
+            Log.e("LoginViewModel", "Failed to save account: $e")
+            _loginState.value = LoginState.Error("Failed to save account.")
         }
     }
 }

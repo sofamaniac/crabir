@@ -61,6 +61,7 @@ import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
@@ -145,6 +146,7 @@ private fun PostOptions(
     val navController = LocalNavController.current!!
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
+    val currentAccount = rememberCurrentAccount()
     var showShareDialog by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
     IconButton(onClick = { showOptions = true }) {
@@ -162,6 +164,17 @@ private fun PostOptions(
                             )
                         },
                         headlineContent = { Text("Moderation") },
+                    )
+                }
+                if (post.author.authorFullname == currentAccount.info?.name?.name) {
+                    ListItem(
+                        leadingContent = {
+                            Icon(
+                                Icons.Default.Shield,
+                                contentDescription = null
+                            )
+                        },
+                        headlineContent = { Text("Edit") },
                     )
                 }
                 ListItem(

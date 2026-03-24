@@ -49,6 +49,40 @@ interface PostAPI {
         @Field("mimetype") mimetype: String
     ): Response<MediaUploadResponse>
 
+    @FormUrlEncoded
+    @POST("api/spoiler")
+    /** Mark post as spoiler */
+    suspend fun spoiler(@Query("id") postFullname: Fullname): Response<Unit>
+
+    @FormUrlEncoded
+    @POST("api/unspoiler")
+    /** Unmark post as spoiler */
+    suspend fun unspoiler(@Field("id") postFullname: Fullname): Response<Unit>
+
+    @FormUrlEncoded
+    @POST("api/marknsfw")
+    suspend fun markNSFW(@Field("id") postFullname: Fullname): Response<Unit>
+
+    @FormUrlEncoded
+    @POST("api/unmarknsfw")
+    suspend fun unmarkNSFW(@Field("id") postFullname: Fullname): Response<Unit>
+
+    @FormUrlEncoded
+    @POST("api/editusertext")
+    /** Edit the body text of a comment or self post */
+    suspend fun editUserText(
+        @Field("thing_id") postFullname: Fullname,
+        @Field("text") text: String,
+        @Field("api_type") apiType: String = "json",
+        @Field("video_poster_url") videoPosterUrl: String? = null,
+    ): Response<Unit>
+
+    @FormUrlEncoded
+    @POST("api/sendreplies")
+    suspend fun setSendReplies(
+        @Field("id") postFullname: Fullname,
+        @Field("state") sendReplies: Boolean,
+    )
 }
 
 interface MediaUploadInterface {

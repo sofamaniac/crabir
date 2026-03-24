@@ -1,13 +1,11 @@
 package com.sofamaniac.crabir.di
 
-import android.content.Context
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
-import com.sofamaniac.crabir.domain.repository.AccountsRepositoryImpl
+import com.sofamaniac.crabir.domain.repository.AccountsRepositoryImplRoom
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import jakarta.inject.Qualifier
 import jakarta.inject.Singleton
@@ -18,18 +16,15 @@ import kotlinx.coroutines.SupervisorJob
 @Module
 @InstallIn(SingletonComponent::class)
 object AccountsModule {
-
-    @Provides
-    @Singleton
-    fun providesAccountsRepository(
-        @ApplicationContext context: Context,
-        @ApplicationScope coroutineScope: CoroutineScope,
-    ): AccountsRepositoryImpl {
-        return AccountsRepositoryImpl(
-            context, coroutineScope
-        )
-
-    }
+//
+//    @Provides
+//    @Singleton
+//    fun providesAccountsRepository(
+//        accountsDao: AccountsDao
+//    ): AccountsRepository {
+//        return AccountsRepositoryImplRoom(accountsDao)
+//
+//    }
 
     @ApplicationScope
     @Provides
@@ -46,7 +41,7 @@ abstract class AccountsModuleAbstract {
     @Binds
     @Singleton
     abstract fun bindsAccountsRepository(
-        accountsRepositoryImpl: AccountsRepositoryImpl
+        accountsRepository: AccountsRepositoryImplRoom
     ): AccountsRepository
 }
 

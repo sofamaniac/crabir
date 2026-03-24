@@ -1,13 +1,13 @@
 package com.sofamaniac.crabir.domain.repository
 
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import net.openid.appauth.AuthState
 
 interface AccountsRepository {
-    val accounts: StateFlow<List<RedditAccount>>
-    val activeAccount: StateFlow<RedditAccount>
-    val activeAccountId: StateFlow<Int>
+    val accounts: Flow<List<RedditAccount>>
+    val activeAccount: Flow<RedditAccount>
+    val activeAccountId: Flow<Int>
 
     suspend fun addAccount(account: RedditAccount)
     suspend fun setActiveAccount(accountId: Int)

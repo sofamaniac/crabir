@@ -53,7 +53,7 @@ fun NavGraphBuilder.profileGraph(navController: NavController) {
             // TODO: ask user to log in
             return@composable
         }
-        ProfileView(currentAccount.username, initialTab = ProfileTabs.Saved)
+        ProfileView(currentAccount.info!!.username, initialTab = ProfileTabs.Saved)
     }
 
     composable<ProfileRoute> {

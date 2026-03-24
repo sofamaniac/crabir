@@ -180,5 +180,5 @@ fun ProfileView(
 @HiltViewModel
 class ProfileViewModel @Inject constructor(accountsRepository: AccountsRepository) :
     ViewModel() {
-    val currentUser = accountsRepository.activeAccount.map { it.username }
+    val currentUser = accountsRepository.activeAccount.map { it.info!!.username }
 }

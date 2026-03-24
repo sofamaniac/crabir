@@ -16,6 +16,7 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -29,8 +30,10 @@ fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: () -> Unit) 
         .size(32.dp)
         .padding(4.dp)
         .clip(CircleShape)
+    val accounts by viewModel.accountsList.collectAsState(initial = Collections.emptyList())
+    Log.d("AccountSelector", "accounts: $accounts")
     Column {
-        for (account in viewModel.accountsList.collectAsState(initial = Collections.emptyList()).value) {
+        for (account in accounts) {
             AccountTile(
                 account,
                 onClick = {
@@ -40,6 +43,13 @@ fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: () -> Unit) 
                 iconModifier = iconModifier
             )
         }
+        AccountTile(
+            RedditAccount.anonymous(),
+            onClick = {
+                viewModel.setActiveAccount(-1)
+                onAccountSelection()
+            }
+        )
         val authLauncher = rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -86,25 +96,25 @@ fun AccountTile(
     iconModifier: Modifier = Modifier,
     badge: @Composable (() -> Unit)? = null
 ) {
-    val image = if (account.thumbnailUrl.isBlank()) {
+    val image = if (account.info == null) {
         @Composable {
             Icon(
                 Icons.Default.Person,
-                contentDescription = "${account.username} icon",
+                contentDescription = "Anonymous icon",
                 modifier = iconModifier
             )
         }
     } else {
         @Composable {
             AsyncImage(
-                model = account.thumbnailUrl,
-                contentDescription = "${account.username} thumbnail",
+                model = account.info.iconImg,
+                contentDescription = "${account.info.username} thumbnail",
                 modifier = iconModifier
             )
         }
     }
     NavigationDrawerItem(
-        label = { Text(account.username) },
+        label = { Text(account.info?.username ?: "Anonymous") },
         selected = false,
         onClick = onClick,
         icon = image,

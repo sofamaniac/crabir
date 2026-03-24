@@ -47,7 +47,7 @@ fun TabBar(
         TabRepresentation(
             Icons.Filled.Person,
             R.string.Profile,
-            ProfileRoute(user.username, ProfileTabs.Overview)
+            ProfileRoute(user.info?.username ?: "Anonymous", ProfileTabs.Overview)
         )
     )
     val navController = LocalNavController.current!!

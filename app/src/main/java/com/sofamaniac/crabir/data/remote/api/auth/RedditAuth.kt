@@ -12,7 +12,8 @@ import android.util.Log
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import jakarta.inject.Inject
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.ClientAuthentication
@@ -28,11 +29,11 @@ class RedditAuthenticator @Inject constructor(
     private val clientAuth: ClientAuthentication,
 ) : Interceptor {
 
-    private val activeAccount: StateFlow<RedditAccount> = accountsRepository.activeAccount
+    private val activeAccount: Flow<RedditAccount> = accountsRepository.activeAccount
 
     override fun intercept(chain: Interceptor.Chain): Response {
         Log.d("RedditAuthenticator", "Authenticating with $activeAccount")
-        val activeAccount = activeAccount.value
+        val activeAccount = runBlocking { activeAccount.first() }
 
         if (activeAccount.isAnonymous()) {
             Log.w("RedditAuthenticator", "Anonymous account")

@@ -13,15 +13,19 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.util.fastFirstOrNull
-import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
 import androidx.datastore.dataStore
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import com.sofamaniac.crabir.data.local.dao.AccountsDao
+import com.sofamaniac.crabir.data.local.entities.toDomainModel
+import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -34,6 +38,7 @@ import net.openid.appauth.AuthState
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Collections.emptyList
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Serializable
@@ -62,13 +67,16 @@ object AccountsSerializer : Serializer<Accounts> {
     override val defaultValue: Accounts
         get() = Accounts(listOf(RedditAccount.anonymous()), -1)
 
+    private val json = Json { ignoreUnknownKeys = true }
+
     override suspend fun readFrom(input: InputStream): Accounts {
         try {
-            return Json.decodeFromString<Accounts>(
+            return json.decodeFromString<Accounts>(
                 input.readBytes().decodeToString()
             )
         } catch (serialization: SerializationException) {
-            throw CorruptionException("Unable to read Settings", serialization)
+            Log.e("AccountsSerializer", "Error reading Settings", serialization)
+            return defaultValue
         }
     }
 
@@ -85,16 +93,65 @@ object AccountsSerializer : Serializer<Accounts> {
 }
 
 @Composable
-fun rememberCurrentAccount(): RedditAccount {
-    val context = LocalContext.current
-    val dataStore = remember(context) { context.accountsDataStore }
-    val accounts by dataStore.data.collectAsState(
-        initial = Accounts(emptyList(), -1)
-    )
-    return accounts.getCurrent()
+fun rememberCurrentAccount(viewModel: CurrentAccountViewModel = hiltViewModel()): RedditAccount {
+    val account by viewModel.account.collectAsState(RedditAccount.anonymous())
+    return account
+}
+
+@HiltViewModel
+class CurrentAccountViewModel @Inject constructor(accountsDao: AccountsDao) : ViewModel() {
+    val account =
+        accountsDao.getActiveAccount().map { it?.toDomainModel() ?: RedditAccount.anonymous() }
 }
 
 @Singleton
+class AccountsRepositoryImplRoom @Inject constructor(
+    private val accountsDao: AccountsDao,
+) : AccountsRepository {
+    override val accounts: Flow<List<RedditAccount>> =
+        accountsDao.getAll().map { it.map { account -> account.toDomainModel() } }
+    override val activeAccount: Flow<RedditAccount> =
+        accountsDao.getActiveAccount().map { it?.toDomainModel() ?: RedditAccount.anonymous() }
+    override val activeAccountId: Flow<Int> = accountsDao.getActiveAccount().map {
+        it?.id ?: -1
+    }
+
+    override suspend fun addAccount(account: RedditAccount) {
+        val entity = account.toEntity()
+        accountsDao.insert(entity)
+    }
+
+    override suspend fun setActiveAccount(accountId: Int) {
+        accountsDao.setActiveAccount(accountId)
+    }
+
+    override suspend fun deleteAccount(accountId: Int) {
+        accountsDao.delete(accountId)
+    }
+
+    override suspend fun updateAccount(
+        accountId: Int,
+        account: RedditAccount
+    ) {
+        val newEntity = account.toEntity()
+        accountsDao.updateAccount(accountId, newEntity)
+    }
+
+    override suspend fun updateAuthState(
+        accountId: Int,
+        authState: AuthState
+    ) {
+        val authState = Json.encodeToString(authState)
+        accountsDao.updateAuthState(accountId, authState)
+    }
+
+    override suspend fun clearAll() {
+        TODO("Not yet implemented")
+    }
+
+}
+
+//@Singleton
 class AccountsRepositoryImpl(
     context: Context,
     coroutineScope: CoroutineScope
@@ -138,7 +195,7 @@ class AccountsRepositoryImpl(
     override suspend fun addAccount(account: RedditAccount) {
         Log.d("AccountsRepositoryImpl", "addAccount: $account")
         dataStore.updateData { accounts ->
-            if (accounts.accounts.any { it.username == account.username }) {
+            if (accounts.accounts.any { (it.info?.name ?: "") == account.info?.name }) {
                 Log.e("AccountsRepositoryImpl", "Account already exists: $account")
                 accounts
             } else {
@@ -155,10 +212,14 @@ class AccountsRepositoryImpl(
     }
 
     override suspend fun deleteAccount(accountId: Int) {
+        if (accountId == -1) {
+            return
+        }
+        Log.d("AccountsRepositoryImpl", "deleteAccount: $accountId")
         dataStore.updateData { accounts ->
             accounts.copy(
                 activeId = -1,
-                accounts = accounts.accounts.filter { it.id != accountId && it.username.isNotEmpty() }
+                accounts = accounts.accounts.filter { it.id != accountId }
             )
         }
     }
@@ -166,14 +227,14 @@ class AccountsRepositoryImpl(
     override suspend fun updateAccount(accountId: Int, account: RedditAccount) {
         dataStore.updateData { accounts ->
             val duplicateIndex =
-                accounts.accounts.indexOfFirst { it.username == account.username }
+                accounts.accounts.indexOfFirst { it.info?.username == account.info?.username }
             if (duplicateIndex != -1 && duplicateIndex != accountId) {
                 Log.e("AccountsRepositoryImpl", "Account already exists: $account")
                 val accountsList = accounts.accounts.toMutableList()
                 accountsList[duplicateIndex] = account
 
                 return@updateData accounts.copy(
-                    accounts = accountsList.filter { it.username.isNotEmpty() }
+                    accounts = accountsList.filter { it.id != accountId }
                 )
             }
             val accountIndex = accounts.accounts.indexOfFirst { it.id == accountId }
