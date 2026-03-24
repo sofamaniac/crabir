@@ -105,78 +105,86 @@ fun EmbeddedGallery(
     } else {
         modifier
     }
-    Box(modifier = modifier.clickable { goFullscreen() }) {
-        val backgroundUrl = when (val current = gallery.get(state.currentPage)) {
-            is MediaMetadata.Gif -> {
-                val resource = current.preview.lastOrNull()?.toMediaResource()
-                resource?.url
-            }
 
-            is MediaMetadata.Image -> {
-                current.preview!!.last().url
-            }
 
-            else -> null
-        }
-
-        if (backgroundUrl != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            AsyncImage(
-                backgroundUrl,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .blur(40.dp),
-                contentScale = ContentScale.FillBounds,
-                contentDescription = null,
-            )
-        }
-
+    Box(
+        modifier = Modifier
+            .clickable { goFullscreen() }
+            .aspectRatio(gallery.aspectRatio)
+    ) {
         Gallery(
             gallery,
             modifier.aspectRatio(gallery.aspectRatio),
             state,
             enableScroll = !blur,
         ) { metadata, page ->
-            when (metadata) {
-                is MediaMetadata.Image -> ImageView(
-                    metadata.toMediaResource(),
-                    allowTransformation = false,
-                )
+            Box {
+                val backgroundUrl = when (metadata) {
+                    is MediaMetadata.Gif -> {
+                        val resource = metadata.preview.lastOrNull()?.toMediaResource()
+                        resource?.url
+                    }
 
-                is MediaMetadata.Gif ->
-                    DecoratedVideoPlayer(
-                        media = metadata.toMediaResource(),
-                        modifier = Modifier.fillMaxSize(),
-                        startPlaying = canPlayVideo && state.currentPage == page && !blur,
-                        clickable = !blur,
-                        placeholder = {
-                            val resource = metadata.preview.lastOrNull()?.toMediaResource()
-                            if (resource != null) {
-                                ImageView(
-                                    resource,
-                                    allowTransformation = false,
-                                )
-                            }
-                        },
-                        fullscreenButton = {
-                            IconButton(onClick = goFullscreen) {
-                                Icon(
-                                    Icons.Default.Fullscreen,
-                                    contentDescription = "Go Fullscreen"
-                                )
-                            }
-                        }
+                    is MediaMetadata.Image -> {
+                        metadata.preview!!.last().url
+                    }
+
+                    else -> null
+                }
+                if (backgroundUrl != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    AsyncImage(
+                        backgroundUrl,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .blur(40.dp),
+                        contentScale = ContentScale.FillBounds,
+                        contentDescription = null,
+                    )
+                }
+                when (metadata) {
+                    is MediaMetadata.Image -> ImageView(
+                        metadata.toMediaResource(),
+                        allowTransformation = false,
+                        modifier = Modifier.align(Alignment.Center)
                     )
 
+                    is MediaMetadata.Gif ->
+                        DecoratedVideoPlayer(
+                            media = metadata.toMediaResource(),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .align(Alignment.Center),
+                            startPlaying = canPlayVideo && state.currentPage == page && !blur,
+                            clickable = !blur,
+                            placeholder = {
+                                val resource = metadata.preview.lastOrNull()?.toMediaResource()
+                                if (resource != null) {
+                                    ImageView(
+                                        resource,
+                                        allowTransformation = false,
+                                    )
+                                }
+                            },
+                            fullscreenButton = {
+                                IconButton(onClick = goFullscreen) {
+                                    Icon(
+                                        Icons.Default.Fullscreen,
+                                        contentDescription = "Go Fullscreen"
+                                    )
+                                }
+                            }
+                        )
 
-                else -> {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = Color(154, 154, 154, 255)
-                    ) {
-                        Icon(Icons.Default.Warning, contentDescription = "Content not found")
+
+                    else -> {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            color = Color(154, 154, 154, 255)
+                        ) {
+                            Icon(Icons.Default.Warning, contentDescription = "Content not found")
+                        }
                     }
                 }
-
             }
         }
         val text = if (blur) {

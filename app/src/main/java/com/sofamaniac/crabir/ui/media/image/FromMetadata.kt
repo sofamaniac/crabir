@@ -40,7 +40,7 @@ fun ImageView(
     allowTransformation: Boolean = true,
     onClick: () -> Unit = {}
 ) {
-    val modifier = Modifier
+    val modifier = modifier
         .fillMaxWidth()
         .aspectRatio(media.aspectRatio)
     TransformableImage(
