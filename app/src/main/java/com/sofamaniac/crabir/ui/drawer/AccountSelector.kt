@@ -26,7 +26,7 @@ import java.util.Collections
 @Composable
 fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: () -> Unit) {
     val iconModifier = Modifier
-        .size(48.dp)
+        .size(32.dp)
         .padding(4.dp)
         .clip(CircleShape)
     Column {

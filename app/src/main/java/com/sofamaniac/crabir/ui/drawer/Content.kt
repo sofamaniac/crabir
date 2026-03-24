@@ -99,7 +99,7 @@ fun DrawerContent(
                 account,
                 onClick = viewModel::toggleSelectAccount,
                 iconModifier = Modifier
-                    .size(48.dp)
+                    .size(32.dp)
                     .clip(CircleShape),
                 badge = {
                     Icon(
