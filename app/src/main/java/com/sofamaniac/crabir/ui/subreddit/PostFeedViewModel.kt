@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -61,11 +60,12 @@ abstract class PostFeedViewModel(
     private val visitedCommunityDao: VisitedCommunityDao,
 ) : ViewModel(), FeedViewModelInterface {
 
-    override val entity: Flow<VisitedCommunityEntity?> = flowOf(null)
+    override val entity: Flow<VisitedCommunityEntity?> = visitedCommunityDao.getCommunityFlow(id)
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
             val e = entity.firstOrNull()
+            Log.d("PostFeedViewModel", "init: $e")
             if (e?.sort != null) {
                 _params.update {
                     it.copy(sort = e.sort, timeframe = e.timeframe)
