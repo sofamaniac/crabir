@@ -8,7 +8,7 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import kotlinx.serialization.json.Json
 
 @Entity(tableName = "accounts", indices = [Index(value = ["name"], unique = true)])
-data class RedditAccountEntity (
+data class RedditAccountEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val name: String,
@@ -28,9 +28,14 @@ fun RedditAccountEntity.toDomainModel(): RedditAccount {
 
 fun RedditAccount.toEntity(): RedditAccountEntity {
     return RedditAccountEntity(
-        id = id,
         info = Json.encodeToString(info),
         authState = Json.encodeToString(AuthStateSerializer, auth),
         name = info?.name?.name ?: "Anonymous",
-    )
+    ).let {
+        if (!isUninitialized()) {
+            it.copy(id = id)
+        } else {
+            it
+        }
+    }
 }

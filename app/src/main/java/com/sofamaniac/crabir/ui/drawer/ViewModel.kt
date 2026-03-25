@@ -211,10 +211,10 @@ class DrawerViewModel @Inject constructor(
 
     private suspend fun save(authState: AuthState) {
         try {
-            val accounts = accountsRepository.accounts.first()
-            val newAccount = RedditAccount.uninitialized(accounts.size, authState)
+            val newAccount = RedditAccount.uninitialized(authState)
             accountsRepository.addAccount(newAccount)
-            accountsRepository.setActiveAccount(accounts.size)
+            val lastIndex = accountsRepository.accounts.first().last().id
+            accountsRepository.setActiveAccount(lastIndex)
             Log.d("LoginViewModel", "save: fetching user info")
             fetchUserInfo()
         } catch (e: Exception) {

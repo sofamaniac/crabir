@@ -44,13 +44,17 @@ data class RedditAccount(
             return RedditAccount(-1, null, AuthState())
         }
 
-        fun uninitialized(id: Int, authState: AuthState): RedditAccount {
-            return RedditAccount(id, null, authState)
+        fun uninitialized(authState: AuthState): RedditAccount {
+            return RedditAccount(-2, null, authState)
         }
     }
 
     fun isAnonymous(): Boolean {
         return id == -1
+    }
+
+    fun isUninitialized(): Boolean {
+        return id == -2
     }
 }
 
