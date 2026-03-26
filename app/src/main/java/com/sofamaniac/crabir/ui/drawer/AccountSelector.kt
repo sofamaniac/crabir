@@ -38,7 +38,7 @@ import java.util.Collections
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: () -> Unit) {
+fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: (Int) -> Unit) {
     val iconModifier = Modifier
         .size(32.dp)
         .padding(4.dp)
@@ -57,8 +57,7 @@ fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: () -> Unit) 
             AccountTile(
                 account,
                 onClick = {
-                    viewModel.setActiveAccount(account.id)
-                    onAccountSelection()
+                    onAccountSelection(account.id)
                 },
                 iconModifier = iconModifier
             )
@@ -66,8 +65,7 @@ fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: () -> Unit) 
         AccountTile(
             RedditAccount.anonymous(),
             onClick = {
-                viewModel.setActiveAccount(-1)
-                onAccountSelection()
+                onAccountSelection(-1)
             }
         )
         NavigationDrawerItem(

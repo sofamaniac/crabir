@@ -111,11 +111,12 @@ fun DrawerContent(
                     )
                 })
             AnimatedVisibility(selectingAccount) {
-                AccountSelector(viewModel) {
+                AccountSelector(viewModel) { id ->
                     coroutineScope.launch {
                         drawerState.close()
+                        viewModel.toggleSelectAccount()
+                        viewModel.setActiveAccount(id)
                     }
-                    viewModel.toggleSelectAccount()
                 }
             }
             HorizontalDivider()
@@ -128,9 +129,9 @@ fun DrawerContent(
                         modifier = Modifier.size(32.dp)
                     )
                 }, selected = false, onClick = {
-                    navController.navigate(feed.route)
                     coroutineScope.launch {
                         drawerState.close()
+                        navController.navigate(feed.route)
                     }
                 })
             }
@@ -152,16 +153,17 @@ fun DrawerContent(
                         )
                     },
                     onClick = {
-                        navController.navigate(
-                            MultiRoute(
-                                multi.data.displayName,
-                                multi.data.permalink,
-                            )
-                        )
                         coroutineScope.launch {
                             drawerState.close()
+                            navController.navigate(
+                                MultiRoute(
+                                    multi.data.displayName,
+                                    multi.data.permalink,
+                                )
+                            )
                         }
-                    })
+                    }
+                )
             }
             for (subreddit in sortedSubscriptions ?: emptyList()) {
                 NavigationDrawerItem(
@@ -177,18 +179,18 @@ fun DrawerContent(
                         )
                     },
                     onClick = {
-                        viewModel.visitCommunity(
-                            SubredditDetailsMapper.map(
-                                subreddit.data
-                            )
-                        )
-                        navController.navigate(
-                            SubredditRoute(
-                                subreddit.data.displayName
-                            )
-                        )
                         coroutineScope.launch {
                             drawerState.close()
+                            viewModel.visitCommunity(
+                                SubredditDetailsMapper.map(
+                                    subreddit.data
+                                )
+                            )
+                            navController.navigate(
+                                SubredditRoute(
+                                    subreddit.data.displayName
+                                )
+                            )
                         }
                     })
             }
@@ -235,9 +237,9 @@ fun SettingsTile() {
         icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
         selected = false,
         onClick = {
-            navController.navigate(SettingsRoute)
             coroutineScope.launch {
                 drawerState.close()
+                navController.navigate(SettingsRoute)
             }
         }
     )
