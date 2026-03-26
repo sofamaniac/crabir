@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.sofamaniac.crabir.data.remote.api.MediaUploadInterface
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.api.auth.RedditAuthenticator
+import com.sofamaniac.crabir.data.remote.interceptors.CountInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.ForceJsonInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.RateLimitInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.loggingInterceptor
@@ -70,6 +71,7 @@ object NetworkModule {
             .addInterceptor(rateLimitInterceptor)
             .addInterceptor(forceJsonInterceptor)
             .addInterceptor(loggingInterceptor)
+            .addInterceptor(CountInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .build()

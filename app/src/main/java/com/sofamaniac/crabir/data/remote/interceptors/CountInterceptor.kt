@@ -1,16 +1,16 @@
 package com.sofamaniac.crabir.data.remote.interceptors
 
+import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class NetworkInterceptor : Interceptor {
+object CountInterceptor : Interceptor {
+    var count = 0
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         val response = chain.proceed(request)
-
-        // Log the response body here for debugging
-        //val responseBody = response.peekBody(Long.MAX_VALUE).string()
-        //println("Response Body: $responseBody")
+        count += 1
+        Log.d("CountInterceptor", "Request count this session: $count")
 
         return response
     }

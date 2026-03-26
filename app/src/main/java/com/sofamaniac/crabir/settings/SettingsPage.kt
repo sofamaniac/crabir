@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.sofamaniac.crabir.data.remote.interceptors.CountInterceptor
 import com.sofamaniac.crabir.navigation.LicensesRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ThemeRoute
@@ -50,6 +51,10 @@ fun SettingsPage() {
                 modifier = Modifier.clickable {
                     navController.navigate(LicensesRoute)
                 }
+            )
+            ListItem(
+                headlineContent = { Text("Number of request this session") },
+                supportingContent = { Text(CountInterceptor.count.toString()) }
             )
         }
     }
