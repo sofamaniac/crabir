@@ -37,11 +37,20 @@ interface AccountsDao {
         activate(accountId)
     }
 
+    @Query("SELECT * FROM accounts WHERE name = :name LIMIT 1")
+    fun getByName(name: String): RedditAccountEntity?
+
+
     @Transaction
-    fun updateAccount(accountIdi: Int, account: RedditAccountEntity) {
-        updateName(accountIdi, account.name)
-        updateInfo(accountIdi, account.info)
-        updateAuthState(accountIdi, account.authState)
+    fun updateAccount(accountId: Int, account: RedditAccountEntity) {
+        //  If there is already an account with the same name, delete it
+        val candidate = getByName(account.name)
+        if (candidate?.id != null && candidate.id != accountId) {
+            delete(candidate.id)
+        }
+        updateName(accountId, account.name)
+        updateInfo(accountId, account.info)
+        updateAuthState(accountId, account.authState)
     }
 
     @Query("UPDATE accounts SET name = :name WHERE id = :accountId")
