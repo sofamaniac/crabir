@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import com.sofamaniac.crabir.data.local.dao.AccountsDao
 import com.sofamaniac.crabir.data.local.entities.toDomainModel
 import com.sofamaniac.crabir.data.local.entities.toEntity
+import com.sofamaniac.crabir.domain.model.AuthStateSerializer
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -141,7 +142,7 @@ class AccountsRepositoryImplRoom @Inject constructor(
         accountId: Int,
         authState: AuthState
     ) {
-        val authState = Json.encodeToString(authState)
+        val authState = Json.encodeToString(AuthStateSerializer, authState)
         accountsDao.updateAuthState(accountId, authState)
     }
 
