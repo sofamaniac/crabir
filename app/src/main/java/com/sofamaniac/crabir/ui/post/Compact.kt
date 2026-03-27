@@ -28,10 +28,10 @@ fun CompactView(
     onClick: (PostData) -> Unit = {},
     canStartVideo: Boolean = false,
     read: Boolean = false,
-    viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
+    viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
-            factory.create(post.name.name, post.subreddit.name)
+            factory.create(post)
         }),
 ) {
     val theme = LocalTheme.current

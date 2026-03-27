@@ -52,7 +52,7 @@ interface PostAPI {
     @FormUrlEncoded
     @POST("api/spoiler")
     /** Mark post as spoiler */
-    suspend fun spoiler(@Query("id") postFullname: Fullname): Response<Unit>
+    suspend fun spoiler(@Field("id") postFullname: Fullname): Response<Unit>
 
     @FormUrlEncoded
     @POST("api/unspoiler")
@@ -82,7 +82,7 @@ interface PostAPI {
     suspend fun setSendReplies(
         @Field("id") postFullname: Fullname,
         @Field("state") sendReplies: Boolean,
-    )
+    ): Response<Unit>
 }
 
 interface MediaUploadInterface {

@@ -16,7 +16,9 @@ import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.ui.thread.updateComment
+import kotlinx.coroutines.flow.first
 import retrofit2.Response
+import javax.inject.Inject
 
 interface ThreadRepository {
     suspend fun getComments(
@@ -43,10 +45,11 @@ interface ThreadRepository {
 
 }
 
-class ThreadRepositoryImpl(
+class ThreadRepositoryImpl @Inject constructor(
     val api: RedditAPIService,
     val visitedPostsDao: VisitedPostsDao,
-    val votableRepository: VotableRepository
+    val commentsRepository: VotableRepository,
+    val postsRepository: LinksRepository,
 ) :
     ThreadRepository {
     private var post: PostData? = null
@@ -69,7 +72,7 @@ class ThreadRepositoryImpl(
                         CommentType.More((comment as Thing.More).data)
                     }
                 }
-                votableRepository.addPost(post!!)
+                postsRepository.insert(listOf(post!!))
             }
         }
     }
@@ -78,7 +81,7 @@ class ThreadRepositoryImpl(
         if (post != null) {
             return post
         } else {
-            post = votableRepository.getPost(name) as? PostData?
+            post = postsRepository.get(name).first() as? PostData?
         }
         return post
     }

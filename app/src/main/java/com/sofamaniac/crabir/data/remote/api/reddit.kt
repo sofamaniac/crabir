@@ -166,7 +166,7 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
     @GET("r/{subreddit}/about/rules.json")
     suspend fun getRules(@Path("subreddit") subreddit: String): Response<Rules>
 
-    @GET("r/{subreddit}/api/link_flair.json")
+    @GET("r/{subreddit}/api/link_flair_v2.json")
     suspend fun getPostFlair(@Path("subreddit") subreddit: String): Response<List<FlairInfo>>
 
     @FormUrlEncoded
@@ -254,4 +254,7 @@ data class FlairInfo(
     @SerialName("text_editable") val textEditable: Boolean = false,
     val type: String = "text",
     val id: String,
+    @SerialName("background_color") val backgroundColor: String = "transparent",
+    @SerialName("text_color") val textColor: String? = null,
+    @SerialName("max_emojis") val maxEmojis: Int? = null,
 )

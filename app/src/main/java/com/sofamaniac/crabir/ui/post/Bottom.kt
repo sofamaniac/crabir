@@ -13,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,24 +25,29 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CallSplit
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -80,7 +86,7 @@ import kotlinx.serialization.json.Json
 fun BottomRow(
     post: PostData,
     modifier: Modifier = Modifier,
-    viewModel: VotableViewModel,
+    viewModel: LinkViewModel,
     action: @Composable () -> Unit = {},
 ) {
     LocalNavController.current!!
@@ -135,7 +141,7 @@ fun OpenThreadButton(post: PostData, onClick: (PostData) -> Unit) {
 @Composable
 private fun PostOptions(
     post: PostData,
-    viewModel: VotableViewModel,
+    viewModel: LinkViewModel,
     modifier: Modifier = Modifier
 ) {
     val prettyJson = Json {
@@ -149,6 +155,7 @@ private fun PostOptions(
     val currentAccount = rememberCurrentAccount()
     var showShareDialog by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
     IconButton(onClick = { showOptions = true }) {
         Icon(Icons.Default.MoreVert, "more", tint = Color.Gray)
     }
@@ -168,9 +175,10 @@ private fun PostOptions(
                 }
                 if (post.author.authorFullname == currentAccount.info?.name?.name) {
                     ListItem(
+                        modifier = Modifier.clickable { showEditDialog = true },
                         leadingContent = {
                             Icon(
-                                Icons.Default.Shield,
+                                Icons.Default.Edit,
                                 contentDescription = null
                             )
                         },
@@ -247,6 +255,12 @@ private fun PostOptions(
     if (showReportDialog) {
         ReportMenu(viewModel) {
             showReportDialog = false
+            showOptions = false
+        }
+    }
+    if (showEditDialog) {
+        EditDialogue(viewModel) {
+            showEditDialog = false
             showOptions = false
         }
     }
@@ -370,13 +384,18 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportMenu(viewModel: VotableViewModel, onDismissRequest: () -> Unit) {
     val rules = viewModel.rules
     val (selectedOption, setSelectedOption) = remember { mutableStateOf(rules.siteRules.firstOrNull()) }
-    Dialog(onDismissRequest) {
+    BasicAlertDialog(onDismissRequest) {
         Card(modifier = Modifier.padding(16.dp)) {
-            LazyColumn(modifier = Modifier.selectableGroup()) {
+            LazyColumn(
+                modifier = Modifier
+                    .selectableGroup()
+                    .fillMaxHeight(0.8f)
+            ) {
                 items(rules.rules.size) { index ->
                     ListItem(
                         modifier = Modifier.selectable(
@@ -424,6 +443,68 @@ fun ReportMenu(viewModel: VotableViewModel, onDismissRequest: () -> Unit) {
                     Text("Report")
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditDialogue(viewModel: LinkViewModel, onDismissRequest: () -> Unit) {
+    val post by viewModel.post.collectAsState(null)
+    if (post == null) return
+
+    BasicAlertDialog(onDismissRequest) {
+        Card(modifier = Modifier.padding(16.dp)) {
+            ListItem(
+                headlineContent = { Text("Change Flair") },
+                trailingContent = {
+                    Icon(Icons.Default.Edit, contentDescription = null)
+                }
+            )
+            ListItem(headlineContent = { Text("Edit text") })
+            ListItem(
+                headlineContent = { Text("NSFW") },
+                trailingContent = {
+                    Switch(
+                        checked = post!!.over18,
+                        onCheckedChange = {
+                            if (it) {
+                                viewModel.markNSFW()
+                            } else {
+                                viewModel.unmarkNSFW()
+                            }
+                        }
+                    )
+
+                }
+            )
+            ListItem(
+                headlineContent = { Text("Spoiler") },
+                trailingContent = {
+                    Switch(
+                        checked = post!!.spoiler,
+                        onCheckedChange = {
+                            if (it) {
+                                viewModel.markSpoiler()
+                            } else {
+                                viewModel.unmarkSpoiler()
+                            }
+                        }
+                    )
+
+                }
+            )
+            ListItem(
+                headlineContent = { Text("Inbox replies") },
+                trailingContent = {
+                    Switch(
+                        checked = post!!.sendReplies,
+                        onCheckedChange = {
+                            viewModel.setInboxReplies(it)
+                        }
+                    )
+                })
+            ListItem(headlineContent = { Text("Delete") })
         }
     }
 }

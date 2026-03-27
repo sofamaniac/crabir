@@ -19,16 +19,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.api.Rules
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.VotableRepository
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -106,14 +109,11 @@ interface VotableInteraction {
     fun upvote()
     fun downvote()
     fun save(target: Boolean)
-
-    fun hide() {}
-    fun unhide() {}
 }
 
 
 @HiltViewModel(assistedFactory = VotableViewModel.Factory::class)
-class VotableViewModel @AssistedInject constructor(
+open class VotableViewModel @AssistedInject constructor(
     @Assisted("fullname") name: String,
     @Assisted("subreddit") val subreddit: String,
     private val posts: VotableRepository,
@@ -126,8 +126,8 @@ class VotableViewModel @AssistedInject constructor(
         require(name.contains("_"))
     }
 
-    override val likes = posts.observePost(fullname).map { it?.relationship?.liked }
-    override val saved = posts.observePost(fullname).map { it?.relationship?.saved ?: false }
+    override val likes = posts.get(fullname).map { it?.relationship?.liked }
+    override val saved = posts.get(fullname).map { it?.relationship?.saved ?: false }
 
     var rules by mutableStateOf(Rules())
 
@@ -166,18 +166,6 @@ class VotableViewModel @AssistedInject constructor(
         }
     }
 
-    override fun hide() {
-        viewModelScope.launch {
-            posts.hide(fullname)
-        }
-    }
-
-    override fun unhide() {
-        viewModelScope.launch {
-            posts.unhide(fullname)
-        }
-    }
-
 
     @AssistedFactory
     interface Factory {
@@ -189,4 +177,72 @@ class VotableViewModel @AssistedInject constructor(
         ): VotableViewModel
     }
 
+}
+
+
+@HiltViewModel(assistedFactory = LinkViewModel.Factory::class)
+class LinkViewModel @AssistedInject constructor(
+    @Assisted("post") post: PostData,
+    private val posts: LinksRepository,
+    private val api: RedditAPIService,
+) : VotableViewModel(post.name.name, post.subreddit.name, posts), VotableInteraction {
+
+    val post = posts.get(post.name).map { it as PostData? }
+
+    fun hide() {
+        viewModelScope.launch {
+            posts.hide(fullname)
+        }
+    }
+
+    fun unhide() {
+        viewModelScope.launch {
+            posts.unhide(fullname)
+        }
+    }
+
+    fun delete() {
+        TODO()
+    }
+
+    fun editFlair() {
+        TODO()
+    }
+
+    fun markNSFW() {
+        viewModelScope.launch(Dispatchers.IO) {
+            posts.markNSFW(fullname)
+        }
+    }
+
+    fun unmarkNSFW() {
+        viewModelScope.launch(Dispatchers.IO) {
+            posts.unmarkNSFW(fullname)
+        }
+    }
+
+    fun markSpoiler() {
+        viewModelScope.launch(Dispatchers.IO) {
+            posts.markSpoiler(fullname)
+        }
+    }
+
+    fun unmarkSpoiler() {
+        viewModelScope.launch(Dispatchers.IO) {
+            posts.unmarkSpoiler(fullname)
+        }
+    }
+
+    fun setInboxReplies(enabled: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            posts.setInboxReplies(fullname, enabled)
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            @Assisted("post") post: PostData
+        ): LinkViewModel
+    }
 }

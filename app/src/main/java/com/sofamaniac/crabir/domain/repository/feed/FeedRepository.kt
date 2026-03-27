@@ -15,7 +15,6 @@ import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.ListingRepository
 import com.sofamaniac.crabir.domain.repository.ListingSource
 import com.sofamaniac.crabir.domain.repository.VotableRepository
-import kotlinx.coroutines.flow.Flow
 
 interface FeedRepository<Params> {
     suspend fun upvote(name: Fullname): Result<Unit>
@@ -28,10 +27,6 @@ abstract class FeedRepositoryCommon<Params>(
     val votableRepository: VotableRepository,
     val api: RedditAPIService,
 ) : FeedRepository<Params>, ListingRepository<Params, VotableData>() {
-
-    fun observePost(name: Fullname): Flow<VotableData?> {
-        return votableRepository.observePost(name)
-    }
 
     override suspend fun upvote(name: Fullname): Result<Unit> {
         return votableRepository.upvote(name)
@@ -68,7 +63,7 @@ abstract class FeedRepositoryCommon<Params>(
     override fun onResponseSuccess(things: List<Thing>) {
         super.onResponseSuccess(things)
         val votableList = things.mapNotNull { thingToData(it) }
-        votableRepository.addPosts(votableList)
+        votableRepository.insert(votableList)
     }
 }
 

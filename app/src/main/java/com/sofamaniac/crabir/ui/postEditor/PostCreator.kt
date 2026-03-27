@@ -65,6 +65,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.data.remote.api.FlairInfo
 import com.sofamaniac.crabir.data.remote.api.InvalidUrl
 import com.sofamaniac.crabir.data.remote.api.MissingTitle
 import com.sofamaniac.crabir.data.remote.api.MissingUrl
@@ -72,6 +73,8 @@ import com.sofamaniac.crabir.data.remote.api.PostSubmissionBuilder
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.mapColor
 import com.sofamaniac.crabir.ui.markdown.Editor
 import com.sofamaniac.crabir.ui.thread.CrossPostView
 
@@ -200,39 +203,71 @@ fun PostCreator(
             }
         }
         if (showFlairDialog) {
-            FlairDialog(viewModel, onDismiss = { showFlairDialog = false })
+            LaunchedEffect(viewModel) {
+                viewModel.getFlairs()
+            }
+            FlairDialog(
+                viewModel.flairs,
+                onSelect = { flair ->
+                    viewModel.state = viewModel.state.copy(flairId = flair.id)
+                },
+                onClickEdit = {
+                    showFlairEdit = true
+                },
+                onDismiss = { showFlairDialog = false }
+            )
         }
         if (showFlairEdit) {
-            FlairEditBox(viewModel, onDismiss = { showFlairEdit = false })
+            val initialText = viewModel.state.flairText
+            FlairEditBox(
+                initialText,
+                viewModel.flairs.find { it.id == viewModel.state.flairId }!!,
+                onConfirm = { flairText ->
+                    viewModel.state = viewModel.state.copy(flairText = flairText)
+                },
+                onDismiss = { showFlairEdit = false }
+            )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FlairDialog(viewModel: PostCreatorViewModel, onDismiss: () -> Unit) {
+fun FlairDialog(
+    flairs: List<FlairInfo>,
+    flairText: String? = null,
+    onSelect: (FlairInfo) -> Unit,
+    onClickEdit: (FlairInfo) -> Unit,
+    onDismiss: () -> Unit
+) {
     var showEditBox by remember { mutableStateOf(false) }
-    LaunchedEffect(viewModel) {
-        viewModel.getFlairs()
-    }
     BasicAlertDialog(onDismissRequest = onDismiss) {
         Card() {
             Column {
-                for (flair in viewModel.flairs) {
+                for (flair in flairs) {
                     ListItem(
                         modifier = Modifier.clickable {
-                            viewModel.state = viewModel.state.copy(flairId = flair.id)
+                            onSelect(flair)
+                            //viewModel.state = viewModel.state.copy(flairId = flair.id)
                             onDismiss()
                         },
-                        headlineContent = { Text(flair.text) },
+                        headlineContent = {
+                            Text(
+                                flair.text,
+                                color = mapColor(flair.textColor ?: "", Color.Unspecified),
+                                modifier = Modifier.cartouche(
+                                    mapColor(flair.backgroundColor)
+                                )
+                            )
+                        },
                         trailingContent = {
                             if (flair.textEditable) {
                                 IconButton(onClick = {
-                                    showEditBox = true
-                                    if (viewModel.state.flairText.isNullOrBlank()) {
-                                        viewModel.state =
-                                            viewModel.state.copy(flairText = flair.text)
-                                    }
+                                    onClickEdit(flair)
+//                                    if (viewModel.state.flairText.isNullOrBlank()) {
+//                                        viewModel.state =
+//                                            viewModel.state.copy(flairText = flair.text)
+//                                    }
                                 }) {
                                     Icon(Icons.Default.Edit, contentDescription = null)
                                 }
@@ -240,7 +275,7 @@ fun FlairDialog(viewModel: PostCreatorViewModel, onDismiss: () -> Unit) {
                         }
                     )
                 }
-                if (viewModel.flairs.isEmpty()) {
+                if (flairs.isEmpty()) {
                     Text("Community has no flair")
                 }
             }
@@ -250,10 +285,15 @@ fun FlairDialog(viewModel: PostCreatorViewModel, onDismiss: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FlairEditBox(viewModel: PostCreatorViewModel, onDismiss: () -> Unit) {
-    val fallbackText = viewModel.flairs.find { it.id == viewModel.state.flairId }?.text ?: ""
+fun FlairEditBox(
+    initialText: String? = null,
+    flair: FlairInfo,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val initialText = if (initialText.isNullOrBlank()) flair.text else initialText
     val textFieldState =
-        rememberTextFieldState(initialText = viewModel.state.flairText ?: fallbackText)
+        rememberTextFieldState(initialText = initialText)
     BasicAlertDialog(onDismissRequest = onDismiss) {
         Card() {
             ListItem(headlineContent = {
@@ -275,8 +315,9 @@ fun FlairEditBox(viewModel: PostCreatorViewModel, onDismiss: () -> Unit) {
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 TextButton(onClick = {
-                    viewModel.state =
-                        viewModel.state.copy(flairText = textFieldState.text as String)
+                    onConfirm(textFieldState.text as String)
+//                    viewModel.state =
+//                        viewModel.state.copy(flairText = textFieldState.text as String)
                     onDismiss()
                 }) {
                     Text("Confirm")

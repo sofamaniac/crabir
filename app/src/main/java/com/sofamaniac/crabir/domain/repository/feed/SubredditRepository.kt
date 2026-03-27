@@ -10,7 +10,7 @@ import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.SubredditData
-import com.sofamaniac.crabir.domain.repository.VotableRepository
+import com.sofamaniac.crabir.domain.repository.LinksRepository
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 
@@ -26,7 +26,7 @@ class SubredditCache @Inject constructor() {
 }
 
 class SubredditPostsRepository @Inject constructor(
-    votableRepository: VotableRepository,
+    votableRepository: LinksRepository,
     api: RedditAPIService,
 ) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
     private var currentSubreddit: String? = null

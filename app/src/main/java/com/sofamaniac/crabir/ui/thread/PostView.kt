@@ -23,10 +23,10 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import com.sofamaniac.crabir.ui.post.BottomRow
+import com.sofamaniac.crabir.ui.post.LinkViewModel
 import com.sofamaniac.crabir.ui.post.PostBody
 import com.sofamaniac.crabir.ui.post.PostHeader
 import com.sofamaniac.crabir.ui.post.PostInfo
-import com.sofamaniac.crabir.ui.post.VotableViewModel
 
 @Composable
 internal fun PostView(
@@ -88,10 +88,10 @@ internal fun CrossPostView(
 fun PostCard(
     post: PostData,
     modifier: Modifier = Modifier,
-    viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
+    viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
-            factory.create(post.name.name, post.subreddit.name)
+            factory.create(post)
         }
     ),
     threadViewModel: ThreadViewModel,

@@ -25,6 +25,7 @@ data class PostData(
     val numComments: Int,
     val over18: Boolean,
     val spoiler: Boolean,
+    val sendReplies: Boolean,
     val preview: Preview?,
     val crosspostParentList: List<PostData>,
     val subredditDetails: SubredditDetails?,
@@ -46,7 +47,7 @@ data class PostData(
 
     val shortlink = "https://redd.it/$id"
 
-    override fun copy(relationship: Relationship?, score: Score?): VotableData {
+    override fun copy(relationship: Relationship?, score: Score?): PostData {
         return copy(relationship = relationship ?: this.relationship, score = score ?: this.score)
     }
 }

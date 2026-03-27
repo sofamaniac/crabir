@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -34,12 +36,14 @@ fun PostCard(
     onClick: (PostData) -> Unit = {},
     canStartVideo: Boolean = false,
     read: Boolean = false,
-    viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
+    viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
-            factory.create(post.name.name, post.subreddit.name)
+            factory.create(post)
         }),
 ) {
+    val post by viewModel.post.collectAsState(initial = null)
+    if (post == null) return
     val settings = rememberViewSettings()
     // We do not apply the padding on the column, but on each of its children except [body]
     // to have images that take the full width
@@ -47,7 +51,7 @@ fun PostCard(
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
     val onClickCard = if (clickable) {
-        { onClick(post) }
+        { onClick(post!!) }
     } else {
         {}
     }
@@ -57,29 +61,29 @@ fun PostCard(
         onClick = onClickCard,
     ) {
         PostHeader(
-            post,
+            post!!,
             showSubredditIcon = settings.cardSettings.showSubredditIcon,
             modifier = modifier.padding(vertical = 8.dp),
             showPrefix = settings.prefixCommunity
         )
-        val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
+        val enablePreview = post!!.kind == Kind.Link || post!!.kind == Kind.Unknown
         PostInfo(
-            post,
+            post!!,
             modifier = modifier,
             enableThumbnail = enablePreview && settings.cardSettings.thumbnailForLinkPreview,
             viewModel = viewModel,
             read = read,
         )
         PostBody(
-            post,
+            post!!,
             canPlayVideo = canStartVideo,
             enableFullHeightImage = settings.cardSettings.enableFullHeightImage,
-            enableTextPreview = settings.cardSettings.enableTextPreview && !post.spoiler,
+            enableTextPreview = settings.cardSettings.enableTextPreview && !post!!.spoiler,
             maxLines = settings.cardSettings.maxLines,
             enableLinkFullSizePreview = !settings.cardSettings.thumbnailForLinkPreview
         )
-        BottomRow(post, modifier, viewModel = viewModel) {
-            OpenThreadButton(post, onClick = onClick)
+        BottomRow(post!!, modifier, viewModel = viewModel) {
+            OpenThreadButton(post!!, onClick = onClick)
         }
     }
 }
