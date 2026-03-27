@@ -29,6 +29,17 @@ open class VotableRepository(private val api: RedditAPIService) {
         }
     }
 
+    suspend fun delete(name: Fullname) {
+        val res = api.delete(name)
+        if (res.isSuccessful) {
+            cache.update {
+                it.toMutableMap().apply {
+                    remove(name)
+                }
+            }
+        }
+    }
+
     suspend fun getRules(subreddit: String): Rules {
         val res = api.getRules(subreddit)
         return if (res.isSuccessful) {

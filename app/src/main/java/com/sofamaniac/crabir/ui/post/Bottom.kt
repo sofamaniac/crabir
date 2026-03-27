@@ -47,6 +47,7 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,12 +67,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalFullscreenHandler
+import com.sofamaniac.crabir.data.remote.api.FlairInfo
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.ui.postEditor.CrosspostCreator
+import com.sofamaniac.crabir.ui.postEditor.FlairDialog
+import com.sofamaniac.crabir.ui.postEditor.FlairEditBox
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.votable.DownButton
@@ -453,9 +457,12 @@ fun EditDialogue(viewModel: LinkViewModel, onDismissRequest: () -> Unit) {
     val post by viewModel.post.collectAsState(null)
     if (post == null) return
 
+    var showFlairDialog by remember { mutableStateOf(false) }
+
     BasicAlertDialog(onDismissRequest) {
         Card(modifier = Modifier.padding(16.dp)) {
             ListItem(
+                modifier = Modifier.clickable { showFlairDialog = true },
                 headlineContent = { Text("Change Flair") },
                 trailingContent = {
                     Icon(Icons.Default.Edit, contentDescription = null)
@@ -506,5 +513,37 @@ fun EditDialogue(viewModel: LinkViewModel, onDismissRequest: () -> Unit) {
                 })
             ListItem(headlineContent = { Text("Delete") })
         }
+    }
+
+    var flair by remember { mutableStateOf<FlairInfo?>(null) }
+    var showFlairEditDialog by remember { mutableStateOf(false) }
+    if (showFlairDialog) {
+        LaunchedEffect(Unit) {
+            viewModel.getFlairs()
+        }
+        val flairs by viewModel.flairs
+        FlairDialog(
+            flairs = flairs,
+            flairId = flair?.id,
+            flairText = flair?.text,
+            onSelect = {
+                flair = it
+            },
+            onClickEdit = {
+                flair = it
+                showFlairEditDialog = true
+            },
+            onDismiss = { showFlairDialog = false }
+        )
+    }
+    if (showFlairEditDialog) {
+        FlairEditBox(
+            initialText = flair!!.text, flair = flair!!, onConfirm = {
+                viewModel.editFlair(flair!!.id, it)
+                showFlairEditDialog = false
+                showFlairDialog = false
+            },
+            onDismiss = { showFlairEditDialog = false }
+        )
     }
 }

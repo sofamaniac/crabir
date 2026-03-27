@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.data.remote.api.FlairInfo
 import com.sofamaniac.crabir.data.remote.api.Rules
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
@@ -184,10 +184,10 @@ open class VotableViewModel @AssistedInject constructor(
 class LinkViewModel @AssistedInject constructor(
     @Assisted("post") post: PostData,
     private val posts: LinksRepository,
-    private val api: RedditAPIService,
 ) : VotableViewModel(post.name.name, post.subreddit.name, posts), VotableInteraction {
 
     val post = posts.get(post.name).map { it as PostData? }
+    val flairs = mutableStateOf(emptyList<FlairInfo>())
 
     fun hide() {
         viewModelScope.launch {
@@ -202,11 +202,21 @@ class LinkViewModel @AssistedInject constructor(
     }
 
     fun delete() {
-        TODO()
+        viewModelScope.launch(Dispatchers.IO) {
+            posts.delete(fullname)
+        }
     }
 
-    fun editFlair() {
-        TODO()
+    fun editFlair(flairId: String, text: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            posts.editFlair(fullname, flairId, text)
+        }
+    }
+
+    fun getFlairs() {
+        viewModelScope.launch(Dispatchers.IO) {
+            flairs.value = posts.getFlairs(fullname)
+        }
     }
 
     fun markNSFW() {

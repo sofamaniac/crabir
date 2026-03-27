@@ -22,6 +22,7 @@ import retrofit2.http.Field
 import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
 
@@ -71,7 +72,7 @@ interface PostAPI {
     @POST("api/editusertext")
     /** Edit the body text of a comment or self post */
     suspend fun editUserText(
-        @Field("thing_id") postFullname: Fullname,
+        @Field("thing_id") name: Fullname,
         @Field("text") text: String,
         @Field("api_type") apiType: String = "json",
         @Field("video_poster_url") videoPosterUrl: String? = null,
@@ -83,6 +84,29 @@ interface PostAPI {
         @Field("id") postFullname: Fullname,
         @Field("state") sendReplies: Boolean,
     ): Response<Unit>
+
+    @FormUrlEncoded
+    @POST("api/del")
+    suspend fun delete(@Field("id") name: Fullname): Response<Unit>
+
+    @FormUrlEncoded
+    @POST("r/{subreddit}/api/selectflair")
+    suspend fun selectFlair(
+        @Path("subreddit") subreddit: String,
+        @Field("link") postFullname: Fullname,
+        @Field("flair_template_id") flairId: String,
+        @Field("text") text: String?,
+    ): Response<Unit>
+
+    @FormUrlEncoded
+    @POST("r/{subreddit}/api/selectflair")
+    suspend fun getFlairs(
+        @Path("subreddit") subreddit: String,
+        @Field("link") postFullname: Fullname,
+    ): Response<List<FlairInfo>>
+
+
+
 }
 
 interface MediaUploadInterface {

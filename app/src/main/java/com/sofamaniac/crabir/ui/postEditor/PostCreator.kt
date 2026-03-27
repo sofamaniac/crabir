@@ -235,16 +235,21 @@ fun PostCreator(
 @Composable
 fun FlairDialog(
     flairs: List<FlairInfo>,
+    flairId: String? = null,
     flairText: String? = null,
     onSelect: (FlairInfo) -> Unit,
     onClickEdit: (FlairInfo) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var showEditBox by remember { mutableStateOf(false) }
     BasicAlertDialog(onDismissRequest = onDismiss) {
         Card() {
             Column {
                 for (flair in flairs) {
+                    val text = if (flair.id == flairId && flairText != null) {
+                        flairText
+                    } else {
+                        flair.text
+                    }
                     ListItem(
                         modifier = Modifier.clickable {
                             onSelect(flair)
@@ -253,7 +258,7 @@ fun FlairDialog(
                         },
                         headlineContent = {
                             Text(
-                                flair.text,
+                                text,
                                 color = mapColor(flair.textColor ?: "", Color.Unspecified),
                                 modifier = Modifier.cartouche(
                                     mapColor(flair.backgroundColor)
@@ -264,10 +269,6 @@ fun FlairDialog(
                             if (flair.textEditable) {
                                 IconButton(onClick = {
                                     onClickEdit(flair)
-//                                    if (viewModel.state.flairText.isNullOrBlank()) {
-//                                        viewModel.state =
-//                                            viewModel.state.copy(flairText = flair.text)
-//                                    }
                                 }) {
                                     Icon(Icons.Default.Edit, contentDescription = null)
                                 }

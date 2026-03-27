@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.domain.repository
 
+import com.sofamaniac.crabir.data.remote.api.FlairInfo
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
@@ -43,6 +44,25 @@ class LinksRepository @Inject constructor(private val api: RedditAPIService) :
         if (res.isSuccessful) {
             update(name, post.copy(spoiler = true))
         }
+    }
+
+    suspend fun editFlair(name: Fullname, flairId: String, text: String?) {
+        val post = cache.value[name] as? PostData?
+        if (post == null) return
+        val subreddit = post.subreddit.name
+        val res = api.selectFlair(subreddit, name, flairId, text ?: "")
+        if (res.isSuccessful) {
+            val oldFlair = post.linkFlair
+            update(name, post.copy(linkFlair = oldFlair.copy(text = text ?: oldFlair.text)))
+        }
+    }
+
+    suspend fun getFlairs(name: Fullname): List<FlairInfo> {
+        val post = cache.value[name] as? PostData?
+        if (post == null) return emptyList()
+        val subreddit = post.subreddit.name
+        val res = api.getPostFlair(subreddit)
+        return res.body() ?: emptyList()
     }
 
     suspend fun setInboxReplies(name: Fullname, enabled: Boolean) {
