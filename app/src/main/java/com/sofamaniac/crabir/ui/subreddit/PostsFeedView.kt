@@ -51,6 +51,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import androidx.paging.filter
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.LocalTheme
@@ -68,6 +69,7 @@ import com.sofamaniac.crabir.ui.thread.CommentNode
 import com.sofamaniac.crabir.ui.thread.ThreadView
 import com.sofamaniac.crabir.ui.thread.ThreadViewModel
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
@@ -97,7 +99,8 @@ fun PostFeedViewer(
     filter: (VotableData?) -> Boolean = PostFeedViewerDefaults::hiddenFilter
 ) {
 
-    val posts = viewModel.data.collectAsLazyPagingItems()
+    val posts =
+        remember { viewModel.data.map { it.filter { post -> filter(post) } } }.collectAsLazyPagingItems()
     val listState = viewModel.listState
 
     LaunchedEffect(posts.loadState.refresh) {
@@ -135,7 +138,6 @@ fun PostFeedViewer(
 
     val fullscreenManager = LocalFullscreenHandler.current!!
     val viewSettings = rememberViewSettings()
-    val postItems = posts.itemSnapshotList.filter { post -> filter(post) }
 
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,
@@ -163,7 +165,7 @@ fun PostFeedViewer(
                 item { feedInfo() }
             }
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
-                val post = posts[index]!!
+                val post = posts[index]
                 val threadView = @Composable { post: PostData ->
                     HorizontalSwipeToDismiss {
                         ThreadView(

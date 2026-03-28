@@ -42,7 +42,7 @@ fun PostCard(
             factory.create(post)
         }),
 ) {
-    val post by viewModel.post.collectAsState(initial = null)
+    val post by viewModel.post.collectAsState()
     if (post == null) return
     val settings = rememberViewSettings()
     // We do not apply the padding on the column, but on each of its children except [body]

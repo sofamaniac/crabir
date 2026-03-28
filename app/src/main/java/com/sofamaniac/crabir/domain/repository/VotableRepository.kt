@@ -19,7 +19,6 @@ open class VotableRepository(
 ) {
     fun insert(things: List<VotableData>) {
         for (thing in things) {
-            Log.d("VotableRepository", "Inserting ${thing.name}")
             votableDao.insert(thing.toEntity())
         }
     }

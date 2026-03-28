@@ -34,6 +34,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
@@ -186,7 +187,12 @@ class LinkViewModel @AssistedInject constructor(
     private val posts: LinksRepository,
 ) : VotableViewModel(post.name.name, post.subreddit.name, posts), VotableInteraction {
 
-    val post = posts.get(post.name).map { it as PostData? }
+    val post = posts.get(post.name).map { it as PostData? }.stateIn(
+        scope = viewModelScope,
+        started = kotlinx.coroutines.flow.SharingStarted.Eagerly,
+        initialValue = post
+    )
+
     val flairs = mutableStateOf(emptyList<FlairInfo>())
 
     fun hide() {

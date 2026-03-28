@@ -3,9 +3,11 @@ package com.sofamaniac.crabir.domain.model
 import com.sofamaniac.crabir.data.local.entities.VotableEntity
 import com.sofamaniac.crabir.data.remote.dto.MoreData
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 
+@Serializable
 sealed class CommentType() {
     data class Comment(val comment: CommentData) : CommentType()
     data class More(val data: MoreData) : CommentType()
@@ -25,6 +27,7 @@ sealed class CommentType() {
             }
 }
 
+@Serializable
 data class CommentData(
     override val id: String,
     override val name: Fullname,
