@@ -1,10 +1,13 @@
 package com.sofamaniac.crabir.ui.thread
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,6 +19,9 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 
@@ -28,6 +34,7 @@ fun TopBar(
 ) {
     val sort: Sort by viewModel.sort.collectAsState()
     val theme = LocalTheme.current
+    var showMenu by remember { mutableStateOf(false) }
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = theme.toolbarBackground,
@@ -51,7 +58,17 @@ fun TopBar(
         actions = {
             Icon(Icons.Default.Search, "Search comments")
             SortMenu(viewModel)
-            Icon(Icons.Default.MoreVert, "More Options")
+            Box {
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(Icons.Default.MoreVert, "More Options")
+                }
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(text = { Text("refresh") }, onClick = { viewModel.refresh() })
+                }
+            }
         }
     )
 }

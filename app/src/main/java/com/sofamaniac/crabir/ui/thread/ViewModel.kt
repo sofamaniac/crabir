@@ -112,6 +112,8 @@ class ThreadViewModel @AssistedInject constructor(
 
     fun refresh() {
         repository.refresh()
+        _comments.value = emptyList()
+        fetchComments()
     }
 
     fun postComment(parentId: Fullname, comment: String) {
