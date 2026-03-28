@@ -43,7 +43,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import coil3.compose.AsyncImage
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.sofamaniac.crabir.navigation.HistoryRoute
@@ -78,6 +77,7 @@ import com.sofamaniac.crabir.ui.subredditList.SubredditListViewer
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.launch
+import me.saket.telephoto.zoomable.coil3.ZoomableAsyncImage
 
 
 @HiltAndroidApp
@@ -248,8 +248,8 @@ fun NavigationGraph(
                                 .fillMaxSize()
                                 .background(color = Color.Black)
                         ) {
-                            AsyncImage(
-                                model = "https://preview.redd.it/$url?$args",
+                            ZoomableAsyncImage(
+                                model = "https://i.redd.it/$url",
                                 contentDescription = null,
                                 contentScale = ContentScale.Fit,
                                 modifier = Modifier.fillMaxSize()
