@@ -334,7 +334,7 @@ private fun String.convertRedditSuperscript(): String {
 }
 
 private fun String.extractRedditLinks(): String {
-    val redditLinksPattern = Regex("(?<!\\S)/?([ru]/[A-Za-z0-9_]+/?)")
+    val redditLinksPattern = Regex("(?<!\\S)/?([ru]/[A-Za-z0-9_-]+/?)")
     val res = redditLinksPattern.replace(this) { matchResult ->
         "[${matchResult.value}](https://www.reddit.com/${matchResult.value})"
     }
