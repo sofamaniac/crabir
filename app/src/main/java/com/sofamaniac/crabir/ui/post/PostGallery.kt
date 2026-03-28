@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.ui.post
 
 import android.os.Build
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -145,7 +146,9 @@ fun EmbeddedGallery(
                     is MediaMetadata.Image -> ImageView(
                         metadata.toMediaResource(),
                         allowTransformation = false,
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .fillMaxSize()
                     )
 
                     is MediaMetadata.Gif ->
@@ -178,6 +181,7 @@ fun EmbeddedGallery(
 
 
                     else -> {
+                        Log.e("PostGallery", "Unsupported media type: ${metadata.javaClass.name}")
                         Surface(
                             modifier = Modifier.fillMaxSize(),
                             color = Color(154, 154, 154, 255)

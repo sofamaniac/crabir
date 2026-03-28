@@ -4,6 +4,7 @@
 
 package com.sofamaniac.crabir.data.remote.utils
 
+import android.util.Log
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.PolymorphicSerializer
@@ -34,6 +35,7 @@ object MediaMetadataSerializer : KSerializer<MediaMetadata> {
                         .jsonObject.forEach { (k, v) -> put(k, v) }
                 }
             }
+
             is MediaMetadata.Gif -> {
                 buildJsonObject {
                     put("e", JsonPrimitive("AnimatedImage"))
@@ -41,6 +43,7 @@ object MediaMetadataSerializer : KSerializer<MediaMetadata> {
                         .jsonObject.forEach { (k, v) -> put(k, v) }
                 }
             }
+
             MediaMetadata.Invalid -> {
                 buildJsonObject { put("e", JsonPrimitive("Invalid")) }
             }
@@ -57,24 +60,27 @@ object MediaMetadataSerializer : KSerializer<MediaMetadata> {
         val element = input.decodeJsonElement()
         val obj = element.jsonObject
 
-        if (obj["status"]?.jsonPrimitive?.content != "valid") {
-            return MediaMetadata.Invalid
+        val res = try {
+            when (obj["e"]?.jsonPrimitive?.content) {
+                "Image" ->
+                    input.json.decodeFromJsonElement(
+                        MediaMetadata.Image.serializer(),
+                        element
+                    )
+
+                "AnimatedImage" ->
+                    input.json.decodeFromJsonElement(
+                        MediaMetadata.Gif.serializer(),
+                        element
+                    )
+
+                else -> MediaMetadata.Invalid
+            }
+        } catch (e: Exception) {
+            Log.e("MediaMetadataSerializer", "Error deserializing media metadata", e)
+            MediaMetadata.Invalid
         }
-
-        return when (obj["e"]?.jsonPrimitive?.content) {
-            "Image" ->
-                input.json.decodeFromJsonElement(
-                    MediaMetadata.Image.serializer(),
-                    element
-                )
-
-            "AnimatedImage" ->
-                input.json.decodeFromJsonElement(
-                    MediaMetadata.Gif.serializer(),
-                    element
-                )
-
-            else -> MediaMetadata.Invalid
-        }
+        return res
     }
 }
+
