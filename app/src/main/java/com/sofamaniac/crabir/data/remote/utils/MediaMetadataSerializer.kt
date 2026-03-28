@@ -14,6 +14,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonEncoder
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
@@ -57,21 +58,25 @@ object MediaMetadataSerializer : KSerializer<MediaMetadata> {
         val input = decoder as? JsonDecoder
             ?: throw SerializationException("This serializer only works with JSON")
 
-        val element = input.decodeJsonElement()
+        val element = input.decodeJsonElement() as? JsonObject
+            ?: throw SerializationException("Expected JsonObject")
+
         val obj = element.jsonObject
+        val filtered = JsonObject(element.filterKeys { it != "e" })
+
 
         val res = try {
             when (obj["e"]?.jsonPrimitive?.content) {
                 "Image" ->
                     input.json.decodeFromJsonElement(
                         MediaMetadata.Image.serializer(),
-                        element
+                        filtered
                     )
 
                 "AnimatedImage" ->
                     input.json.decodeFromJsonElement(
                         MediaMetadata.Gif.serializer(),
-                        element
+                        filtered
                     )
 
                 else -> MediaMetadata.Invalid
