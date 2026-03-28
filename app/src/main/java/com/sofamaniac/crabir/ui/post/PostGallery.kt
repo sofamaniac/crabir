@@ -210,6 +210,7 @@ fun EmbeddedGallery(
         if (!media.caption.isNullOrBlank()) {
             Text(
                 media.caption,
+                color = Color.White,
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomStart)
