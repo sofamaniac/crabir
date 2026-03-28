@@ -204,8 +204,6 @@ fun NavigationGraph(
                 InboxView()
 
             }
-
-
             composable<LicensesRoute> {
                 val libraries by produceLibraries(R.raw.aboutlibraries)
                 LibrariesContainer(libraries, modifier = Modifier.fillMaxSize())
