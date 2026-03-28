@@ -86,6 +86,7 @@ fun RedditMarkdown(
     val processedMarkdown = remember(context) {
         markdown
             .extractRedditLinks()
+            .convertGiphy()
             .convertRedditSpoilers()
             //.convertRedditPreviewLinks(mediaMetadata)
             .convertRedditSuperscript()
@@ -258,9 +259,6 @@ private fun redditMarkwonBuilder(
 
                         return requestManager
                             .load(metadata?.url ?: drawable.destination)
-                            .placeholder(
-                                placeholder
-                            )
                     }
 
                     override fun cancel(target: Target<*>) {
@@ -280,8 +278,8 @@ private fun AsyncDrawable.getMetadata(mediaMetadata: Map<String, MediaMetadata>)
         if (metadata != null && metadata !is MediaMetadata.Invalid) {
             return metadata.toMediaResource()
         } else {
-            val filename = destination.split('|').last()
-            return MediaResource("https://media.giphy.com/media/$filename/giphy.gif", 1f, 100, 100)
+            val id = destination.split('|').last()
+            return MediaResource("https://media.giphy.com/media/$id/giphy.gif", 1f, 100, 100)
         }
     }
     // Otherwise assume destination is a link
@@ -346,6 +344,14 @@ private fun String.fuseQuote(): String {
     return quotePattern.replace(this) { matchResult ->
         val newLines = ">\n".repeat(matchResult.groupValues[2].length)
         ">${matchResult.groupValues[1]}\n$newLines>"
+    }
+}
+
+private fun String.convertGiphy(): String {
+    val giphyPatter = Regex("!\\[gif]\\(.*\\|(.*)\\)")
+    return giphyPatter.replace(this) { matchResult ->
+        val id = matchResult.groupValues[1]
+        "[https://giphy.com/gifs/${id}](https://giphy.com/gifs/${id})"
     }
 }
 
