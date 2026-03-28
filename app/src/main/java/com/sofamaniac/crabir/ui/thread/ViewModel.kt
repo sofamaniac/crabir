@@ -78,7 +78,7 @@ class ThreadViewModel @AssistedInject constructor(
     }
 
     fun collapseComment(name: Fullname, collapsed: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _comments.update { comments ->
                 comments.updateComment(name) {
                     val comment = (it as CommentType.Comment).comment
@@ -89,7 +89,7 @@ class ThreadViewModel @AssistedInject constructor(
     }
 
     fun fetchComments() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _isRefreshing.value = true
             _comments.value = repository.getComments(permalink, sort = _sort.value)
             // If post was not found set it here.
@@ -99,7 +99,7 @@ class ThreadViewModel @AssistedInject constructor(
     }
 
     fun fetchMoreComments(more: CommentType.More) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _comments.value = repository.getMoreComments(more)
         }
     }
@@ -115,7 +115,7 @@ class ThreadViewModel @AssistedInject constructor(
     }
 
     fun postComment(parentId: Fullname, comment: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val response = repository.postComment(parentId, comment)
             if (!response.isSuccessful) {
                 return@launch
@@ -143,7 +143,7 @@ class ThreadViewModel @AssistedInject constructor(
     }
 
     fun upvote(name: Fullname, likes: Boolean?) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 if (likes != true) {
                     repository.upvote(name)
@@ -173,7 +173,7 @@ class ThreadViewModel @AssistedInject constructor(
     }
 
     fun downvote(name: Fullname, likes: Boolean?) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 if (likes != false) {
                     repository.downvote(name)
@@ -204,7 +204,7 @@ class ThreadViewModel @AssistedInject constructor(
 
     fun save(name: Fullname, saved: Boolean) {
         try {
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 if (saved) {
                     repository.unsave(name)
                 } else {
