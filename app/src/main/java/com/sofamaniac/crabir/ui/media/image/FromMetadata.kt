@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.media.image
 
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
@@ -21,9 +20,6 @@ fun FromPreview(
 ) {
 
     val image = preview.images[0].source.toMediaResource()
-    val modifier = modifier
-        .fillMaxWidth()
-        .aspectRatio(image.aspectRatio)
     TransformableImage(
         image,
         contentDescription = contentDescription,
@@ -40,9 +36,6 @@ fun ImageView(
     allowTransformation: Boolean = true,
     onClick: () -> Unit = {}
 ) {
-    val modifier = modifier
-        .fillMaxWidth()
-        .aspectRatio(media.aspectRatio)
     TransformableImage(
         media,
         contentDescription = "Image",

@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.sofamaniac.crabir.data.local.dao.AccountsDao
 import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
+import com.sofamaniac.crabir.data.local.dao.VotableDao
 import com.sofamaniac.crabir.data.local.database.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -43,6 +44,11 @@ object DatabaseModule {
     @Provides
     fun provideVisitedCommunitiesDao(database: AppDatabase): VisitedCommunityDao {
         return database.visitedCommunityDao()
+    }
+
+    @Provides
+    fun provideVotableDao(database: AppDatabase): VotableDao {
+        return database.votableDao()
     }
 
 }

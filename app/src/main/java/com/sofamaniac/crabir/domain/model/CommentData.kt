@@ -1,7 +1,9 @@
 package com.sofamaniac.crabir.domain.model
 
+import com.sofamaniac.crabir.data.local.entities.VotableEntity
 import com.sofamaniac.crabir.data.remote.dto.MoreData
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
+import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 
 sealed class CommentType() {
@@ -46,4 +48,11 @@ data class CommentData(
         copy(relationship = relationship ?: this.relationship, score = score ?: this.score)
 
     fun updateReplies(replies: List<CommentType>): CommentData = copy(replies = replies)
+
+    override fun toEntity(): VotableEntity {
+        return VotableEntity(
+            id = name.name,
+            data = Json.encodeToString(this)
+        )
+    }
 }

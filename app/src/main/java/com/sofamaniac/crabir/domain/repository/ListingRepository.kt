@@ -6,6 +6,8 @@ import androidx.paging.PagingState
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 
 interface DataInterface {
@@ -22,7 +24,7 @@ abstract class ListingRepository<Params, Data : DataInterface> {
         _seenThings = emptySet()
     }
 
-    open fun onResponseSuccess(things: List<Thing>) {
+    open suspend fun onResponseSuccess(things: List<Thing>) {
         val data = things.mapNotNull { thing -> thingToData(thing) }
         cache.putAll(data.associateBy { it.name })
     }
@@ -44,7 +46,9 @@ abstract class ListingRepository<Params, Data : DataInterface> {
                 things.forEach { data ->
                     _seenThings += data.name
                 }
-                onResponseSuccess(things)
+                withContext(Dispatchers.IO) {
+                    onResponseSuccess(things)
+                }
                 val thingsName = things.map { thing ->
                     thing.name
                 }

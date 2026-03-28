@@ -133,31 +133,31 @@ open class VotableViewModel @AssistedInject constructor(
 
     fun getRules() {
         if (rules.rules.isNotEmpty()) return
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             rules = posts.getRules(subreddit)
         }
     }
 
     fun report(reason: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             posts.report(fullname, reason)
         }
     }
 
     override fun upvote() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             posts.upvote(fullname)
         }
     }
 
     override fun downvote() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             posts.downvote(fullname)
         }
     }
 
     override fun save(target: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (target) {
                 posts.save(fullname)
             } else {
@@ -190,13 +190,13 @@ class LinkViewModel @AssistedInject constructor(
     val flairs = mutableStateOf(emptyList<FlairInfo>())
 
     fun hide() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             posts.hide(fullname)
         }
     }
 
     fun unhide() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             posts.unhide(fullname)
         }
     }

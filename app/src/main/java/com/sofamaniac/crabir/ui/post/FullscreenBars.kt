@@ -79,7 +79,6 @@ fun ColumnScope.FullscreenBottomBar(
 ) {
     val theme = LocalTheme.current
     val likes by viewModel.likes.collectAsState(post.relationship.liked)
-    val saved by viewModel.saved.collectAsState(post.relationship.saved)
     AnimatedVisibility(
         visible = enabled,
         modifier = Modifier

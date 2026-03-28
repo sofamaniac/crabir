@@ -48,7 +48,13 @@ fun PostVideo(post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boole
     val blur = post.spoiler || (post.over18 && filters.blurNSFW)
     val placeholderModifier = if (blur) Modifier.blur(40.dp) else Modifier
     val placeholder =
-        @Composable { ImageView(post, allowTransformation = false, modifier = placeholderModifier) }
+        @Composable {
+            ImageView(
+                post,
+                allowTransformation = false,
+                modifier = placeholderModifier.fillMaxSize()
+            )
+        }
     val uriHandler = LocalUriHandler.current
     val fullscreenManager = LocalFullscreenHandler.current!!
 

@@ -48,7 +48,6 @@ import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,6 +67,7 @@ import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.data.remote.api.FlairInfo
+import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -454,8 +454,7 @@ fun ReportMenu(viewModel: VotableViewModel, onDismissRequest: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditDialogue(viewModel: LinkViewModel, onDismissRequest: () -> Unit) {
-    val post by viewModel.post.collectAsState(null)
-    if (post == null) return
+    val post = viewModel.post as? PostData? ?: return
 
     var showFlairDialog by remember { mutableStateOf(false) }
 
@@ -468,12 +467,14 @@ fun EditDialogue(viewModel: LinkViewModel, onDismissRequest: () -> Unit) {
                     Icon(Icons.Default.Edit, contentDescription = null)
                 }
             )
-            ListItem(headlineContent = { Text("Edit text") })
+            if (post.kind == Kind.Self) {
+                ListItem(headlineContent = { Text("Edit text") })
+            }
             ListItem(
                 headlineContent = { Text("NSFW") },
                 trailingContent = {
                     Switch(
-                        checked = post!!.over18,
+                        checked = post.over18,
                         onCheckedChange = {
                             if (it) {
                                 viewModel.markNSFW()
@@ -489,7 +490,7 @@ fun EditDialogue(viewModel: LinkViewModel, onDismissRequest: () -> Unit) {
                 headlineContent = { Text("Spoiler") },
                 trailingContent = {
                     Switch(
-                        checked = post!!.spoiler,
+                        checked = post.spoiler,
                         onCheckedChange = {
                             if (it) {
                                 viewModel.markSpoiler()
@@ -505,7 +506,7 @@ fun EditDialogue(viewModel: LinkViewModel, onDismissRequest: () -> Unit) {
                 headlineContent = { Text("Inbox replies") },
                 trailingContent = {
                     Switch(
-                        checked = post!!.sendReplies,
+                        checked = post.sendReplies,
                         onCheckedChange = {
                             viewModel.setInboxReplies(it)
                         }

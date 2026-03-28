@@ -161,7 +161,7 @@ abstract class PostFeedViewModel(
 
     override fun visitPost(post: PostData) {
         viewModelScope.launch(Dispatchers.IO) {
-            visitedPostsDao.insert(post.toEntity())
+            visitedPostsDao.insert(post.toEntity(System.currentTimeMillis()))
             Log.d("PostFeedViewModel", "visitPost: Post visited (${post.id})")
         }
     }

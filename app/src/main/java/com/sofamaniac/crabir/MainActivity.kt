@@ -226,16 +226,22 @@ fun NavigationGraph(
                 HistoryViewer()
             }
             composable(
-                route = "imagePreview?url={url}",
+                route = "imagePreview?url={url}&args={args}",
                 deepLinks = listOf(navDeepLink {
-                    uriPattern = "https://preview.redd.it/{url}"
+                    uriPattern = "https://preview.redd.it/{url}?{args}"
                 }),
-                arguments = listOf(navArgument("url") {
-                    type = NavType.StringType
-                })
+                arguments = listOf(
+                    navArgument("url") {
+                        type = NavType.StringType
+                    },
+                    navArgument("args") {
+                        type = NavType.StringType
+                    }
+                )
             ) { navBackStackEntry ->
                 val url = navBackStackEntry.arguments?.getString("url")
-                Log.d("NavigationGraph", "Reddit Preview: $url")
+                val args = navBackStackEntry.arguments?.getString("args")
+                Log.d("NavigationGraph", "Reddit Preview: $url $args")
                 if (url != null) {
                     Log.d("NavigationGraph", "Reddit Preview: showing image")
                     FullscreenHandler {
@@ -245,9 +251,10 @@ fun NavigationGraph(
                                 .background(color = Color.Black)
                         ) {
                             AsyncImage(
-                                model = "https://preview.redd.it/$url",
+                                model = "https://preview.redd.it/$url?$args",
                                 contentDescription = null,
-                                contentScale = ContentScale.Fit
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier.fillMaxSize()
                             )
                         }
                     }

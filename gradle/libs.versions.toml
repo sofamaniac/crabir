@@ -35,7 +35,7 @@ kotlinxSerializationJson = "1.10.0"
 retrofit2KotlinxSerializationConverter = "1.0.0"
 room = "2.8.4"
 foundationLayout = "1.10.4"
-zoomable = "2.11.1"
+zoomable = "0.18.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -95,7 +95,7 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 retrofit2-kotlinx-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2KotlinxSerializationConverter" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 simple-ext = { module = "io.noties.markwon:simple-ext", version.ref = "markwon" }
-zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
+zoomable = { module = "me.saket.telephoto:zoomable-image-coil3", version.ref = "zoomable" }
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
 aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose-core", version.ref = "aboutLibraries" } # Common compose core
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }      # Material 3 UI

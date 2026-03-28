@@ -161,6 +161,7 @@ fun EmbeddedGallery(
                                 if (resource != null) {
                                     ImageView(
                                         resource,
+                                        modifier = Modifier.fillMaxSize(),
                                         allowTransformation = false,
                                     )
                                 }
@@ -281,6 +282,7 @@ fun FullscreenGallery(
                 is MediaMetadata.Image ->
                     ImageView(
                         metadata.toMediaResource(),
+                        modifier = Modifier.fillMaxSize(),
                         allowTransformation = true,
                         onClick = onClick
                     )

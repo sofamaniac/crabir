@@ -60,7 +60,7 @@ abstract class FeedRepositoryCommon<Params>(
         }
     }
 
-    override fun onResponseSuccess(things: List<Thing>) {
+    override suspend fun onResponseSuccess(things: List<Thing>) {
         super.onResponseSuccess(things)
         val votableList = things.mapNotNull { thingToData(it) }
         votableRepository.insert(votableList)

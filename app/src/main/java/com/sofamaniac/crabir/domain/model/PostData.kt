@@ -1,10 +1,12 @@
 package com.sofamaniac.crabir.domain.model
 
+import com.sofamaniac.crabir.data.local.entities.VotableEntity
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.data.remote.dto.post.Preview
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetails
 import com.sofamaniac.crabir.reddit.Thumbnail
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 
 @Serializable
@@ -49,5 +51,12 @@ data class PostData(
 
     override fun copy(relationship: Relationship?, score: Score?): PostData {
         return copy(relationship = relationship ?: this.relationship, score = score ?: this.score)
+    }
+
+    override fun toEntity(): VotableEntity {
+        return VotableEntity(
+            id = name.name,
+            data = Json.encodeToString(this)
+        )
     }
 }

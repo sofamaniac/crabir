@@ -1,42 +1,40 @@
 package com.sofamaniac.crabir.domain.repository
 
 import android.util.Log
+import com.sofamaniac.crabir.data.local.dao.VotableDao
+import com.sofamaniac.crabir.data.local.entities.asVotableData
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.api.Rules
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.VotableData
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
 import retrofit2.Response
 
-open class VotableRepository(private val api: RedditAPIService) {
-    protected val cache = MutableStateFlow(emptyMap<Fullname, VotableData>())
+open class VotableRepository(
+    private val api: RedditAPIService,
+    private val votableDao: VotableDao
+) {
     fun insert(things: List<VotableData>) {
-        val newEntries = things.associateBy { it.name }
-        cache.update {
-            it + newEntries
+        for (thing in things) {
+            Log.d("VotableRepository", "Inserting ${thing.name}")
+            votableDao.insert(thing.toEntity())
         }
     }
 
-    fun get(name: Fullname): Flow<VotableData?> = cache.map { it[name] }.distinctUntilChanged()
+    fun get(name: Fullname): Flow<VotableData?> = votableDao.get(name).map { it?.asVotableData() }
+        .distinctUntilChanged()
 
     fun update(name: Fullname, data: VotableData) {
-        cache.update {
-            it + (name to data)
-        }
+        votableDao.update(name, data.toEntity().data)
     }
 
     suspend fun delete(name: Fullname) {
         val res = api.delete(name)
         if (res.isSuccessful) {
-            cache.update {
-                it.toMutableMap().apply {
-                    remove(name)
-                }
-            }
+            votableDao.delete(name)
         }
     }
 
@@ -58,8 +56,9 @@ open class VotableRepository(private val api: RedditAPIService) {
             return Result.failure(Exception("Error reporting post"))
         }
     }
+
     suspend fun vote(name: Fullname, upvote: Boolean): Result<Unit> {
-        val post: VotableData? = cache.value[name]
+        val post: VotableData? = get(name).first()
         if (post == null) {
             Log.e("PostRepository", "Post not found in cache")
             return Result.failure(Exception("Post not found"))
@@ -81,20 +80,14 @@ open class VotableRepository(private val api: RedditAPIService) {
             relationship = relationship,
             score = post.score.copy(score = post.score.score - oldDelta + dir)
         )
-        cache.value += (name to newPost)
-        try {
-            res = api.vote(post.name, dir)
-            if (res.isSuccessful) {
-                return Result.success(Unit)
-            } else {
-                cache.value += (name to post)
-                Log.e("PostRepository", "Error upvoting post: ${res.errorBody()}")
-                return Result.failure(Exception("Error upvoting post"))
-            }
-        } catch (e: Exception) {
-            cache.value += (name to post)
-            Log.e("PostRepository", "Error upvoting post: ${e.message}")
-            return Result.failure(e)
+        votableDao.update(name, newPost.toEntity().data)
+        res = api.vote(post.name, dir)
+        if (res.isSuccessful) {
+            return Result.success(Unit)
+        } else {
+            votableDao.update(name, post.toEntity().data)
+            Log.e("PostRepository", "Error upvoting post: ${res.errorBody()}")
+            return Result.failure(Exception("Error upvoting post"))
         }
     }
 
@@ -111,10 +104,10 @@ open class VotableRepository(private val api: RedditAPIService) {
         if (!res.isSuccessful) {
             return Result.failure(Exception("Error hiding post"))
         }
-        val post: VotableData? = cache.value[fullname]
+        val post: VotableData? = get(fullname).first()
         if (post == null) return Result.success(Unit)
         val relationship = post.relationship.copy(hidden = true)
-        cache.value += (fullname to post.copy(relationship = relationship))
+        votableDao.update(fullname, post.copy(relationship = relationship).toEntity().data)
         return Result.success(Unit)
     }
 
@@ -123,32 +116,28 @@ open class VotableRepository(private val api: RedditAPIService) {
         if (!res.isSuccessful) {
             return Result.failure(Exception("Error unhiding post"))
         }
-        val post: VotableData? = cache.value[fullname]
+        val post: VotableData? = get(fullname).first()
         if (post == null) return Result.success(Unit)
         val relationship = post.relationship.copy(hidden = false)
-        cache.value += (fullname to post.copy(relationship = relationship))
+        votableDao.update(fullname, post.copy(relationship = relationship).toEntity().data)
         return Result.success(Unit)
     }
 
 
     suspend fun saveHelper(name: Fullname, target: Boolean): Result<Unit> {
-        val post: VotableData? = cache.value[name]
+        val post: VotableData? = get(name).first()
         if (post == null) return Result.failure(Exception("Post not found"))
         val relationship = post.relationship.copy(saved = target)
-        cache.value += (name to post.copy(relationship = relationship))
-        try {
-            val res = if (target) api.save(post.name) else api.unsave(post.name)
-            if (res.isSuccessful) {
-                return Result.success(Unit)
-            } else {
-                cache.value += (name to post)
-                Log.e("PostRepository", "Error saving post: ${res.errorBody()}")
-                return Result.failure(Exception("Error saving post"))
-            }
-        } catch (e: Exception) {
-            cache.value += (name to post)
-            Log.e("PostRepository", "Error saving post: ${e.message}")
-            return Result.failure(e)
+        val newPost = post.copy(relationship = relationship)
+        votableDao.update(name, newPost.toEntity().data)
+        val res = if (target) api.save(post.name) else api.unsave(post.name)
+        if (res.isSuccessful) {
+            return Result.success(Unit)
+        } else {
+            // restore old value on failure
+            votableDao.update(name, post.toEntity().data)
+            Log.e("PostRepository", "Error saving post: ${res.errorBody()}")
+            return Result.failure(Exception("Error saving post"))
         }
     }
 

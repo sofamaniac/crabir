@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.di
 
+import com.sofamaniac.crabir.data.local.dao.VotableDao
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.domain.repository.VotableRepository
 import dagger.Module
@@ -15,7 +16,8 @@ object PostsModule {
     @Singleton
     fun providesPostsRepository(
         api: RedditAPIService,
+        votableDao: VotableDao,
     ): VotableRepository {
-        return VotableRepository(api)
+        return VotableRepository(api, votableDao)
     }
 }

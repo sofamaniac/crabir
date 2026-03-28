@@ -5,6 +5,7 @@
 package com.sofamaniac.crabir.ui.post
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,10 +16,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalFullscreenHandler
+import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.settings.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.image.ImageView
+
+private fun PostData.getImage(): MediaResource {
+    return if (preview != null) {
+        preview.images[0].source.toMediaResource()
+    } else {
+        MediaResource(url, -1f, -1, -1)
+    }
+}
 
 @Composable
 fun PostImage(
@@ -34,10 +44,17 @@ fun PostImage(
     }
     val filters = rememberFiltersSettings()
     val blur = post.spoiler || (post.over18 && filters.blurNSFW)
+    val mediaResource = post.getImage()
     val modifier = if (blur) {
         modifier.blur(40.dp)
     } else {
         modifier
+    }.let { modifier ->
+        if (mediaResource.aspectRatio > 0) {
+            modifier.aspectRatio(mediaResource.aspectRatio)
+        } else {
+            modifier
+        }
     }
     ImageView(
         post,

@@ -16,7 +16,6 @@ import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.ui.thread.updateComment
-import kotlinx.coroutines.flow.first
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -81,7 +80,7 @@ class ThreadRepositoryImpl @Inject constructor(
         if (post != null) {
             return post
         } else {
-            post = postsRepository.get(name).first() as? PostData?
+            post = postsRepository.get(name) as? PostData?
         }
         return post
     }

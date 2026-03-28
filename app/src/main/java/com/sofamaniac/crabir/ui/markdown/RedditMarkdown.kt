@@ -87,7 +87,7 @@ fun RedditMarkdown(
         markdown
             .extractRedditLinks()
             .convertRedditSpoilers()
-            .convertRedditPreviewLinks(mediaMetadata)
+            //.convertRedditPreviewLinks(mediaMetadata)
             .convertRedditSuperscript()
             .fuseQuote()
     }
