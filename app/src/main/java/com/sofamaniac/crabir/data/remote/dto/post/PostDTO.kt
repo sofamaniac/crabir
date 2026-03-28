@@ -13,6 +13,7 @@ import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetails
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditId
 import com.sofamaniac.crabir.data.remote.utils.FalseOrTimestampSerializer
 import com.sofamaniac.crabir.data.remote.utils.InstantAsFloatSerializer
+import com.sofamaniac.crabir.data.remote.utils.MediaMetadataSerializer
 import com.sofamaniac.crabir.data.remote.utils.RedditVideoSerializer
 import com.sofamaniac.crabir.domain.model.AuthorInfo
 import com.sofamaniac.crabir.domain.model.Flair
@@ -376,7 +377,7 @@ data class RedditVideo(
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-@Serializable()
+@Serializable(with = MediaMetadataSerializer::class)
 @JsonClassDiscriminator("e")
 sealed class MediaMetadata() {
 
