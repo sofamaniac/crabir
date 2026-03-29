@@ -246,7 +246,11 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
             Flair(comment.author.flair)
         }
         Spacer(modifier = Modifier.weight(1f))
-        ScoreString(comment.score.ups, comment.relationship.liked, hidden = comment.score.hideScore)
+        ScoreString(
+            comment.score.score,
+            comment.relationship.liked,
+            hidden = comment.score.hideScore
+        )
         Text(rightString, maxLines = 1)
     }
 }

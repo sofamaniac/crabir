@@ -56,7 +56,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -80,6 +79,10 @@ import com.sofamaniac.crabir.ui.TimeframeMenu
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subredditList.Tile
 import com.sofamaniac.crabir.ui.user.ProfileTabs
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
@@ -89,15 +92,17 @@ import kotlin.uuid.ExperimentalUuidApi
 fun SearchTab(
     searchQuery: SearchRoute,
     modifier: Modifier = Modifier,
+    commonViewModel: SearchCommonViewModel = hiltViewModel<SearchCommonViewModel, SearchCommonViewModel.Factory>() { factory ->
+        val initialQuery =
+            if (searchQuery.flair.isNotBlank()) "flair:\"${searchQuery.flair}\"" else ""
+        SearchCommonViewModel(initialQuery)
+    },
 ) {
-    val context = LocalContext.current
-    val initialQuery = if (searchQuery.flair.isNotBlank()) "flair:\"${searchQuery.flair}\"" else ""
-    val commonViewModel = remember(context) { SearchCommonViewModel(initialQuery) }
     val viewModels = listOf(
         hiltViewModel<PostSearchViewModel, PostSearchViewModel.Factory>(key = "PostSearch") { factory ->
             val subreddit = searchQuery.subreddit.ifBlank { null }
             val params = PostSearchParams(
-                query = initialQuery,
+                query = commonViewModel.query,
                 subreddit = subreddit,
                 restrictSubreddit = subreddit != null,
                 type = "link",
@@ -189,13 +194,19 @@ fun SearchTab(
     }
 }
 
-class SearchCommonViewModel(query: String) : ViewModel() {
+@HiltViewModel(assistedFactory = SearchCommonViewModel.Factory::class)
+class SearchCommonViewModel @AssistedInject constructor(@Assisted query: String) : ViewModel() {
     val queryState = TextFieldState(initialText = query)
     val query: String get() = queryState.text as String
     var showSettings = MutableStateFlow(false)
 
     fun onQueryUpdate(q: String) {
         queryState.edit { replace(0, length, q) }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(query: String): SearchCommonViewModel
     }
 
 }

@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import retrofit2.Response
 
 open class VotableRepository(
     private val api: RedditAPIService,
@@ -62,25 +61,19 @@ open class VotableRepository(
             Log.e("PostRepository", "Post not found in cache")
             return Result.failure(Exception("Post not found"))
         }
-        lateinit var res: Response<Unit>
-        val oldDelta = when (post.relationship.liked) {
+        val newLikes = if (post.relationship.liked == upvote) null else upvote
+        val dir = when (newLikes) {
             null -> 0
             true -> 1
             false -> -1
         }
-        val newLike = if (post.relationship.liked == upvote) null else upvote
-        val dir = when (newLike) {
-            null -> 0
-            true -> 1
-            false -> -1
-        }
-        val relationship = post.relationship.copy(liked = newLike)
+        val oldLikes = post.relationship.liked
+        val relationship = post.relationship.copy(liked = newLikes)
         val newPost = post.copy(
             relationship = relationship,
-            score = post.score.copy(score = post.score.score - oldDelta + dir)
-        )
+        ).updateScore(oldLikes, newLikes)
         votableDao.update(name, newPost.toEntity().data)
-        res = api.vote(post.name, dir)
+        val res = api.vote(post.name, dir)
         if (res.isSuccessful) {
             return Result.success(Unit)
         } else {

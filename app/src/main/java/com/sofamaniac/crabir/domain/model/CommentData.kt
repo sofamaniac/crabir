@@ -50,6 +50,10 @@ data class CommentData(
     override fun copy(relationship: Relationship?, score: Score?): CommentData =
         copy(relationship = relationship ?: this.relationship, score = score ?: this.score)
 
+    override fun updateScore(oldLikes: Boolean?, newLikes: Boolean?): CommentData {
+        return super.updateScore(oldLikes, newLikes) as CommentData
+    }
+
     fun updateReplies(replies: List<CommentType>): CommentData = copy(replies = replies)
 
     override fun toEntity(): VotableEntity {

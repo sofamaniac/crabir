@@ -34,8 +34,7 @@ class ThreadViewModel @AssistedInject constructor(
     var name: Fullname = repository.getPostId(permalink)
 
     private var _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean>
-        get() = _isRefreshing.asStateFlow()
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     private var _comments = MutableStateFlow<List<CommentType>>(emptyList())
     val comments: StateFlow<List<CommentType>> = _comments.asStateFlow()
@@ -146,88 +145,80 @@ class ThreadViewModel @AssistedInject constructor(
 
     fun upvote(name: Fullname, likes: Boolean?) {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                if (likes != true) {
-                    repository.upvote(name)
-                } else {
-                    repository.neutralVote(name)
-                }
-                _comments.update {
-                    it.updateComment(name) { c ->
-                        val comment = (c as CommentType.Comment).comment
-                        CommentType.Comment(
-                            comment.copy(
-                                relationship = comment.relationship.copy(
-                                    liked = if (likes != true) {
-                                        true
-                                    } else {
-                                        null
-                                    }
-                                )
-                            )
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("ThreadViewModel", "upvote: $e")
+            if (likes != true) {
+                repository.upvote(name)
+            } else {
+                repository.neutralVote(name)
             }
+            _comments.update {
+                it.updateComment(name) { c ->
+                    val comment = (c as CommentType.Comment).comment
+                    val newLikes = if (likes != true) {
+                        true
+                    } else {
+                        null
+                    }
+                    CommentType.Comment(
+                        comment.copy(
+                            relationship = comment.relationship.copy(
+                                liked = newLikes
+                            )
+                        ).updateScore(likes, newLikes)
+                    )
+                }
+            }
+
         }
     }
 
     fun downvote(name: Fullname, likes: Boolean?) {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                if (likes != false) {
-                    repository.downvote(name)
-                } else {
-                    repository.neutralVote(name)
-                }
-                _comments.update {
-                    it.updateComment(name) { c ->
-                        val comment = (c as CommentType.Comment).comment
-                        CommentType.Comment(
-                            comment.copy(
-                                relationship = comment.relationship.copy(
-                                    liked = if (likes != false) {
-                                        false
-                                    } else {
-                                        null
-                                    }
-                                )
-                            )
-                        )
+            if (likes != false) {
+                repository.downvote(name)
+            } else {
+                repository.neutralVote(name)
+            }
+            _comments.update {
+                it.updateComment(name) { c ->
+                    val comment = (c as CommentType.Comment).comment
+                    val newLikes = if (likes != false) {
+                        false
+                    } else {
+                        null
                     }
+                    CommentType.Comment(
+                        comment.copy(
+                            relationship = comment.relationship.copy(
+                                liked = newLikes
+                            )
+                        ).updateScore(likes, newLikes)
+                    )
                 }
-            } catch (e: Exception) {
-                Log.e("ThreadViewModel", "downvote: $e")
             }
         }
     }
 
     fun save(name: Fullname, saved: Boolean) {
-        try {
-            viewModelScope.launch(Dispatchers.IO) {
-                if (saved) {
-                    repository.unsave(name)
-                } else {
-                    repository.save(name)
-                }
+        viewModelScope.launch(Dispatchers.IO) {
+            if (saved) {
+                repository.unsave(name)
+            } else {
+                repository.save(name)
             }
-            _comments.update {
-                it.updateComment(name) { c ->
-                    val comment = (c as CommentType.Comment).comment
-                    CommentType.Comment(
-                        comment.copy(
-                            relationship = comment.relationship.copy(
-                                saved = !saved
-                            )
+        }
+        _comments.update {
+            it.updateComment(name) { c ->
+                val comment = (c as CommentType.Comment).comment
+                CommentType.Comment(
+                    comment.copy(
+                        relationship = comment.relationship.copy(
+                            saved = !saved
                         )
                     )
-                }
+                )
             }
-        } catch (e: Exception) {
-            Log.e("ThreadViewModel", "save: $e")
         }
+
     }
 
     @AssistedFactory
