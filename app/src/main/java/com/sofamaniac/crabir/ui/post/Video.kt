@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -114,9 +115,9 @@ fun YoutubeVideo(post: PostData, modifier: Modifier = Modifier) {
     ) {
         ImageView(
             post,
+            contentScale = ContentScale.FillWidth,
             modifier = Modifier
-                .fillMaxSize()
-                .align(Alignment.Center),
+                .fillMaxSize(),
             allowTransformation = false
         )
         Text(

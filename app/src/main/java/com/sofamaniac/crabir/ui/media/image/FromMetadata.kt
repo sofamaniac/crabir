@@ -16,6 +16,7 @@ fun FromPreview(
     contentDescription: String,
     modifier: Modifier = Modifier,
     allowTransformation: Boolean = true,
+    contentScale: ContentScale = ContentScale.Fit,
     onClick: () -> Unit = {}
 ) {
 
@@ -25,6 +26,7 @@ fun FromPreview(
         contentDescription = contentDescription,
         modifier = modifier,
         enabled = allowTransformation,
+        contentScale = contentScale,
         onClick = onClick
     )
 }
@@ -51,6 +53,7 @@ fun ImageView(
     post: PostData,
     modifier: Modifier = Modifier,
     allowTransformation: Boolean = true,
+    contentScale: ContentScale = ContentScale.Fit,
     onClick: () -> Unit = {},
 ) {
     if (post.preview != null) {
@@ -59,6 +62,7 @@ fun ImageView(
             post.title,
             modifier = modifier,
             allowTransformation = allowTransformation,
+            contentScale = contentScale,
             onClick = onClick
         )
     } else {
