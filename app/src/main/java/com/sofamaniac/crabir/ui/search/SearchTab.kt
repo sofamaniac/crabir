@@ -311,24 +311,6 @@ private fun InnerTab(viewModel: UserSearchViewModel) {
     }
 }
 
-//@Composable
-//private fun InnerTab(viewModel: CommentSearchViewModel) {
-//    val things = viewModel.items.collectAsLazyPagingItems()
-//    val listState = viewModel.listState
-//    LazyVerticalStaggeredGrid(
-//        columns = StaggeredGridCells.Fixed(1),
-//        verticalItemSpacing = 8.dp,
-//        state = listState, modifier = Modifier.fillMaxSize()
-//    ) {
-//        items(
-//            count = things.itemCount,
-//            key = things.itemKey { p -> p.id }) { index ->
-//            val comment = things[index]!!
-//            RedditMarkdown(comment.bodyMd)
-//        }
-//    }
-//}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
@@ -494,5 +476,21 @@ fun SearchSettings(viewModel: CommunitySearchViewModel) {
         ) { sort, _ ->
             viewModel.setSort(sort)
         }
+        ListItem(
+            modifier = Modifier.clickable {
+                viewModel.setIncludeOver18(!params.includeOver18)
+            },
+            headlineContent = {
+                Text("Include NSFW communities")
+            },
+            trailingContent = {
+                Switch(
+                    checked = params.includeOver18,
+                    onCheckedChange = {
+                        viewModel.setIncludeOver18(it)
+                    }
+                )
+            }
+        )
     }
 }

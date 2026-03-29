@@ -179,20 +179,29 @@ class PostSearchViewModel @AssistedInject constructor(
 @HiltViewModel
 class CommunitySearchViewModel @Inject constructor(
     repository: CommunitySearchRepository,
-    private val subscriptionsRepository: SubscriptionsRepository,
+    subscriptionsRepository: SubscriptionsRepository,
 ) : SearchViewModel<CommunitySearchParams, SubredditData>(
     repository, initialParams =
         CommunitySearchParams(
             query = "",
-            sort = CommunitySearchSort.Relevance
+            sort = CommunitySearchSort.Relevance,
+            includeOver18 = true,
         )
 ) {
+
+
     val subscriptions = subscriptionsRepository.subscriptions
     fun setSort(sort: CommunitySearchSort) {
         _params.update {
             it.copy(sort = sort)
         }
         refresh()
+    }
+
+    fun setIncludeOver18(include: Boolean) {
+        _params.update {
+            it.copy(includeOver18 = include)
+        }
     }
 }
 
