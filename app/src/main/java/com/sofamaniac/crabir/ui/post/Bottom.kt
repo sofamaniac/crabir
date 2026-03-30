@@ -48,6 +48,7 @@ import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -179,7 +180,10 @@ private fun PostOptions(
                 }
                 if (post.author.authorFullname == currentAccount.info?.name?.name) {
                     ListItem(
-                        modifier = Modifier.clickable { showEditDialog = true },
+                        modifier = Modifier.clickable {
+                            Log.d("PostOptions", "Edit clicked")
+                            showEditDialog = true
+                        },
                         leadingContent = {
                             Icon(
                                 Icons.Default.Edit,
@@ -454,7 +458,11 @@ fun ReportMenu(viewModel: VotableViewModel, onDismissRequest: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditDialogue(viewModel: LinkViewModel, onDismissRequest: () -> Unit) {
-    val post = viewModel.post as? PostData? ?: return
+    val postOpt by viewModel.post.collectAsState()
+
+    if (postOpt == null) return
+
+    val post = postOpt!!
 
     var showFlairDialog by remember { mutableStateOf(false) }
 
