@@ -3,6 +3,7 @@ package com.sofamaniac.crabir.ui.markdown
 import android.graphics.Color
 import android.text.TextPaint
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.View
 
 class SpoilerSpan : ClickableSpan() {
@@ -10,11 +11,15 @@ class SpoilerSpan : ClickableSpan() {
     private var startingTextColor = Color.WHITE
 
     override fun onClick(widget: View) {
+        Log.d("SpoilerSpan", "onClick: $isRevealed")
         isRevealed = true
+        widget.postInvalidate()
         widget.invalidate()
+        widget.postInvalidateOnAnimation()
     }
 
     override fun updateDrawState(ds: TextPaint) {
+        Log.d("SpoilerSpan", "updateDrawState: $isRevealed")
         if (!isRevealed) {
             // Save original text color
             startingTextColor = ds.color

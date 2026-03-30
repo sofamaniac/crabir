@@ -26,7 +26,7 @@ class PassThroughTextView @JvmOverloads constructor(
         val line = layout.getLineForVertical(y)
         val offset = layout.getOffsetForHorizontal(line, x.toFloat())
 
-        val clickableSpans = listOf(URLSpan::class.java, SpoilerSpan::class.java)
+        val clickableSpans = listOf(URLSpan::class.java, ClickableSpan::class.java)
         var clickedSpan: ClickableSpan? = null
         for (span in clickableSpans) {
             val spans = (text as? Spanned)?.getSpans(offset, offset, span)

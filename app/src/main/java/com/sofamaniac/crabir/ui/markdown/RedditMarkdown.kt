@@ -87,7 +87,7 @@ fun RedditMarkdown(
         markdown
             .extractRedditLinks()
             .convertGiphy()
-            .convertRedditSpoilers()
+            //.convertRedditSpoilers()
             //.convertRedditPreviewLinks(mediaMetadata)
             .convertRedditSuperscript()
             .fuseQuote()
@@ -132,7 +132,7 @@ fun RedditMarkdown(
                 }
                 .fillMaxWidth(),
             update = { textView ->
-                markwonReddit.setParsedMarkdown(textView, spanned)
+                //markwonReddit.setParsedMarkdown(textView, spanned)
                 if (textView.maxLines != maxLines) {
                     textView.maxLines = maxLines
                     textView.invalidate()
@@ -212,11 +212,11 @@ private fun redditMarkwonBuilder(
     Markwon.builder(context)
         .usePlugin(MarkwonInlineParserPlugin.create())
         .usePlugin(StrikethroughPlugin.create())
-        .useRedditSpoilers()
         .usePlugin(TablePlugin.create(context))
         .usePlugin(MarkdownTheme(colorScheme, theme))
         .usePlugin(HtmlPlugin.create())
         .usePlugin(LinkifyPlugin.create(Linkify.WEB_URLS))
+        .useRedditSpoilers()
         .usePlugin(
             GlideImagesPlugin.create(
                 object : GlideImagesPlugin.GlideStore {
@@ -289,7 +289,11 @@ private fun AsyncDrawable.getMetadata(mediaMetadata: Map<String, MediaMetadata>)
 }
 
 private fun String.convertRedditSpoilers(): String {
-    return this.replace(">!", " \ue000 ").replace("!<", " \ue000 ")
+    val spoilerRegex = Regex(""">!(.*?)!<""")
+    return spoilerRegex.replace(this) {
+        val inner = it.groupValues[1]
+        "&gt;! $inner !&lt;"
+    }
 }
 
 
