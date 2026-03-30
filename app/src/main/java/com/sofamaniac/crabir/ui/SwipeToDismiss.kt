@@ -36,6 +36,7 @@ import kotlin.math.roundToInt
 @Composable
 fun VerticalSwipeToDismiss(
     modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
     topBar: @Composable ColumnScope.() -> Unit = {},
     bottomBar: @Composable ColumnScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
@@ -66,11 +67,10 @@ fun VerticalSwipeToDismiss(
     }
 
 
-    val fullscreenManager = LocalFullscreenHandler.current!!
 
     LaunchedEffect(state.settledValue) {
         if (state.settledValue != DismissValue.Default) {
-            fullscreenManager.pop()
+            onDismiss()
         }
     }
 

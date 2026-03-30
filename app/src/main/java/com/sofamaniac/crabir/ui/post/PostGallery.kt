@@ -271,6 +271,7 @@ fun FullscreenGallery(
                 }
             }
         },
+        onDismiss = { fullscreenManager.pop() },
         modifier = Modifier
             .fillMaxSize()
             .clickable {

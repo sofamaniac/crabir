@@ -69,7 +69,9 @@ fun PostImage(
 @Composable
 fun FullscreenImageView(post: PostData) {
     var showDecorations by remember { mutableStateOf(true) }
+    val fullscreenManager = LocalFullscreenHandler.current!!
     VerticalSwipeToDismiss(
+        onDismiss = { fullscreenManager.pop() },
         topBar = {
             FullscreenTopBar(showDecorations, actions = {})
         },

@@ -167,6 +167,7 @@ fun FullscreenVideo(post: PostData) {
                 }
             }
         },
+        onDismiss = { fullscreenManager.pop() },
         modifier = Modifier
             .fillMaxSize()
             .clickable {

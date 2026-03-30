@@ -28,7 +28,6 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -97,24 +96,16 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val navController = rememberNavController()
-            LaunchedEffect(navController) {
-                Log.d("MainActivity", "nav controller launched")
-            }
-
             // Setup nav controller
             CompositionLocalProvider(LocalNavController provides navController) {
-                Log.d("MainActivity", "nav controller")
                 val drawerState = rememberDrawerState(DrawerValue.Closed)
                 ConfigureMaterialTheme {
-                    Log.d("MainActivity", "material")
                     val theme = rememberAppTheme()
                     if (theme == null) {
                         return@ConfigureMaterialTheme
                     }
                     CompositionLocalProvider(LocalTheme provides theme) {
-                        Log.d("MainActivity", "theme")
                         CompositionLocalProvider(LocalDrawerState provides drawerState) {
-                            Log.d("MainActivity", "Drawer state")
                             MainScreen(
                                 navController = navController,
                             )
@@ -223,38 +214,75 @@ fun NavigationGraph(
             composable<HistoryRoute> {
                 HistoryViewer()
             }
+
             composable(
-                route = "imagePreview?url={url}&args={args}",
-                deepLinks = listOf(navDeepLink {
-                    uriPattern = "https://preview.redd.it/{url}?{args}"
-                }),
+                route = "imagePreview?url={url}",
+                deepLinks = listOf(
+                    navDeepLink {
+                        uriPattern = "preview.redd.it/{url}"
+                    },
+                    navDeepLink {
+                        uriPattern = "i.redd.it/{url}"
+                    }
+                ),
                 arguments = listOf(
                     navArgument("url") {
                         type = NavType.StringType
                     },
-                    navArgument("args") {
-                        type = NavType.StringType
-                    }
                 )
             ) { navBackStackEntry ->
                 val url = navBackStackEntry.arguments?.getString("url")
-                val args = navBackStackEntry.arguments?.getString("args")
-                Log.d("NavigationGraph", "Reddit Preview: $url $args")
                 if (url != null) {
-                    Log.d("NavigationGraph", "Reddit Preview: showing image")
-                    FullscreenHandler {
-                        VerticalSwipeToDismiss(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(color = Color.Black)
-                        ) {
-                            ZoomableAsyncImage(
-                                model = "https://i.redd.it/$url",
-                                contentDescription = null,
-                                contentScale = ContentScale.Fit,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
+                    VerticalSwipeToDismiss(
+                        onDismiss = {
+                            // Why do we need to pop twice?
+                            navController.popBackStack()
+                            navController.popBackStack()
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = Color.Black)
+                    ) {
+                        ZoomableAsyncImage(
+                            model = "https://i.redd.it/$url",
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+            }
+            composable(
+                route = "videoPreview?url={url}",
+                deepLinks = listOf(
+                    navDeepLink {
+                        uriPattern = "v.redd.it/{url}"
+                    }
+                ),
+                arguments = listOf(
+                    navArgument("url") {
+                        type = NavType.StringType
+                    },
+                )
+            ) { navBackStackEntry ->
+                val url = navBackStackEntry.arguments?.getString("url")
+                if (url != null) {
+                    VerticalSwipeToDismiss(
+                        onDismiss = {
+                            // Why do we need to pop twice?
+                            navController.popBackStack()
+                            navController.popBackStack()
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = Color.Black)
+                    ) {
+                        ZoomableAsyncImage(
+                            model = "https://v.redd.it/$url",
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
                 }
             }
