@@ -101,7 +101,7 @@ fun EmbeddedGallery(
     blur: Boolean = false,
 ) {
     val media = gallery.images[state.currentPage]
-    val modifier = if (blur) {
+    val innerModifier = if (blur) {
         modifier.blur(40.dp)
     } else {
         modifier
@@ -135,7 +135,7 @@ fun EmbeddedGallery(
                 if (backgroundUrl != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     AsyncImage(
                         backgroundUrl,
-                        modifier = Modifier
+                        modifier = innerModifier
                             .fillMaxSize()
                             .blur(40.dp),
                         contentScale = ContentScale.FillBounds,
@@ -146,7 +146,7 @@ fun EmbeddedGallery(
                     is MediaMetadata.Image -> ImageView(
                         metadata.toMediaResource(),
                         allowTransformation = false,
-                        modifier = Modifier
+                        modifier = innerModifier
                             .align(Alignment.Center)
                             .fillMaxSize()
                     )
@@ -164,7 +164,7 @@ fun EmbeddedGallery(
                                 if (resource != null) {
                                     ImageView(
                                         resource,
-                                        modifier = Modifier.fillMaxSize(),
+                                        modifier = innerModifier.fillMaxSize(),
                                         allowTransformation = false,
                                     )
                                 }
