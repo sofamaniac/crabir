@@ -125,7 +125,11 @@ private fun CollapsedComment(
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.cartouche(backgroundColor = Color.Green)
         )
-        ScoreString(comment.score.score, comment.relationship.liked)
+        ScoreString(
+            comment.score.score,
+            comment.relationship.liked,
+            hidden = comment.score.hideScore
+        )
         Text(rightString)
     }
 }
