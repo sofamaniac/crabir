@@ -348,9 +348,9 @@ private fun String.fuseQuote(): String {
 }
 
 private fun String.convertGiphy(): String {
-    val giphyPatter = Regex("!\\[gif]\\(.*\\|(.*)\\)")
+    val giphyPatter = Regex("!\\[gif]\\(giphy\\|(.*)\\)")
     return giphyPatter.replace(this) { matchResult ->
-        val id = matchResult.groupValues[1]
+        val id = matchResult.groupValues[1].split("|").first()
         "[https://giphy.com/gifs/${id}](https://giphy.com/gifs/${id})"
     }
 }
