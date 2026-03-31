@@ -26,7 +26,7 @@ interface VotableData : DataInterface {
         val newScore = score.copy(
             ups = ups,
             downs = downs, score = ups - downs,
-            upvoteRatio = ups / (ups + downs).toDouble()
+            upvoteRatio = ups / (ups + downs).toDouble().coerceAtLeast(1.0)
         )
         return copy(score = newScore)
     }
