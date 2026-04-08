@@ -1,13 +1,6 @@
 package com.sofamaniac.crabir
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -37,22 +30,22 @@ class FullscreenManager {
 
 }
 
-val LocalFullscreenHandler = compositionLocalOf<FullscreenManager?> { null }
+//val LocalFullscreenHandler = compositionLocalOf<FullscreenManager?> { null }
 
-@Composable
-fun FullscreenHandler(content: @Composable () -> Unit) {
-    val fullscreenManager = remember {
-        FullscreenManager()
-    }
-    val fullscreenView by fullscreenManager.current.collectAsState(null)
-    val backHandlerActive by remember { fullscreenManager.size.map { it > 0 } }.collectAsState(false)
-    CompositionLocalProvider(LocalFullscreenHandler provides fullscreenManager) {
-        BackHandler(enabled = backHandlerActive) {
-            fullscreenManager.pop()
-        }
-        Box {
-            content()
-            fullscreenView?.invoke()
-        }
-    }
-}
+//@Composable
+//fun FullscreenHandler(content: @Composable () -> Unit) {
+//    val fullscreenManager = remember {
+//        FullscreenManager()
+//    }
+//    val fullscreenView by fullscreenManager.current.collectAsState(null)
+//    val backHandlerActive by remember { fullscreenManager.size.map { it > 0 } }.collectAsState(false)
+//    CompositionLocalProvider(LocalFullscreenHandler provides fullscreenManager) {
+//        BackHandler(enabled = backHandlerActive) {
+//            fullscreenManager.pop()
+//        }
+//        Box {
+//            content()
+//            fullscreenView?.invoke()
+//        }
+//    }
+//}

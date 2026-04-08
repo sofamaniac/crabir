@@ -4,8 +4,10 @@
 
 package com.sofamaniac.crabir.domain.model
 
+import androidx.annotation.Keep
 import com.sofamaniac.crabir.data.remote.dto.post.PostDTO
 
+@Keep
 enum class Kind {
     Self,
     Image,

@@ -17,9 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import com.sofamaniac.crabir.ui.post.BottomRow
@@ -46,19 +47,20 @@ internal fun PostView(
             )
         } else {
             val parent = post.crosspostParentList.first()
-            val fullscreenManager = LocalFullscreenHandler.current!!
+            val navController = LocalNavController.current!!
             Box(
                 modifier = Modifier
                     .padding(8.dp)
                     .border(BorderStroke(1.dp, Color.Gray), shape = ShapeDefaults.Medium)
                     .clickable(onClick = {
-                        fullscreenManager.push {
-                            ThreadView(
-                                permalink = parent.permalink,
-                                dismiss = {
-                                    fullscreenManager.pop()
-                                })
-                        }
+                        navController.navigate(PostRoute(parent.permalink, null))
+//                        fullscreenManager.push {
+//                            ThreadView(
+//                                permalink = parent.permalink,
+//                                dismiss = {
+//                                    fullscreenManager.pop()
+//                                })
+//                        }
                     })
                     .padding(8.dp)
             ) {

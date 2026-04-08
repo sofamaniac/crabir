@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,9 +31,9 @@ import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.data.remote.api.MissingCommunity
 import com.sofamaniac.crabir.ui.subredditList.Tile
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,15 +41,14 @@ internal fun CommunitySelector(
     viewModel: CreatorViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val fullscreenManager = LocalFullscreenHandler.current!!
     var showRules by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    var showSearch by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .clickable {
-                fullscreenManager.push(
-                    { CommunitySearch(viewModel) },
-                )
+                showSearch = true
             }
             .semantics {
                 if (viewModel.error is MissingCommunity) {
@@ -81,8 +81,10 @@ internal fun CommunitySelector(
             Tile(viewModel.community!!)
             Spacer(modifier = Modifier.weight(1f))
             TextButton(onClick = {
-                viewModel.getRules()
-                showRules = true
+                scope.launch {
+                    viewModel.getRules()
+                    showRules = true
+                }
             }) { Text("RULES") }
         }
     }
@@ -109,5 +111,8 @@ internal fun CommunitySelector(
                 }
             }
         }
+    }
+    if (showSearch) {
+        CommunitySearch(viewModel, onDismiss = { showSearch = false })
     }
 }

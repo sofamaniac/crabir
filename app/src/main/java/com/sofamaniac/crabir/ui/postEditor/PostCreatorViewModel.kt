@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
+import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
 import com.sofamaniac.crabir.data.remote.api.CrosspostSubmissionBuilder
 import com.sofamaniac.crabir.data.remote.api.FlairInfo
 import com.sofamaniac.crabir.data.remote.api.GalleryItem
@@ -23,6 +24,7 @@ import com.sofamaniac.crabir.data.remote.api.makeMediaUploadBody
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.repository.LinksRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -31,7 +33,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-abstract class CreatorViewModel(val api: RedditAPIService) : ViewModel() {
+abstract class CreatorViewModel(
+    protected val api: RedditAPIService,
+    private val communities: VisitedCommunityDao
+) : ViewModel() {
     var community: SubredditData? by mutableStateOf(null)
         private set
 
@@ -45,29 +50,35 @@ abstract class CreatorViewModel(val api: RedditAPIService) : ViewModel() {
 
     val titleState = TextFieldState()
 
-    fun getRules() {
+    suspend fun getRules() {
         if (rules.siteRules.isNotEmpty()) return
-        viewModelScope.launch(Dispatchers.IO) {
-            val res = api.getRules(community!!.displayName)
-            if (res.isSuccessful) {
-                rules = res.body()!!
-            }
+        val res = api.getRules(community!!.displayName)
+        if (res.isSuccessful) {
+            rules = res.body()!!
         }
     }
 
     fun setSubreddit(subreddit: SubredditData) {
-        community = subreddit
-        getRules()
-        getFlairs()
+        viewModelScope.launch {
+            community = subreddit
+            getRules()
+            getFlairs()
+        }
     }
 
-    fun getFlairs() {
+    fun setSubreddit(subreddit: String) {
+        viewModelScope.launch {
+            community = communities.getCommunity(subreddit)?.getData()
+            getRules()
+            getFlairs()
+        }
+    }
+
+    suspend fun getFlairs() {
         if (flairs.isNotEmpty() || community == null) return
-        viewModelScope.launch(Dispatchers.IO) {
-            val res = api.getPostFlair(community!!.displayName)
-            if (res.isSuccessful) {
-                flairs = res.body()!!
-            }
+        val res = api.getPostFlair(community!!.displayName)
+        if (res.isSuccessful) {
+            flairs = res.body()!!
         }
     }
 }
@@ -75,8 +86,9 @@ abstract class CreatorViewModel(val api: RedditAPIService) : ViewModel() {
 @HiltViewModel
 class PostCreatorViewModel @Inject constructor(
     api: RedditAPIService,
+    communities: VisitedCommunityDao,
     private val mediaUploader: MediaUploadInterface
-) : CreatorViewModel(api) {
+) : CreatorViewModel(api, communities) {
     var state by mutableStateOf(PostSubmissionBuilder())
     val textState = TextFieldState()
     val urlState = TextFieldState()
@@ -179,7 +191,9 @@ class PostCreatorViewModel @Inject constructor(
 class CrosspostCreatorViewModel @AssistedInject constructor(
     @Assisted val parentFullname: String,
     api: RedditAPIService,
-) : CreatorViewModel(api) {
+    communities: VisitedCommunityDao,
+    linksRepository: LinksRepository,
+) : CreatorViewModel(api, communities) {
     var state by mutableStateOf(
         CrosspostSubmissionBuilder(
             crosspostFullname = Fullname(
@@ -187,6 +201,7 @@ class CrosspostCreatorViewModel @AssistedInject constructor(
             )
         )
     )
+    val post = linksRepository.get(Fullname(parentFullname))
 
     var loading by mutableStateOf(false)
 

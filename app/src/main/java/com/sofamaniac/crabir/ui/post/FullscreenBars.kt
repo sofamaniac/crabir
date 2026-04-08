@@ -26,9 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.SavedButton
 import com.sofamaniac.crabir.ui.votable.ScoreString
@@ -39,7 +39,8 @@ fun ColumnScope.FullscreenTopBar(
     enabled: Boolean,
     actions: @Composable () -> Unit = {}
 ) {
-    val fullscreenManager = LocalFullscreenHandler.current!!
+    //val fullscreenManager = LocalFullscreenHandler.current!!
+    val navController = LocalNavController.current!!
     AnimatedVisibility(
         visible = enabled,
         modifier = Modifier
@@ -54,7 +55,7 @@ fun ColumnScope.FullscreenTopBar(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
-            IconButton(onClick = fullscreenManager::pop) {
+            IconButton(onClick = navController::popBackStack) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Go back",

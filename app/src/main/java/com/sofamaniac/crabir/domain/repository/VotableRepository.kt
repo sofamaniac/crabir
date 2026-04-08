@@ -6,6 +6,7 @@ import com.sofamaniac.crabir.data.local.entities.asVotableData
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.api.Rules
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -22,7 +23,8 @@ open class VotableRepository(
         }
     }
 
-    fun get(name: Fullname): Flow<VotableData?> = votableDao.get(name).map { it?.asVotableData() }
+    fun get(name: Fullname): Flow<PostData?> =
+        votableDao.get(name).map { it?.asVotableData() as PostData }
         .distinctUntilChanged()
 
     fun update(name: Fullname, data: VotableData) {

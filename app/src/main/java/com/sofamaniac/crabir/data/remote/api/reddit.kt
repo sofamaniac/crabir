@@ -130,6 +130,16 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
         @Query("sr_detail") srDetail: Boolean = true,
     ): Response<CommentsResponse>
 
+    /**
+     * Gets the post and comments for a post.
+     *
+     * @param subreddit The name of the subreddit where the post is located.
+     * @param id The ID of the post.
+     * @param comment focal point of the returned view
+     * @param context Number of parents to be shown when [comment] is set
+     * @param depth is the maximum depth of subtrees in the thread
+     * @param showMore whether to show [More] or not
+     */
     @GET("{permalink}.json")
     suspend fun getThread(
         @Path(value = "permalink", encoded = true) permalink: String,

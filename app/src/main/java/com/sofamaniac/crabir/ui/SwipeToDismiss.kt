@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.sofamaniac.crabir.LocalFullscreenHandler
+import com.sofamaniac.crabir.navigation.LocalNavController
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -134,7 +134,8 @@ fun HorizontalSwipeToDismiss(
     }
     val decayAnimationSpec = rememberSplineBasedDecay<Float>()
     val density = LocalDensity.current
-    val fullscreenManager = LocalFullscreenHandler.current!!
+    //val fullscreenManager = LocalFullscreenHandler.current!!
+    val navController = LocalNavController.current!!
     @Suppress("DEPRECATION") val state by remember {
         mutableStateOf(
             AnchoredDraggableState(
@@ -155,7 +156,8 @@ fun HorizontalSwipeToDismiss(
 
     LaunchedEffect(state.settledValue) {
         if (state.settledValue != DismissValue.Default) {
-            fullscreenManager.pop()
+            //fullscreenManager.pop()
+            navController.popBackStack()
         }
     }
 

@@ -26,6 +26,8 @@ import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.VotableRepository
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -49,6 +51,11 @@ internal fun ColumnScope.PostBody(
     enableLinkFullSizePreview: Boolean = true,
     forceShowSelftext: Boolean = false,
 ) {
+    val navController = LocalNavController.current!!
+    fun goFullscreen(route: Route) {
+        navController.navigate(route)
+    }
+
     val selftextView = @Composable {
         val selftext = post.selftext.markdown
         RedditMarkdown(
@@ -60,7 +67,7 @@ internal fun ColumnScope.PostBody(
     }
     when (post.kind) {
         Kind.Image -> {
-            PostImage(post, modifier.fillMaxWidth())
+            PostImage(post, modifier.fillMaxWidth(), goFullscreen = { goFullscreen(it) })
         }
 
         Kind.Video -> {
@@ -69,7 +76,12 @@ internal fun ColumnScope.PostBody(
 
         Kind.Link -> {
             if (enableLinkFullSizePreview) {
-                PostImage(post, modifier.fillMaxWidth(), enabled = false)
+                PostImage(
+                    post,
+                    modifier.fillMaxWidth(),
+                    enabled = false,
+                    goFullscreen = { goFullscreen(it) }
+                )
             }
         }
 
@@ -77,7 +89,8 @@ internal fun ColumnScope.PostBody(
             PostGallery(
                 post,
                 modifier.fillMaxWidth(),
-                canPlayVideo = canPlayVideo
+                canPlayVideo = canPlayVideo,
+                goFullscreen = { goFullscreen(it) }
             )
         }
 

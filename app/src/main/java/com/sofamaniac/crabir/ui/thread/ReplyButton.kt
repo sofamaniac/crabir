@@ -11,8 +11,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.ui.markdown.Editor
 
@@ -21,43 +24,46 @@ import com.sofamaniac.crabir.ui.markdown.Editor
 fun ReplyButton(
     parentId: Fullname,
     threadViewModel: ThreadViewModel,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     parentPreview: @Composable () -> Unit = {}
 ) {
-    val fullscreenManager = LocalFullscreenHandler.current!!
+    var showEditor by remember { mutableStateOf(false) }
+
     IconButton(onClick = {
-        fullscreenManager.push {
-            val state = rememberTextFieldState()
-            Editor(
-                state = state,
-                topBar = {
-                    TopAppBar(
-                        title = { Text("Comment") },
-                        navigationIcon = {
-                            IconButton(onClick = { fullscreenManager.pop() }) {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Go back"
-                                )
-                            }
-                        },
-                        actions = {
-                            IconButton(onClick = {
-                                threadViewModel.postComment(parentId, state.text as String)
-                                fullscreenManager.pop()
-                            }) {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.Send,
-                                    contentDescription = "Send Reply"
-                                )
-                            }
-                        }
-                    )
-                }) {
-                parentPreview()
-            }
-        }
+        showEditor = true
     }) {
         Icon(Icons.AutoMirrored.Default.Reply, contentDescription = "Reply")
+    }
+    if (showEditor) {
+
+        val state = rememberTextFieldState()
+        Editor(
+            state = state,
+            topBar = {
+                TopAppBar(
+                    title = { Text("Comment") },
+                    navigationIcon = {
+                        IconButton(onClick = { showEditor = false }) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Go back"
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            threadViewModel.postComment(parentId, state.text as String)
+                            showEditor = false
+                        }) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.Send,
+                                contentDescription = "Send Reply"
+                            )
+                        }
+                    }
+                )
+            }) {
+            parentPreview()
+        }
     }
 }

@@ -41,14 +41,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import com.sofamaniac.crabir.FullscreenHandler
 import com.sofamaniac.crabir.LocalDrawerState
-import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.PostCreatorRoute
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
-import com.sofamaniac.crabir.ui.postEditor.PostCreator
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 
@@ -74,67 +72,76 @@ fun FullFeedView(
     val bottomSheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
-    FullscreenHandler {
-        val fullscreenManager = LocalFullscreenHandler.current!!
-        val entity by viewModel.entity.collectAsState(initial = null)
-        val enabledDrawer by remember { fullscreenManager.size.map { it == 0 } }.collectAsState(true)
-        fun createPost(kind: Kind) {
-            showBottomSheet = false
-            fullscreenManager.push {
-                PostCreator(kind = kind, community = entity?.getData())
-            }
-        }
-        Box {
-            val drawerState = LocalDrawerState.current
-            ModalNavigationDrawer(
-                drawerState = drawerState,
-                drawerContent = {
-                    DrawerContent()
-                },
-                gesturesEnabled = enabledDrawer
-            ) {
-                Scaffold(
-                    topBar = topBar,
-                    bottomBar = bottomBar,
-                    modifier = modifier,
-                    floatingActionButton = {
-                        Fab(viewModel, toggleBottomSheet = {
-                            scope.launch {
-                                bottomSheetState.show()
-                            }.invokeOnCompletion {
-                                showBottomSheet = !showBottomSheet
-                            }
-                        })
-                    }
-                ) { innerPadding ->
-                    PostFeedViewer(
-                        viewModel,
-                        feedInfo = feedInfo,
-                        modifier = Modifier.padding(innerPadding)
-                    )
+    //val fullscreenManager = LocalFullscreenHandler.current!!
+    val entity by viewModel.entity.collectAsState(initial = null)
+    //val enabledDrawer by remember { fullscreenManager.size.map { it == 0 } }.collectAsState(true)
+//    fun createPost(kind: Kind) {
+//        showBottomSheet = false
+//        fullscreenManager.push {
+//            PostCreator(kind = kind, community = entity?.getData())
+//        }
+//    }
 
-                    if (showBottomSheet) {
-                        ModalBottomSheet(
-                            onDismissRequest = { showBottomSheet = false },
-                            sheetState = bottomSheetState,
-                        ) {
-                            ListItem(headlineContent = { Text("Create post") })
-                            for (type in postTypes) {
-                                ListItem(
-                                    headlineContent = { Text(type.name) },
-                                    leadingContent = { Icon(type.icon, contentDescription = null) },
-                                    modifier = Modifier.clickable { createPost(type.kind) }
-                                )
-                            }
-                            TextButton(onClick = {
-                                scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
-                                    if (!bottomSheetState.isVisible) {
-                                        showBottomSheet = false
-                                    }
+    val navController = LocalNavController.current!!
+
+    Box {
+        val drawerState = LocalDrawerState.current
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                DrawerContent()
+            },
+            //gesturesEnabled = enabledDrawer
+        ) {
+            Scaffold(
+                topBar = topBar,
+                bottomBar = bottomBar,
+                modifier = modifier,
+                floatingActionButton = {
+                    Fab(viewModel, toggleBottomSheet = {
+                        scope.launch {
+                            bottomSheetState.show()
+                        }.invokeOnCompletion {
+                            showBottomSheet = !showBottomSheet
+                        }
+                    })
+                }
+            ) { innerPadding ->
+                PostFeedViewer(
+                    viewModel,
+                    feedInfo = feedInfo,
+                    modifier = Modifier.padding(innerPadding)
+                )
+
+                if (showBottomSheet) {
+                    ModalBottomSheet(
+                        onDismissRequest = { showBottomSheet = false },
+                        sheetState = bottomSheetState,
+                    ) {
+                        ListItem(headlineContent = { Text("Create post") })
+                        for (type in postTypes) {
+                            ListItem(
+                                headlineContent = { Text(type.name) },
+                                leadingContent = { Icon(type.icon, contentDescription = null) },
+                                modifier = Modifier.clickable {
+                                    //createPost(type.kind)
+                                    navController.navigate(
+                                        PostCreatorRoute(
+                                            type.kind,
+                                            entity?.getData()?.id
+                                        )
+                                    )
                                 }
-                            }) {
-                                Text("Cancel")
+                            )
+                        }
+                        TextButton(onClick = {
+                            scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
+                                if (!bottomSheetState.isVisible) {
+                                    showBottomSheet = false
+                                }
                             }
+                        }) {
+                            Text("Cancel")
                         }
                     }
                 }

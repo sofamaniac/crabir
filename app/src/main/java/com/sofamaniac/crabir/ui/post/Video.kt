@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,10 +30,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
-import com.sofamaniac.crabir.LocalFullscreenHandler
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
+import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.cartouche
@@ -43,7 +47,9 @@ import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
 
 @OptIn(UnstableApi::class)
 @Composable
-fun PostVideo(post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boolean = false) {
+fun PostVideo(
+    post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boolean = false,
+) {
     val video = getVideoUrl(post)
     val filters = rememberFiltersSettings()
     val blur = post.spoiler || (post.over18 && filters.blurNSFW)
@@ -57,7 +63,8 @@ fun PostVideo(post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boole
             )
         }
     val uriHandler = LocalUriHandler.current
-    val fullscreenManager = LocalFullscreenHandler.current!!
+    //val fullscreenManager = LocalFullscreenHandler.current!!
+    val navController = LocalNavController.current!!
 
     if (video == null) {
         val host = post.url.toUri().host
@@ -75,21 +82,20 @@ fun PostVideo(post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boole
             )
         }
     } else {
+        fun goFullscreen() {
+            navController.navigate(FullscreenVideoRoute(post.name))
+        }
         DecoratedVideoPlayer(
             video,
             startPlaying = canPlayVideo && !blur,
             placeholder = placeholder,
             clickable = !blur,
             modifier = modifier.clickable(enabled = blur) {
-                fullscreenManager.push {
-                    FullscreenVideo(post)
-                }
+                goFullscreen()
             },
             fullscreenButton = {
                 IconButton(onClick = {
-                    fullscreenManager.push {
-                        FullscreenVideo(post)
-                    }
+                    goFullscreen()
                 }) {
                     Icon(
                         Icons.Default.Fullscreen,
@@ -142,11 +148,16 @@ fun getVideoUrl(post: PostData): MediaResource? {
 }
 
 @Composable
-fun FullscreenVideo(post: PostData) {
-
+fun FullscreenVideo(
+    post: Fullname,
+    viewModel: PostDataViewModel = hiltViewModel<PostDataViewModel, PostDataViewModel.Factory> { factory ->
+        factory.create(post.name)
+    },
+    dismiss: () -> Unit
+) {
+    val post = viewModel.post.collectAsState(initial = null).value ?: return
     var showDecorations by remember { mutableStateOf(true) }
     val video = getVideoUrl(post)!!
-    val fullscreenManager = LocalFullscreenHandler.current!!
     VerticalSwipeToDismiss(
         topBar = {
             FullscreenTopBar(showDecorations, actions = {})
@@ -154,9 +165,7 @@ fun FullscreenVideo(post: PostData) {
         bottomBar = {
             FullscreenBottomBar(post, showDecorations) {
                 PlayerControls {
-                    IconButton(onClick = {
-                        fullscreenManager.pop()
-                    }, modifier = Modifier.size(32.dp)) {
+                    IconButton(onClick = dismiss, modifier = Modifier.size(32.dp)) {
                         Icon(
                             Icons.Default.FullscreenExit,
                             contentDescription = "Exit fullscreen",
@@ -167,7 +176,7 @@ fun FullscreenVideo(post: PostData) {
                 }
             }
         },
-        onDismiss = { fullscreenManager.pop() },
+        onDismiss = dismiss,
         modifier = Modifier
             .fillMaxSize()
             .clickable {

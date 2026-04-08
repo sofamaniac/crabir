@@ -66,15 +66,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.BuildConfig
-import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.data.remote.api.FlairInfo
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
+import com.sofamaniac.crabir.navigation.CrosspostCreatorRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
-import com.sofamaniac.crabir.ui.postEditor.CrosspostCreator
 import com.sofamaniac.crabir.ui.postEditor.FlairDialog
 import com.sofamaniac.crabir.ui.postEditor.FlairEditBox
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
@@ -281,7 +280,8 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             onDismissRequest()
         }
-    val fullscreenManager = LocalFullscreenHandler.current!!
+    //val fullscreenManager = LocalFullscreenHandler.current!!
+    val navController = LocalNavController.current!!
     Dialog(onDismissRequest) {
         Card(modifier = Modifier.padding(16.dp)) {
             ListItem(
@@ -364,9 +364,10 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
                 headlineContent = { Text("Crosspost") },
                 modifier = Modifier.clickable {
                     onDismissRequest()
-                    fullscreenManager.push {
-                        CrosspostCreator(post)
-                    }
+                    navController.navigate(CrosspostCreatorRoute(post.name))
+//                    fullscreenManager.push {
+//                        CrosspostCreator(post)
+//                    }
                 }
             )
             ListItem(

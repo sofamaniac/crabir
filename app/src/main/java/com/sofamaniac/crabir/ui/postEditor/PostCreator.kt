@@ -47,6 +47,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,16 +64,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.api.FlairInfo
 import com.sofamaniac.crabir.data.remote.api.InvalidUrl
 import com.sofamaniac.crabir.data.remote.api.MissingTitle
 import com.sofamaniac.crabir.data.remote.api.MissingUrl
 import com.sofamaniac.crabir.data.remote.api.PostSubmissionBuilder
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
-import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.mapColor
 import com.sofamaniac.crabir.ui.markdown.Editor
@@ -81,19 +81,19 @@ import com.sofamaniac.crabir.ui.thread.CrossPostView
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCreator(
-    community: SubredditData? = null,
+    communityId: String? = null,
     kind: Kind = Kind.Self,
-    viewModel: PostCreatorViewModel = hiltViewModel()
+    viewModel: PostCreatorViewModel = hiltViewModel(),
+    onDismissRequest: () -> Unit,
 ) {
-    LaunchedEffect(community, kind) {
-        Log.d("PostCreator", "PostCreator: $community $kind")
+    LaunchedEffect(communityId, kind) {
+        Log.d("PostCreator", "PostCreator: $communityId $kind")
         viewModel.state = PostSubmissionBuilder()
-        if (community != null) {
-            viewModel.setSubreddit(community)
+        if (communityId != null) {
+            viewModel.setSubreddit(communityId)
         }
         viewModel.state = viewModel.state.copy(kind = kind)
     }
-    val fullscreenManager = LocalFullscreenHandler.current!!
     val context = LocalContext.current
     val theme = LocalTheme.current
     var showFlairDialog by remember { mutableStateOf(false) }
@@ -104,14 +104,14 @@ fun PostCreator(
             state = viewModel.textState, topBar = {
                 TopAppBar(
                     navigationIcon = {
-                        IconButton(onClick = { fullscreenManager.pop() }) {
+                        IconButton(onClick = onDismissRequest) {
                             Icon(Icons.Default.Close, contentDescription = "Close")
                         }
                     },
                     title = { Text("Create post") },
                     actions = {
                         IconButton(onClick = {
-                            viewModel.submit(context) { fullscreenManager.pop() }
+                            viewModel.submit(context) { onDismissRequest() }
                         }) {
                             Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                         }
@@ -331,28 +331,29 @@ fun FlairEditBox(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrosspostCreator(
-    post: PostData,
+    post: Fullname,
     viewModel: CrosspostCreatorViewModel = hiltViewModel<CrosspostCreatorViewModel, CrosspostCreatorViewModel.Factory> { factory ->
-        factory.create(post.name.name)
+        factory.create(post.name)
     }
 ) {
-    val fullscreenManager = LocalFullscreenHandler.current!!
     val context = LocalContext.current
+    val navController = LocalNavController.current!!
     val theme = LocalTheme.current
+    val post = viewModel.post.collectAsState(initial = null).value ?: return
     Box {
         Scaffold(
             modifier = Modifier.background(theme.cardBackground),
             topBar = {
                 TopAppBar(
                     navigationIcon = {
-                        IconButton(onClick = { fullscreenManager.pop() }) {
+                        IconButton(onClick = { navController.popBackStack() }) {
                             Icon(Icons.Default.Close, contentDescription = "Close")
                         }
                     },
                     title = { Text("Create post") },
                     actions = {
                         IconButton(onClick = {
-                            viewModel.submit(context) { fullscreenManager.pop() }
+                            viewModel.submit(context) { navController.popBackStack() }
                         }) {
                             Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                         }

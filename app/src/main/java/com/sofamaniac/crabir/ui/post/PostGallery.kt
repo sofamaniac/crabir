@@ -23,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,11 +36,14 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Gallery
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.navigation.FullscreenGalleryRoute
+import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.cartouche
@@ -54,6 +58,7 @@ fun PostGallery(
     post: PostData,
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = false,
+    goFullscreen: (Route) -> Unit,
 ) {
     val gallery = post.gallery
     if (gallery?.images.isNullOrEmpty()) {
@@ -67,7 +72,7 @@ fun PostGallery(
         currentPage = state.currentPage
     }
 
-    val fullscreenManager = LocalFullscreenHandler.current!!
+    //val fullscreenManager = LocalFullscreenHandler.current!!
     val filters = rememberFiltersSettings()
     val blur = post.spoiler || (post.over18 && filters.blurNSFW)
     EmbeddedGallery(
@@ -78,14 +83,15 @@ fun PostGallery(
             .fillMaxSize()
             .aspectRatio(gallery.aspectRatio),
         goFullscreen = {
-            fullscreenManager.push {
-                FullscreenGallery(
-                    post = post,
-                    gallery = gallery,
-                    initialPage = currentPage,
-                    onPageChanged = { currentPage = it }
-                )
-            }
+            goFullscreen(FullscreenGalleryRoute(post.name))
+//            fullscreenManager.push {
+//                FullscreenGallery(
+//                    post = post,
+//                    gallery = gallery,
+//                    initialPage = currentPage,
+//                    onPageChanged = { currentPage = it }
+//                )
+//            }
         },
         canPlayVideo = canPlayVideo
     )
@@ -223,15 +229,19 @@ fun EmbeddedGallery(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun FullscreenGallery(
-    post: PostData,
-    gallery: Gallery,
+    post: Fullname,
     initialPage: Int = 0,
+    viewModel: PostDataViewModel = hiltViewModel<PostDataViewModel, PostDataViewModel.Factory> { factory ->
+        factory.create(post.name)
+    },
+    dismiss: () -> Unit,
     onPageChanged: (Int) -> Unit = {},
 ) {
+    val post = viewModel.post.collectAsState(initial = null).value ?: return
+    val gallery = post.gallery ?: return
     val state: PagerState =
         rememberPagerState(initialPage = initialPage, pageCount = { gallery.images.size })
     var showDecorations by remember { mutableStateOf(true) }
-    val fullscreenManager = LocalFullscreenHandler.current!!
     val onClick = {
         showDecorations = !showDecorations
     }
@@ -254,7 +264,7 @@ fun FullscreenGallery(
                 val title = gallery.images[state.currentPage].caption
                 if (showControls) {
                     PlayerControls() {
-                        IconButton(onClick = fullscreenManager::pop) {
+                        IconButton(onClick = dismiss) {
                             Icon(
                                 Icons.Default.FullscreenExit,
                                 contentDescription = "Exit Fullscreen"
@@ -271,7 +281,7 @@ fun FullscreenGallery(
                 }
             }
         },
-        onDismiss = { fullscreenManager.pop() },
+        onDismiss = dismiss,
         modifier = Modifier
             .fillMaxSize()
             .clickable {

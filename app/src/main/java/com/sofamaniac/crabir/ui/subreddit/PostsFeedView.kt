@@ -53,20 +53,19 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import androidx.paging.filter
 import com.sofamaniac.crabir.LocalDrawerState
-import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
-import com.sofamaniac.crabir.ui.HorizontalSwipeToDismiss
 import com.sofamaniac.crabir.ui.SortMenu
 import com.sofamaniac.crabir.ui.post.CompactView
 import com.sofamaniac.crabir.ui.post.PostCard
 import com.sofamaniac.crabir.ui.thread.CommentNode
-import com.sofamaniac.crabir.ui.thread.ThreadView
 import com.sofamaniac.crabir.ui.thread.ThreadViewModel
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -136,8 +135,9 @@ fun PostFeedViewer(
             }
     }
 
-    val fullscreenManager = LocalFullscreenHandler.current!!
+    //val fullscreenManager = LocalFullscreenHandler.current!!
     val viewSettings = rememberViewSettings()
+    val navController = LocalNavController.current!!
 
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,
@@ -166,20 +166,21 @@ fun PostFeedViewer(
             }
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
                 val post = posts[index]
-                val threadView = @Composable { post: PostData ->
-                    HorizontalSwipeToDismiss {
-                        ThreadView(
-                            permalink = post.permalink,
-                            dismiss = {
-                                fullscreenManager.pop()
-                            })
-                    }
-                }
+//                val threadView = @Composable { post: PostData ->
+//                    HorizontalSwipeToDismiss {
+//                        ThreadView(
+//                            permalink = post.permalink,
+//                            dismiss = {
+//                                fullscreenManager.pop()
+//                            })
+//                    }
+//                }
                 when (post) {
                     is PostData -> {
                         val onClick = { post: PostData ->
                             viewModel.visitPost(post)
-                            fullscreenManager.push { threadView(post) }
+                            //fullscreenManager.push { threadView(post) }
+                            navController.navigate(PostRoute(post.permalink, null))
                         }
                         val canStartVideo =
                             viewSettings.defaultColumns == 1 && index == mostVisibleItemIndex
@@ -203,7 +204,8 @@ fun PostFeedViewer(
                                 PostCard(
                                     post,
                                     onClick = { post ->
-                                        fullscreenManager.push { threadView(post) }
+                                        //fullscreenManager.push { threadView(post) }
+                                        navController.navigate(PostRoute(post.permalink, null))
                                     },
                                     canStartVideo = canStartVideo,
                                 )
