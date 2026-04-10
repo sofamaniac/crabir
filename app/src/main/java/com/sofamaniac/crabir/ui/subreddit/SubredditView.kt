@@ -4,7 +4,6 @@
 
 package com.sofamaniac.crabir.ui.subreddit
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -66,7 +65,6 @@ fun SubredditViewer(
         factory.create(subreddit)
     },
 ) {
-    Log.d("SubredditViewer", "subreddit: $subreddit")
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val topBar = @Composable {
         TopBar(
@@ -78,12 +76,12 @@ fun SubredditViewer(
     val bottomBar = @Composable {
         TabBar(2)
     }
+    val feedInfo by viewModel.info.collectAsState()
     FullFeedView(
         topBar, bottomBar, viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         feedInfo = {
-            val subreddit by viewModel.info.collectAsState()
-            val info = subreddit
+            val info = feedInfo
             if (info != null) {
                 SubredditInfo(info, viewModel)
             } else {

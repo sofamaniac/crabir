@@ -50,12 +50,11 @@ class CommunitySearchRepository(private val api: RedditAPIService) :
     ): PagedResponse<Fullname> {
         if (params.query.length < 3) return PagedResponse()
         return makeRequest {
-            api.search(
-                after = after,
+            api.searchSubreddits(
                 query = params.query,
-                type = "sr",
-                sort = params.sort,
-                timeframe = params.timeframe,
+                includeOver18 = params.includeOver18,
+                exact = params.exact,
+                after = after.name,
             )
         }
     }

@@ -20,7 +20,7 @@ abstract class ListingRepository<Params, Data : DataInterface> {
     var cache = mutableMapOf<Fullname, Data>()
         private set
 
-    fun refresh() {
+    open fun refresh() {
         _seenThings = emptySet()
     }
 

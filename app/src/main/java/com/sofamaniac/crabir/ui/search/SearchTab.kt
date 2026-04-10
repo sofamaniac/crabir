@@ -484,21 +484,21 @@ fun SearchSettings(viewModel: CommunitySearchViewModel) {
         ) { sort, _ ->
             viewModel.setSort(sort)
         }
-        ListItem(
-            modifier = Modifier.clickable {
-                viewModel.setIncludeOver18(!params.includeOver18)
-            },
-            headlineContent = {
-                Text("Include NSFW communities")
-            },
-            trailingContent = {
-                Switch(
-                    checked = params.includeOver18,
-                    onCheckedChange = {
-                        viewModel.setIncludeOver18(it)
-                    }
-                )
-            }
-        )
+//        ListItem(
+//            modifier = Modifier.clickable {
+//                viewModel.setIncludeOver18(!params.includeOver18)
+//            },
+//            headlineContent = {
+//                Text("Include NSFW communities")
+//            },
+//            trailingContent = {
+//                Switch(
+//                    checked = params.includeOver18,
+//                    onCheckedChange = {
+//                        viewModel.setIncludeOver18(it)
+//                    }
+//                )
+//            }
+//        )
     }
 }

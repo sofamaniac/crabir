@@ -8,6 +8,7 @@
 
 package com.sofamaniac.crabir.ui.subreddit
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -40,12 +41,17 @@ fun SubredditIcon(
             )
 
         is SubredditIcon.Color -> {
-            val color = Color(icon.color.toColorInt())
+            val color = try {
+                Color(icon.color.toColorInt())
+            } catch (e: Exception) {
+                Log.e("SubredditIcon", "SubredditIcon: $e")
+                Color.Black
+            }
             val textColor = if (color.luminance() > 0.5) Color.Black else Color.White
             Box(
                 modifier = modifier
                     .background(
-                        Color(icon.color.toColorInt()),
+                        color,
                         shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -63,7 +69,7 @@ fun SubredditIcon(
             Box(
                 modifier = modifier
                     .background(
-                        Color("black".toColorInt()),
+                        Color.Black,
                         shape = CircleShape
                     )
                     .border(width = 1.dp, color = Color.White, shape = CircleShape),

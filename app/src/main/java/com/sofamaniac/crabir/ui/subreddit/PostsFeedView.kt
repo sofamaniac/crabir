@@ -94,13 +94,14 @@ object PostFeedViewerDefaults {
 fun PostFeedViewer(
     viewModel: FeedViewModelInterface,
     modifier: Modifier = Modifier,
-    feedInfo: (@Composable () -> Unit)? = null,
+    feedInfo: @Composable () -> Unit = {},
     filter: (VotableData?) -> Boolean = PostFeedViewerDefaults::hiddenFilter
 ) {
 
     val posts =
         remember { viewModel.data.map { it.filter { post -> filter(post) } } }.collectAsLazyPagingItems()
     val listState = viewModel.listState
+
 
     LaunchedEffect(posts.loadState.refresh) {
         if (posts.loadState.refresh is LoadState.NotLoading && viewModel.needScrollToTop) {
@@ -161,21 +162,9 @@ fun PostFeedViewer(
             //verticalArrangement = Arrangement.spacedBy(8.dp),
             state = listState,
         ) {
-            if (feedInfo != null) {
-                item { feedInfo() }
-            }
+            item(key = "info") { feedInfo() }
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
-                val post = posts[index]
-//                val threadView = @Composable { post: PostData ->
-//                    HorizontalSwipeToDismiss {
-//                        ThreadView(
-//                            permalink = post.permalink,
-//                            dismiss = {
-//                                fullscreenManager.pop()
-//                            })
-//                    }
-//                }
-                when (post) {
+                when (val post = posts[index]) {
                     is PostData -> {
                         val onClick = { post: PostData ->
                             viewModel.visitPost(post)

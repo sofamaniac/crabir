@@ -40,11 +40,16 @@ interface SearchAPI {
         @Query("type") type: String,
     ): Response<Listing<Thing>>
 
-    @GET("api/search_subreddits")
+    @GET("subreddits/search.json")
     suspend fun searchSubreddits(
-        @Query("query") query: String,
+        @Query("q") query: String,
         @Query("include_over_18") includeOver18: Boolean = false,
         @Query("exact") exact: Boolean = false,
+        @Query("limit") limit: Int = API_LIMIT,
+        @Query("after") after: String? = null,
+        @Query("before") before: String? = null,
+        @Query("sr_detail") srDetail: Boolean = true,
+        @Query("show_users") showUsers: Boolean = false,
     ): Response<Listing<Thing>>
 }
 

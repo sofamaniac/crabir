@@ -1,7 +1,6 @@
 package com.sofamaniac.crabir.ui.subreddit
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
@@ -66,7 +65,7 @@ fun FullFeedView(
     bottomBar: @Composable () -> Unit,
     viewModel: FeedViewModelInterface,
     modifier: Modifier = Modifier,
-    feedInfo: (@Composable () -> Unit)? = null,
+    feedInfo: @Composable () -> Unit = {},
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
@@ -84,65 +83,63 @@ fun FullFeedView(
 
     val navController = LocalNavController.current!!
 
-    Box {
-        val drawerState = LocalDrawerState.current
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-                DrawerContent()
-            },
-            //gesturesEnabled = enabledDrawer
-        ) {
-            Scaffold(
-                topBar = topBar,
-                bottomBar = bottomBar,
-                modifier = modifier,
-                floatingActionButton = {
-                    Fab(viewModel, toggleBottomSheet = {
-                        scope.launch {
-                            bottomSheetState.show()
-                        }.invokeOnCompletion {
-                            showBottomSheet = !showBottomSheet
-                        }
-                    })
-                }
-            ) { innerPadding ->
-                PostFeedViewer(
-                    viewModel,
-                    feedInfo = feedInfo,
-                    modifier = Modifier.padding(innerPadding)
-                )
+    val drawerState = LocalDrawerState.current
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            DrawerContent()
+        },
+        //gesturesEnabled = enabledDrawer
+    ) {
+        Scaffold(
+            topBar = topBar,
+            bottomBar = bottomBar,
+            modifier = modifier,
+            floatingActionButton = {
+                Fab(viewModel, toggleBottomSheet = {
+                    scope.launch {
+                        bottomSheetState.show()
+                    }.invokeOnCompletion {
+                        showBottomSheet = !showBottomSheet
+                    }
+                })
+            }
+        ) { innerPadding ->
+            PostFeedViewer(
+                viewModel,
+                feedInfo = feedInfo,
+                modifier = Modifier.padding(innerPadding)
+            )
 
-                if (showBottomSheet) {
-                    ModalBottomSheet(
-                        onDismissRequest = { showBottomSheet = false },
-                        sheetState = bottomSheetState,
-                    ) {
-                        ListItem(headlineContent = { Text("Create post") })
-                        for (type in postTypes) {
-                            ListItem(
-                                headlineContent = { Text(type.name) },
-                                leadingContent = { Icon(type.icon, contentDescription = null) },
-                                modifier = Modifier.clickable {
-                                    //createPost(type.kind)
-                                    navController.navigate(
-                                        PostCreatorRoute(
-                                            type.kind,
-                                            entity?.getData()?.id
-                                        )
+            if (showBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showBottomSheet = false },
+                    sheetState = bottomSheetState,
+                ) {
+                    ListItem(headlineContent = { Text("Create post") })
+                    for (type in postTypes) {
+                        ListItem(
+                            headlineContent = { Text(type.name) },
+                            leadingContent = { Icon(type.icon, contentDescription = null) },
+                            modifier = Modifier.clickable {
+                                //createPost(type.kind)
+                                navController.navigate(
+                                    PostCreatorRoute(
+                                        type.kind,
+                                        entity?.getData()?.id
                                     )
-                                }
-                            )
-                        }
-                        TextButton(onClick = {
-                            scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
-                                if (!bottomSheetState.isVisible) {
-                                    showBottomSheet = false
-                                }
+                                )
                             }
-                        }) {
-                            Text("Cancel")
+                        )
+                    }
+                    TextButton(onClick = {
+                        scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
+                            if (!bottomSheetState.isVisible) {
+                                showBottomSheet = false
+                            }
                         }
+                    }) {
+                        Text("Cancel")
                     }
                 }
             }

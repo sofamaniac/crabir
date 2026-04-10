@@ -68,7 +68,9 @@ abstract class CreatorViewModel(
 
     fun setSubreddit(subreddit: String) {
         viewModelScope.launch {
-            community = communities.getCommunity(subreddit)?.getData()
+            val sub = communities.getCommunity(subreddit)?.getData()
+            if (sub == null) return@launch
+            community = sub
             getRules()
             getFlairs()
         }
