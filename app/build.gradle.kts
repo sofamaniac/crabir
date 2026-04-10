@@ -115,7 +115,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     //implementation(libs.androidx.material3)
-    implementation("androidx.compose.material3:material3:1.5.0-alpha15")
+    implementation("androidx.compose.material3:material3:1.5.0-alpha17")
     implementation(libs.appauth)
     implementation(libs.material3)
 

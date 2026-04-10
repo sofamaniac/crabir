@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
@@ -152,6 +153,10 @@ fun PostFeedViewer(
             }
         }
     ) {
+        // Do not render the lazylist if there are no items
+        // This is necessary because when going back from another page,
+        // posts is at first empty and causes the list to lose its scroll state.
+        if (posts.itemCount == 0) return@PullToRefreshBox
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Fixed(viewSettings.defaultColumns),
             verticalItemSpacing = 2.dp,
@@ -162,7 +167,10 @@ fun PostFeedViewer(
             //verticalArrangement = Arrangement.spacedBy(8.dp),
             state = listState,
         ) {
-            item(key = "info") { feedInfo() }
+            item(
+                key = "info",
+                span = StaggeredGridItemSpan.FullLine
+            ) { feedInfo() }
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
                 when (val post = posts[index]) {
                     is PostData -> {
