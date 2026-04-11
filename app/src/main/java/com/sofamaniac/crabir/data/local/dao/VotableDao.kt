@@ -13,8 +13,11 @@ interface VotableDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(votable: VotableEntity)
 
-    @Query("SELECT * FROM votableTable WHERE id = :id")
+    @Query("SELECT * FROM votableTable WHERE id = :id LIMIT 1")
     fun get(id: Fullname): Flow<VotableEntity?>
+
+    @Query("SELECT * FROM votableTable WHERE id = :id LIMIT 1")
+    fun getValue(id: Fullname): VotableEntity?
 
     @Query("UPDATE votableTable SET data = :data WHERE id = :id")
     fun update(id: Fullname, data: String)

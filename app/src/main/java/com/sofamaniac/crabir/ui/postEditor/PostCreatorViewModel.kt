@@ -29,7 +29,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -146,7 +145,7 @@ class PostCreatorViewModel @Inject constructor(
         }
     }
 
-    fun submit(context: Context, onSucceed: () -> Unit) {
+    suspend fun submit(context: Context): Result<Unit> {
         loading = true
         state = state.copy(
             title = titleState.text as String,
@@ -155,35 +154,42 @@ class PostCreatorViewModel @Inject constructor(
             subreddit = community?.displayName ?: ""
         )
         setKind(context)
-        viewModelScope.launch(Dispatchers.IO) {
-            var submission = state.build()
-            if (submission.isFailure) {
-                Log.e("PostCreatorViewModel", "submit: ${submission.exceptionOrNull()}")
-                error = submission.exceptionOrNull() as SubmissionBuilderError?
-                loading = false
+        var submission = state.build()
+        if (submission.isFailure) {
+            Log.e("PostCreatorViewModel", "submit: ${submission.exceptionOrNull()}")
+            error = submission.exceptionOrNull() as SubmissionBuilderError?
+            loading = false
+            return Result.failure(error!!)
+        } else {
+            val mediaIds = uploadMedia(
+                context,
+                kind = if (state.kind == Kind.Gallery) "gallery" else "link"
+            )
+            val items = mediaIds.map {
+                GalleryItem(mediaId = it)
+            }
+            if (mediaIds.size == 1) {
+                state = state.copy(url = mediaIds[0])
+                submission = state.build()
+            }
+            val res = if (state.kind == Kind.Gallery) {
+                val gallery = state.toGallerySubmission()
+                val galleryFinal = gallery.copy(items = items)
+                api.submitGalleryPost(galleryFinal)
             } else {
-                val mediaIds = uploadMedia(
-                    context,
-                    kind = if (state.kind == Kind.Gallery) "gallery" else "link"
-                )
-                val items = mediaIds.map {
-                    GalleryItem(mediaId = it)
-                }
-                if (mediaIds.size == 1) {
-                    state = state.copy(url = mediaIds[0])
-                    submission = state.build()
-                }
-                val res = if (state.kind == Kind.Gallery) {
-                    val gallery = state.toGallerySubmission()
-                    val galleryFinal = gallery.copy(items = items)
-                    api.submitGalleryPost(galleryFinal)
+                api.submitPost(submission.getOrThrow())
+            }
+            loading = false
+            return if (res.isSuccessful) {
+                val response = res.body()
+                Log.d("PostCreatorViewModel", "submit: $response")
+                if (response?.json?.errors?.isNotEmpty() == true) {
+                    Result.failure(Exception(response.json.errors.toString()))
                 } else {
-                    api.submitPost(submission.getOrThrow())
+                    Result.success(Unit)
                 }
-                loading = false
-                if (res.isSuccessful) {
-                    onSucceed()
-                }
+            } else {
+                Result.failure(Exception("Failed to submit post: ${res.errorBody()}"))
             }
         }
     }
@@ -207,24 +213,31 @@ class CrosspostCreatorViewModel @AssistedInject constructor(
 
     var loading by mutableStateOf(false)
 
-    fun submit(context: Context, onSucceed: () -> Unit) {
+    suspend fun submit(): Result<Unit> {
         loading = true
         state = state.copy(
             title = titleState.text as String,
             subreddit = community?.displayName ?: ""
         )
-        viewModelScope.launch(Dispatchers.IO) {
-            val submission = state.build()
-            if (submission.isFailure) {
-                Log.e("PostCreatorViewModel", "submit: ${submission.exceptionOrNull()}")
-                error = submission.exceptionOrNull() as SubmissionBuilderError?
-                loading = false
-            } else {
-                val res = api.submitPost(submission.getOrThrow())
-                loading = false
-                if (res.isSuccessful) {
-                    onSucceed()
+        val submission = state.build()
+        if (submission.isFailure) {
+            Log.e("PostCreatorViewModel", "submit: ${submission.exceptionOrNull()}")
+            error = submission.exceptionOrNull() as SubmissionBuilderError?
+            loading = false
+            return Result.failure(error!!)
+        } else {
+            val res = api.submitPost(submission.getOrThrow())
+            loading = false
+            return if (res.isSuccessful) {
+                val response = res.body()
+                Log.d("PostCreatorViewModel", "submit: $response")
+                if (response?.json?.errors?.isNotEmpty() == true) {
+                    Result.failure(Exception(response.json.errors.toString()))
+                } else {
+                    Result.success(Unit)
                 }
+            } else {
+                Result.failure(Exception("Failed to submit post: ${res.errorBody()}"))
             }
         }
     }

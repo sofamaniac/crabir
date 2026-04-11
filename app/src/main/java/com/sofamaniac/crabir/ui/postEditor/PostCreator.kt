@@ -21,6 +21,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.delete
+import androidx.compose.foundation.text.input.insert
 import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
@@ -41,6 +43,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -51,6 +55,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,6 +82,7 @@ import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.mapColor
 import com.sofamaniac.crabir.ui.markdown.Editor
 import com.sofamaniac.crabir.ui.thread.CrossPostView
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,10 +104,14 @@ fun PostCreator(
     val theme = LocalTheme.current
     var showFlairDialog by remember { mutableStateOf(false) }
     var showFlairEdit by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
     Box(modifier = Modifier.background(color = theme.cardBackground)) {
         Editor(
             modifier = Modifier.background(theme.cardBackground),
-            state = viewModel.textState, topBar = {
+            state = viewModel.textState,
+            snackbarHostState = snackbarHostState,
+            topBar = {
                 TopAppBar(
                     navigationIcon = {
                         IconButton(onClick = onDismissRequest) {
@@ -111,7 +121,14 @@ fun PostCreator(
                     title = { Text("Create post") },
                     actions = {
                         IconButton(onClick = {
-                            viewModel.submit(context) { onDismissRequest() }
+                            scope.launch {
+                                val res = viewModel.submit(context)
+                                if (res.isSuccess) {
+                                    onDismissRequest()
+                                } else {
+                                    snackbarHostState.showSnackbar(res.exceptionOrNull()!!.message!!)
+                                }
+                            }
                         }) {
                             Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                         }
@@ -340,9 +357,23 @@ fun CrosspostCreator(
     val navController = LocalNavController.current!!
     val theme = LocalTheme.current
     val post = viewModel.post.collectAsState(initial = null).value ?: return
+    LaunchedEffect(post) {
+        viewModel.titleState.edit {
+            delete(0, length)
+            insert(0, post.title)
+        }
+        viewModel.state = viewModel.state.copy(
+            title = post.title,
+            nsfw = post.over18,
+            spoiler = post.spoiler,
+        )
+    }
+    val scope = rememberCoroutineScope()
+    val snackbar = remember { SnackbarHostState() }
     Box {
         Scaffold(
             modifier = Modifier.background(theme.cardBackground),
+            snackbarHost = { SnackbarHost(snackbar) },
             topBar = {
                 TopAppBar(
                     navigationIcon = {
@@ -353,7 +384,14 @@ fun CrosspostCreator(
                     title = { Text("Create post") },
                     actions = {
                         IconButton(onClick = {
-                            viewModel.submit(context) { navController.popBackStack() }
+                            scope.launch {
+                                val res = viewModel.submit()
+                                if (res.isSuccess) {
+                                    navController.popBackStack()
+                                } else {
+                                    snackbar.showSnackbar(res.exceptionOrNull()!!.message!!)
+                                }
+                            }
                         }) {
                             Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                         }
@@ -390,36 +428,37 @@ fun CrosspostCreator(
                     "${viewModel.titleState.text.length}/300",
                     modifier = Modifier.align(Alignment.End)
                 )
-                CrossPostView(post)
-            }
-            if (viewModel.flairs.isNotEmpty()) {
-                TextButton(onClick = {}) {
-                    Text("Flair")
-                }
-            }
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(
-                    onClick = {
-                        viewModel.state = viewModel.state.copy(nsfw = !viewModel.state.nsfw)
-                    },
-                    selected = viewModel.state.nsfw,
-                    colors = FilterChipDefaults.filterChipColors().copy(
-                        selectedContainerColor = Color.Red,
-                    ),
-                    label = {
-                        Text("NSFW")
-                    },
-                )
-                FilterChip(
-                    onClick = {
-                        viewModel.state = viewModel.state.copy(spoiler = !viewModel.state.spoiler)
-                    },
-                    selected = viewModel.state.spoiler,
-                    label = {
-                        Text("SPOILER")
+                if (viewModel.flairs.isNotEmpty()) {
+                    TextButton(onClick = {}) {
+                        Text("Flair")
                     }
-                )
+                }
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        onClick = {
+                            viewModel.state = viewModel.state.copy(nsfw = !viewModel.state.nsfw)
+                        },
+                        selected = viewModel.state.nsfw,
+                        colors = FilterChipDefaults.filterChipColors().copy(
+                            selectedContainerColor = Color.Red,
+                        ),
+                        label = {
+                            Text("NSFW")
+                        },
+                    )
+                    FilterChip(
+                        onClick = {
+                            viewModel.state =
+                                viewModel.state.copy(spoiler = !viewModel.state.spoiler)
+                        },
+                        selected = viewModel.state.spoiler,
+                        label = {
+                            Text("SPOILER")
+                        }
+                    )
+                }
+                CrossPostView(post)
             }
         }
         if (viewModel.loading) {

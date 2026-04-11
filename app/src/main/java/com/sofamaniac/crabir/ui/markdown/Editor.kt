@@ -20,6 +20,8 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -32,13 +34,19 @@ import com.sofamaniac.crabir.LocalTheme
 fun Editor(
     state: TextFieldState,
     modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState? = null,
     topBar: @Composable () -> Unit = {},
     beforeEditor: @Composable () -> Unit = {},
 ) {
     val theme = LocalTheme.current
     Scaffold(
         topBar = topBar, modifier = modifier,
-        bottomBar = { BottomBar(state) }
+        bottomBar = { BottomBar(state) },
+        snackbarHost = {
+            if (snackbarHostState != null) {
+                SnackbarHost(snackbarHostState)
+            }
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier

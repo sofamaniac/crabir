@@ -25,7 +25,10 @@ open class VotableRepository(
 
     fun get(name: Fullname): Flow<PostData?> =
         votableDao.get(name).map { it?.asVotableData() as? PostData? }
-        .distinctUntilChanged()
+            .distinctUntilChanged()
+
+    fun getValue(name: Fullname): PostData? =
+        votableDao.getValue(name)?.asVotableData() as PostData?
 
     fun update(name: Fullname, data: VotableData) {
         votableDao.update(name, data.toEntity().data)

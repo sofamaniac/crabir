@@ -36,12 +36,12 @@ interface PostAPI {
 
     @FormUrlEncoded
     @POST("api/submit")
-    suspend fun submitPost(@FieldMap post: Map<String, String>): Response<Unit>
+    suspend fun submitPost(@FieldMap post: Map<String, String>): Response<PostResponse>
 
     @POST("api/submit_gallery_post.json")
     suspend fun submitGalleryPost(
         @Body body: GallerySubmission
-    ): Response<Unit>
+    ): Response<PostResponse>
 
     @FormUrlEncoded
     @POST("api/media/asset.json")
@@ -108,6 +108,17 @@ interface PostAPI {
 
 
 }
+
+@Serializable
+data class PostResponse(
+    val json: PostResponseInner
+)
+
+@Serializable
+data class PostResponseInner(
+    val errors: List<List<String>> = emptyList()
+)
+
 
 interface MediaUploadInterface {
     @POST
