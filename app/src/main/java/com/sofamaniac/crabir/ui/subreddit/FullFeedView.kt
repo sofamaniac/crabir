@@ -65,7 +65,7 @@ fun FullFeedView(
     bottomBar: @Composable () -> Unit,
     viewModel: FeedViewModelInterface,
     modifier: Modifier = Modifier,
-    feedInfo: @Composable () -> Unit = {},
+    feedInfo: (@Composable () -> Unit)? = null,
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()

@@ -41,7 +41,8 @@ fun HomeViewer(
         topBar,
         bottomBar,
         viewModel,
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        feedInfo = null,
     )
 
 }

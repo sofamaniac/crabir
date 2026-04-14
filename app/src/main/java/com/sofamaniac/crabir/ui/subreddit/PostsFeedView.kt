@@ -11,6 +11,7 @@ package com.sofamaniac.crabir.ui.subreddit
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +36,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -95,7 +98,8 @@ object PostFeedViewerDefaults {
 fun PostFeedViewer(
     viewModel: FeedViewModelInterface,
     modifier: Modifier = Modifier,
-    feedInfo: @Composable () -> Unit = {},
+    // If set to {}, breaks pull to refresh
+    feedInfo: (@Composable () -> Unit)? = null,
     filter: (VotableData?) -> Boolean = PostFeedViewerDefaults::hiddenFilter
 ) {
 
@@ -133,23 +137,38 @@ fun PostFeedViewer(
         }
             .filterNotNull()
             .collect { index ->
-                mostVisibleItemIndex = index
+                mostVisibleItemIndex = if (feedInfo != null) {
+                    index + 1
+                } else {
+                    index
+                }
             }
     }
 
     //val fullscreenManager = LocalFullscreenHandler.current!!
     val viewSettings = rememberViewSettings()
     val navController = LocalNavController.current!!
+    val state = rememberPullToRefreshState()
 
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,
+        state = state,
         onRefresh = {
             viewModel.refresh()
         },
         modifier = modifier.fillMaxSize(),
         indicator = {
-            if (posts.loadState.refresh == LoadState.Loading) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            val refreshing = posts.loadState.refresh == LoadState.Loading
+            Box(modifier = Modifier.fillMaxWidth()) {
+                if (refreshing) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                } else {
+                    PullToRefreshDefaults.Indicator(
+                        state,
+                        isRefreshing = false,
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
+                }
             }
         }
     ) {
@@ -167,10 +186,12 @@ fun PostFeedViewer(
             //verticalArrangement = Arrangement.spacedBy(8.dp),
             state = listState,
         ) {
-            item(
-                key = "info",
-                span = StaggeredGridItemSpan.FullLine
-            ) { feedInfo() }
+            if (feedInfo != null) {
+                item(
+                    key = "info",
+                    span = StaggeredGridItemSpan.FullLine
+                ) { feedInfo() }
+            }
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
                 when (val post = posts[index]) {
                     is PostData -> {
