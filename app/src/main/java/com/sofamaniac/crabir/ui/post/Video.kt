@@ -138,13 +138,12 @@ fun YoutubeVideo(post: PostData, modifier: Modifier = Modifier) {
 
 
 fun getVideoUrl(post: PostData): MediaResource? {
-    val media =
+    var media =
         post.media.media?.redditVideo?.toMediaResource() ?: post.crosspostParentList.firstOrNull()
             ?.let { getVideoUrl(it) }
-    if (media != null) {
-        return media
-    }
-    return post.preview?.images?.firstOrNull()?.variants?.mp4?.source?.toMediaResource()
+    media = media ?: post.preview?.images?.firstOrNull()?.variants?.mp4?.source?.toMediaResource()
+    media = media ?: post.preview?.redditVideoPreview?.toMediaResource()
+    return media
 }
 
 @Composable

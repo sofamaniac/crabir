@@ -21,7 +21,8 @@ enum class Kind {
 
 fun isVideoPost(post: PostDTO): Boolean {
     return post.isVideo || (post.postHint == "image" && isVideoUrl(post.url)) ||
-            (post.preview?.images?.any { it.variants?.mp4 != null } ?: false)
+            (post.preview?.images?.any { it.variants?.mp4 != null } ?: false) ||
+            (post.preview?.redditVideoPreview != null)
 }
 
 fun getKind(post: PostDTO): Kind {

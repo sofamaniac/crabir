@@ -122,14 +122,14 @@ fun PostFeedViewer(
             if (!listState.isScrollInProgress) {
                 listState.layoutInfo.visibleItemsInfo
                     .maxByOrNull { item ->
-                        item.size
                         val itemTop = maxOf(item.offset.y, 0)
                         val itemBottom =
                             minOf(
                                 item.offset.y + item.size.height,
                                 listState.layoutInfo.viewportEndOffset
                             )
-                        (itemBottom - itemTop).toFloat() / max(item.size.height, 1).toFloat()
+                        val visibleHeight = (itemBottom - itemTop).toFloat()
+                        visibleHeight / max(item.size.height, 1).toFloat()
                     }?.index ?: 0
             } else {
                 null
@@ -138,7 +138,7 @@ fun PostFeedViewer(
             .filterNotNull()
             .collect { index ->
                 mostVisibleItemIndex = if (feedInfo != null) {
-                    index + 1
+                    index - 1
                 } else {
                     index
                 }
