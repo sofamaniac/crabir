@@ -10,7 +10,7 @@ package com.sofamaniac.crabir.ui.post
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -51,11 +51,12 @@ fun PostHeader(
 ) {
     val navController = LocalNavController.current!!
     val theme = LocalTheme.current
-    Row(
+    FlowRow(
         modifier = modifier
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        //verticalAlignment = Alignment.CenterVertically,
+        itemVerticalAlignment = Alignment.CenterVertically
     ) {
         if (showSubredditIcon) {
             SubredditIcon(
