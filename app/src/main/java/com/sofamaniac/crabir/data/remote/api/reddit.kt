@@ -191,7 +191,14 @@ interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, Search
     @POST("api/subscribe")
     suspend fun subscribe(
         @Field("action") action: SubscribeAction,
-        @Field("sr") subreddit: String,
+        @Field("sr") subreddit: Fullname,
+    ): Response<Unit>
+
+    @FormUrlEncoded
+    @POST("api/subscribe")
+    suspend fun subscribe(
+        @Field("action") action: SubscribeAction,
+        @Field("sr_name") subreddit: String,
     ): Response<Unit>
 
 }

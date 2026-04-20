@@ -194,12 +194,16 @@ class SubredditViewModel @AssistedInject constructor(
     fun subscribe() {
         viewModelScope.launch {
             repository.subscribe()
+            _info.value = repository.getInfo()
+            _info.value?.let { subredditCache.save(it) }
         }
     }
 
     fun unsubscribe() {
         viewModelScope.launch {
             repository.unsubscribe()
+            _info.value = repository.getInfo()
+            _info.value?.let { subredditCache.save(it) }
         }
     }
 
