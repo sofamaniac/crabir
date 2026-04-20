@@ -44,7 +44,7 @@ import kotlinx.coroutines.runBlocking
 interface FeedViewModelInterface {
     val listState: LazyStaggeredGridState
     val data: Flow<PagingData<VotableData>>
-    val needScrollToTop: Boolean
+    var needScrollToTop: Boolean
     val entity: Flow<VisitedCommunityEntity?>
 
     fun refresh()
@@ -67,9 +67,7 @@ abstract class PostFeedViewModel(
             val e = entity.firstOrNull()
             Log.d("PostFeedViewModel", "init: $e")
             if (e?.sort != null) {
-                _params.update {
-                    it.copy(sort = e.sort, timeframe = e.timeframe)
-                }
+                updateSort(e.sort, e.timeframe)
             }
         }
     }
@@ -128,6 +126,7 @@ abstract class PostFeedViewModel(
 
     fun updateSort(sort: Sort, timeframe: Timeframe? = null) {
         val needRefresh = params.value.sort != sort || params.value.timeframe != timeframe
+        Log.d("PostFeedViewModel", "_params: ${params.value}, sort: $sort, timeframe: $timeframe")
         _params.update {
             if (!needRefresh) it
             else {

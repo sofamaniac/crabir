@@ -112,6 +112,7 @@ fun PostFeedViewer(
         if (posts.loadState.refresh is LoadState.NotLoading && viewModel.needScrollToTop) {
             Log.d("PostFeedViewer", "Refreshing list")
             listState.scrollToItem(0)
+            viewModel.needScrollToTop = false
         }
     }
 
