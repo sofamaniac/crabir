@@ -43,6 +43,7 @@ fun AlwaysOnInfo(modifier: Modifier = Modifier) {
         RemainingTimeText(
             player,
             style = MaterialTheme.typography.labelLarge,
+            color = Color.White,
             modifier = Modifier
                 .height(32.dp)
                 .cartouche(backgroundColor)
