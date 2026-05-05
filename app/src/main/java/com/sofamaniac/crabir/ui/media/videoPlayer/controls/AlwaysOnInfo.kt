@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.media.videoPlayer.controls
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,10 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.material3.buttons.MuteButton
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 
+@OptIn(UnstableApi::class)
 @Composable
 fun AlwaysOnInfo(modifier: Modifier = Modifier) {
     val backgroundColor = Color.Black.copy(alpha = 0.66f)
@@ -42,8 +45,7 @@ fun AlwaysOnInfo(modifier: Modifier = Modifier) {
         }
         RemainingTimeText(
             player,
-            style = MaterialTheme.typography.labelLarge,
-            color = Color.White,
+            style = MaterialTheme.typography.labelLarge.copy(color = Color.White),
             modifier = Modifier
                 .height(32.dp)
                 .cartouche(backgroundColor)
