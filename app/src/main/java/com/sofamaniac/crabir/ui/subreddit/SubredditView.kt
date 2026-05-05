@@ -84,7 +84,7 @@ fun SubredditViewer(
             val info = feedInfo
             if (info != null) {
                 SubredditInfo(info, viewModel)
-            } else {
+            } else if (subreddit != "all" && subreddit != "popular") {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.Center,
@@ -179,7 +179,7 @@ class SubredditViewModel @AssistedInject constructor(
         _info.value = subredditCache.get(subredditName)
         repository.updateSubreddit(subredditName)
         viewModelScope.launch {
-            if (_info.value == null) {
+            if (_info.value == null && subredditName != "all" && subredditName != "popular") {
                 _info.value = repository.getInfo()
                 _info.value?.let { subredditCache.save(it) }
             }
