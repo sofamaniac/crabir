@@ -19,6 +19,14 @@ sealed class CommentType() {
                 is More -> data.name
             }
 
+    val parentId: Fullname
+        get() =
+            when (this) {
+                is Comment -> comment.parentId
+                is More -> data.parentId
+            }
+
+
     val depth: Int
         get() =
             when (this) {
@@ -34,7 +42,7 @@ data class CommentData(
     val depth: Int,
     val bodyMd: String,
     val bodyHtml: String,
-    val parentId: String,
+    val parentId: Fullname,
     val permalink: String,
     val replies: List<CommentType>,
     val author: AuthorInfo,

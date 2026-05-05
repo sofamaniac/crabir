@@ -41,7 +41,7 @@ data class CommentDTO(
     val bodyHtml: String,
     val depth: Int = -1,
     @SerialName("parent_id")
-    val parentId: String,
+    val parentId: Fullname,
     val permalink: String,
     @Serializable(with = EmptyStringOrListingSerializer::class)
     val replies: Thing.Listing<Thing>,

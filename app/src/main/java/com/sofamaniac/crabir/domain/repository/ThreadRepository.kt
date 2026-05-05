@@ -178,6 +178,36 @@ fun List<CommentType>.replaceMore(
             is CommentType.More -> it.name != more.name
         }
     }
-    return withoutMore + children
+    return children.fold(withoutMore) { acc, c ->
+        val res = acc.insertComment(c)
+        if (!res.second) {
+            acc + c
+        } else {
+            res.first
+        }
+    }
 }
 
+/** Try to insert the comment into the list given in respect with `parentId`,
+ * the boolean is true when the element was inserted */
+fun List<CommentType>.insertComment(
+    comment: CommentType
+): Pair<List<CommentType>, Boolean> {
+    var inserted = false
+    val result = this.map { c ->
+        if (c is CommentType.Comment) {
+            if (c.name == comment.parentId) {
+                val children = c.comment.replies + comment
+                inserted = true
+                c.copy(comment = c.comment.copy(replies = children))
+            } else {
+                val children = c.comment.replies.insertComment(comment)
+                inserted = inserted || children.second
+                c.copy(comment = c.comment.copy(replies = children.first))
+            }
+        } else {
+            c
+        }
+    }
+    return Pair(result, inserted)
+}
