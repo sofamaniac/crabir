@@ -23,14 +23,16 @@ import org.commonmark.parser.block.MatchedBlockParser
 import org.commonmark.parser.block.ParserState
 import java.util.regex.Pattern
 
+const val SPOILER_OPEN = "\ue000"
+const val SPOILER_CLOSE = "\ue000"
 class SpoilerInline(val content: String) : CustomNode()
 
 class SpoilerInlineProcessor : InlineProcessor() {
 
-    private val pattern = Pattern.compile(">!(.*?)!<", Pattern.DOTALL)
+    private val pattern = Pattern.compile("$SPOILER_OPEN(.*?)$SPOILER_CLOSE", Pattern.DOTALL)
 
     override fun specialCharacter(): Char {
-        return '>'
+        return '\ue000'
     }
 
     override fun parse(): Node? {

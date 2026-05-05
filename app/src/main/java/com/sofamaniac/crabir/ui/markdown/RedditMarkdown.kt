@@ -87,7 +87,7 @@ fun RedditMarkdown(
         markdown
             .extractRedditLinks()
             .convertGiphy()
-            //.convertRedditSpoilers()
+            .convertRedditSpoilers()
             //.convertRedditPreviewLinks(mediaMetadata)
             .convertRedditSuperscript()
             .fuseQuote()
@@ -292,7 +292,7 @@ private fun String.convertRedditSpoilers(): String {
     val spoilerRegex = Regex(""">!(.*?)!<""")
     return spoilerRegex.replace(this) {
         val inner = it.groupValues[1]
-        "&gt;! $inner !&lt;"
+        "$SPOILER_OPEN $inner $SPOILER_CLOSE;"
     }
 }
 
