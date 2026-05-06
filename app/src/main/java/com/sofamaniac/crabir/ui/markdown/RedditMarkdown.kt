@@ -127,7 +127,7 @@ fun RedditMarkdown(
                 }
                 .let { mod ->
                     viewModel.height?.let { size ->
-                        mod.then(Modifier.height(with(LocalDensity.current) { size.toDp() }))
+                        mod.height(with(LocalDensity.current) { size.toDp() })
                     } ?: mod
                 }
                 .fillMaxWidth(),

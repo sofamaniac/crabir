@@ -120,10 +120,7 @@ class ThreadRepositoryImpl @Inject constructor(
                 } else {
                     comments.updateComment(more.data.parentId) { comment ->
                         if (comment is CommentType.Comment) {
-                            val replies = comment.comment.replies.replaceMore(more, children)
-                            comment.copy(
-                                comment = comment.comment.copy(replies = replies)
-                            )
+                            comment.replaceMore(more, children)
                         } else {
                             comment
                         }
@@ -184,6 +181,40 @@ fun List<CommentType>.replaceMore(
             acc + c
         } else {
             res.first
+        }
+    }
+}
+
+fun CommentType.Comment.replaceMore(
+    more: CommentType.More,
+    replies: List<CommentType>
+): CommentType {
+    val withoutMore = comment.replies.filter {
+        when (it) {
+            is CommentType.Comment -> true
+            is CommentType.More -> it.name != more.name
+        }
+    }
+    return replies.fold(
+        this.copy(comment = comment.copy(replies = withoutMore)) as CommentType,
+    ) { acc, reply ->
+        acc.insertReply(reply)
+    }
+}
+
+fun CommentType.insertReply(reply: CommentType): CommentType {
+    when (this) {
+        is CommentType.More -> {
+            return this
+        }
+
+        is CommentType.Comment -> {
+            val replies: List<CommentType> = if (reply.parentId == this.name) {
+                comment.replies + reply
+            } else {
+                comment.replies.map { it.insertReply(reply) }
+            }
+            return this.copy(comment = comment.copy(replies = replies))
         }
     }
 }

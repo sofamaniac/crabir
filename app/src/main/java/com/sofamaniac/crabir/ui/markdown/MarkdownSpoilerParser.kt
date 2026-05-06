@@ -152,5 +152,6 @@ class BlockQuoteParser : AbstractBlockParser() {
 // Extension function for easier usage
 fun Markwon.Builder.useRedditSpoilers(): Markwon.Builder {
     //return this.usePlugin(RedditSpoilerSpanFactoryPlugin())
-    return this.usePlugin(RedditSpoilerPlugin.create())
+    return this
+        .usePlugin(RedditSpoilerPlugin.create())
 }
