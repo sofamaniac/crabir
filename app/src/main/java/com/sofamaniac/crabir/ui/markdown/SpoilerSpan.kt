@@ -19,7 +19,6 @@ class SpoilerSpan : ClickableSpan() {
     }
 
     override fun updateDrawState(ds: TextPaint) {
-        Log.d("SpoilerSpan", "updateDrawState: $isRevealed")
         if (!isRevealed) {
             // Save original text color
             startingTextColor = ds.color
