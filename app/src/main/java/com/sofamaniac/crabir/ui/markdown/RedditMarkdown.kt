@@ -210,13 +210,13 @@ private fun redditMarkwonBuilder(
 ): () -> Markwon = {
 
     Markwon.builder(context)
+        .useRedditSpoilers()
         .usePlugin(MarkwonInlineParserPlugin.create())
         .usePlugin(StrikethroughPlugin.create())
         .usePlugin(TablePlugin.create(context))
         .usePlugin(MarkdownTheme(colorScheme, theme))
         .usePlugin(HtmlPlugin.create())
         .usePlugin(LinkifyPlugin.create(Linkify.WEB_URLS))
-        .useRedditSpoilers()
         .usePlugin(
             GlideImagesPlugin.create(
                 object : GlideImagesPlugin.GlideStore {
@@ -284,7 +284,7 @@ private fun AsyncDrawable.getMetadata(mediaMetadata: Map<String, MediaMetadata>)
     }
     // Otherwise assume destination is a link
     val url = destination.toUri()
-    val filename = url.pathSegments.last().split('.').first()
+    val filename = url.pathSegments.lastOrNull()?.split('.')?.firstOrNull()
     return mediaMetadata[filename]?.toMediaResource()
 }
 
