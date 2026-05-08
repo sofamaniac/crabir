@@ -87,7 +87,7 @@ fun RedditMarkdown(
         markdown
             .extractRedditLinks()
             .convertGiphy()
-            .convertRedditSpoilers()
+            //.convertRedditSpoilers()
             //.convertRedditPreviewLinks(mediaMetadata)
             .convertRedditSuperscript()
             .fuseQuote()
@@ -288,14 +288,14 @@ private fun AsyncDrawable.getMetadata(mediaMetadata: Map<String, MediaMetadata>)
     return mediaMetadata[filename]?.toMediaResource()
 }
 
-private fun String.convertRedditSpoilers(): String {
-    val spoilerRegex = Regex(""">!(.*?)!<""")
-    return spoilerRegex.replace(this) {
-        val inner = it.groupValues[1]
-        "$SPOILER_OPEN $inner $SPOILER_CLOSE;"
-    }
-}
-
+//private fun String.convertRedditSpoilers(): String {
+//    val spoilerRegex = Regex(""">!(.*?)!<""")
+//    return spoilerRegex.replace(this) {
+//        val inner = it.groupValues[1]
+//        "$SPOILER_OPEN $inner $SPOILER_CLOSE;"
+//    }
+//}
+//
 
 /** Convert all markdown links that correspond to some media metadata to a markdown image */
 private fun String.convertRedditPreviewLinks(mediaMetadata: Map<String, MediaMetadata>): String {
