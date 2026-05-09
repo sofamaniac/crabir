@@ -178,6 +178,8 @@ dependencies {
 
     // Render markdown
     implementation(libs.markdown)
+    implementation("com.mikepenz:multiplatform-markdown-renderer:0.40.2")
+    implementation("com.mikepenz:multiplatform-markdown-renderer-m3:0.40.2")
 
     implementation(libs.core)
     implementation(libs.ext.tables)
