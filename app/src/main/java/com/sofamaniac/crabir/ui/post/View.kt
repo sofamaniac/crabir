@@ -27,6 +27,7 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.VotableRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import dagger.assisted.Assisted
@@ -62,7 +63,8 @@ internal fun ColumnScope.PostBody(
             markdown = selftext,
             maxLines = maxLines,
             modifier = modifier.padding(horizontal = 16.dp),
-            mediaMetadata = post.mediaMetadata
+            mediaMetadata = post.mediaMetadata,
+            onClick = { goFullscreen(PostRoute(post.permalink, null)) }
         )
     }
     when (post.kind) {

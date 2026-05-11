@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.withStyle
@@ -25,10 +26,11 @@ class RedditAnnotator(
     val spoilers: MutableMap<String, Boolean>,
     override var config: MarkdownAnnotatorConfig,
     val depth: Int = 0,
+    val linkInteractionListener: LinkInteractionListener?,
 ) : MarkdownAnnotator {
 
     val superscriptStyle =
-        SpanStyle(baselineShift = BaselineShift.Companion.Superscript, fontSize = 12.sp)
+        SpanStyle(baselineShift = BaselineShift.Superscript, fontSize = 12.sp)
     val makeSettings: (text: String) -> AnnotatorSettings = { text ->
         DefaultAnnotatorSettings(
             linkTextSpanStyle = typography.textLink,
@@ -38,14 +40,16 @@ class RedditAnnotator(
                 referenceLinkHandler,
                 spoilers,
                 config,
-                depth + 1
+                depth + 1,
+                linkInteractionListener
             ),
             referenceLinkHandler = referenceLinkHandler,
-            linkInteractionListener = if (spoilers[text] == true || depth > 0) {
-                null
-            } else {
-                { spoilers[text] = true }
-            }
+            linkInteractionListener = linkInteractionListener
+                ?: if (spoilers[text] == true || depth > 0) {
+                    null
+                } else {
+                    LinkInteractionListener { spoilers[text] = true }
+                }
         )
 
     }
@@ -70,17 +74,19 @@ class RedditAnnotator(
             when (child.type) {
                 RedditFlavourElementType.SPOILER if depth == 0 -> {
                     //appendInlineContent("SPOILER", child.getUnescapedTextInNode(content))
+                    val settings = makeSettings(text)
                     pushStringAnnotation(tag = "SPOILER", annotation = text)
                     withStyle(
                         SpanStyle(
-                            color = if (spoilers[text] == true) Color.Companion.White else Color.Companion.Transparent,
-                            background = if (spoilers[text] == true) Color.Companion.Unspecified else Color.Companion.White
+                            color = if (spoilers[text] == true) Color.White else Color.Transparent,
+                            background = if (spoilers[text] == true) Color.Unspecified else Color.White
                         )
                     ) {
                         addLink(
-                            LinkAnnotation.Clickable(tag = "SPOILER", linkInteractionListener = {
-                                spoilers[text] = true
-                            }),
+                            LinkAnnotation.Clickable(
+                                tag = "SPOILER",
+                                linkInteractionListener = settings.linkInteractionListener
+                            ),
                             0,
                             text.length
                         )
@@ -116,16 +122,16 @@ internal fun List<ASTNode>.removeSpoilerMarker(): List<ASTNode> {
     val start =
         if (this.firstOrNull()?.type == RedditFlavourElementType.SPOILER_START) {
             1
-        } else if (this.getOrNull(0)?.type == MarkdownTokenTypes.Companion.GT
-            && this.getOrNull(1)?.type == MarkdownTokenTypes.Companion.EXCLAMATION_MARK
+        } else if (this.getOrNull(0)?.type == MarkdownTokenTypes.GT
+            && this.getOrNull(1)?.type == MarkdownTokenTypes.EXCLAMATION_MARK
         ) {
             2
         } else {
             0
         }
     val end =
-        if (this.getOrNull(size - 1)?.type == MarkdownTokenTypes.Companion.LT
-            && this.getOrNull(size - 2)?.type == MarkdownTokenTypes.Companion.EXCLAMATION_MARK
+        if (this.getOrNull(size - 1)?.type == MarkdownTokenTypes.LT
+            && this.getOrNull(size - 2)?.type == MarkdownTokenTypes.EXCLAMATION_MARK
         ) {
             size - 2
         } else {
@@ -137,12 +143,12 @@ internal fun List<ASTNode>.removeSpoilerMarker(): List<ASTNode> {
 internal fun List<ASTNode>.removeSuperscriptParenthesis(): List<ASTNode> {
     // First element is always SUPERSCRIPT
     if (size <= 1) return this
-    val start = if (this.getOrNull(1)?.type == MarkdownTokenTypes.Companion.LPAREN) {
+    val start = if (this.getOrNull(1)?.type == MarkdownTokenTypes.LPAREN) {
         2
     } else {
         1
     }
-    val end = if (this.lastOrNull()?.type == MarkdownTokenTypes.Companion.RPAREN) {
+    val end = if (this.lastOrNull()?.type == MarkdownTokenTypes.RPAREN) {
         size - 1
     } else {
         size
