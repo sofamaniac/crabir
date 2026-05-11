@@ -3,7 +3,6 @@ package com.sofamaniac.crabir.ui.markdown.redditFlavour.lexer;
 import com.sofamaniac.crabir.ui.markdown.redditFlavour.RedditFlavourElementType;import org.intellij.markdown.MarkdownTokenTypes;
 import org.intellij.markdown.flavours.gfm.GFMTokenTypes;
 import org.intellij.markdown.IElementType;
-import org.intellij.markdown.lexer.GeneratedLexer;
 
 /* Auto generated File */
 %%
@@ -321,6 +320,10 @@ GFM_AUTOLINK = (("http" "s"? | "ftp" | "file")"://" | "www.") {HOST_PART} ("." {
 
   "~" {
     return getReturnGeneralized(GFMTokenTypes.TILDE);
+  }
+
+  "^" {
+    return getReturnGeneralized(RedditFlavourElementType.SUPERSCRIPT);
   }
 
   {AUTOLINK} { return parseDelimited(MarkdownTokenTypes.AUTOLINK, false); }

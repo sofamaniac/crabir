@@ -1,19 +1,10 @@
 package com.sofamaniac.crabir.ui.markdown.redditFlavour
 
-import org.intellij.markdown.MarkdownElementType
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.parser.sequentialparsers.RangesListBuilder
 import org.intellij.markdown.parser.sequentialparsers.SequentialParser
 import org.intellij.markdown.parser.sequentialparsers.TokensCache
 
-
-object RedditFlavourElementType {
-    @JvmField
-    val SPOILER_START = MarkdownElementType("SPOILER_START", isToken = true)
-
-    @JvmField
-    val SPOILER = MarkdownElementType("SPOILER")
-}
 
 class SpoilerParser : SequentialParser {
     val lastOpenedPos = mutableListOf<Int>()

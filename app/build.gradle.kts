@@ -181,6 +181,7 @@ dependencies {
     implementation("com.mikepenz:multiplatform-markdown-renderer:0.40.2")
     implementation("com.mikepenz:multiplatform-markdown-renderer-m3:0.40.2")
     implementation("com.mikepenz:multiplatform-markdown-renderer-coil3:0.40.2")
+    implementation("io.coil-kt.coil3:coil-gif:3.4.0")
 
     implementation(libs.core)
     implementation(libs.ext.tables)

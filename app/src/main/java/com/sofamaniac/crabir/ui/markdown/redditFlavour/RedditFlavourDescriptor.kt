@@ -28,6 +28,7 @@ class RedditFlavourDescriptor : GFMFlavourDescriptor() {
             override fun getParserSequence(): List<SequentialParser> {
                 return listOf(
                     SpoilerParser(),
+                    SuperscriptParser(),
                     BacktickParser(),
                     MathParser(),
                     ImageParser(),
