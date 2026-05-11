@@ -163,7 +163,7 @@ private fun String.convertGiphy(toImage: Boolean): String {
     val giphyPatter = Regex("!\\[gif]\\(giphy\\|(.*)\\)")
     return giphyPatter.replace(this) { matchResult ->
         val id = matchResult.groupValues[1].split("|").first()
-        if (toImage) "!" else "" +
+        (if (toImage) "!" else "") +
                 "[https://giphy.com/gifs/${id}](https://media.giphy.com/media/${id}/giphy.gif)"
     }
 }

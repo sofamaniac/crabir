@@ -1,11 +1,11 @@
 package com.sofamaniac.crabir.ui.markdown
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
@@ -32,8 +32,12 @@ class RedditAnnotator(
     val superscriptStyle =
         SpanStyle(baselineShift = BaselineShift.Superscript, fontSize = 12.sp)
     val makeSettings: (text: String) -> AnnotatorSettings = { text ->
+        val style = typography.textLink.style!!.copy(color = Color.Transparent)
+        val linkStyle = TextLinkStyles(
+            style = style,
+        )
         DefaultAnnotatorSettings(
-            linkTextSpanStyle = typography.textLink,
+            linkTextSpanStyle = if (spoilers[text] == true) typography.textLink else linkStyle,
             codeSpanStyle = typography.inlineCode.toSpanStyle(),
             annotator = RedditAnnotator(
                 typography,
@@ -90,7 +94,6 @@ class RedditAnnotator(
                             0,
                             text.length
                         )
-                        Log.d("SpoilerAnnotator", "${child.children}")
                         buildMarkdownAnnotatedString(
                             content,
                             child.children.removeSpoilerMarker(),
