@@ -178,22 +178,10 @@ dependencies {
 
     // Render markdown
     implementation(libs.markdown)
-    implementation("com.mikepenz:multiplatform-markdown-renderer:0.40.2")
-    implementation("com.mikepenz:multiplatform-markdown-renderer-m3:0.40.2")
-    implementation("com.mikepenz:multiplatform-markdown-renderer-coil3:0.40.2")
-    implementation("io.coil-kt.coil3:coil-gif:3.4.0")
-
-    implementation(libs.core)
-    implementation(libs.ext.tables)
-    implementation(libs.ext.strikethrough)
-    implementation(libs.image)
-    implementation(libs.html)
-    implementation(libs.image.coil)
-    implementation(libs.image.glide)
-    implementation(libs.coil)
-    implementation(libs.inline.parser)
-    implementation(libs.simple.ext)
-    implementation(libs.linkify)
+    implementation(libs.multiplatform.markdown.renderer)
+    implementation(libs.multiplatform.markdown.renderer.m3)
+    implementation(libs.multiplatform.markdown.renderer.coil3)
+    implementation(libs.coil3.coil.gif)
 
     implementation(libs.glide)
     annotationProcessor(libs.glide)
