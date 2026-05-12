@@ -14,7 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.LinkInteractionListener
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -26,6 +29,7 @@ import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.DefaultMarkdownAnnotatorConfig
+import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.ReferenceLinkHandlerImpl
 import com.mikepenz.markdown.model.State
 import com.mikepenz.markdown.model.markdownAnimations
@@ -75,18 +79,7 @@ private fun InnerRedditMarkdown(
     linkInteractionListener: LinkInteractionListener? = null,
 ) {
     val state by viewModel.markdownFlow.collectAsStateWithLifecycle()
-    val theme = LocalTheme.current
-    val linkStyle = MaterialTheme.typography.bodyMediumEmphasized.copy(
-        color = theme.linkColor,
-        textDecoration = TextDecoration.Underline
-    )
-    val typography = markdownTypography(
-        quote = MaterialTheme.typography.bodyMedium.copy(color = theme.highlight),
-        textLink = TextLinkStyles(
-            style = linkStyle.toSpanStyle(),
-            pressedStyle = linkStyle.copy(color = Color(0xFF800080)).toSpanStyle()
-        )
-    )
+    val typography = redditMarkdownTypography()
     val referenceLinkHandler = ReferenceLinkHandlerImpl()
     val spoilers = remember { mutableStateMapOf<String, Boolean>() }
     Markdown(
@@ -196,4 +189,36 @@ class MarkdownViewModel @AssistedInject constructor(
             enableImages: Boolean
         ): MarkdownViewModel
     }
+}
+
+@Composable
+fun redditMarkdownTypography(): MarkdownTypography {
+    val theme = LocalTheme.current
+    val text = MaterialTheme.typography.bodyLarge
+    val linkStyle = MaterialTheme.typography.bodyMediumEmphasized.copy(
+        color = theme.linkColor,
+        textDecoration = TextDecoration.Underline
+    )
+    return markdownTypography(
+        h1 = MaterialTheme.typography.headlineLarge,
+        h2 = MaterialTheme.typography.headlineMedium,
+        h3 = MaterialTheme.typography.headlineSmall,
+        h4 = MaterialTheme.typography.titleLarge,
+        h5 = MaterialTheme.typography.titleMedium,
+        h6 = MaterialTheme.typography.titleSmall,
+        text = text,
+        code = text.copy(fontFamily = FontFamily.Monospace),
+        inlineCode = text.copy(fontFamily = FontFamily.Monospace),
+        quote = text.copy(color = theme.highlight)
+            .plus(SpanStyle(fontStyle = FontStyle.Italic)),
+        paragraph = text,
+        ordered = text,
+        bullet = text,
+        list = text,
+        textLink = TextLinkStyles(
+            style = linkStyle.toSpanStyle(),
+            pressedStyle = linkStyle.copy(color = Color(0xFF800080)).toSpanStyle()
+        ),
+        table = text,
+    )
 }
