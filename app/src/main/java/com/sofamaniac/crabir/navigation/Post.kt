@@ -2,6 +2,10 @@ package com.sofamaniac.crabir.navigation
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -16,7 +20,11 @@ import com.sofamaniac.crabir.ui.post.FullscreenVideo
 import com.sofamaniac.crabir.ui.postEditor.CrosspostCreator
 import com.sofamaniac.crabir.ui.postEditor.PostCreator
 import com.sofamaniac.crabir.ui.thread.ThreadView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import kotlin.reflect.typeOf
 
 val FullnameType = object : NavType<Fullname>(isNullableAllowed = false) {
@@ -61,6 +69,7 @@ class FullscreenVideoRoute(val post: Fullname) : Route
 class FullscreenGalleryRoute(val post: Fullname) : Route
 
 private const val ROUTE = "r/{subreddit}/comments/{id}/{title}"
+private const val SHORT_ROUTE = "r/{subreddit}/s/{id}"
 
 fun NavGraphBuilder.postGraph(navController: NavController) {
     composable(
@@ -82,6 +91,41 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
             null
         }
         ThreadView(permalink = permalink, dismiss = { navController.popBackStack() })
+    }
+    composable(
+        route = SHORT_ROUTE,
+        deepLinks = stringLink(url = SHORT_ROUTE),
+        arguments = listOf(
+            navArgument("subreddit") { type = NavType.StringType },
+            navArgument("id") { type = NavType.StringType },
+        )
+    )
+    { navBackStackEntry ->
+        val id = navBackStackEntry.arguments?.getString("id")
+        val subreddit = navBackStackEntry.arguments?.getString("subreddit")
+        val client = remember { OkHttpClient() }
+
+        LaunchedEffect(id) {
+            val url =
+                "https://www.reddit.com" + (if (!subreddit.isNullOrBlank()) "/r/$subreddit" else "") + "/s/${id}"
+            Log.d("NavGraph", "Trying to resolve short link at $url")
+            val request = Request.Builder().url(url).build()
+            val finalUrl = withContext(Dispatchers.IO) {
+                client.newCall(request).execute().use { response ->
+                    response.request.url.toString()
+                }
+            }
+            navController.popBackStack()
+            Log.d("NavGraph", finalUrl)
+            navController.navigate(deepLink = finalUrl.toUri())
+        }
+
+//        val permalink = if (subreddit != null && id != null && title != null) {
+//            "/r/$subreddit/comments/$id/$title"
+//        } else {
+//            null
+//        }
+//        ThreadView(permalink = permalink, dismiss = { navController.popBackStack() })
     }
     composable<PostRoute> {
         val route = it.toRoute<PostRoute>()
