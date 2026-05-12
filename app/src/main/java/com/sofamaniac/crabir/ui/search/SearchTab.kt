@@ -290,7 +290,7 @@ private fun InnerTab(viewModel: UserSearchViewModel) {
                 }) { index ->
                 val user = things[index]!!
                 val iconUrl = if (user.prefShowSnoovatar) {
-                    user.snoovatarImg.ifBlank { user.iconImg }
+                    user.snoovatarImg?.ifBlank { user.iconImg }
                 } else {
                     user.iconImg
                 }

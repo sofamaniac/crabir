@@ -19,13 +19,22 @@ import retrofit2.http.Query
 interface UserAPI {
 
     @GET("/user/{username}/about.json")
-    suspend fun getUser(@Path("username") username: String): UserDTO
+    suspend fun getUser(@Path("username") username: String): Response<Thing.User>
 
     @GET("api/v1/me.json")
     suspend fun getIdentity(): Response<UserDTO>
 
     @GET("user/{user}/saved.json")
     suspend fun getSaved(
+        @Path("user") user: String,
+        @Query("after") after: Fullname? = null,
+        @Query("count") count: Int = 0,
+        @Query("limit") limit: Int = API_LIMIT,
+        @Query("sr_detail") srDetail: Boolean = true,
+    ): Response<Listing<Thing>>
+
+    @GET("user/{user}/overview.json")
+    suspend fun getOverview(
         @Path("user") user: String,
         @Query("after") after: Fullname? = null,
         @Query("count") count: Int = 0,

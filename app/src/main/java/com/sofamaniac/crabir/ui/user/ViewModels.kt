@@ -24,6 +24,7 @@ import com.sofamaniac.crabir.domain.repository.feed.FeedSource
 import com.sofamaniac.crabir.domain.repository.profile.CommentsRepository
 import com.sofamaniac.crabir.domain.repository.profile.DownvotedRepository
 import com.sofamaniac.crabir.domain.repository.profile.HiddenRepository
+import com.sofamaniac.crabir.domain.repository.profile.OverviewRepository
 import com.sofamaniac.crabir.domain.repository.profile.ProfileFeedParams
 import com.sofamaniac.crabir.domain.repository.profile.ProfileSort
 import com.sofamaniac.crabir.domain.repository.profile.SavedRepository
@@ -53,6 +54,18 @@ class SavedViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(username: String): SavedViewModel
+    }
+}
+
+@HiltViewModel(assistedFactory = OverviewViewModel.Factory::class)
+class OverviewViewModel @AssistedInject constructor(
+    @Assisted username: String,
+    repository: OverviewRepository,
+    visitedPostsDao: VisitedPostsDao,
+) : ProfileFeedViewModel(username, repository, visitedPostsDao) {
+    @AssistedFactory
+    interface Factory {
+        fun create(username: String): OverviewViewModel
     }
 }
 

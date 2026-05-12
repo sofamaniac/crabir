@@ -3,12 +3,22 @@ package com.sofamaniac.crabir.ui.user
 import androidx.annotation.Keep
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.CallReceived
+import androidx.compose.material.icons.filled.Cake
+import androidx.compose.material.icons.filled.CardGiftcard
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.outlined.ModeComment
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryScrollableTabRow
@@ -17,27 +27,40 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.LocalDrawerState
+import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.ui.TabBar
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
+import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewerDefaults
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import javax.inject.Inject
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import kotlin.time.Instant
+import kotlin.time.toJavaInstant
 
 
 @Serializable
@@ -73,9 +96,13 @@ fun ProfileView(
     user: String,
     modifier: Modifier = Modifier,
     initialTab: ProfileTabs = ProfileTabs.Overview,
-    viewModel: ProfileViewModel = hiltViewModel()
+    profileViewModel: ProfileViewModel = hiltViewModel<ProfileViewModel, ProfileViewModel.Factory> { factory ->
+        factory.create(user)
+    }
 ) {
-    val isConnectedUser by remember { viewModel.currentUser.map { it == user } }.collectAsState(true)
+    val isConnectedUser by remember { profileViewModel.currentUser.map { it == user } }.collectAsState(
+        true
+    )
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val tabs = if (isConnectedUser) ProfileTabs.entries else ProfileTabs.publicTabs
     val initialIndex = tabs.indexOf(initialTab).coerceIn(0, tabs.size)
@@ -83,6 +110,11 @@ fun ProfileView(
     val scope = rememberCoroutineScope()
 
     val viewModels: Map<ProfileTabs, ProfileFeedViewModel> = mapOf(
+        ProfileTabs.Overview to hiltViewModel<OverviewViewModel, OverviewViewModel.Factory> { factory ->
+            factory.create(
+                user
+            )
+        },
         ProfileTabs.Saved to hiltViewModel<SavedViewModel, SavedViewModel.Factory> { factory ->
             factory.create(
                 user
@@ -126,9 +158,10 @@ fun ProfileView(
         Scaffold(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                TopBar(
+                TopBarBig(
                     scrollBehavior,
                     user,
+                    profileViewModel.userProfile.value,
                     viewModel = viewModels[tabs[currentTab.currentPage]]
                 )
 
@@ -162,7 +195,10 @@ fun ProfileView(
                     if (viewModel != null) {
                         PostFeedViewer(viewModel = viewModel, filter = filter)
                     } else {
-                        Text("TODO")
+                        AboutTab(
+                            profileViewModel.userProfile.value,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
                     }
                 }
             }
@@ -170,8 +206,73 @@ fun ProfileView(
     }
 }
 
-@HiltViewModel
-class ProfileViewModel @Inject constructor(accountsRepository: AccountsRepository) :
+@Composable
+fun AboutTab(user: UserDTO?, modifier: Modifier = Modifier) {
+    if (user == null) return
+
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.Top) {
+        Text(user.subreddit.publicDescription)
+        Spacer(Modifier.height(8.dp))
+        Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Column {
+                Text("KARMA")
+                Text("${user.totalKarma}")
+                Row {
+                    Icon(Icons.Default.Link, contentDescription = "Link karma")
+                    Text("${user.linkKarma}")
+                    Icon(Icons.Outlined.ModeComment, contentDescription = "Comment karma")
+                    Text("${user.commentKarma}")
+                }
+                Row {
+                    Icon(Icons.Default.CardGiftcard, contentDescription = "Awarder karma")
+                    Text("${user.awarderKarma}")
+                    Icon(
+                        Icons.AutoMirrored.Filled.CallReceived,
+                        contentDescription = "Awardee karma"
+                    )
+                    Text("${user.awardeeKarma}")
+                }
+            }
+            Column {
+                val created = Instant.fromEpochSeconds(user.createdUtc.toLong())
+                val formatter = DateTimeFormatter
+                    .ofPattern("MMM dd, yyyy")
+                    .withLocale(LocalLocale.current.platformLocale)
+                    .withZone(ZoneId.systemDefault())
+
+                Text("REDDIT AGE")
+                Text(formatElapsedTimeLocalized(created))
+                Row {
+                    Icon(Icons.Default.Cake, contentDescription = null)
+                    Text(formatter.format(created.toJavaInstant()))
+                }
+            }
+        }
+    }
+}
+
+@HiltViewModel(assistedFactory = ProfileViewModel.Factory::class)
+class ProfileViewModel @AssistedInject constructor(
+    accountsRepository: AccountsRepository,
+    api: RedditAPIService,
+    @Assisted username: String
+) :
     ViewModel() {
     val currentUser = accountsRepository.activeAccount.map { it.info!!.username }
+
+    val userProfile: MutableState<UserDTO?> = mutableStateOf(null)
+
+    init {
+        viewModelScope.launch {
+            val res = api.getUser(username)
+            if (res.isSuccessful) {
+                userProfile.value = res.body()?.data
+            }
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(username: String): ProfileViewModel
+    }
 }
