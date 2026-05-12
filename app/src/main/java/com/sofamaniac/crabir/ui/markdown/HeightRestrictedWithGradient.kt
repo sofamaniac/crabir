@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.LocalTheme
 
 /**
  * A layout that restricts its content to [maxHeight]. When the content exceeds
@@ -32,10 +33,12 @@ import androidx.compose.ui.unit.dp
 fun HeightRestrictedWithGradient(
     maxHeight: Dp,
     modifier: Modifier = Modifier,
-    gradientColors: List<Color> = listOf(Color.Transparent, Color.Black),
+    //gradientColors: List<Color> = listOf(Color.Transparent, Color.Black),
     gradientHeight: Dp = 64.dp,
     content: @Composable () -> Unit,
 ) {
+    val theme = LocalTheme.current
+    val gradientColors = listOf(Color.Transparent, theme.cardBackground)
     SubcomposeLayout(modifier = modifier.clipToBounds()) { constraints ->
         val maxHeightPx = maxHeight.roundToPx()
 
