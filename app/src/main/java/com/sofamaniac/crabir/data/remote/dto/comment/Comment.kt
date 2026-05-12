@@ -187,7 +187,7 @@ private fun CommentDTO.toScore() = Score(
     downs = downs,
     score = score,
     hideScore = score_hidden,
-    upvoteRatio = ups.toDouble() / (ups + downs).toDouble()
+    upvoteRatio = ups.toDouble() / (ups + downs).toDouble().coerceAtLeast(1.0)
 )
 
 private fun CommentDTO.toSubredditInfo() = SubredditInfo(
