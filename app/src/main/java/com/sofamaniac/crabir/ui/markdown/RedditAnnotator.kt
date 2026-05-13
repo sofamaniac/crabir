@@ -17,8 +17,10 @@ import com.mikepenz.markdown.model.MarkdownAnnotatorConfig
 import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.ReferenceLinkHandler
 import com.sofamaniac.crabir.ui.markdown.redditFlavour.RedditFlavourElementType
+import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
+import org.intellij.markdown.ast.getParentOfType
 
 class RedditAnnotator(
     typography: MarkdownTypography,
@@ -27,10 +29,18 @@ class RedditAnnotator(
     override var config: MarkdownAnnotatorConfig,
     val depth: Int = 0,
     val linkInteractionListener: LinkInteractionListener?,
+    val defaultAnnotator: MarkdownAnnotator,
 ) : MarkdownAnnotator {
 
     val superscriptStyle =
         SpanStyle(baselineShift = BaselineShift.Superscript, fontSize = 12.sp)
+
+    val codeSpanAnnotator = DefaultAnnotatorSettings(
+        linkTextSpanStyle = typography.textLink,
+        codeSpanStyle = typography.inlineCode.toSpanStyle(),
+        annotator = defaultAnnotator,
+        referenceLinkHandler = referenceLinkHandler,
+    )
     val makeSettings: (text: String) -> AnnotatorSettings = { text ->
         val style = typography.textLink.style!!.copy(color = Color.Transparent)
         val linkStyle = TextLinkStyles(
@@ -45,7 +55,8 @@ class RedditAnnotator(
                 spoilers,
                 config,
                 depth + 1,
-                linkInteractionListener
+                linkInteractionListener,
+                defaultAnnotator
             ),
             referenceLinkHandler = referenceLinkHandler,
             linkInteractionListener = linkInteractionListener
@@ -62,8 +73,12 @@ class RedditAnnotator(
             val start = child.startOffset
             val end = child.endOffset.coerceAtMost(content.length)
             val text = content.substring(start until end)
-            if (child.type == RedditFlavourElementType.SUPERSCRIPT) {
-                if (child.children.size > 1) {
+            // Do not render superscript & spoilers in code span
+            if (child.isInCode()) {
+                buildMarkdownAnnotatedString(content, child.children, codeSpanAnnotator)
+                false
+            } else when (child.type) {
+                RedditFlavourElementType.SUPERSCRIPT if child.children.size > 1 -> {
                     withStyle(superscriptStyle) {
                         buildMarkdownAnnotatedString(
                             content,
@@ -71,11 +86,14 @@ class RedditAnnotator(
                             makeSettings(content)
                         )
                     }
-                } else {
-                    append("^")
+                    true
                 }
-            }
-            when (child.type) {
+
+                RedditFlavourElementType.SUPERSCRIPT -> {
+                    append("^")
+                    true
+                }
+
                 RedditFlavourElementType.SPOILER if depth == 0 -> {
                     //appendInlineContent("SPOILER", child.getUnescapedTextInNode(content))
                     val settings = makeSettings(text)
@@ -118,6 +136,10 @@ class RedditAnnotator(
                 }
             }
         }
+}
+
+internal fun ASTNode.isInCode(): Boolean {
+    return getParentOfType(MarkdownElementTypes.CODE_SPAN, MarkdownElementTypes.CODE_BLOCK) != null
 }
 
 internal fun List<ASTNode>.removeSpoilerMarker(): List<ASTNode> {

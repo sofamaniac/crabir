@@ -33,6 +33,7 @@ import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.ReferenceLinkHandlerImpl
 import com.mikepenz.markdown.model.State
 import com.mikepenz.markdown.model.markdownAnimations
+import com.mikepenz.markdown.model.markdownAnnotator
 import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
@@ -101,6 +102,7 @@ private fun InnerRedditMarkdown(
             spoilers,
             config = DefaultMarkdownAnnotatorConfig(),
             linkInteractionListener = linkInteractionListener,
+            defaultAnnotator = markdownAnnotator()
         ),
     )
 }
