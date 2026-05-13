@@ -22,7 +22,7 @@ class MultiPostsRepository @Inject constructor(
     ): PagedResponse<Fullname> {
         val subreddit = currentMulti ?: return PagedResponse()
         return makeRequest {
-            api.getMultreddit(
+            api.getMultireddit(
                 path = subreddit,
                 after = after,
                 sort = params.sort,
