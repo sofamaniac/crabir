@@ -22,7 +22,9 @@ import javax.inject.Inject
 interface ThreadRepository {
     suspend fun getComments(
         permalink: String,
-        sort: Sort, timeframe: Timeframe? = null
+        sort: Sort, timeframe: Timeframe? = null,
+        comment: String? = null,
+        context: Int? = null,
     ): List<CommentType>
 
     suspend fun getPost(name: Fullname): PostData?
@@ -54,11 +56,16 @@ class ThreadRepositoryImpl @Inject constructor(
     private var post: PostData? = null
     private var comments: List<CommentType> = emptyList()
 
-    suspend fun fetchThread(permalink: String, sort: Sort) {
+    suspend fun fetchThread(
+        permalink: String,
+        sort: Sort,
+        comment: String? = null,
+        context: Int? = null
+    ) {
         if (post != null && comments.isNotEmpty()) {
             return
         }
-        val response = api.getThread(permalink, sort = sort)
+        val response = api.getThread(permalink, sort = sort, comment = comment, context = context)
         if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
@@ -88,9 +95,11 @@ class ThreadRepositoryImpl @Inject constructor(
     override suspend fun getComments(
         permalink: String,
         sort: Sort,
-        timeframe: Timeframe?
+        timeframe: Timeframe?,
+        comment: String?,
+        context: Int?,
     ): List<CommentType> {
-        fetchThread(permalink, sort)
+        fetchThread(permalink, sort, comment = comment, context = context)
         return comments
     }
 

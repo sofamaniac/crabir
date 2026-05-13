@@ -28,7 +28,9 @@ import kotlinx.coroutines.runBlocking
 class ThreadViewModel @AssistedInject constructor(
     private val repository: ThreadRepository,
     private val visitedPostsDao: VisitedPostsDao,
-    @Assisted val permalink: String,
+    @Assisted("permalink") val permalink: String,
+    @Assisted("comment") val comment: String?,
+    @Assisted val context: Int?,
 ) : ViewModel() {
 
     var name: Fullname = repository.getPostId(permalink)
@@ -90,7 +92,12 @@ class ThreadViewModel @AssistedInject constructor(
     fun fetchComments() {
         viewModelScope.launch(Dispatchers.IO) {
             _isRefreshing.value = true
-            _comments.value = repository.getComments(permalink, sort = _sort.value)
+            _comments.value = repository.getComments(
+                permalink,
+                sort = _sort.value,
+                comment = comment,
+                context = context
+            )
             // If post was not found set it here.
             _post.value = _post.value ?: getPost()
             _isRefreshing.value = false
@@ -223,7 +230,11 @@ class ThreadViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(permalink: String): ThreadViewModel
+        fun create(
+            @Assisted("permalink") permalink: String,
+            @Assisted("comment") comment: String? = null,
+            context: Int? = null
+        ): ThreadViewModel
     }
 }
 

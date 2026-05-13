@@ -11,6 +11,8 @@ import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.CommentType
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.ui.ThemedCard
 
 @Composable
@@ -26,11 +28,22 @@ fun MoreViewer(
         more.data.count,
         more.data.count
     )
+    val navController = LocalNavController.current!!
     ThemedCard(
         modifier = modifier,
         shape = RoundedCornerShape(0),
         onClick = {
-            viewModel.fetchMoreComments(more)
+            if (more.data.count > 0) {
+                viewModel.fetchMoreComments(more)
+            } else {
+                val parentId = more.parentId.name.split('_').last()
+                navController.navigate(
+                    PostRoute(
+                        postPermalink = viewModel.permalink,
+                        comment = parentId,
+                    )
+                )
+            }
         }
     ) {
         Text(

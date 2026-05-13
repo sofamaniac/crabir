@@ -23,6 +23,10 @@ import com.sofamaniac.crabir.navigation.PostRoute
 fun ThreadView(
     modifier: Modifier = Modifier,
     permalink: String? = null,
+    /**Focal point of the view*/
+    comment: String? = null,
+    /** If @param comment is not null, number of parent to show.*/
+    context: Int? = null,
     dismiss: () -> Unit = {},
 ) {
     val link = permalink
@@ -31,7 +35,7 @@ fun ThreadView(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val viewModel: ThreadViewModel =
         hiltViewModel<ThreadViewModel, ThreadViewModel.Factory>(key = link) { factory ->
-            factory.create(link!!)
+            factory.create(link!!, comment = comment, context = context)
         }
 
     Scaffold(
@@ -41,6 +45,8 @@ fun ThreadView(
     ) { innerPadding ->
         CommentListRoot(
             viewModel = viewModel,
+            comment = comment,
+            context = context,
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()

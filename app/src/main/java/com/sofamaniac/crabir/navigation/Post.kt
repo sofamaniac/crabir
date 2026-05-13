@@ -51,7 +51,8 @@ val FullnameType = object : NavType<Fullname>(isNullableAllowed = false) {
 }
 
 @Serializable
-class PostRoute(val postPermalink: String, val comment: String?) : Route
+class PostRoute(val postPermalink: String, val comment: String? = null, val context: Int? = null) :
+    Route
 
 @Serializable
 class PostCreatorRoute(val kind: Kind, val communityId: String?) : Route
@@ -70,6 +71,8 @@ class FullscreenGalleryRoute(val post: Fullname) : Route
 
 private const val ROUTE = "r/{subreddit}/comments/{id}/{title}"
 private const val SHORT_ROUTE = "r/{subreddit}/s/{id}"
+private const val LONG_ROUTE = "r/{subreddit}/comments/{id}/{title}/{commentId}"
+private const val LONGER_ROUTE = "r/{subreddit}/comments/{id}/{title}/comment/{commentId}"
 
 fun NavGraphBuilder.postGraph(navController: NavController) {
     composable(
@@ -91,6 +94,32 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
             null
         }
         ThreadView(permalink = permalink, dismiss = { navController.popBackStack() })
+    }
+    composable(
+        route = LONG_ROUTE,
+        deepLinks = stringLink(url = LONG_ROUTE) + stringLink(LONGER_ROUTE),
+        arguments = listOf(
+            navArgument("subreddit") { type = NavType.StringType },
+            navArgument("id") { type = NavType.StringType },
+            navArgument("title") { type = NavType.StringType },
+            navArgument("commentId") { type = NavType.StringType },
+        )
+    )
+    {
+        val subreddit = it.arguments?.getString("subreddit")
+        val id = it.arguments?.getString("id")
+        val title = it.arguments?.getString("title")
+        val commentId = it.arguments?.getString("commentId")
+        val permalink = if (subreddit != null && id != null && title != null) {
+            "/r/$subreddit/comments/$id/$title"
+        } else {
+            null
+        }
+        ThreadView(
+            permalink = permalink,
+            dismiss = { navController.popBackStack() },
+            comment = commentId
+        )
     }
     composable(
         route = SHORT_ROUTE,
@@ -119,17 +148,15 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
             Log.d("NavGraph", finalUrl)
             navController.navigate(deepLink = finalUrl.toUri())
         }
-
-//        val permalink = if (subreddit != null && id != null && title != null) {
-//            "/r/$subreddit/comments/$id/$title"
-//        } else {
-//            null
-//        }
-//        ThreadView(permalink = permalink, dismiss = { navController.popBackStack() })
     }
     composable<PostRoute> {
         val route = it.toRoute<PostRoute>()
-        ThreadView(permalink = route.postPermalink, dismiss = { navController.popBackStack() })
+        ThreadView(
+            permalink = route.postPermalink,
+            comment = route.comment,
+            context = route.context,
+            dismiss = { navController.popBackStack() }
+        )
     }
 
     composable<PostCreatorRoute> {
