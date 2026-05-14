@@ -91,6 +91,7 @@ import kotlin.uuid.ExperimentalUuidApi
 fun SearchTab(
     searchQuery: SearchRoute,
     modifier: Modifier = Modifier,
+    initialTab: Int = 0,
     commonViewModel: SearchCommonViewModel = hiltViewModel<SearchCommonViewModel, SearchCommonViewModel.Factory>() { factory ->
         val initialQuery =
             if (searchQuery.flair.isNotBlank()) "flair:\"${searchQuery.flair}\"" else ""
@@ -115,7 +116,7 @@ fun SearchTab(
     )
     val tabs = listOf("Posts", "Communities", "Users")//, "Comments")
     val scope = rememberCoroutineScope()
-    val currentTab = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
+    val currentTab = rememberPagerState(initialPage = initialTab, pageCount = { tabs.size })
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val showSettings by commonViewModel.showSettings.collectAsState()
     Scaffold(

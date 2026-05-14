@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -210,6 +211,9 @@ fun PostFeedViewer(
                                 onClick = onClick,
                                 canStartVideo = canStartVideo,
                                 read = wasRead,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .defaultMinSize(minHeight = 10.dp)
                             )
 
                             Views.Compact -> CompactView(
@@ -238,6 +242,10 @@ fun PostFeedViewer(
                                 factory.create(post.permalink)
                             }
                         )
+                    }
+
+                    else -> {
+                        Log.e("PostFeedViewer", "Could not render ${post?.name}")
                     }
                 }
                 HorizontalDivider()

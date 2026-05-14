@@ -4,7 +4,6 @@ import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.domain.repository.VotableRepository
 import com.sofamaniac.crabir.domain.repository.search.CommunitySearchRepository
-import com.sofamaniac.crabir.domain.repository.search.PostSearchRepository
 import com.sofamaniac.crabir.domain.repository.search.UserSearchRepository
 import com.sofamaniac.crabir.ui.subreddit.HistoryRepository
 import dagger.Module
@@ -40,13 +39,14 @@ object RepositoryModule {
 //        return SubredditPostsRepository(votableRepository, api)
 //    }
 
-    @Provides
-    fun provideSearchPostRepository(
-        api: RedditAPIService
-    ): PostSearchRepository {
-        return PostSearchRepository(api = api)
-    }
-
+    //    @Provides
+//    fun provideSearchPostRepository(
+//        api: RedditAPIService,
+//        votableRepository: VotableRepository,
+//    ): PostSearchRepository {
+//        return PostSearchRepository(api = api, votableRepository = votableRepository)
+//    }
+//
     @Provides
     fun provideSearchCommunityRepository(
         api: RedditAPIService

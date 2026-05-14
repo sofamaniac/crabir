@@ -202,7 +202,7 @@ class LinkViewModel @AssistedInject constructor(
     private val posts: LinksRepository,
 ) : VotableViewModel(post.name.name, post.subreddit.name, posts), VotableInteraction {
 
-    val post = posts.get(post.name).map { it as PostData? }.stateIn(
+    val post = posts.get(post.name).stateIn(
         scope = viewModelScope,
         started = kotlinx.coroutines.flow.SharingStarted.Eagerly,
         initialValue = post

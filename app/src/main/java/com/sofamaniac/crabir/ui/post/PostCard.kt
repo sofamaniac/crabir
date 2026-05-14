@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.post
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,7 +44,10 @@ fun PostCard(
         }),
 ) {
     val post by viewModel.post.collectAsState()
-    if (post == null) return
+    if (post == null) {
+        Log.w("PostCard", "Trying to render null")
+        return
+    }
     val settings = rememberViewSettings()
     // We do not apply the padding on the column, but on each of its children except [body]
     // to have images that take the full width

@@ -10,12 +10,23 @@ import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.ListingRepository
+import com.sofamaniac.crabir.domain.repository.VotableRepository
+import javax.inject.Inject
 
-class PostSearchRepository(private val api: RedditAPIService) :
+class PostSearchRepository @Inject constructor(
+    private val api: RedditAPIService,
+    private val votableRepository: VotableRepository
+) :
     ListingRepository<PostSearchParams, PostData>() {
     override fun thingToData(thing: Thing): PostData? {
         if (thing !is Thing.Post) return null
         return PostDataMapper.map(thing.data)
+    }
+
+    override suspend fun onResponseSuccess(things: List<Thing>) {
+        super.onResponseSuccess(things)
+        val votableList = things.mapNotNull { thingToData(it) }
+        votableRepository.insert(votableList)
     }
 
     override suspend fun getThings(
