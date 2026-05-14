@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Crabir</string>
+    <string name="SortTop">Top</string>
+    <string name="SortControversial">Controversés</string>
+    <string name="SortRising">En hausse</string>
+    <string name="SortConfidence">Meilleur</string>
+    <string name="SortHot">Populaire</string>
+    <string name="SortBest">Meilleur</string>
+    <string name="SortNew">Nouveau</string>
+    <string name="SortOld">Ancien</string>
+    <string name="SortRandom">Aléatoire</string>
+    <string name="ViewSwipe">Glisser</string>
+    <string name="Home">Accueil</string>
+    <string name="ScheduledMode">Programée</string>
+    <string name="ViewCard">Carte</string>
+    <string name="ViewCompact">Compacte</string>
+    <string name="ViewSmallCard">Carte Compacte</string>
+    <string name="ViewDense">Dense</string>
+    <string name="ViewColumns">Colonnes</string>
+    <string name="ViewImage">Images</string>
+    <string name="SortActivity">Activité</string>
+    <string name="DarkMode">Sombre</string>
+    <string name="LightMode">Lumineux</string>
+    <string name="Profile">Profil</string>
+    <string name="hour">Heure</string>
+    <string name="day">Jour</string>
+    <string name="week">Semaine</string>
+    <string name="month">Mois</string>
+    <string name="year">Année</string>
+    <string name="Search">Chercher</string>
+    <string name="Subscriptions">Abonnements</string>
+    <string name="Inbox">Boîte de réception</string>
+    <string name="SystemMode">Système</string>
+    <string name="SortQa">Question Réponse</string>
+    <string name="SortLive">Live</string>
+    <string name="SortRelevance">Pertinence</string>
+    <string name="SortComments">Commentaires</string>
+    <string name="all_time">Tout</string>
+    <plurals name="MoreComments">
+        <item quantity="one">%d réponse</item>
+        <item quantity="many">%d réponses</item>
+    </plurals>
+</resources>

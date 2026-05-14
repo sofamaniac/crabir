@@ -3,7 +3,7 @@
   -->
 
 <resources>
-    <string name="app_name">Crabir</string>
+    <string name="app_name" translatable="false">Crabir</string>
     <string name="SortTop">Top</string>
     <string name="SortControversial">Controversial</string>
     <string name="SortHot">Hot</string>
@@ -41,6 +41,7 @@
     <string name="year">Year</string>
     <string name="all_time">All</string>
     <plurals name="MoreComments">
+        <item quantity="zero">See more comments</item>
         <item quantity="one">%d more reply</item>
         <item quantity="other">%d more replies</item>
     </plurals>
