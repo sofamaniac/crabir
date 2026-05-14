@@ -6,6 +6,7 @@ package com.sofamaniac.crabir.data.remote.dto.comment
 
 import com.sofamaniac.crabir.data.remote.dto.LinkFlairRichtext
 import com.sofamaniac.crabir.data.remote.dto.Thing
+import com.sofamaniac.crabir.data.remote.dto.emptyListing
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditId
 import com.sofamaniac.crabir.data.remote.utils.EmptyStringOrListingSerializer
@@ -42,9 +43,9 @@ data class CommentDTO(
     val depth: Int = -1,
     @SerialName("parent_id")
     val parentId: Fullname,
-    val permalink: String,
+    val permalink: String = "",
     @Serializable(with = EmptyStringOrListingSerializer::class)
-    val replies: Thing.Listing<Thing>,
+    val replies: Thing.Listing<Thing> = emptyListing(),
     val media_metadata: Map<String, MediaMetadata> = emptyMap(),
 
     // ================================================ //
@@ -64,37 +65,42 @@ data class CommentDTO(
     val author_flair_text_color: String? = null,
     val author_flair_type: String? = null,
 
-    val saved: Boolean,
+    val saved: Boolean = false,
     val likes: Boolean? = null,
-    val score: Int,
-    val downs: Int,
-    val ups: Int,
+    val score: Int = 0,
+    val downs: Int = 0,
+    val ups: Int = 0,
 
-    val subreddit: String,
-    val subreddit_id: String,
-    val subreddit_name_prefixed: String,
-    val subreddit_type: String,
+    val subreddit: String = "",
+    val subreddit_id: String = "",
+    val subreddit_name_prefixed: String = "",
+    val subreddit_type: String = "",
+
+    // FIELD WHEN MESSAGE
+    val subject: String? = null,
+    val type: String? = null,
+    val context: String? = null,
 
 
     @Serializable(with = InstantAsFloatSerializer::class)
     val approved_at_utc: Instant? = null,
     val approved_by: String? = null,
-    val archived: Boolean,
+    val archived: Boolean = false,
     val all_awardings: List<String> = emptyList(),
     val associated_award: String? = null,
     val awarders: List<String> = emptyList(),
     @Serializable(with = InstantAsFloatSerializer::class)
     val banned_at_utc: Instant? = null,
     val banned_by: String? = null,
-    val can_gild: Boolean,
-    val can_mod_post: Boolean,
-    val collapsed: Boolean,
+    val can_gild: Boolean = false,
+    val can_mod_post: Boolean = false,
+    val collapsed: Boolean = false,
     val collapsed_because_crowd_control: Boolean? = null,
     val collapsed_reason: String? = null,
     // TODO Replace with enum
     val collapsed_reason_code: String? = null,
     val comment_type: String? = null,
-    val controversiality: Int,
+    val controversiality: Int = 0,
     @Serializable(with = InstantAsFloatSerializer::class)
     val created: Instant,
     @Serializable(with = InstantAsFloatSerializer::class)
@@ -102,28 +108,28 @@ data class CommentDTO(
     val distinguished: String? = null,
     @Serializable(with = FalseOrTimestampSerializer::class)
     val edited: Instant? = null,
-    val gilded: Int,
+    val gilded: Int = 0,
     // FIXME
     //val gildings: List<String>,
-    val is_submitter: Boolean,
-    val link_id: String,
-    val locked: Boolean,
+    val is_submitter: Boolean = false,
+    val link_id: String = "",
+    val locked: Boolean = false,
     val mod_note: String? = null,
     val mod_reason_by: String? = null,
     val mod_reason_title: String? = null,
-    val mod_reports: List<String>,
-    val no_follow: Boolean,
+    val mod_reports: List<String> = emptyList(),
+    val no_follow: Boolean = false,
     val num_reports: Int? = null,
     val removal_reason: String? = null,
     // val report_reasons: String? = null,
-    val score_hidden: Boolean,
-    val send_replies: Boolean,
-    val stickied: Boolean,
+    val score_hidden: Boolean = false,
+    val send_replies: Boolean = false,
+    val stickied: Boolean = false,
     val top_awarded_type: String? = null,
-    val total_awards_received: Int,
-    val treatment_tags: List<String>,
-    val unrepliable_reason: String?,
-    val user_reports: List<String>
+    val total_awards_received: Int = 0,
+    val treatment_tags: List<String> = emptyList(),
+    val unrepliable_reason: String? = null,
+    val user_reports: List<String> = emptyList()
 )
 
 object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {

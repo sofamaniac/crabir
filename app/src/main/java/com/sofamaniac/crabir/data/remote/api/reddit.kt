@@ -32,7 +32,13 @@ import com.sofamaniac.crabir.data.remote.dto.post.Sort as PostSort
 
 internal const val API_LIMIT = 100
 
-interface RedditAPIService : VotableAPI, PostAPI, RedditAuthApi, UserAPI, SearchAPI, ThreadAPI {
+interface RedditAPIService :
+    VotableAPI,
+    PostAPI,
+    RedditAuthApi,
+    UserAPI, SearchAPI,
+    ThreadAPI,
+    InboxAPI {
 
     @GET("{sort}.json")
     suspend fun getHome(
@@ -141,7 +147,6 @@ enum class SubscribeAction {
         }
     }
 }
-
 
 
 fun postCommentBody(parentId: Fullname, text: String): RequestBody {

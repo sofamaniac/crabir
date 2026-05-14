@@ -52,6 +52,13 @@ sealed class Thing : DataInterface {
     }
 
     @Serializable
+    @SerialName("t4")
+    data class Message(val data: MessageDTO) : Thing() {
+        override val id: String = data.id
+        override val name: Fullname = data.name
+    }
+
+    @Serializable
     @SerialName("t5")
     data class Subreddit(val data: SubredditDTO = dummySubredditData()) :
         Thing() {
@@ -69,6 +76,10 @@ sealed class Thing : DataInterface {
         override val name: Fullname = Fullname("Listing")
 
         val size: Int get() = data.children.size
+
+        operator fun get(n: Int): T {
+            return data.children[n]
+        }
 
         override fun iterator(): Iterator<T> {
             return data.children.iterator()
