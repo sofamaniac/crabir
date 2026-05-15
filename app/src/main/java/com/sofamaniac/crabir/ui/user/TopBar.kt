@@ -14,7 +14,6 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.TwoRowsTopAppBar
 import androidx.compose.runtime.Composable
@@ -31,45 +30,9 @@ import com.sofamaniac.crabir.domain.repository.profile.ProfileSort
 import com.sofamaniac.crabir.ui.SortMenu
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopBar(
-    scrollBehavior: TopAppBarScrollBehavior,
-    user: String,
-    modifier: Modifier = Modifier,
-    viewModel: ProfileFeedViewModel?
-) {
-    val scope = rememberCoroutineScope()
-    val drawerState = LocalDrawerState.current
-    TopAppBar(scrollBehavior = scrollBehavior, title = {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Text(user)
-        }
-
-    }, navigationIcon = {
-        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-            Icon(
-                Icons.Default.Menu, "Open Drawer"
-            )
-        }
-    }, actions = {
-        when (viewModel) {
-            is SortProfileTab -> {
-                SortMenu<ProfileSort> { sort, timeframe ->
-                    viewModel.updateSort(sort, timeframe)
-                }
-            }
-
-            else -> {
-                Log.d("TopBar", "No sort menu")
-            }
-        }
-    })
-}
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun TopBarBig(
+fun TopBar(
     scrollBehavior: TopAppBarScrollBehavior,
     user: String,
     userInfo: UserDTO?,
