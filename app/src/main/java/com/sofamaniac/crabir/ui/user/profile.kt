@@ -149,6 +149,9 @@ fun ProfileView(
 
 
     val drawerState = LocalDrawerState.current
+    val activeViewModel = tabs.getOrNull(currentTab.currentPage).let {
+        viewModels.getOrDefault(it, defaultValue = null)
+    }
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -158,11 +161,11 @@ fun ProfileView(
         Scaffold(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                TopBarBig(
+                TopBar(
                     scrollBehavior,
                     user,
                     profileViewModel.userProfile.value,
-                    viewModel = viewModels[tabs[currentTab.currentPage]]
+                    viewModel = activeViewModel
                 )
 
             },
@@ -173,7 +176,7 @@ fun ProfileView(
                 verticalArrangement = Arrangement.Top, modifier = Modifier.padding(innerPadding)
             ) {
                 SecondaryScrollableTabRow(
-                    selectedTabIndex = currentTab.currentPage,
+                    selectedTabIndex = currentTab.currentPage.coerceAtMost(tabs.size - 1),
                     modifier = Modifier.fillMaxWidth(),
                     edgePadding = 0.dp
                 ) {

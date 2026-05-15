@@ -114,6 +114,7 @@ fun DrawerContent(
                 AccountSelector(viewModel) { id ->
                     coroutineScope.launch {
                         drawerState.close()
+                        navController.popBackStack(route = HomeRoute, inclusive = false)
                         viewModel.toggleSelectAccount()
                         viewModel.setActiveAccount(id)
                     }
