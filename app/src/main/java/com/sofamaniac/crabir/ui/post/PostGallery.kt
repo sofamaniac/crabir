@@ -133,7 +133,7 @@ fun EmbeddedGallery(
                     }
 
                     is MediaMetadata.Image -> {
-                        metadata.preview?.last()?.url
+                        metadata.preview?.lastOrNull()?.url
                     }
 
                     else -> null
