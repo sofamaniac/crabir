@@ -11,9 +11,7 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.domain.repository.feed.CommentFeedRepository
 import jakarta.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class CommentsRepository @Inject constructor(
     override val votableRepository: CommentsRepository,
     val api: RedditAPIService,

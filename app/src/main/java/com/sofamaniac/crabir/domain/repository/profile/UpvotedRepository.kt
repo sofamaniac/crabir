@@ -11,9 +11,7 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository
 import jakarta.inject.Inject
-import jakarta.inject.Singleton
 
-@Singleton
 class UpvotedRepository @Inject constructor(
     override val votableRepository: LinksRepository,
     val api: RedditAPIService,

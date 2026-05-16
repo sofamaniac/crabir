@@ -12,10 +12,8 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.MixedRepository
 import com.sofamaniac.crabir.domain.repository.feed.MixedFeedRepository
 import jakarta.inject.Inject
-import jakarta.inject.Singleton
 import retrofit2.Response
 
-@Singleton
 class OverviewRepository @Inject constructor(
     override val votableRepository: MixedRepository,
     val api: RedditAPIService,
