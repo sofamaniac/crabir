@@ -9,7 +9,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.map
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
 import com.sofamaniac.crabir.data.local.entities.toEntity
@@ -20,7 +19,6 @@ import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
-import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.DataInterface
 import com.sofamaniac.crabir.domain.repository.ListingRepository
 import com.sofamaniac.crabir.domain.repository.ListingSource
@@ -43,7 +41,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -123,11 +120,10 @@ class PostSearchViewModel @AssistedInject constructor(
     repository: PostSearchRepository,
     val visitedPostsDao: VisitedPostsDao,
     @Assisted initialParams: PostSearchParams,
-) : SearchViewModel<PostSearchParams, PostData>(repository, initialParams), FeedViewModelInterface {
+) : SearchViewModel<PostSearchParams, PostData>(repository, initialParams),
+    FeedViewModelInterface<PostData> {
     override val entity: Flow<VisitedCommunityEntity?> = flowOf(null)
-    override val data: StateFlow<PagingData<VotableData>> = items.map { pagingData ->
-        pagingData.map { it as VotableData }
-    }.stateIn(
+    override val data: StateFlow<PagingData<PostData>> = items.stateIn(
         scope = viewModelScope,
         started = kotlinx.coroutines.flow.SharingStarted.Lazily,
         initialValue = PagingData.empty()

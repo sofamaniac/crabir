@@ -24,6 +24,7 @@ import com.sofamaniac.crabir.data.remote.api.Rules
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.VotableRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -122,17 +123,16 @@ internal fun ColumnScope.PostBody(
 interface VotableInteraction {
     val likes: Flow<Boolean?>
     val saved: Flow<Boolean>
-    fun upvote()
-    fun downvote()
-    fun save(target: Boolean)
+    fun upvote(name: Fullname)
+    fun downvote(name: Fullname)
+    fun save(name: Fullname, target: Boolean)
 }
 
 
-@HiltViewModel(assistedFactory = VotableViewModel.Factory::class)
-open class VotableViewModel @AssistedInject constructor(
-    @Assisted("fullname") name: String,
-    @Assisted("subreddit") val subreddit: String,
-    private val posts: VotableRepository,
+open class VotableViewModel<T : VotableData>(
+    val name: String,
+    val subreddit: String,
+    private val posts: VotableRepository<T>,
 ) : ViewModel(), VotableInteraction {
 
     val fullname =
@@ -160,19 +160,19 @@ open class VotableViewModel @AssistedInject constructor(
         }
     }
 
-    override fun upvote() {
+    override fun upvote(name: Fullname) {
         viewModelScope.launch(Dispatchers.IO) {
             posts.upvote(fullname)
         }
     }
 
-    override fun downvote() {
+    override fun downvote(name: Fullname) {
         viewModelScope.launch(Dispatchers.IO) {
             posts.downvote(fullname)
         }
     }
 
-    override fun save(target: Boolean) {
+    override fun save(name: Fullname, target: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             if (target) {
                 posts.save(fullname)
@@ -183,16 +183,16 @@ open class VotableViewModel @AssistedInject constructor(
     }
 
 
-    @AssistedFactory
-    interface Factory {
-        fun create(
-            // Because fullname is a value class it cannot be used in a factory
-            // https://github.com/google/dagger/issues/4613
-            @Assisted("fullname") fullname: String,
-            @Assisted("subreddit") subreddit: String
-        ): VotableViewModel
-    }
-
+//    @AssistedFactory
+//    interface Factory {
+//        fun<T: VotableData> create(
+//            // Because fullname is a value class it cannot be used in a factory
+//            // https://github.com/google/dagger/issues/4613
+//            @Assisted("fullname") fullname: String,
+//            @Assisted("subreddit") subreddit: String
+//        ): VotableViewModel<T>
+//    }
+//
 }
 
 
@@ -200,7 +200,7 @@ open class VotableViewModel @AssistedInject constructor(
 class LinkViewModel @AssistedInject constructor(
     @Assisted("post") post: PostData,
     private val posts: LinksRepository,
-) : VotableViewModel(post.name.name, post.subreddit.name, posts), VotableInteraction {
+) : VotableViewModel<PostData>(post.name.name, post.subreddit.name, posts), VotableInteraction {
 
     val post = posts.get(post.name).stateIn(
         scope = viewModelScope,

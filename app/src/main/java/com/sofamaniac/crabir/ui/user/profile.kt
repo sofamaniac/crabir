@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.ui.user
 
 import androidx.annotation.Keep
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,17 +44,33 @@ import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
+import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
+import com.sofamaniac.crabir.domain.repository.VotableRepository
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.ui.TabBar
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
+import com.sofamaniac.crabir.ui.subreddit.DefaultPostView
+import com.sofamaniac.crabir.ui.subreddit.FeedViewModelInterface
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewerDefaults
+import com.sofamaniac.crabir.ui.thread.CommentViewModelInterface
+import com.sofamaniac.crabir.ui.thread.OpenedComment
+import com.sofamaniac.crabir.ui.thread.ThreadViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -109,7 +126,7 @@ fun ProfileView(
     val currentTab = rememberPagerState(initialPage = initialIndex, pageCount = { tabs.size })
     val scope = rememberCoroutineScope()
 
-    val viewModels: Map<ProfileTabs, ProfileFeedViewModel> = mapOf(
+    val viewModels: Map<ProfileTabs, ProfileFeedViewModel<out VotableData>> = mapOf(
         ProfileTabs.Overview to hiltViewModel<OverviewViewModel, OverviewViewModel.Factory> { factory ->
             factory.create(
                 user
@@ -196,7 +213,23 @@ fun ProfileView(
                         else -> PostFeedViewerDefaults::hiddenFilter
                     }
                     if (viewModel != null) {
-                        PostFeedViewer(viewModel = viewModel, filter = filter)
+                        PostFeedViewer(
+                            viewModel = viewModel, filter = filter,
+                        ) { thing, isMostVisible ->
+                            when (thing) {
+                                is PostData -> DefaultPostView(
+                                    thing,
+                                    isMostVisible = isMostVisible,
+                                    viewModel = viewModel as FeedViewModelInterface<PostData>
+                                )
+
+                                is CommentData -> CommentView(
+                                    thing,
+                                    viewModel as FeedViewModelInterface<CommentData>,
+                                    isMostVisible
+                                )
+                            }
+                        }
                     } else {
                         AboutTab(
                             profileViewModel.userProfile.value,
@@ -207,6 +240,73 @@ fun ProfileView(
             }
         }
     }
+}
+
+@Composable
+fun CommentView(
+    thing: CommentData,
+    viewModel: FeedViewModelInterface<CommentData>,
+    isMostVisible: Boolean
+) {
+    val navController = LocalNavController.current!!
+    Column(
+        modifier = Modifier.clickable {
+            navController.navigate(
+                PostRoute(
+                    thing.permalink,
+                    comment = thing.id,
+                )
+            )
+        }
+    ) {
+        OpenedComment(
+            thing,
+            viewModel = hiltViewModel<ThreadViewModel, ThreadViewModel.Factory> { factory ->
+                factory.create(thing.permalink)
+            },
+            enableAnimation = false,
+        )
+    }
+}
+
+class CommentViewModel(
+    val comment: CommentData,
+    private val commentsRepository: VotableRepository<CommentData>
+) : CommentViewModelInterface, ViewModel() {
+    override val openComment: StateFlow<Fullname?> = MutableStateFlow(comment.name)
+
+    override fun submitComment(
+        parent: Fullname,
+        body: String
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override val likes: Flow<Boolean?> = flowOf(comment.relationship.liked)
+    override val saved: Flow<Boolean> = flowOf(comment.relationship.saved)
+
+    override fun upvote(name: Fullname) {
+        viewModelScope.launch(Dispatchers.IO) {
+            commentsRepository.upvote(name)
+        }
+    }
+
+    override fun downvote(name: Fullname) {
+        viewModelScope.launch(Dispatchers.IO) {
+            commentsRepository.downvote(name)
+        }
+    }
+
+    override fun save(name: Fullname, target: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (target) {
+                commentsRepository.unsave(name)
+            } else {
+                commentsRepository.save(name)
+            }
+        }
+    }
+
 }
 
 @Composable

@@ -17,9 +17,11 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -31,9 +33,12 @@ class ThreadViewModel @AssistedInject constructor(
     @Assisted("permalink") val permalink: String,
     @Assisted("comment") val comment: String?,
     @Assisted val context: Int?,
-) : ViewModel() {
+) : ViewModel(), CommentViewModelInterface {
 
     var name: Fullname = repository.getPostId(permalink)
+
+    override val likes: Flow<Boolean?> = flowOf(null)
+    override val saved: Flow<Boolean> = flowOf(false)
 
     private var _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
@@ -47,7 +52,7 @@ class ThreadViewModel @AssistedInject constructor(
     private var _openComment = MutableStateFlow<Fullname?>(null)
 
     /** Id of the comment of which the bottom bar is currently open */
-    val openComment: StateFlow<Fullname?> = _openComment.asStateFlow()
+    override val openComment: StateFlow<Fullname?> = _openComment.asStateFlow()
 
     /** If [openComment] is equal to [name], close it. Otherwise, open it. */
     fun toggleComment(name: Fullname) {
@@ -122,9 +127,9 @@ class ThreadViewModel @AssistedInject constructor(
         fetchComments()
     }
 
-    fun postComment(parentId: Fullname, comment: String) {
+    override fun submitComment(parent: Fullname, body: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val response = repository.postComment(parentId, comment)
+            val response = repository.postComment(parent, body)
             if (!response.isSuccessful) {
                 return@launch
             }
@@ -133,13 +138,13 @@ class ThreadViewModel @AssistedInject constructor(
             var commentData = CommentDataMapper.map(commentDTO.data)
             commentData =
                 commentData.copy(relationship = commentData.relationship.copy(liked = true))
-            if (parentId == post.value?.name) {
+            if (parent == post.value?.name) {
                 _comments.update {
                     it + CommentType.Comment(commentData.copy(depth = 0))
                 }
             } else {
                 _comments.update {
-                    it.updateComment(parentId) { c ->
+                    it.updateComment(parent) { c ->
                         c as CommentType.Comment
                         val replies =
                             c.comment.replies + CommentType.Comment(commentData.copy(depth = c.depth + 1))
@@ -150,8 +155,9 @@ class ThreadViewModel @AssistedInject constructor(
         }
     }
 
-    fun upvote(name: Fullname, likes: Boolean?) {
+    override fun upvote(name: Fullname) {
         viewModelScope.launch(Dispatchers.IO) {
+            val likes = comments.value.findComment(name)?.comment?.relationship?.liked
             if (likes != true) {
                 repository.upvote(name)
             } else {
@@ -178,8 +184,9 @@ class ThreadViewModel @AssistedInject constructor(
         }
     }
 
-    fun downvote(name: Fullname, likes: Boolean?) {
+    override fun downvote(name: Fullname) {
         viewModelScope.launch(Dispatchers.IO) {
+            val likes = comments.value.findComment(name)?.comment?.relationship?.liked
             if (likes != false) {
                 repository.downvote(name)
             } else {
@@ -205,12 +212,12 @@ class ThreadViewModel @AssistedInject constructor(
         }
     }
 
-    fun save(name: Fullname, saved: Boolean) {
+    override fun save(name: Fullname, target: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (saved) {
-                repository.unsave(name)
-            } else {
+            if (target) {
                 repository.save(name)
+            } else {
+                repository.unsave(name)
             }
         }
         _comments.update {
@@ -219,7 +226,7 @@ class ThreadViewModel @AssistedInject constructor(
                 CommentType.Comment(
                     comment.copy(
                         relationship = comment.relationship.copy(
-                            saved = !saved
+                            saved = target
                         )
                     )
                 )
@@ -259,4 +266,21 @@ fun List<CommentType>.updateComment(
         }
     }
 
+}
+
+fun List<CommentType>.findComment(name: Fullname): CommentType.Comment? {
+    for (comment in this) {
+        if (comment.name == name && comment is CommentType.Comment) {
+            return comment
+        }
+    }
+    for (comment in this) {
+        if (comment is CommentType.Comment) {
+            val res = comment.comment.replies.findComment(name)
+            if (res != null) {
+                return res
+            }
+        }
+    }
+    return null
 }

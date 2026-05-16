@@ -119,7 +119,7 @@ fun PostCard(
         )
         body()
         BottomRow(post, modifier, viewModel = viewModel) {
-            ReplyButton(parentId = post.name, threadViewModel = threadViewModel) {
+            ReplyButton(parentId = post.name, submitComment = threadViewModel::submitComment) {
                 ThemedCard(modifier = Modifier.padding(all = 16.dp)) {
                     Text(post.author.username, modifier = modifier)
                     Text(post.title, modifier = modifier)

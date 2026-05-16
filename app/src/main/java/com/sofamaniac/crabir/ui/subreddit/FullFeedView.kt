@@ -43,6 +43,7 @@ import androidx.compose.ui.semantics.stateDescription
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostCreatorRoute
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
@@ -63,7 +64,7 @@ val postTypes = listOf(
 fun FullFeedView(
     topBar: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit,
-    viewModel: FeedViewModelInterface,
+    viewModel: FeedViewModelInterface<PostData>,
     modifier: Modifier = Modifier,
     feedInfo: (@Composable () -> Unit)? = null,
 ) {
@@ -72,7 +73,7 @@ fun FullFeedView(
     val scope = rememberCoroutineScope()
 
     //val fullscreenManager = LocalFullscreenHandler.current!!
-    val entity by viewModel.entity.collectAsState(initial = null)
+    val communityEntity by viewModel.entity.collectAsState(initial = null)
     //val enabledDrawer by remember { fullscreenManager.size.map { it == 0 } }.collectAsState(true)
 //    fun createPost(kind: Kind) {
 //        showBottomSheet = false
@@ -109,7 +110,9 @@ fun FullFeedView(
                 viewModel,
                 feedInfo = feedInfo,
                 modifier = Modifier.padding(innerPadding)
-            )
+            ) { post, isMosVisible ->
+                DefaultPostView(post, isMostVisible = isMosVisible, viewModel = viewModel)
+            }
 
             if (showBottomSheet) {
                 ModalBottomSheet(
@@ -126,7 +129,7 @@ fun FullFeedView(
                                 navController.navigate(
                                     PostCreatorRoute(
                                         type.kind,
-                                        entity?.getData()?.id
+                                        communityEntity?.getData()?.id
                                     )
                                 )
                             }
@@ -149,7 +152,7 @@ fun FullFeedView(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun Fab(viewModel: FeedViewModelInterface, toggleBottomSheet: () -> Unit) {
+fun Fab(viewModel: FeedViewModelInterface<PostData>, toggleBottomSheet: () -> Unit) {
     val scope = rememberCoroutineScope()
     var expandFab by remember { mutableStateOf(false) }
     val showFab by remember {

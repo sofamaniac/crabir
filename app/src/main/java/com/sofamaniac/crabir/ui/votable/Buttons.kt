@@ -22,8 +22,6 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -31,18 +29,15 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.ui.post.VotableInteraction
 import kotlinx.coroutines.launch
 
 const val MAX_OFFSET = 10f
 
 @Composable
-fun UpButton(viewModel: VotableInteraction) {
+fun UpButton(likes: Boolean?, onClick: () -> Unit) {
     val theme = LocalTheme.current
 
     val offset = remember { Animatable(0f) }
-    val likes by viewModel.likes.collectAsState(initial = null)
-
     suspend fun animate(likes: Boolean?) {
         if (likes == true) return
         offset.animateTo(-MAX_OFFSET, animationSpec = tween(50, easing = EaseIn))
@@ -69,7 +64,7 @@ fun UpButton(viewModel: VotableInteraction) {
         IconButton(
             onClick = {
                 scope.launch { animate(likes) }
-                viewModel.upvote()
+                onClick()
             },
             modifier = Modifier.offset { IntOffset(0, offset.value.toInt()) }
         ) {
@@ -79,10 +74,9 @@ fun UpButton(viewModel: VotableInteraction) {
 }
 
 @Composable
-fun DownButton(viewModel: VotableInteraction) {
+fun DownButton(likes: Boolean?, onClick: () -> Unit) {
     val theme = LocalTheme.current
     val offset = remember { Animatable(0f) }
-    val likes by viewModel.likes.collectAsState(initial = null)
 
     suspend fun animate(likes: Boolean?) {
         if (likes == false) return
@@ -110,7 +104,7 @@ fun DownButton(viewModel: VotableInteraction) {
         IconButton(
             onClick = {
                 scope.launch { animate(likes) }
-                viewModel.downvote()
+                onClick()
             },
             modifier = Modifier.offset { IntOffset(0, offset.value.toInt()) }
         ) {
@@ -120,9 +114,8 @@ fun DownButton(viewModel: VotableInteraction) {
 }
 
 @Composable
-fun SavedButton(viewModel: VotableInteraction) {
+fun SavedButton(saved: Boolean, onClick: () -> Unit) {
     val scale = remember { Animatable(1f) }
-    val saved by viewModel.saved.collectAsState(initial = false)
     val buttonColor = animateColorAsState(
         targetValue = if (saved) Color.Yellow else Color.Gray,
         label = "button color"
@@ -146,7 +139,7 @@ fun SavedButton(viewModel: VotableInteraction) {
     ) {
         IconButton(onClick = {
             scope.launch { animate(!saved) }
-            viewModel.save(!saved)
+            onClick()
         }, modifier = Modifier.scale(scale.value)) {
             if (saved) {
                 Icon(Icons.Filled.Bookmark, description, tint = buttonColor.value)

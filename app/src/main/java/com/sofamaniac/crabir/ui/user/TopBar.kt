@@ -37,7 +37,7 @@ fun TopBar(
     user: String,
     userInfo: UserDTO?,
     modifier: Modifier = Modifier,
-    viewModel: ProfileFeedViewModel?
+    viewModel: ProfileFeedViewModel<*>?
 ) {
     val scope = rememberCoroutineScope()
     val drawerState = LocalDrawerState.current

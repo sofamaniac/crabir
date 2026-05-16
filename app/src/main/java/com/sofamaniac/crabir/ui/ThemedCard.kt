@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
@@ -16,16 +17,22 @@ fun ThemedCard(
     shape: Shape = CardDefaults.shape,
     elevation: CardElevation = CardDefaults.cardElevation(),
     border: BorderStroke? = null,
+    highlight: Boolean = false,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val theme = LocalTheme.current
+    val background = if (highlight) {
+        MaterialTheme.colorScheme.primaryContainer
+    } else {
+        theme.cardBackground
+    }
     Card(
         modifier = modifier,
         shape = shape,
         elevation = elevation,
         border = border,
         content = content,
-        colors = CardDefaults.cardColors().copy(containerColor = theme.cardBackground)
+        colors = CardDefaults.cardColors().copy(containerColor = background)
     )
 }
 

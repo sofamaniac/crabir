@@ -41,8 +41,8 @@ fun PostInfo(
     modifier: Modifier = Modifier,
     enableThumbnail: Boolean = true,
     read: Boolean = false,
-    viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(key = post.id) { factory ->
-        factory.create(post.name.name, post.subreddit.name)
+    viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(key = post.id) { factory ->
+        factory.create(post)
     },
 ) {
     val navController = LocalNavController.current!!

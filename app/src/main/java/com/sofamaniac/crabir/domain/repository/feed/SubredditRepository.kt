@@ -26,9 +26,9 @@ class SubredditCache @Inject constructor() {
 }
 
 class SubredditPostsRepository @Inject constructor(
-    votableRepository: LinksRepository,
-    api: RedditAPIService,
-) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
+    override val votableRepository: LinksRepository,
+    val api: RedditAPIService,
+) : PostFeedRepository<FeedParams>() {
     private var currentSubreddit: String? = null
 
     suspend fun getInfo(): SubredditData? {

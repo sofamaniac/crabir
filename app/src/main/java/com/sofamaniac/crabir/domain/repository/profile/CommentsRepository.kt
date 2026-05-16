@@ -8,16 +8,16 @@ import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.domain.repository.VotableRepository
-import com.sofamaniac.crabir.domain.repository.feed.FeedRepositoryCommon
+import com.sofamaniac.crabir.domain.repository.CommentsRepository
+import com.sofamaniac.crabir.domain.repository.feed.CommentFeedRepository
 import jakarta.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class CommentsRepository @Inject constructor(
-    votableRepository: VotableRepository,
-    api: RedditAPIService,
-) : FeedRepositoryCommon<ProfileFeedParams>(votableRepository, api) {
+    override val votableRepository: CommentsRepository,
+    val api: RedditAPIService,
+) : CommentFeedRepository<ProfileFeedParams>() {
     override suspend fun getThings(
         after: Fullname,
         params: ProfileFeedParams,

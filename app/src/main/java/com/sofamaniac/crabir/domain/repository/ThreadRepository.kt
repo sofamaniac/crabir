@@ -49,7 +49,7 @@ interface ThreadRepository {
 class ThreadRepositoryImpl @Inject constructor(
     val api: RedditAPIService,
     val visitedPostsDao: VisitedPostsDao,
-    val commentsRepository: VotableRepository,
+    val commentsRepository: CommentsRepository,
     val postsRepository: LinksRepository,
 ) :
     ThreadRepository {

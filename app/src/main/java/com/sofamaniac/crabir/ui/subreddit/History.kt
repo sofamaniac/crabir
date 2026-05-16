@@ -11,13 +11,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.domain.repository.VotableRepository
+import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
-import com.sofamaniac.crabir.domain.repository.feed.FeedRepositoryCommon
+import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository
 import com.sofamaniac.crabir.ui.TabBar
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -60,9 +59,8 @@ class HistoryViewModel @Inject constructor(
 @Singleton
 class HistoryRepository @Inject constructor(
     private val visitedPostsDao: VisitedPostsDao,
-    votableRepository: VotableRepository,
-    api: RedditAPIService,
-) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
+    override val votableRepository: LinksRepository,
+) : PostFeedRepository<FeedParams>() {
 
     val json = Json { ignoreUnknownKeys = true }
 

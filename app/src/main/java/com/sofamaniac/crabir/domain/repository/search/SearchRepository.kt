@@ -9,13 +9,13 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ListingRepository
-import com.sofamaniac.crabir.domain.repository.VotableRepository
 import javax.inject.Inject
 
 class PostSearchRepository @Inject constructor(
     private val api: RedditAPIService,
-    private val votableRepository: VotableRepository
+    private val votableRepository: LinksRepository
 ) :
     ListingRepository<PostSearchParams, PostData>() {
     override fun thingToData(thing: Thing): PostData? {
@@ -48,7 +48,7 @@ class PostSearchRepository @Inject constructor(
     }
 }
 
-class CommunitySearchRepository(private val api: RedditAPIService) :
+class CommunitySearchRepository @Inject constructor(private val api: RedditAPIService) :
     ListingRepository<CommunitySearchParams, SubredditData>() {
     override fun thingToData(thing: Thing): SubredditData? {
         if (thing !is Thing.Subreddit) return null
@@ -71,7 +71,7 @@ class CommunitySearchRepository(private val api: RedditAPIService) :
     }
 }
 
-class UserSearchRepository(private val api: RedditAPIService) :
+class UserSearchRepository @Inject constructor(private val api: RedditAPIService) :
     ListingRepository<PostSearchParams, UserDTO>() {
     override fun thingToData(thing: Thing): UserDTO? {
         if (thing !is Thing.User) return null

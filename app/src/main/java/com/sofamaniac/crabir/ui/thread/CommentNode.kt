@@ -35,6 +35,7 @@ import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.CommentType
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.ui.Flair
@@ -48,9 +49,13 @@ import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.SavedButton
 import com.sofamaniac.crabir.ui.votable.ScoreString
 import com.sofamaniac.crabir.ui.votable.UpButton
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+
+interface CommentViewModelInterface : VotableInteraction {
+    val openComment: StateFlow<Fullname?>
+    fun submitComment(parent: Fullname, body: String)
+}
 
 @Composable
 fun CommentNode(
@@ -98,7 +103,6 @@ fun CommentNode(
             }
         }
     }
-
 }
 
 @Composable
@@ -135,9 +139,9 @@ private fun CollapsedComment(
 }
 
 @Composable
-private fun ColumnScope.OpenedComment(
+fun ColumnScope.OpenedComment(
     comment: CommentData,
-    viewModel: ThreadViewModel,
+    viewModel: CommentViewModelInterface,
     modifier: Modifier = Modifier,
     enableAnimation: Boolean = true
 ) {
@@ -165,37 +169,26 @@ private fun ColumnScope.OpenedComment(
 }
 
 @Composable
-fun BottomRow(comment: CommentData, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
+fun BottomRow(
+    comment: CommentData,
+    viewModel: CommentViewModelInterface,
+    modifier: Modifier = Modifier
+) {
     val likes = comment.relationship.liked
     val saved = comment.relationship.saved
-    val votable = remember(comment) {
-        object : VotableInteraction {
-            override val likes: Flow<Boolean?> = flowOf(likes)
-            override val saved: Flow<Boolean> = flowOf(saved)
 
-            override fun upvote() {
-                viewModel.upvote(comment.name, likes)
-            }
-
-            override fun downvote() {
-                viewModel.downvote(comment.name, likes)
-            }
-
-            override fun save(target: Boolean) {
-                viewModel.save(comment.name, saved)
-            }
-        }
-    }
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(color = Color.Gray.copy(alpha = 0.2f)),
         horizontalArrangement = Arrangement.End
     ) {
-        UpButton(votable)
-        DownButton(votable)
-        SavedButton(votable)
-        ReplyButton(parentId = comment.name, threadViewModel = viewModel) {
+        UpButton(likes, onClick = { viewModel.upvote(comment.name) })
+        DownButton(likes, onClick = { viewModel.downvote(comment.name) })
+        SavedButton(saved, onClick = { viewModel.save(comment.name, !saved) })
+        ReplyButton(parentId = comment.name, submitComment = { name, comment ->
+            viewModel.submitComment(name, comment)
+        }) {
             ThemedCard(modifier = Modifier.padding(all = 16.dp)) {
                 Text(comment.author.username, modifier = modifier)
                 RedditMarkdown(

@@ -1,13 +1,6 @@
 package com.sofamaniac.crabir.di
 
-import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
-import com.sofamaniac.crabir.domain.repository.VotableRepository
-import com.sofamaniac.crabir.domain.repository.search.CommunitySearchRepository
-import com.sofamaniac.crabir.domain.repository.search.UserSearchRepository
-import com.sofamaniac.crabir.ui.subreddit.HistoryRepository
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 
@@ -22,14 +15,14 @@ object RepositoryModule {
 //        return HomeRepository(votableRepository, api)
 //    }
 
-    @Provides
-    fun provideHistoryRepository(
-        visitedPostsDao: VisitedPostsDao,
-        votableRepository: VotableRepository,
-        api: RedditAPIService
-    ): HistoryRepository {
-        return HistoryRepository(visitedPostsDao, votableRepository, api)
-    }
+//    @Provides
+//    fun provideHistoryRepository(
+//        visitedPostsDao: VisitedPostsDao,
+//        votableRepository: VotableRepository,
+//        api: RedditAPIService
+//    ): HistoryRepository {
+//        return HistoryRepository(visitedPostsDao, votableRepository, api)
+//    }
 
 //    @Provides
 //    fun provideSubredditPostsRepository(
@@ -47,17 +40,17 @@ object RepositoryModule {
 //        return PostSearchRepository(api = api, votableRepository = votableRepository)
 //    }
 //
-    @Provides
-    fun provideSearchCommunityRepository(
-        api: RedditAPIService
-    ): CommunitySearchRepository {
-        return CommunitySearchRepository(api = api)
-    }
-
-    @Provides
-    fun provideSearchUserRepository(api: RedditAPIService): UserSearchRepository {
-        return UserSearchRepository(api = api)
-    }
+//    @Provides
+//    fun provideSearchCommunityRepository(
+//        api: RedditAPIService
+//    ): CommunitySearchRepository {
+//        return CommunitySearchRepository(api = api)
+//    }
+//
+//    @Provides
+//    fun provideSearchUserRepository(api: RedditAPIService): UserSearchRepository {
+//        return UserSearchRepository(api = api)
+//    }
 
 //    @Provides
 //    fun provideSearchCommentRepository(api: RedditAPIService): CommentSearchRepository {

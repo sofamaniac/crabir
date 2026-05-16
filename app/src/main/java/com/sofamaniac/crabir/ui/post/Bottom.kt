@@ -43,6 +43,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
@@ -69,6 +70,7 @@ import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.data.remote.api.FlairInfo
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
 import com.sofamaniac.crabir.navigation.CrosspostCreatorRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -94,10 +96,12 @@ fun BottomRow(
     action: @Composable () -> Unit = {},
 ) {
     LocalNavController.current!!
+    val likes by viewModel.likes.collectAsState(post.relationship.liked)
+    val saved by viewModel.saved.collectAsState(post.relationship.saved)
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-        UpButton(viewModel)
-        DownButton(viewModel)
-        SavedButton(viewModel)
+        UpButton(likes, onClick = { viewModel.upvote(post.name) })
+        DownButton(likes, onClick = { viewModel.downvote(post.name) })
+        SavedButton(saved, onClick = { viewModel.save(post.name, !saved) })
         action()
         OpenInAppButton(post)
         PostOptions(post, viewModel)
@@ -113,10 +117,12 @@ fun OpenInAppButton(
     TooltipBox(
         tooltip = { PlainTooltip { Text(description) } },
         state = rememberTooltipState(),
-        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+            TooltipAnchorPosition.Above
+        ),
     ) {
         IconButton(onClick = {
-            uriHandler.openUri(post.url.toString())
+            uriHandler.openUri(post.url)
         }) {
             Icon(Icons.AutoMirrored.Outlined.ExitToApp, description, tint = Color.Gray)
         }
@@ -395,7 +401,7 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportMenu(viewModel: VotableViewModel, onDismissRequest: () -> Unit) {
+fun <T : VotableData> ReportMenu(viewModel: VotableViewModel<T>, onDismissRequest: () -> Unit) {
     val rules = viewModel.rules
     val (selectedOption, setSelectedOption) = remember { mutableStateOf(rules.siteRules.firstOrNull()) }
     BasicAlertDialog(onDismissRequest) {

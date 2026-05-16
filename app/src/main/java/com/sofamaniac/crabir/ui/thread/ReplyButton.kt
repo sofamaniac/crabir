@@ -23,7 +23,7 @@ import com.sofamaniac.crabir.ui.markdown.Editor
 @Composable
 fun ReplyButton(
     parentId: Fullname,
-    threadViewModel: ThreadViewModel,
+    submitComment: (Fullname, String) -> Unit,
     modifier: Modifier = Modifier,
     parentPreview: @Composable () -> Unit = {}
 ) {
@@ -52,7 +52,7 @@ fun ReplyButton(
                     },
                     actions = {
                         IconButton(onClick = {
-                            threadViewModel.postComment(parentId, state.text as String)
+                            submitComment(parentId, state.text as String)
                             showEditor = false
                         }) {
                             Icon(

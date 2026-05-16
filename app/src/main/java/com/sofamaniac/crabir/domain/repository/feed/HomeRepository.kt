@@ -13,9 +13,9 @@ import javax.inject.Singleton
 
 @Singleton
 class HomeRepository @Inject constructor(
-    votableRepository: LinksRepository,
-    api: RedditAPIService
-) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
+    override val votableRepository: LinksRepository,
+    val api: RedditAPIService
+) : PostFeedRepository<FeedParams>() {
 
     override suspend fun getThings(
         after: Fullname,

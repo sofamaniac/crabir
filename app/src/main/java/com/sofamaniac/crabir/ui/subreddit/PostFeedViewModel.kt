@@ -27,8 +27,8 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
-import com.sofamaniac.crabir.domain.repository.feed.FeedRepositoryCommon
 import com.sofamaniac.crabir.domain.repository.feed.FeedSource
+import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,9 +41,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
-interface FeedViewModelInterface {
+interface FeedViewModelInterface<T : VotableData> {
     val listState: LazyStaggeredGridState
-    val data: Flow<PagingData<VotableData>>
+    val data: Flow<PagingData<T>>
     var needScrollToTop: Boolean
     val entity: Flow<VisitedCommunityEntity?>
 
@@ -55,10 +55,10 @@ interface FeedViewModelInterface {
 
 abstract class PostFeedViewModel(
     private val id: String,
-    private val repository: FeedRepositoryCommon<FeedParams>,
+    private val repository: PostFeedRepository<FeedParams>,
     private val visitedPostsDao: VisitedPostsDao,
     private val visitedCommunityDao: VisitedCommunityDao,
-) : ViewModel(), FeedViewModelInterface {
+) : ViewModel(), FeedViewModelInterface<PostData> {
 
     override val entity: Flow<VisitedCommunityEntity?> = visitedCommunityDao.getCommunityFlow(id)
 
@@ -89,8 +89,8 @@ abstract class PostFeedViewModel(
         repository.refresh()
     }
 
-    private var feedSource: FeedSource<FeedParams>? = null
-    override val data: Flow<PagingData<VotableData>> = Pager(
+    private var feedSource: FeedSource<FeedParams, PostData>? = null
+    override val data: Flow<PagingData<PostData>> = Pager(
         config = PagingConfig(pageSize = 100, prefetchDistance = 10, initialLoadSize = 100),
         initialKey = Fullname(""),
         pagingSourceFactory = {

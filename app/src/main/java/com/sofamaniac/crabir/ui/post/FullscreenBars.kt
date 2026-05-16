@@ -71,15 +71,16 @@ fun ColumnScope.FullscreenTopBar(
 fun ColumnScope.FullscreenBottomBar(
     post: PostData,
     enabled: Boolean,
-    viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
+    viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
-            factory.create(post.name.name, post.subreddit.name)
+            factory.create(post)
         }),
     title: @Composable () -> Unit = {}
 ) {
     val theme = LocalTheme.current
     val likes by viewModel.likes.collectAsState(post.relationship.liked)
+    val saved by viewModel.saved.collectAsState(post.relationship.saved)
     AnimatedVisibility(
         visible = enabled,
         modifier = Modifier
@@ -105,11 +106,11 @@ fun ColumnScope.FullscreenBottomBar(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    UpButton(viewModel)
+                    UpButton(likes, onClick = { viewModel.upvote(post.name) })
                     ScoreString(post.score.score, likes)
-                    DownButton(viewModel)
+                    DownButton(likes, onClick = { viewModel.downvote(post.name) })
                 }
-                SavedButton(viewModel)
+                SavedButton(saved, onClick = { viewModel.save(post.name, !saved) })
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(

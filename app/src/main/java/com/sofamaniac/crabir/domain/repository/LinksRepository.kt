@@ -4,16 +4,18 @@ import com.sofamaniac.crabir.data.local.dao.VotableDao
 import com.sofamaniac.crabir.data.remote.api.FlairInfo
 import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.VotableData
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class LinksRepository @Inject constructor(
-    private val api: RedditAPIService,
-    private val votableDao: VotableDao
+    override val api: RedditAPIService,
+    override val votableDao: VotableDao
 ) :
-    VotableRepository(api, votableDao) {
+    VotableRepository<PostData> {
     suspend fun markNSFW(name: Fullname) {
         val post = get(name).first()
         if (post == null) return
@@ -76,5 +78,29 @@ class LinksRepository @Inject constructor(
         if (res.isSuccessful) {
             update(name, post.copy(sendReplies = enabled))
         }
+    }
+
+    suspend fun hide(fullname: Fullname): Result<Unit> {
+        val res = api.hide(fullname)
+        if (!res.isSuccessful) {
+            return Result.failure(Exception("Error hiding post"))
+        }
+        val post: VotableData? = get(fullname).first()
+        if (post == null) return Result.success(Unit)
+        val relationship = post.relationship.copy(hidden = true)
+        votableDao.update(fullname, post.copy(relationship = relationship).toEntity().data)
+        return Result.success(Unit)
+    }
+
+    suspend fun unhide(fullname: Fullname): Result<Unit> {
+        val res = api.unhide(fullname)
+        if (!res.isSuccessful) {
+            return Result.failure(Exception("Error unhiding post"))
+        }
+        val post: VotableData? = get(fullname).first()
+        if (post == null) return Result.success(Unit)
+        val relationship = post.relationship.copy(hidden = false)
+        votableDao.update(fullname, post.copy(relationship = relationship).toEntity().data)
+        return Result.success(Unit)
     }
 }

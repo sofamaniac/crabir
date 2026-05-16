@@ -9,17 +9,17 @@ import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.domain.repository.VotableRepository
-import com.sofamaniac.crabir.domain.repository.feed.FeedRepositoryCommon
+import com.sofamaniac.crabir.domain.repository.MixedRepository
+import com.sofamaniac.crabir.domain.repository.feed.MixedFeedRepository
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import retrofit2.Response
 
 @Singleton
 class SavedRepository @Inject constructor(
-    votableRepository: VotableRepository,
-    api: RedditAPIService,
-) : FeedRepositoryCommon<ProfileFeedParams>(votableRepository, api) {
+    override val votableRepository: MixedRepository,
+    val api: RedditAPIService,
+) : MixedFeedRepository<ProfileFeedParams>() {
     override suspend fun getThings(
         after: Fullname,
         params: ProfileFeedParams
@@ -36,5 +36,4 @@ class SavedRepository @Inject constructor(
             )
         }
     }
-
 }

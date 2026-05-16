@@ -48,9 +48,9 @@ fun CompactView(
             verticalAlignment = Alignment.Top,
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                UpButton(viewModel)
+                UpButton(likes, onClick = { viewModel.upvote(post.name) })
                 ScoreString(post.score.score, likes)
-                DownButton(viewModel)
+                DownButton(likes, onClick = { viewModel.downvote(post.name) })
             }
             Column {
                 PostInfo(

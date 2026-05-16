@@ -75,6 +75,7 @@ import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.ui.TimeframeMenu
+import com.sofamaniac.crabir.ui.subreddit.DefaultPostView
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subredditList.Tile
 import com.sofamaniac.crabir.ui.user.ProfileTabs
@@ -212,7 +213,9 @@ class SearchCommonViewModel @AssistedInject constructor(@Assisted query: String)
 
 @Composable
 private fun InnerTab(viewModel: PostSearchViewModel) {
-    PostFeedViewer(viewModel)
+    PostFeedViewer(viewModel) { post, isMosVisible ->
+        DefaultPostView(post, isMostVisible = isMosVisible, viewModel = viewModel)
+    }
 }
 
 @Composable

@@ -7,9 +7,9 @@ import com.sofamaniac.crabir.domain.repository.LinksRepository
 import jakarta.inject.Inject
 
 class MultiPostsRepository @Inject constructor(
-    votableRepository: LinksRepository,
-    api: RedditAPIService,
-) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
+    override val votableRepository: LinksRepository,
+    val api: RedditAPIService,
+) : PostFeedRepository<FeedParams>() {
     private var currentMulti: String? = null
 
     fun updateMulti(permalink: String) {

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -56,7 +55,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import androidx.paging.filter
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
@@ -73,9 +71,10 @@ import com.sofamaniac.crabir.ui.post.PostCard
 import com.sofamaniac.crabir.ui.thread.CommentNode
 import com.sofamaniac.crabir.ui.thread.ThreadViewModel
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.math.max
+
+typealias ThingView<T> = @Composable (thing: T, isMostVisible: Boolean) -> Unit
 
 object PostFeedViewerDefaults {
     fun hiddenFilter(votableData: VotableData?): Boolean {
@@ -93,19 +92,20 @@ object PostFeedViewerDefaults {
  * Composable function to display a list of posts from a subreddit.
  *
  * @param viewModel The current state of the SubredditViewer, including subreddit, sort order, and timeframe.
+ * @param filter Renders only the elements for which filter returns true
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostFeedViewer(
-    viewModel: FeedViewModelInterface,
+fun <T : VotableData> PostFeedViewer(
+    viewModel: FeedViewModelInterface<T>,
     modifier: Modifier = Modifier,
     // If set to {}, breaks pull to refresh
     feedInfo: (@Composable () -> Unit)? = null,
-    filter: (VotableData?) -> Boolean = PostFeedViewerDefaults::hiddenFilter
+    filter: (T?) -> Boolean = PostFeedViewerDefaults::hiddenFilter,
+    itemView: @Composable (thing: T, isMosVisible: Boolean) -> Unit
 ) {
 
-    val posts =
-        remember { viewModel.data.map { it.filter { post -> filter(post) } } }.collectAsLazyPagingItems()
+    val posts = viewModel.data.collectAsLazyPagingItems()
     val listState = viewModel.listState
 
 
@@ -195,60 +195,12 @@ fun PostFeedViewer(
                 ) { feedInfo() }
             }
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
-                when (val post = posts[index]) {
-                    is PostData -> {
-                        val onClick = { post: PostData ->
-                            viewModel.visitPost(post)
-                            //fullscreenManager.push { threadView(post) }
-                            navController.navigate(PostRoute(post.permalink, null))
-                        }
-                        val canStartVideo =
-                            viewSettings.defaultColumns == 1 && index == mostVisibleItemIndex
-                        val wasRead = viewModel.isPostRead(post)
-                        when (viewSettings.defaultView) {
-                            Views.Card -> PostCard(
-                                post,
-                                onClick = onClick,
-                                canStartVideo = canStartVideo,
-                                read = wasRead,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .defaultMinSize(minHeight = 10.dp)
-                            )
-
-                            Views.Compact -> CompactView(
-                                post,
-                                onClick = onClick,
-                                canStartVideo = canStartVideo,
-                                read = wasRead,
-                            )
-
-                            else ->
-                                PostCard(
-                                    post,
-                                    onClick = { post ->
-                                        //fullscreenManager.push { threadView(post) }
-                                        navController.navigate(PostRoute(post.permalink, null))
-                                    },
-                                    canStartVideo = canStartVideo,
-                                )
-                        }
-                    }
-
-                    is CommentData -> {
-                        CommentNode(
-                            comment = post,
-                            viewModel = hiltViewModel<ThreadViewModel, ThreadViewModel.Factory> { factory ->
-                                factory.create(post.permalink)
-                            }
-                        )
-                    }
-
-                    else -> {
-                        Log.e("PostFeedViewer", "Could not render ${post?.name}")
-                    }
+                val isMostVisible = index == mostVisibleItemIndex
+                val post = posts[index]
+                if (post != null && filter(post)) {
+                    itemView(post, isMostVisible)
+                    HorizontalDivider()
                 }
-                HorizontalDivider()
             }
         }
     }
@@ -311,6 +263,62 @@ fun TopBar(
             SortMenu<Sort> { sort, timeframe ->
                 state.updateSort(sort, timeframe)
             }
+        }
+    )
+}
+
+@Composable
+fun DefaultPostView(
+    thing: PostData,
+    viewModel: FeedViewModelInterface<PostData>,
+    isMostVisible: Boolean
+) {
+
+    val viewSettings = rememberViewSettings()
+    val navController = LocalNavController.current!!
+    val onClick = { post: PostData ->
+        viewModel.visitPost(post)
+        navController.navigate(PostRoute(post.permalink, null))
+    }
+    val canStartVideo =
+        viewSettings.defaultColumns == 1 && isMostVisible
+    val wasRead = viewModel.isPostRead(thing)
+    when (viewSettings.defaultView) {
+        Views.Card -> PostCard(
+            thing,
+            onClick = onClick,
+            canStartVideo = canStartVideo,
+            read = wasRead,
+        )
+
+        Views.Compact -> CompactView(
+            thing,
+            onClick = onClick,
+            canStartVideo = canStartVideo,
+            read = wasRead,
+        )
+
+        else ->
+            PostCard(
+                thing,
+                onClick = { post ->
+                    navController.navigate(PostRoute(post.permalink, null))
+                },
+                canStartVideo = canStartVideo,
+            )
+    }
+}
+
+@Composable
+fun DefaultCommentView(
+    thing: CommentData,
+    viewModel: FeedViewModelInterface<CommentData>,
+    isMostVisible: Boolean
+) {
+    CommentNode(
+        comment = thing,
+        viewModel = hiltViewModel<ThreadViewModel, ThreadViewModel.Factory> { factory ->
+            factory.create(thing.permalink)
         }
     )
 }

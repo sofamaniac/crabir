@@ -16,6 +16,7 @@ import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
 import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
+import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
@@ -50,7 +51,7 @@ class SavedViewModel @AssistedInject constructor(
     @Assisted username: String,
     repository: SavedRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel(username, repository, visitedPostsDao) {
+) : ProfileFeedViewModel<VotableData>(username, repository, visitedPostsDao) {
     @AssistedFactory
     interface Factory {
         fun create(username: String): SavedViewModel
@@ -62,7 +63,7 @@ class OverviewViewModel @AssistedInject constructor(
     @Assisted username: String,
     repository: OverviewRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel(username, repository, visitedPostsDao) {
+) : ProfileFeedViewModel<VotableData>(username, repository, visitedPostsDao) {
     @AssistedFactory
     interface Factory {
         fun create(username: String): OverviewViewModel
@@ -74,7 +75,7 @@ class CommentsViewModel @AssistedInject constructor(
     @Assisted username: String,
     repository: CommentsRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel(username, repository, visitedPostsDao), SortProfileTab {
+) : ProfileFeedViewModel<CommentData>(username, repository, visitedPostsDao), SortProfileTab {
     @AssistedFactory
     interface Factory {
         fun create(username: String): CommentsViewModel
@@ -100,7 +101,7 @@ class UpvotedViewModel @AssistedInject constructor(
     @Assisted username: String,
     repository: UpvotedRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel(username, repository, visitedPostsDao) {
+) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao) {
     @AssistedFactory
     interface Factory {
         fun create(username: String): UpvotedViewModel
@@ -112,7 +113,7 @@ class DownvotedViewModel @AssistedInject constructor(
     @Assisted username: String,
     repository: DownvotedRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel(username, repository, visitedPostsDao) {
+) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao) {
     @AssistedFactory
     interface Factory {
         fun create(username: String): DownvotedViewModel
@@ -124,7 +125,7 @@ class HiddenViewModel @AssistedInject constructor(
     @Assisted username: String,
     repository: HiddenRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel(username, repository, visitedPostsDao) {
+) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao) {
     @AssistedFactory
     interface Factory {
         fun create(username: String): HiddenViewModel
@@ -136,7 +137,7 @@ class SubmittedViewModel @AssistedInject constructor(
     @Assisted username: String,
     repository: SubmittedRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel(username, repository, visitedPostsDao), SortProfileTab {
+) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao), SortProfileTab {
     @AssistedFactory
     interface Factory {
         fun create(username: String): SubmittedViewModel
@@ -156,11 +157,11 @@ class SubmittedViewModel @AssistedInject constructor(
     }
 }
 
-abstract class ProfileFeedViewModel(
+abstract class ProfileFeedViewModel<T : VotableData>(
     val username: String,
-    private val repository: FeedRepositoryCommon<ProfileFeedParams>,
+    private val repository: FeedRepositoryCommon<ProfileFeedParams, T>,
     private val visitedPostsDao: VisitedPostsDao,
-) : ViewModel(), FeedViewModelInterface {
+) : ViewModel(), FeedViewModelInterface<T> {
 
     override val entity: Flow<VisitedCommunityEntity?> = flowOf(null)
 
@@ -182,8 +183,8 @@ abstract class ProfileFeedViewModel(
         repository.refresh()
     }
 
-    private var feedSource: FeedSource<ProfileFeedParams>? = null
-    override val data: Flow<PagingData<VotableData>> = Pager(
+    private var feedSource: FeedSource<ProfileFeedParams, T>? = null
+    override val data: Flow<PagingData<T>> = Pager(
         config = PagingConfig(pageSize = 100, prefetchDistance = 10, initialLoadSize = 100),
         initialKey = Fullname(""),
         pagingSourceFactory = {
