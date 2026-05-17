@@ -12,7 +12,6 @@ import org.intellij.markdown.parser.sequentialparsers.impl.BacktickParser
 import org.intellij.markdown.parser.sequentialparsers.impl.EmphStrongDelimiterParser
 import org.intellij.markdown.parser.sequentialparsers.impl.ImageParser
 import org.intellij.markdown.parser.sequentialparsers.impl.InlineLinkParser
-import org.intellij.markdown.parser.sequentialparsers.impl.MathParser
 import org.intellij.markdown.parser.sequentialparsers.impl.ReferenceLinkParser
 
 class RedditFlavourDescriptor : GFMFlavourDescriptor() {
@@ -30,7 +29,7 @@ class RedditFlavourDescriptor : GFMFlavourDescriptor() {
                     SpoilerParser(),
                     SuperscriptParser(),
                     BacktickParser(),
-                    MathParser(),
+                    //MathParser(),
                     ImageParser(),
                     InlineLinkParser(),
                     ReferenceLinkParser(),
