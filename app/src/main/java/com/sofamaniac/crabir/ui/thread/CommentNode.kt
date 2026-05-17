@@ -148,7 +148,7 @@ fun ColumnScope.OpenedComment(
     val context = LocalContext.current
     val showBottomBar by remember(comment.name, context) {
         viewModel.openComment.map { it == comment.name || !enableAnimation }
-    }.collectAsState(initial = false)
+    }.collectAsState(initial = !enableAnimation)
 
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)

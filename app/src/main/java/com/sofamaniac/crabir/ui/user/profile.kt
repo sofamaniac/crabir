@@ -49,7 +49,7 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
-import com.sofamaniac.crabir.domain.repository.VotableRepository
+import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.ui.TabBar
@@ -61,7 +61,6 @@ import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewerDefaults
 import com.sofamaniac.crabir.ui.thread.CommentViewModelInterface
 import com.sofamaniac.crabir.ui.thread.OpenedComment
-import com.sofamaniac.crabir.ui.thread.ThreadViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -261,17 +260,18 @@ fun CommentView(
     ) {
         OpenedComment(
             thing,
-            viewModel = hiltViewModel<ThreadViewModel, ThreadViewModel.Factory> { factory ->
-                factory.create(thing.permalink)
+            viewModel = hiltViewModel<CommentViewModel, CommentViewModel.Factory> { factory ->
+                factory.create(thing)
             },
             enableAnimation = false,
         )
     }
 }
 
-class CommentViewModel(
-    val comment: CommentData,
-    private val commentsRepository: VotableRepository<CommentData>
+@HiltViewModel(assistedFactory = CommentViewModel.Factory::class)
+class CommentViewModel @AssistedInject constructor(
+    @Assisted val comment: CommentData,
+    private val commentsRepository: CommentsRepository,
 ) : CommentViewModelInterface, ViewModel() {
     override val openComment: StateFlow<Fullname?> = MutableStateFlow(comment.name)
 
@@ -305,6 +305,11 @@ class CommentViewModel(
                 commentsRepository.save(name)
             }
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(comment: CommentData): CommentViewModel
     }
 
 }
