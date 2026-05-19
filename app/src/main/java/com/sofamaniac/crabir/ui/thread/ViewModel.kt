@@ -240,7 +240,7 @@ class ThreadViewModel @AssistedInject constructor(
         fun create(
             @Assisted("permalink") permalink: String,
             @Assisted("comment") comment: String? = null,
-            context: Int? = null
+            context: Int? = null,
         ): ThreadViewModel
     }
 }

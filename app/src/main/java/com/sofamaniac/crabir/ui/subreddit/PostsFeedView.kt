@@ -40,7 +40,6 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -50,17 +49,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
-import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
+import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.settings.views.Views
@@ -68,8 +68,6 @@ import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.SortMenu
 import com.sofamaniac.crabir.ui.post.CompactView
 import com.sofamaniac.crabir.ui.post.PostCard
-import com.sofamaniac.crabir.ui.thread.CommentNode
-import com.sofamaniac.crabir.ui.thread.ThreadViewModel
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlin.math.max
@@ -210,11 +208,12 @@ fun <T : VotableData> PostFeedViewer(
 @Composable
 fun TopBar(
     title: String,
-    state: PostFeedViewModel,
+    params: FeedParams,
+    updateSort: (Sort, Timeframe?) -> Unit,
+    refresh: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior?,
 ) {
     val scope = rememberCoroutineScope()
-    val params = state.params.collectAsState()
     val theme = LocalTheme.current
     val drawerState = LocalDrawerState.current
 
@@ -232,11 +231,13 @@ fun TopBar(
                     modifier = Modifier.padding(horizontal = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(params.value.sort.toString(), style = MaterialTheme.typography.labelSmall)
-                    if (params.value.timeframe != null) {
-                        Text(".", style = MaterialTheme.typography.labelSmall)
+                    val sortString = stringResource(params.sort.representation)
+                    Text(sortString, style = MaterialTheme.typography.labelSmall)
+                    if (params.timeframe != null) {
+                        val timeframeString = stringResource(params.timeframe!!.representation)
+                        Text(" · ", style = MaterialTheme.typography.labelSmall)
                         Text(
-                            params.value.timeframe.toString(),
+                            timeframeString,
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
@@ -256,12 +257,13 @@ fun TopBar(
             }
 
             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                // TODO
                 DropdownMenuItem(onClick = { }, text = { Text("Settings") })
                 DropdownMenuItem(onClick = { }, text = { Text("Info") })
-                DropdownMenuItem(onClick = { state.refresh() }, text = { Text("Refresh") })
+                DropdownMenuItem(onClick = { refresh() }, text = { Text("Refresh") })
             }
             SortMenu<Sort> { sort, timeframe ->
-                state.updateSort(sort, timeframe)
+                updateSort(sort, timeframe)
             }
         }
     )
@@ -307,18 +309,4 @@ fun DefaultPostView(
                 canStartVideo = canStartVideo,
             )
     }
-}
-
-@Composable
-fun DefaultCommentView(
-    thing: CommentData,
-    viewModel: FeedViewModelInterface<CommentData>,
-    isMostVisible: Boolean
-) {
-    CommentNode(
-        comment = thing,
-        viewModel = hiltViewModel<ThreadViewModel, ThreadViewModel.Factory> { factory ->
-            factory.create(thing.permalink)
-        }
-    )
 }

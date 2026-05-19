@@ -40,6 +40,17 @@
     <string name="month">Month</string>
     <string name="year">Year</string>
     <string name="all_time">All</string>
+    <string name="History">History</string>
+    <string name="create_post">Create post</string>
+    <string name="cancel">Cancel</string>
+    <string name="go_to_top">Go to top</string>
+    <string name="open_in_app">Open in app</string>
+    <string name="open_comments">Open comments</string>
+    <string name="neutral_vote">Neutral Vote</string>
+    <string name="upvote">Upvote</string>
+    <string name="downvote">Downvote</string>
+    <string name="save">Save</string>
+    <string name="unsave">Unsave</string>
     <plurals name="MoreComments">
         <item quantity="zero">See more comments</item>
         <item quantity="one">%d more reply</item>

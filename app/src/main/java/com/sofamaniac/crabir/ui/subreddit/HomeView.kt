@@ -8,10 +8,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.domain.repository.feed.HomeRepository
@@ -29,7 +33,17 @@ fun HomeViewer(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
-    val topBar = @Composable { TopBar("Home", viewModel, scrollBehavior) }
+    val title = stringResource(R.string.Home)
+    val params by viewModel.params.collectAsState()
+    val topBar = @Composable {
+        TopBar(
+            title,
+            params,
+            updateSort = viewModel::updateSort,
+            refresh = viewModel::refresh,
+            scrollBehavior = scrollBehavior
+        )
+    }
     val bottomBar = @Composable {
         TabBar(0, onTabReselect = {
             scope.launch {

@@ -15,11 +15,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.sofamaniac.crabir.data.remote.dto.SortInterface
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 
+@Preview
 @Composable
-inline fun <reified Sort> SortMenu(crossinline onSelect: (Sort, Timeframe?) -> Unit) where Sort : Enum<Sort>, Sort : SortInterface {
+inline fun <reified Sort> SortMenu(crossinline onSelect: (Sort, Timeframe?) -> Unit = { _, _ -> }) where Sort : Enum<Sort>, Sort : SortInterface {
 
     var sortExpanded by remember { mutableStateOf(false) }
     var timeframeExpanded by remember { mutableStateOf(false) }

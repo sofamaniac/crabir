@@ -41,4 +41,15 @@
         <item quantity="one">%d réponse</item>
         <item quantity="many">%d réponses</item>
     </plurals>
+    <string name="History">Historique</string>
+    <string name="create_post">Créer publication</string>
+    <string name="cancel">Annuler</string>
+    <string name="go_to_top">Aller au début</string>
+    <string name="open_in_app">Ouvrir dans une app</string>
+    <string name="open_comments">Ouvrir les commentaires</string>
+    <string name="neutral_vote">Vote Neutre</string>
+    <string name="upvote">Haut Voter</string>
+    <string name="downvote">Bas Voter</string>
+    <string name="save">Sauvegarder</string>
+    <string name="unsave">Retirer des sauvegardés</string>
 </resources>

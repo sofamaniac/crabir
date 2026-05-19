@@ -27,8 +27,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.R
 import kotlinx.coroutines.launch
 
 const val MAX_OFFSET = 10f
@@ -53,7 +55,9 @@ fun UpButton(likes: Boolean?, onClick: () -> Unit) {
     )
 
     val scope = rememberCoroutineScope()
-    val description = if (likes == true) "Neutral vote" else "Upvote"
+    val neutral = stringResource(R.string.neutral_vote)
+    val upvote = stringResource(R.string.upvote)
+    val description = if (likes == true) neutral else upvote
     TooltipBox(
         tooltip = { PlainTooltip { Text(description) } },
         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
@@ -93,7 +97,9 @@ fun DownButton(likes: Boolean?, onClick: () -> Unit) {
         targetValue = if (likes == false) theme.downvote else Color.Gray,
         label = "button color"
     )
-    val description = if (likes == false) "Neutral vote" else "Downvote"
+    val neutral = stringResource(R.string.neutral_vote)
+    val upvote = stringResource(R.string.downvote)
+    val description = if (likes == true) neutral else upvote
     TooltipBox(
         tooltip = { PlainTooltip { Text(description) } },
         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
@@ -129,7 +135,9 @@ fun SavedButton(saved: Boolean, onClick: () -> Unit) {
     }
 
     val scope = rememberCoroutineScope()
-    val description = if (saved) "Unsave" else "Save"
+    val save = stringResource(R.string.save)
+    val unsave = stringResource(R.string.unsave)
+    val description = if (saved) unsave else save
     TooltipBox(
         tooltip = { PlainTooltip { Text(description) } },
         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(

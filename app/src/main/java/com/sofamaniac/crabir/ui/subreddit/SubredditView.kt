@@ -66,11 +66,14 @@ fun SubredditViewer(
     },
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val params by viewModel.params.collectAsState()
     val topBar = @Composable {
         TopBar(
             subreddit,
-            viewModel,
-            scrollBehavior,
+            params,
+            updateSort = viewModel::updateSort,
+            refresh = viewModel::refresh,
+            scrollBehavior = scrollBehavior
         )
     }
     val bottomBar = @Composable {

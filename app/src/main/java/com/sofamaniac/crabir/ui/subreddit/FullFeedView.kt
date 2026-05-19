@@ -37,11 +37,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -119,7 +121,7 @@ fun FullFeedView(
                     onDismissRequest = { showBottomSheet = false },
                     sheetState = bottomSheetState,
                 ) {
-                    ListItem(headlineContent = { Text("Create post") })
+                    ListItem(headlineContent = { Text(stringResource(R.string.create_post)) })
                     for (type in postTypes) {
                         ListItem(
                             headlineContent = { Text(type.name) },
@@ -142,7 +144,7 @@ fun FullFeedView(
                             }
                         }
                     }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                 }
             }
@@ -204,7 +206,7 @@ fun Fab(viewModel: FeedViewModelInterface<PostData>, toggleBottomSheet: () -> Un
                     contentDescription = null
                 )
             },
-            text = { Text("Go to top") }
+            text = { Text(stringResource(R.string.go_to_top)) }
         )
         FloatingActionButtonMenuItem(
             onClick = { toggleBottomSheet() },
@@ -215,7 +217,7 @@ fun Fab(viewModel: FeedViewModelInterface<PostData>, toggleBottomSheet: () -> Un
                     contentDescription = null
                 )
             },
-            text = { Text("Create Post") }
+            text = { Text(stringResource(R.string.create_post)) }
         )
     }
 }

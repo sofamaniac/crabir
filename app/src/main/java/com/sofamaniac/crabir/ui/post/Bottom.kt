@@ -62,11 +62,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.BuildConfig
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.api.FlairInfo
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
@@ -113,7 +115,7 @@ fun OpenInAppButton(
     post: PostData,
 ) {
     val uriHandler = LocalUriHandler.current
-    val description = "Open in app"
+    val description = stringResource(R.string.open_in_app)
     TooltipBox(
         tooltip = { PlainTooltip { Text(description) } },
         state = rememberTooltipState(),
@@ -131,7 +133,7 @@ fun OpenInAppButton(
 
 @Composable
 fun OpenThreadButton(post: PostData, onClick: (PostData) -> Unit) {
-    val description = "Open comments"
+    val description = stringResource(R.string.open_comments)
     TooltipBox(
         tooltip = { PlainTooltip { Text(description) } },
         state = rememberTooltipState(),
