@@ -16,33 +16,41 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/* Auto generated File */
+
+
 public class _RFMLexer implements GeneratedLexer {
 
   /**
    * This character denotes the end of file
    */
   public static final int YYEOF = -1;
-  /**
-   * lexical states
-   */
+
+  /** lexical states */
   public static final int YYINITIAL = 0;
+  /**
+   * initial size of the lookahead buffer
+   */
+  private static final int ZZ_BUFFERSIZE = 16384;
   public static final int TAG_START = 2;
   public static final int AFTER_LINE_START = 4;
   public static final int PARSE_DELIMITED = 6;
   public static final int CODE_SPAN = 8;
   /**
-   * initial size of the lookahead buffer
-   */
-  private static final int ZZ_BUFFERSIZE = 16384;
-  /**
    * ZZ_LEXSTATE[l] is the state in the DFA for the lexical state l
    * ZZ_LEXSTATE[l+1] is the state in the DFA for the lexical state l
-   * at the beginning of a line
+   *                  at the beginning of a line
    * l is of the form l = 2*k, k a non negative integer
    */
   private static final int ZZ_LEXSTATE[] = {
-          0, 0, 1, 1, 2, 2, 3, 3, 4, 4
+          0, 0, 1, 1,  2, 2, 3, 3, 4, 4
   };
+
+  /**
+   * Top-level table for translating characters to character classes
+   */
+  private static final int[] ZZ_CMAP_TOP = zzUnpackcmap_top();
+
   private static final String ZZ_CMAP_TOP_PACKED_0 =
           "\1\0\1\u0100\1\u0200\1\u0300\1\u0400\1\u0500\1\u0600\1\u0700" +
                   "\1\u0800\1\u0900\1\u0a00\1\u0b00\1\u0c00\1\u0d00\1\u0e00\1\u0f00" +
@@ -65,15 +73,11 @@ public class _RFMLexer implements GeneratedLexer {
                   "\1\u6e00\1\u6f00\2\u1f00\1\u7000\16\u1f00\246\u0100\1\u7100\20\u0100" +
                   "\1\u7200\1\u7300\25\u0100\1\u7400\34\u0100\1\u7500\14\u1f00\2\u0100" +
                   "\1\u7600\u0e05\u1f00";
-  /**
-   * Top-level table for translating characters to character classes
-   */
-  private static final int[] ZZ_CMAP_TOP = zzUnpackcmap_top();
   private static final String ZZ_CMAP_BLOCKS_PACKED_0 =
           "\11\0\1\1\1\2\1\3\1\4\1\5\22\0\1\1" +
                   "\1\6\1\7\1\10\1\11\2\10\1\12\1\13\1\14" +
                   "\1\15\1\10\1\16\1\17\1\20\1\21\12\22\1\23" +
-                  "\1\0\1\24\1\25\1\26\1\27\1\30\1\31\1\32" +
+                  "\1\16\1\24\1\25\1\26\1\27\1\30\1\31\1\32" +
                   "\1\33\1\34\17\32\1\35\6\32\1\36\1\37\1\40" +
                   "\1\41\1\42\1\43\4\44\1\45\1\46\1\44\1\47" +
                   "\1\50\2\44\1\51\3\44\1\52\2\44\1\53\1\54" +
@@ -256,104 +260,10 @@ public class _RFMLexer implements GeneratedLexer {
    * Second-level tables for translating characters to character classes
    */
   private static final int[] ZZ_CMAP_BLOCKS = zzUnpackcmap_blocks();
-  private static final String ZZ_ACTION_PACKED_0 =
-          "\7\0\3\1\1\2\1\3\1\4\1\5\1\6\1\7" +
-                  "\1\10\1\11\1\3\1\12\1\7\1\3\1\13\1\14" +
-                  "\3\3\1\15\2\16\1\1\2\16\1\3\1\17\11\0" +
-                  "\1\1\1\20\10\0\2\21\1\22\4\3\15\0\1\1" +
-                  "\1\22\3\3\14\0\1\23\1\0\4\3\3\0\1\1" +
-                  "\4\3\14\0\1\3\3\0\4\3\3\0\1\23\3\0" +
-                  "\1\24\4\0\1\24\2\0\1\25\1\0\1\26\5\0" +
-                  "\1\3\15\0\1\26\1\0\1\26\5\0\1\27\2\0" +
-                  "\1\24\10\0\1\26\1\0\1\26\6\0\1\27\1\0" +
-                  "\1\27\13\0\1\27\1\0\1\27\12\0\1\23\2\0" +
-                  "\1\23\74\0\1\23\u016c\0";
   /**
    * Translates DFA states to action switch labels.
    */
   private static final int[] ZZ_ACTION = zzUnpackAction();
-  private static final String ZZ_ROWMAP_PACKED_0 =
-          "\0\0\0\62\0\144\0\226\0\310\0\372\0\u012c\0\u015e" +
-                  "\0\u0190\0\u01c2\0\u01f4\0\u015e\0\u0226\0\u0258\0\u015e\0\u015e" +
-                  "\0\u028a\0\u015e\0\u02bc\0\u015e\0\u02ee\0\u0320\0\u015e\0\u0352" +
-                  "\0\u0384\0\u03b6\0\u03e8\0\u015e\0\u015e\0\u041a\0\u041a\0\u02ee" +
-                  "\0\u044c\0\u047e\0\u04b0\0\u04e2\0\u0514\0\u0546\0\u0578\0\u05aa" +
-                  "\0\u05dc\0\u060e\0\u0640\0\u0672\0\u0672\0\u015e\0\u06a4\0\u06d6" +
-                  "\0\u0708\0\u073a\0\u076c\0\u079e\0\u07d0\0\u0802\0\u015e\0\u0834" +
-                  "\0\u015e\0\u0866\0\u0898\0\u08ca\0\u08fc\0\u041a\0\u092e\0\u0960" +
-                  "\0\u0992\0\u09c4\0\u09f6\0\u0a28\0\u0a5a\0\u0a8c\0\u0abe\0\u0af0" +
-                  "\0\u0b22\0\u0b54\0\u0b54\0\u06a4\0\u0b86\0\u0bb8\0\u0bea\0\u0c1c" +
-                  "\0\u0c4e\0\u0c80\0\u0cb2\0\u0ce4\0\u0d16\0\u0d48\0\u0d7a\0\u0dac" +
-                  "\0\u0dde\0\u0e10\0\u0e42\0\u015e\0\u0e74\0\u0ea6\0\u0ed8\0\u0f0a" +
-                  "\0\u0f3c\0\u0f6e\0\u0fa0\0\u0fd2\0\u0fd2\0\u1004\0\u1036\0\u1068" +
-                  "\0\u109a\0\u10cc\0\u10fe\0\u1130\0\u1162\0\u1194\0\u11c6\0\u11f8" +
-                  "\0\u122a\0\u125c\0\u128e\0\u12c0\0\u12f2\0\u1324\0\u1356\0\u1388" +
-                  "\0\u13ba\0\u13ec\0\u141e\0\u1450\0\u1482\0\u14b4\0\u14e6\0\u1518" +
-                  "\0\u14b4\0\u154a\0\u157c\0\u15ae\0\u015e\0\u15e0\0\u1612\0\u1644" +
-                  "\0\u1676\0\u0d16\0\u16a8\0\u16da\0\u015e\0\u170c\0\u173e\0\u1770" +
-                  "\0\u17a2\0\u17d4\0\u1806\0\u1838\0\u186a\0\u189c\0\u18ce\0\u1900" +
-                  "\0\u1932\0\u1964\0\u1996\0\u19c8\0\u19fa\0\u1a2c\0\u1a5e\0\u1a90" +
-                  "\0\u1ac2\0\u1af4\0\u1b26\0\u1b58\0\u1b8a\0\u1bbc\0\u1bee\0\u1c20" +
-                  "\0\u1c52\0\u1c84\0\u1cb6\0\u1ce8\0\u1d1a\0\u14b4\0\u1d4c\0\u1d7e" +
-                  "\0\u1db0\0\u1de2\0\u1e14\0\u1e46\0\u1e78\0\u1eaa\0\u1edc\0\u1f0e" +
-                  "\0\u1f40\0\u1f72\0\u1fa4\0\u1fd6\0\u2008\0\u203a\0\u206c\0\u209e" +
-                  "\0\u20d0\0\u2102\0\u2134\0\u2166\0\u2198\0\u21ca\0\u21fc\0\u222e" +
-                  "\0\u2260\0\u2292\0\u22c4\0\u22f6\0\u2328\0\u235a\0\u238c\0\u23be" +
-                  "\0\u23f0\0\u2422\0\u2454\0\u2486\0\u24b8\0\u24ea\0\u251c\0\u254e" +
-                  "\0\u2580\0\u25b2\0\u1a90\0\u25e4\0\u2616\0\u1ac2\0\u2648\0\u267a" +
-                  "\0\u26ac\0\u26de\0\u2710\0\u2742\0\u2774\0\u27a6\0\u27d8\0\u280a" +
-                  "\0\u283c\0\u286e\0\u28a0\0\u28d2\0\u2904\0\u2936\0\u2968\0\u299a" +
-                  "\0\u29cc\0\u29fe\0\u2a30\0\u2a62\0\u2a94\0\u2ac6\0\u2af8\0\u2b2a" +
-                  "\0\u2b5c\0\u2b8e\0\u2bc0\0\u2bf2\0\u2c24\0\u2c56\0\u2c88\0\u2cba" +
-                  "\0\u2cec\0\u2d1e\0\u2d50\0\u2d82\0\u2db4\0\u2de6\0\u2e18\0\u2e4a" +
-                  "\0\u2e7c\0\u2eae\0\u2ee0\0\u2f12\0\u2f44\0\u2f76\0\u2fa8\0\u2fda" +
-                  "\0\u300c\0\u303e\0\u3070\0\u30a2\0\u30d4\0\u3106\0\u3138\0\u316a" +
-                  "\0\u319c\0\u31ce\0\u2c56\0\u3200\0\u3232\0\u3264\0\u3296\0\u32c8" +
-                  "\0\u32fa\0\u332c\0\u335e\0\u3390\0\u33c2\0\u33f4\0\u3426\0\u3458" +
-                  "\0\u348a\0\u34bc\0\u34ee\0\u3520\0\u3552\0\u3584\0\u35b6\0\u35e8" +
-                  "\0\u361a\0\u364c\0\u367e\0\u36b0\0\u36e2\0\u3714\0\u3746\0\u3778" +
-                  "\0\u37aa\0\u37dc\0\u380e\0\u3840\0\u3872\0\u38a4\0\u38d6\0\u3908" +
-                  "\0\u393a\0\u396c\0\u399e\0\u39d0\0\u3a02\0\u3a34\0\u3a66\0\u3a98" +
-                  "\0\u3aca\0\u3afc\0\u3b2e\0\u3b60\0\u3b92\0\u3bc4\0\u3bf6\0\u3c28" +
-                  "\0\u3c5a\0\u3c8c\0\u3cbe\0\u3cf0\0\u3d22\0\u3d54\0\u3d86\0\u3db8" +
-                  "\0\u3dea\0\u3e1c\0\u3e4e\0\u3e80\0\u3eb2\0\u3ee4\0\u3f16\0\u3f48" +
-                  "\0\u3f7a\0\u3fac\0\u3fde\0\u4010\0\u4042\0\u4074\0\u40a6\0\u40d8" +
-                  "\0\u410a\0\u413c\0\u416e\0\u41a0\0\u41d2\0\u4204\0\u4236\0\u4268" +
-                  "\0\u429a\0\u42cc\0\u42fe\0\u4330\0\u4362\0\u4394\0\u43c6\0\u43f8" +
-                  "\0\u442a\0\u445c\0\u448e\0\u44c0\0\u44f2\0\u4524\0\u4556\0\u4588" +
-                  "\0\u45ba\0\u45ec\0\u461e\0\u4650\0\u4682\0\u46b4\0\u46e6\0\u4718" +
-                  "\0\u474a\0\u477c\0\u47ae\0\u47e0\0\u4812\0\u4844\0\u4876\0\u48a8" +
-                  "\0\u48da\0\u490c\0\u493e\0\u4970\0\u49a2\0\u49d4\0\u4a06\0\u4a38" +
-                  "\0\u4a6a\0\u4a9c\0\u4ace\0\u4b00\0\u4b32\0\u4b64\0\u4b96\0\u4bc8" +
-                  "\0\u4bfa\0\u4c2c\0\u4c5e\0\u4c90\0\u4cc2\0\u4cf4\0\u4d26\0\u4d58" +
-                  "\0\u4d8a\0\u4dbc\0\u4dee\0\u4e20\0\u4e52\0\u4e84\0\u4eb6\0\u4ee8" +
-                  "\0\u4f1a\0\u4f4c\0\u4f7e\0\u4fb0\0\u4fe2\0\u5014\0\u5046\0\u5078" +
-                  "\0\u50aa\0\u50dc\0\u510e\0\u5140\0\u5172\0\u51a4\0\u51d6\0\u5208" +
-                  "\0\u523a\0\u526c\0\u529e\0\u52d0\0\u5302\0\u5334\0\u5366\0\u5398" +
-                  "\0\u53ca\0\u53fc\0\u542e\0\u5460\0\u5492\0\u54c4\0\u54f6\0\u5528" +
-                  "\0\u555a\0\u558c\0\u55be\0\u55f0\0\u5622\0\u5654\0\u5686\0\u56b8" +
-                  "\0\u56ea\0\u571c\0\u574e\0\u5780\0\u57b2\0\u57e4\0\u5816\0\u5848" +
-                  "\0\u587a\0\u58ac\0\u58de\0\u5910\0\u5942\0\u5974\0\u59a6\0\u59d8" +
-                  "\0\u5a0a\0\u5a3c\0\u5a6e\0\u5aa0\0\u5ad2\0\u5b04\0\u5b36\0\u5b68" +
-                  "\0\u5b9a\0\u5bcc\0\u5bfe\0\u5c30\0\u5c62\0\u5c94\0\u5cc6\0\u5cf8" +
-                  "\0\u5d2a\0\u5d5c\0\u5d8e\0\u5dc0\0\u5df2\0\u5e24\0\u5e56\0\u5e88" +
-                  "\0\u5eba\0\u5eec\0\u5f1e\0\u5f50\0\u5f82\0\u5fb4\0\u5fe6\0\u6018" +
-                  "\0\u604a\0\u607c\0\u60ae\0\u60e0\0\u6112\0\u6144\0\u6176\0\u61a8" +
-                  "\0\u61da\0\u620c\0\u623e\0\u6270\0\u62a2\0\u62d4\0\u6306\0\u6338" +
-                  "\0\u636a\0\u639c\0\u63ce\0\u6400\0\u6432\0\u6464\0\u6496\0\u64c8" +
-                  "\0\u64fa\0\u652c\0\u655e\0\u6590\0\u65c2\0\u65f4\0\u6626\0\u6658" +
-                  "\0\u668a\0\u66bc\0\u66ee\0\u6720\0\u6752\0\u6784\0\u67b6\0\u67e8" +
-                  "\0\u681a\0\u684c\0\u687e\0\u68b0\0\u68e2\0\u6914\0\u6946\0\u6978" +
-                  "\0\u69aa\0\u69dc\0\u6a0e\0\u6a40\0\u6a72\0\u6aa4\0\u6ad6\0\u6b08" +
-                  "\0\u6b3a\0\u6b6c\0\u6b9e\0\u6bd0\0\u6c02\0\u6c34\0\u6c66\0\u6c98" +
-                  "\0\u6cca\0\u6cfc\0\u6d2e\0\u6d60\0\u6d92\0\u6dc4\0\u6df6\0\u6e28" +
-                  "\0\u6e5a\0\u6e8c\0\u6ebe\0\u6ef0\0\u6f22\0\u6f54\0\u6f86\0\u6fb8" +
-                  "\0\u6fea\0\u701c\0\u704e\0\u7080\0\u70b2\0\u70e4\0\u7116\0\u7148" +
-                  "\0\u717a\0\u71ac\0\u71de\0\u7210\0\u7242\0\u7274\0\u72a6\0\u72d8" +
-                  "\0\u730a\0\u733c\0\u736e\0\u73a0\0\u73d2\0\u7404\0\u7436\0\u7468" +
-                  "\0\u749a\0\u74cc\0\u74fe\0\u7530\0\u7562\0\u7594\0\u75c6\0\u75f8" +
-                  "\0\u762a\0\u765c\0\u768e\0\u76c0\0\u76f2\0\u7724\0\u7756\0\u7788" +
-                  "\0\u77ba\0\u77ec\0\u781e\0\u7850\0\u7882\0\u78b4\0\u78e6";
   /**
    * Translates a state to a row index in the transition table
    */
@@ -382,8 +292,7 @@ public class _RFMLexer implements GeneratedLexer {
                   "\1\23\6\0\1\62\1\0\3\63\2\0\1\63\1\0" +
                   "\2\63\1\64\1\63\2\0\1\63\1\0\1\65\1\0" +
                   "\5\66\3\0\3\63\12\66\2\63\4\0\3\67\1\70" +
-                  "\14\71\1\0\2\71\1\0\1\71\1\0\1\71\5\0" +
-                  "\3\71\1\0\2\71\13\0\1\71\45\0\1\30\17\0" +
+                  "\11\71\1\0\24\71\13\0\1\71\45\0\1\30\17\0" +
                   "\1\60\2\0\1\60\15\0\1\23\6\0\5\23\4\0" +
                   "\1\61\1\0\4\23\1\72\3\23\1\73\1\23\3\0" +
                   "\1\23\1\0\1\60\2\0\1\60\15\0\1\23\6\0" +
@@ -391,8 +300,7 @@ public class _RFMLexer implements GeneratedLexer {
                   "\1\23\1\0\1\60\2\0\1\60\15\0\1\23\6\0" +
                   "\5\23\4\0\1\61\1\0\11\23\1\75\3\0\1\23" +
                   "\1\0\1\76\2\0\1\76\10\0\1\57\24\0\1\57" +
-                  "\25\0\14\71\1\0\2\71\1\0\1\71\1\0\1\71" +
-                  "\5\0\3\71\1\0\2\71\13\0\1\71\4\0\3\67" +
+                  "\25\0\11\71\1\0\24\71\13\0\1\71\4\0\3\67" +
                   "\1\70\117\0\1\43\17\0\1\77\2\0\1\77\15\0" +
                   "\1\44\6\0\5\44\4\0\1\100\1\0\12\44\3\0" +
                   "\1\44\1\45\5\46\5\45\1\47\1\50\4\45\1\51" +
@@ -1226,16 +1134,144 @@ public class _RFMLexer implements GeneratedLexer {
    * The transition table of the DFA
    */
   private static final int[] ZZ_TRANS = zzUnpacktrans();
+  /**
+   * ZZ_ATTRIBUTE[aState] contains the attributes of state {@code aState}
+   */
+  private static final int[] ZZ_ATTRIBUTE = zzUnpackAttribute();
+
+  private static final String ZZ_ACTION_PACKED_0 =
+          "\7\0\3\1\1\2\1\3\1\4\1\5\1\6\1\7" +
+                  "\1\10\1\11\1\3\1\12\1\7\1\3\1\13\1\14" +
+                  "\3\3\1\15\2\16\1\1\2\16\1\3\1\17\11\0" +
+                  "\1\1\1\20\10\0\2\21\1\22\4\3\15\0\1\1" +
+                  "\1\22\3\3\14\0\1\23\1\0\4\3\3\0\1\1" +
+                  "\4\3\14\0\1\3\3\0\4\3\3\0\1\23\3\0" +
+                  "\1\24\4\0\1\24\2\0\1\25\1\0\1\26\5\0" +
+                  "\1\3\15\0\1\26\1\0\1\26\5\0\1\27\2\0" +
+                  "\1\24\10\0\1\26\1\0\1\26\6\0\1\27\1\0" +
+                  "\1\27\13\0\1\27\1\0\1\27\12\0\1\23\2\0" +
+                  "\1\23\74\0\1\23\u016c\0";
+  /**
+   * Number of characters from the last newline up to the start of the matched text.
+   */
+  @SuppressWarnings("unused")
+  protected int yycolumn;
+  /** the input device */
+  private java.io.Reader zzReader;
+  /** the current state of the DFA */
+  private int zzState;
+
+  private static final String ZZ_ROWMAP_PACKED_0 =
+          "\0\0\0\62\0\144\0\226\0\310\0\372\0\u012c\0\u015e" +
+                  "\0\u0190\0\u01c2\0\u01f4\0\u015e\0\u0226\0\u0258\0\u015e\0\u015e" +
+                  "\0\u028a\0\u015e\0\u02bc\0\u015e\0\u02ee\0\u0320\0\u015e\0\u0352" +
+                  "\0\u0384\0\u03b6\0\u03e8\0\u015e\0\u015e\0\u041a\0\u041a\0\u02ee" +
+                  "\0\u044c\0\u047e\0\u04b0\0\u04e2\0\u0514\0\u0546\0\u0578\0\u05aa" +
+                  "\0\u05dc\0\u060e\0\u0640\0\u0672\0\u0672\0\u015e\0\u06a4\0\u06d6" +
+                  "\0\u0708\0\u073a\0\u076c\0\u079e\0\u07d0\0\u0802\0\u015e\0\u0834" +
+                  "\0\u015e\0\u0866\0\u0898\0\u08ca\0\u08fc\0\u041a\0\u092e\0\u0960" +
+                  "\0\u0992\0\u09c4\0\u09f6\0\u0a28\0\u0a5a\0\u0a8c\0\u0abe\0\u0af0" +
+                  "\0\u0b22\0\u0b54\0\u0b54\0\u06a4\0\u0b86\0\u0bb8\0\u0bea\0\u0c1c" +
+                  "\0\u0c4e\0\u0c80\0\u0cb2\0\u0ce4\0\u0d16\0\u0d48\0\u0d7a\0\u0dac" +
+                  "\0\u0dde\0\u0e10\0\u0e42\0\u015e\0\u0e74\0\u0ea6\0\u0ed8\0\u0f0a" +
+                  "\0\u0f3c\0\u0f6e\0\u0fa0\0\u0fd2\0\u0fd2\0\u1004\0\u1036\0\u1068" +
+                  "\0\u109a\0\u10cc\0\u10fe\0\u1130\0\u1162\0\u1194\0\u11c6\0\u11f8" +
+                  "\0\u122a\0\u125c\0\u128e\0\u12c0\0\u12f2\0\u1324\0\u1356\0\u1388" +
+                  "\0\u13ba\0\u13ec\0\u141e\0\u1450\0\u1482\0\u14b4\0\u14e6\0\u1518" +
+                  "\0\u14b4\0\u154a\0\u157c\0\u15ae\0\u015e\0\u15e0\0\u1612\0\u1644" +
+                  "\0\u1676\0\u0d16\0\u16a8\0\u16da\0\u015e\0\u170c\0\u173e\0\u1770" +
+                  "\0\u17a2\0\u17d4\0\u1806\0\u1838\0\u186a\0\u189c\0\u18ce\0\u1900" +
+                  "\0\u1932\0\u1964\0\u1996\0\u19c8\0\u19fa\0\u1a2c\0\u1a5e\0\u1a90" +
+                  "\0\u1ac2\0\u1af4\0\u1b26\0\u1b58\0\u1b8a\0\u1bbc\0\u1bee\0\u1c20" +
+                  "\0\u1c52\0\u1c84\0\u1cb6\0\u1ce8\0\u1d1a\0\u14b4\0\u1d4c\0\u1d7e" +
+                  "\0\u1db0\0\u1de2\0\u1e14\0\u1e46\0\u1e78\0\u1eaa\0\u1edc\0\u1f0e" +
+                  "\0\u1f40\0\u1f72\0\u1fa4\0\u1fd6\0\u2008\0\u203a\0\u206c\0\u209e" +
+                  "\0\u20d0\0\u2102\0\u2134\0\u2166\0\u2198\0\u21ca\0\u21fc\0\u222e" +
+                  "\0\u2260\0\u2292\0\u22c4\0\u22f6\0\u2328\0\u235a\0\u238c\0\u23be" +
+                  "\0\u23f0\0\u2422\0\u2454\0\u2486\0\u24b8\0\u24ea\0\u251c\0\u254e" +
+                  "\0\u2580\0\u25b2\0\u1a90\0\u25e4\0\u2616\0\u1ac2\0\u2648\0\u267a" +
+                  "\0\u26ac\0\u26de\0\u2710\0\u2742\0\u2774\0\u27a6\0\u27d8\0\u280a" +
+                  "\0\u283c\0\u286e\0\u28a0\0\u28d2\0\u2904\0\u2936\0\u2968\0\u299a" +
+                  "\0\u29cc\0\u29fe\0\u2a30\0\u2a62\0\u2a94\0\u2ac6\0\u2af8\0\u2b2a" +
+                  "\0\u2b5c\0\u2b8e\0\u2bc0\0\u2bf2\0\u2c24\0\u2c56\0\u2c88\0\u2cba" +
+                  "\0\u2cec\0\u2d1e\0\u2d50\0\u2d82\0\u2db4\0\u2de6\0\u2e18\0\u2e4a" +
+                  "\0\u2e7c\0\u2eae\0\u2ee0\0\u2f12\0\u2f44\0\u2f76\0\u2fa8\0\u2fda" +
+                  "\0\u300c\0\u303e\0\u3070\0\u30a2\0\u30d4\0\u3106\0\u3138\0\u316a" +
+                  "\0\u319c\0\u31ce\0\u2c56\0\u3200\0\u3232\0\u3264\0\u3296\0\u32c8" +
+                  "\0\u32fa\0\u332c\0\u335e\0\u3390\0\u33c2\0\u33f4\0\u3426\0\u3458" +
+                  "\0\u348a\0\u34bc\0\u34ee\0\u3520\0\u3552\0\u3584\0\u35b6\0\u35e8" +
+                  "\0\u361a\0\u364c\0\u367e\0\u36b0\0\u36e2\0\u3714\0\u3746\0\u3778" +
+                  "\0\u37aa\0\u37dc\0\u380e\0\u3840\0\u3872\0\u38a4\0\u38d6\0\u3908" +
+                  "\0\u393a\0\u396c\0\u399e\0\u39d0\0\u3a02\0\u3a34\0\u3a66\0\u3a98" +
+                  "\0\u3aca\0\u3afc\0\u3b2e\0\u3b60\0\u3b92\0\u3bc4\0\u3bf6\0\u3c28" +
+                  "\0\u3c5a\0\u3c8c\0\u3cbe\0\u3cf0\0\u3d22\0\u3d54\0\u3d86\0\u3db8" +
+                  "\0\u3dea\0\u3e1c\0\u3e4e\0\u3e80\0\u3eb2\0\u3ee4\0\u3f16\0\u3f48" +
+                  "\0\u3f7a\0\u3fac\0\u3fde\0\u4010\0\u4042\0\u4074\0\u40a6\0\u40d8" +
+                  "\0\u410a\0\u413c\0\u416e\0\u41a0\0\u41d2\0\u4204\0\u4236\0\u4268" +
+                  "\0\u429a\0\u42cc\0\u42fe\0\u4330\0\u4362\0\u4394\0\u43c6\0\u43f8" +
+                  "\0\u442a\0\u445c\0\u448e\0\u44c0\0\u44f2\0\u4524\0\u4556\0\u4588" +
+                  "\0\u45ba\0\u45ec\0\u461e\0\u4650\0\u4682\0\u46b4\0\u46e6\0\u4718" +
+                  "\0\u474a\0\u477c\0\u47ae\0\u47e0\0\u4812\0\u4844\0\u4876\0\u48a8" +
+                  "\0\u48da\0\u490c\0\u493e\0\u4970\0\u49a2\0\u49d4\0\u4a06\0\u4a38" +
+                  "\0\u4a6a\0\u4a9c\0\u4ace\0\u4b00\0\u4b32\0\u4b64\0\u4b96\0\u4bc8" +
+                  "\0\u4bfa\0\u4c2c\0\u4c5e\0\u4c90\0\u4cc2\0\u4cf4\0\u4d26\0\u4d58" +
+                  "\0\u4d8a\0\u4dbc\0\u4dee\0\u4e20\0\u4e52\0\u4e84\0\u4eb6\0\u4ee8" +
+                  "\0\u4f1a\0\u4f4c\0\u4f7e\0\u4fb0\0\u4fe2\0\u5014\0\u5046\0\u5078" +
+                  "\0\u50aa\0\u50dc\0\u510e\0\u5140\0\u5172\0\u51a4\0\u51d6\0\u5208" +
+                  "\0\u523a\0\u526c\0\u529e\0\u52d0\0\u5302\0\u5334\0\u5366\0\u5398" +
+                  "\0\u53ca\0\u53fc\0\u542e\0\u5460\0\u5492\0\u54c4\0\u54f6\0\u5528" +
+                  "\0\u555a\0\u558c\0\u55be\0\u55f0\0\u5622\0\u5654\0\u5686\0\u56b8" +
+                  "\0\u56ea\0\u571c\0\u574e\0\u5780\0\u57b2\0\u57e4\0\u5816\0\u5848" +
+                  "\0\u587a\0\u58ac\0\u58de\0\u5910\0\u5942\0\u5974\0\u59a6\0\u59d8" +
+                  "\0\u5a0a\0\u5a3c\0\u5a6e\0\u5aa0\0\u5ad2\0\u5b04\0\u5b36\0\u5b68" +
+                  "\0\u5b9a\0\u5bcc\0\u5bfe\0\u5c30\0\u5c62\0\u5c94\0\u5cc6\0\u5cf8" +
+                  "\0\u5d2a\0\u5d5c\0\u5d8e\0\u5dc0\0\u5df2\0\u5e24\0\u5e56\0\u5e88" +
+                  "\0\u5eba\0\u5eec\0\u5f1e\0\u5f50\0\u5f82\0\u5fb4\0\u5fe6\0\u6018" +
+                  "\0\u604a\0\u607c\0\u60ae\0\u60e0\0\u6112\0\u6144\0\u6176\0\u61a8" +
+                  "\0\u61da\0\u620c\0\u623e\0\u6270\0\u62a2\0\u62d4\0\u6306\0\u6338" +
+                  "\0\u636a\0\u639c\0\u63ce\0\u6400\0\u6432\0\u6464\0\u6496\0\u64c8" +
+                  "\0\u64fa\0\u652c\0\u655e\0\u6590\0\u65c2\0\u65f4\0\u6626\0\u6658" +
+                  "\0\u668a\0\u66bc\0\u66ee\0\u6720\0\u6752\0\u6784\0\u67b6\0\u67e8" +
+                  "\0\u681a\0\u684c\0\u687e\0\u68b0\0\u68e2\0\u6914\0\u6946\0\u6978" +
+                  "\0\u69aa\0\u69dc\0\u6a0e\0\u6a40\0\u6a72\0\u6aa4\0\u6ad6\0\u6b08" +
+                  "\0\u6b3a\0\u6b6c\0\u6b9e\0\u6bd0\0\u6c02\0\u6c34\0\u6c66\0\u6c98" +
+                  "\0\u6cca\0\u6cfc\0\u6d2e\0\u6d60\0\u6d92\0\u6dc4\0\u6df6\0\u6e28" +
+                  "\0\u6e5a\0\u6e8c\0\u6ebe\0\u6ef0\0\u6f22\0\u6f54\0\u6f86\0\u6fb8" +
+                  "\0\u6fea\0\u701c\0\u704e\0\u7080\0\u70b2\0\u70e4\0\u7116\0\u7148" +
+                  "\0\u717a\0\u71ac\0\u71de\0\u7210\0\u7242\0\u7274\0\u72a6\0\u72d8" +
+                  "\0\u730a\0\u733c\0\u736e\0\u73a0\0\u73d2\0\u7404\0\u7436\0\u7468" +
+                  "\0\u749a\0\u74cc\0\u74fe\0\u7530\0\u7562\0\u7594\0\u75c6\0\u75f8" +
+                  "\0\u762a\0\u765c\0\u768e\0\u76c0\0\u76f2\0\u7724\0\u7756\0\u7788" +
+                  "\0\u77ba\0\u77ec\0\u781e\0\u7850\0\u7882\0\u78b4\0\u78e6";
+  /** the current lexical state */
+  private int zzLexicalState = YYINITIAL;
+  /** the textposition at the last accepting state */
+  private int zzMarkedPos;
+  /** the current text position in the buffer */
+  private int zzCurrentPos;
+  /** startRead marks the beginning of the yytext() string in the buffer */
+  private int zzStartRead;
+  /** endRead marks the last character in the buffer, that has been read
+      from input */
+  private int zzEndRead;
+  /** zzAtEOF == true <=> the scanner is at the EOF */
+  private boolean zzAtEOF;
+
+
   /* error codes */
   private static final int ZZ_UNKNOWN_ERROR = 0;
   private static final int ZZ_NO_MATCH = 1;
   private static final int ZZ_PUSHBACK_2BIG = 2;
+
   /* error messages for the codes above */
   private static final String[] ZZ_ERROR_MSG = {
           "Unknown internal scanner error",
           "Error: could not match input",
           "Error: pushback value was too large"
   };
+  /** For the backwards DFA of general lookahead statements */
+  private BitSet zzFin = null;
+
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
           "\7\0\1\11\3\1\1\11\2\1\2\11\1\1\1\11" +
                   "\1\1\1\11\2\1\1\11\4\1\2\11\7\1\10\0" +
@@ -1247,79 +1283,18 @@ public class _RFMLexer implements GeneratedLexer {
                   "\1\1\1\0\2\1\5\0\1\1\1\0\1\1\13\0" +
                   "\1\1\1\0\1\1\12\0\1\1\2\0\1\1\74\0" +
                   "\1\1\u016c\0";
-  /**
-   * ZZ_ATTRIBUTE[aState] contains the attributes of state {@code aState}
-   */
-  private static final int[] ZZ_ATTRIBUTE = zzUnpackAttribute();
-  /**
-   * Number of characters from the last newline up to the start of the matched text.
-   */
-  @SuppressWarnings("unused")
-  protected int yycolumn;
-  /**
-   * the input device
-   */
-  private java.io.Reader zzReader;
-  /**
-   * the current state of the DFA
-   */
-  private int zzState;
-  /**
-   * the current lexical state
-   */
-  private int zzLexicalState = YYINITIAL;
-  /** this buffer contains the current text to be matched and is
-   the source of the yytext() string */
-  private CharSequence zzBuffer = "";
-  /**
-   * the textposition at the last accepting state
-   */
-  private int zzMarkedPos;
-  /**
-   * the current text position in the buffer
-   */
-  private int zzCurrentPos;
-  /**
-   * startRead marks the beginning of the yytext() string in the buffer
-   */
-  private int zzStartRead;
-  /**
-   * endRead marks the last character in the buffer, that has been read
-   * from input
-   */
-  private int zzEndRead;
-  /**
-   * zzAtEOF == true <=> the scanner is at the EOF
-   */
-  private boolean zzAtEOF;
-  /**
-   * For the backwards DFA of general lookahead statements
-   */
-  private BitSet zzFin = null;
-  /**
-   * Number of newlines encountered up to the start of the matched text.
-   */
+  /** Number of newlines encountered up to the start of the matched text. */
   @SuppressWarnings("unused")
   private int yyline;
-  /**
-   * Number of characters up to the start of the matched text.
-   */
+  /** Number of characters up to the start of the matched text. */
   @SuppressWarnings("unused")
   private long yychar;
-  /**
-   * Whether the scanner is currently at the beginning of a line.
-   */
+  /** Whether the scanner is currently at the beginning of a line. */
   @SuppressWarnings("unused")
   private boolean zzAtBOL = true;
-  /**
-   * Whether the user-EOF-code has already been executed.
-   */
+  /** Whether the user-EOF-code has already been executed. */
   @SuppressWarnings("unused")
   private boolean zzEOFDone;
-  private List<Integer> stateStack = new ArrayList<Integer>();
-  private boolean isHeader = false;
-  private int codeSpanBacktickslength = 0;
-  private ParseDelimited parseDelimited = new ParseDelimited();
 
   private static int[] zzUnpackcmap_top() {
     int[] result = new int[4352];
@@ -1327,6 +1302,10 @@ public class _RFMLexer implements GeneratedLexer {
     offset = zzUnpackcmap_top(ZZ_CMAP_TOP_PACKED_0, offset, result);
     return result;
   }
+
+  /** this buffer contains the current text to be matched and is
+   the source of the yytext() string */
+  private CharSequence zzBuffer = "";
 
   private static int zzUnpackcmap_top(String packed, int offset, int[] result) {
     int i = 0;       /* index in packed string  */
@@ -1435,6 +1414,85 @@ public class _RFMLexer implements GeneratedLexer {
     return j;
   }
 
+  /**
+   * Translates raw input code points to DFA table row
+   */
+  private static int zzCMap(int input) {
+    int offset = input & 255;
+    return offset == input ? ZZ_CMAP_BLOCKS[offset] : ZZ_CMAP_BLOCKS[ZZ_CMAP_TOP[input >> 8] | offset];
+  }
+
+  @Override
+  public int getState() {
+    return 0;
+  }
+
+  private List<Integer> stateStack = new ArrayList<Integer>();
+
+  private boolean isHeader = false;
+
+  private int codeSpanBacktickslength = 0;
+
+  private ParseDelimited parseDelimited = new ParseDelimited();
+
+  private void popState() {
+    if (stateStack.isEmpty()) {
+      yybegin(AFTER_LINE_START);
+    } else {
+      yybegin(stateStack.remove(stateStack.size()-1));
+    }
+  }
+
+  private int calcBalance(int startPos) {
+    int balance = 0;
+    for (int i = startPos; i >= 0; --i) {
+      char c = yycharat(i);
+      if (c == ')') {
+        balance++;
+      } else if (c == '(') {
+        balance--;
+        if (balance <= 0) break;
+          }
+      }
+      return balance;
+  }
+
+  private void pushbackAutolink() {
+    int length = yylength();
+    if (yycharat(length - 1) == '/') {
+      while (yycharat(length - 2) == '/') length--;
+      yypushback(yylength() - length);
+      return;
+    }
+
+    int balance = -1;
+
+    // See GFM_AUTOLINK rule
+    String badEnding = ".,:;!?\"'*_~]`";
+
+    for (int i = length - 1; i >= 0; --i) {
+      char c = yycharat(i);
+      if (c == ')') {
+        if (balance == -1) {
+          balance = calcBalance(i);
+        }
+
+        // If there are not enough opening brackets to match this closing one, drop this bracket
+        if (balance > 0) {
+          balance--;
+        } else {
+          break;
+        }
+      } else if (badEnding.indexOf(c) == -1) {
+        break;
+      }
+
+      length--;
+    }
+
+      yypushback(yylength() - length);
+  }
+
   private static IElementType getDelimiterTokenType(char c) {
     switch (c) {
       case '"':
@@ -1456,19 +1514,6 @@ public class _RFMLexer implements GeneratedLexer {
       default:
         return MarkdownTokenTypes.BAD_CHARACTER;
     }
-  }
-
-  /**
-   * Translates raw input code points to DFA table row
-   */
-  private static int zzCMap(int input) {
-    int offset = input & 255;
-    return offset == input ? ZZ_CMAP_BLOCKS[offset] : ZZ_CMAP_BLOCKS[ZZ_CMAP_TOP[input >> 8] | offset];
-  }
-
-  @Override
-  public int getState() {
-    return 0;
   }
 
   private IElementType parseDelimited(IElementType contentsType, boolean allowInlines) {
@@ -1506,12 +1551,9 @@ public class _RFMLexer implements GeneratedLexer {
     isHeader = false;
   }
 
-  private void popState() {
-    if (stateStack.isEmpty()) {
-      yybegin(AFTER_LINE_START);
-    } else {
-      yybegin(stateStack.remove(stateStack.size() - 1));
-    }
+  /**  Whether the scanner buffer can grow to accommodate a larger token. */
+  private boolean zzCanGrow() {
+    return true;
   }
 
   private void resetState() {
@@ -1551,80 +1593,10 @@ public class _RFMLexer implements GeneratedLexer {
     return result;
   }
 
-  private int calcBalance(int startPos) {
-    int balance = 0;
-    for (int i = startPos; i >= 0; --i) {
-      char c = yycharat(i);
-      if (c == ')') {
-        balance++;
-      } else if (c == '(') {
-        balance--;
-        if (balance <= 0) break;
-      }
-    }
-    return balance;
-  }
-
-  private void pushbackAutolink() {
-    int length = yylength();
-    if (yycharat(length - 1) == '/') {
-      while (yycharat(length - 2) == '/') length--;
-      yypushback(yylength() - length);
-      return;
-    }
-
-    int balance = -1;
-
-    // See GFM_AUTOLINK rule
-    String badEnding = ".,:;!?\"'*_~]`";
-
-    for (int i = length - 1; i >= 0; --i) {
-      char c = yycharat(i);
-      if (c == ')') {
-        if (balance == -1) {
-          balance = calcBalance(i);
-        }
-
-        // If there are not enough opening brackets to match this closing one, drop this bracket
-        if (balance > 0) {
-          balance--;
-        } else {
-          break;
-        }
-      } else if (badEnding.indexOf(c) == -1) {
-        break;
-      }
-
-      length--;
-    }
-
-    yypushback(yylength() - length);
-  }
-
-  /** Returns the maximum size of the scanner buffer, which limits the size of tokens. */
-  private int zzMaxBufferLen() {
-    return Integer.MAX_VALUE;
-  }
-
-  /**
-   * Whether the scanner buffer can grow to accommodate a larger token.
-   */
-  private boolean zzCanGrow() {
-    return true;
-  }
-
-  public final int getTokenStart() {
-    return zzStartRead;
-  }
-
-  public final int getTokenEnd() {
-    return getTokenStart() + yylength();
-  }
-
   public void reset(CharSequence buffer, int start, int end, int initialState) {
     zzBuffer = buffer;
     zzCurrentPos = zzMarkedPos = zzStartRead = start;
-    zzAtEOF = false;
+    zzAtEOF  = false;
     zzAtBOL = true;
     zzEndRead = end;
     yybegin(initialState);
@@ -1635,33 +1607,16 @@ public class _RFMLexer implements GeneratedLexer {
    *
    * @return      {@code false}, iff there was new input.
    *
-   * @exception java.io.IOException  if any I/O-Error occurs
+   * @exception   java.io.IOException  if any I/O-Error occurs
    */
-  private boolean zzRefill() {
+  private boolean zzRefill(){
     return true;
   }
 
-  /**
-   * Returns the current lexical state.
-   */
-  public final int yystate() {
-    return zzLexicalState;
-  }
 
-  /**
-   * Enters a new lexical state
-   *
-   * @param newState the new lexical state
-   */
-  public final void yybegin(int newState) {
-    zzLexicalState = newState;
-  }
-
-  /**
-   * Returns the text matched by the current regular expression.
-   */
-  public final CharSequence yytext() {
-    return zzBuffer.subSequence(zzStartRead, zzMarkedPos);
+  /** Returns the maximum size of the scanner buffer, which limits the size of tokens. */
+  private int zzMaxBufferLen() {
+    return Integer.MAX_VALUE;
   }
 
   /**
@@ -1676,14 +1631,22 @@ public class _RFMLexer implements GeneratedLexer {
    * @return the character at position pos
    */
   public final char yycharat(int pos) {
-    return zzBuffer.charAt(zzStartRead + pos);
+    return zzBuffer.charAt(zzStartRead+pos);
   }
 
   /**
    * Returns the length of the matched text region.
    */
   public final int yylength() {
-    return zzMarkedPos - zzStartRead;
+    return zzMarkedPos-zzStartRead;
+  }
+
+  public final int getTokenStart() {
+    return zzStartRead;
+  }
+
+  public final int getTokenEnd() {
+    return getTokenStart() + yylength();
   }
 
   /**
@@ -1704,7 +1667,8 @@ public class _RFMLexer implements GeneratedLexer {
     String message;
     try {
       message = ZZ_ERROR_MSG[errorCode];
-    } catch (ArrayIndexOutOfBoundsException e) {
+    }
+    catch (ArrayIndexOutOfBoundsException e) {
       message = ZZ_ERROR_MSG[ZZ_UNKNOWN_ERROR];
     }
 
@@ -1719,11 +1683,37 @@ public class _RFMLexer implements GeneratedLexer {
    * @param number  the number of characters to be read again.
    *                This number must not be greater than yylength()!
    */
-  public void yypushback(int number) {
-    if (number > yylength())
+  public void yypushback(int number)  {
+    if ( number > yylength() )
       zzScanError(ZZ_PUSHBACK_2BIG);
 
     zzMarkedPos -= number;
+  }
+
+
+  /**
+   * Returns the current lexical state.
+   */
+  public final int yystate() {
+    return zzLexicalState;
+  }
+
+
+  /**
+   * Enters a new lexical state
+   *
+   * @param newState the new lexical state
+   */
+  public final void yybegin(int newState) {
+    zzLexicalState = newState;
+  }
+
+
+  /**
+   * Returns the text matched by the current regular expression.
+   */
+  public final CharSequence yytext() {
+    return zzBuffer.subSequence(zzStartRead, zzMarkedPos);
   }
 
   /**
@@ -1731,9 +1721,10 @@ public class _RFMLexer implements GeneratedLexer {
    * the end of input is encountered or an I/O-Error occurs.
    *
    * @return      the next token
-   * @exception java.io.IOException  if any I/O-Error occurs
+   * @exception   java.io.IOException  if any I/O-Error occurs
    */
-  public IElementType advance() {
+  public IElementType advance()
+  {
     int zzInput;
     int zzAction;
 
@@ -1745,7 +1736,7 @@ public class _RFMLexer implements GeneratedLexer {
 
     int[] zzTransL = ZZ_TRANS;
     int[] zzRowMapL = ZZ_ROWMAP;
-    int[] zzAttrL = ZZ_ATTRIBUTE;
+    int [] zzAttrL = ZZ_ATTRIBUTE;
 
     while (true) {
       zzMarkedPosL = zzMarkedPos;
@@ -1758,48 +1749,50 @@ public class _RFMLexer implements GeneratedLexer {
 
       // set up zzAction for empty match case:
       int zzAttributes = zzAttrL[zzState];
-      if ((zzAttributes & 1) == 1) {
+      if ( (zzAttributes & 1) == 1) {
         zzAction = zzState;
       }
 
 
-      zzForAction:
-      {
+      zzForAction: {
         while (true) {
 
           if (zzCurrentPosL < zzEndReadL) {
             zzInput = Character.codePointAt(zzBufferL, zzCurrentPosL);
             zzCurrentPosL += Character.charCount(zzInput);
-          } else if (zzAtEOF) {
+          }
+          else if (zzAtEOF) {
             zzInput = YYEOF;
             break zzForAction;
-          } else {
+          }
+          else {
             // store back cached positions
             zzCurrentPos = zzCurrentPosL;
-            zzMarkedPos = zzMarkedPosL;
+            zzMarkedPos   = zzMarkedPosL;
             boolean eof = zzRefill();
             // get translated positions and possibly new buffer
             zzCurrentPosL = zzCurrentPos;
             zzMarkedPosL = zzMarkedPos;
             zzBufferL = zzBuffer;
-            zzEndReadL = zzEndRead;
+            zzEndReadL     = zzEndRead;
             if (eof) {
               zzInput = YYEOF;
               break zzForAction;
-            } else {
+            }
+            else {
               zzInput = Character.codePointAt(zzBufferL, zzCurrentPosL);
               zzCurrentPosL += Character.charCount(zzInput);
             }
           }
-          int zzNext = zzTransL[zzRowMapL[zzState] + zzCMap(zzInput)];
+          int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMap(zzInput) ];
           if (zzNext == -1) break zzForAction;
           zzState = zzNext;
 
           zzAttributes = zzAttrL[zzState];
-          if ((zzAttributes & 1) == 1) {
+          if ( (zzAttributes & 1) == 1 ) {
             zzAction = zzState;
             zzMarkedPosL = zzCurrentPosL;
-            if ((zzAttributes & 8) == 8) break zzForAction;
+            if ( (zzAttributes & 8) == 8 ) break zzForAction;
           }
 
         }
@@ -1811,11 +1804,12 @@ public class _RFMLexer implements GeneratedLexer {
       if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
         zzAtEOF = true;
         return null;
-      } else {
+      }
+      else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
-          case 1: {
-            resetState();
-          }
+          case 1:
+            { resetState();
+            }
           // fall through
           case 24:
             break;
@@ -1825,8 +1819,7 @@ public class _RFMLexer implements GeneratedLexer {
           // fall through
           case 25:
             break;
-          case 3: {
-            return MarkdownTokenTypes.TEXT;
+          case 3: { return MarkdownTokenTypes.TEXT;
           }
           // fall through
           case 26:
@@ -1883,8 +1876,7 @@ public class _RFMLexer implements GeneratedLexer {
           // fall through
           case 32:
             break;
-          case 10: {
-            return MarkdownTokenTypes.COLON;
+          case 10: { return MarkdownTokenTypes.COLON;
           }
           // fall through
           case 33:
@@ -1940,8 +1932,7 @@ public class _RFMLexer implements GeneratedLexer {
             return RedditFlavourElementType.SPOILER_START;
           }
           // fall through
-          case 39:
-            break;
+          case 39: break;
           case 17:
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
@@ -1981,8 +1972,7 @@ public class _RFMLexer implements GeneratedLexer {
             return GFMTokenTypes.GFM_AUTOLINK;
           }
           // fall through
-          case 45:
-            break;
+          case 45: break;
           case 23:
             // general lookahead, find correct zzMarkedPos
           {
@@ -2010,8 +2000,8 @@ public class _RFMLexer implements GeneratedLexer {
             while (!zzFinL.get(zzFPos) || (zzAttrL[zzFState] & 1) != 1) {
               zzInput = Character.codePointBefore(zzBufferL, zzFPos);
               zzFPos -= Character.charCount(zzInput);
-              zzFState = zzTransL[zzRowMapL[zzFState] + zzCMap(zzInput)];
-            };
+              zzFState = zzTransL[zzRowMapL[zzFState] + zzCMap(zzInput) ];
+              };
               zzMarkedPos = zzFPos;
             }
             { return MarkdownTokenTypes.TEXT;
@@ -2026,8 +2016,7 @@ public class _RFMLexer implements GeneratedLexer {
   }
 
   /* user code: */
-  private static class Token extends MarkdownTokenTypes {
-  }
+  private static class Token extends MarkdownTokenTypes {}
 
   private static class ParseDelimited {
     char exitChar = 0;

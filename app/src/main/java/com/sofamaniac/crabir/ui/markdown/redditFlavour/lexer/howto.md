@@ -10,6 +10,7 @@ Once compiled the code needs some editing:
 - add the following imports
 
 ```java
+import org.intellij.markdown.lexer.GeneratedLexer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashSet;
