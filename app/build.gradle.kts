@@ -24,6 +24,9 @@ plugins {
 
 android {
     namespace = "com.sofamaniac.crabir"
+    androidResources {
+        generateLocaleConfig = true
+    }
     compileSdk = 36
     defaultConfig {
         applicationId = "com.sofamaniac.crabir"
