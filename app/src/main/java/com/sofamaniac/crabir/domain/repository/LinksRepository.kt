@@ -1,8 +1,8 @@
 package com.sofamaniac.crabir.domain.repository
 
 import com.sofamaniac.crabir.data.local.dao.VotableDao
-import com.sofamaniac.crabir.data.remote.api.FlairInfo
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData

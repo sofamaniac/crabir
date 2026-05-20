@@ -4,7 +4,7 @@
 
 package com.sofamaniac.crabir.domain.repository.feed
 
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.repository.LinksRepository

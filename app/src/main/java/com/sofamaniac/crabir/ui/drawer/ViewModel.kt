@@ -14,10 +14,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
 import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
-import com.sofamaniac.crabir.data.remote.api.auth.AuthConfig
-import com.sofamaniac.crabir.data.remote.api.auth.BasicAuthClient
 import com.sofamaniac.crabir.data.remote.dto.Thing
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.auth.AuthConfig
+import com.sofamaniac.crabir.data.remote.reddit.auth.BasicAuthClient
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.AccountsRepository

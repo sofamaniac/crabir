@@ -65,10 +65,10 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.data.remote.api.CommunitySearchSort
-import com.sofamaniac.crabir.data.remote.api.PostSearchSort
 import com.sofamaniac.crabir.data.remote.dto.SortInterface
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
+import com.sofamaniac.crabir.data.remote.reddit.CommunitySearchSort
+import com.sofamaniac.crabir.data.remote.reddit.PostSearchSort
 import com.sofamaniac.crabir.domain.repository.search.PostSearchParams
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute

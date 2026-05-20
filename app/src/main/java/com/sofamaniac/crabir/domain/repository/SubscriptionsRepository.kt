@@ -1,11 +1,11 @@
 package com.sofamaniac.crabir.domain.repository
 
 import android.util.Log
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache

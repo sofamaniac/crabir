@@ -1,0 +1,96 @@
+package com.sofamaniac.crabir.ui.post
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.core.net.toUri
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import coil3.compose.AsyncImage
+import com.sofamaniac.crabir.data.remote.streamable.StreamableAPI
+import com.sofamaniac.crabir.data.remote.streamable.Video
+import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.settings.rememberFiltersSettings
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+@HiltViewModel(assistedFactory = StreamableViewModel.Factory::class)
+class StreamableViewModel @AssistedInject constructor(
+    @Assisted post: PostData,
+    api: StreamableAPI
+) : ViewModel() {
+    private val _video: MutableStateFlow<Video?> = MutableStateFlow(null)
+    val video: StateFlow<Video?> = _video.asStateFlow()
+
+    private val _thumbnailUrl: MutableStateFlow<String?> = MutableStateFlow(null)
+    val thumbnailUrl: StateFlow<String?> = _thumbnailUrl.asStateFlow()
+
+    init {
+        val id = post.url.toUri().lastPathSegment
+        if (id != null) {
+            viewModelScope.launch {
+                val response = api.getVideo(id)
+                if (response.isSuccessful) {
+                    val body = response.body() ?: return@launch
+                    _video.value = body.files.mp4
+                    _thumbnailUrl.value = body.thumbnailUrl
+                }
+            }
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(post: PostData): StreamableViewModel
+    }
+}
+
+@Composable
+fun StreamableVideo(post: PostData, canPlayVideo: Boolean, modifier: Modifier = Modifier) {
+    val viewModel: StreamableViewModel =
+        hiltViewModel<StreamableViewModel, StreamableViewModel.Factory> { factory ->
+            factory.create(
+                post
+            )
+        }
+    val video by viewModel.video.collectAsState()
+    val thumbnailUrl by viewModel.thumbnailUrl.collectAsState()
+    val filters = rememberFiltersSettings()
+    val blur = post.spoiler || (post.over18 && filters.blurNSFW)
+    if (video == null) return
+    val navController = LocalNavController.current!!
+    val goFullscreen = {
+        navController.navigate(FullscreenVideoRoute(post.name))
+    }
+    PostVideo(
+        video!!.toMediaResource(),
+        canPlayVideo = canPlayVideo,
+        blur = blur,
+        modifier = modifier.clickable(enabled = blur) { goFullscreen() },
+        goFullscreen = goFullscreen,
+    ) {
+        AsyncImage(
+            model = thumbnailUrl,
+            contentDescription = null,
+            modifier = modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            contentScale = ContentScale.Fit,
+        )
+    }
+
+}

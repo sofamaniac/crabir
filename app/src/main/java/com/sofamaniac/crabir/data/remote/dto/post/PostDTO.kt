@@ -339,6 +339,7 @@ data class Media(
     @SerialName("reddit_video")
     val redditVideo: RedditVideo? = null,
     val oembed: OEmbed? = null,
+    val type: String? = null,
 )
 
 @Serializable

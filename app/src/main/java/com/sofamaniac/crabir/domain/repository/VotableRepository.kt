@@ -3,8 +3,8 @@ package com.sofamaniac.crabir.domain.repository
 import android.util.Log
 import com.sofamaniac.crabir.data.local.dao.VotableDao
 import com.sofamaniac.crabir.data.local.entities.asVotableData
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
-import com.sofamaniac.crabir.data.remote.api.Rules
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.VotableData
 import kotlinx.coroutines.flow.Flow

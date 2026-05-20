@@ -6,7 +6,7 @@
  *
  */
 
-package com.sofamaniac.crabir.data.remote.api.auth
+package com.sofamaniac.crabir.data.remote.reddit.auth
 
 import android.util.Log
 import com.sofamaniac.crabir.domain.model.RedditAccount

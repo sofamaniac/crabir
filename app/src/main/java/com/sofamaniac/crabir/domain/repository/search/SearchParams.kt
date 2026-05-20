@@ -1,8 +1,8 @@
 package com.sofamaniac.crabir.domain.repository.search
 
-import com.sofamaniac.crabir.data.remote.api.PostSearchSort
-import com.sofamaniac.crabir.data.remote.api.SearchSort
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
+import com.sofamaniac.crabir.data.remote.reddit.PostSearchSort
+import com.sofamaniac.crabir.data.remote.reddit.SearchSort
 import com.sofamaniac.crabir.ui.search.SearchParams
 
 data class PostSearchParams(

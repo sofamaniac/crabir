@@ -16,6 +16,7 @@ enum class Kind {
     Meta,
     Link,
     YoutubeVideo,
+    Streamable,
     Unknown,
 }
 
@@ -26,6 +27,7 @@ fun isVideoPost(post: PostDTO): Boolean {
 }
 
 fun getKind(post: PostDTO): Kind {
+    if (post.secureMedia?.type == "streamable.com") return Kind.Streamable
     if (isVideoPost(post)) return Kind.Video
 
     if (post.crosspostParentList.isNotEmpty()) return getKind(post.crosspostParentList.first())

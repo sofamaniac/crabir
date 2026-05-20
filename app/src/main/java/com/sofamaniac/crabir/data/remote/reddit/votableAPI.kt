@@ -2,7 +2,7 @@
  * Copyright (c) 2025 Antoine Grimod
  */
 
-package com.sofamaniac.crabir.data.remote.api
+package com.sofamaniac.crabir.data.remote.reddit
 
 import com.sofamaniac.crabir.domain.model.Fullname
 import retrofit2.Response

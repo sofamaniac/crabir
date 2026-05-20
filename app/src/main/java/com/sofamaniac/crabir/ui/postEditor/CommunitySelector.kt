@@ -31,7 +31,7 @@ import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.sofamaniac.crabir.data.remote.api.MissingCommunity
+import com.sofamaniac.crabir.data.remote.reddit.MissingCommunity
 import com.sofamaniac.crabir.ui.subredditList.Tile
 import kotlinx.coroutines.launch
 

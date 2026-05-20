@@ -4,10 +4,10 @@
 
 package com.sofamaniac.crabir.data.remote.utils
 
-import com.sofamaniac.crabir.data.remote.api.CommentsResponse
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Post
+import com.sofamaniac.crabir.data.remote.reddit.CommentsResponse
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind

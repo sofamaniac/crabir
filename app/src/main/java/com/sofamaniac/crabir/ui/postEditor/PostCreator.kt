@@ -70,11 +70,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.data.remote.api.FlairInfo
-import com.sofamaniac.crabir.data.remote.api.InvalidUrl
-import com.sofamaniac.crabir.data.remote.api.MissingTitle
-import com.sofamaniac.crabir.data.remote.api.MissingUrl
-import com.sofamaniac.crabir.data.remote.api.PostSubmissionBuilder
+import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
+import com.sofamaniac.crabir.data.remote.reddit.InvalidUrl
+import com.sofamaniac.crabir.data.remote.reddit.MissingTitle
+import com.sofamaniac.crabir.data.remote.reddit.MissingUrl
+import com.sofamaniac.crabir.data.remote.reddit.PostSubmissionBuilder
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.navigation.LocalNavController

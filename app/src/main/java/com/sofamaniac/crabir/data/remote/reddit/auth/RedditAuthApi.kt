@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.data.remote.api.auth
+package com.sofamaniac.crabir.data.remote.reddit.auth
 
 import android.util.Base64
 import com.sofamaniac.crabir.BuildConfig

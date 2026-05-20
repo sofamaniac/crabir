@@ -1,7 +1,7 @@
 package com.sofamaniac.crabir.domain.repository
 
 import com.sofamaniac.crabir.data.local.dao.VotableDao
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.VotableData
 import javax.inject.Inject

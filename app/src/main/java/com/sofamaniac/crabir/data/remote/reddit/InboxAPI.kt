@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.data.remote.api
+package com.sofamaniac.crabir.data.remote.reddit
 
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import retrofit2.Response

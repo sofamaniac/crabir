@@ -1,8 +1,8 @@
 package com.sofamaniac.crabir.di
 
 import android.content.Context
-import com.sofamaniac.crabir.data.remote.api.auth.AuthConfig
-import com.sofamaniac.crabir.data.remote.api.auth.BasicAuthClient
+import com.sofamaniac.crabir.data.remote.reddit.auth.AuthConfig
+import com.sofamaniac.crabir.data.remote.reddit.auth.BasicAuthClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

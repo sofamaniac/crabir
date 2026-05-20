@@ -1,17 +1,17 @@
 package com.sofamaniac.crabir.domain.repository
 
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.remote.api.DOWNVOTED
-import com.sofamaniac.crabir.data.remote.api.MoreResponseOuter
-import com.sofamaniac.crabir.data.remote.api.NEUTRAL
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
-import com.sofamaniac.crabir.data.remote.api.UPVOTED
-import com.sofamaniac.crabir.data.remote.api.postCommentBody
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
+import com.sofamaniac.crabir.data.remote.reddit.DOWNVOTED
+import com.sofamaniac.crabir.data.remote.reddit.MoreResponseOuter
+import com.sofamaniac.crabir.data.remote.reddit.NEUTRAL
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.UPVOTED
+import com.sofamaniac.crabir.data.remote.reddit.postCommentBody
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData

@@ -82,31 +82,51 @@ fun PostVideo(
             )
         }
     } else {
-        fun goFullscreen() {
+        val goFullscreen = {
             navController.navigate(FullscreenVideoRoute(post.name))
         }
-        DecoratedVideoPlayer(
+        PostVideo(
             video,
-            startPlaying = canPlayVideo && !blur,
-            placeholder = placeholder,
-            clickable = !blur,
+            canPlayVideo,
+            blur,
             modifier = modifier.clickable(enabled = blur) {
                 goFullscreen()
             },
-            fullscreenButton = {
-                IconButton(onClick = {
-                    goFullscreen()
-                }) {
-                    Icon(
-                        Icons.Default.Fullscreen,
-                        contentDescription = "Go fullscreen",
-                        tint = Color.White
-                    )
-                }
-            }
+            goFullscreen = goFullscreen,
+            placeholder = placeholder,
         )
     }
+}
 
+@Composable
+fun PostVideo(
+    video: MediaResource,
+    canPlayVideo: Boolean,
+    blur: Boolean,
+    modifier: Modifier = Modifier,
+    goFullscreen: () -> Unit,
+    placeholder: @Composable () -> Unit,
+) {
+    DecoratedVideoPlayer(
+        video,
+        startPlaying = canPlayVideo && !blur,
+        placeholder = placeholder,
+        clickable = !blur,
+        modifier = modifier.clickable(enabled = blur) {
+            goFullscreen()
+        },
+        fullscreenButton = {
+            IconButton(onClick = {
+                goFullscreen()
+            }) {
+                Icon(
+                    Icons.Default.Fullscreen,
+                    contentDescription = "Go fullscreen",
+                    tint = Color.White
+                )
+            }
+        }
+    )
 }
 
 @Composable

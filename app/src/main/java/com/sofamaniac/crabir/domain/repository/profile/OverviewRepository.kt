@@ -5,7 +5,7 @@
 package com.sofamaniac.crabir.domain.repository.profile
 
 import android.util.Log
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.RedditAccount

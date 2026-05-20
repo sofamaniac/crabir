@@ -19,8 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.data.remote.api.FlairInfo
-import com.sofamaniac.crabir.data.remote.api.Rules
+import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
+import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
@@ -102,6 +102,10 @@ internal fun ColumnScope.PostBody(
                 post,
                 modifier.fillMaxWidth(),
             )
+        }
+
+        Kind.Streamable -> {
+            StreamableVideo(post, canPlayVideo = canPlayVideo, modifier = modifier.fillMaxWidth())
         }
 
         else -> {

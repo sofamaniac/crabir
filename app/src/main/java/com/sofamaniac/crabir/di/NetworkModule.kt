@@ -1,13 +1,14 @@
 package com.sofamaniac.crabir.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import com.sofamaniac.crabir.data.remote.api.MediaUploadInterface
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
-import com.sofamaniac.crabir.data.remote.api.auth.RedditAuthenticator
 import com.sofamaniac.crabir.data.remote.interceptors.CountInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.ForceJsonInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.RateLimitInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.loggingInterceptor
+import com.sofamaniac.crabir.data.remote.reddit.MediaUploadInterface
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.auth.RedditAuthenticator
+import com.sofamaniac.crabir.data.remote.streamable.StreamableAPI
 import com.sofamaniac.crabir.data.remote.utils.URISerializer
 import com.sofamaniac.crabir.data.remote.utils.URLSerializer
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
@@ -124,6 +125,28 @@ object NetworkModule {
                 XML.v1.asConverterFactory("application/xml".toMediaType())
             )
             .client(client).build().create(MediaUploadInterface::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideStreamableAPI(
+        json: Json
+    ): StreamableAPI {
+        val contentType = "application/json".toMediaType()
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.HEADERS
+        }
+        val client = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+        return Retrofit.Builder()
+            .baseUrl("https://api.streamable.com")
+            .client(client)
+            .addConverterFactory(json.asConverterFactory(contentType))
+            .build()
+            .create(StreamableAPI::class.java)
     }
 }
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2025 Antoine Grimod
  */
 
-package com.sofamaniac.crabir.data.remote.api
+package com.sofamaniac.crabir.data.remote.reddit
 
 import android.content.Context
 import android.net.Uri

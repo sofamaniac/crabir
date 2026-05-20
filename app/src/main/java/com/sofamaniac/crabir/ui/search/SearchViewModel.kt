@@ -12,10 +12,10 @@ import androidx.paging.cachedIn
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
 import com.sofamaniac.crabir.data.local.entities.toEntity
-import com.sofamaniac.crabir.data.remote.api.CommunitySearchSort
-import com.sofamaniac.crabir.data.remote.api.PostSearchSort
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
+import com.sofamaniac.crabir.data.remote.reddit.CommunitySearchSort
+import com.sofamaniac.crabir.data.remote.reddit.PostSearchSort
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
