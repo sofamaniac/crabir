@@ -7,6 +7,7 @@ import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import com.mikepenz.markdown.annotator.AnnotatorSettings
@@ -16,6 +17,7 @@ import com.mikepenz.markdown.model.MarkdownAnnotator
 import com.mikepenz.markdown.model.MarkdownAnnotatorConfig
 import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.ReferenceLinkHandler
+import com.mikepenz.markdown.utils.getUnescapedTextInNode
 import com.sofamaniac.crabir.ui.markdown.redditFlavour.RedditFlavourElementType
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
@@ -78,6 +80,31 @@ class RedditAnnotator(
                 buildMarkdownAnnotatedString(content, child.children, codeSpanAnnotator)
                 false
             } else when (child.type) {
+
+                MarkdownTokenTypes.TEXT -> {
+                    val redditLinksPattern = Regex("(\\p{Punct}|\\s)?/?([ru]/\\w{2,24}/?)")
+                    val text = child.getUnescapedTextInNode(content)
+                    val links = redditLinksPattern.findAll(text)
+                    var lastEnd = 0
+                    for (l in links) {
+                        append(text.substring(lastEnd, l.range.first))
+                        val dest = l.groupValues[2]
+                        val url = "https://www.reddit.com/$dest"
+                        withStyle(typography.textLink.style!!) {
+                            withLink(LinkAnnotation.Url(url)) {
+                                append(l.value)
+                            }
+                        }
+                        lastEnd = l.range.last + 1
+                    }
+
+                    if (lastEnd < text.length) {
+                        append(text.substring(lastEnd))
+                    }
+
+                    true
+                }
+
                 RedditFlavourElementType.SUPERSCRIPT if child.children.size > 1 -> {
                     withStyle(superscriptStyle) {
                         buildMarkdownAnnotatedString(

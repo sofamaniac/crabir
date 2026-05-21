@@ -144,9 +144,11 @@ private fun String.convertRedditPreviewLinks(mediaMetadata: Map<String, MediaMet
  * Convert reddit relative links (r/..., u/...) to full links
  */
 private fun String.extractRedditLinks(): String {
-    val redditLinksPattern = Regex("(?<!\\S)/?([ru]/[A-Za-z0-9_-]+/?)")
+    val redditLinksPattern = Regex("(\\p{Punct}|\\s)?/?([ru]/\\w{2,24}/?)")
     val res = redditLinksPattern.replace(this) { matchResult ->
-        "[${matchResult.value}](https://www.reddit.com/${matchResult.value})"
+        val prefix = matchResult.groupValues[1]
+        val dest = matchResult.groupValues[2]
+        "$prefix[$dest](https://www.reddit.com/$dest)"
     }
     return res
 }
@@ -170,7 +172,7 @@ class MarkdownViewModel @AssistedInject constructor(
     @Assisted val enableImages: Boolean,
 ) : ViewModel() {
     val processedMarkdown = markdown
-        .extractRedditLinks()
+        //.extractRedditLinks()
         .convertGiphy(toImage = enableImages).let {
             if (enableImages)
                 it.convertRedditPreviewLinks(mediaMetadata)
