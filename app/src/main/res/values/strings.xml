@@ -52,7 +52,7 @@
     <string name="save">Save</string>
     <string name="unsave">Unsave</string>
     <plurals name="MoreComments">
-        <item quantity="zero">See more comments</item>
+        <item quantity="many">See more comments</item>
         <item quantity="one">%d more reply</item>
         <item quantity="other">%d more replies</item>
     </plurals>

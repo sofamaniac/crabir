@@ -40,6 +40,7 @@
     <plurals name="MoreComments">
         <item quantity="one">%d réponse</item>
         <item quantity="many">%d réponses</item>
+        <item quantity="other">%d réponses</item>
     </plurals>
     <string name="History">Historique</string>
     <string name="create_post">Créer publication</string>
