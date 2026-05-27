@@ -69,18 +69,16 @@ class DrawerViewModel @Inject constructor(
 
     val serviceConfig = AuthConfig()
 
-    val subscriptions: StateFlow<List<Thing.Subreddit>>
-        get() = subsRepository.subscriptions.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList<Thing.Subreddit>()
-        )
-    val multis: StateFlow<List<Thing.Multi>>
-        get() = subsRepository.multis.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList<Thing.Multi>()
-        )
+    val subscriptions: StateFlow<List<Thing.Subreddit>> = subsRepository.subscriptions.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList<Thing.Subreddit>()
+    )
+    val multis: StateFlow<List<Thing.Multi>> = subsRepository.multis.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList<Thing.Multi>()
+    )
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
