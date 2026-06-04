@@ -3,7 +3,9 @@ package com.sofamaniac.crabir.di
 import android.content.Context
 import androidx.room.Room
 import com.sofamaniac.crabir.data.local.dao.AccountsDao
-import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
+import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
+import com.sofamaniac.crabir.data.local.dao.MultiDao
+import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.dao.VotableDao
 import com.sofamaniac.crabir.data.local.database.AppDatabase
@@ -42,13 +44,23 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideVisitedCommunitiesDao(database: AppDatabase): VisitedCommunityDao {
+    fun provideVisitedCommunitiesDao(database: AppDatabase): CommunityViewDao {
         return database.visitedCommunityDao()
     }
 
     @Provides
     fun provideVotableDao(database: AppDatabase): VotableDao {
         return database.votableDao()
+    }
+
+    @Provides
+    fun subredditDao(database: AppDatabase): SubredditDao {
+        return database.subredditDao()
+    }
+
+    @Provides
+    fun multiDao(database: AppDatabase): MultiDao {
+        return database.multiDao()
     }
 
 }

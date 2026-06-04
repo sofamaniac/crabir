@@ -131,7 +131,7 @@ fun FullFeedView(
                                 navController.navigate(
                                     PostCreatorRoute(
                                         type.kind,
-                                        communityEntity?.getData()?.id
+                                        communityEntity?.name
                                     )
                                 )
                             }

@@ -66,6 +66,7 @@ data class CrabirTheme(
     val linkColor: Color,
     val secondaryText: Color,
     val downvote: Color,
+    val saved: Color,
 ) {
     fun getFieldValue(field: ColorFields): Color {
         return when (field) {
@@ -140,6 +141,7 @@ data class CrabirTheme(
                 linkColor = Color(0xff4b91e2),
                 downvote = Color(0xFF448AFF),
                 secondaryText = colorScheme.onPrimaryFixedVariant,
+                saved = Color(0xFFFFD740)
             )
         }
     }
@@ -159,6 +161,7 @@ val DefaultDarkTheme = CrabirTheme(
     contentColor = Color(0xfff5f6f8),
     linkColor = Color(0xff4b91e2),
     downvote = Color(0xFF448AFF),
+    saved = Color(0xFFFFD740),
 )
 
 val DefaultLightTheme = CrabirTheme(
@@ -175,6 +178,7 @@ val DefaultLightTheme = CrabirTheme(
     contentColor = Color.Black,
     linkColor = Color(0xff4b91e2),
     downvote = Color(0xFF448AFF),
+    saved = Color(0xFFFFD740),
 )
 
 enum class ThemeMode {

@@ -11,7 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
-import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
+import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.remote.reddit.CrosspostSubmissionBuilder
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.GalleryItem
@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 abstract class CreatorViewModel(
     protected val api: RedditAPIService,
-    private val communities: VisitedCommunityDao
+    private val communities: SubredditDao
 ) : ViewModel() {
     var community: SubredditData? by mutableStateOf(null)
         private set
@@ -65,9 +65,9 @@ abstract class CreatorViewModel(
         }
     }
 
-    fun setSubreddit(subreddit: String) {
+    fun setSubreddit(subreddit: Fullname) {
         viewModelScope.launch {
-            val sub = communities.getCommunity(subreddit)?.getData()
+            val sub = communities.getByName(subreddit)
             if (sub == null) return@launch
             community = sub
             getRules()
@@ -87,7 +87,7 @@ abstract class CreatorViewModel(
 @HiltViewModel
 class PostCreatorViewModel @Inject constructor(
     api: RedditAPIService,
-    communities: VisitedCommunityDao,
+    communities: SubredditDao,
     private val mediaUploader: MediaUploadInterface
 ) : CreatorViewModel(api, communities) {
     var state by mutableStateOf(PostSubmissionBuilder())
@@ -199,7 +199,7 @@ class PostCreatorViewModel @Inject constructor(
 class CrosspostCreatorViewModel @AssistedInject constructor(
     @Assisted val parentFullname: String,
     api: RedditAPIService,
-    communities: VisitedCommunityDao,
+    communities: SubredditDao,
     linksRepository: LinksRepository,
 ) : CreatorViewModel(api, communities) {
     var state by mutableStateOf(

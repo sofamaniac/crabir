@@ -16,8 +16,11 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
+import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
+import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
+import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.feed.HomeRepository
 import com.sofamaniac.crabir.ui.TabBar
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -65,7 +68,14 @@ fun HomeViewer(
 class HomeViewModel @Inject constructor(
     repository: HomeRepository,
     visitedPostsDao: VisitedPostsDao,
-    visitedCommunityDao: VisitedCommunityDao,
-) : PostFeedViewModel(id = "_HOME", repository, visitedPostsDao, visitedCommunityDao)
+    communityDao: SubredditDao,
+    viewDao: CommunityViewDao
+) : PostFeedViewModel<SubredditData>(
+    id = Fullname("_HOME"),
+    repository,
+    visitedPostsDao,
+    communityDao,
+    viewDao
+)
 
 

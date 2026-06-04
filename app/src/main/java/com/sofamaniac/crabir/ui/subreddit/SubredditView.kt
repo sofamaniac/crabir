@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -40,11 +42,15 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
+import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
+import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import com.sofamaniac.crabir.domain.repository.feed.SubredditPostsRepository
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.SubredditInfoRoute
 import com.sofamaniac.crabir.ui.TabBar
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import dagger.assisted.Assisted
@@ -56,7 +62,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun SubredditViewer(
     subreddit: String,
@@ -67,6 +73,8 @@ fun SubredditViewer(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val params by viewModel.params.collectAsState()
+    val navController = LocalNavController.current!!
+    val feedInfo by viewModel.info.collectAsState()
     val topBar = @Composable {
         TopBar(
             subreddit,
@@ -74,12 +82,19 @@ fun SubredditViewer(
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior
-        )
+        ) {
+            if (feedInfo == null) return@TopBar
+            IconButton(onClick = {
+                navController.navigate(SubredditInfoRoute(feedInfo!!.name))
+            }) {
+                Icon(Icons.Default.Info, contentDescription = null)
+            }
+        }
     }
     val bottomBar = @Composable {
         TabBar(2)
     }
-    val feedInfo by viewModel.info.collectAsState()
+
     FullFeedView(
         topBar, bottomBar, viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -144,6 +159,16 @@ fun SubredditInfo(info: SubredditData, viewModel: SubredditViewModel) {
                 IconButton(onClick = {}) {
                     Icon(Icons.Default.MoreVert, contentDescription = "More options")
                 }
+                SubscribeButton(info.userIsSubscriber) {
+                    if (info.userIsSubscriber) {
+                        viewModel.unsubscribe()
+                    } else {
+                        viewModel.subscribe()
+                    }
+                }
+                FavoriteButton(info.userHasFavorited) {
+                    viewModel.favorite(!info.userHasFavorited)
+                }
                 val joined = info.userIsSubscriber
                 OutlinedButton(onClick = {
                     if (joined) {
@@ -169,36 +194,38 @@ fun SubredditInfo(info: SubredditData, viewModel: SubredditViewModel) {
 class SubredditViewModel @AssistedInject constructor(
     private val repository: SubredditPostsRepository,
     visitedPostsDao: VisitedPostsDao,
-    visitedCommunityDao: VisitedCommunityDao,
+    communityDao: SubredditDao,
+    viewDao: CommunityViewDao,
     private val subredditCache: SubredditCache,
-    /** Subreddit's display name */
-    @Assisted private val subredditName: String,
-) : PostFeedViewModel(id = subredditName, repository, visitedPostsDao, visitedCommunityDao) {
+    /** Subreddit's fullname */
+    @Assisted subredditName: String,
+) : PostFeedViewModel<SubredditData>(
+    id = Fullname(subredditName),
+    repository,
+    visitedPostsDao,
+    communityDao,
+    viewDao
+) {
 
+    val name = Fullname(subredditName)
     private val _info = MutableStateFlow<SubredditData?>(null)
     val info = _info.asStateFlow()
 
     init {
-        _info.value = subredditCache.get(subredditName)
-        repository.updateSubreddit(subredditName)
+        repository.updateSubreddit(name)
         viewModelScope.launch {
-            if (_info.value == null && subredditName != "all" && subredditName != "popular") {
+            _info.value = subredditCache.get(name)
+            if (_info.value == null) {
                 _info.value = repository.getInfo()
-                _info.value?.let { subredditCache.save(it) }
+                updateData(_info.value)
             }
-            updateData(_info.value)
         }
     }
-
-    private suspend fun updateInfo(subscribed: Boolean) {
-
-    }
-
     fun subscribe() {
         viewModelScope.launch {
             repository.subscribe()
             _info.value = repository.getInfo()
-            _info.value?.let { subredditCache.save(it) }
+            updateData(_info.value)
         }
     }
 
@@ -206,7 +233,15 @@ class SubredditViewModel @AssistedInject constructor(
         viewModelScope.launch {
             repository.unsubscribe()
             _info.value = repository.getInfo()
-            _info.value?.let { subredditCache.save(it) }
+            updateData(_info.value)
+        }
+    }
+
+    fun favorite(favorite: Boolean) {
+        viewModelScope.launch {
+            repository.favorite(favorite)
+            _info.value = repository.getInfo()
+            updateData(_info.value)
         }
     }
 

@@ -1,12 +1,16 @@
 package com.sofamaniac.crabir.data.remote.dto
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetails
 import com.sofamaniac.crabir.domain.model.Fullname
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@Entity(tableName = "multireddits")
 data class MultiData(
+    @PrimaryKey
     val name: Fullname,
     @SerialName("display_name") val displayName: String,
     @SerialName("description_md") val descriptionMd: String,

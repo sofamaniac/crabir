@@ -1,0 +1,214 @@
+package com.sofamaniac.crabir.ui.subreddit
+
+import android.util.Log
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.R
+import com.sofamaniac.crabir.data.remote.reddit.SubredditAPI
+import com.sofamaniac.crabir.data.remote.reddit.SubscribeAction
+import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.SearchRoute
+import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+
+@HiltViewModel(assistedFactory = SubredditInfoViewModel.Factory::class)
+class SubredditInfoViewModel @AssistedInject constructor(
+    private val subredditCache: SubredditCache,
+    private val redditApi: SubredditAPI,
+    /** Subreddit's fullname */
+    @Assisted subredditName: String,
+) : ViewModel() {
+
+    val info: MutableStateFlow<SubredditData?> = MutableStateFlow(null)
+    val name: Fullname = Fullname(subredditName)
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            info.value = subredditCache.get(name)
+        }
+    }
+
+    fun favorite(favorite: Boolean) {
+        val infoLoc = info.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                redditApi.favorite(info.value!!.displayName, !infoLoc.userHasFavorited)
+            } catch (e: Exception) {
+                Log.e("SubredditInfoViewModel", "Failed to favorite subreddit : ${e.message}")
+                return@launch
+            }
+            info.value = infoLoc.copy(userHasFavorited = favorite)
+            info.value?.let { subredditCache.save(it) }
+        }
+    }
+
+    private fun _subscribe(action: SubscribeAction) {
+        val infoLoc = info.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                redditApi.subscribe(action, info.value!!.displayName)
+            } catch (e: Exception) {
+                Log.e("SubredditInfoViewModel", "Failed to subscribe to subreddit : ${e.message}")
+                return@launch
+            }
+            info.value = infoLoc.copy(userIsSubscriber = action == SubscribeAction.SUBSCRIBE)
+            info.value?.let { subredditCache.save(it) }
+        }
+    }
+
+
+    fun subscribe() {
+        _subscribe(SubscribeAction.SUBSCRIBE)
+    }
+
+    fun unsubscribe() {
+        _subscribe(SubscribeAction.UNSUBSCRIBE)
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(subredditName: String): SubredditInfoViewModel
+    }
+}
+
+@Composable
+fun SubscribeButton(isSubscriber: Boolean, onClick: () -> Unit = {}) {
+    OutlinedButton(onClick = onClick) {
+        val icon = if (isSubscriber) Icons.Default.CheckCircle else null
+        val text = if (isSubscriber) "Joined" else "Subscribe"
+        if (icon != null) {
+            Icon(icon, contentDescription = null)
+        }
+        Text(text)
+    }
+}
+
+@Composable
+fun FavoriteButton(hasFavorited: Boolean, onClick: () -> Unit = {}) {
+    val theme = LocalTheme.current
+    OutlinedButton(onClick = onClick) {
+        val icon = if (hasFavorited) Icons.Filled.Star else Icons.Outlined.Star
+        val tint = if (hasFavorited) theme.saved else Color.Gray
+        val text = if (hasFavorited) "Unfavorite" else "Favorite"
+        Icon(icon, contentDescription = null, tint = tint)
+        Text(text)
+    }
+}
+
+@Composable
+fun SubredditInfoView(
+    subreddit: Fullname,
+    viewModel: SubredditInfoViewModel =
+        hiltViewModel<SubredditInfoViewModel, SubredditInfoViewModel.Factory> { factory ->
+            factory.create(subreddit.name)
+        }
+) {
+    val infoOpt by viewModel.info.collectAsState()
+
+    if (infoOpt == null) return
+
+    val info = infoOpt!!
+
+    Scaffold(topBar = { TopBar(info.displayName) }) { padding ->
+        LazyColumn(modifier = Modifier.padding(padding)) {
+            item {
+                Row() {
+                    SubredditIcon(info.displayName, info.icon)
+                    Column {
+                        Text(info.displayNamePrefixed, style = MaterialTheme.typography.titleMedium)
+                        val members = LocalResources.current.getQuantityString(
+                            R.plurals.members,
+                            info.subscribers,
+                            info.subscribers
+                        )
+                        Text(members, style = MaterialTheme.typography.labelSmall)
+                        TextButton(onClick = {}) {
+                            Text("Edit Flair")
+                        }
+                    }
+                }
+            }
+            item {
+                Row {
+                    SubscribeButton(info.userIsSubscriber) {
+                        if (info.userIsSubscriber) {
+                            viewModel.unsubscribe()
+                        } else {
+                            viewModel.subscribe()
+                        }
+                    }
+                    FavoriteButton(info.userHasFavorited) {
+                        viewModel.favorite(!info.userHasFavorited)
+                    }
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Default.MoreVert, contentDescription = null)
+                    }
+                }
+            }
+            item {
+                RedditMarkdown(
+                    info.description,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun TopBar(subreddit: String) {
+    val navController = LocalNavController.current!!
+    TopAppBar(
+        navigationIcon = {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
+            }
+        },
+        title = {},
+        actions = {
+            IconButton(onClick = {
+                navController.navigate(SearchRoute(subreddit))
+            }) {
+                Icon(Icons.Default.Search, contentDescription = null)
+            }
+        }
+    )
+}

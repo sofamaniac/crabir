@@ -131,6 +131,8 @@ data class SubredditDTO(
     val submissionType: String = "",
     @SerialName("user_is_subscriber")
     val userIsSubscriber: Boolean = false,
+    @SerialName("user_has_favorited")
+    val userHasFavorited: Boolean = false,
     @SerialName("allowed_media_in_comments")
     val allowedMediaInComments: List<String> = emptyList(),
     @SerialName("allow_videogifs")

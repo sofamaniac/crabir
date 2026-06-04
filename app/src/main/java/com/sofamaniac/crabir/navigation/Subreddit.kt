@@ -6,8 +6,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.toRoute
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.ui.subreddit.MultiView
+import com.sofamaniac.crabir.ui.subreddit.SubredditInfoView
 import com.sofamaniac.crabir.ui.subreddit.SubredditViewer
+import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.subredditGraph(navController: NavController) {
     composable<SubredditRoute>
@@ -30,11 +33,18 @@ fun NavGraphBuilder.subredditGraph(navController: NavController) {
         val subreddit = params!!.getString("subreddit")!!
         SubredditViewer(subreddit = subreddit)
     }
-    composable<MultiRoute> { navBackStackEntry ->
+    composable<MultiRoute>(
+        typeMap = mapOf(typeOf<Fullname>() to NullableFullnameType)
+    ) { navBackStackEntry ->
         val multi = navBackStackEntry.toRoute<MultiRoute>()
         MultiView(
-            multi.displayName,
-            multi.permalink
+            multi.name
         )
+    }
+    composable<SubredditInfoRoute>(
+        typeMap = mapOf(typeOf<Fullname>() to NullableFullnameType)
+    ) { navBackStackEntry ->
+        val subreddit = navBackStackEntry.toRoute<SubredditInfoRoute>()
+        SubredditInfoView(subreddit.subreddit)
     }
 }

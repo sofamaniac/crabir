@@ -41,7 +41,7 @@ internal fun PostView(
             PostBody(
                 post,
                 canPlayVideo = canPlayVideo,
-                maxLines = Int.MAX_VALUE,
+                maxLines = null,
                 forceShowSelftext = true,
                 enableLinkFullSizePreview = false,
             )

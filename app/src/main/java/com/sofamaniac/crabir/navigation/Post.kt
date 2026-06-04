@@ -50,12 +50,35 @@ val FullnameType = object : NavType<Fullname>(isNullableAllowed = false) {
     }
 }
 
+val NullableFullnameType = object : NavType<Fullname?>(isNullableAllowed = true) {
+    override fun get(bundle: Bundle, key: String): Fullname? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            bundle.getParcelable(key, Fullname::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            bundle.getParcelable(key)
+        }
+    }
+
+    override fun parseValue(value: String): Fullname? {
+        return if (value == "null") null else Fullname(value)
+    }
+
+    override fun put(bundle: Bundle, key: String, value: Fullname?) {
+        bundle.putParcelable(key, value)
+    }
+
+    override fun serializeAsValue(value: Fullname?): String {
+        return value?.name ?: "null"
+    }
+}
+
 @Serializable
 class PostRoute(val postPermalink: String, val comment: String? = null, val context: Int? = null) :
     Route
 
 @Serializable
-class PostCreatorRoute(val kind: Kind, val communityId: String?) : Route
+class PostCreatorRoute(val kind: Kind, val communityId: Fullname?) : Route
 
 @Serializable
 class CrosspostCreatorRoute(val post: Fullname) : Route
@@ -159,7 +182,9 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
         )
     }
 
-    composable<PostCreatorRoute> {
+    composable<PostCreatorRoute>(
+        typeMap = mapOf(typeOf<Fullname?>() to NullableFullnameType)
+    ) {
         val route = it.toRoute<PostCreatorRoute>()
         PostCreator(kind = route.kind, communityId = route.communityId, onDismissRequest = {
             navController.popBackStack()

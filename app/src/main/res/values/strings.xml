@@ -51,6 +51,12 @@
     <string name="downvote">Downvote</string>
     <string name="save">Save</string>
     <string name="unsave">Unsave</string>
+    <plurals name="members">
+        <item quantity="zero">No members</item>
+        <item quantity="one">%d member</item>
+        <item quantity="many">%d members</item>
+        <item quantity="other">%d members</item>
+    </plurals>
     <plurals name="MoreComments">
         <item quantity="many">See more comments</item>
         <item quantity="one">%d more reply</item>

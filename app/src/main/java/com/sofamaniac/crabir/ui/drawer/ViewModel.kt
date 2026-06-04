@@ -12,8 +12,9 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
-import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
+import com.sofamaniac.crabir.data.local.dao.MultiDao
+import com.sofamaniac.crabir.data.local.dao.SubredditDao
+import com.sofamaniac.crabir.data.remote.dto.MultiData
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.auth.AuthConfig
@@ -51,7 +52,8 @@ class DrawerViewModel @Inject constructor(
     private val accountsRepository: AccountsRepository,
     private val subsRepository: SubscriptionsRepository,
     private val redditApi: RedditAPIService,
-    private val visitedCommunityDao: VisitedCommunityDao,
+    private val subredditDao: SubredditDao,
+    private val multiDao: MultiDao,
 ) : ViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
@@ -206,9 +208,13 @@ class DrawerViewModel @Inject constructor(
 
     fun visitCommunity(data: SubredditData) {
         viewModelScope.launch(Dispatchers.IO) {
-            val entity = visitedCommunityDao.getCommunity(data.displayName)?.copy(data = data)
-                ?: VisitedCommunityEntity(id = data.displayName, data = null).copy(data = data)
-            visitedCommunityDao.upsert(entity)
+            subredditDao.upsert(data)
+        }
+    }
+
+    fun visitCommunity(data: MultiData) {
+        viewModelScope.launch(Dispatchers.IO) {
+            multiDao.upsert(data)
         }
     }
 

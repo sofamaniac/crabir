@@ -4,6 +4,8 @@
 
 package com.sofamaniac.crabir.domain.repository.feed
 
+import android.util.Log
+import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.SubscribeAction
@@ -16,13 +18,16 @@ import jakarta.inject.Singleton
 
 
 @Singleton
-class SubredditCache @Inject constructor() {
-    private val cache = mutableMapOf<String, SubredditData>()
-    fun save(subreddit: SubredditData) {
-        cache[subreddit.displayName] = subreddit
+class SubredditCache @Inject constructor(
+    private val dao: SubredditDao
+) {
+    suspend fun save(subreddit: SubredditData) {
+        dao.upsert(subreddit)
     }
 
-    fun get(displayName: String): SubredditData? = cache[displayName]
+    suspend fun get(name: Fullname): SubredditData? {
+        return dao.getByName(name)
+    }
 }
 
 class SubredditPostsRepository @Inject constructor(
@@ -35,15 +40,20 @@ class SubredditPostsRepository @Inject constructor(
         if (currentSubreddit == null) {
             return null
         }
-        val res = api.getSubInfo(currentSubreddit!!)
-        if (!res.isSuccessful) {
+        try {
+            val res = api.getSubInfo(currentSubreddit!!)
+            if (!res.isSuccessful) {
+                return null
+            }
+            return res.body()?.data?.let { SubredditDetailsMapper.map(it) }
+        } catch (e: Exception) {
+            Log.e("SubredditPostsRepository", "Failed to get subreddit info", e)
             return null
         }
-        return res.body()?.data?.let { SubredditDetailsMapper.map(it) }
     }
 
-    fun updateSubreddit(subreddit: String) {
-        currentSubreddit = subreddit
+    fun updateSubreddit(subreddit: Fullname) {
+        currentSubreddit = subreddit.name
     }
 
     suspend fun subscribe(): Result<Unit> {
@@ -63,6 +73,16 @@ class SubredditPostsRepository @Inject constructor(
             Result.success(Unit)
         } else {
             Result.failure(Exception("Failed to subscribe"))
+        }
+    }
+
+    suspend fun favorite(favorite: Boolean): Result<Unit> {
+        val subreddit = currentSubreddit ?: return Result.failure(Exception("No subreddit set"))
+        val res = api.favorite(subreddit, favorite)
+        return if (res.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(Exception("Failed to favorite"))
         }
     }
 

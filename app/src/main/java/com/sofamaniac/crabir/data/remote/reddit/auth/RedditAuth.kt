@@ -15,12 +15,12 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.ClientAuthentication
 import okhttp3.Interceptor
 import okhttp3.Response
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 
 class RedditAuthenticator @Inject constructor(
@@ -61,7 +61,7 @@ class RedditAuthenticator @Inject constructor(
     private fun refreshToken(account: RedditAccount): String? {
         return try {
             runBlocking<String?> {
-                suspendCoroutine { continuation ->
+                suspendCancellableCoroutine { continuation ->
                     account.auth.performActionWithFreshTokens(
                         authService,
                         clientAuth

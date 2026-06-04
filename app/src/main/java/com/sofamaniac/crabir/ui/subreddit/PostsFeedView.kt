@@ -212,6 +212,7 @@ fun TopBar(
     updateSort: (Sort, Timeframe?) -> Unit,
     refresh: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior?,
+    infoButton: (@Composable () -> Unit)? = null,
 ) {
     val scope = rememberCoroutineScope()
     val theme = LocalTheme.current
@@ -232,15 +233,13 @@ fun TopBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val sortString = stringResource(params.sort.representation)
-                    Text(sortString, style = MaterialTheme.typography.labelSmall)
-                    if (params.timeframe != null) {
-                        val timeframeString = stringResource(params.timeframe!!.representation)
-                        Text(" · ", style = MaterialTheme.typography.labelSmall)
-                        Text(
-                            timeframeString,
-                            style = MaterialTheme.typography.labelSmall
-                        )
+                    val timeString = params.timeframe?.let { stringResource(it.representation) }
+                    val fullString = if (params.timeframe != null) {
+                        "$sortString • $timeString"
+                    } else {
+                        sortString
                     }
+                    Text(fullString, style = MaterialTheme.typography.labelSmall)
                 }
             }
         },
@@ -262,6 +261,7 @@ fun TopBar(
                 DropdownMenuItem(onClick = { }, text = { Text("Info") })
                 DropdownMenuItem(onClick = { refresh() }, text = { Text("Refresh") })
             }
+            infoButton?.invoke()
             SortMenu<Sort> { sort, timeframe ->
                 updateSort(sort, timeframe)
             }

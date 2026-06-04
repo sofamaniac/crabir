@@ -7,6 +7,7 @@ import com.sofamaniac.crabir.data.remote.interceptors.RateLimitInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.loggingInterceptor
 import com.sofamaniac.crabir.data.remote.reddit.MediaUploadInterface
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.SubredditAPI
 import com.sofamaniac.crabir.data.remote.reddit.auth.RedditAuthenticator
 import com.sofamaniac.crabir.data.remote.streamable.StreamableAPI
 import com.sofamaniac.crabir.data.remote.utils.URISerializer
@@ -106,6 +107,15 @@ object NetworkModule {
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
             .create(RedditAPIService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSubredditAPIService(
+        okHttpClient: OkHttpClient,
+        json: Json
+    ): SubredditAPI {
+        return provideRedditApiService(okHttpClient, json)
     }
 
     @Provides

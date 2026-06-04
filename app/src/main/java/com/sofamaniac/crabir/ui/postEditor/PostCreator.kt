@@ -87,7 +87,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCreator(
-    communityId: String? = null,
+    communityId: Fullname? = null,
     kind: Kind = Kind.Self,
     viewModel: PostCreatorViewModel = hiltViewModel(),
     onDismissRequest: () -> Unit,

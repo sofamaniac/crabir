@@ -13,7 +13,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
+import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.domain.model.CommentData
@@ -163,7 +163,7 @@ abstract class ProfileFeedViewModel<T : VotableData>(
     private val visitedPostsDao: VisitedPostsDao,
 ) : ViewModel(), FeedViewModelInterface<T> {
 
-    override val entity: Flow<VisitedCommunityEntity?> = flowOf(null)
+    override val entity: Flow<CommunityViewEntity?> = flowOf(null)
 
     override val listState = LazyStaggeredGridState()
     override var needScrollToTop = false

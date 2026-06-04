@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,6 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalDrawerState
+import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.navigation.HomeRoute
@@ -68,7 +71,18 @@ fun DrawerContent(
 ) {
     val navController = LocalNavController.current!!
     val subscriptions = viewModel.subscriptions.collectAsState(initial = emptyList())
-    val sortedSubscriptions = subscriptions.value?.sortedBy { it.data.displayName.lowercase() }
+    val sortedSubscriptions = subscriptions.value?.sortedWith { subreddit1, subreddit2 ->
+        if (subreddit1 == subreddit2) {
+            return@sortedWith 0
+        } else if (subreddit1.data.userHasFavorited != subreddit2.data.userHasFavorited) {
+            // favorited subs should be first
+            return@sortedWith if (subreddit1.data.userHasFavorited) -1 else 1
+        } else {
+            return@sortedWith subreddit1.data.displayName.lowercase()
+                .compareTo(subreddit2.data.displayName.lowercase())
+        }
+    }
+    //{ it.data.displayName.lowercase() }
     val selectingAccount by viewModel.selectingAccount.collectAsState()
     val rotation =
         animateFloatAsState(targetValue = if (selectingAccount) 180f else 0f, label = "rotation")
@@ -141,62 +155,83 @@ fun DrawerContent(
             SettingsTile()
             HorizontalDivider()
             for (multi in viewModel.multis.collectAsState(initial = emptyList()).value) {
-                NavigationDrawerItem(
-                    label = { Text(multi.data.displayName) },
-                    selected = false,
-                    icon = {
-                        AsyncImage(
-                            multi.data.iconUrl,
-                            "${multi.data.displayName} icon",
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
-                        )
-                    },
-                    onClick = {
-                        coroutineScope.launch {
-                            drawerState.close()
-                            navController.navigate(
-                                MultiRoute(
-                                    multi.data.displayName,
-                                    multi.data.permalink,
-                                )
+                MultiTile(multi) {
+                    coroutineScope.launch {
+                        drawerState.close()
+                        viewModel.visitCommunity(multi.data)
+                        navController.navigate(
+                            MultiRoute(
+                                multi.name
                             )
-                        }
+                        )
                     }
-                )
+                }
             }
             for (subreddit in sortedSubscriptions ?: emptyList()) {
-                NavigationDrawerItem(
-                    label = { Text(subreddit.data.displayName) },
-                    selected = false,
-                    icon = {
-                        SubredditIcon(
-                            subreddit.data.displayName,
-                            subreddit.data.icon,
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
+                SubredditTile(subreddit)
+                {
+                    coroutineScope.launch {
+                        drawerState.close()
+                        viewModel.visitCommunity(
+                            SubredditDetailsMapper.map(
+                                subreddit.data
+                            )
                         )
-                    },
-                    onClick = {
-                        coroutineScope.launch {
-                            drawerState.close()
-                            viewModel.visitCommunity(
-                                SubredditDetailsMapper.map(
-                                    subreddit.data
-                                )
+                        navController.navigate(
+                            SubredditRoute(
+                                subreddit.data.displayName
                             )
-                            navController.navigate(
-                                SubredditRoute(
-                                    subreddit.data.displayName
-                                )
-                            )
-                        }
-                    })
+                        )
+                    }
+                }
             }
         }
     }
+}
+
+@Composable
+internal fun MultiTile(multi: Thing.Multi, onClick: () -> Unit) {
+    NavigationDrawerItem(
+        label = { Text(multi.data.displayName) },
+        selected = false,
+        icon = {
+            AsyncImage(
+                multi.data.iconUrl,
+                "${multi.data.displayName} icon",
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+            )
+        },
+        onClick = onClick
+    )
+}
+
+@Composable
+internal fun SubredditTile(
+    subreddit: Thing.Subreddit,
+    onClick: () -> Unit,
+) {
+    val theme = LocalTheme.current
+    NavigationDrawerItem(
+        label = { Text(subreddit.data.displayName) },
+        selected = false,
+        icon = {
+            SubredditIcon(
+                subreddit.data.displayName,
+                subreddit.data.icon,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+            )
+        },
+        badge = if (!subreddit.data.userHasFavorited) null else {
+            {
+                Icon(Icons.Filled.Star, tint = theme.saved, contentDescription = null)
+            }
+        },
+        onClick = onClick
+    )
 }
 
 @Composable

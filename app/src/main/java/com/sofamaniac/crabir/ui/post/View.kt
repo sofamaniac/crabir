@@ -8,7 +8,6 @@
 
 package com.sofamaniac.crabir.ui.post
 
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -43,13 +42,13 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-internal fun ColumnScope.PostBody(
+internal fun PostBody(
     post: PostData,
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = false,
     enableFullHeightImage: Boolean = true,
     enableTextPreview: Boolean = true,
-    maxLines: Int = 5,
+    maxLines: Int?,
     enableLinkFullSizePreview: Boolean = true,
     forceShowSelftext: Boolean = false,
 ) {

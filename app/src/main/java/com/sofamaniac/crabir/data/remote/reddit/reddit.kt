@@ -12,7 +12,6 @@ import com.sofamaniac.crabir.data.remote.dto.LinkFlairRichtext
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Post
-import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
 import com.sofamaniac.crabir.data.remote.reddit.auth.RedditAuthApi
 import com.sofamaniac.crabir.domain.model.Fullname
 import kotlinx.serialization.SerialName
@@ -35,48 +34,12 @@ internal const val API_LIMIT = 100
 interface RedditAPIService :
     VotableAPI,
     PostAPI,
+    SubredditAPI,
     RedditAuthApi,
     UserAPI, SearchAPI,
     ThreadAPI,
     InboxAPI {
 
-    @GET("{sort}.json")
-    suspend fun getHome(
-        @Path("sort") sort: PostSort,
-        @Query("t") timeframe: PostTimeframe? = null,
-        @Query("after") after: Fullname? = null,
-        @Query("count") count: Int = 0,
-        @Query("limit") limit: Int = API_LIMIT,
-        @Query("sr_detail") srDetail: Boolean = true,
-    ): Response<Listing<Post>>
-
-    @GET("/r/{subreddit}/about.json")
-    suspend fun getSubInfo(@Path("subreddit") subreddit: String): Response<Subreddit>
-
-    /** Get the list of subreddits the user is subscribed to. */
-    @GET("/subreddits/mine/subscriber")
-    suspend fun getSubreddits(
-        @Query("after") after: Fullname? = null,
-        @Query("before") before: String? = null,
-        @Query("count") count: Int = 0,
-        @Query("limit") limit: Int = API_LIMIT,
-    ): Response<Listing<Subreddit>>
-
-    /** Get the post of a given subreddit.
-     *
-     * @param subreddit The name of the subreddit without the `r/` prefix
-     * */
-    @GET("/r/{subreddit}/{sort}.json")
-    suspend fun getSubreddit(
-        @Path("subreddit") subreddit: String,
-        @Path("sort") sort: PostSort = PostSort.Best,
-        @Query("after") after: Fullname? = null,
-        @Query("before") before: String? = null,
-        @Query("count") count: Int = 0,
-        @Query("limit") limit: Int = API_LIMIT,
-        @Query("t") timeframe: PostTimeframe? = null,
-        @Query("sr_detail") srDetail: Boolean = true,
-    ): Response<Listing<Post>>
 
     /** Get the list of multis the user is subscribed to. */
     @GET("/api/multi/mine.json?raw_json=1")
@@ -106,8 +69,6 @@ interface RedditAPIService :
         @Body body: RequestBody
     ): Response<MoreResponseOuter>
 
-    @GET("r/{subreddit}/about/rules.json")
-    suspend fun getRules(@Path("subreddit") subreddit: String): Response<Rules>
 
     @GET("r/{subreddit}/api/link_flair_v2.json")
     suspend fun getPostFlair(@Path("subreddit") subreddit: String): Response<List<FlairInfo>>
@@ -118,20 +79,6 @@ interface RedditAPIService :
         @Field("thing_id") id: Fullname,
         @Field("reason") reason: String,
         @Field("api_type") apiType: String = "json"
-    ): Response<Unit>
-
-    @FormUrlEncoded
-    @POST("api/subscribe")
-    suspend fun subscribe(
-        @Field("action") action: SubscribeAction,
-        @Field("sr") subreddit: Fullname,
-    ): Response<Unit>
-
-    @FormUrlEncoded
-    @POST("api/subscribe")
-    suspend fun subscribe(
-        @Field("action") action: SubscribeAction,
-        @Field("sr_name") subreddit: String,
     ): Response<Unit>
 
 }

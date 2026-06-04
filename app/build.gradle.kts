@@ -128,6 +128,8 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidx.compose.adaptive.layout)
+    implementation(libs.androidx.compose.adaptive.navigation)
     ksp(libs.hilt.android.compiler)
     ksp(libs.kotlin.metadata.jvm)
 

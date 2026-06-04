@@ -13,11 +13,13 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
+import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
+import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository
@@ -67,8 +69,15 @@ fun HistoryViewer(
 class HistoryViewModel @Inject constructor(
     repository: HistoryRepository,
     visitedPostsDao: VisitedPostsDao,
-    visitedCommunityDao: VisitedCommunityDao,
-) : PostFeedViewModel(id = "_HISTORY", repository, visitedPostsDao, visitedCommunityDao)
+    communityDao: SubredditDao,
+    viewDao: CommunityViewDao,
+) : PostFeedViewModel<SubredditData>(
+    id = Fullname("_HISTORY"),
+    repository,
+    visitedPostsDao,
+    communityDao,
+    viewDao
+)
 
 @Singleton
 class HistoryRepository @Inject constructor(

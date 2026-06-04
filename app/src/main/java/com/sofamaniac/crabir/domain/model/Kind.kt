@@ -7,7 +7,10 @@ package com.sofamaniac.crabir.domain.model
 import androidx.annotation.Keep
 import com.sofamaniac.crabir.data.remote.dto.post.PostDTO
 
+import kotlinx.serialization.Serializable
+
 @Keep
+@Serializable
 enum class Kind {
     Self,
     Image,

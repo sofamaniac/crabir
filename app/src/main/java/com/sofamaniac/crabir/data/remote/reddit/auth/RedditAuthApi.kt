@@ -21,6 +21,10 @@ interface RedditAuthApi {
     ): Call<TokenResponse>
 
     @FormUrlEncoded
+    @POST("https://www.reddit.com/api/v1/access_token")
+    suspend fun getAccessToken(@Field("grant_type") grantType: String = "client_credentials")
+
+    @FormUrlEncoded
     @POST("https://www.reddit.com/api/v1/revoke_token")
     suspend fun logout(
         @Field("token") token: String,

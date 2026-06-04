@@ -16,15 +16,15 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
+import com.sofamaniac.crabir.data.local.dao.CommunityDao
+import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
+import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.domain.repository.feed.FeedSource
@@ -45,7 +45,7 @@ interface FeedViewModelInterface<T : VotableData> {
     val listState: LazyStaggeredGridState
     val data: Flow<PagingData<T>>
     var needScrollToTop: Boolean
-    val entity: Flow<VisitedCommunityEntity?>
+    val entity: Flow<CommunityViewEntity?>
 
     fun refresh()
     fun visitPost(post: PostData)
@@ -53,14 +53,15 @@ interface FeedViewModelInterface<T : VotableData> {
     fun isPostRead(post: PostData): Boolean
 }
 
-abstract class PostFeedViewModel(
-    private val id: String,
+abstract class PostFeedViewModel<T>(
+    private val id: Fullname,
     private val repository: PostFeedRepository<FeedParams>,
     private val visitedPostsDao: VisitedPostsDao,
-    private val visitedCommunityDao: VisitedCommunityDao,
+    private val communityDao: CommunityDao<T>,
+    private val viewDao: CommunityViewDao,
 ) : ViewModel(), FeedViewModelInterface<PostData> {
 
-    override val entity: Flow<VisitedCommunityEntity?> = visitedCommunityDao.getCommunityFlow(id)
+    override val entity: Flow<CommunityViewEntity?> = viewDao.getCommunityFlow(id)
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -104,23 +105,11 @@ abstract class PostFeedViewModel(
             viewModelScope
         )
 
-    fun updateData(data: SubredditData?) {
+    fun updateData(data: T?) {
         Log.d("PostFeedViewModel", "updateData: $data")
         if (data == null) return
         viewModelScope.launch(Dispatchers.IO) {
-            val e = entity.first()?.copy(data = data)
-            if (e != null) {
-                visitedCommunityDao.upsert(e)
-            } else {
-                visitedCommunityDao.insert(
-                    VisitedCommunityEntity(
-                        id = data.displayName,
-                        data = null
-                    ).copy(
-                        data = data,
-                    )
-                )
-            }
+            communityDao.upsert(data)
         }
     }
 
@@ -136,21 +125,9 @@ abstract class PostFeedViewModel(
         if (needRefresh) {
             Log.d("PostFeedViewModel", "updateSort: Updating sort to $sort")
             viewModelScope.launch(Dispatchers.IO) {
-                val e = entity.first()
-                    ?.let { it.copy(sort = sort, timeframe = timeframe, data = it.data) }
-                if (e != null) {
-                    visitedCommunityDao.upsert(e)
-                } else {
-                    visitedCommunityDao.insert(
-                        VisitedCommunityEntity(
-                            id,
-                            sort,
-                            timeframe,
-                            null,
-                            null,
-                            null
-                        )
-                    )
+                val view = entity.first()?.copy(sort = sort, timeframe = timeframe)
+                if (view != null) {
+                    viewDao.update(view)
                 }
 
             }

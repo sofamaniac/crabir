@@ -52,8 +52,10 @@ fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: (Int) -> Uni
         Log.d("AccountSelector", "Result: $result")
         viewModel.handleAuthResult(result.data)
     }
+    val currentAccount by viewModel.activeAccount.collectAsState(initial = RedditAccount.anonymous())
     Column {
         for (account in accounts) {
+            if (account.id == currentAccount.id) continue
             AccountTile(
                 account,
                 onClick = {

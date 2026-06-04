@@ -49,7 +49,7 @@ import kotlinx.coroutines.flow.stateIn
 fun RedditMarkdown(
     markdown: String,
     modifier: Modifier = Modifier,
-    maxLines: Int = Int.MAX_VALUE,
+    maxLines: Int? = null,
     mediaMetadata: Map<String, MediaMetadata> = emptyMap(),
     enableImages: Boolean = true,
     key: String? = markdown,
@@ -58,15 +58,15 @@ fun RedditMarkdown(
     },
     onClick: (() -> Unit)? = null,
 ) {
-    if (maxLines == Int.MAX_VALUE) {
-        InnerRedditMarkdown(modifier, viewModel = viewModel)
+    if (maxLines == null) {
+        InnerRedditMarkdown(modifier = modifier, viewModel = viewModel)
     } else {
         HeightRestrictedWithGradient(
+            modifier = modifier,
             maxHeight = with(LocalDensity.current) { (MaterialTheme.typography.bodyMedium.lineHeight * maxLines).toDp() },
         ) {
             InnerRedditMarkdown(
-                modifier,
-                viewModel,
+                viewModel = viewModel,
                 linkInteractionListener = onClick?.let { { onClick() } }
             )
         }
@@ -75,8 +75,8 @@ fun RedditMarkdown(
 
 @Composable
 private fun InnerRedditMarkdown(
-    modifier: Modifier = Modifier,
     viewModel: MarkdownViewModel,
+    modifier: Modifier = Modifier,
     linkInteractionListener: LinkInteractionListener? = null,
 ) {
     val state by viewModel.markdownFlow.collectAsStateWithLifecycle()

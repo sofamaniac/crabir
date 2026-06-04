@@ -121,9 +121,10 @@ fun DownButton(likes: Boolean?, onClick: () -> Unit) {
 
 @Composable
 fun SavedButton(saved: Boolean, onClick: () -> Unit) {
+    val theme = LocalTheme.current
     val scale = remember { Animatable(1f) }
     val buttonColor = animateColorAsState(
-        targetValue = if (saved) Color.Yellow else Color.Gray,
+        targetValue = if (saved) theme.saved else Color.Gray,
         label = "button color"
     )
 

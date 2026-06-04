@@ -9,36 +9,41 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
+import androidx.lifecycle.viewModelScope
+import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
+import com.sofamaniac.crabir.data.local.dao.MultiDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
+import com.sofamaniac.crabir.data.remote.dto.MultiData
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.repository.feed.MultiPostsRepository
 import com.sofamaniac.crabir.ui.TabBar
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MultiView(
-    name: String,
-    permalink: String,
+    name: Fullname,
     modifier: Modifier = Modifier,
     viewModel: MultiViewModel = hiltViewModel<MultiViewModel, MultiViewModel.Factory> { factory ->
-        factory.create(permalink)
+        factory.create(name.name)
     },
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
-    val title = stringResource(R.string.Home)
     val params by viewModel.params.collectAsState()
+    val info by viewModel.info.collectAsState()
+    if (info == null) return
     val topBar = @Composable {
         TopBar(
-            name,
+            info!!.displayName,
             params,
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
@@ -65,17 +70,32 @@ fun MultiView(
 class MultiViewModel @AssistedInject constructor(
     repository: MultiPostsRepository,
     visitedPostsDao: VisitedPostsDao,
-    visitedCommunityDao: VisitedCommunityDao,
-    @Assisted private val multiPath: String
-) : PostFeedViewModel(id = multiPath, repository, visitedPostsDao, visitedCommunityDao) {
+    communityDao: MultiDao,
+    viewDao: CommunityViewDao,
+    @Assisted("name") name: String,
+) : PostFeedViewModel<MultiData>(
+    id = Fullname(name),
+    repository,
+    visitedPostsDao,
+    communityDao,
+    viewDao
+) {
 
+
+    private val _info = MutableStateFlow<MultiData?>(null)
+    val info = _info.asStateFlow()
     init {
-        repository.updateMulti(multiPath)
+        viewModelScope.launch(Dispatchers.IO) {
+            _info.value = communityDao.getByName(Fullname(name)) ?: return@launch
+            repository.updateMulti(_info.value!!.permalink)
+        }
     }
 
     @AssistedFactory
     interface Factory {
-        fun create(subreddit: String): MultiViewModel
+        fun create(
+            @Assisted("name") name: String
+        ): MultiViewModel
     }
 
 }

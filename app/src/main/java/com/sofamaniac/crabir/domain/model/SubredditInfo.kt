@@ -4,6 +4,9 @@
 
 package com.sofamaniac.crabir.domain.model
 
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditIcon
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditId
 import com.sofamaniac.crabir.domain.repository.DataInterface
@@ -19,7 +22,11 @@ data class SubredditInfo(
 )
 
 @Serializable
+@Entity(tableName = "subreddits")
 data class SubredditData(
+    @PrimaryKey
+    override val id: String,
+    override val name: Fullname,
     val defaultSet: Boolean,
     val bannerImg: String,
     val allowedMediaInComments: List<String>,
@@ -48,8 +55,6 @@ data class SubredditData(
     val linkFlairPosition: String,
     val displayNamePrefixed: String,
     val keyColor: String?,
-    override val name: Fullname,
-    override val id: String,
     val url: String,
     val quarantine: Boolean,
     val createdUtc: Double = 0.0,
@@ -61,8 +66,10 @@ data class SubredditData(
     val linkFlairEnabled: Boolean,
     val disableContributorRequests: Boolean,
     val subredditType: String,
-    val userIsSubscriber: Boolean = false
+    val userIsSubscriber: Boolean = false,
+    val userHasFavorited: Boolean = false,
 ) : DataInterface {
+    @Ignore
     val icon: SubredditIcon =
         when {
             !communityIcon.isNullOrBlank() -> SubredditIcon.Icon(communityIcon)

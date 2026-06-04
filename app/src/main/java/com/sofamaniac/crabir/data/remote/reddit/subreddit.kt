@@ -1,0 +1,78 @@
+package com.sofamaniac.crabir.data.remote.reddit
+
+import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
+import com.sofamaniac.crabir.data.remote.dto.Thing.Post
+import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
+import com.sofamaniac.crabir.data.remote.dto.Timeframe
+import com.sofamaniac.crabir.data.remote.dto.post.Sort
+import com.sofamaniac.crabir.domain.model.Fullname
+import retrofit2.Response
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
+import retrofit2.http.Query
+
+interface SubredditAPI {
+    @GET("{sort}.json")
+    suspend fun getHome(
+        @Path("sort") sort: Sort,
+        @Query("t") timeframe: Timeframe? = null,
+        @Query("after") after: Fullname? = null,
+        @Query("count") count: Int = 0,
+        @Query("limit") limit: Int = API_LIMIT,
+        @Query("sr_detail") srDetail: Boolean = true,
+    ): Response<Listing<Post>>
+
+    @GET("/r/{subreddit}/about.json")
+    suspend fun getSubInfo(@Path("subreddit") subreddit: String): Response<Subreddit>
+
+    /** Get the list of subreddits the user is subscribed to. */
+    @GET("/subreddits/mine/subscriber")
+    suspend fun getSubreddits(
+        @Query("after") after: Fullname? = null,
+        @Query("before") before: String? = null,
+        @Query("count") count: Int = 0,
+        @Query("limit") limit: Int = API_LIMIT,
+    ): Response<Listing<Subreddit>>
+
+    /** Get the post of a given subreddit.
+     *
+     * @param subreddit The name of the subreddit without the `r/` prefix
+     * */
+    @GET("/r/{subreddit}/{sort}.json")
+    suspend fun getSubreddit(
+        @Path("subreddit") subreddit: String,
+        @Path("sort") sort: Sort = Sort.Best,
+        @Query("after") after: Fullname? = null,
+        @Query("before") before: String? = null,
+        @Query("count") count: Int = 0,
+        @Query("limit") limit: Int = API_LIMIT,
+        @Query("t") timeframe: Timeframe? = null,
+        @Query("sr_detail") srDetail: Boolean = true,
+    ): Response<Listing<Post>>
+
+    @FormUrlEncoded
+    @POST("api/subscribe")
+    suspend fun subscribe(
+        @Field("action") action: SubscribeAction,
+        @Field("sr") subreddit: Fullname,
+    ): Response<Unit>
+
+    @FormUrlEncoded
+    @POST("api/subscribe")
+    suspend fun subscribe(
+        @Field("action") action: SubscribeAction,
+        @Field("sr_name") subreddit: String,
+    ): Response<Unit>
+
+    @GET("r/{subreddit}/about/rules.json")
+    suspend fun getRules(@Path("subreddit") subreddit: String): Response<Rules>
+
+    @POST("api/favorite")
+    suspend fun favorite(
+        @Query("sr_name") name: String,
+        @Query("make_favorite") favorite: Boolean
+    ): Response<Unit>
+}

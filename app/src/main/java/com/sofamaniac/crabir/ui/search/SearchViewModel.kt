@@ -10,7 +10,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
+import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
@@ -122,7 +122,7 @@ class PostSearchViewModel @AssistedInject constructor(
     @Assisted initialParams: PostSearchParams,
 ) : SearchViewModel<PostSearchParams, PostData>(repository, initialParams),
     FeedViewModelInterface<PostData> {
-    override val entity: Flow<VisitedCommunityEntity?> = flowOf(null)
+    override val entity: Flow<CommunityViewEntity?> = flowOf(null)
     override val data: StateFlow<PagingData<PostData>> = items.stateIn(
         scope = viewModelScope,
         started = kotlinx.coroutines.flow.SharingStarted.Lazily,
