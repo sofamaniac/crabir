@@ -127,7 +127,9 @@ class DrawerViewModel @Inject constructor(
 
     fun createAuthIntent(): Intent {
         val authRequest = serviceConfig.createAuthorizationRequest()
-        return authService.getAuthorizationRequestIntent(authRequest)
+        val intent = authService.getAuthorizationRequestIntent(authRequest)
+        Log.d("LoginViewModel", "Creating auth intent: $intent")
+        return intent
     }
 
     fun createAuthUrl(): String {

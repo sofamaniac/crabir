@@ -14,7 +14,7 @@ import net.openid.appauth.ResponseTypeValues
 
 class AuthConfig(
 ) {
-    val authorizationEndpoint = "https://old.reddit.com/api/v1/authorize"
+    val authorizationEndpoint = "https://sh.reddit.com/api/v1/authorize.compact"
     private val tokenEndpoint = "https://www.reddit.com/api/v1/access_token"
     private val redirectUri = "com.sofamaniac.crabir://callback"
     private val clientId = BuildConfig.REDDIT_CLIENT_ID

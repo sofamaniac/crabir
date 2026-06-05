@@ -16,20 +16,24 @@ import com.sofamaniac.crabir.data.local.entities.VotableEntity
 import com.sofamaniac.crabir.data.remote.dto.MultiData
 import com.sofamaniac.crabir.domain.model.SubredditData
 
+
+@Database(entities = [RedditAccountEntity::class], version = 1)
+abstract class AccountDatabase : RoomDatabase() {
+    abstract fun accountsDao(): AccountsDao
+}
+
 @Database(
     entities = [
-        RedditAccountEntity::class,
         VisitedPostEntity::class,
         CommunityViewEntity::class,
         VotableEntity::class,
         SubredditData::class,
         MultiData::class
     ],
-    version = 11
+    version = 12
 )
 @TypeConverters(RoomConverters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun accountsDao(): AccountsDao
     abstract fun visitedPostsDao(): VisitedPostsDao
     abstract fun visitedCommunityDao(): CommunityViewDao
     abstract fun votableDao(): VotableDao

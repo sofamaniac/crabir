@@ -125,11 +125,11 @@ abstract class PostFeedViewModel<T>(
         if (needRefresh) {
             Log.d("PostFeedViewModel", "updateSort: Updating sort to $sort")
             viewModelScope.launch(Dispatchers.IO) {
-                val view = entity.first()?.copy(sort = sort, timeframe = timeframe)
-                if (view != null) {
-                    viewDao.update(view)
-                }
-
+                val view = (entity.first() ?: CommunityViewEntity(id, displayName = "")).copy(
+                    sort = sort,
+                    timeframe = timeframe
+                )
+                viewDao.upsert(view)
             }
             refresh()
         }

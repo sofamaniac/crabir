@@ -122,6 +122,7 @@ fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: (Int) -> Uni
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         TextButton(onClick = {
+                            Log.d("AccountSelector", "Starting Intent")
                             showWarningDialog = false
                             val authIntent = viewModel.createAuthIntent()
                             authLauncher.launch(authIntent)

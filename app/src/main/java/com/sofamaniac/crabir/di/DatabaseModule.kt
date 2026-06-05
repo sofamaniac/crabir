@@ -8,6 +8,7 @@ import com.sofamaniac.crabir.data.local.dao.MultiDao
 import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.dao.VotableDao
+import com.sofamaniac.crabir.data.local.database.AccountDatabase
 import com.sofamaniac.crabir.data.local.database.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -34,7 +35,18 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideAccountsDao(database: AppDatabase): AccountsDao {
+    @Singleton
+    fun provideAccountDatabase(@ApplicationContext context: Context): AccountDatabase {
+        return Room.databaseBuilder(
+            context,
+            AccountDatabase::class.java,
+            "reddit_account_database"
+        ).fallbackToDestructiveMigration(false)
+            .build()
+    }
+
+    @Provides
+    fun provideAccountsDao(database: AccountDatabase): AccountsDao {
         return database.accountsDao()
     }
 
