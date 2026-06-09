@@ -106,7 +106,6 @@ interface PostAPI {
     ): Response<List<FlairInfo>>
 
 
-
 }
 
 @Serializable
@@ -222,20 +221,15 @@ data class PostSubmissionBuilder(
 
 
     fun build(): Result<Map<String, String>> {
-        if (title.isBlank()) return Result.failure(MissingTitle())
-        else if (subreddit.isBlank()) return Result.failure(MissingCommunity())
-        else if (kind == Kind.Link && url.isNullOrBlank()) return Result.failure(MissingUrl())
-        else if (text.isNullOrBlank() && url.isNullOrBlank() && kind != Kind.Gallery) return Result.failure(
-            MissingText()
-        )
-        else if (kind == Kind.Link) {
-            try {
-                url!!.toHttpUrl()
-            } catch (e: Exception) {
-                return Result.failure(InvalidUrl())
-            }
+        when {
+            title.isBlank() -> return Result.failure(MissingTitle())
+            subreddit.isBlank() -> return Result.failure(MissingCommunity())
+            kind == Kind.Link && url.isNullOrBlank() -> return Result.failure(MissingUrl())
+            kind == Kind.Self && text.isNullOrBlank() -> return Result.failure(MissingText())
+            kind == Kind.Link && url?.runCatching { toHttpUrl() }?.isSuccess != true -> return Result.failure(
+                InvalidUrl()
+            )
         }
-
         return Result.success(
             buildMap {
                 put("api_type", "json")
