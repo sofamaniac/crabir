@@ -92,10 +92,10 @@ class FullscreenVideoRoute(val post: Fullname) : Route
 @Serializable
 class FullscreenGalleryRoute(val post: Fullname) : Route
 
-private const val ROUTE = "r/{subreddit}/comments/{id}/{title}"
-private const val SHORT_ROUTE = "r/{subreddit}/s/{id}"
-private const val LONG_ROUTE = "r/{subreddit}/comments/{id}/{title}/{commentId}"
-private const val LONGER_ROUTE = "r/{subreddit}/comments/{id}/{title}/comment/{commentId}"
+private const val ROUTE = "/r/{subreddit}/comments/{id}/{title}"
+private const val SHORT_ROUTE = "/r/{subreddit}/s/{id}"
+private const val LONG_ROUTE = "/r/{subreddit}/comments/{id}/{title}/{commentId}"
+private const val LONGER_ROUTE = "/r/{subreddit}/comments/{id}/{title}/comment/{commentId}"
 
 fun NavGraphBuilder.postGraph(navController: NavController) {
     composable(

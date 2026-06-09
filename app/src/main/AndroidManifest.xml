@@ -45,6 +45,7 @@
                 <data android:host="reddit.app.link" />
                 <data android:host="redd.it" />
                 <data android:host="s.reddit.com" />
+                <data android:host="preview.reddit.com" />
             </intent-filter>
         </activity>
 

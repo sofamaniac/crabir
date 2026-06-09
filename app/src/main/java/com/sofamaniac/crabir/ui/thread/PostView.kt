@@ -126,7 +126,8 @@ fun PostCard(
                     RedditMarkdown(
                         post.selftext.markdown,
                         maxLines = 5,
-                        modifier = modifier
+                        modifier = modifier,
+                        onClick = {}
                     )
                 }
             }

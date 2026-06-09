@@ -4,6 +4,7 @@
 
 package com.sofamaniac.crabir.ui.markdown
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -13,6 +14,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -37,6 +40,8 @@ import com.mikepenz.markdown.model.markdownAnnotator
 import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.toLocalUrl
 import com.sofamaniac.crabir.ui.markdown.redditFlavour.RedditFlavourDescriptor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -56,10 +61,16 @@ fun RedditMarkdown(
     viewModel: MarkdownViewModel = hiltViewModel<MarkdownViewModel, MarkdownViewModel.Factory>(key = key) { factory ->
         factory.create(markdown, mediaMetadata, enableImages)
     },
-    onClick: (() -> Unit)? = null,
+    onClick: LinkInteractionListener? = null,
+    enableLinkInteraction: Boolean = true,
 ) {
+    val onClick = if (enableLinkInteraction) (onClick ?: redditLinkHandler()) else null
     if (maxLines == null) {
-        InnerRedditMarkdown(modifier = modifier, viewModel = viewModel)
+        InnerRedditMarkdown(
+            modifier = modifier,
+            viewModel = viewModel,
+            linkInteractionListener = onClick
+        )
     } else {
         HeightRestrictedWithGradient(
             modifier = modifier,
@@ -67,7 +78,7 @@ fun RedditMarkdown(
         ) {
             InnerRedditMarkdown(
                 viewModel = viewModel,
-                linkInteractionListener = onClick?.let { { onClick() } }
+                linkInteractionListener = onClick
             )
         }
     }
@@ -105,6 +116,25 @@ private fun InnerRedditMarkdown(
             defaultAnnotator = markdownAnnotator()
         ),
     )
+}
+
+
+@Composable
+fun redditLinkHandler(): LinkInteractionListener {
+    val navController = LocalNavController.current!!
+    val uriHandler = LocalUriHandler.current
+    return LinkInteractionListener { link ->
+        Log.d("redditLinkHandler", "redditLinkHandler: $link")
+        if (link is LinkAnnotation.Url) {
+            try {
+                Log.d("redditLinkHandler", "navigating to : ${link.url.toLocalUrl()}")
+                navController.navigate(link.url.toLocalUrl())
+            } catch (e: IllegalArgumentException) {
+                Log.i("redditLinkHandler", "failed to open link in app: $e")
+                uriHandler.openUri(link.url)
+            }
+        }
+    }
 }
 
 

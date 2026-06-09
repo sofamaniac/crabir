@@ -19,7 +19,7 @@ object SavedRoute : Route
 
 fun NavGraphBuilder.profileGraph(navController: NavController) {
     composable(
-        route = "user/{author}",
+        route = "/user/{author}",
         deepLinks = makeDeepLinks<String>(url = "user/{author}") + makeDeepLinks<String>("u/{author}"),
         arguments = listOf(
             navArgument("author") { type = NavType.StringType }
@@ -31,7 +31,7 @@ fun NavGraphBuilder.profileGraph(navController: NavController) {
         )
     }
     composable(
-        route = "user/{author}/{tab}",
+        route = "/user/{author}/{tab}",
         deepLinks = stringLink(url = "user/{author}/{tab}")
                 + stringLink(url = "u/{author}/{tab}"),
         arguments = listOf(

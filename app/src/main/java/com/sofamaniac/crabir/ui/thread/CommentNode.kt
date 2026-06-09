@@ -160,7 +160,7 @@ fun ColumnScope.OpenedComment(
         comment.bodyMd,
         modifier = innerModifier,
         mediaMetadata = comment.mediaMetadata,
-        key = comment.id
+        key = comment.id,
     )
     Spacer(modifier = Modifier.height(8.dp))
     AnimatedVisibility(showBottomBar) {

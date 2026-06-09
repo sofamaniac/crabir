@@ -42,6 +42,7 @@ class RedditAnnotator(
         codeSpanStyle = typography.inlineCode.toSpanStyle(),
         annotator = defaultAnnotator,
         referenceLinkHandler = referenceLinkHandler,
+        linkInteractionListener = linkInteractionListener,
     )
     val makeSettings: (text: String) -> AnnotatorSettings = { text ->
         val style = typography.textLink.style!!.copy(color = Color.Transparent)
@@ -82,20 +83,29 @@ class RedditAnnotator(
             } else when (child.type) {
 
                 MarkdownTokenTypes.TEXT -> {
-                    val redditLinksPattern = Regex("(\\p{Punct}|\\s)?/?([ru]/\\w{2,24}/?)")
+                    val redditLinksPattern = Regex("/?([ru]/\\w{2,24}/?)")
                     val text = child.getUnescapedTextInNode(content)
                     val links = redditLinksPattern.findAll(text)
                     var lastEnd = 0
                     for (l in links) {
-                        append(text.substring(lastEnd, l.range.first))
-                        val dest = l.groupValues[2]
-                        val url = "https://www.reddit.com/$dest"
-                        withStyle(typography.textLink.style!!) {
-                            withLink(LinkAnnotation.Url(url)) {
-                                append(l.value)
+                        // Check if char before link is a whitesepace
+                        val char = text.getOrNull(l.range.first - 1)
+                        if (char == null || char.isWhitespace()) {
+                            append(text.substring(lastEnd, l.range.first))
+                            val dest = l.groupValues[1]
+                            val url = "https://www.reddit.com/$dest"
+                            withStyle(typography.textLink.style!!) {
+                                withLink(
+                                    LinkAnnotation.Url(
+                                        url,
+                                        linkInteractionListener = linkInteractionListener
+                                    )
+                                ) {
+                                    append(l.value)
+                                }
                             }
+                            lastEnd = l.range.last + 1
                         }
-                        lastEnd = l.range.last + 1
                     }
 
                     if (lastEnd < text.length) {

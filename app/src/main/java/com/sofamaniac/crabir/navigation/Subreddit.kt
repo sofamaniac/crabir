@@ -21,7 +21,7 @@ fun NavGraphBuilder.subredditGraph(navController: NavController) {
         )
     }
     composable(
-        route = "r/{subreddit}",
+        route = "/r/{subreddit}",
         deepLinks = stringLink("r/{subreddit}"),
         arguments = listOf(
             navArgument("subreddit") {
