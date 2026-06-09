@@ -93,8 +93,7 @@ inline fun <reified T : Any> makeDeepLinks(url: String): List<NavDeepLink> {
 }
 
 fun stringLink(url: String): List<NavDeepLink> {
-    require(!url.startsWith("/"))
-    require(!url.endsWith("/"))
+    val url = url.removePrefix("/").removeSuffix("/")
     val links = BASE_URLS.map {
         navDeepLink { uriPattern = "$it/$url" }
     }

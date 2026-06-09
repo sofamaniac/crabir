@@ -9,6 +9,7 @@
 package com.sofamaniac.crabir
 
 import android.app.Application
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -34,7 +35,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -88,6 +91,19 @@ val LocalDrawerState = compositionLocalOf<DrawerState> { error("No drawer state 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    lateinit var navController: NavHostController
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        Log.d("MainActivity", "onNewIntent: $intent")
+        intent.data?.let { uri ->
+            val request = NavDeepLinkRequest.Builder.fromUri(uri).build()
+            navController.navigate(
+                request = request,
+                navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
+            )
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,7 +111,7 @@ class MainActivity : ComponentActivity() {
         //window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         setContent {
 
-            val navController = rememberNavController()
+            navController = rememberNavController()
             // Setup nav controller
             CompositionLocalProvider(LocalNavController provides navController) {
                 val drawerState = rememberDrawerState(DrawerValue.Closed)
