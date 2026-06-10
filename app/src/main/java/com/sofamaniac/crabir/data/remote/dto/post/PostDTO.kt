@@ -10,6 +10,7 @@ package com.sofamaniac.crabir.data.remote.dto.post
 
 import com.sofamaniac.crabir.data.remote.dto.LinkFlairRichtext
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetails
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditId
 import com.sofamaniac.crabir.data.remote.utils.FalseOrTimestampSerializer
 import com.sofamaniac.crabir.data.remote.utils.InstantAsFloatSerializer
@@ -315,6 +316,7 @@ object PostDataMapper : ObjectMappie<PostDTO, PostData>() {
 
         PostData::author fromValue from.toAuthorInfo()
         PostData::subreddit fromValue from.toSubredditInfo()
+        PostData::subredditDetails fromProperty from::subredditDetails via SubredditDetailsMapper
         PostData::thumbnail fromValue from.toThumbnail()
         PostData::score fromValue from.toScore()
         PostData::selftext fromValue from.toSelftext()

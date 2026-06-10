@@ -6,7 +6,7 @@ package com.sofamaniac.crabir.domain.repository.feed
 
 import android.util.Log
 import com.sofamaniac.crabir.data.local.dao.SubredditDao
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.SubscribeAction
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -45,7 +45,7 @@ class SubredditPostsRepository @Inject constructor(
             if (!res.isSuccessful) {
                 return null
             }
-            return res.body()?.data?.let { SubredditDetailsMapper.map(it) }
+            return res.body()?.data?.let { SubredditDTOMapper.map(it) }
         } catch (e: Exception) {
             Log.e("SubredditPostsRepository", "Failed to get subreddit info", e)
             return null

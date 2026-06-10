@@ -168,6 +168,11 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.zoomable)
+    implementation(libs.coil3.coil.gif)
+    // TODO: switch to landscapist once zoomable can transmit single tap event to its parent
+//    implementation(libs.landscapist.coil)
+//    implementation(libs.landscapist.zoomable)
+//    implementation(libs.landscapist.image.gallery)
 
     // Video player
     implementation(libs.androidx.media3.exoplayer)
@@ -186,14 +191,11 @@ dependencies {
     implementation(libs.multiplatform.markdown.renderer)
     implementation(libs.multiplatform.markdown.renderer.m3)
     implementation(libs.multiplatform.markdown.renderer.coil3)
-    implementation(libs.coil3.coil.gif)
-
-    implementation(libs.glide)
-    annotationProcessor(libs.glide)
 
     implementation(libs.aboutlibraries.core)
     implementation(libs.aboutlibraries.compose.core)
     implementation(libs.aboutlibraries.compose.m3)
 
-    implementation("io.github.pdvrieze.xmlutil:serialization:1.0.0-rc2")
+    // Support for XML serialization / deserialization
+    implementation(libs.serialization)
 }

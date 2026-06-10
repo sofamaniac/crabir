@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.toDomainModel
+import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
+import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
@@ -39,6 +41,8 @@ class ThreadViewModel @AssistedInject constructor(
 
     override val likes: Flow<Boolean?> = flowOf(null)
     override val saved: Flow<Boolean> = flowOf(false)
+    override val rules: StateFlow<Rules>
+        get() = TODO("Not yet implemented")
 
     private var _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
@@ -233,6 +237,18 @@ class ThreadViewModel @AssistedInject constructor(
             }
         }
 
+    }
+
+    fun visitPost(post: PostData) {
+        visitedPostsDao.insert(post.toEntity(timestamp = System.currentTimeMillis()))
+    }
+
+    override fun fetchRules() {
+        TODO("Not yet implemented")
+    }
+
+    override fun report(reason: String) {
+        TODO("Not yet implemented")
     }
 
     @AssistedFactory

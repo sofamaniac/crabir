@@ -12,8 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,7 +19,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -41,13 +38,11 @@ fun PostInfo(
     modifier: Modifier = Modifier,
     enableThumbnail: Boolean = true,
     read: Boolean = false,
-    viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(key = post.id) { factory ->
-        factory.create(post)
-    },
+    likes: Boolean?,
+    visitPost: (PostData) -> Unit = {},
 ) {
     val navController = LocalNavController.current!!
     val theme = LocalTheme.current
-    val likes by viewModel.likes.collectAsState(initial = post.relationship.liked)
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -124,7 +119,7 @@ fun PostInfo(
             }
         }
         if (enableThumbnail) {
-            Thumbnail(post)
+            Thumbnail(post, visitPost = visitPost)
         }
     }
 }

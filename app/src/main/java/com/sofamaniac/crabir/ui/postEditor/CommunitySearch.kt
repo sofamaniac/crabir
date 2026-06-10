@@ -26,7 +26,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.ui.search.CommunitySearchViewModel
 import com.sofamaniac.crabir.ui.subredditList.Tile
 
@@ -96,7 +96,7 @@ internal fun CommunitySearch(
                     items(
                         count = subs.size,
                         key = { subs[it].id }) { index ->
-                        val subreddit = SubredditDetailsMapper.map(subs[index].data)
+                        val subreddit = SubredditDTOMapper.map(subs[index].data)
                         Tile(subreddit, modifier = Modifier.clickable {
                             viewModel.setSubreddit(subreddit)
                             onDismiss()

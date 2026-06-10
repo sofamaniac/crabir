@@ -11,3 +11,11 @@ data class Flair(
     val type: String,
     val richText: List<LinkFlairRichtext>,
 )
+
+val EMPTY_FLAIR = Flair(
+    text = "",
+    backgroundColor = "transparent",
+    textColor = "black",
+    type = "text",
+    richText = emptyList(),
+)

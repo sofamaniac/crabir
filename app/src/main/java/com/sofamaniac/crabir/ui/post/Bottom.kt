@@ -68,12 +68,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.BuildConfig
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.domain.model.VotableData
-import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
 import com.sofamaniac.crabir.navigation.CrosspostCreatorRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
@@ -94,19 +93,19 @@ import kotlinx.serialization.json.Json
 fun BottomRow(
     post: PostData,
     modifier: Modifier = Modifier,
-    viewModel: LinkViewModel,
+    interactions: LinkInteraction,
     action: @Composable () -> Unit = {},
 ) {
     LocalNavController.current!!
-    val likes by viewModel.likes.collectAsState(post.relationship.liked)
-    val saved by viewModel.saved.collectAsState(post.relationship.saved)
+    val likes by interactions.likes.collectAsState(post.relationship.liked)
+    val saved by interactions.saved.collectAsState(post.relationship.saved)
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-        UpButton(likes, onClick = { viewModel.upvote(post.name) })
-        DownButton(likes, onClick = { viewModel.downvote(post.name) })
-        SavedButton(saved, onClick = { viewModel.save(post.name, !saved) })
+        UpButton(likes, onClick = { interactions.upvote(post.name) })
+        DownButton(likes, onClick = { interactions.downvote(post.name) })
+        SavedButton(saved, onClick = { interactions.save(post.name, !saved) })
         action()
         OpenInAppButton(post)
-        PostOptions(post, viewModel)
+        PostOptions(post, interactions)
     }
 }
 
@@ -153,7 +152,7 @@ fun OpenThreadButton(post: PostData, onClick: (PostData) -> Unit) {
 @Composable
 private fun PostOptions(
     post: PostData,
-    viewModel: LinkViewModel,
+    interaction: LinkInteraction,
     modifier: Modifier = Modifier
 ) {
     val prettyJson = Json {
@@ -164,7 +163,7 @@ private fun PostOptions(
     val navController = LocalNavController.current!!
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
-    val currentAccount = rememberCurrentAccount()
+    val currentAccount = LocalRedditAccount.current
     var showShareDialog by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
@@ -231,13 +230,13 @@ private fun PostOptions(
                     headlineContent = { Text("Hide / Unhide post") },
                     modifier = Modifier.clickable {
                         if (post.relationship.hidden) {
-                            viewModel.unhide()
+                            interaction.unhide()
                         } else {
-                            viewModel.hide()
+                            interaction.hide()
                         }
                     })
                 ListItem(headlineContent = { Text("Report") }, modifier = Modifier.clickable {
-                    viewModel.getRules()
+                    interaction.fetchRules()
                     showReportDialog = true
                 })
                 ListItem(headlineContent = { Text("Mute") }, modifier = Modifier.clickable {})
@@ -268,13 +267,13 @@ private fun PostOptions(
         }
     }
     if (showReportDialog) {
-        ReportMenu(viewModel) {
+        ReportMenu(interaction) {
             showReportDialog = false
             showOptions = false
         }
     }
     if (showEditDialog) {
-        EditDialogue(viewModel) {
+        EditDialogue(interaction) {
             showEditDialog = false
             showOptions = false
         }
@@ -403,8 +402,8 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T : VotableData> ReportMenu(viewModel: VotableViewModel<T>, onDismissRequest: () -> Unit) {
-    val rules = viewModel.rules
+fun ReportMenu(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
+    val rules by viewModel.rules.collectAsState()
     val (selectedOption, setSelectedOption) = remember { mutableStateOf(rules.siteRules.firstOrNull()) }
     BasicAlertDialog(onDismissRequest) {
         Card(modifier = Modifier.padding(16.dp)) {
@@ -466,8 +465,8 @@ fun <T : VotableData> ReportMenu(viewModel: VotableViewModel<T>, onDismissReques
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditDialogue(viewModel: LinkViewModel, onDismissRequest: () -> Unit) {
-    val postOpt by viewModel.post.collectAsState()
+fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
+    val postOpt by viewModel.post.collectAsState(null)
 
     if (postOpt == null) return
 
@@ -539,7 +538,7 @@ fun EditDialogue(viewModel: LinkViewModel, onDismissRequest: () -> Unit) {
         LaunchedEffect(Unit) {
             viewModel.getFlairs()
         }
-        val flairs by viewModel.flairs
+        val flairs by viewModel.flairs.collectAsState()
         FlairDialog(
             flairs = flairs,
             flairId = flair?.id,

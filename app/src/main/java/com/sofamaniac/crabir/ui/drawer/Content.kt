@@ -48,7 +48,7 @@ import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.Thing
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.navigation.HomeRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -173,7 +173,7 @@ fun DrawerContent(
                     coroutineScope.launch {
                         drawerState.close()
                         viewModel.visitCommunity(
-                            SubredditDetailsMapper.map(
+                            SubredditDTOMapper.map(
                                 subreddit.data
                             )
                         )

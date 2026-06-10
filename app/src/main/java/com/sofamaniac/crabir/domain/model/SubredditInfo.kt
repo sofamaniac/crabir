@@ -19,7 +19,18 @@ data class SubredditInfo(
     val subredditPrefixed: String,
     val subredditSubscribers: Int,
     val subredditType: String
-)
+) {
+    companion object {
+        val DUMMY = SubredditInfo(
+            name = "DUMMY",
+            subredditId = SubredditId("t3_dummy"),
+            subredditPrefixed = "r/DUMMY",
+            subredditSubscribers = 1_000_000,
+            subredditType = "type"
+        )
+    }
+}
+
 
 @Serializable
 @Entity(tableName = "subreddits")

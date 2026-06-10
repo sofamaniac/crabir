@@ -3,7 +3,6 @@ package com.sofamaniac.crabir.domain.model
 import com.sofamaniac.crabir.data.local.entities.VotableEntity
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.data.remote.dto.post.Preview
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetails
 import com.sofamaniac.crabir.reddit.Thumbnail
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -30,7 +29,7 @@ data class PostData(
     val sendReplies: Boolean,
     val preview: Preview?,
     val crosspostParentList: List<PostData>,
-    val subredditDetails: SubredditDetails?,
+    val subredditDetails: SubredditData?,
     val thumbnail: Thumbnail,
     val selftext: Selftext,
     val mediaMetadata: Map<String, MediaMetadata>,
@@ -60,3 +59,53 @@ data class PostData(
         )
     }
 }
+
+val DUMMY_POST = PostData(
+    id = "t3_abc123",
+    name = Fullname("t3_abc123"),
+    relationship = Relationship(
+        clicked = false,
+        visited = false,
+        liked = null,
+        saved = false,
+        hidden = false
+    ),
+    createdUtc = Instant.parse("2024-03-15T10:30:00Z"),
+    edited = null,
+    author = AuthorInfo.DUMMY,
+    subreddit = SubredditInfo.DUMMY,
+    score = Score(ups = 100, downs = 100, score = 0, upvoteRatio = 1.0, hideScore = false),
+    url = "https://google.com",
+    domain = "google.com",
+    permalink = "/r/DUMMY/comments/abc123/dummy_post_title/",
+    title = "Dummy Post Title",
+    suggestedSort = "top",
+    numComments = 42,
+    over18 = false,
+    spoiler = false,
+    sendReplies = true,
+    preview = null,
+    crosspostParentList = emptyList(),
+    subredditDetails = null,
+    thumbnail = Thumbnail(
+        uri = "https://b.thumbs.redditmedia.com/thumb123.jpg",
+        width = 140,
+        height = 140,
+    ),
+    selftext = Selftext.DUMMY,
+    mediaMetadata = emptyMap(),
+    kind = Kind.Link,
+    isDistinguished = false,
+    linkFlair = Flair(
+        text = "Discussion",
+        textColor = "Black",
+        backgroundColor = "#ff4500",
+        richText = emptyList(),
+        type = "text",
+    ),
+    media = MediaInfo(media = null),
+    gallery = null,
+    locked = false,
+    isCrosspostable = true,
+    canModPost = false,
+)

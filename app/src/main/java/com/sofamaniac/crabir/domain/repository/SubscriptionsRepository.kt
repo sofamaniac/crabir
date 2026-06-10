@@ -4,7 +4,7 @@ import android.util.Log
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
@@ -97,7 +97,7 @@ class SubscriptionsRepository @Inject constructor(
             "loadSubscriptions: ${subs.size} subreddits loaded"
         )
         for (sub in subs) {
-            val mapped = SubredditDetailsMapper.map(sub.data)
+            val mapped = SubredditDTOMapper.map(sub.data)
             subredditCache.save(mapped)
         }
         return subs

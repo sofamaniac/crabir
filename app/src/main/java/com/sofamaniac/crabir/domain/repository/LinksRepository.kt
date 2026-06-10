@@ -10,13 +10,26 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface LinksRepository : VotableRepository<PostData> {
+    suspend fun markNSFW(name: Fullname)
+    suspend fun unmarkNSFW(name: Fullname)
+    suspend fun markSpoiler(name: Fullname)
+    suspend fun unmarkSpoiler(name: Fullname)
+    suspend fun editFlair(name: Fullname, flairId: String, text: String?)
+    suspend fun getFlairs(name: Fullname): List<FlairInfo>
+    suspend fun setInboxReplies(name: Fullname, enabled: Boolean)
+    suspend fun hide(name: Fullname): Result<Unit>
+    suspend fun unhide(name: Fullname): Result<Unit>
+
+}
+
 @Singleton
-class LinksRepository @Inject constructor(
+class LinksRepositoryImpl @Inject constructor(
     override val api: RedditAPIService,
     override val votableDao: VotableDao
 ) :
-    VotableRepository<PostData> {
-    suspend fun markNSFW(name: Fullname) {
+    LinksRepository {
+    override suspend fun markNSFW(name: Fullname) {
         val post = get(name).first()
         if (post == null) return
         val res = api.markNSFW(name)
@@ -25,7 +38,7 @@ class LinksRepository @Inject constructor(
         }
     }
 
-    suspend fun unmarkNSFW(name: Fullname) {
+    override suspend fun unmarkNSFW(name: Fullname) {
         val post = get(name).first()
         if (post == null) return
         val res = api.unmarkNSFW(name)
@@ -34,7 +47,7 @@ class LinksRepository @Inject constructor(
         }
     }
 
-    suspend fun unmarkSpoiler(name: Fullname) {
+    override suspend fun unmarkSpoiler(name: Fullname) {
         val post = get(name).first()
         if (post == null) return
         val res = api.unspoiler(name)
@@ -43,7 +56,7 @@ class LinksRepository @Inject constructor(
         }
     }
 
-    suspend fun markSpoiler(name: Fullname) {
+    override suspend fun markSpoiler(name: Fullname) {
         val post = get(name).first()
         if (post == null) return
         val res = api.spoiler(name)
@@ -52,7 +65,7 @@ class LinksRepository @Inject constructor(
         }
     }
 
-    suspend fun editFlair(name: Fullname, flairId: String, text: String?) {
+    override suspend fun editFlair(name: Fullname, flairId: String, text: String?) {
         val post = get(name).first()
         if (post == null) return
         val subreddit = post.subreddit.name
@@ -63,7 +76,7 @@ class LinksRepository @Inject constructor(
         }
     }
 
-    suspend fun getFlairs(name: Fullname): List<FlairInfo> {
+    override suspend fun getFlairs(name: Fullname): List<FlairInfo> {
         val post = get(name).first()
         if (post == null) return emptyList()
         val subreddit = post.subreddit.name
@@ -71,7 +84,7 @@ class LinksRepository @Inject constructor(
         return res.body() ?: emptyList()
     }
 
-    suspend fun setInboxReplies(name: Fullname, enabled: Boolean) {
+    override suspend fun setInboxReplies(name: Fullname, enabled: Boolean) {
         val post = get(name).first()
         if (post == null) return
         val res = api.setSendReplies(name, enabled)
@@ -80,27 +93,71 @@ class LinksRepository @Inject constructor(
         }
     }
 
-    suspend fun hide(fullname: Fullname): Result<Unit> {
-        val res = api.hide(fullname)
+    override suspend fun hide(name: Fullname): Result<Unit> {
+        val res = api.hide(name)
         if (!res.isSuccessful) {
             return Result.failure(Exception("Error hiding post"))
         }
-        val post: VotableData? = get(fullname).first()
+        val post: VotableData? = get(name).first()
         if (post == null) return Result.success(Unit)
         val relationship = post.relationship.copy(hidden = true)
-        votableDao.update(fullname, post.copy(relationship = relationship).toEntity().data)
+        votableDao.update(name, post.copy(relationship = relationship).toEntity().data)
         return Result.success(Unit)
     }
 
-    suspend fun unhide(fullname: Fullname): Result<Unit> {
-        val res = api.unhide(fullname)
+    override suspend fun unhide(name: Fullname): Result<Unit> {
+        val res = api.unhide(name)
         if (!res.isSuccessful) {
             return Result.failure(Exception("Error unhiding post"))
         }
-        val post: VotableData? = get(fullname).first()
+        val post: VotableData? = get(name).first()
         if (post == null) return Result.success(Unit)
         val relationship = post.relationship.copy(hidden = false)
-        votableDao.update(fullname, post.copy(relationship = relationship).toEntity().data)
+        votableDao.update(name, post.copy(relationship = relationship).toEntity().data)
         return Result.success(Unit)
     }
+}
+
+object DummyLinksRepository : LinksRepository {
+    override suspend fun markNSFW(name: Fullname) {
+    }
+
+    override suspend fun unmarkNSFW(name: Fullname) {
+    }
+
+    override suspend fun markSpoiler(name: Fullname) {
+    }
+
+    override suspend fun unmarkSpoiler(name: Fullname) {
+    }
+
+    override suspend fun editFlair(
+        name: Fullname,
+        flairId: String,
+        text: String?
+    ) {
+    }
+
+    override suspend fun getFlairs(name: Fullname): List<FlairInfo> {
+        return emptyList()
+    }
+
+    override suspend fun setInboxReplies(
+        name: Fullname,
+        enabled: Boolean
+    ) {
+    }
+
+    override suspend fun hide(name: Fullname): Result<Unit> {
+        return Result.success(Unit)
+    }
+
+    override suspend fun unhide(name: Fullname): Result<Unit> {
+        return Result.success(Unit)
+    }
+
+    override val api: RedditAPIService
+        get() = TODO("Not yet implemented")
+    override val votableDao: VotableDao
+        get() = TODO("Not yet implemented")
 }

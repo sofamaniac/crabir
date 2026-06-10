@@ -13,4 +13,8 @@ data class Selftext(
 ) {
     val markdown: String get() = selftext
     val html: String get() = selftextHtml
+
+    companion object {
+        val DUMMY = Selftext("selftext", "selftextHtml")
+    }
 }

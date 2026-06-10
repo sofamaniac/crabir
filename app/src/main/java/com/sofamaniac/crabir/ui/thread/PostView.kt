@@ -13,6 +13,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -44,6 +46,7 @@ internal fun PostView(
                 maxLines = null,
                 forceShowSelftext = true,
                 enableLinkFullSizePreview = false,
+                visitPost = threadViewModel::visitPost
             )
         } else {
             val parent = post.crosspostParentList.first()
@@ -81,6 +84,7 @@ internal fun CrossPostView(
             post,
             modifier = modifier,
             enableThumbnail = true,
+            likes = post.relationship.liked,
         )
     }
 }
@@ -99,6 +103,7 @@ fun PostCard(
     threadViewModel: ThreadViewModel,
     body: @Composable ColumnScope.() -> Unit,
 ) {
+    val likes by viewModel.likes.collectAsState(null)
     val modifier = modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
@@ -115,10 +120,10 @@ fun PostCard(
             post,
             modifier = modifier,
             enableThumbnail = enablePreview && !post.isCrosspost,
-            viewModel = viewModel,
+            likes = likes
         )
         body()
-        BottomRow(post, modifier, viewModel = viewModel) {
+        BottomRow(post, modifier, interactions = viewModel) {
             ReplyButton(parentId = post.name, submitComment = threadViewModel::submitComment) {
                 ThemedCard(modifier = Modifier.padding(all = 16.dp)) {
                     Text(post.author.username, modifier = modifier)

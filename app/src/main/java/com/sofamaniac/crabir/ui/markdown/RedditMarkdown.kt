@@ -8,7 +8,6 @@ import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -23,9 +22,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.net.toUri
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
 import com.mikepenz.markdown.compose.components.markdownComponents
@@ -58,17 +55,24 @@ fun RedditMarkdown(
     mediaMetadata: Map<String, MediaMetadata> = emptyMap(),
     enableImages: Boolean = true,
     key: String? = markdown,
-    viewModel: MarkdownViewModel = hiltViewModel<MarkdownViewModel, MarkdownViewModel.Factory>(key = key) { factory ->
-        factory.create(markdown, mediaMetadata, enableImages)
-    },
     onClick: LinkInteractionListener? = null,
     enableLinkInteraction: Boolean = true,
 ) {
+    val processedMarkdown = remember(key) {
+        markdown
+            //.extractRedditLinks()
+            .convertGiphy(toImage = enableImages).let {
+                if (enableImages)
+                    it.convertRedditPreviewLinks(mediaMetadata)
+                else
+                    it
+            }
+    }
     val onClick = if (enableLinkInteraction) (onClick ?: redditLinkHandler()) else null
     if (maxLines == null) {
         InnerRedditMarkdown(
             modifier = modifier,
-            viewModel = viewModel,
+            markdown = processedMarkdown,
             linkInteractionListener = onClick
         )
     } else {
@@ -77,7 +81,7 @@ fun RedditMarkdown(
             maxHeight = with(LocalDensity.current) { (MaterialTheme.typography.bodyMedium.lineHeight * maxLines).toDp() },
         ) {
             InnerRedditMarkdown(
-                viewModel = viewModel,
+                markdown = processedMarkdown,
                 linkInteractionListener = onClick
             )
         }
@@ -86,16 +90,15 @@ fun RedditMarkdown(
 
 @Composable
 private fun InnerRedditMarkdown(
-    viewModel: MarkdownViewModel,
+    markdown: String,
     modifier: Modifier = Modifier,
     linkInteractionListener: LinkInteractionListener? = null,
 ) {
-    val state by viewModel.markdownFlow.collectAsStateWithLifecycle()
     val typography = redditMarkdownTypography()
     val referenceLinkHandler = ReferenceLinkHandlerImpl()
     val spoilers = remember { mutableStateMapOf<String, Boolean>() }
     Markdown(
-        state,
+        content = markdown,
         modifier = modifier,
         typography = typography,
         imageTransformer = Coil3ImageTransformerImpl,

@@ -10,4 +10,15 @@ data class AuthorInfo(
     val isAuthorBlocked: Boolean = false,
     val hasPatreonFlair: Boolean = false,
     val isAuthorPremium: Boolean = false,
-)
+) {
+    companion object {
+        val DUMMY = AuthorInfo(
+            username = "user123",
+            flair = EMPTY_FLAIR,
+            authorFullname = "t2_dummy",
+            isAuthorBlocked = false,
+            hasPatreonFlair = false,
+            isAuthorPremium = false,
+        )
+    }
+}

@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
@@ -29,16 +28,14 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 @Composable
 fun Thumbnail(
     post: PostData,
-    viewModel: PostDataViewModel = hiltViewModel<PostDataViewModel, PostDataViewModel.Factory> { factory ->
-        factory.create(post.name.name)
-    }
+    visitPost: (PostData) -> Unit,
 ) {
     val thumbnailURL = post.getThumbnailUrl()
     val uriHandler = LocalUriHandler.current
     //val fullscreenManager = LocalFullscreenHandler.current!!
     val navController = LocalNavController.current!!
     val goFullscreen = {
-        viewModel.visitPost(post)
+        visitPost(post)
         when (post.kind) {
 //            Kind.Image -> fullscreenManager.push { FullscreenImageView(post) }
 //            Kind.Gallery -> fullscreenManager.push {

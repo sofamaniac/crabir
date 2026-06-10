@@ -40,7 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,7 +117,7 @@ fun SubredditListViewer(
                 state = listState
             ) {
                 items(count = sortedSubs.size) { index ->
-                    val subreddit = SubredditDetailsMapper.map(sortedSubs[index].data)
+                    val subreddit = SubredditDTOMapper.map(sortedSubs[index].data)
                     Tile(subreddit)
                 }
             }

@@ -248,7 +248,7 @@ data class SubredditDTO(
 }
 
 
-object SubredditDetailsMapper : ObjectMappie<SubredditDTO, SubredditData>() {
+object SubredditDTOMapper : ObjectMappie<SubredditDTO, SubredditData>() {
     override fun map(from: SubredditDTO): SubredditData = mapping {
         SubredditData::defaultSet fromValue false
         SubredditData::previousNames fromValue emptyList()
@@ -256,3 +256,13 @@ object SubredditDetailsMapper : ObjectMappie<SubredditDTO, SubredditData>() {
     }
 }
 
+object SubredditDetailsMapper : ObjectMappie<SubredditDetails, SubredditData>() {
+    override fun map(from: SubredditDetails): SubredditData = mapping {
+        SubredditData::id fromValue from.getId()
+        SubredditData::defaultSet fromValue false
+        SubredditData::previousNames fromValue emptyList()
+        //SubredditData::iconColor fromValue (from.keyColor ?: from.iconColor)
+    }
+}
+
+fun SubredditDetails.getId(): String = name.name.split("_").last()

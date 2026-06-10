@@ -11,9 +11,6 @@ package com.sofamaniac.crabir.ui.post
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -36,6 +33,8 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -51,6 +50,7 @@ internal fun PostBody(
     maxLines: Int?,
     enableLinkFullSizePreview: Boolean = true,
     forceShowSelftext: Boolean = false,
+    visitPost: (PostData) -> Unit = {},
 ) {
     val navController = LocalNavController.current!!
     fun goFullscreen(route: Route) {
@@ -69,7 +69,12 @@ internal fun PostBody(
     }
     when (post.kind) {
         Kind.Image -> {
-            PostImage(post, modifier.fillMaxWidth(), goFullscreen = { goFullscreen(it) })
+            PostImage(
+                post,
+                modifier.fillMaxWidth(),
+                goFullscreen = { goFullscreen(it) },
+                visitPost = visitPost
+            )
         }
 
         Kind.Video -> {
@@ -82,7 +87,8 @@ internal fun PostBody(
                     post,
                     modifier.fillMaxWidth(),
                     enabled = false,
-                    goFullscreen = { goFullscreen(it) }
+                    goFullscreen = { goFullscreen(it) },
+                    visitPost = visitPost
                 )
             }
         }
@@ -126,9 +132,36 @@ internal fun PostBody(
 interface VotableInteraction {
     val likes: Flow<Boolean?>
     val saved: Flow<Boolean>
+    val rules: StateFlow<Rules>
     fun upvote(name: Fullname)
     fun downvote(name: Fullname)
     fun save(name: Fullname, target: Boolean)
+    fun fetchRules()
+    fun report(reason: String)
+}
+
+interface LinkInteraction : VotableInteraction {
+    val post: Flow<PostData?>
+    val flairs: StateFlow<List<FlairInfo>>
+    fun hide()
+
+    fun unhide()
+
+    fun delete()
+
+    fun editFlair(flairId: String, text: String?)
+
+    fun getFlairs()
+
+    fun markNSFW()
+
+    fun unmarkNSFW()
+
+    fun markSpoiler()
+
+    fun unmarkSpoiler()
+
+    fun setInboxReplies(enabled: Boolean)
 }
 
 
@@ -148,16 +181,17 @@ open class VotableViewModel<T : VotableData>(
     override val likes = posts.get(fullname).map { it?.relationship?.liked }
     override val saved = posts.get(fullname).map { it?.relationship?.saved ?: false }
 
-    var rules by mutableStateOf(Rules())
+    var _rules = MutableStateFlow(Rules())
+    override val rules: StateFlow<Rules> = _rules
 
-    fun getRules() {
-        if (rules.rules.isNotEmpty()) return
+    override fun fetchRules() {
+        if (_rules.value.rules.isNotEmpty()) return
         viewModelScope.launch(Dispatchers.IO) {
-            rules = posts.getRules(subreddit)
+            _rules.value = posts.getRules(subreddit)
         }
     }
 
-    fun report(reason: String) {
+    override fun report(reason: String) {
         viewModelScope.launch(Dispatchers.IO) {
             posts.report(fullname, reason)
         }
@@ -184,90 +218,79 @@ open class VotableViewModel<T : VotableData>(
             }
         }
     }
-
-
-//    @AssistedFactory
-//    interface Factory {
-//        fun<T: VotableData> create(
-//            // Because fullname is a value class it cannot be used in a factory
-//            // https://github.com/google/dagger/issues/4613
-//            @Assisted("fullname") fullname: String,
-//            @Assisted("subreddit") subreddit: String
-//        ): VotableViewModel<T>
-//    }
-//
 }
 
 
 @HiltViewModel(assistedFactory = LinkViewModel.Factory::class)
-class LinkViewModel @AssistedInject constructor(
+open class LinkViewModel @AssistedInject constructor(
     @Assisted("post") post: PostData,
     private val posts: LinksRepository,
-) : VotableViewModel<PostData>(post.name.name, post.subreddit.name, posts), VotableInteraction {
+) : VotableViewModel<PostData>(post.name.name, post.subreddit.name, posts), LinkInteraction {
 
-    val post = posts.get(post.name).stateIn(
+    override val post = posts.get(post.name).stateIn(
         scope = viewModelScope,
         started = kotlinx.coroutines.flow.SharingStarted.Eagerly,
         initialValue = post
     )
 
-    val flairs = mutableStateOf(emptyList<FlairInfo>())
+    private var _flairs = MutableStateFlow(emptyList<FlairInfo>())
+    override val flairs: StateFlow<List<FlairInfo>> = _flairs
 
-    fun hide() {
+    override fun hide() {
         viewModelScope.launch(Dispatchers.IO) {
             posts.hide(fullname)
         }
     }
 
-    fun unhide() {
+    override fun unhide() {
         viewModelScope.launch(Dispatchers.IO) {
             posts.unhide(fullname)
         }
     }
 
-    fun delete() {
+    override fun delete() {
         viewModelScope.launch(Dispatchers.IO) {
             posts.delete(fullname)
         }
     }
 
-    fun editFlair(flairId: String, text: String?) {
+    override fun editFlair(flairId: String, text: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             posts.editFlair(fullname, flairId, text)
         }
     }
 
-    fun getFlairs() {
+    override fun getFlairs() {
         viewModelScope.launch(Dispatchers.IO) {
-            flairs.value = posts.getFlairs(fullname)
+            _flairs.value = posts.getFlairs(fullname)
         }
     }
 
-    fun markNSFW() {
+    override fun markNSFW() {
         viewModelScope.launch(Dispatchers.IO) {
             posts.markNSFW(fullname)
         }
     }
 
-    fun unmarkNSFW() {
+    override fun unmarkNSFW() {
         viewModelScope.launch(Dispatchers.IO) {
             posts.unmarkNSFW(fullname)
         }
     }
 
-    fun markSpoiler() {
+    override fun markSpoiler() {
         viewModelScope.launch(Dispatchers.IO) {
             posts.markSpoiler(fullname)
         }
     }
 
-    fun unmarkSpoiler() {
+    override fun unmarkSpoiler() {
         viewModelScope.launch(Dispatchers.IO) {
             posts.unmarkSpoiler(fullname)
         }
     }
 
-    fun setInboxReplies(enabled: Boolean) {
+    override fun setInboxReplies(enabled: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             posts.setInboxReplies(fullname, enabled)
         }

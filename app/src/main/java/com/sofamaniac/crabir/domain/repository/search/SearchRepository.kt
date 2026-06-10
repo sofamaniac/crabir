@@ -2,7 +2,7 @@ package com.sofamaniac.crabir.domain.repository.search
 
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -52,7 +52,7 @@ class CommunitySearchRepository @Inject constructor(private val api: RedditAPISe
     ListingRepository<CommunitySearchParams, SubredditData>() {
     override fun thingToData(thing: Thing): SubredditData? {
         if (thing !is Thing.Subreddit) return null
-        return SubredditDetailsMapper.map(thing.data)
+        return SubredditDTOMapper.map(thing.data)
     }
 
     override suspend fun getThings(

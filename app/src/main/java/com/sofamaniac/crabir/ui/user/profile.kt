@@ -44,6 +44,7 @@ import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
@@ -284,6 +285,8 @@ class CommentViewModel @AssistedInject constructor(
 
     override val likes: Flow<Boolean?> = flowOf(comment.relationship.liked)
     override val saved: Flow<Boolean> = flowOf(comment.relationship.saved)
+    override val rules: StateFlow<Rules>
+        get() = TODO("Not yet implemented")
 
     override fun upvote(name: Fullname) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -305,6 +308,14 @@ class CommentViewModel @AssistedInject constructor(
                 commentsRepository.save(name)
             }
         }
+    }
+
+    override fun fetchRules() {
+        TODO("Not yet implemented")
+    }
+
+    override fun report(reason: String) {
+        TODO("Not yet implemented")
     }
 
     @AssistedFactory

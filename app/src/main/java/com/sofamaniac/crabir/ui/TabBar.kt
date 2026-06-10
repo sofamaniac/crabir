@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
 import com.sofamaniac.crabir.navigation.HomeRoute
 import com.sofamaniac.crabir.navigation.InboxRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -35,7 +35,7 @@ fun TabBar(
     modifier: Modifier = Modifier,
     onTabReselect: (() -> Unit)? = null,
 ) {
-    val user = rememberCurrentAccount()
+    val user = LocalRedditAccount.current
     val tabs = listOf(
         TabRepresentation(Icons.Filled.Home, R.string.Home, HomeRoute),
         TabRepresentation(Icons.Default.Search, R.string.Search, SearchRoute()),

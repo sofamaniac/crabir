@@ -39,16 +39,14 @@ fun PostImage(
     post: PostData,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    viewModel: PostDataViewModel = hiltViewModel<PostDataViewModel, PostDataViewModel.Factory> { factory ->
-        factory.create(post.name.name)
-    },
+    visitPost: (PostData) -> Unit,
     goFullscreen: (Route) -> Unit
 ) {
     val goFullscreen = {
 //        fullscreenManager.push {
 //            FullscreenImageView(post)
 //        }
-        viewModel.visitPost(post)
+        visitPost(post)
         goFullscreen(FullscreenImageRoute(post.name))
     }
     val filters = rememberFiltersSettings()
