@@ -35,6 +35,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
@@ -47,6 +49,8 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
+import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
 import com.sofamaniac.crabir.navigation.HistoryRoute
 import com.sofamaniac.crabir.navigation.HomeRoute
 import com.sofamaniac.crabir.navigation.InboxRoute
@@ -58,6 +62,7 @@ import com.sofamaniac.crabir.navigation.SubscriptionsRoute
 import com.sofamaniac.crabir.navigation.ThemeEditorRoute
 import com.sofamaniac.crabir.navigation.ThemeRoute
 import com.sofamaniac.crabir.navigation.ViewsSettingRoute
+import com.sofamaniac.crabir.navigation.imagesGraph
 import com.sofamaniac.crabir.navigation.postGraph
 import com.sofamaniac.crabir.navigation.profileGraph
 import com.sofamaniac.crabir.navigation.subredditGraph
@@ -87,21 +92,27 @@ class CrabirApp : Application()
 
 val LocalTheme = compositionLocalOf<CrabirTheme> { DefaultDarkTheme }
 val LocalDrawerState = compositionLocalOf<DrawerState> { error("No drawer state provided") }
+val LocalRedditAccount = compositionLocalOf<RedditAccount> { RedditAccount.anonymous() }
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     lateinit var navController: NavHostController
+    lateinit var uriHandler: UriHandler
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         Log.d("MainActivity", "onNewIntent: $intent")
         intent.data?.let { uri ->
             val request = NavDeepLinkRequest.Builder.fromUri(uri).build()
-            navController.navigate(
-                request = request,
-                navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
-            )
+            try {
+                navController.navigate(
+                    request = request,
+                    navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
+                )
+            } catch (e: IllegalArgumentException) {
+                uriHandler.openUri(uri.toString())
+            }
         }
     }
 
@@ -112,6 +123,8 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             navController = rememberNavController()
+            uriHandler = LocalUriHandler.current
+
             // Setup nav controller
             CompositionLocalProvider(LocalNavController provides navController) {
                 val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -122,9 +135,12 @@ class MainActivity : ComponentActivity() {
                     }
                     CompositionLocalProvider(LocalTheme provides theme) {
                         CompositionLocalProvider(LocalDrawerState provides drawerState) {
-                            MainScreen(
-                                navController = navController,
-                            )
+                            val currentAccount = rememberCurrentAccount()
+                            CompositionLocalProvider(LocalRedditAccount provides currentAccount) {
+                                MainScreen(
+                                    navController = navController,
+                                )
+                            }
                         }
                     }
                 }
@@ -199,6 +215,7 @@ fun NavigationGraph(
             profileGraph(navController = navController)
             postGraph(navController = navController)
             subredditGraph(navController = navController)
+            imagesGraph(navController = navController)
 
             composable<SubscriptionsRoute> {
                 SubredditListViewer(navController = navController)
@@ -231,43 +248,6 @@ fun NavigationGraph(
                 HistoryViewer()
             }
 
-            composable(
-                route = "imagePreview?url={url}",
-                deepLinks = listOf(
-                    navDeepLink {
-                        uriPattern = "preview.redd.it/{url}"
-                    },
-                    navDeepLink {
-                        uriPattern = "i.redd.it/{url}"
-                    }
-                ),
-                arguments = listOf(
-                    navArgument("url") {
-                        type = NavType.StringType
-                    },
-                )
-            ) { navBackStackEntry ->
-                val url = navBackStackEntry.arguments?.getString("url")
-                if (url != null) {
-                    VerticalSwipeToDismiss(
-                        onDismiss = {
-                            // Why do we need to pop twice?
-                            navController.popBackStack()
-                            navController.popBackStack()
-                        },
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = Color.Black)
-                    ) {
-                        ZoomableAsyncImage(
-                            model = "https://i.redd.it/$url",
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                }
-            }
             composable(
                 route = "videoPreview?url={url}",
                 deepLinks = listOf(
@@ -305,3 +285,4 @@ fun NavigationGraph(
         }
     }
 }
+

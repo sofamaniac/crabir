@@ -6,7 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.toRoute
-import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.user.ProfileView
 import kotlinx.serialization.Serializable
@@ -48,7 +48,7 @@ fun NavGraphBuilder.profileGraph(navController: NavController) {
         )
     }
     composable<SavedRoute> {
-        val currentAccount = rememberCurrentAccount()
+        val currentAccount = LocalRedditAccount.current
         if (currentAccount.isAnonymous()) {
             // TODO: ask user to log in
             return@composable
