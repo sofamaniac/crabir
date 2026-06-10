@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.LinkAnnotation
@@ -232,7 +231,7 @@ class MarkdownViewModel @AssistedInject constructor(
 fun redditMarkdownTypography(): MarkdownTypography {
     val theme = LocalTheme.current
     val text = MaterialTheme.typography.bodyLarge
-    val linkStyle = MaterialTheme.typography.bodyMediumEmphasized.copy(
+    val linkStyle = SpanStyle(
         color = theme.linkColor,
         textDecoration = TextDecoration.Underline
     )
@@ -253,8 +252,7 @@ fun redditMarkdownTypography(): MarkdownTypography {
         bullet = text,
         list = text,
         textLink = TextLinkStyles(
-            style = linkStyle.toSpanStyle(),
-            pressedStyle = linkStyle.copy(color = Color(0xFF800080)).toSpanStyle()
+            style = linkStyle,
         ),
         table = text,
     )
