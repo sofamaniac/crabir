@@ -92,7 +92,7 @@ import kotlin.uuid.ExperimentalUuidApi
 fun SearchTab(
     searchQuery: SearchRoute,
     modifier: Modifier = Modifier,
-    initialTab: Int = 0,
+    initialTab: Int = if (searchQuery.flair.isNotBlank()) 0 else 1,
     commonViewModel: SearchCommonViewModel = hiltViewModel<SearchCommonViewModel, SearchCommonViewModel.Factory>() { factory ->
         val initialQuery =
             if (searchQuery.flair.isNotBlank()) "flair:\"${searchQuery.flair}\"" else ""
