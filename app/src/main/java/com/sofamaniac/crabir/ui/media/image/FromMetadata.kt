@@ -9,6 +9,7 @@ import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.data.remote.dto.post.Preview
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.Quality
 
 @Composable
 fun FromPreview(
@@ -17,10 +18,16 @@ fun FromPreview(
     modifier: Modifier = Modifier,
     allowTransformation: Boolean = true,
     contentScale: ContentScale = ContentScale.Fit,
+    quality: Quality,
     onClick: () -> Unit = {}
 ) {
-
-    val image = preview.images[0].source.toMediaResource()
+    val preview = preview.images[0]
+    val image = when (quality) {
+        Quality.Source -> preview.source
+        Quality.High -> preview.resolutions.last()
+        Quality.Medium -> preview.resolutions[preview.resolutions.size / 2]
+        Quality.Low -> preview.resolutions.first()
+    }.toMediaResource()
     TransformableImage(
         image,
         contentDescription = contentDescription,
@@ -54,6 +61,7 @@ fun ImageView(
     modifier: Modifier = Modifier,
     allowTransformation: Boolean = true,
     contentScale: ContentScale = ContentScale.Fit,
+    quality: Quality,
     onClick: () -> Unit = {},
 ) {
     if (post.preview != null) {
@@ -63,6 +71,7 @@ fun ImageView(
             modifier = modifier,
             allowTransformation = allowTransformation,
             contentScale = contentScale,
+            quality = quality,
             onClick = onClick
         )
     } else {

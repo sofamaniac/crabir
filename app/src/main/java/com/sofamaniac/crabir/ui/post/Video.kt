@@ -35,11 +35,13 @@ import androidx.media3.common.util.UnstableApi
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.media.image.DownloadButton
 import com.sofamaniac.crabir.ui.media.image.ImageView
 import com.sofamaniac.crabir.ui.media.videoPlayer.DecoratedVideoPlayer
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayer
@@ -58,6 +60,7 @@ fun PostVideo(
         @Composable {
             ImageView(
                 post,
+                quality = Quality.High,
                 allowTransformation = false,
                 modifier = placeholderModifier.fillMaxSize()
             )
@@ -141,6 +144,7 @@ fun YoutubeVideo(post: PostData, modifier: Modifier = Modifier) {
     ) {
         ImageView(
             post,
+            quality = Quality.High,
             contentScale = ContentScale.FillWidth,
             modifier = Modifier
                 .fillMaxSize(),
@@ -179,7 +183,7 @@ fun FullscreenVideo(
     val video = getVideoUrl(post)!!
     VerticalSwipeToDismiss(
         topBar = {
-            FullscreenTopBar(showDecorations, actions = {})
+            FullscreenTopBar(showDecorations, actions = { DownloadButton(video.url.toUri()) })
         },
         bottomBar = {
             FullscreenBottomBar(post, showDecorations) {

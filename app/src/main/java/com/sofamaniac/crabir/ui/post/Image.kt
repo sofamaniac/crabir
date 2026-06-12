@@ -7,6 +7,10 @@ package com.sofamaniac.crabir.ui.post
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Hd
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,14 +20,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.FullscreenImageRoute
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
+import com.sofamaniac.crabir.ui.media.image.DownloadButton
 import com.sofamaniac.crabir.ui.media.image.ImageView
 
 private fun PostData.getImage(): MediaResource {
@@ -42,6 +49,7 @@ fun PostImage(
     visitPost: (PostData) -> Unit,
     goFullscreen: (Route) -> Unit
 ) {
+    val quality = Quality.High
     val goFullscreen = {
 //        fullscreenManager.push {
 //            FullscreenImageView(post)
@@ -65,6 +73,7 @@ fun PostImage(
     }
     ImageView(
         post,
+        quality = quality,
         modifier = modifier.clickable(enabled = enabled) {
             goFullscreen()
         },
@@ -81,13 +90,19 @@ fun FullscreenImageView(
     },
     dismiss: () -> Unit
 ) {
+    var quality by remember { mutableStateOf(Quality.High) }
     var showDecorations by remember { mutableStateOf(true) }
     val postData by viewModel.post.collectAsState(initial = null)
     if (postData == null) return
     VerticalSwipeToDismiss(
         onDismiss = dismiss,
         topBar = {
-            FullscreenTopBar(showDecorations, actions = {})
+            FullscreenTopBar(showDecorations, actions = {
+                if (quality != Quality.Source) DownloadButton(postData!!.getSourceUrl().toUri())
+                IconButton(onClick = { quality = Quality.Source }) {
+                    Icon(Icons.Default.Hd, contentDescription = null)
+                }
+            })
         },
         bottomBar = { FullscreenBottomBar(postData!!, showDecorations) },
         modifier = Modifier
@@ -96,8 +111,15 @@ fun FullscreenImageView(
                 showDecorations = !showDecorations
             },
     ) {
-        ImageView(postData!!, modifier = Modifier.fillMaxSize(), onClick = {
-            showDecorations = !showDecorations
-        })
+        ImageView(
+            postData!!,
+            modifier = Modifier.fillMaxSize(),
+            quality = quality,
+            onClick = {
+                showDecorations = !showDecorations
+            }
+        )
     }
 }
+
+internal fun PostData.getSourceUrl(): String = preview?.images?.firstOrNull()?.source?.url ?: url
