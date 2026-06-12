@@ -18,7 +18,7 @@ import com.mikepenz.markdown.model.MarkdownAnnotatorConfig
 import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.ReferenceLinkHandler
 import com.mikepenz.markdown.utils.getUnescapedTextInNode
-import com.sofamaniac.crabir.ui.markdown.redditFlavour.RedditFlavourElementType
+import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourElementType
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode

@@ -38,7 +38,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.toLocalUrl
-import com.sofamaniac.crabir.ui.markdown.redditFlavour.RedditFlavourDescriptor
+import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

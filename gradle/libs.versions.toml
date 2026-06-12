@@ -29,6 +29,8 @@ room = "2.8.4"
 adaptiveLayout = "1.2.0"
 adaptiveNavigation = "1.2.0"
 serialization = "1.0.0-rc2"
+jetbrainsKotlinJvm = "2.3.10"
+symbolProcessingApi = "2.3.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.18.0" }
@@ -85,6 +87,7 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 retrofit2-kotlinx-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2KotlinxSerializationConverter" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version = "1.10.6" }
 serialization = { module = "io.github.pdvrieze.xmlutil:serialization", version.ref = "serialization" }
+symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "symbolProcessingApi" }
 zoomable = { module = "me.saket.telephoto:zoomable-image-coil3", version = "0.19.0" }
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version = "14.0.1" }
 aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose-core", version = "14.0.1" } # Common compose core
@@ -96,3 +99,4 @@ androidx-compose-adaptive-navigation = { group = "androidx.compose.material3.ada
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibraries" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }

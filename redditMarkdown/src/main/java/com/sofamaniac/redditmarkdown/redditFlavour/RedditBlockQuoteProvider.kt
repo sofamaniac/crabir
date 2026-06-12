@@ -1,6 +1,5 @@
-package com.sofamaniac.crabir.ui.markdown.redditFlavour
+package com.sofamaniac.redditmarkdown.redditFlavour
 
-import android.util.Log
 import org.intellij.markdown.parser.LookaheadText
 import org.intellij.markdown.parser.MarkerProcessor
 import org.intellij.markdown.parser.ProductionHolder
@@ -22,7 +21,6 @@ class RedditBlockQuoteProvider : MarkerBlockProvider<MarkerProcessor.StateInfo> 
             emptyList()
         } else if (nextConstraints != currentConstraints && nextConstraints.types.lastOrNull() == '>') {
             if (isSpoilerStart(pos)) {
-                Log.d("BlockQuoteProvider", "Emitting SPOILER")
                 listOf(SpoilerMarkerBlock(currentConstraints, productionHolder.mark()))
             } else if (matches(pos)) {
                 listOf(

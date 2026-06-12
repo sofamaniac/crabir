@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui.markdown.redditFlavour
+package com.sofamaniac.redditmarkdown.redditFlavour
 
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.parser.sequentialparsers.RangesListBuilder

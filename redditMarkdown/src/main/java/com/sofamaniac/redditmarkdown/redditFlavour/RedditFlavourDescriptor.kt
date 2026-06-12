@@ -1,6 +1,6 @@
-package com.sofamaniac.crabir.ui.markdown.redditFlavour
+package com.sofamaniac.redditmarkdown.redditFlavour
 
-import com.sofamaniac.crabir.ui.markdown.redditFlavour.lexer._RFMLexer
+import com.sofamaniac.redditmarkdown.redditFlavour.lexer._RFMLexer
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.flavours.gfm.StrikeThroughDelimiterParser
 import org.intellij.markdown.lexer.MarkdownLexer

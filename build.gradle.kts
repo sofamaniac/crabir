@@ -13,4 +13,5 @@ plugins {
     id("com.google.dagger.hilt.android") version "2.59.2" apply false
     id("tech.mappie.plugin") version "2.3.10-2.4.1" apply true
     id("androidx.room") version "2.8.4" apply false
+    alias(libs.plugins.jetbrains.kotlin.jvm) apply false
 }
