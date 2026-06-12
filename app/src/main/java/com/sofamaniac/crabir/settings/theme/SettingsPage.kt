@@ -49,14 +49,8 @@ fun ThemeSettingsPage() {
                     )
                 },
                 headlineContent = { Text("Theme") },
-                supportingContent = { Text("Choose your theme") },
                 options = ThemeMode.entries.toList(),
-                selectedOption = {
-                    Text(
-                        stringResource(settings!!.mode.toStringResource()),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                },
+                selectedOption = settings!!.mode,
                 onOptionSelected = { target ->
                     scope.launch {
                         themeDataStore.updateData {

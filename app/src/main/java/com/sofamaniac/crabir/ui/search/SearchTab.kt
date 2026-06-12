@@ -74,6 +74,7 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
+import com.sofamaniac.crabir.settings.ui.ListSelector
 import com.sofamaniac.crabir.ui.TimeframeMenu
 import com.sofamaniac.crabir.ui.subreddit.DefaultPostView
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
@@ -450,15 +451,14 @@ inline fun <reified Sort> SortMenu(
 
 @Composable
 fun SearchSettings(viewModel: PostSearchViewModel) {
-
     val params by viewModel.params.collectAsState()
     Column {
-        SortMenu<PostSearchSort>(
-            params.sort,
-            params.timeframe
-        ) { sort, timeframe ->
-            viewModel.setSort(sort, timeframe)
-        }
+        ListSelector(
+            PostSearchSort.entries,
+            params.sort as PostSearchSort,
+            onOptionSelected = viewModel::setSort,
+            headlineContent = { Text("Sort") }
+        )
         if (params.subreddit != null) {
             ListItem(
                 modifier = Modifier.clickable {
@@ -481,28 +481,10 @@ fun SearchSettings(viewModel: PostSearchViewModel) {
 @Composable
 fun SearchSettings(viewModel: CommunitySearchViewModel) {
     val params by viewModel.params.collectAsState()
-    Column {
-        SortMenu<CommunitySearchSort>(
-            params.sort as CommunitySearchSort,
-            params.timeframe
-        ) { sort, _ ->
-            viewModel.setSort(sort)
-        }
-//        ListItem(
-//            modifier = Modifier.clickable {
-//                viewModel.setIncludeOver18(!params.includeOver18)
-//            },
-//            headlineContent = {
-//                Text("Include NSFW communities")
-//            },
-//            trailingContent = {
-//                Switch(
-//                    checked = params.includeOver18,
-//                    onCheckedChange = {
-//                        viewModel.setIncludeOver18(it)
-//                    }
-//                )
-//            }
-//        )
-    }
+    ListSelector(
+        CommunitySearchSort.entries,
+        params.sort as CommunitySearchSort,
+        onOptionSelected = viewModel::setSort,
+        headlineContent = { Text("Sort") }
+    )
 }

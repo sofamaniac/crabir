@@ -40,7 +40,7 @@ fun ViewsSettingsPage() {
         Column(modifier = Modifier.padding(innerPadding)) {
             ListSelector(
                 options = Views.entries.toList(),
-                selectedOption = { Text(stringResource(viewSettings.defaultView.toStringResource())) },
+                selectedOption = viewSettings.defaultView,
                 headlineContent = { Text("Default view") },
                 leadingContent = { Icon(Icons.Default.ViewComfy, contentDescription = null) },
                 onOptionSelected = { target ->
