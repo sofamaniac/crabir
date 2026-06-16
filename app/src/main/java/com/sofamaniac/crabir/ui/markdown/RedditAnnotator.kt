@@ -62,12 +62,11 @@ class RedditAnnotator(
                 defaultAnnotator
             ),
             referenceLinkHandler = referenceLinkHandler,
-            linkInteractionListener = linkInteractionListener
-                ?: if (spoilers[text] == true || depth > 0) {
-                    null
-                } else {
-                    LinkInteractionListener { spoilers[text] = true }
-                }
+            linkInteractionListener = if (spoilers[text] == true || (spoilers[text] != null && depth > 0)) {
+                linkInteractionListener
+            } else {
+                LinkInteractionListener { spoilers[text] = true }
+            }
         )
 
     }
@@ -135,10 +134,11 @@ class RedditAnnotator(
                     //appendInlineContent("SPOILER", child.getUnescapedTextInNode(content))
                     val settings = makeSettings(text)
                     pushStringAnnotation(tag = "SPOILER", annotation = text)
+                    val textColor = typography.text.color
                     withStyle(
                         SpanStyle(
-                            color = if (spoilers[text] == true) Color.White else Color.Transparent,
-                            background = if (spoilers[text] == true) Color.Unspecified else Color.White
+                            color = if (spoilers[text] == true) Color.Unspecified else Color.Transparent,
+                            background = if (spoilers[text] == true) Color.Unspecified else Color.Gray
                         )
                     ) {
                         addLink(
