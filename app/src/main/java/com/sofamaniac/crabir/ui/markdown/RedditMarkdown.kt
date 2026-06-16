@@ -45,8 +45,6 @@ fun RedditMarkdown(
     mediaMetadata: Map<String, MediaMetadata> = emptyMap(),
     enableImages: Boolean = true,
     key: String? = markdown,
-    onClick: LinkInteractionListener? = null,
-    enableLinkInteraction: Boolean = true,
 ) {
     val processedMarkdown = remember(key) {
         markdown
@@ -58,7 +56,7 @@ fun RedditMarkdown(
                     it
             }
     }
-    val onClick = if (enableLinkInteraction) (onClick ?: redditLinkHandler()) else null
+    val onClick = if (maxLines == null) redditLinkHandler() else null
     if (maxLines == null) {
         InnerRedditMarkdown(
             modifier = modifier,
@@ -82,7 +80,7 @@ fun RedditMarkdown(
 private fun InnerRedditMarkdown(
     markdown: String,
     modifier: Modifier = Modifier,
-    linkInteractionListener: LinkInteractionListener? = null,
+    linkInteractionListener: LinkInteractionListener?,
 ) {
     val typography = redditMarkdownTypography()
     val referenceLinkHandler = ReferenceLinkHandlerImpl()
@@ -98,7 +96,7 @@ private fun InnerRedditMarkdown(
         animations = markdownAnimations(animateTextSize = { Modifier.fillMaxSize() }),
         components = markdownComponents(
             inlineImage = { model ->
-                ClickableMarkdownInlineImage(model.content, model.node)
+                ClickableMarkdownInlineImage(model.content, model.node, linkInteractionListener)
             },
         ),
         annotator = RedditAnnotator(

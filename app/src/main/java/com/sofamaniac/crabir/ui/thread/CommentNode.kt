@@ -194,7 +194,7 @@ fun BottomRow(
                 RedditMarkdown(
                     comment.bodyMd,
                     maxLines = 5,
-                    modifier = modifier
+                    modifier = modifier,
                 )
             }
         }

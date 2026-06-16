@@ -62,10 +62,12 @@ class RedditAnnotator(
                 defaultAnnotator
             ),
             referenceLinkHandler = referenceLinkHandler,
-            linkInteractionListener = if (spoilers[text] == true || (spoilers[text] != null && depth > 0)) {
-                linkInteractionListener
-            } else {
-                LinkInteractionListener { spoilers[text] = true }
+            linkInteractionListener = linkInteractionListener?.let {
+                if (spoilers[text] == true || (spoilers[text] != null && depth > 0)) {
+                    it
+                } else {
+                    LinkInteractionListener { spoilers[text] = true }
+                }
             }
         )
 

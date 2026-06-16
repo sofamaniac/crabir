@@ -134,7 +134,6 @@ fun PostCard(
                         post.selftext.markdown,
                         maxLines = 5,
                         modifier = modifier,
-                        onClick = {}
                     )
                 }
             }
