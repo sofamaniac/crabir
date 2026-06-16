@@ -18,14 +18,16 @@ import androidx.navigation.toRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 
+/**
+ * @param comment Focal point of the view
+ * @param context If is not null, number of parents to show
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThreadView(
     modifier: Modifier = Modifier,
     permalink: String? = null,
-    /**Focal point of the view*/
     comment: String? = null,
-    /** If @param comment is not null, number of parent to show.*/
     context: Int? = null,
     dismiss: () -> Unit = {},
 ) {
@@ -35,7 +37,8 @@ fun ThreadView(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val viewModel: ThreadViewModel =
         hiltViewModel<ThreadViewModel, ThreadViewModel.Factory>(key = link) { factory ->
-            factory.create(link!!, comment = comment, context = context)
+            // TODO user setting initial sort
+            factory.create(link!!, comment = comment, context = context, initialSort = null)
         }
 
     Scaffold(

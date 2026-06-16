@@ -9,9 +9,11 @@
 package com.sofamaniac.crabir.data.remote.dto.post
 
 import com.sofamaniac.crabir.data.remote.dto.LinkFlairRichtext
+import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetails
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditId
+import com.sofamaniac.crabir.data.remote.utils.CommentSortSerializer
 import com.sofamaniac.crabir.data.remote.utils.FalseOrTimestampSerializer
 import com.sofamaniac.crabir.data.remote.utils.InstantAsFloatSerializer
 import com.sofamaniac.crabir.data.remote.utils.MediaMetadataSerializer
@@ -58,7 +60,8 @@ data class PostDTO(
     @SerialName("name") val fullname: Fullname,
     @SerialName("url") val url: String = "",
     @SerialName("title") val title: String = "",
-    @SerialName("suggested_sort") val suggestedSort: String? = null,
+    @Serializable(with = CommentSortSerializer::class)
+    @SerialName("suggested_sort") val suggestedSort: Sort? = null,
     @SerialName("num_comments") val numComments: Int = 0,
     @SerialName("over_18") val over18: Boolean = false,
     @SerialName("permalink") val permalink: String,
@@ -310,7 +313,7 @@ object PostDataMapper : ObjectMappie<PostDTO, PostData>() {
         PostData::name fromProperty from::fullname
 
         PostData::url fromProperty from::url
-        PostData::suggestedSort fromValue (from.suggestedSort ?: "")
+        PostData::suggestedSort fromProperty from::suggestedSort
         PostData::preview fromValue from.getPreview()
         PostData::crosspostParentList fromProperty from::crosspostParentList
 

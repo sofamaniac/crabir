@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.domain.model
 
 import com.sofamaniac.crabir.data.local.entities.VotableEntity
+import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.data.remote.dto.post.Preview
 import com.sofamaniac.crabir.reddit.Thumbnail
@@ -22,7 +23,7 @@ data class PostData(
     val domain: String,
     val permalink: String,
     val title: String,
-    val suggestedSort: String,
+    val suggestedSort: Sort?,
     val numComments: Int,
     val over18: Boolean,
     val spoiler: Boolean,
@@ -79,7 +80,7 @@ val DUMMY_POST = PostData(
     domain = "google.com",
     permalink = "/r/DUMMY/comments/abc123/dummy_post_title/",
     title = "Dummy Post Title",
-    suggestedSort = "top",
+    suggestedSort = null,
     numComments = 42,
     over18 = false,
     spoiler = false,

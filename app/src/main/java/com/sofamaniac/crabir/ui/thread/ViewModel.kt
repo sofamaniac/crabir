@@ -36,6 +36,7 @@ class ThreadViewModel @AssistedInject constructor(
     @Assisted("permalink") val permalink: String,
     @Assisted("comment") val comment: String?,
     @Assisted val context: Int?,
+    @Assisted val initialSort: Sort?,
 ) : ViewModel(), CommentViewModelInterface {
 
     var name: Fullname = repository.getPostId(permalink)
@@ -74,6 +75,11 @@ class ThreadViewModel @AssistedInject constructor(
     init {
         // try initializing post
         _post.value = getPost()
+        Log.d(
+            "ThreadViewModel",
+            "${initialSort}, ${post.value != null}, ${post.value?.suggestedSort}"
+        )
+        _sort.value = initialSort ?: post.value?.suggestedSort ?: Sort.Best
         fetchComments()
     }
 
@@ -261,6 +267,7 @@ class ThreadViewModel @AssistedInject constructor(
             @Assisted("permalink") permalink: String,
             @Assisted("comment") comment: String? = null,
             context: Int? = null,
+            initialSort: Sort?,
         ): ThreadViewModel
     }
 }
