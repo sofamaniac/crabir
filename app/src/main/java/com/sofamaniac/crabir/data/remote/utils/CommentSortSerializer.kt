@@ -43,6 +43,7 @@ object CommentSortSerializer : KSerializer<Sort?> {
                 "old" -> Sort.Old
                 "live" -> Sort.Live
                 "random" -> Sort.Random
+                "confidence" -> Sort.Confidence
                 else -> {
                     Log.e("CommentSortSerializer", "Unknown sort: $element")
                     Sort.Best
