@@ -66,4 +66,26 @@
     <string name="showNSFW">Show NSFW</string>
     <string name="showNSFWMedia">Show NSFW Media</string>
     <string name="blurNSFW">Blur NSFW</string>
+    <string name="unhide_post">Unhide post</string>
+    <string name="hide_post">Hide post</string>
+    <string name="go_to_profile">Go to %1$s profile</string>
+    <string name="go_to_subreddit">Go to %1$s</string>
+    <string name="moderation">Moderation</string>
+    <string name="edit">Edit</string>
+    <string name="report">Report</string>
+    <string name="mute">Mute</string>
+    <string name="share">Share</string>
+    <string name="copy">Copy</string>
+    <string name="post_content">Post content</string>
+    <string name="share_link">Share link</string>
+    <string name="share_post">Share post</string>
+    <string name="share_title_link">Share title + link</string>
+    <string name="crosspost" translatable="false">Crosspost</string>
+    <string name="share_shortlink">Share shortlink</string>
+    <string name="change_flair">Change Flair</string>
+    <string name="edit_text">Edit text</string>
+    <string name="nsfw">NSFW</string>
+    <string name="spoiler">Spoiler</string>
+    <string name="inbox_replies">Inbox replies</string>
+    <string name="delete">Delete</string>
 </resources>

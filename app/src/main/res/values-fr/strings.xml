@@ -57,4 +57,25 @@
     <string name="showNSFWMedia">Afficher les images NSFW</string>
     <string name="blurNSFW">Flouter les images NSFW</string>
     <string name="filtersPageTitle">Filtres</string>
+    <string name="unhide_post">Afficher la publication</string>
+    <string name="hide_post">Cacher la publication</string>
+    <string name="go_to_profile">Aller au profile du %1$s</string>
+    <string name="go_to_subreddit">Aller à %1$s</string>
+    <string name="moderation">Modération</string>
+    <string name="edit">Éditer</string>
+    <string name="report">Reporter</string>
+    <string name="mute">Mettre en sourdine</string>
+    <string name="share">Partager</string>
+    <string name="copy">Copier</string>
+    <string name="post_content">Contenu de la publication</string>
+    <string name="share_link">Partager le lien</string>
+    <string name="share_post">Partager la publication</string>
+    <string name="share_title_link">Partager le titre + le lien</string>
+    <string name="share_shortlink">Partager un lien court</string>
+    <string name="change_flair">Cahnger Flair</string>
+    <string name="edit_text">Éditer le texte</string>
+    <string name="nsfw">NSFW</string>
+    <string name="spoiler">Spoiler</string>
+    <string name="inbox_replies">Notification de réponse</string>
+    <string name="delete">Supprimer</string>
 </resources>

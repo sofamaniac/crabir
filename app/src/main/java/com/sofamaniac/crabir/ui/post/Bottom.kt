@@ -181,7 +181,7 @@ private fun PostOptions(
                                 contentDescription = null
                             )
                         },
-                        headlineContent = { Text("Moderation") },
+                        headlineContent = { Text(stringResource(R.string.moderation)) },
                     )
                 }
                 if (post.author.authorFullname == currentAccount.info?.name?.name) {
@@ -196,7 +196,7 @@ private fun PostOptions(
                                 contentDescription = null
                             )
                         },
-                        headlineContent = { Text("Edit") },
+                        headlineContent = { Text(stringResource(R.string.edit)) },
                     )
                 }
                 ListItem(
@@ -209,14 +209,28 @@ private fun PostOptions(
                                 .clip(CircleShape)
                         )
                     },
-                    headlineContent = { Text("Go to ${post.subreddit.name}") },
+                    headlineContent = {
+                        Text(
+                            stringResource(
+                                R.string.go_to_subreddit,
+                                post.subreddit.name
+                            )
+                        )
+                    },
                     modifier = Modifier.clickable {
                         navController.navigate(SubredditRoute(post.subreddit.name))
                     }
                 )
                 ListItem(
                     leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
-                    headlineContent = { Text("Go to ${post.author.username} profile") },
+                    headlineContent = {
+                        Text(
+                            stringResource(
+                                R.string.go_to_profile,
+                                post.author.username
+                            )
+                        )
+                    },
                     modifier = Modifier.clickable {
                         navController.navigate(
                             ProfileRoute(
@@ -227,7 +241,11 @@ private fun PostOptions(
                     }
                 )
                 ListItem(
-                    headlineContent = { Text("Hide / Unhide post") },
+                    headlineContent = {
+                        val text =
+                            if (post.relationship.hidden) R.string.unhide_post else R.string.hide_post
+                        Text(stringResource(text))
+                    },
                     modifier = Modifier.clickable {
                         if (post.relationship.hidden) {
                             interaction.unhide()
@@ -235,15 +253,23 @@ private fun PostOptions(
                             interaction.hide()
                         }
                     })
-                ListItem(headlineContent = { Text("Report") }, modifier = Modifier.clickable {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.report)) },
+                    modifier = Modifier.clickable {
                     interaction.fetchRules()
                     showReportDialog = true
                 })
-                ListItem(headlineContent = { Text("Mute") }, modifier = Modifier.clickable {})
-                ListItem(headlineContent = { Text("Share") }, modifier = Modifier.clickable {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.mute)) },
+                    modifier = Modifier.clickable {})
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.share)) },
+                    modifier = Modifier.clickable {
                     showShareDialog = true
                 })
-                ListItem(headlineContent = { Text("Copy") }, modifier = Modifier.clickable {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.copy)) },
+                    modifier = Modifier.clickable {
                     scope.launch {
                         val clipData = ClipData.newPlainText("Post URL", post.url.toString())
                         val clipEntry = ClipEntry(clipData)
@@ -252,7 +278,7 @@ private fun PostOptions(
                 })
                 if (BuildConfig.DEBUG) {
                     ListItem(
-                        headlineContent = { Text("Post content") },
+                        headlineContent = { Text(stringResource(R.string.post_content)) },
                         modifier = Modifier.clickable {
                             Log.d("Post", prettyJson.encodeToString(post))
                         })
@@ -293,7 +319,7 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
         Card(modifier = Modifier.padding(16.dp)) {
             ListItem(
                 leadingContent = { Icon(Icons.Default.Link, contentDescription = null) },
-                headlineContent = { Text("Share link") },
+                headlineContent = { Text(stringResource(R.string.share_link)) },
                 supportingContent = {
                     Text(
                         post.url,
@@ -317,7 +343,7 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
                         contentDescription = null
                     )
                 },
-                headlineContent = { Text("Share post") },
+                headlineContent = { Text(stringResource(R.string.share_post)) },
                 supportingContent = {
                     Text(
                         permalink,
@@ -342,7 +368,7 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
                         contentDescription = null
                     )
                 },
-                headlineContent = { Text("Share title + post") },
+                headlineContent = { Text(stringResource(R.string.share_title_link)) },
                 supportingContent = {
                     Text(
                         titleLink,
@@ -368,7 +394,7 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
                         contentDescription = null,
                     )
                 },
-                headlineContent = { Text("Crosspost") },
+                headlineContent = { Text(stringResource(R.string.crosspost)) },
                 modifier = Modifier.clickable {
                     onDismissRequest()
                     navController.navigate(CrosspostCreatorRoute(post.name))
@@ -379,7 +405,7 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
             )
             ListItem(
                 leadingContent = { Icon(Icons.Default.Link, contentDescription = null) },
-                headlineContent = { Text("Share shortlink") },
+                headlineContent = { Text(stringResource(R.string.share_shortlink)) },
                 supportingContent = {
                     Text(
                         post.shortlink,
@@ -448,7 +474,7 @@ fun ReportMenu(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
 
             Row {
                 TextButton(onClick = onDismissRequest) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 TextButton(onClick = {
@@ -456,7 +482,7 @@ fun ReportMenu(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
                     viewModel.report(selectedOption)
                     onDismissRequest()
                 }) {
-                    Text("Report")
+                    Text(stringResource(R.string.report))
                 }
             }
         }
@@ -478,16 +504,16 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
         Card(modifier = Modifier.padding(16.dp)) {
             ListItem(
                 modifier = Modifier.clickable { showFlairDialog = true },
-                headlineContent = { Text("Change Flair") },
+                headlineContent = { Text(stringResource(R.string.change_flair)) },
                 trailingContent = {
                     Icon(Icons.Default.Edit, contentDescription = null)
                 }
             )
             if (post.kind == Kind.Self) {
-                ListItem(headlineContent = { Text("Edit text") })
+                ListItem(headlineContent = { Text(stringResource(R.string.edit_text)) })
             }
             ListItem(
-                headlineContent = { Text("NSFW") },
+                headlineContent = { Text(stringResource(R.string.nsfw)) },
                 trailingContent = {
                     Switch(
                         checked = post.over18,
@@ -503,7 +529,7 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
                 }
             )
             ListItem(
-                headlineContent = { Text("Spoiler") },
+                headlineContent = { Text(stringResource(R.string.spoiler)) },
                 trailingContent = {
                     Switch(
                         checked = post.spoiler,
@@ -519,7 +545,7 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
                 }
             )
             ListItem(
-                headlineContent = { Text("Inbox replies") },
+                headlineContent = { Text(stringResource(R.string.inbox_replies)) },
                 trailingContent = {
                     Switch(
                         checked = post.sendReplies,
@@ -528,7 +554,7 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
                         }
                     )
                 })
-            ListItem(headlineContent = { Text("Delete") })
+            ListItem(headlineContent = { Text(stringResource(R.string.delete)) })
         }
     }
 
