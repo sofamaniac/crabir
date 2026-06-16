@@ -3,7 +3,7 @@ package com.sofamaniac.crabir.ui.post
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.toEntity
+import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
@@ -28,9 +28,10 @@ class PostDataViewModel @AssistedInject constructor(
         fun create(name: String): PostDataViewModel
     }
 
-    fun visitPost(post: PostData) {
+    fun visitPost(post: PostData, visitedBy: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            visitedPostsDao.insert(post.toEntity(timestamp = System.currentTimeMillis()))
+            val entity = VisitedPostEntity(post.name, System.currentTimeMillis(), visitedBy)
+            visitedPostsDao.insert(entity)
         }
     }
 }

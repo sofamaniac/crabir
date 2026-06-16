@@ -39,39 +39,6 @@ interface FeedRepository<Params, T : VotableData> {
 abstract class FeedRepositoryCommon<Params, T : VotableData>(
     //val api: RedditAPIService,
 ) : FeedRepository<Params, T>, ListingRepository<Params, T>() {
-//
-//    override suspend fun upvote(name: Fullname): Result<Unit> {
-//        return votableRepository.upvote(name)
-//    }
-//
-//    override suspend fun downvote(name: Fullname): Result<Unit> {
-//        return votableRepository.downvote(name)
-//    }
-//
-//    override suspend fun save(name: Fullname): Result<Unit> {
-//        return votableRepository.save(name)
-//    }
-//
-//    override suspend fun unsave(name: Fullname): Result<Unit> {
-//        return votableRepository.unsave(name)
-//    }
-
-//    override fun thingToData(thing: Thing): T? {
-//        return when (thing) {
-//            is Thing.Post -> {
-//                PostDataMapper.map(thing.data)
-//            }
-//
-//            is Thing.Comment -> {
-//                CommentDataMapper.map(thing.data)
-//            }
-//
-//            else -> {
-//                throw IllegalArgumentException("Unreachable code")
-//            }
-//        }
-//    }
-
     override suspend fun onResponseSuccess(things: List<Thing>) {
         super.onResponseSuccess(things)
         val votableList = things.mapNotNull { thingToData(it) }

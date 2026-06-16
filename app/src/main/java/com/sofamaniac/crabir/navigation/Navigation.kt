@@ -48,6 +48,12 @@ object ThemeEditorRoute : Route
 @Serializable
 object ViewsSettingRoute : Route
 
+@Serializable
+object FiltersSettingRoute : Route
+
+@Serializable
+object DebugOptionsRoute : Route
+
 interface Route
 
 // TODO move closer in the navgraph. Maybe one per tab ? Or move its initalisation to the tabs ?

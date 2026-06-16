@@ -28,13 +28,13 @@ data class PostData(
     val spoiler: Boolean,
     val sendReplies: Boolean,
     val preview: Preview?,
-    val crosspostParentList: List<PostData>,
-    val subredditDetails: SubredditData?,
+    val crosspostParentList: List<PostData> = emptyList(),
+    val subredditDetails: SubredditData? = null,
     val thumbnail: Thumbnail,
     val selftext: Selftext,
-    val mediaMetadata: Map<String, MediaMetadata>,
+    val mediaMetadata: Map<String, MediaMetadata> = emptyMap(),
     val kind: Kind,
-    val isDistinguished: Boolean,
+    val isDistinguished: Boolean = false,
     val linkFlair: Flair,
     val media: MediaInfo,
     val gallery: Gallery?,
@@ -54,7 +54,7 @@ data class PostData(
 
     override fun toEntity(): VotableEntity {
         return VotableEntity(
-            id = name.name,
+            id = name,
             data = Json.encodeToString(this)
         )
     }

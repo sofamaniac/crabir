@@ -11,8 +11,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.ScoreString
@@ -23,7 +24,7 @@ fun CompactView(
     post: PostData,
     modifier: Modifier = Modifier,
     clickable: Boolean = true,
-    onClick: (PostData) -> Unit = {},
+    markAsRead: () -> Unit = {},
     canStartVideo: Boolean = false,
     read: Boolean = false,
     viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
@@ -32,15 +33,16 @@ fun CompactView(
             factory.create(post)
         }),
 ) {
-    val theme = LocalTheme.current
-    val onClick = { post: PostData ->
+    val navController = LocalNavController.current!!
+    val onClick = {
         if (clickable) {
-            onClick(post)
+            markAsRead()
+            navController.navigate(PostRoute(post.permalink))
         }
     }
     val likes by viewModel.likes.collectAsState(post.relationship.liked)
     ThemedCard(
-        onClick = { onClick(post) },
+        onClick = onClick,
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp),

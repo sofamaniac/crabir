@@ -20,6 +20,7 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.ThemedCard
 import kotlinx.coroutines.flow.Flow
@@ -38,7 +39,7 @@ import kotlinx.coroutines.flow.map
  * @param enableThumbnail Whether to enable the thumbnail preview. Defaults to true. The thumbnail is shown only if there is one and the post if a link.
  * @param showSubredditIcon Whether to display the subreddit icon in the header. Defaults to true.
  * @param clickable Whether the post is clickable to navigate to the thread view. Defaults to true.
- * @param onClick A lambda that takes a [com.sofamaniac.crabir.domain.model.PostData] and is called before navigating to the post.
+ * @param markAsRead A lambda that takes a [com.sofamaniac.crabir.domain.model.PostData] and is called before navigating to the post.
  * @param canStartVideo Whether the post can start a video. Defaults to false.
  */
 @Composable
@@ -46,7 +47,7 @@ fun PostCard(
     post: PostData,
     modifier: Modifier = Modifier,
     clickable: Boolean = true,
-    onClick: (PostData) -> Unit = {},
+    markAsRead: () -> Unit = {},
     canStartVideo: Boolean = false,
     read: Boolean = false,
     viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
@@ -55,21 +56,21 @@ fun PostCard(
             factory.create(post)
         }),
 ) {
-    val post by viewModel.post.collectAsState()
+    val _post by viewModel.post.collectAsState()
     val likes by viewModel.likes.collectAsState(null)
-    if (post == null) {
+    if (_post == null) {
         Log.w("PostCard", "Trying to render null")
         return
     }
-
+    val post = _post!!
     PostCardContent(
-        post!!,
+        post,
         modifier,
         clickable,
-        onClick,
-        canStartVideo,
-        read,
-        likes,
+        markAsRead,
+        canStartVideo = canStartVideo,
+        read = read,
+        likes = likes,
         interactions = viewModel,
     )
 }
@@ -79,7 +80,7 @@ internal fun PostCardContent(
     post: PostData,
     modifier: Modifier = Modifier,
     clickable: Boolean = true,
-    onClick: (PostData) -> Unit = {},
+    markAsRead: () -> Unit = {},
     canStartVideo: Boolean = false,
     read: Boolean = false,
     likes: Boolean?,
@@ -87,20 +88,24 @@ internal fun PostCardContent(
 ) {
 
     val settings = rememberViewSettings()
-    // We do not apply the padding on the column, but on each of its children except [body]
+    // We do not apply the padding on the column, but on each of its children except []
     // to have images that take the full width
     val modifier = Modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
-    val onClickCard = if (clickable) {
-        { onClick(post) }
+    val navController = LocalNavController.current!!
+    val openPost = if (clickable) {
+        {
+            markAsRead()
+            navController.navigate(PostRoute(post.permalink))
+        }
     } else {
         {}
     }
     ThemedCard(
         shape = RoundedCornerShape(0),
         modifier = Modifier.fillMaxWidth(),
-        onClick = onClickCard,
+        onClick = openPost,
     ) {
         PostHeader(
             post,
@@ -115,7 +120,7 @@ internal fun PostCardContent(
             enableThumbnail = enablePreview && settings.cardSettings.thumbnailForLinkPreview,
             likes = likes,
             read = read,
-            visitPost = { onClick(post) }
+            markAsRead = markAsRead
         )
         PostBody(
             post,
@@ -124,10 +129,13 @@ internal fun PostCardContent(
             enableTextPreview = settings.cardSettings.enableTextPreview && !post.spoiler,
             maxLines = settings.cardSettings.maxLines,
             enableLinkFullSizePreview = !settings.cardSettings.thumbnailForLinkPreview,
-            visitPost = { onClick(post) }
+            markAsRead = markAsRead
         )
         BottomRow(post, modifier, interactions = interactions) {
-            OpenThreadButton(post, onClick = onClick)
+            OpenThreadButton(
+                post,
+                onClick = markAsRead
+            )
         }
     }
 }
@@ -141,7 +149,7 @@ internal fun PostCardPreview() {
         PostCardContent(
             post!!,
             clickable = false,
-            onClick = {},
+            markAsRead = {},
             canStartVideo = false,
             read = false,
             likes = null,

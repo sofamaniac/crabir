@@ -17,7 +17,7 @@ import com.sofamaniac.crabir.data.remote.streamable.StreamableAPI
 import com.sofamaniac.crabir.data.remote.streamable.Video
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
-import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.rememberFiltersSettings
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -60,7 +60,12 @@ class StreamableViewModel @AssistedInject constructor(
 }
 
 @Composable
-fun StreamableVideo(post: PostData, canPlayVideo: Boolean, modifier: Modifier = Modifier) {
+fun StreamableVideo(
+    post: PostData,
+    canPlayVideo: Boolean,
+    modifier: Modifier = Modifier,
+    goFullscreen: (Route) -> Unit
+) {
     val viewModel: StreamableViewModel =
         hiltViewModel<StreamableViewModel, StreamableViewModel.Factory> { factory ->
             factory.create(
@@ -72,9 +77,8 @@ fun StreamableVideo(post: PostData, canPlayVideo: Boolean, modifier: Modifier = 
     val filters = rememberFiltersSettings()
     val blur = post.spoiler || (post.over18 && filters.blurNSFW)
     if (video == null) return
-    val navController = LocalNavController.current!!
     val goFullscreen = {
-        navController.navigate(FullscreenVideoRoute(post.name))
+        goFullscreen(FullscreenVideoRoute(post.name))
     }
     PostVideo(
         video!!.toMediaResource(),

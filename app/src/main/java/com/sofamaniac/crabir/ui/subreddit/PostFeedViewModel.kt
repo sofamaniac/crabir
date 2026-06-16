@@ -20,7 +20,7 @@ import com.sofamaniac.crabir.data.local.dao.CommunityDao
 import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
-import com.sofamaniac.crabir.data.local.entities.toEntity
+import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -48,7 +48,7 @@ interface FeedViewModelInterface<T : VotableData> {
     val entity: Flow<CommunityViewEntity?>
 
     fun refresh()
-    fun visitPost(post: PostData)
+    fun visitPost(post: PostData, visitedBy: Int)
 
     fun isPostRead(post: PostData): Boolean
 }
@@ -135,10 +135,10 @@ abstract class PostFeedViewModel<T>(
         }
     }
 
-    override fun visitPost(post: PostData) {
+    override fun visitPost(post: PostData, visitedBy: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            visitedPostsDao.insert(post.toEntity(System.currentTimeMillis()))
-            Log.d("PostFeedViewModel", "visitPost: Post visited (${post.id})")
+            val entity = VisitedPostEntity(post.name, System.currentTimeMillis(), visitedBy)
+            visitedPostsDao.insert(entity)
         }
     }
 

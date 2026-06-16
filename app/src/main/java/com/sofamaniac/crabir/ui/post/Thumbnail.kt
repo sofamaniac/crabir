@@ -28,14 +28,14 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 @Composable
 fun Thumbnail(
     post: PostData,
-    visitPost: (PostData) -> Unit,
+    markAsRead: () -> Unit,
 ) {
     val thumbnailURL = post.getThumbnailUrl()
     val uriHandler = LocalUriHandler.current
     //val fullscreenManager = LocalFullscreenHandler.current!!
     val navController = LocalNavController.current!!
     val goFullscreen = {
-        visitPost(post)
+        markAsRead()
         when (post.kind) {
 //            Kind.Image -> fullscreenManager.push { FullscreenImageView(post) }
 //            Kind.Gallery -> fullscreenManager.push {

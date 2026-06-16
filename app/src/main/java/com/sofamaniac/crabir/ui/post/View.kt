@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
+import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -50,10 +52,11 @@ internal fun PostBody(
     maxLines: Int?,
     enableLinkFullSizePreview: Boolean = true,
     forceShowSelftext: Boolean = false,
-    visitPost: (PostData) -> Unit = {},
+    markAsRead: () -> Unit = {},
 ) {
     val navController = LocalNavController.current!!
     fun goFullscreen(route: Route) {
+        markAsRead()
         navController.navigate(route)
     }
 
@@ -72,13 +75,17 @@ internal fun PostBody(
             PostImage(
                 post,
                 modifier.fillMaxWidth(),
-                goFullscreen = { goFullscreen(it) },
-                visitPost = visitPost
+                goFullscreen = ::goFullscreen,
             )
         }
 
         Kind.Video -> {
-            PostVideo(post, modifier.fillMaxWidth(), canPlayVideo = canPlayVideo)
+            PostVideo(
+                post,
+                modifier.fillMaxWidth(),
+                canPlayVideo = canPlayVideo,
+                goFullscreen = ::goFullscreen
+            )
         }
 
         Kind.Link -> {
@@ -87,8 +94,7 @@ internal fun PostBody(
                     post,
                     modifier.fillMaxWidth(),
                     enabled = false,
-                    goFullscreen = { goFullscreen(it) },
-                    visitPost = visitPost
+                    goFullscreen = ::goFullscreen,
                 )
             }
         }
@@ -98,7 +104,7 @@ internal fun PostBody(
                 post,
                 modifier.fillMaxWidth(),
                 canPlayVideo = canPlayVideo,
-                goFullscreen = { goFullscreen(it) }
+                goFullscreen = ::goFullscreen,
             )
         }
 
@@ -110,7 +116,12 @@ internal fun PostBody(
         }
 
         Kind.Streamable -> {
-            StreamableVideo(post, canPlayVideo = canPlayVideo, modifier = modifier.fillMaxWidth())
+            StreamableVideo(
+                post,
+                canPlayVideo = canPlayVideo,
+                modifier = modifier.fillMaxWidth(),
+                goFullscreen = ::goFullscreen
+            )
         }
 
         else -> {
@@ -225,6 +236,7 @@ open class VotableViewModel<T : VotableData>(
 open class LinkViewModel @AssistedInject constructor(
     @Assisted("post") post: PostData,
     private val posts: LinksRepository,
+    private val history: VisitedPostsDao,
 ) : VotableViewModel<PostData>(post.name.name, post.subreddit.name, posts), LinkInteraction {
 
     override val post = posts.get(post.name).stateIn(
@@ -235,6 +247,14 @@ open class LinkViewModel @AssistedInject constructor(
 
     private var _flairs = MutableStateFlow(emptyList<FlairInfo>())
     override val flairs: StateFlow<List<FlairInfo>> = _flairs
+
+    fun markPost(post: PostData, visitedBy: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val entity: VisitedPostEntity =
+                VisitedPostEntity(post.name, System.currentTimeMillis(), visitedBy)
+            history.insert(entity)
+        }
+    }
 
     override fun hide() {
         viewModelScope.launch(Dispatchers.IO) {

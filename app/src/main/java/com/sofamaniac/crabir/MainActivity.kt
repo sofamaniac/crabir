@@ -30,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,33 +46,23 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
-import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
 import com.sofamaniac.crabir.navigation.HistoryRoute
 import com.sofamaniac.crabir.navigation.HomeRoute
 import com.sofamaniac.crabir.navigation.InboxRoute
-import com.sofamaniac.crabir.navigation.LicensesRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SearchRoute
-import com.sofamaniac.crabir.navigation.SettingsRoute
 import com.sofamaniac.crabir.navigation.SubscriptionsRoute
-import com.sofamaniac.crabir.navigation.ThemeEditorRoute
-import com.sofamaniac.crabir.navigation.ThemeRoute
-import com.sofamaniac.crabir.navigation.ViewsSettingRoute
 import com.sofamaniac.crabir.navigation.imagesGraph
 import com.sofamaniac.crabir.navigation.postGraph
 import com.sofamaniac.crabir.navigation.profileGraph
+import com.sofamaniac.crabir.navigation.settingsGraph
 import com.sofamaniac.crabir.navigation.subredditGraph
-import com.sofamaniac.crabir.settings.SettingsPage
 import com.sofamaniac.crabir.settings.theme.ConfigureMaterialTheme
 import com.sofamaniac.crabir.settings.theme.CrabirTheme
 import com.sofamaniac.crabir.settings.theme.DefaultDarkTheme
-import com.sofamaniac.crabir.settings.theme.ThemeEditor
-import com.sofamaniac.crabir.settings.theme.ThemeSettingsPage
 import com.sofamaniac.crabir.settings.theme.rememberAppTheme
-import com.sofamaniac.crabir.settings.views.ViewsSettingsPage
 import com.sofamaniac.crabir.ui.InboxView
 import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
@@ -216,6 +205,7 @@ fun NavigationGraph(
             postGraph(navController = navController)
             subredditGraph(navController = navController)
             imagesGraph(navController = navController)
+            settingsGraph(navController = navController)
 
             composable<SubscriptionsRoute> {
                 SubredditListViewer(navController = navController)
@@ -228,25 +218,12 @@ fun NavigationGraph(
                 InboxView()
 
             }
-            composable<LicensesRoute> {
-                val libraries by produceLibraries(R.raw.aboutlibraries)
-                LibrariesContainer(libraries, modifier = Modifier.fillMaxSize())
-            }
-            composable<SettingsRoute> {
-                SettingsPage()
-            }
-            composable<ThemeRoute> {
-                ThemeSettingsPage()
-            }
-            composable<ThemeEditorRoute> {
-                ThemeEditor()
-            }
-            composable<ViewsSettingRoute> {
-                ViewsSettingsPage()
-            }
             composable<HistoryRoute> {
                 HistoryViewer()
             }
+//            composable<FiltersSettingRoute>{
+//                FiltersSettings.View()
+//            }
 
             composable(
                 route = "videoPreview?url={url}",

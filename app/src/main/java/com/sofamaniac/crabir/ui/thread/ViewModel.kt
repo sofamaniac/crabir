@@ -4,8 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.toDomainModel
-import com.sofamaniac.crabir.data.local.entities.toEntity
+import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
@@ -13,6 +12,7 @@ import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -32,6 +32,7 @@ import kotlinx.coroutines.runBlocking
 class ThreadViewModel @AssistedInject constructor(
     private val repository: ThreadRepository,
     private val visitedPostsDao: VisitedPostsDao,
+    private val linksRepository: LinksRepository,
     @Assisted("permalink") val permalink: String,
     @Assisted("comment") val comment: String?,
     @Assisted val context: Int?,
@@ -78,7 +79,7 @@ class ThreadViewModel @AssistedInject constructor(
 
     private fun getPost(): PostData? {
         val post = runBlocking(Dispatchers.IO) {
-            val post = repository.getPost(name) ?: visitedPostsDao.getPost(name)?.toDomainModel()
+            val post = repository.getPost(name) ?: linksRepository.getValue(name)
             if (post == null) {
                 Log.e("ThreadViewModel", "getPost: Post not found in database ($name)")
             }
@@ -239,8 +240,11 @@ class ThreadViewModel @AssistedInject constructor(
 
     }
 
-    fun visitPost(post: PostData) {
-        visitedPostsDao.insert(post.toEntity(timestamp = System.currentTimeMillis()))
+    fun visitPost(post: PostData, visitedBy: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val entity = VisitedPostEntity(post.name, System.currentTimeMillis(), visitedBy)
+            visitedPostsDao.insert(entity)
+        }
     }
 
     override fun fetchRules() {

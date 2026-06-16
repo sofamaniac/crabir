@@ -39,7 +39,7 @@ fun PostInfo(
     enableThumbnail: Boolean = true,
     read: Boolean = false,
     likes: Boolean?,
-    visitPost: (PostData) -> Unit = {},
+    markAsRead: () -> Unit = {},
 ) {
     val navController = LocalNavController.current!!
     val theme = LocalTheme.current
@@ -119,7 +119,7 @@ fun PostInfo(
             }
         }
         if (enableThumbnail) {
-            Thumbnail(post, visitPost = visitPost)
+            Thumbnail(post, markAsRead = markAsRead)
         }
     }
 }

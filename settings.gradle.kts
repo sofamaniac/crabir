@@ -29,6 +29,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Crabir"
 include(":app")
-include(":annotation")
-include(":processor")
 include(":redditMarkdown")

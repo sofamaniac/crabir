@@ -131,14 +131,14 @@ fun OpenInAppButton(
 }
 
 @Composable
-fun OpenThreadButton(post: PostData, onClick: (PostData) -> Unit) {
+fun OpenThreadButton(post: PostData, onClick: () -> Unit) {
     val description = stringResource(R.string.open_comments)
     TooltipBox(
         tooltip = { PlainTooltip { Text(description) } },
         state = rememberTooltipState(),
         positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
     ) {
-        IconButton(onClick = { onClick(post) }) {
+        IconButton(onClick = onClick) {
             Icon(
                 Icons.AutoMirrored.Filled.Comment,
                 contentDescription = description,

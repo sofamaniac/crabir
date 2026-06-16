@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.dataStore
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 data class FiltersSettings(
     val showNSFW: Boolean = true,

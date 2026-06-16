@@ -21,8 +21,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.net.toUri
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.m3.Markdown
@@ -30,21 +28,12 @@ import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.DefaultMarkdownAnnotatorConfig
 import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.ReferenceLinkHandlerImpl
-import com.mikepenz.markdown.model.State
 import com.mikepenz.markdown.model.markdownAnimations
 import com.mikepenz.markdown.model.markdownAnnotator
-import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.toLocalUrl
-import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
 
 @Composable
 fun RedditMarkdown(
@@ -197,35 +186,35 @@ private fun String.convertGiphy(toImage: Boolean): String {
     }
 }
 
-@HiltViewModel(assistedFactory = MarkdownViewModel.Factory::class)
-class MarkdownViewModel @AssistedInject constructor(
-    @Assisted val markdown: String,
-    @Assisted val mediaMetadata: Map<String, MediaMetadata>,
-    @Assisted val enableImages: Boolean,
-) : ViewModel() {
-    val processedMarkdown = markdown
-        //.extractRedditLinks()
-        .convertGiphy(toImage = enableImages).let {
-            if (enableImages)
-                it.convertRedditPreviewLinks(mediaMetadata)
-            else
-                it
-        }
-
-    val markdownFlow = parseMarkdownFlow(processedMarkdown, flavour = RedditFlavourDescriptor())
-        .stateIn(
-            viewModelScope, SharingStarted.Eagerly, State.Loading()
-        )
-
-    @AssistedFactory
-    interface Factory {
-        fun create(
-            markdown: String,
-            mediaMetadata: Map<String, MediaMetadata>,
-            enableImages: Boolean
-        ): MarkdownViewModel
-    }
-}
+//@HiltViewModel(assistedFactory = MarkdownViewModel.Factory::class)
+//class MarkdownViewModel @AssistedInject constructor(
+//    @Assisted val markdown: String,
+//    @Assisted val mediaMetadata: Map<String, MediaMetadata>,
+//    @Assisted val enableImages: Boolean,
+//) : ViewModel() {
+//    val processedMarkdown = markdown
+//        //.extractRedditLinks()
+//        .convertGiphy(toImage = enableImages).let {
+//            if (enableImages)
+//                it.convertRedditPreviewLinks(mediaMetadata)
+//            else
+//                it
+//        }
+//
+//    val markdownFlow = parseMarkdownFlow(processedMarkdown, flavour = RedditFlavourDescriptor())
+//        .stateIn(
+//            viewModelScope, SharingStarted.Eagerly, State.Loading()
+//        )
+//
+//    @AssistedFactory
+//    interface Factory {
+//        fun create(
+//            markdown: String,
+//            mediaMetadata: Map<String, MediaMetadata>,
+//            enableImages: Boolean
+//        ): MarkdownViewModel
+//    }
+//}
 
 @Composable
 fun redditMarkdownTypography(): MarkdownTypography {

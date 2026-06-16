@@ -16,6 +16,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
 import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
+import com.sofamaniac.crabir.data.local.entities.asVotableData
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.PostData
@@ -105,14 +106,19 @@ class HistoryRepository @Inject constructor(
             )
         }
         Log.d("HistoryRepository", "getThings: $timestamp")
+        val ids = visitedPostsDao.getHistoryIds(before = timestamp).map { it.id }
+        Log.d("HistoryRepository", "visited posts: ${ids}")
         val entities =
             visitedPostsDao.getHistory(before = timestamp)
         cache.putAll(entities.map {
-            json.decodeFromString<PostData>(it.post)
+            it.asVotableData() as PostData
         }.associateBy { it.name })
+        val nextPage = entities.lastOrNull()?.let {
+            visitedPostsDao.getPost(it.id)
+        }
         return PagedResponse(
             data = entities.map { it.id },
-            after = Fullname(entities.lastOrNull()?.visitedAt.toString()),
+            after = nextPage?.id,
             total = entities.size
         )
     }

@@ -66,7 +66,7 @@ data class CommentData(
 
     override fun toEntity(): VotableEntity {
         return VotableEntity(
-            id = name.name,
+            id = name,
             data = Json.encodeToString(this)
         )
     }

@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -38,6 +39,7 @@ internal fun PostView(
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = true,
 ) {
+    val currentAccount = LocalRedditAccount.current
     PostCard(post, threadViewModel = threadViewModel) {
         if (!post.isCrosspost) {
             PostBody(
@@ -46,7 +48,7 @@ internal fun PostView(
                 maxLines = null,
                 forceShowSelftext = true,
                 enableLinkFullSizePreview = false,
-                visitPost = threadViewModel::visitPost
+                markAsRead = { threadViewModel.visitPost(post, currentAccount.id) }
             )
         } else {
             val parent = post.crosspostParentList.first()

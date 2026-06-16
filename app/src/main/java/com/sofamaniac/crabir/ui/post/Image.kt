@@ -46,7 +46,6 @@ fun PostImage(
     post: PostData,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    visitPost: (PostData) -> Unit,
     goFullscreen: (Route) -> Unit
 ) {
     val quality = Quality.High
@@ -54,7 +53,6 @@ fun PostImage(
 //        fullscreenManager.push {
 //            FullscreenImageView(post)
 //        }
-        visitPost(post)
         goFullscreen(FullscreenImageRoute(post.name))
     }
     val filters = rememberFiltersSettings()

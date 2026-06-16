@@ -55,6 +55,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.LocalDrawerState
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
@@ -62,7 +63,6 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.SortMenu
@@ -277,10 +277,9 @@ fun DefaultPostView(
 ) {
 
     val viewSettings = rememberViewSettings()
-    val navController = LocalNavController.current!!
-    val onClick = { post: PostData ->
-        viewModel.visitPost(post)
-        navController.navigate(PostRoute(post.permalink, null))
+    val currentAccount = LocalRedditAccount.current
+    val markAsRead = {
+        viewModel.visitPost(thing, currentAccount.id)
     }
     val canStartVideo =
         viewSettings.defaultColumns == 1 && isMostVisible
@@ -288,14 +287,14 @@ fun DefaultPostView(
     when (viewSettings.defaultView) {
         Views.Card -> PostCard(
             thing,
-            onClick = onClick,
+            markAsRead = markAsRead,
             canStartVideo = canStartVideo,
             read = wasRead,
         )
 
         Views.Compact -> CompactView(
             thing,
-            onClick = onClick,
+            markAsRead = markAsRead,
             canStartVideo = canStartVideo,
             read = wasRead,
         )
@@ -303,9 +302,7 @@ fun DefaultPostView(
         else ->
             PostCard(
                 thing,
-                onClick = { post ->
-                    navController.navigate(PostRoute(post.permalink, null))
-                },
+                markAsRead = markAsRead,
                 canStartVideo = canStartVideo,
             )
     }

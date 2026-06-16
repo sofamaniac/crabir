@@ -187,7 +187,6 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     // Render markdown
-    implementation(libs.markdown)
     implementation(libs.multiplatform.markdown.renderer)
     implementation(libs.multiplatform.markdown.renderer.m3)
     implementation(libs.multiplatform.markdown.renderer.coil3)
@@ -198,4 +197,6 @@ dependencies {
 
     // Support for XML serialization / deserialization
     implementation(libs.serialization)
+
+    implementation(project(":redditMarkdown"))
 }

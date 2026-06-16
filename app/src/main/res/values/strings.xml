@@ -51,6 +51,7 @@
     <string name="downvote">Downvote</string>
     <string name="save">Save</string>
     <string name="unsave">Unsave</string>
+    <string name="filtersPageTitle">Filters</string>
     <plurals name="members">
         <item quantity="zero">No members</item>
         <item quantity="one">%d member</item>
@@ -62,4 +63,7 @@
         <item quantity="one">%d more reply</item>
         <item quantity="other">%d more replies</item>
     </plurals>
+    <string name="showNSFW">Show NSFW</string>
+    <string name="showNSFWMedia">Show NSFW Media</string>
+    <string name="blurNSFW">Blur NSFW</string>
 </resources>
