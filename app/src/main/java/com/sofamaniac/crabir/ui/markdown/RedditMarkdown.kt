@@ -34,6 +34,8 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.toLocalUrl
+import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
+import org.intellij.markdown.parser.MarkdownParser
 
 @Composable
 fun RedditMarkdown(
@@ -87,6 +89,7 @@ private fun InnerRedditMarkdown(
     val spoilers = remember { mutableStateMapOf<String, Boolean>() }
     Markdown(
         content = markdown,
+        parser = MarkdownParser(RedditFlavourDescriptor()),
         modifier = modifier,
         typography = typography,
         imageTransformer = Coil3ImageTransformerImpl,
