@@ -64,6 +64,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.SortInterface
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
@@ -214,8 +215,14 @@ class SearchCommonViewModel @AssistedInject constructor(@Assisted query: String)
 
 @Composable
 private fun InnerTab(viewModel: PostSearchViewModel) {
+    val currentAccount = LocalRedditAccount.current
     PostFeedViewer(viewModel) { post, isMosVisible ->
-        DefaultPostView(post, isMostVisible = isMosVisible, viewModel = viewModel)
+        DefaultPostView(
+            post, isMostVisible = isMosVisible, markAsRead = {
+                viewModel.visitPost(post, currentAccount.id)
+            },
+            read = viewModel.isPostRead(post)
+        )
     }
 }
 
@@ -455,7 +462,7 @@ fun SearchSettings(viewModel: PostSearchViewModel) {
     Column {
         ListSelector(
             PostSearchSort.entries,
-            params.sort as PostSearchSort,
+            params.sort,
             onOptionSelected = viewModel::setSort,
             headlineContent = { Text("Sort") }
         )

@@ -55,14 +55,12 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.LocalDrawerState
-import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
-import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.SortMenu
@@ -145,9 +143,7 @@ fun <T : VotableData> PostFeedViewer(
             }
     }
 
-    //val fullscreenManager = LocalFullscreenHandler.current!!
     val viewSettings = rememberViewSettings()
-    val navController = LocalNavController.current!!
     val state = rememberPullToRefreshState()
 
     PullToRefreshBox(
@@ -183,14 +179,15 @@ fun <T : VotableData> PostFeedViewer(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize(),
-            //verticalArrangement = Arrangement.spacedBy(8.dp),
             state = listState,
         ) {
             if (feedInfo != null) {
                 item(
                     key = "info",
                     span = StaggeredGridItemSpan.FullLine
-                ) { feedInfo() }
+                ) {
+                    feedInfo()
+                }
             }
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
                 val isMostVisible = index == mostVisibleItemIndex
@@ -272,37 +269,34 @@ fun TopBar(
 @Composable
 fun DefaultPostView(
     thing: PostData,
-    viewModel: FeedViewModelInterface<PostData>,
-    isMostVisible: Boolean
+    isMostVisible: Boolean,
+    read: Boolean,
+    markAsRead: () -> Unit,
 ) {
 
     val viewSettings = rememberViewSettings()
-    val currentAccount = LocalRedditAccount.current
-    val markAsRead = {
-        viewModel.visitPost(thing, currentAccount.id)
-    }
     val canStartVideo =
         viewSettings.defaultColumns == 1 && isMostVisible
-    val wasRead = viewModel.isPostRead(thing)
     when (viewSettings.defaultView) {
         Views.Card -> PostCard(
             thing,
             markAsRead = markAsRead,
             canStartVideo = canStartVideo,
-            read = wasRead,
+            read = read,
         )
 
         Views.Compact -> CompactView(
             thing,
             markAsRead = markAsRead,
             canStartVideo = canStartVideo,
-            read = wasRead,
+            read = read,
         )
 
         else ->
             PostCard(
                 thing,
                 markAsRead = markAsRead,
+                read = read,
                 canStartVideo = canStartVideo,
             )
     }

@@ -42,6 +42,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import com.sofamaniac.crabir.LocalDrawerState
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Kind
@@ -74,19 +75,10 @@ fun FullFeedView(
     val bottomSheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
-    //val fullscreenManager = LocalFullscreenHandler.current!!
     val communityEntity by viewModel.entity.collectAsState(initial = null)
-    //val enabledDrawer by remember { fullscreenManager.size.map { it == 0 } }.collectAsState(true)
-//    fun createPost(kind: Kind) {
-//        showBottomSheet = false
-//        fullscreenManager.push {
-//            PostCreator(kind = kind, community = entity?.getData())
-//        }
-//    }
-
     val navController = LocalNavController.current!!
-
     val drawerState = LocalDrawerState.current
+    val currentAccount = LocalRedditAccount.current
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -113,7 +105,14 @@ fun FullFeedView(
                 feedInfo = feedInfo,
                 modifier = Modifier.padding(innerPadding)
             ) { post, isMosVisible ->
-                DefaultPostView(post, isMostVisible = isMosVisible, viewModel = viewModel)
+                DefaultPostView(
+                    post,
+                    isMostVisible = isMosVisible,
+                    read = viewModel.isPostRead(post),
+                    markAsRead = {
+                        viewModel.visitPost(post, currentAccount.id)
+                    }
+                )
             }
 
             if (showBottomSheet) {

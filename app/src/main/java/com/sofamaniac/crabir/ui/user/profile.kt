@@ -42,6 +42,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.LocalDrawerState
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.Rules
@@ -57,7 +58,6 @@ import com.sofamaniac.crabir.ui.TabBar
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.subreddit.DefaultPostView
-import com.sofamaniac.crabir.ui.subreddit.FeedViewModelInterface
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewerDefaults
 import com.sofamaniac.crabir.ui.thread.CommentViewModelInterface
@@ -100,11 +100,6 @@ enum class ProfileTabs {
             }
         }
     }
-}
-
-@Composable
-fun ProfileInfo(modifier: Modifier = Modifier) {
-    Text("WIP")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -209,9 +204,10 @@ fun ProfileView(
                     val page = tabs[it]
                     val viewModel = viewModels[page]
                     val filter = when (page) {
-                        ProfileTabs.Hidden -> { data: VotableData? -> true }
+                        ProfileTabs.Hidden -> { _: VotableData? -> true }
                         else -> PostFeedViewerDefaults::hiddenFilter
                     }
+                    val currentAccount = LocalRedditAccount.current
                     if (viewModel != null) {
                         PostFeedViewer(
                             viewModel = viewModel, filter = filter,
@@ -220,13 +216,11 @@ fun ProfileView(
                                 is PostData -> DefaultPostView(
                                     thing,
                                     isMostVisible = isMostVisible,
-                                    viewModel = viewModel as FeedViewModelInterface<PostData>
+                                    markAsRead = { viewModel.visitPost(thing, currentAccount.id) },
+                                    read = viewModel.isPostRead(thing),
                                 )
-
                                 is CommentData -> CommentView(
                                     thing,
-                                    viewModel as FeedViewModelInterface<CommentData>,
-                                    isMostVisible
                                 )
                             }
                         }
@@ -245,8 +239,6 @@ fun ProfileView(
 @Composable
 fun CommentView(
     thing: CommentData,
-    viewModel: FeedViewModelInterface<CommentData>,
-    isMostVisible: Boolean
 ) {
     val navController = LocalNavController.current!!
     Column(
