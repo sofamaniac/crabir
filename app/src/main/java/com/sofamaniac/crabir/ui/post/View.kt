@@ -151,7 +151,7 @@ interface VotableInteraction {
 }
 
 interface LinkInteraction : VotableInteraction {
-    val post: Flow<PostData?>
+    val post: Flow<PostData>
     val flairs: StateFlow<List<FlairInfo>>
     fun hide()
 
@@ -238,7 +238,7 @@ open class LinkViewModel @AssistedInject constructor(
     private val history: VisitedPostsDao,
 ) : VotableViewModel<PostData>(post.name.name, post.subreddit.name, posts), LinkInteraction {
 
-    override val post = posts.get(post.name).stateIn(
+    override val post = posts.get(post.name).map { it ?: post }.stateIn(
         scope = viewModelScope,
         started = kotlinx.coroutines.flow.SharingStarted.Eagerly,
         initialValue = post

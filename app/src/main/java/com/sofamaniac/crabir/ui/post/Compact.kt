@@ -27,6 +27,7 @@ fun CompactView(
     markAsRead: () -> Unit = {},
     canStartVideo: Boolean = false,
     read: Boolean = false,
+    showHidden: Boolean = false,
     viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
@@ -41,6 +42,10 @@ fun CompactView(
         }
     }
     val likes by viewModel.likes.collectAsState(post.relationship.liked)
+    val post by viewModel.post.collectAsState(post)
+    if (!showHidden && post.relationship.hidden) {
+        return
+    }
     ThemedCard(
         onClick = onClick,
     ) {

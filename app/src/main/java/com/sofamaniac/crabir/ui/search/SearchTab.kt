@@ -221,7 +221,8 @@ private fun InnerTab(viewModel: PostSearchViewModel) {
             post, isMostVisible = isMosVisible, markAsRead = {
                 viewModel.visitPost(post, currentAccount.id)
             },
-            read = viewModel.isPostRead(post)
+            read = viewModel.isPostRead(post),
+            showHidden = false
         )
     }
 }

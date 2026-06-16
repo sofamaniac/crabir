@@ -111,7 +111,8 @@ fun FullFeedView(
                     read = viewModel.isPostRead(post),
                     markAsRead = {
                         viewModel.visitPost(post, currentAccount.id)
-                    }
+                    },
+                    showHidden = false
                 )
             }
 

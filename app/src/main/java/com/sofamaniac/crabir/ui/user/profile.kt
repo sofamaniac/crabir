@@ -59,7 +59,6 @@ import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.subreddit.DefaultPostView
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
-import com.sofamaniac.crabir.ui.subreddit.PostFeedViewerDefaults
 import com.sofamaniac.crabir.ui.thread.CommentViewModelInterface
 import com.sofamaniac.crabir.ui.thread.OpenedComment
 import dagger.assisted.Assisted
@@ -203,14 +202,10 @@ fun ProfileView(
                 ) {
                     val page = tabs[it]
                     val viewModel = viewModels[page]
-                    val filter = when (page) {
-                        ProfileTabs.Hidden -> { _: VotableData? -> true }
-                        else -> PostFeedViewerDefaults::hiddenFilter
-                    }
                     val currentAccount = LocalRedditAccount.current
                     if (viewModel != null) {
                         PostFeedViewer(
-                            viewModel = viewModel, filter = filter,
+                            viewModel = viewModel,
                         ) { thing, isMostVisible ->
                             when (thing) {
                                 is PostData -> DefaultPostView(
@@ -218,7 +213,9 @@ fun ProfileView(
                                     isMostVisible = isMostVisible,
                                     markAsRead = { viewModel.visitPost(thing, currentAccount.id) },
                                     read = viewModel.isPostRead(thing),
+                                    showHidden = page == ProfileTabs.Hidden,
                                 )
+
                                 is CommentData -> CommentView(
                                     thing,
                                 )

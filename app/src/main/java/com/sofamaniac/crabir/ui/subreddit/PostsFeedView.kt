@@ -26,7 +26,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -97,8 +96,7 @@ fun <T : VotableData> PostFeedViewer(
     modifier: Modifier = Modifier,
     // If set to {}, breaks pull to refresh
     feedInfo: (@Composable () -> Unit)? = null,
-    filter: (T?) -> Boolean = PostFeedViewerDefaults::hiddenFilter,
-    itemView: @Composable (thing: T, isMosVisible: Boolean) -> Unit
+    itemView: @Composable (thing: T, isMostVisible: Boolean) -> Unit
 ) {
 
     val posts = viewModel.data.collectAsLazyPagingItems()
@@ -192,9 +190,8 @@ fun <T : VotableData> PostFeedViewer(
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
                 val isMostVisible = index == mostVisibleItemIndex
                 val post = posts[index]
-                if (post != null && filter(post)) {
+                if (post != null) {
                     itemView(post, isMostVisible)
-                    HorizontalDivider()
                 }
             }
         }
@@ -272,6 +269,7 @@ fun DefaultPostView(
     isMostVisible: Boolean,
     read: Boolean,
     markAsRead: () -> Unit,
+    showHidden: Boolean,
 ) {
 
     val viewSettings = rememberViewSettings()
@@ -283,6 +281,7 @@ fun DefaultPostView(
             markAsRead = markAsRead,
             canStartVideo = canStartVideo,
             read = read,
+            showHidden = showHidden,
         )
 
         Views.Compact -> CompactView(
@@ -290,6 +289,7 @@ fun DefaultPostView(
             markAsRead = markAsRead,
             canStartVideo = canStartVideo,
             read = read,
+            showHidden = showHidden,
         )
 
         else ->
@@ -298,6 +298,7 @@ fun DefaultPostView(
                 markAsRead = markAsRead,
                 read = read,
                 canStartVideo = canStartVideo,
+                showHidden = showHidden,
             )
     }
 }

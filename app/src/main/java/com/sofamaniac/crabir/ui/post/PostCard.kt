@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.post
 
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,19 +49,18 @@ fun PostCard(
     markAsRead: () -> Unit = {},
     canStartVideo: Boolean = false,
     read: Boolean = false,
+    showHidden: Boolean = false,
     viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
             factory.create(post)
         }),
 ) {
-    val _post by viewModel.post.collectAsState()
+    val post by viewModel.post.collectAsState()
     val likes by viewModel.likes.collectAsState(null)
-    if (_post == null) {
-        Log.w("PostCard", "Trying to render null")
+    if (!showHidden && post.relationship.hidden) {
         return
     }
-    val post = _post!!
     PostCardContent(
         post,
         modifier,
@@ -160,7 +158,7 @@ internal fun PostCardPreview() {
 
 object DummyInteraction : LinkInteraction {
     private var _post = MutableStateFlow(DUMMY_POST.copy(kind = Kind.Self))
-    override val post: StateFlow<PostData?> = _post
+    override val post: StateFlow<PostData> = _post
     override val flairs: StateFlow<List<FlairInfo>> = MutableStateFlow(emptyList())
 
     override fun hide() {
