@@ -86,6 +86,10 @@ android {
             )
         }
     }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
 }
 
 
@@ -130,6 +134,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.adaptive.layout)
     implementation(libs.androidx.compose.adaptive.navigation)
+    implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     ksp(libs.hilt.android.compiler)
     ksp(libs.kotlin.metadata.jvm)
 

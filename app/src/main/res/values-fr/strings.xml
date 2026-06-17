@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Crabir</string>
     <string name="SortTop">Top</string>
     <string name="SortControversial">Controversés</string>
     <string name="SortRising">En hausse</string>
@@ -78,4 +77,14 @@
     <string name="spoiler">Spoiler</string>
     <string name="inbox_replies">Notification de réponse</string>
     <string name="delete">Supprimer</string>
+    <string name="edit_title_filters">Éditer les filtres de titres</string>
+    <string name="edit_author_filters">Éditer les filtres d\'auteurs</string>
+    <string name="edit_subreddit_filters">Éditer les filtres de subreddit</string>
+    <string name="edit_domains_filters">Éditer les filtres de domaines</string>
+    <string name="edit_flair_filters">Éditer les filtres de flair</string>
+    <string name="filter_settings_title">Paramètres de filtres</string>
+    <string name="mute_posts_from_user">Mettre en sourdine les publications de u/%1$s</string>
+    <string name="mute_posts_from_community">Mettre en sourdine les publications de r/%1$s</string>
+    <string name="mute_posts_from_domain">Mettre en sourdine les publications vers %1$s</string>
+    <string name="mute_flair">Mettre en sourdine le flair</string>
 </resources>

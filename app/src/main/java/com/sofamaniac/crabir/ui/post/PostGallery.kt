@@ -44,7 +44,7 @@ import com.sofamaniac.crabir.domain.model.Gallery
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.FullscreenGalleryRoute
 import com.sofamaniac.crabir.navigation.Route
-import com.sofamaniac.crabir.settings.rememberFiltersSettings
+import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.media.gallery.Gallery

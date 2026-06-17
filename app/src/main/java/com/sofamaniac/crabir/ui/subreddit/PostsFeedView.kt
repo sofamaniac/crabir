@@ -48,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -60,6 +61,7 @@ import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
+import com.sofamaniac.crabir.settings.filters.FiltersSettings
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.SortMenu
@@ -68,20 +70,6 @@ import com.sofamaniac.crabir.ui.post.PostCard
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlin.math.max
-
-typealias ThingView<T> = @Composable (thing: T, isMostVisible: Boolean) -> Unit
-
-object PostFeedViewerDefaults {
-    fun hiddenFilter(votableData: VotableData?): Boolean {
-        return when (votableData) {
-            is PostData -> {
-                !votableData.relationship.hidden
-            }
-
-            else -> true
-        }
-    }
-}
 
 /**
  * Composable function to display a list of posts from a subreddit.
@@ -94,6 +82,7 @@ object PostFeedViewerDefaults {
 fun <T : VotableData> PostFeedViewer(
     viewModel: FeedViewModelInterface<T>,
     modifier: Modifier = Modifier,
+    filter: (T) -> Boolean = { true },
     // If set to {}, breaks pull to refresh
     feedInfo: (@Composable () -> Unit)? = null,
     itemView: @Composable (thing: T, isMostVisible: Boolean) -> Unit
@@ -175,7 +164,7 @@ fun <T : VotableData> PostFeedViewer(
             verticalItemSpacing = 2.dp,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
+                .background(Color.Gray)
                 .fillMaxSize(),
             state = listState,
         ) {
@@ -190,7 +179,7 @@ fun <T : VotableData> PostFeedViewer(
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
                 val isMostVisible = index == mostVisibleItemIndex
                 val post = posts[index]
-                if (post != null) {
+                if (post != null && filter(post)) {
                     itemView(post, isMostVisible)
                 }
             }
@@ -301,4 +290,12 @@ fun DefaultPostView(
                 showHidden = showHidden,
             )
     }
+}
+
+private fun FiltersSettings.filter(post: PostData): Boolean {
+    return titleFilters.any { Regex(it).matches(post.title) }
+            || domainFilters.any { Regex(it).matches(post.url) }
+            || subredditFilters.any { Regex(it).matches(post.subreddit.name) }
+            || authorFilters.any { Regex(it).matches(post.author.username) }
+            || flairFilters.any { Regex(it).matches(post.linkFlair.text) }
 }

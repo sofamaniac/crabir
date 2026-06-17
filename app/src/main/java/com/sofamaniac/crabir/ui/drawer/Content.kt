@@ -55,7 +55,7 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.MultiRoute
 import com.sofamaniac.crabir.navigation.SettingsRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
-import com.sofamaniac.crabir.settings.filtersDataStore
+import com.sofamaniac.crabir.settings.filters.filtersDataStore
 import com.sofamaniac.crabir.settings.theme.ThemeMode
 import com.sofamaniac.crabir.settings.theme.themeDataStore
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon

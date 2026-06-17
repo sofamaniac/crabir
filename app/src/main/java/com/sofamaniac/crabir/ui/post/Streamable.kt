@@ -18,7 +18,7 @@ import com.sofamaniac.crabir.data.remote.streamable.Video
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
 import com.sofamaniac.crabir.navigation.Route
-import com.sofamaniac.crabir.settings.rememberFiltersSettings
+import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

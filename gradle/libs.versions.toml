@@ -89,7 +89,8 @@ aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version = "
 aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose-core", version = "14.0.1" } # Common compose core
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version = "14.0.1" }
 androidx-compose-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout", version.ref = "adaptiveLayout" }
-androidx-compose-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "adaptiveNavigation" }      # Material 3 UI
+androidx-compose-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "adaptiveNavigation" }
+androidx-compose-material3-adaptive-navigation-suite = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite" }      # Material 3 UI
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

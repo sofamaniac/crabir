@@ -49,6 +49,7 @@ import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostCreatorRoute
+import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import kotlinx.coroutines.launch
 
@@ -69,6 +70,7 @@ fun FullFeedView(
     bottomBar: @Composable () -> Unit,
     viewModel: FeedViewModelInterface<PostData>,
     modifier: Modifier = Modifier,
+    filter: (PostData) -> Boolean = rememberPostsFilter(),
     feedInfo: (@Composable () -> Unit)? = null,
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -103,6 +105,7 @@ fun FullFeedView(
             PostFeedViewer(
                 viewModel,
                 feedInfo = feedInfo,
+                filter = filter,
                 modifier = Modifier.padding(innerPadding)
             ) { post, isMosVisible ->
                 DefaultPostView(

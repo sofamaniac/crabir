@@ -51,6 +51,7 @@ import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import com.sofamaniac.crabir.domain.repository.feed.SubredditPostsRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SubredditInfoRoute
+import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
 import com.sofamaniac.crabir.ui.TabBar
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import dagger.assisted.Assisted
@@ -98,6 +99,7 @@ fun SubredditViewer(
     FullFeedView(
         topBar, bottomBar, viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        filter = rememberPostsFilter(whitelistSubreddit = listOf(subreddit)),
         feedInfo = {
             val info = feedInfo
             if (info != null) {

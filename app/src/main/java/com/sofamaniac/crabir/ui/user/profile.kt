@@ -55,6 +55,7 @@ import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.ui.TabBar
+import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.subreddit.DefaultPostView
@@ -206,6 +207,7 @@ fun ProfileView(
                     if (viewModel != null) {
                         PostFeedViewer(
                             viewModel = viewModel,
+                            filter = { true }
                         ) { thing, isMostVisible ->
                             when (thing) {
                                 is PostData -> DefaultPostView(
@@ -238,7 +240,7 @@ fun CommentView(
     thing: CommentData,
 ) {
     val navController = LocalNavController.current!!
-    Column(
+    ThemedCard(
         modifier = Modifier.clickable {
             navController.navigate(
                 PostRoute(

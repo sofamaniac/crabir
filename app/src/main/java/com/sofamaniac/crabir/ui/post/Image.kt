@@ -28,7 +28,7 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.FullscreenImageRoute
 import com.sofamaniac.crabir.navigation.Route
-import com.sofamaniac.crabir.settings.rememberFiltersSettings
+import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.image.DownloadButton
 import com.sofamaniac.crabir.ui.media.image.ImageView

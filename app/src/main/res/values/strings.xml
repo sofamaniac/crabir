@@ -88,4 +88,14 @@
     <string name="spoiler">Spoiler</string>
     <string name="inbox_replies">Inbox replies</string>
     <string name="delete">Delete</string>
+    <string name="edit_title_filters">Edit title filters</string>
+    <string name="edit_author_filters">Edit author filters</string>
+    <string name="edit_subreddit_filters">Edit subreddit filters</string>
+    <string name="edit_domains_filters">Edit domains filters</string>
+    <string name="edit_flair_filters">Edit flair filters</string>
+    <string name="filter_settings_title">Filter settings</string>
+    <string name="mute_posts_from_user">Mute posts from u/%1$s</string>
+    <string name="mute_posts_from_community">Mute posts from r/%1$s</string>
+    <string name="mute_posts_from_domain">Mute posts from %1$s</string>
+    <string name="mute_flair">Mute flair</string>
 </resources>

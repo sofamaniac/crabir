@@ -145,7 +145,7 @@ internal fun PostCardPreview() {
     val post by DummyInteraction.post.collectAsState()
     CompositionLocalProvider(LocalNavController provides navController) {
         PostCardContent(
-            post!!,
+            post,
             clickable = false,
             markAsRead = {},
             canStartVideo = false,

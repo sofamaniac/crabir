@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.CallSplit
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
@@ -61,12 +62,14 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.core.net.toUri
 import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.R
@@ -77,6 +80,7 @@ import com.sofamaniac.crabir.navigation.CrosspostCreatorRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
+import com.sofamaniac.crabir.settings.filters.filtersDataStore
 import com.sofamaniac.crabir.ui.postEditor.FlairDialog
 import com.sofamaniac.crabir.ui.postEditor.FlairEditBox
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
@@ -167,6 +171,7 @@ private fun PostOptions(
     var showShareDialog by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
+    var showMuteDialog by remember { mutableStateOf(false) }
     IconButton(onClick = { showOptions = true }) {
         Icon(Icons.Default.MoreVert, "more", tint = Color.Gray)
     }
@@ -256,26 +261,28 @@ private fun PostOptions(
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.report)) },
                     modifier = Modifier.clickable {
-                    interaction.fetchRules()
-                    showReportDialog = true
-                })
+                        interaction.fetchRules()
+                        showReportDialog = true
+                    })
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.mute)) },
-                    modifier = Modifier.clickable {})
+                    modifier = Modifier.clickable {
+                        showMuteDialog = true
+                    })
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.share)) },
                     modifier = Modifier.clickable {
-                    showShareDialog = true
-                })
+                        showShareDialog = true
+                    })
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.copy)) },
                     modifier = Modifier.clickable {
-                    scope.launch {
-                        val clipData = ClipData.newPlainText("Post URL", post.url.toString())
-                        val clipEntry = ClipEntry(clipData)
-                        clipboard.setClipEntry(clipEntry)
-                    }
-                })
+                        scope.launch {
+                            val clipData = ClipData.newPlainText("Post URL", post.url)
+                            val clipEntry = ClipEntry(clipData)
+                            clipboard.setClipEntry(clipEntry)
+                        }
+                    })
                 if (BuildConfig.DEBUG) {
                     ListItem(
                         headlineContent = { Text(stringResource(R.string.post_content)) },
@@ -303,6 +310,13 @@ private fun PostOptions(
             showEditDialog = false
             showOptions = false
         }
+    }
+    if (showMuteDialog) {
+        MuteDialog(post) {
+            showMuteDialog = false
+            showOptions = false
+        }
+
     }
 }
 
@@ -588,5 +602,79 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
             },
             onDismiss = { showFlairEditDialog = false }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MuteDialog(post: PostData, onClick: () -> Unit) {
+    val context = LocalContext.current
+    val settingsDataStore = remember(context) { context.filtersDataStore }
+    val scope = rememberCoroutineScope()
+    val username = post.author.username
+    val subreddit = post.subreddit.name
+    val flair = post.linkFlair.text
+    val domain = post.url.toUri().host
+    BasicAlertDialog(onDismissRequest = onClick) {
+        Card() {
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.mute_posts_from_user, username)) },
+                leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
+                modifier = Modifier.clickable {
+                    scope.launch {
+                        settingsDataStore.updateData { it.copy(authorFilters = it.authorFilters + username) }
+                        onClick()
+                    }
+                }
+            )
+            ListItem(
+                headlineContent = {
+                    Text(
+                        stringResource(
+                            R.string.mute_posts_from_community,
+                            subreddit
+                        )
+                    )
+                },
+                leadingContent = { Icon(Icons.Default.Groups, contentDescription = null) },
+                modifier = Modifier.clickable {
+                    scope.launch {
+                        settingsDataStore.updateData { it.copy(subredditFilters = it.subredditFilters + subreddit) }
+                        onClick()
+                    }
+                }
+            )
+            domain?.isNotBlank()?.let {
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            stringResource(
+                                R.string.mute_posts_from_domain,
+                                domain
+                            )
+                        )
+                    },
+                    leadingContent = { Icon(Icons.Default.Link, contentDescription = null) },
+                    modifier = Modifier.clickable {
+                        scope.launch {
+                            settingsDataStore.updateData { it.copy(domainFilters = it.domainFilters + domain) }
+                            onClick()
+                        }
+                    }
+                )
+            }
+            if (flair.isNotBlank()) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.mute_flair)) },
+                    leadingContent = { Spacer(modifier = Modifier.size(16.dp)) },
+                    modifier = Modifier.clickable {
+                        scope.launch {
+                            settingsDataStore.updateData { it.copy(flairFilters = it.flairFilters + flair) }
+                            onClick()
+                        }
+                    }
+                )
+            }
+        }
     }
 }
