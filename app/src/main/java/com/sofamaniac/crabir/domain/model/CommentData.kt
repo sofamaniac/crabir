@@ -53,7 +53,8 @@ data class CommentData(
     val collapsed: Boolean,
     val createdUtc: Instant,
     val edited: Instant?,
-    val mediaMetadata: Map<String, MediaMetadata>
+    val mediaMetadata: Map<String, MediaMetadata>,
+    val distinguished: String? = ""
 ) : VotableData {
     override fun copy(relationship: Relationship?, score: Score?): CommentData =
         copy(relationship = relationship ?: this.relationship, score = score ?: this.score)

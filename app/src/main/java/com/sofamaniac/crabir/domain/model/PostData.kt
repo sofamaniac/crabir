@@ -4,6 +4,7 @@ import com.sofamaniac.crabir.data.local.entities.VotableEntity
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.data.remote.dto.post.Preview
+import com.sofamaniac.crabir.data.remote.utils.CommentSortSerializer
 import com.sofamaniac.crabir.reddit.Thumbnail
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -23,6 +24,7 @@ data class PostData(
     val domain: String,
     val permalink: String,
     val title: String,
+    @Serializable(with = CommentSortSerializer::class)
     val suggestedSort: Sort?,
     val numComments: Int,
     val over18: Boolean,

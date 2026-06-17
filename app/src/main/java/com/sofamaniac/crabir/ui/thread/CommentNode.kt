@@ -29,7 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalTheme
@@ -116,12 +118,22 @@ private fun CollapsedComment(
         append("· ")
         append(timeString)
     }
+    val authorString = buildAnnotatedString {
+        append("[+] ")
+        if (comment.distinguished == "moderator") {
+            withStyle(SpanStyle(background = Color(0xFFB2FF59))) {
+                append(comment.author.username)
+            }
+        } else {
+            append(comment.author.username)
+        }
+    }
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text("[+] ${comment.author.username}", color = theme.secondaryText)
+        Text(authorString, color = theme.secondaryText)
         Spacer(modifier = Modifier.weight(1f))
         Text(
             "+${comment.replies.size}",
@@ -225,6 +237,7 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
             )
         )
     }
+    val authorString = comment.author.username
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -232,9 +245,15 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
     ) {
         if (comment.isSubmitter) {
             Text(
-                comment.author.username,
+                authorString,
                 color = Color.White,
                 modifier = authorModifier.cartouche(Color(0xFF2196F3))
+            )
+        } else if (comment.distinguished == "moderator") {
+            Text(
+                authorString,
+                color = Color.White,
+                modifier = authorModifier.cartouche(Color(0xFFB2FF59))
             )
         } else {
             Text(comment.author.username, color = theme.highlight, modifier = authorModifier)

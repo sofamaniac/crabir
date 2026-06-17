@@ -1,5 +1,5 @@
 [versions]
-aboutLibraries = "13.2.1"
+aboutLibraries = "14.0.1"
 agp = "9.1.1"
 appauth = "0.11.1"
 coil = "3.4.0"
@@ -30,6 +30,7 @@ adaptiveNavigation = "1.2.0"
 serialization = "1.0.0-rc2"
 jetbrainsKotlinJvm = "2.3.10"
 symbolProcessingApi = "2.3.2"
+coreKtx = "1.19.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.18.0" }
@@ -90,10 +91,12 @@ aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose-co
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version = "14.0.1" }
 androidx-compose-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout", version.ref = "adaptiveLayout" }
 androidx-compose-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "adaptiveNavigation" }
-androidx-compose-material3-adaptive-navigation-suite = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite" }      # Material 3 UI
+androidx-compose-material3-adaptive-navigation-suite = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }      # Material 3 UI
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibraries" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

@@ -27,7 +27,7 @@ android {
     androidResources {
         generateLocaleConfig = true
     }
-    compileSdk = 36
+    compileSdk = 37
     defaultConfig {
         applicationId = "com.sofamaniac.crabir"
         minSdk = 28
@@ -90,8 +90,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+//    kotlinOptions {
+//        jvmTarget = "11"
+//    }
 }
-
 
 room {
     schemaDirectory("$projectDir/schemas")
@@ -135,6 +137,7 @@ dependencies {
     implementation(libs.androidx.compose.adaptive.layout)
     implementation(libs.androidx.compose.adaptive.navigation)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
+    implementation(libs.core.ktx)
     ksp(libs.hilt.android.compiler)
     ksp(libs.kotlin.metadata.jvm)
 

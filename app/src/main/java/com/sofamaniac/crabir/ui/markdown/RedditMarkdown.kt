@@ -30,12 +30,12 @@ import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.ReferenceLinkHandlerImpl
 import com.mikepenz.markdown.model.markdownAnimations
 import com.mikepenz.markdown.model.markdownAnnotator
+import com.mikepenz.markdown.model.rememberMarkdownState
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.toLocalUrl
 import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
-import org.intellij.markdown.parser.MarkdownParser
 
 @Composable
 fun RedditMarkdown(
@@ -85,9 +85,9 @@ private fun InnerRedditMarkdown(
     val typography = redditMarkdownTypography()
     val referenceLinkHandler = ReferenceLinkHandlerImpl()
     val spoilers = remember { mutableStateMapOf<String, Boolean>() }
+    val markdown = rememberMarkdownState(markdown, flavour = RedditFlavourDescriptor())
     Markdown(
-        content = markdown,
-        parser = MarkdownParser(RedditFlavourDescriptor()),
+        markdown,
         modifier = modifier,
         typography = typography,
         imageTransformer = Coil3ImageTransformerImpl,
