@@ -54,12 +54,12 @@ fun rememberPostsFilter(
         val domain = post.url.toUri().host ?: ""
         val subreddit = post.subreddit.name
         val flair = post.linkFlair.text
-        settings.titleFilters.any { Regex(it).matches(title) }
+        !(settings.titleFilters.any { Regex(it).matches(title) }
                 || settings.domainFilters.any { Regex(it).matches(domain) }
                 || settings.subredditFilters.any { Regex(it).matches(subreddit) }
             .and(whitelistSubreddit.none { Regex(it).matches(subreddit) })
                 || settings.authorFilters.any { Regex(it).matches(author) }
             .and(whitelistAuthor.none { Regex(it).matches(author) })
-                || settings.flairFilters.any { Regex(it).matches(flair) }
+                || settings.flairFilters.any { Regex(it).matches(flair) })
     }
 }
