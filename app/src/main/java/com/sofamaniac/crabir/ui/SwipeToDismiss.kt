@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -21,6 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.IntOffset
+import com.sofamaniac.crabir.settings.theme.ThemeMode
+import com.sofamaniac.crabir.settings.theme.rememberThemeSettings
+import com.sofamaniac.crabir.settings.theme.setSystemBarsColor
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.absoluteValue
@@ -50,6 +54,15 @@ fun VerticalSwipeToDismiss(
 
     val blockDrag = Modifier.pointerInput(Unit) {
         detectDragGestures { _, _ -> }
+    }
+
+    val theme = rememberThemeSettings()
+    val updateBars = setSystemBarsColor()
+    DisposableEffect(theme.mode) {
+        updateBars(ThemeMode.Dark)
+        onDispose {
+            updateBars(theme.mode)
+        }
     }
 
     Box(

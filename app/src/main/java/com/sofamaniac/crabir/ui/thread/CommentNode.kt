@@ -40,6 +40,9 @@ import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
+import com.sofamaniac.crabir.settings.theme.ADMIN_CARTOUCHE_COLOR
+import com.sofamaniac.crabir.settings.theme.AUTHOR_CARTOUCHE_COLOR
+import com.sofamaniac.crabir.settings.theme.MODERATOR_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.ui.Flair
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.cartouche
@@ -247,13 +250,19 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
             Text(
                 authorString,
                 color = Color.White,
-                modifier = authorModifier.cartouche(Color(0xFF2196F3))
+                modifier = authorModifier.cartouche(AUTHOR_CARTOUCHE_COLOR)
             )
         } else if (comment.distinguished == "moderator") {
             Text(
                 authorString,
                 color = Color.White,
-                modifier = authorModifier.cartouche(Color(0xFFB2FF59))
+                modifier = authorModifier.cartouche(MODERATOR_CARTOUCHE_COLOR)
+            )
+        } else if (comment.distinguished == "admin") {
+            Text(
+                authorString,
+                color = Color.White,
+                modifier = authorModifier.cartouche(ADMIN_CARTOUCHE_COLOR)
             )
         } else {
             Text(comment.author.username, color = theme.highlight, modifier = authorModifier)

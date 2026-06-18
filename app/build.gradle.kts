@@ -127,6 +127,7 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.5.0-alpha17")
     implementation(libs.appauth)
     implementation(libs.material3)
+    debugImplementation(libs.androidx.compose.ui.tooling)
 
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.coroutines.core)

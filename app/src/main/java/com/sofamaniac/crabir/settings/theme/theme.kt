@@ -181,6 +181,13 @@ val DefaultLightTheme = CrabirTheme(
     saved = Color(0xFFFFD740),
 )
 
+val AUTHOR_CARTOUCHE_COLOR = Color(0xFF448AFF)
+val MODERATOR_CARTOUCHE_COLOR = Color(0xFF388E3C)
+val GIF_CARTOUCHE_COLOR = Color(0xFF0097A7)
+val VIDEO_CARTOUCHE_COLOR = Color(0xFFE64A19)
+val ADMIN_CARTOUCHE_COLOR = Color(0xFFE64A19)
+val YOUTUBE_CARTOUCHE_COLOR = Color(0xFFE64A19)
+
 enum class ThemeMode {
     Dark, Light, System, Scheduled;
 
@@ -231,11 +238,11 @@ object ColorSerializer : KSerializer<Color> {
 }
 
 @Composable
-fun rememberThemeSettings(): ThemeSettings? {
+fun rememberThemeSettings(): ThemeSettings {
     val context = LocalContext.current
     val themeDataStore = remember(context) { context.themeDataStore }
     val theme by themeDataStore.data.collectAsState(
-        initial = null,
+        initial = ThemeSettings.DEFAULT,
     )
     return theme
 }
@@ -243,41 +250,45 @@ fun rememberThemeSettings(): ThemeSettings? {
 @Composable
 fun rememberAppTheme(): CrabirTheme? {
     val theme = rememberThemeSettings()
-    if (theme == null) {
-        return null
-    }
     val colorScheme = MaterialTheme.colorScheme
     val dynamicTheme = CrabirTheme.fromColorScheme(colorScheme)
+    setSystemBarsColor()(theme.mode)
+    if (theme.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        return dynamicTheme
+    }
+    Log.d("rememberAppTheme", "rememberAppTheme: ${theme.mode}")
+    val mode = when (theme.mode) {
+        ThemeMode.System -> if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
+        else -> theme.mode
+    }
+    return when (mode) {
+        ThemeMode.Dark -> theme.dark
+        ThemeMode.Light -> theme.light
+        else -> theme.dark
+    }
+}
+
+@Composable
+fun setSystemBarsColor(): (ThemeMode) -> Unit {
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
     val windowInsetsController =
         WindowCompat.getInsetsController(window!!, window.decorView)
-    if (theme.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        return dynamicTheme
-    }
-    Log.d("rememberAppTheme", "rememberAppTheme: ${theme!!.mode}")
-    val mode = when (theme!!.mode) {
-        ThemeMode.System -> if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
-        else -> theme!!.mode
-    }
-    when (mode) {
-        ThemeMode.Dark -> {
-            windowInsetsController.isAppearanceLightStatusBars = false
-            windowInsetsController.isAppearanceLightNavigationBars = false
+    return { mode ->
+        Log.d("setSystemBarsColor", "Setting colors to $mode")
+        when (mode) {
+            ThemeMode.Dark -> {
+                windowInsetsController.isAppearanceLightStatusBars = false
+                windowInsetsController.isAppearanceLightNavigationBars = false
+            }
+
+            ThemeMode.Light -> {
+                windowInsetsController.isAppearanceLightStatusBars = true
+                windowInsetsController.isAppearanceLightNavigationBars = true
+            }
+
+            else -> {}
         }
-
-        ThemeMode.Light -> {
-            windowInsetsController.isAppearanceLightStatusBars = true
-            windowInsetsController.isAppearanceLightNavigationBars = true
-        }
-
-        else -> {}
-    }
-
-    return when (mode) {
-        ThemeMode.Dark -> theme!!.dark
-        ThemeMode.Light -> theme!!.light
-        else -> theme!!.dark
     }
 }
 

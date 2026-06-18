@@ -37,9 +37,11 @@ import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
-import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
+import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
+import com.sofamaniac.crabir.settings.theme.VIDEO_CARTOUCHE_COLOR
+import com.sofamaniac.crabir.settings.theme.YOUTUBE_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.media.image.DownloadButton
@@ -51,7 +53,9 @@ import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
 @OptIn(UnstableApi::class)
 @Composable
 fun PostVideo(
-    post: PostData, modifier: Modifier = Modifier, canPlayVideo: Boolean = false,
+    post: PostData,
+    modifier: Modifier = Modifier,
+    canPlayVideo: Boolean = false,
     goFullscreen: (Route) -> Unit
 ) {
     val video = getVideoUrl(post)
@@ -68,21 +72,22 @@ fun PostVideo(
             )
         }
     val uriHandler = LocalUriHandler.current
-    //val fullscreenManager = LocalFullscreenHandler.current!!
-    val navController = LocalNavController.current!!
 
     if (video == null) {
         val host = post.url.toUri().host
         val domain = host?.removePrefix("www.")?.split(".")?.firstOrNull()
+        val isGif = post.url.toUri().lastPathSegment?.endsWith(".gif") ?: false
+        val text = if (isGif) "GIF" else domain ?: "Video"
+        val cartoucheColor = if (isGif) GIF_CARTOUCHE_COLOR else VIDEO_CARTOUCHE_COLOR
         Box(modifier = Modifier.clickable {
             uriHandler.openUri(post.url)
         }) {
             placeholder()
             Text(
-                domain ?: "Video",
+                text,
                 modifier = Modifier
                     .padding(8.dp)
-                    .cartouche(backgroundColor = Color(64, 196, 255, 255))
+                    .cartouche(backgroundColor = cartoucheColor)
                     .align(Alignment.TopEnd)
             )
         }
@@ -157,7 +162,7 @@ fun YoutubeVideo(post: PostData, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(8.dp)
-                .cartouche(Color.Red)
+                .cartouche(YOUTUBE_CARTOUCHE_COLOR)
         )
     }
 }

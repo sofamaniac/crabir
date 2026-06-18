@@ -15,8 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -34,10 +32,9 @@ fun ThemeSettingsPage() {
     val context = LocalContext.current
     val themeDataStore = remember(context) { context.themeDataStore }
 
-    val settings by themeDataStore.data.collectAsState(initial = null)
+    val settings = rememberThemeSettings()
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current!!
-    if (settings == null) return
 
     Scaffold { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
@@ -50,7 +47,7 @@ fun ThemeSettingsPage() {
                 },
                 headlineContent = { Text("Theme") },
                 options = ThemeMode.entries.toList(),
-                selectedOption = settings!!.mode,
+                selectedOption = settings.mode,
                 onOptionSelected = { target ->
                     scope.launch {
                         themeDataStore.updateData {
@@ -64,7 +61,7 @@ fun ThemeSettingsPage() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 SwitchTile(
                     headlineContent = { Text("Dynamic color") },
-                    checked = settings!!.dynamicColor,
+                    checked = settings.dynamicColor,
                     onCheckedChange = { target ->
                         scope.launch {
                             themeDataStore.updateData {
@@ -76,7 +73,7 @@ fun ThemeSettingsPage() {
             }
             ConditionalListItem(
                 text = "Edit Colors",
-                enabled = !settings!!.dynamicColor || Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
+                enabled = !settings.dynamicColor || Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
                 onClick = {
                     navController.navigate(ThemeEditorRoute)
                 },
