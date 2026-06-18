@@ -98,4 +98,6 @@
     <string name="mute_posts_from_community">Mute posts from r/%1$s</string>
     <string name="mute_posts_from_domain">Mute posts from %1$s</string>
     <string name="mute_flair">Mute flair</string>
+    <string name="nsfw_content">NSFW Content</string>
+    <string name="filters">Filters</string>
 </resources>

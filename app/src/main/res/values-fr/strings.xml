@@ -87,4 +87,6 @@
     <string name="mute_posts_from_community">Mettre en sourdine les publications de r/%1$s</string>
     <string name="mute_posts_from_domain">Mettre en sourdine les publications vers %1$s</string>
     <string name="mute_flair">Mettre en sourdine le flair</string>
+    <string name="nsfw_content">Contenu NSFW</string>
+    <string name="filters">Filtres</string>
 </resources>

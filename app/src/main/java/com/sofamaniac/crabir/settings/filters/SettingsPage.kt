@@ -15,7 +15,6 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -41,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.settings.ui.SettingHeader
 import com.sofamaniac.crabir.settings.ui.SwitchTile
 import kotlinx.coroutines.launch
 
@@ -77,6 +77,9 @@ fun FiltersSettingsPage() {
     ) { paddingValues ->
         LazyColumn(modifier = Modifier.padding(paddingValues)) {
             item {
+                SettingHeader(stringResource(R.string.nsfw_content))
+            }
+            item {
                 SwitchTile(
                     headlineContent = { Text(stringResource(R.string.showNSFW)) },
                     leadingContent = { Icon(Icons.Default._18UpRating, contentDescription = null) },
@@ -101,7 +104,7 @@ fun FiltersSettingsPage() {
                 )
             }
             item {
-                HorizontalDivider()
+                SettingHeader(stringResource(R.string.filters))
             }
             item {
                 ListItem(
@@ -179,7 +182,6 @@ private fun FilterEditor(
         .copy(
             containerColor = CardDefaults.cardColors().containerColor,
         )
-    var editingIndex: Int? by remember { mutableStateOf(null) }
     BasicAlertDialog(onDismissRequest) {
         Card() {
             LazyColumn() {
@@ -216,7 +218,6 @@ private fun FilterEditor(
                         colors = colors,
                         headlineContent = {
                             IconButton(onClick = {
-                                editingIndex = filters.size
                                 filters = filters + ""
                             }) {
                                 Icon(Icons.Default.Add, contentDescription = null)
