@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -34,7 +35,7 @@ import kotlin.math.roundToInt
 fun VerticalSwipeToDismiss(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
-    velocityThreshold: Float = 1000f,
+    velocityThreshold: Float = 5000f,
     threshold: Float = 0.3f,
     topBar: @Composable ColumnScope.() -> Unit = {},
     bottomBar: @Composable ColumnScope.() -> Unit = {},
@@ -75,6 +76,7 @@ fun VerticalSwipeToDismiss(
                 onDragStopped = { velocity ->
                     val fraction = abs(offsetY.value) / screenHeight
                     if (fraction >= threshold || abs(velocity) >= velocityThreshold) {
+                        Log.d("VerticalSwipeToDismiss", "Dismissed $velocity")
                         onDismiss()
                     } else {
                         scope.launch {
@@ -107,10 +109,4 @@ fun VerticalSwipeToDismiss(
         )
 
     }
-}
-
-enum class DismissValue {
-    Default,
-    DismissedStart,
-    DismissedEnd
 }

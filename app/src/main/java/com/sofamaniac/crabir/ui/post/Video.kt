@@ -79,7 +79,7 @@ fun PostVideo(
         val isGif = post.url.toUri().lastPathSegment?.endsWith(".gif") ?: false
         val text = if (isGif) "GIF" else domain ?: "Video"
         val cartoucheColor = if (isGif) GIF_CARTOUCHE_COLOR else VIDEO_CARTOUCHE_COLOR
-        Box(modifier = Modifier.clickable {
+        Box(modifier = modifier.clickable {
             uriHandler.openUri(post.url)
         }) {
             placeholder()
@@ -99,9 +99,7 @@ fun PostVideo(
             video,
             canPlayVideo,
             blur,
-            modifier = modifier.clickable(enabled = blur) {
-                goFullscreen()
-            },
+            modifier = modifier,
             goFullscreen = goFullscreen,
             placeholder = placeholder,
         )

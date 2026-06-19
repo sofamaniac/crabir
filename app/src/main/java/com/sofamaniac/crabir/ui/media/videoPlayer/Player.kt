@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.media.videoPlayer
 
-import android.util.Log
 import androidx.annotation.OptIn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -29,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.ContentFrame
 import com.sofamaniac.crabir.domain.model.MediaResource
+import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.AlwaysOnInfo
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
@@ -45,7 +45,7 @@ fun DecoratedVideoPlayer(
         }
     },
     cartouche: @Composable (() -> Unit)? = {
-        Text("Gif", modifier = Modifier.cartouche(Color.Cyan))
+        Text("Gif", modifier = Modifier.cartouche(GIF_CARTOUCHE_COLOR))
     },
     fullscreenButton: @Composable (() -> Unit)? = null,
     startPlaying: Boolean = false,
@@ -101,11 +101,10 @@ fun DecoratedVideoPlayer(
 
     val modifier = remember {
         val mod = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .aspectRatio(media.aspectRatio)
         if (clickable) {
             mod.clickable {
-                Log.d("VideoPlayer", "click")
                 VideoPlayerManager.setMediaItem(media.url)
                 showControls = !showControls
             }

@@ -275,7 +275,6 @@ fun setSystemBarsColor(): (ThemeMode) -> Unit {
     val windowInsetsController =
         WindowCompat.getInsetsController(window!!, window.decorView)
     return { mode ->
-        Log.d("setSystemBarsColor", "Setting colors to $mode")
         when (mode) {
             ThemeMode.Dark -> {
                 windowInsetsController.isAppearanceLightStatusBars = false
