@@ -13,7 +13,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.EnterTransition
@@ -31,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -158,30 +156,17 @@ fun MainScreen(
         }
     }
 
-    val scope = rememberCoroutineScope()
-    val activity = LocalActivity.current
-    val drawerState = LocalDrawerState.current
-//    PredictiveBackHandler {
-//        if (drawerState.isOpen) {
-//            scope.launch {
-//                drawerState.close()
-//            }
-//        } else {
-//            // TODO: ask for confirmation and exit the app
-//            if (navController.previousBackStackEntry != null) {
-//                Log.d("MainScreen", "Popping back stack ${navController.currentBackStackEntry}")
-//                navController.popBackStack()
-//            } else {
-//                activity?.finish()
-//            }
+//    val scope = rememberCoroutineScope()
+//    val drawerState = LocalDrawerState.current
+//    BackHandler(enabled = drawerState.isOpen) {
+//        scope.launch {
+//            drawerState.close()
 //        }
 //    }
 
     NavigationGraph(
         navController,
     )
-
-
 }
 
 
@@ -191,77 +176,71 @@ fun NavigationGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    CompositionLocalProvider(LocalNavController provides navController) {
-        NavHost(
-            navController = navController,
-            startDestination = HomeRoute,
-            modifier = modifier
-                .fillMaxSize()
-                .imePadding(),
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None }
-        ) {
-            composable<HomeRoute> {
-                Log.d("NavigationGraph", "HomeRoute")
-                HomeViewer(animatedVisibilityScope = this@composable)
-            }
+    NavHost(
+        navController = navController,
+        startDestination = HomeRoute,
+        modifier = modifier
+            .fillMaxSize()
+            .imePadding(),
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None }
+    ) {
+        composable<HomeRoute> {
+            Log.d("NavigationGraph", "HomeRoute")
+            HomeViewer(animatedVisibilityScope = this@composable)
+        }
 
-            profileGraph(navController = navController)
-            postGraph(navController = navController)
-            subredditGraph(navController = navController)
-            imagesGraph(navController = navController)
-            settingsGraph(navController = navController)
+        profileGraph(navController = navController)
+        postGraph(navController = navController)
+        subredditGraph(navController = navController)
+        imagesGraph(navController = navController)
+        settingsGraph(navController = navController)
 
-            composable<SubscriptionsRoute> {
-                SubredditListViewer(navController = navController)
-            }
-            composable<SearchRoute> { navBackStackEntry ->
-                val search = navBackStackEntry.toRoute<SearchRoute>()
-                SearchTab(search, animatedVisibilityScope = this@composable)
-            }
-            composable<InboxRoute> {
-                InboxView()
+        composable<SubscriptionsRoute> {
+            SubredditListViewer(navController = navController)
+        }
+        composable<SearchRoute> { navBackStackEntry ->
+            val search = navBackStackEntry.toRoute<SearchRoute>()
+            SearchTab(search, animatedVisibilityScope = this@composable)
+        }
+        composable<InboxRoute> {
+            InboxView()
 
-            }
-            composable<HistoryRoute> {
-                HistoryViewer(animatedVisibilityScope = this@composable)
-            }
-//            composable<FiltersSettingRoute>{
-//                FiltersSettings.View()
-//            }
-
-            composable(
-                route = "videoPreview?url={url}",
-                deepLinks = listOf(
-                    navDeepLink {
-                        uriPattern = "v.redd.it/{url}"
-                    }
-                ),
-                arguments = listOf(
-                    navArgument("url") {
-                        type = NavType.StringType
+        }
+        composable<HistoryRoute> {
+            HistoryViewer(animatedVisibilityScope = this@composable)
+        }
+        composable(
+            route = "videoPreview?url={url}",
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "v.redd.it/{url}"
+                }
+            ),
+            arguments = listOf(
+                navArgument("url") {
+                    type = NavType.StringType
+                },
+            )
+        ) { navBackStackEntry ->
+            val url = navBackStackEntry.arguments?.getString("url")
+            if (url != null) {
+                VerticalSwipeToDismiss(
+                    onDismiss = {
+                        // Why do we need to pop twice?
+                        navController.popBackStack()
+                        navController.popBackStack()
                     },
-                )
-            ) { navBackStackEntry ->
-                val url = navBackStackEntry.arguments?.getString("url")
-                if (url != null) {
-                    VerticalSwipeToDismiss(
-                        onDismiss = {
-                            // Why do we need to pop twice?
-                            navController.popBackStack()
-                            navController.popBackStack()
-                        },
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = Color.Black)
-                    ) {
-                        ZoomableAsyncImage(
-                            model = "https://v.redd.it/$url",
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = Color.Black)
+                ) {
+                    ZoomableAsyncImage(
+                        model = "https://v.redd.it/$url",
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
             }
         }

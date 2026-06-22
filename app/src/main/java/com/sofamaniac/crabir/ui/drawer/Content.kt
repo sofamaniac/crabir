@@ -101,7 +101,7 @@ fun DrawerContent(
             }
     }
 
-    ModalDrawerSheet {
+    ModalDrawerSheet(drawerState = drawerState) {
         Column(
             modifier = modifier
                 .fillMaxWidth(0.75f)
