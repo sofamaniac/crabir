@@ -69,7 +69,7 @@ fun DrawerContent(
     modifier: Modifier = Modifier,
     viewModel: DrawerViewModel = hiltViewModel(),
 ) {
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val subscriptions = viewModel.subscriptions.collectAsState(initial = emptyList())
     val sortedSubscriptions = subscriptions.value?.sortedWith { subreddit1, subreddit2 ->
         if (subreddit1 == subreddit2) {
@@ -94,7 +94,7 @@ fun DrawerContent(
         viewModel.activeAccount
             .drop(1) // skip initial emission
             .collect {
-                navController.navigate(HomeRoute) {
+                navController?.navigate(HomeRoute) {
                     popUpTo(0) { inclusive = true }
                     //launchSingleTop = true
                 }
@@ -128,7 +128,7 @@ fun DrawerContent(
                 AccountSelector(viewModel) { id ->
                     coroutineScope.launch {
                         drawerState.close()
-                        navController.popBackStack(route = HomeRoute, inclusive = false)
+                        navController?.popBackStack(route = HomeRoute, inclusive = false)
                         viewModel.toggleSelectAccount()
                         viewModel.setActiveAccount(id)
                     }
@@ -146,7 +146,7 @@ fun DrawerContent(
                 }, selected = false, onClick = {
                     coroutineScope.launch {
                         drawerState.close()
-                        navController.navigate(feed.route)
+                        navController?.navigate(feed.route)
                     }
                 })
             }
@@ -159,7 +159,7 @@ fun DrawerContent(
                     coroutineScope.launch {
                         drawerState.close()
                         viewModel.visitCommunity(multi.data)
-                        navController.navigate(
+                        navController?.navigate(
                             MultiRoute(
                                 multi.name
                             )
@@ -177,7 +177,7 @@ fun DrawerContent(
                                 subreddit.data
                             )
                         )
-                        navController.navigate(
+                        navController?.navigate(
                             SubredditRoute(
                                 subreddit.data.displayName
                             )

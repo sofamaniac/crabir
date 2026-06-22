@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.ui.user
 
 import androidx.annotation.Keep
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -110,7 +111,8 @@ fun ProfileView(
     initialTab: ProfileTabs = ProfileTabs.Overview,
     profileViewModel: ProfileViewModel = hiltViewModel<ProfileViewModel, ProfileViewModel.Factory> { factory ->
         factory.create(user)
-    }
+    },
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val isConnectedUser by remember { profileViewModel.currentUser.map { it == user } }.collectAsState(
         true
@@ -216,6 +218,7 @@ fun ProfileView(
                                     markAsRead = { viewModel.visitPost(thing, currentAccount.id) },
                                     read = viewModel.isPostRead(thing),
                                     showHidden = page == ProfileTabs.Hidden,
+                                    animatedContentScope = animatedVisibilityScope,
                                 )
 
                                 is CommentData -> CommentView(

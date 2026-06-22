@@ -120,7 +120,8 @@ fun redditLinkHandler(): LinkInteractionListener {
         if (link is LinkAnnotation.Url) {
             try {
                 Log.d("redditLinkHandler", "navigating to : ${link.url.toLocalUrl()}")
-                navController.navigate(link.url.toLocalUrl())
+                //navController.navigate(link.url.toLocalUrl())
+                uriHandler.openUri(link.url)
             } catch (e: IllegalArgumentException) {
                 Log.i("redditLinkHandler", "failed to open link in app: $e")
                 uriHandler.openUri(link.url)

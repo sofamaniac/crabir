@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.ui.subreddit
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -36,6 +37,7 @@ import javax.inject.Singleton
 fun HistoryViewer(
     modifier: Modifier = Modifier,
     viewModel: HistoryViewModel = hiltViewModel(),
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
@@ -61,7 +63,8 @@ fun HistoryViewer(
         topBar,
         bottomBar,
         viewModel,
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        animatedVisibilityScope = animatedVisibilityScope
     )
 }
 

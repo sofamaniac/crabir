@@ -28,6 +28,7 @@ fun NavGraphBuilder.profileGraph(navController: NavController) {
         val params = it.toRoute<ProfileRoute>()
         ProfileView(
             params.author,
+            animatedVisibilityScope = this@composable
         )
     }
     composable(
@@ -44,6 +45,7 @@ fun NavGraphBuilder.profileGraph(navController: NavController) {
         val tab = ProfileTabs.fromString(params.getString("tab")!!)
         ProfileView(
             author,
+            animatedVisibilityScope = this@composable,
             initialTab = tab
         )
     }
@@ -53,13 +55,18 @@ fun NavGraphBuilder.profileGraph(navController: NavController) {
             // TODO: ask user to log in
             return@composable
         }
-        ProfileView(currentAccount.info!!.username, initialTab = ProfileTabs.Saved)
+        ProfileView(
+            currentAccount.info!!.username,
+            initialTab = ProfileTabs.Saved,
+            animatedVisibilityScope = this@composable,
+        )
     }
 
     composable<ProfileRoute> {
         val params = it.toRoute<ProfileRoute>()
         ProfileView(
             params.author,
+            animatedVisibilityScope = this@composable,
             initialTab = params.tab
         )
     }

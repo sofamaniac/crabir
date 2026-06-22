@@ -4,6 +4,7 @@
 
 package com.sofamaniac.crabir.ui
 
+import com.sofamaniac.crabir.domain.model.Fullname
 import java.time.Clock
 import java.time.Duration
 import java.util.Locale
@@ -24,3 +25,10 @@ fun formatElapsedTimeLocalized(
         else -> String.format(locale, "%ds", duration.seconds)
     }
 }
+
+enum class SharedElementType {
+    Post,
+    Content,
+}
+
+data class SharedElementKey(val name: Fullname, val type: SharedElementType)

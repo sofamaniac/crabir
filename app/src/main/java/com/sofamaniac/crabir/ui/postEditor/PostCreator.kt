@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.delete
@@ -77,11 +78,14 @@ import com.sofamaniac.crabir.data.remote.reddit.MissingUrl
 import com.sofamaniac.crabir.data.remote.reddit.PostSubmissionBuilder
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.mapColor
 import com.sofamaniac.crabir.ui.markdown.Editor
-import com.sofamaniac.crabir.ui.thread.CrossPostView
+import com.sofamaniac.crabir.ui.post.PostHeader
+import com.sofamaniac.crabir.ui.post.PostInfo
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -353,8 +357,7 @@ fun CrosspostCreator(
         factory.create(post.name)
     }
 ) {
-    val context = LocalContext.current
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val theme = LocalTheme.current
     val post = viewModel.post.collectAsState(initial = null).value ?: return
     LaunchedEffect(post) {
@@ -377,7 +380,7 @@ fun CrosspostCreator(
             topBar = {
                 TopAppBar(
                     navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
+                        IconButton(onClick = { navController?.popBackStack() }) {
                             Icon(Icons.Default.Close, contentDescription = "Close")
                         }
                     },
@@ -387,7 +390,7 @@ fun CrosspostCreator(
                             scope.launch {
                                 val res = viewModel.submit()
                                 if (res.isSuccess) {
-                                    navController.popBackStack()
+                                    navController?.popBackStack()
                                 } else {
                                     snackbar.showSnackbar(res.exceptionOrNull()!!.message!!)
                                 }
@@ -458,7 +461,7 @@ fun CrosspostCreator(
                         }
                     )
                 }
-                CrossPostView(post)
+                CrosspostView(post)
             }
         }
         if (viewModel.loading) {
@@ -469,6 +472,42 @@ fun CrosspostCreator(
     }
 }
 
+@Composable
+internal fun CrosspostView(
+    post: PostData,
+    modifier: Modifier = Modifier,
+) {
+    val modifier = modifier
+        .padding(horizontal = 16.dp)
+        .padding(bottom = 4.dp)
+
+    ThemedCard(
+        shape = RoundedCornerShape(0),
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        PostHeader(
+            post,
+            modifier = modifier.padding(vertical = 8.dp)
+        )
+        val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
+        PostInfo(
+            post,
+            modifier = modifier,
+            enableThumbnail = enablePreview && !post.isCrosspost,
+            likes = post.relationship.liked
+        )
+        Column {
+            PostHeader(post, showSubredditIcon = false)
+            PostInfo(
+                post,
+                modifier = modifier,
+                enableThumbnail = true,
+                likes = post.relationship.liked,
+            )
+        }
+    }
+}
 
 @Composable
 fun UrlField(viewModel: PostCreatorViewModel) {
@@ -538,7 +577,10 @@ fun MediaPicker(viewModel: PostCreatorViewModel) {
         }
     }
     val stroke =
-        Stroke(width = 1.dp.value, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f)))
+        Stroke(
+            width = 1.dp.value,
+            pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f))
+        )
     var editIndex by remember { mutableStateOf<Int?>(null) }
 
     LazyHorizontalGrid(

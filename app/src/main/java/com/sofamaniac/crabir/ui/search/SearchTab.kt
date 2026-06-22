@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.ui.search
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -100,6 +101,7 @@ fun SearchTab(
             if (searchQuery.flair.isNotBlank()) "flair:\"${searchQuery.flair}\"" else ""
         SearchCommonViewModel(initialQuery)
     },
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val viewModels = listOf(
         hiltViewModel<PostSearchViewModel, PostSearchViewModel.Factory>(key = "PostSearch") { factory ->
@@ -179,7 +181,7 @@ fun SearchTab(
             ) { index ->
                 when (val viewModel = viewModels[index]) {
                     is PostSearchViewModel ->
-                        InnerTab(viewModel)
+                        InnerTab(viewModel, animatedVisibilityScope)
 
                     is CommunitySearchViewModel ->
                         InnerTab(viewModel)
@@ -214,7 +216,10 @@ class SearchCommonViewModel @AssistedInject constructor(@Assisted query: String)
 
 
 @Composable
-private fun InnerTab(viewModel: PostSearchViewModel) {
+private fun InnerTab(
+    viewModel: PostSearchViewModel,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
     val currentAccount = LocalRedditAccount.current
     PostFeedViewer(viewModel) { post, isMosVisible ->
         DefaultPostView(
@@ -222,7 +227,8 @@ private fun InnerTab(viewModel: PostSearchViewModel) {
                 viewModel.visitPost(post, currentAccount.id)
             },
             read = viewModel.isPostRead(post),
-            showHidden = false
+            showHidden = false,
+            animatedContentScope = animatedVisibilityScope
         )
     }
 }
@@ -340,7 +346,7 @@ fun TopBar(
     enableSettings: Boolean = true,
     onQueryUpdate: (String) -> Unit = {},
 ) {
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val showSettings by commonViewModel.showSettings.collectAsState()
     val focusRequest = remember { FocusRequester() }
     LaunchedEffect(Unit) {
@@ -359,7 +365,7 @@ fun TopBar(
         navigationIcon = {
             IconButton(
                 enabled = enableSettings,
-                onClick = { navController.popBackStack() }) {
+                onClick = { navController?.popBackStack() }) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back"

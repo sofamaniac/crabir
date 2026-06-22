@@ -8,6 +8,7 @@
 
 package com.sofamaniac.crabir.ui.post
 
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sofamaniac.crabir.LocalSharedTransitionScope
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
@@ -27,6 +29,8 @@ import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.VotableRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.Route
+import com.sofamaniac.crabir.ui.SharedElementKey
+import com.sofamaniac.crabir.ui.SharedElementType
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -51,6 +55,7 @@ internal fun PostBody(
     maxLines: Int?,
     enableLinkFullSizePreview: Boolean = true,
     forceShowSelftext: Boolean = false,
+    animatedVisbilityScope: AnimatedVisibilityScope,
     markAsRead: () -> Unit = {},
 ) {
     val navController = LocalNavController.current!!
@@ -59,82 +64,95 @@ internal fun PostBody(
         navController.navigate(route)
     }
 
-    val selftextView = @Composable {
-        val selftext = post.selftext.markdown
-        RedditMarkdown(
-            markdown = selftext,
-            maxLines = maxLines,
-            modifier = modifier.padding(horizontal = 16.dp),
-            mediaMetadata = post.mediaMetadata,
-            //onClick = { goFullscreen(PostRoute(post.permalink, null)) }
-        )
-    }
-    when (post.kind) {
-        Kind.Image -> {
-            PostImage(
-                post,
-                modifier.fillMaxWidth(),
-                goFullscreen = ::goFullscreen,
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    with(sharedTransitionScope) {
+        val modifier =
+            modifier.sharedElement(
+                sharedTransitionScope.rememberSharedContentState(
+                    key = SharedElementKey(
+                        post.name,
+                        SharedElementType.Content
+                    )
+                ),
+                animatedVisbilityScope
+            )
+        val selftextView = @Composable {
+            val selftext = post.selftext.markdown
+            RedditMarkdown(
+                markdown = selftext,
+                maxLines = maxLines,
+                modifier = modifier.padding(horizontal = 16.dp),
+                mediaMetadata = post.mediaMetadata,
+                //onClick = { goFullscreen(PostRoute(post.permalink, null)) }
             )
         }
-
-        Kind.Video -> {
-            PostVideo(
-                post,
-                modifier.fillMaxWidth(),
-                canPlayVideo = canPlayVideo,
-                goFullscreen = ::goFullscreen
-            )
-        }
-
-        Kind.Link -> {
-            if (enableLinkFullSizePreview) {
+        when (post.kind) {
+            Kind.Image -> {
                 PostImage(
                     post,
                     modifier.fillMaxWidth(),
-                    enabled = false,
                     goFullscreen = ::goFullscreen,
                 )
             }
-        }
 
-        Kind.Gallery -> {
-            PostGallery(
-                post,
-                modifier.fillMaxWidth(),
-                canPlayVideo = canPlayVideo,
-                goFullscreen = ::goFullscreen,
-            )
-        }
+            Kind.Video -> {
+                PostVideo(
+                    post,
+                    modifier.fillMaxWidth(),
+                    canPlayVideo = canPlayVideo,
+                    goFullscreen = ::goFullscreen
+                )
+            }
 
-        Kind.YoutubeVideo -> {
-            YoutubeVideo(
-                post,
-                modifier.fillMaxWidth(),
-            )
-        }
+            Kind.Link -> {
+                if (enableLinkFullSizePreview) {
+                    PostImage(
+                        post,
+                        modifier.fillMaxWidth(),
+                        enabled = false,
+                        goFullscreen = ::goFullscreen,
+                    )
+                }
+            }
 
-        Kind.Streamable -> {
-            StreamableVideo(
-                post,
-                canPlayVideo = canPlayVideo,
-                modifier = modifier.fillMaxWidth(),
-                goFullscreen = ::goFullscreen
-            )
-        }
+            Kind.Gallery -> {
+                PostGallery(
+                    post,
+                    modifier.fillMaxWidth(),
+                    canPlayVideo = canPlayVideo,
+                    goFullscreen = ::goFullscreen,
+                )
+            }
 
-        else -> {
+            Kind.YoutubeVideo -> {
+                YoutubeVideo(
+                    post,
+                    modifier.fillMaxWidth(),
+                )
+            }
+
+            Kind.Streamable -> {
+                StreamableVideo(
+                    post,
+                    canPlayVideo = canPlayVideo,
+                    modifier = modifier.fillMaxWidth(),
+                    goFullscreen = ::goFullscreen
+                )
+            }
+
+            else -> {
+                val selftext = post.selftext.markdown
+                if (selftext.isNotBlank() && enableTextPreview) {
+                    selftextView()
+                    return
+                }
+            }
+        }
+        if (forceShowSelftext) {
             val selftext = post.selftext.markdown
             if (selftext.isNotBlank() && enableTextPreview) {
                 selftextView()
-                return
             }
-        }
-    }
-    if (forceShowSelftext) {
-        val selftext = post.selftext.markdown
-        if (selftext.isNotBlank() && enableTextPreview) {
-            selftextView()
         }
     }
 }
@@ -236,7 +254,7 @@ open class LinkViewModel @AssistedInject constructor(
     @Assisted("post") post: PostData,
     private val posts: LinksRepository,
     private val history: VisitedPostsDao,
-) : VotableViewModel<PostData>(post.name.name, post.subreddit.name, posts), LinkInteraction {
+) : VotableViewModel<PostData>(post.name.name, post.subreddit.name, posts), PostViewModelInterface {
 
     override val post = posts.get(post.name).map { it ?: post }.stateIn(
         scope = viewModelScope,
@@ -322,3 +340,5 @@ open class LinkViewModel @AssistedInject constructor(
         ): LinkViewModel
     }
 }
+
+interface PostViewModelInterface : LinkInteraction, VotableInteraction

@@ -105,7 +105,7 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
             navArgument("subreddit") { type = NavType.StringType },
             navArgument("id") { type = NavType.StringType },
             navArgument("title") { type = NavType.StringType },
-        )
+        ),
     )
     {
         val subreddit = it.arguments?.getString("subreddit")
@@ -116,7 +116,11 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
         } else {
             null
         }
-        ThreadView(permalink = permalink, dismiss = { navController.popBackStack() })
+        ThreadView(
+            permalink = permalink,
+            dismiss = { navController.popBackStack() },
+            animatedVisibilityScope = this@composable
+        )
     }
     composable(
         route = LONG_ROUTE,
@@ -141,7 +145,8 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
         ThreadView(
             permalink = permalink,
             dismiss = { navController.popBackStack() },
-            comment = commentId
+            comment = commentId,
+            animatedVisibilityScope = this@composable
         )
     }
     composable(
@@ -172,13 +177,27 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
             navController.navigate(deepLink = finalUrl.toUri())
         }
     }
-    composable<PostRoute> {
+    composable<PostRoute>(
+//        enterTransition = {
+//            slideIntoContainer(
+//                animationSpec = tween(300, easing = EaseIn),
+//                towards = AnimatedContentTransitionScope.SlideDirection.Start
+//            )
+//        },
+//        exitTransition = {
+//            slideOutOfContainer(
+//                animationSpec = tween(300, easing = EaseOut),
+//                towards = AnimatedContentTransitionScope.SlideDirection.End
+//            )
+//        }
+    ) {
         val route = it.toRoute<PostRoute>()
         ThreadView(
             permalink = route.postPermalink,
             comment = route.comment,
             context = route.context,
-            dismiss = { navController.popBackStack() }
+            dismiss = { navController.popBackStack() },
+            animatedVisibilityScope = this@composable
         )
     }
 
@@ -195,7 +214,11 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
         typeMap = mapOf(typeOf<Fullname>() to FullnameType)
     ) {
         val route = it.toRoute<FullscreenImageRoute>()
-        FullscreenImageView(route.post, dismiss = { navController.popBackStack() })
+        FullscreenImageView(
+            route.post,
+            dismiss = { navController.popBackStack() },
+            animatedVisibilityScope = this@composable
+        )
     }
     composable<FullscreenVideoRoute>(
         typeMap = mapOf(typeOf<Fullname>() to FullnameType)

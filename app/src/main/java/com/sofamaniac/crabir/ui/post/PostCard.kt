@@ -1,17 +1,19 @@
 package com.sofamaniac.crabir.ui.post
 
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.compose.rememberNavController
+import com.sofamaniac.crabir.LocalSharedTransitionScope
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.DUMMY_POST
@@ -21,6 +23,8 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
+import com.sofamaniac.crabir.ui.SharedElementKey
+import com.sofamaniac.crabir.ui.SharedElementType
 import com.sofamaniac.crabir.ui.ThemedCard
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,8 +39,6 @@ import kotlinx.coroutines.flow.map
  *
  * @param post The [com.sofamaniac.crabir.domain.model.PostData] data to display.
  * @param modifier Modifier for the root layout of the post.
- * @param enableThumbnail Whether to enable the thumbnail preview. Defaults to true. The thumbnail is shown only if there is one and the post if a link.
- * @param showSubredditIcon Whether to display the subreddit icon in the header. Defaults to true.
  * @param clickable Whether the post is clickable to navigate to the thread view. Defaults to true.
  * @param markAsRead A lambda that takes a [com.sofamaniac.crabir.domain.model.PostData] and is called before navigating to the post.
  * @param canStartVideo Whether the post can start a video. Defaults to false.
@@ -50,14 +52,16 @@ fun PostCard(
     canStartVideo: Boolean = false,
     read: Boolean = false,
     showHidden: Boolean = false,
-    viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
+    animatedContentScope: AnimatedVisibilityScope,
+    viewModel: PostViewModelInterface = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
             factory.create(post)
-        }),
+        }
+    ),
 ) {
-    val post by viewModel.post.collectAsState()
-    val likes by viewModel.likes.collectAsState(null)
+    val post by viewModel.post.collectAsState(post)
+    val likes by viewModel.likes.collectAsState(post.relationship.liked)
     if (!showHidden && post.relationship.hidden) {
         return
     }
@@ -70,7 +74,13 @@ fun PostCard(
         read = read,
         likes = likes,
         interactions = viewModel,
-    )
+        animatedContentScope = animatedContentScope,
+    ) {
+        OpenThreadButton(
+            post,
+            onClick = markAsRead
+        )
+    }
 }
 
 @Composable
@@ -82,7 +92,9 @@ internal fun PostCardContent(
     canStartVideo: Boolean = false,
     read: Boolean = false,
     likes: Boolean?,
+    animatedContentScope: AnimatedVisibilityScope,
     interactions: LinkInteraction,
+    bottomRowAction: @Composable () -> Unit,
 ) {
 
     val settings = rememberViewSettings()
@@ -91,49 +103,65 @@ internal fun PostCardContent(
     val modifier = Modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val openPost = if (clickable) {
         {
             markAsRead()
-            navController.navigate(PostRoute(post.permalink))
+            navController?.navigate(PostRoute(post.permalink)) ?: Unit
         }
     } else {
         {}
     }
-    ThemedCard(
-        shape = RoundedCornerShape(0),
-        modifier = Modifier.fillMaxWidth(),
-        onClick = openPost,
-    ) {
-        PostHeader(
-            post,
-            showSubredditIcon = settings.cardSettings.showSubredditIcon,
-            modifier = modifier.padding(vertical = 8.dp),
-            showPrefix = settings.prefixCommunity
-        )
-        val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
-        PostInfo(
-            post,
-            modifier = modifier,
-            enableThumbnail = enablePreview && settings.cardSettings.thumbnailForLinkPreview,
-            likes = likes,
-            read = read,
-            markAsRead = markAsRead
-        )
-        PostBody(
-            post,
-            canPlayVideo = canStartVideo,
-            enableFullHeightImage = settings.cardSettings.enableFullHeightImage,
-            enableTextPreview = settings.cardSettings.enableTextPreview && !post.spoiler,
-            maxLines = settings.cardSettings.maxLines,
-            enableLinkFullSizePreview = !settings.cardSettings.thumbnailForLinkPreview,
-            markAsRead = markAsRead
-        )
-        BottomRow(post, modifier, interactions = interactions) {
-            OpenThreadButton(
-                post,
-                onClick = markAsRead
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    with(sharedTransitionScope) {
+        val state =
+            sharedTransitionScope.rememberSharedContentState(
+                key = SharedElementKey(
+                    post.name,
+                    SharedElementType.Post
+                )
             )
+        Log.d("PostCardContent", "Match found: ${state.isMatchFound}")
+        val animatedModifier = Modifier.sharedElement(
+            state,
+            animatedVisibilityScope = animatedContentScope
+        )
+
+        ThemedCard(
+            shape = RoundedCornerShape(0),
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(animatedModifier),
+            onClick = openPost,
+        ) {
+            PostHeader(
+                post,
+                showSubredditIcon = settings.cardSettings.showSubredditIcon,
+                modifier = modifier.padding(vertical = 8.dp),
+                showPrefix = settings.prefixCommunity
+            )
+            val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
+            PostInfo(
+                post,
+                modifier = modifier,
+                enableThumbnail = enablePreview && settings.cardSettings.thumbnailForLinkPreview,
+                likes = likes,
+                read = read,
+                markAsRead = markAsRead
+            )
+            PostBody(
+                post,
+                canPlayVideo = canStartVideo,
+                enableFullHeightImage = settings.cardSettings.enableFullHeightImage,
+                enableTextPreview = settings.cardSettings.enableTextPreview && !post.spoiler,
+                maxLines = settings.cardSettings.maxLines,
+                enableLinkFullSizePreview = !settings.cardSettings.thumbnailForLinkPreview,
+                markAsRead = markAsRead,
+                animatedVisbilityScope = animatedContentScope,
+            )
+            BottomRow(post, modifier, interactions = interactions) {
+                bottomRowAction()
+            }
         }
     }
 }
@@ -141,18 +169,23 @@ internal fun PostCardContent(
 @Preview()
 @Composable
 internal fun PostCardPreview() {
-    val navController = rememberNavController()
     val post by DummyInteraction.post.collectAsState()
-    CompositionLocalProvider(LocalNavController provides navController) {
+    AnimatedVisibility(visible = true) {
         PostCardContent(
             post,
             clickable = false,
             markAsRead = {},
             canStartVideo = false,
             read = false,
-            likes = null,
-            interactions = DummyInteraction
-        )
+            likes = post.relationship.liked,
+            interactions = DummyInteraction,
+            animatedContentScope = this@AnimatedVisibility
+        ) {
+            OpenThreadButton(
+                post,
+                onClick = {}
+            )
+        }
     }
 }
 

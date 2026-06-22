@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui
 
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -15,8 +14,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +32,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
+import kotlin.math.sign
 
 @Composable
 fun VerticalSwipeToDismiss(
@@ -53,12 +56,14 @@ fun VerticalSwipeToDismiss(
     }
 
 
+    // prevent dragging from the top / bottom bars
     val blockDrag = Modifier.pointerInput(Unit) {
         detectDragGestures { _, _ -> }
     }
 
     val theme = rememberThemeSettings()
     val updateBars = setSystemBarsColor()
+    var isDissmising by remember { mutableStateOf(false) }
     DisposableEffect(theme.mode) {
         updateBars(ThemeMode.Dark)
         onDispose {
@@ -76,9 +81,12 @@ fun VerticalSwipeToDismiss(
                 onDragStopped = { velocity ->
                     val fraction = abs(offsetY.value) / screenHeight
                     if (fraction >= threshold || abs(velocity) >= velocityThreshold) {
-                        Log.d("VerticalSwipeToDismiss", "Dismissed $velocity")
-                        onDismiss()
-                    } else {
+                        isDissmising = true
+                        scope.launch {
+                            offsetY.animateTo(offsetY.value.sign * screenHeight)
+                            onDismiss()
+                        }
+                    } else if (!isDissmising) {
                         scope.launch {
                             offsetY.animateTo(0f, spring())
                         }

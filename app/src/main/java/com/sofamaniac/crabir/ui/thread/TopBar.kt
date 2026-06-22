@@ -32,7 +32,7 @@ fun TopBar(
     scrollBehavior: TopAppBarScrollBehavior?,
     dismiss: () -> Unit
 ) {
-    val sort: Sort by viewModel.sort.collectAsState()
+    val sort: Sort? by viewModel.sort.collectAsState()
     val theme = LocalTheme.current
     var showMenu by remember { mutableStateOf(false) }
     TopAppBar(
@@ -52,7 +52,7 @@ fun TopBar(
         title = {
             Column {
                 Text("Comments", style = MaterialTheme.typography.titleMedium)
-                Text("${sort}", style = MaterialTheme.typography.labelSmall)
+                Text("${sort ?: Sort.Best}", style = MaterialTheme.typography.labelSmall)
             }
         },
         actions = {

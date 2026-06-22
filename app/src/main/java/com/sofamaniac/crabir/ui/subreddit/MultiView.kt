@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.subreddit
 
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -35,6 +36,7 @@ fun MultiView(
     viewModel: MultiViewModel = hiltViewModel<MultiViewModel, MultiViewModel.Factory> { factory ->
         factory.create(name.name)
     },
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
@@ -62,7 +64,8 @@ fun MultiView(
     }
     FullFeedView(
         topBar, bottomBar, viewModel,
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        animatedVisibilityScope = animatedVisibilityScope
     )
 }
 
@@ -84,6 +87,7 @@ class MultiViewModel @AssistedInject constructor(
 
     private val _info = MutableStateFlow<MultiData?>(null)
     val info = _info.asStateFlow()
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             _info.value = communityDao.getByName(Fullname(name)) ?: return@launch

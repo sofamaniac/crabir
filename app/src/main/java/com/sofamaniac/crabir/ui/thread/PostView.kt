@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.thread
 
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,10 +21,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.LocalRedditAccount
+import com.sofamaniac.crabir.LocalSharedTransitionScope
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
+import com.sofamaniac.crabir.ui.SharedElementKey
+import com.sofamaniac.crabir.ui.SharedElementType
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import com.sofamaniac.crabir.ui.post.BottomRow
@@ -38,9 +42,14 @@ internal fun PostView(
     threadViewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = true,
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val currentAccount = LocalRedditAccount.current
-    PostCard(post, threadViewModel = threadViewModel) {
+    PostCard(
+        post,
+        threadViewModel = threadViewModel,
+        animatedVisibilityScope = animatedVisibilityScope
+    ) {
         if (!post.isCrosspost) {
             PostBody(
                 post,
@@ -48,7 +57,8 @@ internal fun PostView(
                 maxLines = null,
                 forceShowSelftext = true,
                 enableLinkFullSizePreview = false,
-                markAsRead = { threadViewModel.visitPost(post, currentAccount.id) }
+                markAsRead = { threadViewModel.visitPost(post, currentAccount.id) },
+                animatedVisbilityScope = animatedVisibilityScope
             )
         } else {
             val parent = post.crosspostParentList.first()
@@ -59,13 +69,6 @@ internal fun PostView(
                     .border(BorderStroke(1.dp, Color.Gray), shape = ShapeDefaults.Medium)
                     .clickable(onClick = {
                         navController.navigate(PostRoute(parent.permalink, null))
-//                        fullscreenManager.push {
-//                            ThreadView(
-//                                permalink = parent.permalink,
-//                                dismiss = {
-//                                    fullscreenManager.pop()
-//                                })
-//                        }
                     })
                     .padding(8.dp)
             ) {
@@ -103,38 +106,54 @@ fun PostCard(
         }
     ),
     threadViewModel: ThreadViewModel,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     body: @Composable ColumnScope.() -> Unit,
 ) {
     val likes by viewModel.likes.collectAsState(null)
     val modifier = modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
-    ThemedCard(
-        shape = RoundedCornerShape(0),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        PostHeader(
-            post,
-            modifier = modifier.padding(vertical = 8.dp)
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    with(sharedTransitionScope) {
+        val state = sharedTransitionScope.rememberSharedContentState(
+            key = SharedElementKey(
+                post.name,
+                SharedElementType.Post
+            )
         )
-        val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
-        PostInfo(
-            post,
-            modifier = modifier,
-            enableThumbnail = enablePreview && !post.isCrosspost,
-            likes = likes
+        val animatedModifier = Modifier.sharedElement(
+            state,
+            animatedVisibilityScope = animatedVisibilityScope
         )
-        body()
-        BottomRow(post, modifier, interactions = viewModel) {
-            ReplyButton(parentId = post.name, submitComment = threadViewModel::submitComment) {
-                ThemedCard(modifier = Modifier.padding(all = 16.dp)) {
-                    Text(post.author.username, modifier = modifier)
-                    Text(post.title, modifier = modifier)
-                    RedditMarkdown(
-                        post.selftext.markdown,
-                        maxLines = 5,
-                        modifier = modifier,
-                    )
+        ThemedCard(
+            shape = RoundedCornerShape(0),
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(animatedModifier),
+        ) {
+            PostHeader(
+                post,
+                modifier = modifier.padding(vertical = 8.dp)
+            )
+            val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
+            PostInfo(
+                post,
+                modifier = modifier,
+                enableThumbnail = enablePreview && !post.isCrosspost,
+                likes = likes
+            )
+            body()
+            BottomRow(post, modifier, interactions = viewModel) {
+                ReplyButton(parentId = post.name, submitComment = threadViewModel::submitComment) {
+                    ThemedCard(modifier = Modifier.padding(all = 16.dp)) {
+                        Text(post.author.username, modifier = modifier)
+                        Text(post.title, modifier = modifier)
+                        RedditMarkdown(
+                            post.selftext.markdown,
+                            maxLines = 5,
+                            modifier = modifier,
+                        )
+                    }
                 }
             }
         }

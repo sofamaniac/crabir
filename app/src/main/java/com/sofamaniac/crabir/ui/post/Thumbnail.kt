@@ -37,15 +37,6 @@ fun Thumbnail(
     val goFullscreen = {
         markAsRead()
         when (post.kind) {
-//            Kind.Image -> fullscreenManager.push { FullscreenImageView(post) }
-//            Kind.Gallery -> fullscreenManager.push {
-//                FullscreenGallery(
-//                    post,
-//                    gallery = post.gallery!!
-//                )
-//            }
-            //Kind.Video -> fullscreenManager.push { FullscreenVideo(post) }
-
             Kind.Image -> navController.navigate(FullscreenImageRoute(post.name))
             Kind.Gallery -> navController.navigate(FullscreenGalleryRoute(post.name))
             Kind.Video -> navController.navigate(FullscreenVideoRoute(post.name))

@@ -4,6 +4,7 @@
 
 package com.sofamaniac.crabir.ui.subreddit
 
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -33,6 +34,7 @@ import kotlinx.coroutines.launch
 fun HomeViewer(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
@@ -60,6 +62,7 @@ fun HomeViewer(
         viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         feedInfo = null,
+        animatedVisibilityScope = animatedVisibilityScope
     )
 
 }

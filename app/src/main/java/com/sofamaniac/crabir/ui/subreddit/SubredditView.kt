@@ -4,6 +4,7 @@
 
 package com.sofamaniac.crabir.ui.subreddit
 
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -71,6 +72,7 @@ fun SubredditViewer(
     viewModel: SubredditViewModel = hiltViewModel<SubredditViewModel, SubredditViewModel.Factory> { factory ->
         factory.create(subreddit)
     },
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val params by viewModel.params.collectAsState()
@@ -113,7 +115,8 @@ fun SubredditViewer(
                     Text("Loading...")
                 }
             }
-        }
+        },
+        animatedVisibilityScope = animatedVisibilityScope
     )
 }
 

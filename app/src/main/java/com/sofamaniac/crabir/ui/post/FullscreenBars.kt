@@ -39,8 +39,7 @@ fun ColumnScope.FullscreenTopBar(
     enabled: Boolean,
     actions: @Composable () -> Unit = {}
 ) {
-    //val fullscreenManager = LocalFullscreenHandler.current!!
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     AnimatedVisibility(
         visible = enabled,
         modifier = Modifier
@@ -55,7 +54,7 @@ fun ColumnScope.FullscreenTopBar(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
-            IconButton(onClick = navController::popBackStack) {
+            IconButton(onClick = { navController?.popBackStack() }) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Go back",

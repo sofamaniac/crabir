@@ -58,7 +58,7 @@ interface ThreadAPI {
         @Query("showmore") showMore: Boolean = true,
         @Query("showmedia") showMedia: Boolean = true,
         @Query("showtitle") showTitle: Boolean = true,
-        @Query("sort") sort: Sort = Sort.Best,
+        @Query("sort") sort: Sort? = null,
         @Query("comment") comment: String? = null,
         @Query("context") context: Int? = 0,
         @Query("depth") depth: Int? = null,

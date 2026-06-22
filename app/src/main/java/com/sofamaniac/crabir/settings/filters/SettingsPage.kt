@@ -25,7 +25,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.ui.SettingHeader
@@ -46,8 +44,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun FiltersSettingsPage() {
+    val navController = LocalNavController.current
     val context = LocalContext.current
-    val navController = LocalNavController.current!!
     val settingsDataStore = remember(context) { context.filtersDataStore }
     val settings by settingsDataStore.data.collectAsState(FiltersSettings())
     val scope = rememberCoroutineScope()
@@ -65,7 +63,9 @@ fun FiltersSettingsPage() {
             TopAppBar(
                 title = { Text(stringResource(R.string.filter_settings_title)) },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = {
+                        navController?.popBackStack()
+                    }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null
@@ -254,7 +254,5 @@ private fun TestEditor() {
 @Preview
 @Composable
 private fun PreviewSettingsPage() {
-    CompositionLocalProvider(LocalNavController provides rememberNavController()) {
-        FiltersSettingsPage()
-    }
+    FiltersSettingsPage()
 }

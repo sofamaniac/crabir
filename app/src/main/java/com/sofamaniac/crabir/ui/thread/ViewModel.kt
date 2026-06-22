@@ -8,12 +8,15 @@ import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
+import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.CommentType
+import com.sofamaniac.crabir.domain.model.DUMMY_POST
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
+import com.sofamaniac.crabir.ui.post.PostViewModelInterface
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -37,7 +40,7 @@ class ThreadViewModel @AssistedInject constructor(
     @Assisted("comment") val comment: String?,
     @Assisted val context: Int?,
     @Assisted val initialSort: Sort?,
-) : ViewModel(), CommentViewModelInterface {
+) : ViewModel(), CommentViewModelInterface, PostViewModelInterface {
 
     var name: Fullname = repository.getPostId(permalink)
 
@@ -52,8 +55,52 @@ class ThreadViewModel @AssistedInject constructor(
     private var _comments = MutableStateFlow<List<CommentType>>(emptyList())
     val comments: StateFlow<List<CommentType>> = _comments.asStateFlow()
 
-    private var _post = MutableStateFlow<PostData?>(null)
-    val post: StateFlow<PostData?> = _post.asStateFlow()
+    private var _post = MutableStateFlow<PostData>(DUMMY_POST)
+
+    //override val post: StateFlow<PostData?> = _post.asStateFlow()
+    override val post: Flow<PostData> = _post.asStateFlow()
+    override val flairs: StateFlow<List<FlairInfo>>
+        get() = TODO("Not yet implemented")
+
+    override fun hide() {
+        TODO("Not yet implemented")
+    }
+
+    override fun unhide() {
+        TODO("Not yet implemented")
+    }
+
+    override fun delete() {
+        TODO("Not yet implemented")
+    }
+
+    override fun editFlair(flairId: String, text: String?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getFlairs() {
+        TODO("Not yet implemented")
+    }
+
+    override fun markNSFW() {
+        TODO("Not yet implemented")
+    }
+
+    override fun unmarkNSFW() {
+        TODO("Not yet implemented")
+    }
+
+    override fun markSpoiler() {
+        TODO("Not yet implemented")
+    }
+
+    override fun unmarkSpoiler() {
+        TODO("Not yet implemented")
+    }
+
+    override fun setInboxReplies(enabled: Boolean) {
+        TODO("Not yet implemented")
+    }
 
     private var _openComment = MutableStateFlow<Fullname?>(null)
 
@@ -69,18 +116,16 @@ class ThreadViewModel @AssistedInject constructor(
         }
     }
 
-    private val _sort = MutableStateFlow(Sort.Best)
-    val sort: StateFlow<Sort> = _sort.asStateFlow()
+    private val _sort = MutableStateFlow<Sort?>(null)
+    val sort: StateFlow<Sort?> = _sort.asStateFlow()
 
     init {
-        // try initializing post
-        _post.value = getPost()
-        Log.d(
-            "ThreadViewModel",
-            "${initialSort}, ${post.value != null}, ${post.value?.suggestedSort}"
-        )
-        _sort.value = initialSort ?: post.value?.suggestedSort ?: Sort.Best
+        _sort.value = initialSort
         fetchComments()
+        // try initializing post
+        val initialPost = getPost()
+        _post.value = initialPost!!
+        _sort.value = _sort.value ?: _post.value.suggestedSort
     }
 
     private fun getPost(): PostData? {
@@ -115,7 +160,7 @@ class ThreadViewModel @AssistedInject constructor(
                 context = context
             )
             // If post was not found set it here.
-            _post.value = _post.value ?: getPost()
+            _post.value = getPost() ?: _post.value
             _isRefreshing.value = false
         }
     }
@@ -149,7 +194,7 @@ class ThreadViewModel @AssistedInject constructor(
             var commentData = CommentDataMapper.map(commentDTO.data)
             commentData =
                 commentData.copy(relationship = commentData.relationship.copy(liked = true))
-            if (parent == post.value?.name) {
+            if (parent == _post.value.name) {
                 _comments.update {
                     it + CommentType.Comment(commentData.copy(depth = 0))
                 }

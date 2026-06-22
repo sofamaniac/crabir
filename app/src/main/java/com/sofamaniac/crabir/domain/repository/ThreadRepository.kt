@@ -22,7 +22,8 @@ import javax.inject.Inject
 interface ThreadRepository {
     suspend fun getComments(
         permalink: String,
-        sort: Sort, timeframe: Timeframe? = null,
+        sort: Sort? = null,
+        timeframe: Timeframe? = null,
         comment: String? = null,
         context: Int? = null,
     ): List<CommentType>
@@ -58,7 +59,7 @@ class ThreadRepositoryImpl @Inject constructor(
 
     suspend fun fetchThread(
         permalink: String,
-        sort: Sort,
+        sort: Sort? = null,
         comment: String? = null,
         context: Int? = null
     ) {
@@ -87,14 +88,14 @@ class ThreadRepositoryImpl @Inject constructor(
         if (post != null) {
             return post
         } else {
-            post = postsRepository.get(name) as? PostData?
+            post = postsRepository.getValue(name)
         }
         return post
     }
 
     override suspend fun getComments(
         permalink: String,
-        sort: Sort,
+        sort: Sort?,
         timeframe: Timeframe?,
         comment: String?,
         context: Int?,

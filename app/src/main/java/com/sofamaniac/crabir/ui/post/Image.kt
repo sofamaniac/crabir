@@ -4,6 +4,7 @@
 
 package com.sofamaniac.crabir.ui.post
 
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.sofamaniac.crabir.LocalSharedTransitionScope
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
@@ -29,6 +31,8 @@ import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.FullscreenImageRoute
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
+import com.sofamaniac.crabir.ui.SharedElementKey
+import com.sofamaniac.crabir.ui.SharedElementType
 import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.image.DownloadButton
 import com.sofamaniac.crabir.ui.media.image.ImageView
@@ -86,37 +90,51 @@ fun FullscreenImageView(
     viewModel: PostDataViewModel = hiltViewModel<PostDataViewModel, PostDataViewModel.Factory> { factory ->
         factory.create(post.name)
     },
-    dismiss: () -> Unit
+    dismiss: () -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     var quality by remember { mutableStateOf(Quality.High) }
     var showDecorations by remember { mutableStateOf(true) }
     val postData by viewModel.post.collectAsState(initial = null)
     if (postData == null) return
-    VerticalSwipeToDismiss(
-        onDismiss = dismiss,
-        topBar = {
-            FullscreenTopBar(showDecorations, actions = {
-                if (quality != Quality.Source) DownloadButton(postData!!.getSourceUrl().toUri())
-                IconButton(onClick = { quality = Quality.Source }) {
-                    Icon(Icons.Default.Hd, contentDescription = null)
-                }
-            })
-        },
-        bottomBar = { FullscreenBottomBar(postData!!, showDecorations) },
-        modifier = Modifier
-            .fillMaxSize()
-            .clickable {
-                showDecorations = !showDecorations
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    with(sharedTransitionScope) {
+        VerticalSwipeToDismiss(
+            onDismiss = dismiss,
+            topBar = {
+                FullscreenTopBar(showDecorations, actions = {
+                    if (quality != Quality.Source) DownloadButton(postData!!.getSourceUrl().toUri())
+                    IconButton(onClick = { quality = Quality.Source }) {
+                        Icon(Icons.Default.Hd, contentDescription = null)
+                    }
+                })
             },
-    ) {
-        ImageView(
-            postData!!,
-            modifier = Modifier.fillMaxSize(),
-            quality = quality,
-            onClick = {
-                showDecorations = !showDecorations
-            }
-        )
+            bottomBar = { FullscreenBottomBar(postData!!, showDecorations) },
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable {
+                    showDecorations = !showDecorations
+                },
+        ) {
+            ImageView(
+                postData!!,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .sharedElement(
+                        sharedTransitionScope.rememberSharedContentState(
+                            key = SharedElementKey(
+                                postData!!.name,
+                                SharedElementType.Content
+                            )
+                        ),
+                        animatedVisibilityScope
+                    ),
+                quality = quality,
+                onClick = {
+                    showDecorations = !showDecorations
+                }
+            )
+        }
     }
 }
 

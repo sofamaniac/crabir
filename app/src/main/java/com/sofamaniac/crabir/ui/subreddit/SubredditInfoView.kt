@@ -195,17 +195,17 @@ fun SubredditInfoView(
 
 @Composable
 internal fun TopBar(subreddit: String) {
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     TopAppBar(
         navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
+            IconButton(onClick = { navController?.popBackStack() }) {
                 Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
             }
         },
         title = {},
         actions = {
             IconButton(onClick = {
-                navController.navigate(SearchRoute(subreddit))
+                navController?.navigate(SearchRoute(subreddit))
             }) {
                 Icon(Icons.Default.Search, contentDescription = null)
             }

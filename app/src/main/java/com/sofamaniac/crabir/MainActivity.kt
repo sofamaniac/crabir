@@ -13,12 +13,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -72,7 +73,6 @@ import com.sofamaniac.crabir.ui.subreddit.HomeViewer
 import com.sofamaniac.crabir.ui.subredditList.SubredditListViewer
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.launch
 import me.saket.telephoto.zoomable.coil3.ZoomableAsyncImage
 
 
@@ -82,6 +82,8 @@ class CrabirApp : Application()
 val LocalTheme = compositionLocalOf<CrabirTheme> { DefaultDarkTheme }
 val LocalDrawerState = compositionLocalOf<DrawerState> { error("No drawer state provided") }
 val LocalRedditAccount = compositionLocalOf<RedditAccount> { RedditAccount.anonymous() }
+val LocalSharedTransitionScope =
+    compositionLocalOf<SharedTransitionScope> { error("No shared transition scope provided") }
 
 
 @AndroidEntryPoint
@@ -126,9 +128,13 @@ class MainActivity : ComponentActivity() {
                         CompositionLocalProvider(LocalDrawerState provides drawerState) {
                             val currentAccount = rememberCurrentAccount()
                             CompositionLocalProvider(LocalRedditAccount provides currentAccount) {
-                                MainScreen(
-                                    navController = navController,
-                                )
+                                SharedTransitionLayout {
+                                    CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
+                                        MainScreen(
+                                            navController = navController,
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -155,21 +161,21 @@ fun MainScreen(
     val scope = rememberCoroutineScope()
     val activity = LocalActivity.current
     val drawerState = LocalDrawerState.current
-    BackHandler {
-        if (drawerState.isOpen) {
-            scope.launch {
-                drawerState.close()
-            }
-        } else {
-            // TODO: ask for confirmation and exit the app
-            if (navController.previousBackStackEntry != null) {
-                Log.d("MainScreen", "Popping back stack ${navController.currentBackStackEntry}")
-                navController.popBackStack()
-            } else {
-                activity?.finish()
-            }
-        }
-    }
+//    PredictiveBackHandler {
+//        if (drawerState.isOpen) {
+//            scope.launch {
+//                drawerState.close()
+//            }
+//        } else {
+//            // TODO: ask for confirmation and exit the app
+//            if (navController.previousBackStackEntry != null) {
+//                Log.d("MainScreen", "Popping back stack ${navController.currentBackStackEntry}")
+//                navController.popBackStack()
+//            } else {
+//                activity?.finish()
+//            }
+//        }
+//    }
 
     NavigationGraph(
         navController,
@@ -185,7 +191,6 @@ fun NavigationGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-
     CompositionLocalProvider(LocalNavController provides navController) {
         NavHost(
             navController = navController,
@@ -198,7 +203,7 @@ fun NavigationGraph(
         ) {
             composable<HomeRoute> {
                 Log.d("NavigationGraph", "HomeRoute")
-                HomeViewer()
+                HomeViewer(animatedVisibilityScope = this@composable)
             }
 
             profileGraph(navController = navController)
@@ -212,14 +217,14 @@ fun NavigationGraph(
             }
             composable<SearchRoute> { navBackStackEntry ->
                 val search = navBackStackEntry.toRoute<SearchRoute>()
-                SearchTab(search)
+                SearchTab(search, animatedVisibilityScope = this@composable)
             }
             composable<InboxRoute> {
                 InboxView()
 
             }
             composable<HistoryRoute> {
-                HistoryViewer()
+                HistoryViewer(animatedVisibilityScope = this@composable)
             }
 //            composable<FiltersSettingRoute>{
 //                FiltersSettings.View()
