@@ -11,6 +11,7 @@ import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ClientAuthentication
 import net.openid.appauth.ResponseTypeValues
+import kotlin.enums.enumEntries
 
 class AuthConfig(
 ) {
@@ -20,14 +21,17 @@ class AuthConfig(
     private val clientId = BuildConfig.REDDIT_CLIENT_ID
 
     /** Add all available scopes */
-    private val scopes = enumValues<Scopes>().map { it.name.lowercase() }
+    private val scopes = enumEntries<Scopes>().map { it.name.lowercase() }
 
-    fun createAuthorizationRequest(): AuthorizationRequest {
-        val serviceConfiguration = AuthorizationServiceConfiguration(
+    fun authorizationServiceConfiguration(): AuthorizationServiceConfiguration {
+        return AuthorizationServiceConfiguration(
             authorizationEndpoint.toUri(),
             tokenEndpoint.toUri()
         )
+    }
 
+    fun createAuthorizationRequest(): AuthorizationRequest {
+        val serviceConfiguration = authorizationServiceConfiguration()
         return AuthorizationRequest.Builder(
             serviceConfiguration,
             clientId,
@@ -40,8 +44,9 @@ class AuthConfig(
     }
 }
 
+//val BasicAuthClient = ClientSecretBasic(BuildConfig.REDDIT_CLIENT_ID)
 
-class BasicAuthClient() : ClientAuthentication {
+val BasicAuthClient = object : ClientAuthentication {
     override fun getRequestHeaders(clientId: String): MutableMap<String, String> {
         return mutableMapOf(
             "Authorization" to "Basic " + Base64.encodeToString(

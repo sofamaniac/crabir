@@ -9,7 +9,7 @@ import kotlinx.serialization.json.Json
 
 @Entity(tableName = "accounts", indices = [Index(value = ["name"], unique = true)])
 data class RedditAccountEntity(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey()
     val id: Int = 0,
     val name: String,
     val info: String,

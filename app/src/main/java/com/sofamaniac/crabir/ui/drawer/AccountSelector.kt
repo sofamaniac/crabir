@@ -54,7 +54,7 @@ fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: (Int) -> Uni
     }
     val currentAccount by viewModel.activeAccount.collectAsState(initial = RedditAccount.anonymous())
     Column {
-        for (account in accounts) {
+        for (account in accounts.sortedByDescending { it.id }) {
             if (account.id == currentAccount.id) continue
             AccountTile(
                 account,

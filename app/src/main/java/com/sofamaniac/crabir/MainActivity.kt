@@ -52,6 +52,7 @@ import com.sofamaniac.crabir.navigation.HomeRoute
 import com.sofamaniac.crabir.navigation.InboxRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SearchRoute
+import com.sofamaniac.crabir.navigation.SimpleImageRoute
 import com.sofamaniac.crabir.navigation.SubscriptionsRoute
 import com.sofamaniac.crabir.navigation.imagesGraph
 import com.sofamaniac.crabir.navigation.postGraph
@@ -95,10 +96,19 @@ class MainActivity : ComponentActivity() {
         intent.data?.let { uri ->
             val request = NavDeepLinkRequest.Builder.fromUri(uri).build()
             try {
-                navController.navigate(
-                    request = request,
-                    navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
-                )
+                Log.d("MainActivity", "onNewIntent: request: $request")
+                val mediaUrl = listOf("i.redd.it", "preview.reddit.com", "preview.redd.it")
+                if (mediaUrl.contains(uri.host)) {
+                    navController.navigate(
+                        route = SimpleImageRoute(uri.toString()),
+                        navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
+                    )
+                } else {
+                    navController.navigate(
+                        request = request,
+                        navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
+                    )
+                }
             } catch (e: IllegalArgumentException) {
                 uriHandler.openUri(uri.toString())
             }
@@ -156,14 +166,6 @@ fun MainScreen(
         }
     }
 
-//    val scope = rememberCoroutineScope()
-//    val drawerState = LocalDrawerState.current
-//    BackHandler(enabled = drawerState.isOpen) {
-//        scope.launch {
-//            drawerState.close()
-//        }
-//    }
-
     NavigationGraph(
         navController,
     )
@@ -186,7 +188,6 @@ fun NavigationGraph(
         exitTransition = { ExitTransition.None }
     ) {
         composable<HomeRoute> {
-            Log.d("NavigationGraph", "HomeRoute")
             HomeViewer(animatedVisibilityScope = this@composable)
         }
 

@@ -34,7 +34,7 @@ object AuthModule {
 
     @Provides
     fun provideClientAuth(): ClientAuthentication {
-        return BasicAuthClient()
+        return BasicAuthClient
     }
 
 }

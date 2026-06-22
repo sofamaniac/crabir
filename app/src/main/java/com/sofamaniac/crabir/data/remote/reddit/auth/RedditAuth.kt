@@ -32,18 +32,24 @@ class RedditAuthenticator @Inject constructor(
     private val activeAccount: Flow<RedditAccount> = accountsRepository.activeAccount
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        Log.d("RedditAuthenticator", "Authenticating with $activeAccount")
         val activeAccount = runBlocking { activeAccount.first() }
+        Log.d("RedditAuthenticator", "Authenticating with ${activeAccount.auth.accessToken}")
 
-        if (activeAccount.isAnonymous()) {
-            Log.w("RedditAuthenticator", "Anonymous account")
-            // TODO
-            //return null // Anonymous account
-            return chain.proceed(chain.request())
-        } else if (chain.request().url.host.contains("www.reddit.com")) {
+//        if (activeAccount.isAnonymous()) {
+//            Log.w("RedditAuthenticator", "Anonymous account")
+//            // TODO
+//            //return null // Anonymous account
+//            Log.d("RedditAuthenticator", "auth: ${activeAccount.auth.accessToken}")
+//            Log.d("RedditAuthenticator", "${chain.request().headers}")
+//
+//            return chain.proceed(chain.request())
+//        } else
+        if (chain.request().url.host.contains("www.reddit.com")) {
             // Disable auth on non oauth endpoints
-            Log.w("RedditAuthenticator", "Non oauth endpoint")
-            return chain.proceed(chain.request())
+            Log.w("RedditAuthenticator", "Non oauth endpoint (${chain.request().url})")
+            val request =
+                chain.request().newBuilder().header("Authorization", authorizationHeader).build()
+            return chain.proceed(request)
         }
 
         val newAccessToken = if (activeAccount.auth.needsTokenRefresh) {

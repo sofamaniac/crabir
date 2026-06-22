@@ -12,6 +12,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.data.local.dao.MultiDao
 import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.remote.dto.MultiData
@@ -38,6 +39,10 @@ import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
+import net.openid.appauth.TokenRequest
+import net.openid.appauth.TokenResponse
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 sealed class LoginState {
     object Idle : LoginState()
@@ -84,8 +89,14 @@ class DrawerViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
+            for (accounts in accountsRepository.accounts.first()) {
+                if (accounts.info == null || accounts.isAnonymous() || accounts.isUninitialized()) {
+                    accountsRepository.deleteAccount(accounts.id)
+                }
+            }
             val activeAccount = accountsRepository.activeAccount.first()
-            if (activeAccount.isAnonymous()) {
+            if (activeAccount.isAnonymous() || accountsRepository.accounts.first().isEmpty()) {
+                setupAnonymous()
                 return@launch
             }
             if (activeAccount.info?.username.isNullOrBlank()) {
@@ -109,17 +120,58 @@ class DrawerViewModel @Inject constructor(
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
+    private suspend fun setupAnonymous() {
+        if (accountsRepository.accounts.first().any { it.isAnonymous() && it.auth.isAuthorized }) {
+            Log.i("LoginViewModel", "Anonymous account already set up")
+            return
+        }
+        Log.d("LoginViewModel", "Setting up anonymous")
+        val response = redditApi.getAnonymousAccessToken(
+            deviceId = Uuid.random().toHexDashString()
+        )
+        if (response.isSuccessful) {
+            Log.d("LoginViewModel", "Obtained access token for anonymous")
+            val accessToken = response.body()!!
+            val authResponse =
+                AuthorizationResponse.Builder(serviceConfig.createAuthorizationRequest())
+                    .setAccessToken(accessToken.access_token)
+                    .setAccessTokenExpiresIn(accessToken.expires_in)
+                    .build()
+            val tokenRequest = TokenRequest.Builder(
+                serviceConfig.authorizationServiceConfiguration(),
+                BuildConfig.REDDIT_CLIENT_ID
+            ).setGrantType(
+                TokenRequest.GRANT_TYPE_CLIENT_CREDENTIALS
+            ).build()
+            val tokenResponse =
+                TokenResponse.Builder(tokenRequest).setAccessToken(accessToken.access_token)
+                    .setAccessTokenExpiresIn(accessToken.expires_in ?: Long.MAX_VALUE)
+                    .setScope(accessToken.scope)
+                    .build()
+            val state = AuthState(authResponse, tokenResponse, null)
+            val account = RedditAccount.anonymous().copy(auth = state)
+            accountsRepository.addAccount(account)
+            accountsRepository.setActiveAccount(-1)
+        } else {
+            Log.e("LoginViewModel", "failed to setup anonymous: ${response.errorBody()}")
+        }
+    }
+
     fun setActiveAccount(accountId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             accountsRepository.setActiveAccount(accountId)
+            val account = activeAccount.first()
             Log.d(
                 "LoginViewModel",
                 "Setting active account to '${activeAccount.first().info?.username ?: "Anonymous"}'"
             )
-            if (accountId == -1) {
+            if (account.isAnonymous()) {
+                if (account.auth.accessToken.isNullOrBlank()) {
+                    setupAnonymous()
+                }
                 return@launch
-            }
-            if (activeAccount.first().info?.username.isNullOrBlank()) {
+            } else if (account.info?.username.isNullOrBlank()) {
                 fetchUserInfo()
             }
         }
@@ -130,11 +182,6 @@ class DrawerViewModel @Inject constructor(
         val intent = authService.getAuthorizationRequestIntent(authRequest)
         Log.d("LoginViewModel", "Creating auth intent: $intent")
         return intent
-    }
-
-    fun createAuthUrl(): String {
-        val authRequest = serviceConfig.createAuthorizationRequest()
-        return authRequest.toUri().toString()
     }
 
     fun handleAuthResult(intent: Intent?) {
@@ -167,7 +214,7 @@ class DrawerViewModel @Inject constructor(
 
 
     private fun exchangeAuthCodeForToken(authResponse: AuthorizationResponse) {
-        val clientAuth = BasicAuthClient()
+        val clientAuth = BasicAuthClient
         authService.performTokenRequest(
             authResponse.createTokenExchangeRequest(),
             clientAuth
@@ -179,17 +226,21 @@ class DrawerViewModel @Inject constructor(
                 }
 
                 tokenResponse != null -> {
+                    Log.d("LoginViewModel", "Got authorization token")
                     val authState = AuthState(authResponse, tokenResponse, null)
                     runBlocking(Dispatchers.IO) {
                         save(authState)
                     }
+                }
+
+                else -> {
+                    Log.e("LoginViewModel", "Something went wrong")
                 }
             }
         }
     }
 
     private suspend fun fetchUserInfo() {
-        val accounts = accountsRepository.accounts.first()
         val currentAccount = accountsRepository.activeAccount.first()
         val user = redditApi.getIdentity()
         if (user.isSuccessful) {
@@ -222,10 +273,10 @@ class DrawerViewModel @Inject constructor(
 
     private suspend fun save(authState: AuthState) {
         try {
-            val newAccount = RedditAccount.uninitialized(authState)
+            val id = accountsRepository.accounts.first().size
+            val newAccount = RedditAccount.uninitialized(id, authState)
             accountsRepository.addAccount(newAccount)
-            val lastIndex = accountsRepository.accounts.first().last().id
-            accountsRepository.setActiveAccount(lastIndex)
+            accountsRepository.setActiveAccount(id)
             Log.d("LoginViewModel", "save: fetching user info")
             fetchUserInfo()
         } catch (e: Exception) {

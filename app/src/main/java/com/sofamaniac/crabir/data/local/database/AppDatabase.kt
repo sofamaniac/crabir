@@ -17,7 +17,7 @@ import com.sofamaniac.crabir.data.remote.dto.MultiData
 import com.sofamaniac.crabir.domain.model.SubredditData
 
 
-@Database(entities = [RedditAccountEntity::class], version = 1)
+@Database(entities = [RedditAccountEntity::class], version = 2)
 abstract class AccountDatabase : RoomDatabase() {
     abstract fun accountsDao(): AccountsDao
 }

@@ -44,8 +44,8 @@ data class RedditAccount(
             return RedditAccount(-1, null, AuthState())
         }
 
-        fun uninitialized(authState: AuthState): RedditAccount {
-            return RedditAccount(-2, null, authState)
+        fun uninitialized(id: Int, authState: AuthState): RedditAccount {
+            return RedditAccount(id, null, authState)
         }
     }
 
