@@ -5,7 +5,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.domain.model.MediaResource
+import me.saket.telephoto.zoomable.ZoomableState
 import me.saket.telephoto.zoomable.coil3.ZoomableAsyncImage
+import me.saket.telephoto.zoomable.rememberZoomableImageState
 
 @Composable
 fun TransformableImage(
@@ -14,6 +16,7 @@ fun TransformableImage(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     contentScale: ContentScale = ContentScale.Fit,
+    zoomableState: ZoomableState,
     onClick: () -> Unit = {}
 ) {
     if (enabled) {
@@ -21,6 +24,7 @@ fun TransformableImage(
             source.url,
             contentDescription,
             modifier,
+            state = rememberZoomableImageState(zoomableState),
             contentScale = contentScale,
             onClick = { onClick() },
         )

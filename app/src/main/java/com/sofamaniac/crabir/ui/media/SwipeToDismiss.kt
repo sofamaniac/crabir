@@ -40,6 +40,7 @@ fun VerticalSwipeToDismiss(
     onDismiss: () -> Unit,
     velocityThreshold: Float = 5000f,
     threshold: Float = 0.3f,
+    enabled: Boolean = true,
     topBar: @Composable ColumnScope.() -> Unit = {},
     bottomBar: @Composable ColumnScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
@@ -63,7 +64,7 @@ fun VerticalSwipeToDismiss(
 
     val theme = rememberThemeSettings()
     val updateBars = setSystemBarsColor()
-    var isDissmising by remember { mutableStateOf(false) }
+    var isDismissing by remember { mutableStateOf(false) }
     DisposableEffect(theme.mode) {
         updateBars(ThemeMode.Dark)
         onDispose {
@@ -76,17 +77,18 @@ fun VerticalSwipeToDismiss(
             .fillMaxSize()
             .background(color = Color.Black)
             .draggable(
+                enabled = enabled,
                 state = state,
                 orientation = Orientation.Vertical,
                 onDragStopped = { velocity ->
                     val fraction = abs(offsetY.value) / screenHeight
                     if (fraction >= threshold || abs(velocity) >= velocityThreshold) {
-                        isDissmising = true
+                        isDismissing = true
                         scope.launch {
                             offsetY.animateTo(offsetY.value.sign * screenHeight)
                             onDismiss()
                         }
-                    } else if (!isDissmising) {
+                    } else if (!isDismissing) {
                         scope.launch {
                             offsetY.animateTo(0f, spring())
                         }

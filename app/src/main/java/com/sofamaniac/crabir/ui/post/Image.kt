@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -38,6 +39,7 @@ import com.sofamaniac.crabir.ui.media.FullscreenTopBar
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.image.DownloadButton
 import com.sofamaniac.crabir.ui.media.image.ImageView
+import me.saket.telephoto.zoomable.rememberZoomableState
 
 private fun PostData.getImage(): MediaResource {
     return if (preview != null) {
@@ -100,14 +102,16 @@ fun FullscreenImageView(
     val postData by viewModel.post.collectAsState(initial = null)
     if (postData == null) return
     val sharedTransitionScope = LocalSharedTransitionScope.current
+    val zoomableState = rememberZoomableState()
     with(sharedTransitionScope) {
         VerticalSwipeToDismiss(
             onDismiss = dismiss,
+            enabled = zoomableState.contentTransformation.scaleMetadata.userZoom == 1.0f,
             topBar = {
                 FullscreenTopBar(showDecorations, actions = {
                     if (quality != Quality.Source) DownloadButton(postData!!.getSourceUrl().toUri())
                     IconButton(onClick = { quality = Quality.Source }) {
-                        Icon(Icons.Default.Hd, contentDescription = null)
+                        Icon(Icons.Default.Hd, contentDescription = null, tint = Color.White)
                     }
                 })
             },
@@ -120,6 +124,7 @@ fun FullscreenImageView(
         ) {
             ImageView(
                 postData!!,
+                zoomableState = zoomableState,
                 modifier = Modifier
                     .fillMaxSize()
                     .sharedElement(

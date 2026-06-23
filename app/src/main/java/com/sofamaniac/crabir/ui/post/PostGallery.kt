@@ -262,11 +262,14 @@ fun FullscreenGallery(
         showDecorations = !showDecorations
     }
     var showControls by remember { mutableStateOf(false) }
+    var enableDismiss by remember { mutableStateOf(false) }
     LaunchedEffect(state.currentPage) {
         onPageChanged(state.currentPage)
+        enableDismiss = true
         showControls = gallery.get(state.currentPage) is MediaMetadata.Gif
     }
     VerticalSwipeToDismiss(
+        enabled = enableDismiss,
         topBar = {
             FullscreenTopBar(showDecorations) {
                 Text(
@@ -316,7 +319,11 @@ fun FullscreenGallery(
                         metadata.toMediaResource(),
                         modifier = Modifier.fillMaxSize(),
                         allowTransformation = true,
-                        onClick = onClick
+                        onClick = onClick,
+                        onZoomChange = { zoom ->
+                            Log.d("FullscreenGallery", "onZoomChange: $zoom")
+                            enableDismiss = zoom == 1f
+                        }
                     )
 
                 is MediaMetadata.Gif ->
