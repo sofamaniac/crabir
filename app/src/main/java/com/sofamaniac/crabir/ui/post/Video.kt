@@ -42,8 +42,10 @@ import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.VIDEO_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.YOUTUBE_CARTOUCHE_COLOR
-import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
+import com.sofamaniac.crabir.ui.media.FullscreenTopBar
+import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.image.DownloadButton
 import com.sofamaniac.crabir.ui.media.image.ImageView
 import com.sofamaniac.crabir.ui.media.videoPlayer.DecoratedVideoPlayer

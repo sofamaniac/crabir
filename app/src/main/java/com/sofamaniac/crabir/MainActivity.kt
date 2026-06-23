@@ -64,7 +64,7 @@ import com.sofamaniac.crabir.settings.theme.CrabirTheme
 import com.sofamaniac.crabir.settings.theme.DefaultDarkTheme
 import com.sofamaniac.crabir.settings.theme.rememberAppTheme
 import com.sofamaniac.crabir.ui.InboxView
-import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
+import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 import com.sofamaniac.crabir.ui.search.SearchTab
 import com.sofamaniac.crabir.ui.subreddit.HistoryViewer
@@ -118,7 +118,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        //window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         setContent {
 
             navController = rememberNavController()

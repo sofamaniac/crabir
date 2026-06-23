@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui
+package com.sofamaniac.crabir.ui.media
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
@@ -36,7 +36,7 @@ import kotlin.math.sign
 
 @Composable
 fun VerticalSwipeToDismiss(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.Companion,
     onDismiss: () -> Unit,
     velocityThreshold: Float = 5000f,
     threshold: Float = 0.3f,

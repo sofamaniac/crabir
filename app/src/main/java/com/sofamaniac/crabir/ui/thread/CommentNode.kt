@@ -48,12 +48,12 @@ import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
-import com.sofamaniac.crabir.ui.post.VotableInteraction
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.SavedButton
 import com.sofamaniac.crabir.ui.votable.ScoreString
 import com.sofamaniac.crabir.ui.votable.UpButton
+import com.sofamaniac.crabir.ui.votable.VotableInteraction
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 

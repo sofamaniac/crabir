@@ -33,7 +33,9 @@ import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.SharedElementKey
 import com.sofamaniac.crabir.ui.SharedElementType
-import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
+import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
+import com.sofamaniac.crabir.ui.media.FullscreenTopBar
+import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.image.DownloadButton
 import com.sofamaniac.crabir.ui.media.image.ImageView
 

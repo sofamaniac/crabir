@@ -45,8 +45,10 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.FullscreenGalleryRoute
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
-import com.sofamaniac.crabir.ui.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
+import com.sofamaniac.crabir.ui.media.FullscreenTopBar
+import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.gallery.Gallery
 import com.sofamaniac.crabir.ui.media.image.ImageView
 import com.sofamaniac.crabir.ui.media.videoPlayer.DecoratedVideoPlayer
@@ -84,14 +86,6 @@ fun PostGallery(
             .aspectRatio(gallery.aspectRatio),
         goFullscreen = {
             goFullscreen(FullscreenGalleryRoute(post.name))
-//            fullscreenManager.push {
-//                FullscreenGallery(
-//                    post = post,
-//                    gallery = gallery,
-//                    initialPage = currentPage,
-//                    onPageChanged = { currentPage = it }
-//                )
-//            }
         },
         canPlayVideo = canPlayVideo
     )
@@ -126,6 +120,19 @@ fun EmbeddedGallery(
             enableScroll = !blur,
         ) { metadata, page ->
             Box {
+                val blurBackground = when (metadata) {
+                    is MediaMetadata.Gif -> {
+                        metadata.obfuscated.lastOrNull()?.toMediaResource()?.url
+                    }
+
+                    is MediaMetadata.Image -> {
+                        metadata.obfuscated.lastOrNull()?.toMediaResource()?.url
+                    }
+
+                    else -> {
+                        null
+                    }
+                }
                 val backgroundUrl = when (metadata) {
                     is MediaMetadata.Gif -> {
                         val resource = metadata.preview.lastOrNull()?.toMediaResource()
@@ -133,12 +140,21 @@ fun EmbeddedGallery(
                     }
 
                     is MediaMetadata.Image -> {
-                        metadata.preview?.lastOrNull()?.url
+                        metadata.preview.lastOrNull()?.url
                     }
 
                     else -> null
                 }
-                if (backgroundUrl != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (blurBackground != null) {
+                    AsyncImage(
+                        backgroundUrl,
+                        modifier = modifier
+                            .fillMaxSize(),
+                        contentScale = ContentScale.FillBounds,
+                        contentDescription = null,
+                    )
+                } else if (backgroundUrl != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    // If available, blur background
                     AsyncImage(
                         backgroundUrl,
                         modifier = innerModifier
@@ -255,7 +271,7 @@ fun FullscreenGallery(
             FullscreenTopBar(showDecorations) {
                 Text(
                     "${state.currentPage + 1}/${state.pageCount}",
-                    style = MaterialTheme.typography.labelMedium.copy(color = Color.Companion.White)
+                    style = MaterialTheme.typography.labelMedium.copy(color = Color.White)
                 )
             }
         },

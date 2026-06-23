@@ -32,9 +32,9 @@ import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import com.sofamaniac.crabir.ui.post.BottomRow
 import com.sofamaniac.crabir.ui.post.LinkViewModel
-import com.sofamaniac.crabir.ui.post.PostBody
 import com.sofamaniac.crabir.ui.post.PostHeader
 import com.sofamaniac.crabir.ui.post.PostInfo
+import com.sofamaniac.crabir.ui.post.card.PostBody
 
 @Composable
 internal fun PostView(

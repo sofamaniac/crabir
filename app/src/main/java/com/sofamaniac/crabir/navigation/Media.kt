@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import com.sofamaniac.crabir.ui.SimpleFullscreenImage
+import com.sofamaniac.crabir.ui.media.SimpleFullscreenImage
 import kotlinx.serialization.Serializable
 
 val URLS = listOf(

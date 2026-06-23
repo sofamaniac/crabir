@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui.post
+package com.sofamaniac.crabir.ui.post.card
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
@@ -14,10 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.LocalSharedTransitionScope
-import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
-import com.sofamaniac.crabir.data.remote.reddit.Rules
-import com.sofamaniac.crabir.domain.model.DUMMY_POST
-import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -26,10 +22,14 @@ import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.SharedElementKey
 import com.sofamaniac.crabir.ui.SharedElementType
 import com.sofamaniac.crabir.ui.ThemedCard
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import com.sofamaniac.crabir.ui.post.BottomRow
+import com.sofamaniac.crabir.ui.post.DummyInteraction
+import com.sofamaniac.crabir.ui.post.LinkInteraction
+import com.sofamaniac.crabir.ui.post.LinkViewModel
+import com.sofamaniac.crabir.ui.post.OpenThreadButton
+import com.sofamaniac.crabir.ui.post.PostHeader
+import com.sofamaniac.crabir.ui.post.PostInfo
+import com.sofamaniac.crabir.ui.post.PostViewModelInterface
 
 /**
  * Composable function that displays a single post in a Card format.
@@ -46,7 +46,7 @@ import kotlinx.coroutines.flow.map
 @Composable
 fun PostCard(
     post: PostData,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.Companion,
     clickable: Boolean = true,
     markAsRead: () -> Unit = {},
     canStartVideo: Boolean = false,
@@ -77,7 +77,6 @@ fun PostCard(
         animatedContentScope = animatedContentScope,
     ) {
         OpenThreadButton(
-            post,
             onClick = markAsRead
         )
     }
@@ -86,7 +85,7 @@ fun PostCard(
 @Composable
 internal fun PostCardContent(
     post: PostData,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.Companion,
     clickable: Boolean = true,
     markAsRead: () -> Unit = {},
     canStartVideo: Boolean = false,
@@ -122,7 +121,7 @@ internal fun PostCardContent(
                 )
             )
         Log.d("PostCardContent", "Match found: ${state.isMatchFound}")
-        val animatedModifier = Modifier.sharedElement(
+        val animatedModifier = Modifier.Companion.sharedElement(
             state,
             animatedVisibilityScope = animatedContentScope
         )
@@ -182,99 +181,9 @@ internal fun PostCardPreview() {
             animatedContentScope = this@AnimatedVisibility
         ) {
             OpenThreadButton(
-                post,
                 onClick = {}
             )
         }
     }
 }
 
-object DummyInteraction : LinkInteraction {
-    private var _post = MutableStateFlow(DUMMY_POST.copy(kind = Kind.Self))
-    override val post: StateFlow<PostData> = _post
-    override val flairs: StateFlow<List<FlairInfo>> = MutableStateFlow(emptyList())
-
-    override fun hide() {
-    }
-
-    override fun unhide() {
-    }
-
-    override fun delete() {
-    }
-
-    override fun editFlair(flairId: String, text: String?) {
-    }
-
-    override fun getFlairs() {
-    }
-
-    override fun markNSFW() {
-        _post.value = _post.value.copy(over18 = true)
-    }
-
-    override fun unmarkNSFW() {
-        _post.value = _post.value.copy(over18 = false)
-    }
-
-    override fun markSpoiler() {
-        _post.value = _post.value.copy(spoiler = true)
-    }
-
-    override fun unmarkSpoiler() {
-        _post.value = _post.value.copy(spoiler = false)
-    }
-
-    override fun setInboxReplies(enabled: Boolean) {
-    }
-
-    override val likes: Flow<Boolean?> = _post.map { it.relationship.liked }
-    override val saved: Flow<Boolean> = _post.map { it.relationship.saved }
-    override val rules: StateFlow<Rules> = MutableStateFlow(Rules())
-
-    override fun upvote(name: Fullname) {
-        val likes = _post.value.relationship.liked
-        var relationship = _post.value.relationship
-        var score = _post.value.score
-        if (likes == true) {
-            relationship = relationship.copy(liked = null)
-            score = score.copy(ups = score.ups - 1, score = score.score - 1)
-        } else {
-            relationship = relationship.copy(liked = true)
-            score = score.copy(ups = score.ups + 1, score = score.score + 1)
-        }
-        _post.value =
-            _post.value.copy(
-                relationship = relationship,
-                score = score
-            )
-    }
-
-    override fun downvote(name: Fullname) {
-        val likes = _post.value.relationship.liked
-        var relationship = _post.value.relationship
-        var score = _post.value.score
-        if (likes == false) {
-            relationship = relationship.copy(liked = null)
-            score = score.copy(downs = score.downs - 1, score = score.score + 1)
-        } else {
-            relationship = relationship.copy(liked = false)
-            score = score.copy(downs = score.downs + 1, score = score.score - 1)
-        }
-        _post.value =
-            _post.value.copy(
-                relationship = relationship,
-                score = score
-            )
-    }
-
-    override fun save(name: Fullname, target: Boolean) {
-        _post.value = _post.value.copy(relationship = _post.value.relationship.copy(saved = target))
-    }
-
-    override fun fetchRules() {
-    }
-
-    override fun report(reason: String) {
-    }
-}

@@ -400,9 +400,9 @@ sealed class MediaMetadata() {
         @SerialName("id") val id: String? = null,
         /** Something like "image/jpeg" */
         @SerialName("m") val mime: String? = null,
-        @SerialName("p") val preview: List<MediaPreview>? = emptyList(),
+        @SerialName("p") val preview: List<MediaPreview> = emptyList(),
         @SerialName("s") val source: MediaPreview? = null,
-        @SerialName("o") val obfuscated: List<MediaPreview>? = emptyList(),
+        @SerialName("o") val obfuscated: List<MediaPreview> = emptyList(),
     ) : MediaMetadata() {
         override val ratio: Float
             get() = source?.ratio ?: 1f

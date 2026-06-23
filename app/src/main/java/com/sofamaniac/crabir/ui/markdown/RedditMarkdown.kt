@@ -188,36 +188,6 @@ private fun String.convertGiphy(toImage: Boolean): String {
     }
 }
 
-//@HiltViewModel(assistedFactory = MarkdownViewModel.Factory::class)
-//class MarkdownViewModel @AssistedInject constructor(
-//    @Assisted val markdown: String,
-//    @Assisted val mediaMetadata: Map<String, MediaMetadata>,
-//    @Assisted val enableImages: Boolean,
-//) : ViewModel() {
-//    val processedMarkdown = markdown
-//        //.extractRedditLinks()
-//        .convertGiphy(toImage = enableImages).let {
-//            if (enableImages)
-//                it.convertRedditPreviewLinks(mediaMetadata)
-//            else
-//                it
-//        }
-//
-//    val markdownFlow = parseMarkdownFlow(processedMarkdown, flavour = RedditFlavourDescriptor())
-//        .stateIn(
-//            viewModelScope, SharingStarted.Eagerly, State.Loading()
-//        )
-//
-//    @AssistedFactory
-//    interface Factory {
-//        fun create(
-//            markdown: String,
-//            mediaMetadata: Map<String, MediaMetadata>,
-//            enableImages: Boolean
-//        ): MarkdownViewModel
-//    }
-//}
-
 @Composable
 fun redditMarkdownTypography(): MarkdownTypography {
     val theme = LocalTheme.current

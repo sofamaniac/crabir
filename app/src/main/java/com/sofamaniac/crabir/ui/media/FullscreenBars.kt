@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui.post
+package com.sofamaniac.crabir.ui.media
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.Comment
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,14 +20,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.PostRoute
+import com.sofamaniac.crabir.ui.post.LinkViewModel
+import com.sofamaniac.crabir.ui.post.OpenThreadButton
+import com.sofamaniac.crabir.ui.post.dialog.ShareMenu
 import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.SavedButton
 import com.sofamaniac.crabir.ui.votable.ScoreString
@@ -80,6 +87,9 @@ fun ColumnScope.FullscreenBottomBar(
     val theme = LocalTheme.current
     val likes by viewModel.likes.collectAsState(post.relationship.liked)
     val saved by viewModel.saved.collectAsState(post.relationship.saved)
+    val navController = LocalNavController.current
+    val currentAccount = LocalRedditAccount.current
+    var showShareMenu by remember { mutableStateOf(false) }
     AnimatedVisibility(
         visible = enabled,
         modifier = Modifier
@@ -111,16 +121,13 @@ fun ColumnScope.FullscreenBottomBar(
                 }
                 SavedButton(saved, onClick = { viewModel.save(post.name, !saved) })
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            Icons.AutoMirrored.Outlined.Comment,
-                            contentDescription = "comments",
-                            tint = theme.secondaryText
-                        )
+                    OpenThreadButton {
+                        viewModel.markPost(post, currentAccount.id)
+                        navController?.navigate(PostRoute(post.permalink))
                     }
                     Text("${post.numComments}", color = theme.secondaryText)
                 }
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { showShareMenu = true }) {
                     Icon(
                         Icons.Default.Share,
                         contentDescription = "share",
@@ -129,5 +136,8 @@ fun ColumnScope.FullscreenBottomBar(
                 }
             }
         }
+    }
+    if (showShareMenu) {
+        ShareMenu(post) { showShareMenu = false }
     }
 }

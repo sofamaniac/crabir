@@ -67,7 +67,7 @@ import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.SortMenu
 import com.sofamaniac.crabir.ui.post.CompactView
-import com.sofamaniac.crabir.ui.post.PostCard
+import com.sofamaniac.crabir.ui.post.card.PostCard
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlin.math.max

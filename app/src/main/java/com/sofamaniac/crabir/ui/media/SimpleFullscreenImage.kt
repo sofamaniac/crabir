@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui
+package com.sofamaniac.crabir.ui.media
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,7 +13,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.core.net.toUri
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.media.image.DownloadButton
-import com.sofamaniac.crabir.ui.post.FullscreenTopBar
 import me.saket.telephoto.zoomable.coil3.ZoomableAsyncImage
 
 @Composable
