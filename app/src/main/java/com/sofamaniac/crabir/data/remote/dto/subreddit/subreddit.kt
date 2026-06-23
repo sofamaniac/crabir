@@ -9,6 +9,7 @@
 package com.sofamaniac.crabir.data.remote.dto.subreddit
 
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.DataInterface
 import kotlinx.serialization.SerialName
@@ -253,6 +254,8 @@ object SubredditDTOMapper : ObjectMappie<SubredditDTO, SubredditData>() {
         SubredditData::defaultSet fromValue false
         SubredditData::previousNames fromValue emptyList()
         SubredditData::iconColor fromProperty from::keyColor
+        SubredditData::publicDescription fromValue ParsedMarkdown(from.publicDescription)
+        SubredditData::description fromValue ParsedMarkdown(from.description)
     }
 }
 
@@ -261,8 +264,11 @@ object SubredditDetailsMapper : ObjectMappie<SubredditDetails, SubredditData>() 
         SubredditData::id fromValue from.getId()
         SubredditData::defaultSet fromValue false
         SubredditData::previousNames fromValue emptyList()
+        SubredditData::publicDescription fromValue ParsedMarkdown(from.publicDescription)
+        SubredditData::description fromValue ParsedMarkdown(from.description)
         //SubredditData::iconColor fromValue (from.keyColor ?: from.iconColor)
     }
 }
+
 
 fun SubredditDetails.getId(): String = name.name.split("_").last()

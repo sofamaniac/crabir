@@ -40,7 +40,7 @@ data class CommentData(
     override val id: String,
     override val name: Fullname,
     val depth: Int,
-    val bodyMd: String,
+    val bodyMd: ParsedMarkdown,
     val bodyHtml: String,
     val parentId: Fullname,
     val permalink: String,
@@ -56,6 +56,7 @@ data class CommentData(
     val mediaMetadata: Map<String, MediaMetadata>,
     val distinguished: String? = ""
 ) : VotableData {
+    override val body: ParsedMarkdown = bodyMd
     override fun copy(relationship: Relationship?, score: Score?): CommentData =
         copy(relationship = relationship ?: this.relationship, score = score ?: this.score)
 

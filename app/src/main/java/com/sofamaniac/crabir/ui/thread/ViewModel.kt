@@ -3,6 +3,8 @@ package com.sofamaniac.crabir.ui.thread
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mikepenz.markdown.model.State
+import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Thing
@@ -17,16 +19,21 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
 import com.sofamaniac.crabir.ui.post.PostViewModelInterface
+import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -54,8 +61,34 @@ class ThreadViewModel @AssistedInject constructor(
 
     private var _comments = MutableStateFlow<List<CommentType>>(emptyList())
     val comments: StateFlow<List<CommentType>> = _comments.asStateFlow()
-
     private var _post = MutableStateFlow<PostData>(DUMMY_POST)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override var markdown: StateFlow<State> = _post.flatMapLatest { post ->
+        parseMarkdownFlow(post.body.markdown, flavour = RedditFlavourDescriptor(true))
+    }.stateIn(
+        viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = State.Loading()
+    )
+
+    private val _markdownComments: MutableMap<Fullname, StateFlow<State>> = mutableMapOf()
+    override fun getMarkdownState(name: Fullname): StateFlow<State> {
+        if (!_markdownComments.contains(name)) {
+            val comment = _comments.value.findComment(name)!!
+            _markdownComments[name] =
+                parseMarkdownFlow(
+                    comment.comment.body.markdown,
+                    flavour = RedditFlavourDescriptor(true)
+                )
+                    .stateIn(
+                        viewModelScope,
+                        started = SharingStarted.Lazily,
+                        initialValue = State.Loading()
+                    )
+        }
+        return _markdownComments[name]!!
+    }
 
     //override val post: StateFlow<PostData?> = _post.asStateFlow()
     override val post: Flow<PostData> = _post.asStateFlow()
@@ -125,6 +158,7 @@ class ThreadViewModel @AssistedInject constructor(
         // try initializing post
         val initialPost = getPost()
         _post.value = initialPost!!
+
         _sort.value = _sort.value ?: _post.value.suggestedSort
     }
 
@@ -338,6 +372,15 @@ fun List<CommentType>.updateComment(
         }
     }
 
+}
+
+fun List<CommentType>.count(): Int {
+    return this.sumOf {
+        1 + when (it) {
+            is CommentType.Comment -> it.comment.replies.count()
+            is CommentType.More -> 1
+        }
+    }
 }
 
 fun List<CommentType>.findComment(name: Fullname): CommentType.Comment? {

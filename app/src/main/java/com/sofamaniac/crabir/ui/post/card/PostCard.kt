@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sofamaniac.crabir.LocalSharedTransitionScope
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
@@ -46,7 +47,7 @@ import com.sofamaniac.crabir.ui.post.PostViewModelInterface
 @Composable
 fun PostCard(
     post: PostData,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     clickable: Boolean = true,
     markAsRead: () -> Unit = {},
     canStartVideo: Boolean = false,
@@ -85,7 +86,7 @@ fun PostCard(
 @Composable
 internal fun PostCardContent(
     post: PostData,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     clickable: Boolean = true,
     markAsRead: () -> Unit = {},
     canStartVideo: Boolean = false,
@@ -112,6 +113,7 @@ internal fun PostCardContent(
         {}
     }
     val sharedTransitionScope = LocalSharedTransitionScope.current
+    val markdownState by interactions.markdown.collectAsState()
     with(sharedTransitionScope) {
         val state =
             sharedTransitionScope.rememberSharedContentState(
@@ -156,7 +158,8 @@ internal fun PostCardContent(
                 maxLines = settings.cardSettings.maxLines,
                 enableLinkFullSizePreview = !settings.cardSettings.thumbnailForLinkPreview,
                 markAsRead = markAsRead,
-                animatedVisbilityScope = animatedContentScope,
+                animatedVisibilityScope = animatedContentScope,
+                markdownState = markdownState,
             )
             BottomRow(post, modifier, interactions = interactions) {
                 bottomRowAction()
@@ -168,7 +171,8 @@ internal fun PostCardContent(
 @Preview()
 @Composable
 internal fun PostCardPreview() {
-    val post by DummyInteraction.post.collectAsState()
+    val viewModel: DummyInteraction = viewModel()
+    val post by viewModel.post.collectAsState()
     AnimatedVisibility(visible = true) {
         PostCardContent(
             post,
@@ -177,8 +181,8 @@ internal fun PostCardPreview() {
             canStartVideo = false,
             read = false,
             likes = post.relationship.liked,
-            interactions = DummyInteraction,
-            animatedContentScope = this@AnimatedVisibility
+            interactions = viewModel,
+            animatedContentScope = this@AnimatedVisibility,
         ) {
             OpenThreadButton(
                 onClick = {}

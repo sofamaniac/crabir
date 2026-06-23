@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mikepenz.markdown.model.State
+import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
@@ -70,9 +72,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.time.ZoneId
@@ -270,6 +274,12 @@ class CommentViewModel @AssistedInject constructor(
 ) : CommentViewModelInterface, ViewModel() {
     override val openComment: StateFlow<Fullname?> = MutableStateFlow(comment.name)
 
+    override val markdown = parseMarkdownFlow(comment.body.markdown).stateIn(
+        viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = State.Loading()
+    )
+
     override fun submitComment(
         parent: Fullname,
         body: String
@@ -277,10 +287,13 @@ class CommentViewModel @AssistedInject constructor(
         TODO("Not yet implemented")
     }
 
+    override fun getMarkdownState(name: Fullname): StateFlow<State> = markdown
+
     override val likes: Flow<Boolean?> = flowOf(comment.relationship.liked)
     override val saved: Flow<Boolean> = flowOf(comment.relationship.saved)
     override val rules: StateFlow<Rules>
         get() = TODO("Not yet implemented")
+
 
     override fun upvote(name: Fullname) {
         viewModelScope.launch(Dispatchers.IO) {

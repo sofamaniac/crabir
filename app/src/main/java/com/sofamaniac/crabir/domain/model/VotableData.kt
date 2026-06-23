@@ -6,6 +6,7 @@ import com.sofamaniac.crabir.domain.repository.DataInterface
 interface VotableData : DataInterface {
     val relationship: Relationship
     val score: Score
+    val body: ParsedMarkdown
     fun copy(relationship: Relationship? = null, score: Score? = null): VotableData
     fun toEntity(): VotableEntity
 

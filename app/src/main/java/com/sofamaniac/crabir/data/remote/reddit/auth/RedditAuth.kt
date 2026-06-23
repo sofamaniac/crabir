@@ -57,6 +57,9 @@ class RedditAuthenticator @Inject constructor(
         } else {
             activeAccount.auth.accessToken
         }
+        if (activeAccount.auth.accessToken == null) {
+            chain.proceed(chain.request())
+        }
 
         val request = chain.request().newBuilder()
             .header("Authorization", "Bearer $newAccessToken").build()

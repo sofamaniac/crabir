@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +35,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.mikepenz.markdown.model.State
 import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentData
@@ -60,22 +63,47 @@ import kotlinx.coroutines.flow.map
 interface CommentViewModelInterface : VotableInteraction {
     val openComment: StateFlow<Fullname?>
     fun submitComment(parent: Fullname, body: String)
+
+    fun getMarkdownState(name: Fullname): StateFlow<State>
+}
+
+fun LazyListScope.replies(
+    replies: List<CommentType>,
+    viewModel: ThreadViewModel,
+    modifier: Modifier = Modifier,
+    enableAnimation: Boolean = true,
+) {
+    replies.forEach { comment ->
+        when (comment) {
+            is CommentType.Comment -> commentNode(
+                comment.comment,
+                viewModel,
+                modifier,
+                enableAnimation
+            )
+
+            is CommentType.More -> MoreNode(comment, viewModel, modifier)
+        }
+    }
 }
 
 @Composable
-fun CommentNode(
+fun CommentContent(
     comment: CommentData,
     viewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
     enableAnimation: Boolean = true
 ) {
+
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
     Column {
+        if (comment.depth == 0) HorizontalDivider()
         ThemedCard(
             shape = RoundedCornerShape(0),
             modifier = modifier
                 .fillMaxWidth()
+                .depthIndent(comment.depth.coerceAtLeast(0))
                 .combinedClickable(
                     onClick = { if (!comment.collapsed) viewModel.toggleComment(comment.name) },
                     onLongClick = { viewModel.collapseComment(comment.name, !comment.collapsed) },
@@ -88,26 +116,23 @@ fun CommentNode(
                 OpenedComment(comment, viewModel, modifier = innerModifier, enableAnimation)
             }
         }
-        AnimatedVisibility(!comment.collapsed) {
-            Column {
-                for (reply in comment.replies) {
-                    when (reply) {
-                        is CommentType.Comment -> CommentNode(
-                            reply.comment,
-                            viewModel,
-                            modifier = modifier.depthIndent(1),
-                        )
-
-                        is CommentType.More -> MoreViewer(
-                            reply,
-                            viewModel,
-                            modifier = modifier.depthIndent(1)
-                        )
-                    }
-                }
-            }
-        }
     }
+}
+
+fun LazyListScope.commentNode(
+    comment: CommentData,
+    viewModel: ThreadViewModel,
+    modifier: Modifier = Modifier,
+    enableAnimation: Boolean = true
+) {
+    item {
+        CommentContent(comment, viewModel, modifier, enableAnimation)
+    }
+    //AnimatedVisibility(!comment.collapsed) {
+    if (!comment.collapsed) {
+        replies(comment.replies, viewModel, modifier, enableAnimation)
+    }
+    //}
 }
 
 @Composable
@@ -164,6 +189,7 @@ fun ColumnScope.OpenedComment(
     val showBottomBar by remember(comment.name, context) {
         viewModel.openComment.map { it == comment.name || !enableAnimation }
     }.collectAsState(initial = !enableAnimation)
+    val markdownState by viewModel.getMarkdownState(comment.name).collectAsState()
 
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
@@ -172,10 +198,10 @@ fun ColumnScope.OpenedComment(
     TopRow(comment, modifier = innerModifier)
     Spacer(modifier = Modifier.height(8.dp))
     RedditMarkdown(
-        comment.bodyMd,
+        markdownState,
         modifier = innerModifier,
         mediaMetadata = comment.mediaMetadata,
-        key = comment.id,
+        //key = comment.id,
     )
     Spacer(modifier = Modifier.height(8.dp))
     AnimatedVisibility(showBottomBar) {
@@ -191,7 +217,7 @@ fun BottomRow(
 ) {
     val likes = comment.relationship.liked
     val saved = comment.relationship.saved
-
+    val markdownState by viewModel.markdown.collectAsState()
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -207,7 +233,7 @@ fun BottomRow(
             ThemedCard(modifier = Modifier.padding(all = 16.dp)) {
                 Text(comment.author.username, modifier = modifier)
                 RedditMarkdown(
-                    comment.bodyMd,
+                    markdownState,
                     maxLines = 5,
                     modifier = modifier,
                 )

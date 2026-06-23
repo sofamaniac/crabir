@@ -19,18 +19,20 @@ import com.sofamaniac.crabir.ui.post.PostImage
 import com.sofamaniac.crabir.ui.post.PostVideo
 import com.sofamaniac.crabir.ui.post.StreamableVideo
 import com.sofamaniac.crabir.ui.post.YoutubeVideo
+import com.mikepenz.markdown.model.State as MarkdownState
 
 @Composable
 internal fun PostBody(
     post: PostData,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     canPlayVideo: Boolean = false,
     enableFullHeightImage: Boolean = true,
     enableTextPreview: Boolean = true,
     maxLines: Int?,
     enableLinkFullSizePreview: Boolean = true,
     forceShowSelftext: Boolean = false,
-    animatedVisbilityScope: AnimatedVisibilityScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    markdownState: MarkdownState,
     markAsRead: () -> Unit = {},
 ) {
     val navController = LocalNavController.current!!
@@ -49,12 +51,11 @@ internal fun PostBody(
                         SharedElementType.Content
                     )
                 ),
-                animatedVisbilityScope
+                animatedVisibilityScope
             )
         val selftextView = @Composable {
-            val selftext = post.selftext.markdown
             RedditMarkdown(
-                markdown = selftext,
+                markdownState,
                 maxLines = maxLines,
                 modifier = modifier.padding(horizontal = 16.dp),
                 mediaMetadata = post.mediaMetadata,
@@ -117,7 +118,7 @@ internal fun PostBody(
 
             else -> {
                 val selftext = post.selftext.markdown
-                if (selftext.isNotBlank() && enableTextPreview) {
+                if (selftext.markdown.isNotBlank() && enableTextPreview) {
                     selftextView()
                     return
                 }
@@ -125,7 +126,7 @@ internal fun PostBody(
         }
         if (forceShowSelftext) {
             val selftext = post.selftext.markdown
-            if (selftext.isNotBlank() && enableTextPreview) {
+            if (selftext.markdown.isNotBlank() && enableTextPreview) {
                 selftextView()
             }
         }

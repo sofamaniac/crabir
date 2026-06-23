@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.ui.thread
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,7 +31,8 @@ fun MoreViewer(
     )
     val navController = LocalNavController.current!!
     ThemedCard(
-        modifier = modifier,
+        modifier = modifier
+            .depthIndent(more.depth.coerceAtLeast(0)),
         shape = RoundedCornerShape(0),
         onClick = {
             if (more.data.count > 0) {
@@ -52,5 +54,15 @@ fun MoreViewer(
             color = theme.highlight,
             modifier = Modifier.padding(8.dp)
         )
+    }
+}
+
+fun LazyListScope.MoreNode(
+    more: CommentType.More,
+    viewModel: ThreadViewModel,
+    modifier: Modifier = Modifier
+) {
+    item {
+        MoreViewer(more, viewModel, modifier)
     }
 }

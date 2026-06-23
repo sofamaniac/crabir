@@ -45,6 +45,7 @@ internal fun PostView(
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val currentAccount = LocalRedditAccount.current
+    val markdownState by threadViewModel.markdown.collectAsState()
     PostCard(
         post,
         threadViewModel = threadViewModel,
@@ -55,10 +56,11 @@ internal fun PostView(
                 post,
                 canPlayVideo = canPlayVideo,
                 maxLines = null,
-                forceShowSelftext = true,
                 enableLinkFullSizePreview = false,
+                forceShowSelftext = true,
+                animatedVisibilityScope = animatedVisibilityScope,
                 markAsRead = { threadViewModel.visitPost(post, currentAccount.id) },
-                animatedVisbilityScope = animatedVisibilityScope
+                markdownState = markdownState,
             )
         } else {
             val parent = post.crosspostParentList.first()

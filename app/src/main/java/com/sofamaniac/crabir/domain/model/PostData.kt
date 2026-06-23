@@ -51,6 +51,8 @@ data class PostData(
 
     val shortlink = "https://redd.it/$id"
 
+    override val body: ParsedMarkdown = selftext.markdown
+
     override fun copy(relationship: Relationship?, score: Score?): PostData {
         return copy(relationship = relationship ?: this.relationship, score = score ?: this.score)
     }

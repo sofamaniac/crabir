@@ -1,6 +1,9 @@
 package com.sofamaniac.crabir.ui.post
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mikepenz.markdown.model.State
+import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
@@ -12,6 +15,7 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.ui.votable.VotableInteraction
 import com.sofamaniac.crabir.ui.votable.VotableViewModel
+import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -143,10 +147,16 @@ open class LinkViewModel @AssistedInject constructor(
 }
 
 interface PostViewModelInterface : LinkInteraction, VotableInteraction
-object DummyInteraction : LinkInteraction {
+
+class DummyInteraction : LinkInteraction, ViewModel() {
     private var _post = MutableStateFlow(DUMMY_POST.copy(kind = Kind.Self))
     override val post: StateFlow<PostData> = _post
     override val flairs: StateFlow<List<FlairInfo>> = MutableStateFlow(emptyList())
+    override val markdown: StateFlow<State> =
+        parseMarkdownFlow(
+            DUMMY_POST.selftext.markdown.markdown,
+            flavour = RedditFlavourDescriptor(true)
+        ).stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = State.Loading())
 
     override fun hide() {
     }

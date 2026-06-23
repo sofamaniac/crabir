@@ -3,6 +3,7 @@ package com.sofamaniac.crabir.data.local.database
 import androidx.room.TypeConverter
 import com.sofamaniac.crabir.data.remote.dto.SubredditInfo
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import kotlinx.serialization.json.Json
 
 class RoomConverters {
@@ -44,5 +45,15 @@ class RoomConverters {
     @TypeConverter
     fun fromInfoList(value: List<SubredditInfo>): String {
         return Json.encodeToString(value)
+    }
+
+    @TypeConverter
+    fun fromParsedMarkdown(value: ParsedMarkdown): String {
+        return value.markdown
+    }
+
+    @TypeConverter
+    fun toParsedMarkdown(value: String): ParsedMarkdown {
+        return ParsedMarkdown(value)
     }
 }

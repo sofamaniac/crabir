@@ -24,6 +24,7 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Gallery
 import com.sofamaniac.crabir.domain.model.MediaInfo
 import com.sofamaniac.crabir.domain.model.MediaResource
+import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Relationship
 import com.sofamaniac.crabir.domain.model.Score
@@ -264,8 +265,8 @@ private fun PostDTO.toScore() = Score(
 )
 
 private fun PostDTO.toSelftext() = Selftext(
-    selftext = selftextRaw,
-    selftextHtml = selftextHtml ?: ""
+    markdown = ParsedMarkdown(selftextRaw, mediaMetadata),
+    html = selftextHtml ?: ""
 )
 
 private fun PostDTO.toLinkFlair() = Flair(

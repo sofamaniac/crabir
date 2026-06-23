@@ -26,7 +26,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentType
@@ -62,7 +61,7 @@ fun CommentListRoot(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = listState,
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
             // Show post
             item {
@@ -133,28 +132,34 @@ fun CommentListRoot(
                     }
                 }
             }
-            items(comments.size, key = { index -> comments[index].name }) { index ->
-                when (val comment = comments[index]) {
-                    is CommentType.Comment -> CommentNode(
-                        comment.comment,
-                        viewModel,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(color = theme.cardBackground)
-                            .depthIndent(comment.depth.coerceAtLeast(0), color = Color.Gray)
-                    )
-
-                    is CommentType.More -> MoreViewer(
-                        comment,
-                        viewModel,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(color = theme.cardBackground)
-                            .depthIndent(comment.depth, color = Color.Gray)
-                    )
-                }
-                HorizontalDivider()
-            }
+            replies(
+                comments, viewModel,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = theme.cardBackground)
+            )
+//            items(comments.size, key = { index -> comments[index].name }) { index ->
+//                when (val comment = comments[index]) {
+//                    is CommentType.Comment -> CommentNode(
+//                        comment.comment,
+//                        viewModel,
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .background(color = theme.cardBackground)
+//                            .depthIndent(comment.depth.coerceAtLeast(0), color = Color.Gray)
+//                    )
+//
+//                    is CommentType.More -> MoreViewer(
+//                        comment,
+//                        viewModel,
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .background(color = theme.cardBackground)
+//                            .depthIndent(comment.depth, color = Color.Gray)
+//                    )
+//                }
+//                HorizontalDivider()
+//            }
             item {
                 Spacer(modifier = Modifier.fillParentMaxHeight(0.1f))
             }

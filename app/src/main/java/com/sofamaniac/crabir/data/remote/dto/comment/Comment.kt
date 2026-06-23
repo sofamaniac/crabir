@@ -17,6 +17,7 @@ import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Flair
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.domain.model.Relationship
 import com.sofamaniac.crabir.domain.model.Score
 import com.sofamaniac.crabir.domain.model.SubredditInfo
@@ -139,7 +140,7 @@ object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
         CommentData::parentId fromProperty from::parentId
         CommentData::depth fromProperty from::depth
         CommentData::author fromValue from.toAuthorInfo()
-        CommentData::bodyMd fromProperty from::body
+        CommentData::bodyMd fromValue from.markdown()
         CommentData::bodyHtml fromProperty from::bodyHtml
         CommentData::relationship fromValue from.toRelationship()
         CommentData::permalink fromProperty from::permalink
@@ -159,6 +160,9 @@ private fun CommentDTO.mapReplies(): List<CommentType> = replies.data.children.m
         is Thing.More -> CommentType.More(it.data)
         else -> throw IllegalArgumentException("Unknown comment type: ${it.javaClass.name}")
     }
+}
+private fun CommentDTO.markdown(): ParsedMarkdown {
+    return ParsedMarkdown(body, media_metadata)
 }
 
 

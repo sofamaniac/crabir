@@ -38,6 +38,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.emptyListing
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
+import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -151,7 +152,10 @@ fun Message(
         }
         Text(annotatedString)
         Spacer(modifier = Modifier.height(8.dp))
-        RedditMarkdown(body, modifier = Modifier.padding(horizontal = 8.dp))
+        RedditMarkdown(
+            ParsedMarkdown(body),
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
     }
 }
 
