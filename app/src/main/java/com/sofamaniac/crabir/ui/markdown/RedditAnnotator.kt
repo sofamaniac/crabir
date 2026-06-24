@@ -27,10 +27,10 @@ import org.intellij.markdown.ast.getParentOfType
 class RedditAnnotator(
     typography: MarkdownTypography,
     referenceLinkHandler: ReferenceLinkHandler,
-    val spoilers: MutableMap<String, Boolean>,
+    val spoilers: SpoilerState,
     override var config: MarkdownAnnotatorConfig,
     val depth: Int = 0,
-    val linkInteractionListener: LinkInteractionListener?,
+    val linkInteractionListener: LinkInteractionListener,
     val defaultAnnotator: MarkdownAnnotator,
 ) : MarkdownAnnotator {
 
@@ -50,7 +50,7 @@ class RedditAnnotator(
             style = style,
         )
         DefaultAnnotatorSettings(
-            linkTextSpanStyle = if (spoilers[text] == true) typography.textLink else linkStyle,
+            linkTextSpanStyle = if (spoilers.getState(text) == true) typography.textLink else linkStyle,
             codeSpanStyle = typography.inlineCode.toSpanStyle(),
             annotator = RedditAnnotator(
                 typography,
@@ -59,19 +59,16 @@ class RedditAnnotator(
                 config,
                 depth + 1,
                 linkInteractionListener,
-                defaultAnnotator
+                defaultAnnotator,
             ),
             referenceLinkHandler = referenceLinkHandler,
-            linkInteractionListener = linkInteractionListener?.let {
-                if (spoilers[text] == true || (spoilers[text] != null && depth > 0)) {
-                    it
-                } else {
-                    LinkInteractionListener { spoilers[text] = true }
-                }
+            linkInteractionListener = if (spoilers.getState(text) != false || depth > 0) linkInteractionListener else {
+                LinkInteractionListener { spoilers.setState(text, true) }
             }
         )
 
     }
+
     override val annotate: (AnnotatedString.Builder.(content: String, child: ASTNode) -> Boolean) =
         { content, child ->
             val start = child.startOffset
@@ -84,17 +81,16 @@ class RedditAnnotator(
             } else when (child.type) {
 
                 MarkdownTokenTypes.TEXT -> {
-                    val redditLinksPattern = Regex("/?([ru]/\\w{2,24}/?)")
+                    val redditLinksPattern = Regex("/?([ru]/[a-zA-Z0-9_-]{2,24}/?)")
                     val text = child.getUnescapedTextInNode(content)
                     val links = redditLinksPattern.findAll(text)
                     var lastEnd = 0
                     for (l in links) {
-                        // Check if char before link is a whitesepace
+                        append(text.substring(lastEnd, l.range.first))
+                        val dest = l.groupValues[1]
+                        val url = "https://www.reddit.com/$dest"
                         val char = text.getOrNull(l.range.first - 1)
                         if (char == null || char.isWhitespace()) {
-                            append(text.substring(lastEnd, l.range.first))
-                            val dest = l.groupValues[1]
-                            val url = "https://www.reddit.com/$dest"
                             withStyle(typography.textLink.style!!) {
                                 withLink(
                                     LinkAnnotation.Url(
@@ -105,8 +101,8 @@ class RedditAnnotator(
                                     append(l.value)
                                 }
                             }
-                            lastEnd = l.range.last + 1
                         }
+                        lastEnd = l.range.last + 1
                     }
 
                     if (lastEnd < text.length) {
@@ -132,32 +128,44 @@ class RedditAnnotator(
                     true
                 }
 
+                RedditFlavourElementType.LINK -> {
+                    val text = child.getUnescapedTextInNode(content)
+                    val url = "https://www.reddit.com/$text"
+                    withStyle(typography.textLink.style!!) {
+                        withLink(
+                            LinkAnnotation.Url(
+                                url,
+                                linkInteractionListener = linkInteractionListener
+                            )
+                        ) {
+                            append(text)
+                        }
+                    }
+                    true
+                }
+
                 RedditFlavourElementType.SPOILER if depth == 0 -> {
-                    //appendInlineContent("SPOILER", child.getUnescapedTextInNode(content))
                     val settings = makeSettings(text)
-                    pushStringAnnotation(tag = "SPOILER", annotation = text)
-                    val textColor = typography.text.color
+                    spoilers.setState(text, false)
                     withStyle(
                         SpanStyle(
-                            color = if (spoilers[text] == true) Color.Unspecified else Color.Transparent,
-                            background = if (spoilers[text] == true) Color.Unspecified else Color.Gray
+                            color = if (spoilers.getState(text)!!) Color.Unspecified else Color.Transparent,
+                            background = if (spoilers.getState(text)!!) Color.Unspecified else Color.Gray
                         )
                     ) {
-                        addLink(
+                        withLink(
                             LinkAnnotation.Clickable(
                                 tag = "SPOILER",
                                 linkInteractionListener = settings.linkInteractionListener
-                            ),
-                            0,
-                            text.length
-                        )
-                        buildMarkdownAnnotatedString(
-                            content,
-                            child.children.removeSpoilerMarker(),
-                            makeSettings(text)
-                        )
+                            )
+                        ) {
+                            buildMarkdownAnnotatedString(
+                                content,
+                                child.children.removeSpoilerMarker(),
+                                makeSettings(text)
+                            )
+                        }
                     }
-                    pop()
                     true
                 }
 

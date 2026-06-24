@@ -12,42 +12,43 @@ import com.sofamaniac.crabir.ui.user.ProfileView
 import kotlinx.serialization.Serializable
 
 @Serializable
-class ProfileRoute(val author: String, val tab: ProfileTabs) : Route
+class ProfileRoute(val author: String, val tab: ProfileTabs = ProfileTabs.Overview) : Route
 
 @Serializable
 object SavedRoute : Route
 
+val baseUrls = listOf("user/{author}", "u/{author}")
+
 fun NavGraphBuilder.profileGraph(navController: NavController) {
-    composable(
-        route = "/user/{author}",
-        deepLinks = makeDeepLinks<String>(url = "user/{author}") + makeDeepLinks<String>("u/{author}"),
-        arguments = listOf(
-            navArgument("author") { type = NavType.StringType }
-        )
-    ) {
-        val params = it.toRoute<ProfileRoute>()
-        ProfileView(
-            params.author,
-            animatedVisibilityScope = this@composable
-        )
-    }
-    composable(
-        route = "/user/{author}/{tab}",
-        deepLinks = stringLink(url = "user/{author}/{tab}")
-                + stringLink(url = "u/{author}/{tab}"),
-        arguments = listOf(
-            navArgument("author") { type = NavType.StringType },
-            navArgument("tab") { type = NavType.StringType }
-        )
-    ) { navBackStackEntry ->
-        val params = navBackStackEntry.arguments
-        val author = params!!.getString("author")!!
-        val tab = ProfileTabs.fromString(params.getString("tab")!!)
-        ProfileView(
-            author,
-            animatedVisibilityScope = this@composable,
-            initialTab = tab
-        )
+    for (url in baseUrls) {
+        composable(
+            route = "/$url",
+            deepLinks = makeDeepLinks<String>(url = url),
+            arguments = listOf(
+                navArgument("author") { type = NavType.StringType }
+            )
+        ) {
+            val params = it.toRoute<ProfileRoute>()
+            ProfileView(
+                params.author
+            )
+        }
+        composable(
+            route = "/$url/{tab}",
+            deepLinks = stringLink(url = "$url/{tab}"),
+            arguments = listOf(
+                navArgument("author") { type = NavType.StringType },
+                navArgument("tab") { type = NavType.StringType }
+            )
+        ) { navBackStackEntry ->
+            val params = navBackStackEntry.arguments
+            val author = params!!.getString("author")!!
+            val tab = ProfileTabs.fromString(params.getString("tab")!!)
+            ProfileView(
+                author,
+                initialTab = tab
+            )
+        }
     }
     composable<SavedRoute> {
         val currentAccount = LocalRedditAccount.current
@@ -58,7 +59,6 @@ fun NavGraphBuilder.profileGraph(navController: NavController) {
         ProfileView(
             currentAccount.info!!.username,
             initialTab = ProfileTabs.Saved,
-            animatedVisibilityScope = this@composable,
         )
     }
 
@@ -66,7 +66,6 @@ fun NavGraphBuilder.profileGraph(navController: NavController) {
         val params = it.toRoute<ProfileRoute>()
         ProfileView(
             params.author,
-            animatedVisibilityScope = this@composable,
             initialTab = params.tab
         )
     }

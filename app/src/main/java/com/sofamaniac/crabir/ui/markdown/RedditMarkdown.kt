@@ -10,8 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
@@ -34,7 +32,6 @@ import com.mikepenz.markdown.model.markdownAnimations
 import com.mikepenz.markdown.model.markdownAnnotator
 import com.mikepenz.markdown.model.rememberMarkdownState
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.toLocalUrl
@@ -45,10 +42,11 @@ fun RedditMarkdown(
     markdown: State,
     modifier: Modifier = Modifier,
     maxLines: Int? = null,
-    mediaMetadata: Map<String, MediaMetadata> = emptyMap(),
     enableImages: Boolean = true,
+    key: Any,
+    spoilerState: SpoilerState = rememberSpoilerState(),
 ) {
-    HeightRestrictedMarkdown(markdown, modifier, maxLines, enableImages)
+    HeightRestrictedMarkdown(markdown, modifier, maxLines, enableImages, key, spoilerState)
 }
 
 @Composable
@@ -56,8 +54,9 @@ fun RedditMarkdown(
     markdown: ParsedMarkdown,
     modifier: Modifier = Modifier,
     maxLines: Int? = null,
-    mediaMetadata: Map<String, MediaMetadata> = emptyMap(),
     enableImages: Boolean = true,
+    key: Any? = null,
+    spoilerState: SpoilerState = rememberSpoilerState(),
 ) {
     val markdownState = rememberMarkdownState(
         markdown.markdown,
@@ -65,7 +64,14 @@ fun RedditMarkdown(
         retainState = true
     )
     val state by markdownState.state.collectAsState()
-    HeightRestrictedMarkdown(state, modifier, maxLines, enableImages)
+    HeightRestrictedMarkdown(
+        state,
+        modifier,
+        maxLines,
+        enableImages,
+        key = key,
+        spoilers = spoilerState
+    )
 }
 
 @Composable
@@ -74,14 +80,18 @@ private fun HeightRestrictedMarkdown(
     modifier: Modifier = Modifier,
     maxLines: Int? = null,
     enableImages: Boolean,
+    key: Any? = null,
+    spoilers: SpoilerState,
 ) {
-    val onClick = if (maxLines == null) redditLinkHandler() else null
+    val onClick = if (maxLines == null) redditLinkHandler() else LinkInteractionListener { }
     if (maxLines == null) {
         InnerRedditMarkdown(
             modifier = modifier,
             markdown = markdown,
             enableImages = enableImages,
-            linkInteractionListener = onClick
+            linkInteractionListener = onClick,
+            key = key,
+            spoilers = spoilers,
         )
     } else {
         HeightRestrictedWithGradient(
@@ -90,8 +100,10 @@ private fun HeightRestrictedMarkdown(
         ) {
             InnerRedditMarkdown(
                 markdown = markdown,
-                linkInteractionListener = null,
-                enableImages = enableImages
+                linkInteractionListener = onClick,
+                enableImages = enableImages,
+                key = key,
+                spoilers = spoilers,
             )
         }
     }
@@ -101,12 +113,13 @@ private fun HeightRestrictedMarkdown(
 private fun InnerRedditMarkdown(
     markdown: State,
     modifier: Modifier = Modifier,
-    linkInteractionListener: LinkInteractionListener?,
+    linkInteractionListener: LinkInteractionListener,
     enableImages: Boolean,
+    key: Any? = null,
+    spoilers: SpoilerState,
 ) {
     val typography = redditMarkdownTypography()
     val referenceLinkHandler = ReferenceLinkHandlerImpl()
-    val spoilers = remember { mutableStateMapOf<String, Boolean>() }
     Markdown(
         markdown,
         modifier = modifier,

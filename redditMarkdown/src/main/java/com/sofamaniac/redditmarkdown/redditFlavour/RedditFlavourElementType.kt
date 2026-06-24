@@ -11,4 +11,7 @@ object RedditFlavourElementType {
 
     @JvmField
     val SUPERSCRIPT = MarkdownElementType("SUPERSCRIPT", isToken = true)
+
+    @JvmField
+    val LINK = MarkdownElementType("LINK", isToken = true)
 }
