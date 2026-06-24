@@ -273,7 +273,7 @@ class DrawerViewModel @Inject constructor(
 
     private suspend fun save(authState: AuthState) {
         try {
-            val id = accountsRepository.accounts.first().size
+            val id = (accountsRepository.accounts.first().maxByOrNull { it.id }?.id ?: 0) + 1
             val newAccount = RedditAccount.uninitialized(id, authState)
             accountsRepository.addAccount(newAccount)
             accountsRepository.setActiveAccount(id)
