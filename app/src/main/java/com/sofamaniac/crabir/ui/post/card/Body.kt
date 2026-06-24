@@ -42,7 +42,7 @@ internal fun PostBody(
                 markdownState,
                 maxLines = maxLines,
                 modifier = modifier.padding(horizontal = 16.dp),
-                mediaMetadata = post.mediaMetadata,
+                key = post.name,
                 //onClick = { goFullscreen(PostRoute(post.permalink, null)) }
             )
         }

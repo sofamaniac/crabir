@@ -55,7 +55,9 @@ fun PostCard(
         }
     ),
 ) {
-    val post by viewModel.post.collectAsState(post)
+    val postOpt by viewModel.post.collectAsState(post)
+    if (postOpt == null) return
+    val post = postOpt!!
     val likes by viewModel.likes.collectAsState(post.relationship.liked)
     if (!showHidden && post.relationship.hidden) {
         return

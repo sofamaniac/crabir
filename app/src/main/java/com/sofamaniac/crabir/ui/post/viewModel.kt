@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 interface LinkInteraction : VotableInteraction {
-    val post: Flow<PostData>
+    val post: Flow<PostData?>
     val flairs: StateFlow<List<FlairInfo>>
     fun hide()
 

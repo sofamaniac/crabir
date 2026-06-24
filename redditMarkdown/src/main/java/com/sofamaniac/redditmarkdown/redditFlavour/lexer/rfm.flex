@@ -245,7 +245,9 @@ PATH=({PATH_PART}+ | ("(" {PATH_PART}* ")"? {PATH_PART}*)) ("(" {PATH_PART}* ")"
 // See pushbackAutolink method
 GFM_AUTOLINK = (("http" "s"? | "ftp" | "file")"://" | "www.") {HOST_PART} ("." {HOST_PART})* (":" [0-9]+)? ("/" {PATH})? "/"?
 
-REDDIT_AUTOLINK = "/"? [ru] "/" [a-zA-Z0-9_-]{2,24}
+REDDIT_AUTOLINK_CONTENT = "/"? [ru] "/" [a-zA-Z0-9_-]{2,24}
+
+REDDIT_AUTOLINK = {REDDIT_AUTOLINK_CONTENT}
 
 %state TAG_START, AFTER_LINE_START, PARSE_DELIMITED, CODE_SPAN
 
@@ -333,7 +335,6 @@ REDDIT_AUTOLINK = "/"? [ru] "/" [a-zA-Z0-9_-]{2,24}
 
   {HTML_TAG} { return MarkdownTokenTypes.HTML_TAG; }
 
-  {REDDIT_AUTOLINK} { return RedditFlavourElementType.LINK; }
 
 }
 
@@ -375,6 +376,8 @@ REDDIT_AUTOLINK = "/"? [ru] "/" [a-zA-Z0-9_-]{2,24}
     pushbackAutolink();
     return GFMTokenTypes.GFM_AUTOLINK;
   }
+
+  {REDDIT_AUTOLINK} { return RedditFlavourElementType.LINK; }
 
   {ALPHANUM}+ (({WHITE_SPACE}+ | "_"+) {ALPHANUM}+)* / {WHITE_SPACE}+ {GFM_AUTOLINK} {
     return MarkdownTokenTypes.TEXT;

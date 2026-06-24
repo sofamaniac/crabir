@@ -13,7 +13,6 @@ import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.CommentType
-import com.sofamaniac.crabir.domain.model.DUMMY_POST
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
@@ -61,11 +60,13 @@ class ThreadViewModel @AssistedInject constructor(
 
     private var _comments = MutableStateFlow<List<CommentType>>(emptyList())
     val comments: StateFlow<List<CommentType>> = _comments.asStateFlow()
-    private var _post = MutableStateFlow<PostData>(DUMMY_POST)
+    private var _post = MutableStateFlow<PostData?>(null)
+    override val post: Flow<PostData?> = _post.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override var markdown: StateFlow<State> = _post.flatMapLatest { post ->
-        parseMarkdownFlow(post.body.markdown, flavour = RedditFlavourDescriptor(true))
+        if (post == null) flowOf(State.Loading())
+        else parseMarkdownFlow(post.body.markdown, flavour = RedditFlavourDescriptor(true))
     }.stateIn(
         viewModelScope,
         started = SharingStarted.Lazily,
@@ -91,7 +92,6 @@ class ThreadViewModel @AssistedInject constructor(
     }
 
     //override val post: StateFlow<PostData?> = _post.asStateFlow()
-    override val post: Flow<PostData> = _post.asStateFlow()
     override val flairs: StateFlow<List<FlairInfo>>
         get() = TODO("Not yet implemented")
 
@@ -155,11 +155,6 @@ class ThreadViewModel @AssistedInject constructor(
     init {
         _sort.value = initialSort
         fetchComments()
-        // try initializing post
-        val initialPost = getPost()
-        _post.value = initialPost!!
-
-        _sort.value = _sort.value ?: _post.value.suggestedSort
     }
 
     private fun getPost(): PostData? {
@@ -184,18 +179,23 @@ class ThreadViewModel @AssistedInject constructor(
         }
     }
 
+    private suspend fun fetchAsync() {
+        _isRefreshing.value = true
+        _comments.value = repository.getComments(
+            permalink,
+            sort = _sort.value,
+            comment = comment,
+            context = context
+        )
+        // If post was not found set it here.
+        _post.value = getPost() ?: _post.value
+        _sort.value = _sort.value ?: _post.value?.suggestedSort
+        _isRefreshing.value = false
+    }
+
     fun fetchComments() {
         viewModelScope.launch(Dispatchers.IO) {
-            _isRefreshing.value = true
-            _comments.value = repository.getComments(
-                permalink,
-                sort = _sort.value,
-                comment = comment,
-                context = context
-            )
-            // If post was not found set it here.
-            _post.value = getPost() ?: _post.value
-            _isRefreshing.value = false
+            fetchAsync()
         }
     }
 
@@ -228,7 +228,7 @@ class ThreadViewModel @AssistedInject constructor(
             var commentData = CommentDataMapper.map(commentDTO.data)
             commentData =
                 commentData.copy(relationship = commentData.relationship.copy(liked = true))
-            if (parent == _post.value.name) {
+            if (parent == _post.value?.name) {
                 _comments.update {
                     it + CommentType.Comment(commentData.copy(depth = 0))
                 }

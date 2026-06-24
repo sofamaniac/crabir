@@ -8,11 +8,13 @@ import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.SpanStyle
@@ -120,28 +122,30 @@ private fun InnerRedditMarkdown(
 ) {
     val typography = redditMarkdownTypography()
     val referenceLinkHandler = ReferenceLinkHandlerImpl()
-    Markdown(
-        markdown,
-        modifier = modifier,
-        typography = typography,
-        imageTransformer = Coil3ImageTransformerImpl,
-        // Disable animations
-        // animations = markdownAnimations(animateTextSize = { this }),
-        animations = markdownAnimations(animateTextSize = { Modifier.fillMaxSize() }),
-        components = markdownComponents(
-            inlineImage = { model ->
-                ClickableMarkdownInlineImage(model.content, model.node, linkInteractionListener)
-            },
-        ),
-        annotator = RedditAnnotator(
-            typography,
-            referenceLinkHandler,
-            spoilers,
-            config = DefaultMarkdownAnnotatorConfig(),
-            linkInteractionListener = linkInteractionListener,
-            defaultAnnotator = markdownAnnotator()
-        ),
-    )
+    CompositionLocalProvider(LocalUriHandler provides redditUriHandler()) {
+        Markdown(
+            markdown,
+            modifier = modifier,
+            typography = typography,
+            imageTransformer = Coil3ImageTransformerImpl,
+            // Disable animations
+            // animations = markdownAnimations(animateTextSize = { this }),
+            animations = markdownAnimations(animateTextSize = { Modifier.fillMaxSize() }),
+            components = markdownComponents(
+                inlineImage = { model ->
+                    ClickableMarkdownInlineImage(model.content, model.node, linkInteractionListener)
+                },
+            ),
+            annotator = RedditAnnotator(
+                typography,
+                referenceLinkHandler,
+                spoilers,
+                config = DefaultMarkdownAnnotatorConfig(),
+                linkInteractionListener = linkInteractionListener,
+                defaultAnnotator = markdownAnnotator()
+            ),
+        )
+    }
 }
 
 
@@ -159,6 +163,24 @@ fun redditLinkHandler(): LinkInteractionListener {
             } catch (e: IllegalArgumentException) {
                 Log.i("redditLinkHandler", "failed to open link in app: $e")
                 uriHandler.openUri(link.url)
+            }
+        }
+    }
+}
+
+@Composable
+fun redditUriHandler(): UriHandler {
+    val navController = LocalNavController.current!!
+    val uriHandler = LocalUriHandler.current
+    return object : UriHandler {
+        override fun openUri(uri: String) {
+            try {
+                Log.d("redditUriHandler", "navigating to : ${uri.toLocalUrl()}")
+                navController.navigate(uri.toLocalUrl())
+                //uriHandler.openUri(link.url)
+            } catch (e: IllegalArgumentException) {
+                Log.i("redditUriHandler", "failed to open link in app: $e")
+                uriHandler.openUri(uri)
             }
         }
     }

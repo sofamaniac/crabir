@@ -11,7 +11,6 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import com.mikepenz.markdown.annotator.AnnotatorSettings
-import com.mikepenz.markdown.annotator.DefaultAnnotatorSettings
 import com.mikepenz.markdown.annotator.buildMarkdownAnnotatedString
 import com.mikepenz.markdown.model.MarkdownAnnotator
 import com.mikepenz.markdown.model.MarkdownAnnotatorConfig
@@ -37,7 +36,7 @@ class RedditAnnotator(
     val superscriptStyle =
         SpanStyle(baselineShift = BaselineShift.Superscript, fontSize = 12.sp)
 
-    val codeSpanAnnotator = DefaultAnnotatorSettings(
+    val codeSpanAnnotator = RedditAnnotatorSettings(
         linkTextSpanStyle = typography.textLink,
         codeSpanStyle = typography.inlineCode.toSpanStyle(),
         annotator = defaultAnnotator,
@@ -49,7 +48,11 @@ class RedditAnnotator(
         val linkStyle = TextLinkStyles(
             style = style,
         )
-        DefaultAnnotatorSettings(
+        val linkInteractionListenerChild =
+            if (spoilers.getState(text) != false || depth > 0) linkInteractionListener else {
+                LinkInteractionListener { spoilers.setState(text, true) }
+            }
+        RedditAnnotatorSettings(
             linkTextSpanStyle = if (spoilers.getState(text) == true) typography.textLink else linkStyle,
             codeSpanStyle = typography.inlineCode.toSpanStyle(),
             annotator = RedditAnnotator(
@@ -58,13 +61,11 @@ class RedditAnnotator(
                 spoilers,
                 config,
                 depth + 1,
-                linkInteractionListener,
-                defaultAnnotator,
+                linkInteractionListenerChild,
+                defaultAnnotator
             ),
             referenceLinkHandler = referenceLinkHandler,
-            linkInteractionListener = if (spoilers.getState(text) != false || depth > 0) linkInteractionListener else {
-                LinkInteractionListener { spoilers.setState(text, true) }
-            }
+            linkInteractionListener = linkInteractionListenerChild
         )
 
     }
@@ -79,38 +80,6 @@ class RedditAnnotator(
                 buildMarkdownAnnotatedString(content, child.children, codeSpanAnnotator)
                 false
             } else when (child.type) {
-
-                MarkdownTokenTypes.TEXT -> {
-                    val redditLinksPattern = Regex("/?([ru]/[a-zA-Z0-9_-]{2,24}/?)")
-                    val text = child.getUnescapedTextInNode(content)
-                    val links = redditLinksPattern.findAll(text)
-                    var lastEnd = 0
-                    for (l in links) {
-                        append(text.substring(lastEnd, l.range.first))
-                        val dest = l.groupValues[1]
-                        val url = "https://www.reddit.com/$dest"
-                        val char = text.getOrNull(l.range.first - 1)
-                        if (char == null || char.isWhitespace()) {
-                            withStyle(typography.textLink.style!!) {
-                                withLink(
-                                    LinkAnnotation.Url(
-                                        url,
-                                        linkInteractionListener = linkInteractionListener
-                                    )
-                                ) {
-                                    append(l.value)
-                                }
-                            }
-                        }
-                        lastEnd = l.range.last + 1
-                    }
-
-                    if (lastEnd < text.length) {
-                        append(text.substring(lastEnd))
-                    }
-
-                    true
-                }
 
                 RedditFlavourElementType.SUPERSCRIPT if child.children.size > 1 -> {
                     withStyle(superscriptStyle) {
@@ -145,8 +114,8 @@ class RedditAnnotator(
                 }
 
                 RedditFlavourElementType.SPOILER if depth == 0 -> {
-                    val settings = makeSettings(text)
                     spoilers.setState(text, false)
+                    val settings = makeSettings(text)
                     withStyle(
                         SpanStyle(
                             color = if (spoilers.getState(text)!!) Color.Unspecified else Color.Transparent,
@@ -184,6 +153,14 @@ class RedditAnnotator(
             }
         }
 }
+
+class RedditAnnotatorSettings(
+    override val linkTextSpanStyle: TextLinkStyles,
+    override val codeSpanStyle: SpanStyle,
+    override val annotator: MarkdownAnnotator,
+    override val referenceLinkHandler: ReferenceLinkHandler? = null,
+    override val linkInteractionListener: LinkInteractionListener? = null,
+) : AnnotatorSettings
 
 internal fun ASTNode.isInCode(): Boolean {
     return getParentOfType(MarkdownElementTypes.CODE_SPAN, MarkdownElementTypes.CODE_BLOCK) != null

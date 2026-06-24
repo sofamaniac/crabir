@@ -200,8 +200,7 @@ fun ColumnScope.OpenedComment(
     RedditMarkdown(
         markdownState,
         modifier = innerModifier,
-        mediaMetadata = comment.mediaMetadata,
-        //key = comment.id,
+        key = comment.name,
     )
     Spacer(modifier = Modifier.height(8.dp))
     AnimatedVisibility(showBottomBar) {
@@ -236,6 +235,7 @@ fun BottomRow(
                     markdownState,
                     maxLines = 5,
                     modifier = modifier,
+                    key = comment.name
                 )
             }
         }
