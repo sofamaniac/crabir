@@ -147,7 +147,7 @@ fun EmbeddedGallery(
                 }
                 if (blurBackground != null) {
                     AsyncImage(
-                        backgroundUrl,
+                        blurBackground,
                         modifier = modifier
                             .fillMaxSize(),
                         contentScale = ContentScale.FillBounds,
