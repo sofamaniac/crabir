@@ -1,8 +1,10 @@
 package com.sofamaniac.crabir.navigation
 
-import android.os.Build
-import android.os.Bundle
 import android.util.Log
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.core.net.toUri
@@ -14,9 +16,6 @@ import androidx.navigation.navArgument
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
-import com.sofamaniac.crabir.ui.post.FullscreenGallery
-import com.sofamaniac.crabir.ui.post.FullscreenImageView
-import com.sofamaniac.crabir.ui.post.FullscreenVideo
 import com.sofamaniac.crabir.ui.postEditor.CrosspostCreator
 import com.sofamaniac.crabir.ui.postEditor.PostCreator
 import com.sofamaniac.crabir.ui.thread.ThreadView
@@ -26,52 +25,6 @@ import kotlinx.serialization.Serializable
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import kotlin.reflect.typeOf
-
-val FullnameType = object : NavType<Fullname>(isNullableAllowed = false) {
-    override fun get(bundle: Bundle, key: String): Fullname? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            bundle.getParcelable(key, Fullname::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            bundle.getParcelable(key)
-        }
-    }
-
-    override fun parseValue(value: String): Fullname {
-        return Fullname(value)
-    }
-
-    override fun put(bundle: Bundle, key: String, value: Fullname) {
-        bundle.putParcelable(key, value)
-    }
-
-    override fun serializeAsValue(value: Fullname): String {
-        return value.name
-    }
-}
-
-val NullableFullnameType = object : NavType<Fullname?>(isNullableAllowed = true) {
-    override fun get(bundle: Bundle, key: String): Fullname? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            bundle.getParcelable(key, Fullname::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            bundle.getParcelable(key)
-        }
-    }
-
-    override fun parseValue(value: String): Fullname? {
-        return if (value == "null") null else Fullname(value)
-    }
-
-    override fun put(bundle: Bundle, key: String, value: Fullname?) {
-        bundle.putParcelable(key, value)
-    }
-
-    override fun serializeAsValue(value: Fullname?): String {
-        return value?.name ?: "null"
-    }
-}
 
 @Serializable
 class PostRoute(val postPermalink: String, val comment: String? = null, val context: Int? = null) :
@@ -83,14 +36,6 @@ class PostCreatorRoute(val kind: Kind, val communityId: Fullname?) : Route
 @Serializable
 class CrosspostCreatorRoute(val post: Fullname) : Route
 
-@Serializable
-class FullscreenImageRoute(val post: Fullname) : Route
-
-@Serializable
-class FullscreenVideoRoute(val post: Fullname) : Route
-
-@Serializable
-class FullscreenGalleryRoute(val post: Fullname) : Route
 
 private const val ROUTE = "/r/{subreddit}/comments/{id}/{title}"
 private const val SHORT_ROUTE = "/r/{subreddit}/s/{id}"
@@ -118,8 +63,7 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
         }
         ThreadView(
             permalink = permalink,
-            dismiss = { navController.popBackStack() },
-            animatedVisibilityScope = this@composable
+            dismiss = { navController.popBackStack() }
         )
     }
     composable(
@@ -145,8 +89,7 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
         ThreadView(
             permalink = permalink,
             dismiss = { navController.popBackStack() },
-            comment = commentId,
-            animatedVisibilityScope = this@composable
+            comment = commentId
         )
     }
     composable(
@@ -178,26 +121,25 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
         }
     }
     composable<PostRoute>(
-//        enterTransition = {
-//            slideIntoContainer(
-//                animationSpec = tween(300, easing = EaseIn),
-//                towards = AnimatedContentTransitionScope.SlideDirection.Start
-//            )
-//        },
-//        exitTransition = {
-//            slideOutOfContainer(
-//                animationSpec = tween(300, easing = EaseOut),
-//                towards = AnimatedContentTransitionScope.SlideDirection.End
-//            )
-//        }
+        enterTransition = {
+            slideIntoContainer(
+                animationSpec = tween(300, easing = EaseIn),
+                towards = AnimatedContentTransitionScope.SlideDirection.Start
+            )
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                animationSpec = tween(300, easing = EaseOut),
+                towards = AnimatedContentTransitionScope.SlideDirection.End
+            )
+        }
     ) {
         val route = it.toRoute<PostRoute>()
         ThreadView(
             permalink = route.postPermalink,
             comment = route.comment,
             context = route.context,
-            dismiss = { navController.popBackStack() },
-            animatedVisibilityScope = this@composable
+            dismiss = { navController.popBackStack() }
         )
     }
 
@@ -210,28 +152,6 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
         })
     }
 
-    composable<FullscreenImageRoute>(
-        typeMap = mapOf(typeOf<Fullname>() to FullnameType)
-    ) {
-        val route = it.toRoute<FullscreenImageRoute>()
-        FullscreenImageView(
-            route.post,
-            dismiss = { navController.popBackStack() },
-            animatedVisibilityScope = this@composable
-        )
-    }
-    composable<FullscreenVideoRoute>(
-        typeMap = mapOf(typeOf<Fullname>() to FullnameType)
-    ) {
-        val route = it.toRoute<FullscreenVideoRoute>()
-        FullscreenVideo(route.post, dismiss = { navController.popBackStack() })
-    }
-    composable<FullscreenGalleryRoute>(
-        typeMap = mapOf(typeOf<Fullname>() to FullnameType)
-    ) {
-        val route = it.toRoute<FullscreenGalleryRoute>()
-        FullscreenGallery(route.post, dismiss = { navController.popBackStack() })
-    }
     composable<CrosspostCreatorRoute>(
         typeMap = mapOf(typeOf<Fullname>() to FullnameType)
     ) {

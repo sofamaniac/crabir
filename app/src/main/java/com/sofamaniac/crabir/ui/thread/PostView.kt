@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.thread
 
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,13 +20,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.LocalRedditAccount
-import com.sofamaniac.crabir.LocalSharedTransitionScope
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
-import com.sofamaniac.crabir.ui.SharedElementKey
-import com.sofamaniac.crabir.ui.SharedElementType
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import com.sofamaniac.crabir.ui.post.BottomRow
@@ -41,15 +37,13 @@ internal fun PostView(
     post: PostData,
     threadViewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
-    canPlayVideo: Boolean = true,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    canPlayVideo: Boolean = true
 ) {
     val currentAccount = LocalRedditAccount.current
     val markdownState by threadViewModel.markdown.collectAsState()
     PostCard(
         post,
-        threadViewModel = threadViewModel,
-        animatedVisibilityScope = animatedVisibilityScope
+        threadViewModel = threadViewModel
     ) {
         if (!post.isCrosspost) {
             PostBody(
@@ -58,7 +52,6 @@ internal fun PostView(
                 maxLines = null,
                 enableLinkFullSizePreview = false,
                 forceShowSelftext = true,
-                animatedVisibilityScope = animatedVisibilityScope,
                 markAsRead = { threadViewModel.visitPost(post, currentAccount.id) },
                 markdownState = markdownState,
             )
@@ -108,30 +101,17 @@ fun PostCard(
         }
     ),
     threadViewModel: ThreadViewModel,
-    animatedVisibilityScope: AnimatedVisibilityScope,
     body: @Composable ColumnScope.() -> Unit,
 ) {
     val likes by viewModel.likes.collectAsState(null)
     val modifier = modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
-    val sharedTransitionScope = LocalSharedTransitionScope.current
-    with(sharedTransitionScope) {
-        val state = sharedTransitionScope.rememberSharedContentState(
-            key = SharedElementKey(
-                post.name,
-                SharedElementType.Post
-            )
-        )
-        val animatedModifier = Modifier.sharedElement(
-            state,
-            animatedVisibilityScope = animatedVisibilityScope
-        )
-        ThemedCard(
+
+    ThemedCard(
             shape = RoundedCornerShape(0),
             modifier = Modifier
                 .fillMaxWidth()
-                .then(animatedModifier),
         ) {
             PostHeader(
                 post,
@@ -159,5 +139,4 @@ fun PostCard(
                 }
             }
         }
-    }
 }

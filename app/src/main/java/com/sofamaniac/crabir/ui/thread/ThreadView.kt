@@ -4,7 +4,6 @@
 
 package com.sofamaniac.crabir.ui.thread
 
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,7 +30,6 @@ fun ThreadView(
     comment: String? = null,
     context: Int? = null,
     dismiss: () -> Unit = {},
-    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val link = permalink
         ?: LocalNavController.current?.currentBackStackEntry?.toRoute<PostRoute>()?.postPermalink
@@ -53,7 +51,6 @@ fun ThreadView(
             viewModel = viewModel,
             comment = comment,
             context = context,
-            animatedVisibilityScope = animatedVisibilityScope,
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()

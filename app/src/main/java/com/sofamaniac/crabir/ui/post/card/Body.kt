@@ -1,18 +1,14 @@
 package com.sofamaniac.crabir.ui.post.card
 
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sofamaniac.crabir.LocalSharedTransitionScope
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.Route
-import com.sofamaniac.crabir.ui.SharedElementKey
-import com.sofamaniac.crabir.ui.SharedElementType
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import com.sofamaniac.crabir.ui.post.PostGallery
 import com.sofamaniac.crabir.ui.post.PostImage
@@ -31,7 +27,6 @@ internal fun PostBody(
     maxLines: Int?,
     enableLinkFullSizePreview: Boolean = true,
     forceShowSelftext: Boolean = false,
-    animatedVisibilityScope: AnimatedVisibilityScope,
     markdownState: MarkdownState,
     markAsRead: () -> Unit = {},
 ) {
@@ -41,19 +36,8 @@ internal fun PostBody(
         navController.navigate(route)
     }
 
-    val sharedTransitionScope = LocalSharedTransitionScope.current
-    with(sharedTransitionScope) {
-        val modifier =
-            modifier.sharedElement(
-                sharedTransitionScope.rememberSharedContentState(
-                    key = SharedElementKey(
-                        post.name,
-                        SharedElementType.Content
-                    )
-                ),
-                animatedVisibilityScope
-            )
-        val selftextView = @Composable {
+
+    val selftextView = @Composable {
             RedditMarkdown(
                 markdownState,
                 maxLines = maxLines,
@@ -130,7 +114,6 @@ internal fun PostBody(
                 selftextView()
             }
         }
-    }
 }
 
 

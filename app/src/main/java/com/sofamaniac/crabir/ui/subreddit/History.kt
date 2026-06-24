@@ -63,8 +63,7 @@ fun HistoryViewer(
         topBar,
         bottomBar,
         viewModel,
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        animatedVisibilityScope = animatedVisibilityScope
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     )
 }
 

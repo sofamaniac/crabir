@@ -1,8 +1,6 @@
 package com.sofamaniac.crabir.ui.post.card
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,14 +12,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.sofamaniac.crabir.LocalSharedTransitionScope
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
-import com.sofamaniac.crabir.ui.SharedElementKey
-import com.sofamaniac.crabir.ui.SharedElementType
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.post.BottomRow
 import com.sofamaniac.crabir.ui.post.DummyInteraction
@@ -53,7 +48,6 @@ fun PostCard(
     canStartVideo: Boolean = false,
     read: Boolean = false,
     showHidden: Boolean = false,
-    animatedContentScope: AnimatedVisibilityScope,
     viewModel: PostViewModelInterface = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
         key = post.id,
         creationCallback = { factory ->
@@ -75,7 +69,6 @@ fun PostCard(
         read = read,
         likes = likes,
         interactions = viewModel,
-        animatedContentScope = animatedContentScope,
     ) {
         OpenThreadButton(
             onClick = markAsRead
@@ -92,7 +85,6 @@ internal fun PostCardContent(
     canStartVideo: Boolean = false,
     read: Boolean = false,
     likes: Boolean?,
-    animatedContentScope: AnimatedVisibilityScope,
     interactions: LinkInteraction,
     bottomRowAction: @Composable () -> Unit,
 ) {
@@ -112,27 +104,13 @@ internal fun PostCardContent(
     } else {
         {}
     }
-    val sharedTransitionScope = LocalSharedTransitionScope.current
     val markdownState by interactions.markdown.collectAsState()
-    with(sharedTransitionScope) {
-        val state =
-            sharedTransitionScope.rememberSharedContentState(
-                key = SharedElementKey(
-                    post.name,
-                    SharedElementType.Post
-                )
-            )
-        Log.d("PostCardContent", "Match found: ${state.isMatchFound}")
-        val animatedModifier = Modifier.Companion.sharedElement(
-            state,
-            animatedVisibilityScope = animatedContentScope
-        )
+
 
         ThemedCard(
             shape = RoundedCornerShape(0),
             modifier = Modifier
-                .fillMaxWidth()
-                .then(animatedModifier),
+                .fillMaxWidth(),
             onClick = openPost,
         ) {
             PostHeader(
@@ -158,7 +136,6 @@ internal fun PostCardContent(
                 maxLines = settings.cardSettings.maxLines,
                 enableLinkFullSizePreview = !settings.cardSettings.thumbnailForLinkPreview,
                 markAsRead = markAsRead,
-                animatedVisibilityScope = animatedContentScope,
                 markdownState = markdownState,
             )
             BottomRow(post, modifier, interactions = interactions) {
@@ -166,7 +143,6 @@ internal fun PostCardContent(
             }
         }
     }
-}
 
 @Preview()
 @Composable
@@ -182,7 +158,6 @@ internal fun PostCardPreview() {
             read = false,
             likes = post.relationship.liked,
             interactions = viewModel,
-            animatedContentScope = this@AnimatedVisibility,
         ) {
             OpenThreadButton(
                 onClick = {}

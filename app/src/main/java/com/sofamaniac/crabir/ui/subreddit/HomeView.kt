@@ -61,8 +61,7 @@ fun HomeViewer(
         bottomBar,
         viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        feedInfo = null,
-        animatedVisibilityScope = animatedVisibilityScope
+        feedInfo = null
     )
 
 }

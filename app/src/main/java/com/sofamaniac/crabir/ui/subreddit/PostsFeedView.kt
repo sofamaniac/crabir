@@ -9,7 +9,6 @@
 package com.sofamaniac.crabir.ui.subreddit
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -260,7 +259,6 @@ fun DefaultPostView(
     read: Boolean,
     markAsRead: () -> Unit,
     showHidden: Boolean,
-    animatedContentScope: AnimatedVisibilityScope,
 ) {
 
     val viewSettings = rememberViewSettings()
@@ -273,7 +271,6 @@ fun DefaultPostView(
             canStartVideo = canStartVideo,
             read = read,
             showHidden = showHidden,
-            animatedContentScope = animatedContentScope,
         )
 
         Views.Compact -> CompactView(
@@ -291,7 +288,6 @@ fun DefaultPostView(
                 read = read,
                 canStartVideo = canStartVideo,
                 showHidden = showHidden,
-                animatedContentScope = animatedContentScope,
             )
     }
 }

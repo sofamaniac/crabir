@@ -115,8 +115,7 @@ fun SubredditViewer(
                     Text("Loading...")
                 }
             }
-        },
-        animatedVisibilityScope = animatedVisibilityScope
+        }
     )
 }
 

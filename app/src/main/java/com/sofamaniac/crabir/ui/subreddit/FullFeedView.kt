@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.subreddit
 
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -72,7 +71,6 @@ fun FullFeedView(
     viewModel: FeedViewModelInterface<PostData>,
     modifier: Modifier = Modifier,
     filter: (PostData) -> Boolean = rememberPostsFilter(),
-    animatedVisibilityScope: AnimatedVisibilityScope,
     feedInfo: (@Composable () -> Unit)? = null,
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -117,8 +115,7 @@ fun FullFeedView(
                     markAsRead = {
                         viewModel.visitPost(post, currentAccount.id)
                     },
-                    showHidden = false,
-                    animatedContentScope = animatedVisibilityScope
+                    showHidden = false
                 )
             }
 

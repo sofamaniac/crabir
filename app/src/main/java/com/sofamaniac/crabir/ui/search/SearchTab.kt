@@ -227,8 +227,7 @@ private fun InnerTab(
                 viewModel.visitPost(post, currentAccount.id)
             },
             read = viewModel.isPostRead(post),
-            showHidden = false,
-            animatedContentScope = animatedVisibilityScope
+            showHidden = false
         )
     }
 }

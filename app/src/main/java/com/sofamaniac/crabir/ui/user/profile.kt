@@ -222,7 +222,6 @@ fun ProfileView(
                                     markAsRead = { viewModel.visitPost(thing, currentAccount.id) },
                                     read = viewModel.isPostRead(thing),
                                     showHidden = page == ProfileTabs.Hidden,
-                                    animatedContentScope = animatedVisibilityScope,
                                 )
 
                                 is CommentData -> CommentView(

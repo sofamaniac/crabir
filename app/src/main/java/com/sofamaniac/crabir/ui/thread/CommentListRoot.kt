@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.thread
 
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -39,8 +38,7 @@ fun CommentListRoot(
     viewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
     comment: String? = null,
-    context: Int? = null,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    context: Int? = null
 ) {
     val listState = rememberLazyListState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
@@ -67,8 +65,7 @@ fun CommentListRoot(
             item {
                 PostView(
                     post!!,
-                    threadViewModel = viewModel,
-                    animatedVisibilityScope = animatedVisibilityScope
+                    threadViewModel = viewModel
                 )
                 HorizontalDivider()
             }
