@@ -164,54 +164,63 @@ fun EmbeddedGallery(
                         contentDescription = null,
                     )
                 }
-                when (metadata) {
-                    is MediaMetadata.Image -> ImageView(
-                        metadata.toMediaResource(),
-                        allowTransformation = false,
-                        modifier = innerModifier
-                            .align(Alignment.Center)
-                            .fillMaxSize()
-                    )
-
-                    is MediaMetadata.Gif ->
-                        DecoratedVideoPlayer(
-                            media = metadata.toMediaResource(),
-                            modifier = Modifier
+                if (!blur) {
+                    when (metadata) {
+                        is MediaMetadata.Image -> ImageView(
+                            metadata.toMediaResource(),
+                            allowTransformation = false,
+                            modifier = innerModifier
+                                .align(Alignment.Center)
                                 .fillMaxSize()
-                                .align(Alignment.Center),
-                            startPlaying = canPlayVideo && state.currentPage == page && !blur,
-                            clickable = !blur,
-                            placeholder = {
-                                val resource = metadata.preview.lastOrNull()?.toMediaResource()
-                                if (resource != null) {
-                                    ImageView(
-                                        resource,
-                                        modifier = innerModifier.fillMaxSize(),
-                                        allowTransformation = false,
-                                    )
-                                }
-                            },
-                            fullscreenButton = {
-                                IconButton(onClick = goFullscreen) {
-                                    Icon(
-                                        Icons.Default.Fullscreen,
-                                        contentDescription = "Go Fullscreen"
-                                    )
-                                }
-                            }
                         )
 
+                        is MediaMetadata.Gif ->
+                            DecoratedVideoPlayer(
+                                media = metadata.toMediaResource(),
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .align(Alignment.Center),
+                                startPlaying = canPlayVideo && state.currentPage == page && !blur,
+                                clickable = !blur,
+                                placeholder = {
+                                    val resource = metadata.preview.lastOrNull()?.toMediaResource()
+                                    if (resource != null) {
+                                        ImageView(
+                                            resource,
+                                            modifier = innerModifier.fillMaxSize(),
+                                            allowTransformation = false,
+                                        )
+                                    }
+                                },
+                                fullscreenButton = {
+                                    IconButton(onClick = goFullscreen) {
+                                        Icon(
+                                            Icons.Default.Fullscreen,
+                                            contentDescription = "Go Fullscreen"
+                                        )
+                                    }
+                                }
+                            )
 
-                    else -> {
-                        Log.e("PostGallery", "Unsupported media type: ${metadata.javaClass.name}")
-                        Surface(
-                            modifier = Modifier.fillMaxSize(),
-                            color = Color(154, 154, 154, 255)
-                        ) {
-                            Icon(Icons.Default.Warning, contentDescription = "Content not found")
+
+                        else -> {
+                            Log.e(
+                                "PostGallery",
+                                "Unsupported media type: ${metadata.javaClass.name}"
+                            )
+                            Surface(
+                                modifier = Modifier.fillMaxSize(),
+                                color = Color(154, 154, 154, 255)
+                            ) {
+                                Icon(
+                                    Icons.Default.Warning,
+                                    contentDescription = "Content not found"
+                                )
+                            }
                         }
                     }
                 }
+
             }
         }
         val text = if (blur) {
