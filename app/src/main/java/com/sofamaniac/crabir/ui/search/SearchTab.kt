@@ -1,7 +1,6 @@
 package com.sofamaniac.crabir.ui.search
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -35,6 +34,8 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -45,6 +46,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -66,7 +68,9 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalRedditAccount
+import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.SortInterface
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.reddit.CommunitySearchSort
@@ -101,7 +105,6 @@ fun SearchTab(
             if (searchQuery.flair.isNotBlank()) "flair:\"${searchQuery.flair}\"" else ""
         SearchCommonViewModel(initialQuery)
     },
-    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val viewModels = listOf(
         hiltViewModel<PostSearchViewModel, PostSearchViewModel.Factory>(key = "PostSearch") { factory ->
@@ -119,78 +122,88 @@ fun SearchTab(
         hiltViewModel<UserSearchViewModel>(key = "UserSearch"),
         //hiltViewModel<CommentSearchViewModel>(key = "CommentSearch"),
     )
-    val tabs = listOf("Posts", "Communities", "Users")//, "Comments")
+    val tabs = listOf(
+        stringResource(R.string.search_post_tab),
+        stringResource(R.string.search_communities_tab),
+        stringResource(R.string.search_users_tab)
+    )//, "Comments")
     val scope = rememberCoroutineScope()
     val currentTab = rememberPagerState(initialPage = initialTab, pageCount = { tabs.size })
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val showSettings by commonViewModel.showSettings.collectAsState()
-    Scaffold(
-        topBar = {
-            TopBar(
-                commonViewModel,
-                scrollBehavior,
-                enableSettings = currentTab.currentPage != 2
-            ) {
-                commonViewModel.onQueryUpdate(it)
-                viewModels[currentTab.currentPage].onQueryUpdate(it)
-            }
-        },
-        bottomBar = {},
-        modifier = modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .imePadding(),
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues = innerPadding)
-                .fillMaxSize()
-        ) {
-            SecondaryTabRow(
-                selectedTabIndex = currentTab.currentPage,
-            ) {
-                tabs.forEachIndexed { index, tab ->
-                    val localViewModel = viewModels[index]
-                    Tab(
-                        selected = index == currentTab.currentPage,
-                        onClick = {
-                            val query = commonViewModel.query
-                            localViewModel.onQueryUpdate(query)
-                            scope.launch { currentTab.animateScrollToPage(index) }
-                        },
-                        text = { Text(tab) }
-                    )
-
+    val snackbarHostState = remember { SnackbarHostState() }
+    CompositionLocalProvider(LocalSnackBarHost provides snackbarHostState) {
+        Scaffold(
+            snackbarHost = {
+                SnackbarHost(snackbarHostState)
+            },
+            topBar = {
+                TopBar(
+                    commonViewModel,
+                    scrollBehavior,
+                    enableSettings = currentTab.currentPage != 2
+                ) {
+                    commonViewModel.onQueryUpdate(it)
+                    viewModels[currentTab.currentPage].onQueryUpdate(it)
                 }
-            }
-            val localViewModel = viewModels[currentTab.currentPage]
-            AnimatedVisibility(visible = showSettings) {
-                when (localViewModel) {
-                    is PostSearchViewModel -> {
-                        SearchSettings(localViewModel)
-                    }
-
-                    is CommunitySearchViewModel -> {
-                        SearchSettings(localViewModel)
-                    }
-                }
-            }
-            HorizontalPager(
-                state = currentTab,
+            },
+            bottomBar = {},
+            modifier = modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .imePadding(),
+        ) { innerPadding ->
+            Column(
                 modifier = Modifier
+                    .padding(paddingValues = innerPadding)
                     .fillMaxSize()
-            ) { index ->
-                when (val viewModel = viewModels[index]) {
-                    is PostSearchViewModel ->
-                        InnerTab(viewModel, animatedVisibilityScope)
+            ) {
+                SecondaryTabRow(
+                    selectedTabIndex = currentTab.currentPage,
+                ) {
+                    tabs.forEachIndexed { index, tab ->
+                        val localViewModel = viewModels[index]
+                        Tab(
+                            selected = index == currentTab.currentPage,
+                            onClick = {
+                                val query = commonViewModel.query
+                                localViewModel.onQueryUpdate(query)
+                                scope.launch { currentTab.animateScrollToPage(index) }
+                            },
+                            text = { Text(tab) }
+                        )
 
-                    is CommunitySearchViewModel ->
-                        InnerTab(viewModel)
+                    }
+                }
+                val localViewModel = viewModels[currentTab.currentPage]
+                AnimatedVisibility(visible = showSettings) {
+                    when (localViewModel) {
+                        is PostSearchViewModel -> {
+                            SearchSettings(localViewModel)
+                        }
 
-                    is UserSearchViewModel ->
-                        InnerTab(viewModel)
+                        is CommunitySearchViewModel -> {
+                            SearchSettings(localViewModel)
+                        }
+                    }
+                }
+                HorizontalPager(
+                    state = currentTab,
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) { index ->
+                    when (val viewModel = viewModels[index]) {
+                        is PostSearchViewModel ->
+                            InnerTab(viewModel)
+
+                        is CommunitySearchViewModel ->
+                            InnerTab(viewModel)
+
+                        is UserSearchViewModel ->
+                            InnerTab(viewModel)
 
 //                        is CommentSearchViewModel ->
 //                            InnerTab(viewModel)
+                    }
                 }
             }
         }
@@ -217,8 +230,7 @@ class SearchCommonViewModel @AssistedInject constructor(@Assisted query: String)
 
 @Composable
 private fun InnerTab(
-    viewModel: PostSearchViewModel,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    viewModel: PostSearchViewModel
 ) {
     val currentAccount = LocalRedditAccount.current
     PostFeedViewer(viewModel) { post, isMosVisible ->

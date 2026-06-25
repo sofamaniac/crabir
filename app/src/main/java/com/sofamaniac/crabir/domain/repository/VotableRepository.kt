@@ -34,28 +34,42 @@ interface VotableRepository<T : VotableData> {
     }
 
     suspend fun delete(name: Fullname) {
-        val res = api.delete(name)
-        if (res.isSuccessful) {
-            votableDao.delete(name)
+        try {
+            val res = api.delete(name)
+            if (res.isSuccessful) {
+                votableDao.delete(name)
+            }
+        } catch (e: Exception) {
+            Log.e("VotableRepository", "Failed to delete: $e")
         }
     }
 
     suspend fun getRules(subreddit: String): Rules {
-        val res = api.getRules(subreddit)
-        return if (res.isSuccessful) {
-            res.body()!!
-        } else {
-            Rules()
+        try {
+            val res = api.getRules(subreddit)
+            return if (res.isSuccessful) {
+                res.body()!!
+            } else {
+                Rules()
+            }
+        } catch (e: Exception) {
+            Log.e("VotableRepository", "Failed to get rules: $e")
+//            return Result.failure(e)
+            return Rules()
         }
     }
 
     suspend fun report(name: Fullname, reason: String): Result<Unit> {
-        val res = api.report(name, reason)
-        if (res.isSuccessful) {
-            return Result.success(Unit)
-        } else {
-            Log.e("PostRepository", "Error reporting post: ${res.errorBody()}")
-            return Result.failure(Exception("Error reporting post"))
+        try {
+            val res = api.report(name, reason)
+            if (res.isSuccessful) {
+                return Result.success(Unit)
+            } else {
+                Log.e("PostRepository", "Error reporting post: ${res.errorBody()}")
+                return Result.failure(Exception("Error reporting post"))
+            }
+        } catch (e: Exception) {
+            return Result.failure(e)
         }
     }
 
@@ -77,13 +91,17 @@ interface VotableRepository<T : VotableData> {
             relationship = relationship,
         ).updateScore(oldLikes, newLikes)
         votableDao.update(name, newPost.toEntity().data)
-        val res = api.vote(thing.name, dir)
-        if (res.isSuccessful) {
-            return Result.success(Unit)
-        } else {
-            votableDao.update(name, thing.toEntity().data)
-            Log.e("PostRepository", "Error upvoting post: ${res.errorBody()}")
-            return Result.failure(Exception("Error upvoting post"))
+        try {
+            val res = api.vote(thing.name, dir)
+            if (res.isSuccessful) {
+                return Result.success(Unit)
+            } else {
+                votableDao.update(name, thing.toEntity().data)
+                Log.e("PostRepository", "Error upvoting post: ${res.errorBody()}")
+                return Result.failure(Exception("Error upvoting post"))
+            }
+        } catch (e: Exception) {
+            return Result.failure(e)
         }
     }
 
@@ -102,14 +120,18 @@ interface VotableRepository<T : VotableData> {
         val relationship = post.relationship.copy(saved = target)
         val newPost = post.copy(relationship = relationship)
         votableDao.update(name, newPost.toEntity().data)
-        val res = if (target) api.save(post.name) else api.unsave(post.name)
-        if (res.isSuccessful) {
-            return Result.success(Unit)
-        } else {
-            // restore old value on failure
-            votableDao.update(name, post.toEntity().data)
-            Log.e("PostRepository", "Error saving post: ${res.errorBody()}")
-            return Result.failure(Exception("Error saving post"))
+        try {
+            val res = if (target) api.save(post.name) else api.unsave(post.name)
+            if (res.isSuccessful) {
+                return Result.success(Unit)
+            } else {
+                // restore old value on failure
+                votableDao.update(name, post.toEntity().data)
+                Log.e("PostRepository", "Error saving post: ${res.errorBody()}")
+                return Result.failure(Exception("Error saving post"))
+            }
+        } catch (e: Exception) {
+            return Result.failure(e)
         }
     }
 

@@ -75,20 +75,24 @@ class ListingSource<Params, Data : DataInterface>(
         return Fullname("")
     }
 
-    override suspend fun load(params: LoadParams<Fullname>): LoadResult.Page<Fullname, Data> {
-        val page = if (params.key != null) {
-            getThings(params.key!!)
-        } else {
-            PagedResponse()
+    override suspend fun load(params: LoadParams<Fullname>): LoadResult<Fullname, Data> {
+        if (params.key == null) {
+            return LoadResult.Page(prevKey = null, nextKey = null, data = emptyList())
         }
-        val data = page.data.mapNotNull { id ->
-            repository.cache[id]
+        try {
+            val page = getThings(params.key!!)
+            val data = page.data.mapNotNull { id ->
+                repository.cache[id]
+            }
+            return LoadResult.Page(
+                prevKey = null,
+                nextKey = page.after,
+                data = data
+            )
+        } catch (e: Exception) {
+            return LoadResult.Error(e)
         }
-        return LoadResult.Page(
-            prevKey = null,
-            nextKey = page.after,
-            data = data
-        )
+
     }
 
     private suspend fun getThings(after: Fullname): PagedResponse<Fullname> {

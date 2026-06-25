@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalDrawerState
+import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
@@ -89,6 +90,7 @@ fun DrawerContent(
     val coroutineScope = rememberCoroutineScope()
     val drawerState = LocalDrawerState.current
     val account by viewModel.activeAccount.collectAsState(initial = RedditAccount.anonymous())
+    val loginState by viewModel.loginState.collectAsState()
     LaunchedEffect(Unit) {
         // Reset when account changes
         viewModel.activeAccount
@@ -99,6 +101,13 @@ fun DrawerContent(
                     //launchSingleTop = true
                 }
             }
+    }
+
+    val snackbarHostState = LocalSnackBarHost.current
+    LaunchedEffect(loginState) {
+        if (loginState is LoginState.Error) {
+            snackbarHostState?.showSnackbar(message = "Something went wrong: ${(loginState as LoginState.Error).message}")
+        }
     }
 
     ModalDrawerSheet(drawerState = drawerState) {

@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthState
@@ -48,7 +49,7 @@ sealed class LoginState {
     object Idle : LoginState()
     object Loading : LoginState()
     object Success : LoginState()
-    data class Error(val message: String) : LoginState()
+    data class Error(val message: Throwable) : LoginState()
 }
 
 @HiltViewModel
@@ -116,6 +117,7 @@ class DrawerViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 Log.e("LoginViewModel", "Failed to logout: $e")
+                _loginState.update { LoginState.Error(e) }
             }
         }
     }
@@ -127,9 +129,14 @@ class DrawerViewModel @Inject constructor(
             return
         }
         Log.d("LoginViewModel", "Setting up anonymous")
-        val response = redditApi.getAnonymousAccessToken(
-            deviceId = Uuid.random().toHexDashString()
-        )
+        val response = try {
+            redditApi.getAnonymousAccessToken(
+                deviceId = Uuid.random().toHexDashString()
+            )
+        } catch (e: Exception) {
+            _loginState.update { LoginState.Error(e) }
+            return
+        }
         if (response.isSuccessful) {
             Log.d("LoginViewModel", "Obtained access token for anonymous")
             val accessToken = response.body()!!
@@ -154,7 +161,15 @@ class DrawerViewModel @Inject constructor(
             accountsRepository.addAccount(account)
             accountsRepository.setActiveAccount(-1)
         } else {
-            Log.e("LoginViewModel", "failed to setup anonymous: ${response.errorBody()}")
+            val error = response.errorBody()
+            Log.e("LoginViewModel", "failed to setup anonymous: ${error}")
+            _loginState.update {
+                LoginState.Error(
+                    Exception(
+                        error?.string() ?: "Something went wrong"
+                    )
+                )
+            }
         }
     }
 
@@ -187,7 +202,7 @@ class DrawerViewModel @Inject constructor(
     fun handleAuthResult(intent: Intent?) {
         Log.d("LoginViewModel", "Handling auth result ${intent?.data}")
         if (intent == null) {
-            _loginState.value = LoginState.Error("Login cancelled")
+            _loginState.update { LoginState.Error(Exception("Login cancelled")) }
             return
         }
 
@@ -200,13 +215,11 @@ class DrawerViewModel @Inject constructor(
         when {
             authException != null -> {
                 Log.e("LoginViewModel", "Authorization exception: $authException")
-                _loginState.value = LoginState.Error(
-                    authException.message ?: "Authorization exception: $authException"
-                )
+                _loginState.update { LoginState.Error(authException) }
             }
 
             authResponse != null -> {
-                _loginState.value = LoginState.Loading
+                _loginState.update { LoginState.Loading }
                 exchangeAuthCodeForToken(authResponse)
             }
         }
@@ -222,7 +235,7 @@ class DrawerViewModel @Inject constructor(
             when {
                 ex != null -> {
                     Log.e("LoginViewModel", "Token exchange failed: $ex")
-                    _loginState.value = LoginState.Error("Failed to get access token.")
+                    _loginState.value = LoginState.Error(ex)
                 }
 
                 tokenResponse != null -> {
@@ -242,20 +255,24 @@ class DrawerViewModel @Inject constructor(
 
     private suspend fun fetchUserInfo() {
         val currentAccount = accountsRepository.activeAccount.first()
-        val user = redditApi.getIdentity()
-        if (user.isSuccessful) {
-            val identity = user.body()!!
-            Log.d("LoginViewModel", "Updating ${currentAccount.id}")
-            accountsRepository.updateAccount(
-                currentAccount.id,
-                currentAccount.copy(
-                    info = identity,
+        try {
+            val user = redditApi.getIdentity()
+            if (user.isSuccessful) {
+                val identity = user.body()!!
+                Log.d("LoginViewModel", "Updating ${currentAccount.id}")
+                accountsRepository.updateAccount(
+                    currentAccount.id,
+                    currentAccount.copy(
+                        info = identity,
+                    )
                 )
-            )
 
-        } else {
-            Log.e("LoginViewModel", "Failed to get user info: ${user.message()}")
-            //accountsRepository.deleteAccount(accounts.size)
+            } else {
+                Log.e("LoginViewModel", "Failed to get user info: ${user.message()}")
+                //accountsRepository.deleteAccount(accounts.size)
+            }
+        } catch (e: Exception) {
+            _loginState.update { LoginState.Error(e) }
         }
     }
 
@@ -281,7 +298,7 @@ class DrawerViewModel @Inject constructor(
             fetchUserInfo()
         } catch (e: Exception) {
             Log.e("LoginViewModel", "Failed to save account: $e")
-            _loginState.value = LoginState.Error("Failed to save account.")
+            _loginState.value = LoginState.Error(e)
         }
     }
 }

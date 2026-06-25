@@ -6,6 +6,8 @@ package com.sofamaniac.crabir.ui.user
 
 import android.util.Log
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -16,10 +18,13 @@ import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
+import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
+import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.feed.FeedRepositoryCommon
 import com.sofamaniac.crabir.domain.repository.feed.FeedSource
 import com.sofamaniac.crabir.domain.repository.profile.CommentsRepository
@@ -42,10 +47,36 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
+@HiltViewModel(assistedFactory = ProfileViewModel.Factory::class)
+class ProfileViewModel @AssistedInject constructor(
+    accountsRepository: AccountsRepository,
+    api: RedditAPIService,
+    @Assisted username: String
+) :
+    ViewModel() {
+    val currentUser = accountsRepository.activeAccount.map { it.info!!.username }
+
+    val userProfile: MutableState<UserDTO?> = mutableStateOf(null)
+
+    init {
+        viewModelScope.launch {
+            val res = api.getUser(username)
+            if (res.isSuccessful) {
+                userProfile.value = res.body()?.data
+            }
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(username: String): ProfileViewModel
+    }
+}
 @HiltViewModel(assistedFactory = SavedViewModel.Factory::class)
 class SavedViewModel @AssistedInject constructor(
     @Assisted username: String,

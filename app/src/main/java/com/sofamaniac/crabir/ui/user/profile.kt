@@ -1,87 +1,46 @@
 package com.sofamaniac.crabir.ui.user
 
 import androidx.annotation.Keep
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.CallReceived
-import androidx.compose.material.icons.filled.Cake
-import androidx.compose.material.icons.filled.CardGiftcard
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.outlined.ModeComment
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryScrollableTabRow
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.mikepenz.markdown.model.State
-import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalRedditAccount
-import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
-import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
-import com.sofamaniac.crabir.data.remote.reddit.Rules
+import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.domain.model.CommentData
-import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
-import com.sofamaniac.crabir.domain.repository.AccountsRepository
-import com.sofamaniac.crabir.domain.repository.CommentsRepository
-import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.ui.TabBar
-import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
-import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.subreddit.DefaultPostView
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
-import com.sofamaniac.crabir.ui.thread.CommentViewModelInterface
-import com.sofamaniac.crabir.ui.thread.OpenedComment
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import kotlin.time.Instant
-import kotlin.time.toJavaInstant
 
 
 @Serializable
@@ -168,234 +127,84 @@ fun ProfileView(
     val activeViewModel = tabs.getOrNull(currentTab.currentPage).let {
         viewModels.getOrDefault(it, defaultValue = null)
     }
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerContent()
-        },
-    ) {
-        Scaffold(
-            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                TopBar(
-                    scrollBehavior,
-                    user,
-                    profileViewModel.userProfile.value,
-                    viewModel = activeViewModel
-                )
-
+    val snackbarHostState = remember { SnackbarHostState() }
+    CompositionLocalProvider(LocalSnackBarHost provides snackbarHostState) {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                DrawerContent()
             },
-            bottomBar = {
-                TabBar(selected = 4)
-            }) { innerPadding ->
-            Column(
-                verticalArrangement = Arrangement.Top, modifier = Modifier.padding(innerPadding)
-            ) {
-                SecondaryScrollableTabRow(
-                    selectedTabIndex = currentTab.currentPage.coerceAtMost(tabs.size - 1),
-                    modifier = Modifier.fillMaxWidth(),
-                    edgePadding = 0.dp
-                ) {
-                    tabs.forEachIndexed { index, tab ->
-                        Tab(selected = index == currentTab.currentPage, onClick = {
-                            scope.launch { currentTab.animateScrollToPage(index) }
-                        }, text = { Text(tab.name) })
-                    }
-                }
-                HorizontalPager(
-                    state = currentTab, modifier = Modifier.fillMaxSize()
-                ) {
-                    val page = tabs[it]
-                    val viewModel = viewModels[page]
-                    val currentAccount = LocalRedditAccount.current
-                    if (viewModel != null) {
-                        PostFeedViewer(
-                            viewModel = viewModel,
-                            filter = { true }
-                        ) { thing, isMostVisible ->
-                            when (thing) {
-                                is PostData -> DefaultPostView(
-                                    thing,
-                                    isMostVisible = isMostVisible,
-                                    markAsRead = { viewModel.visitPost(thing, currentAccount.id) },
-                                    read = viewModel.isPostRead(thing),
-                                    showHidden = page == ProfileTabs.Hidden,
-                                )
-
-                                is CommentData -> CommentView(
-                                    thing,
-                                )
-                            }
-                        }
-                    } else {
-                        AboutTab(
-                            profileViewModel.userProfile.value,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun CommentView(
-    thing: CommentData,
-) {
-    val navController = LocalNavController.current!!
-    ThemedCard(
-        modifier = Modifier.clickable {
-            navController.navigate(
-                PostRoute(
-                    thing.permalink,
-                    comment = thing.id,
-                )
-            )
-        }
-    ) {
-        OpenedComment(
-            thing,
-            viewModel = hiltViewModel<CommentViewModel, CommentViewModel.Factory> { factory ->
-                factory.create(thing)
-            },
-            enableAnimation = false,
-        )
-    }
-}
-
-@HiltViewModel(assistedFactory = CommentViewModel.Factory::class)
-class CommentViewModel @AssistedInject constructor(
-    @Assisted val comment: CommentData,
-    private val commentsRepository: CommentsRepository,
-) : CommentViewModelInterface, ViewModel() {
-    override val openComment: StateFlow<Fullname?> = MutableStateFlow(comment.name)
-
-    override val markdown = parseMarkdownFlow(comment.body.markdown).stateIn(
-        viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = State.Loading()
-    )
-
-    override fun submitComment(
-        parent: Fullname,
-        body: String
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getMarkdownState(name: Fullname): StateFlow<State> = markdown
-
-    override val likes: Flow<Boolean?> = flowOf(comment.relationship.liked)
-    override val saved: Flow<Boolean> = flowOf(comment.relationship.saved)
-    override val rules: StateFlow<Rules>
-        get() = TODO("Not yet implemented")
-
-
-    override fun upvote(name: Fullname) {
-        viewModelScope.launch(Dispatchers.IO) {
-            commentsRepository.upvote(name)
-        }
-    }
-
-    override fun downvote(name: Fullname) {
-        viewModelScope.launch(Dispatchers.IO) {
-            commentsRepository.downvote(name)
-        }
-    }
-
-    override fun save(name: Fullname, target: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (target) {
-                commentsRepository.unsave(name)
-            } else {
-                commentsRepository.save(name)
-            }
-        }
-    }
-
-    override fun fetchRules() {
-        TODO("Not yet implemented")
-    }
-
-    override fun report(reason: String) {
-        TODO("Not yet implemented")
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(comment: CommentData): CommentViewModel
-    }
-
-}
-
-@Composable
-fun AboutTab(user: UserDTO?, modifier: Modifier = Modifier) {
-    if (user == null) return
-
-    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.Top) {
-        Text(user.subreddit.publicDescription)
-        Spacer(Modifier.height(8.dp))
-        Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Column {
-                Text("KARMA")
-                Text("${user.totalKarma}")
-                Row {
-                    Icon(Icons.Default.Link, contentDescription = "Link karma")
-                    Text("${user.linkKarma}")
-                    Icon(Icons.Outlined.ModeComment, contentDescription = "Comment karma")
-                    Text("${user.commentKarma}")
-                }
-                Row {
-                    Icon(Icons.Default.CardGiftcard, contentDescription = "Awarder karma")
-                    Text("${user.awarderKarma}")
-                    Icon(
-                        Icons.AutoMirrored.Filled.CallReceived,
-                        contentDescription = "Awardee karma"
+        ) {
+            Scaffold(
+                snackbarHost = {
+                    SnackbarHost(snackbarHostState)
+                },
+                modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                topBar = {
+                    TopBar(
+                        scrollBehavior,
+                        user,
+                        profileViewModel.userProfile.value,
+                        viewModel = activeViewModel
                     )
-                    Text("${user.awardeeKarma}")
-                }
-            }
-            Column {
-                val created = Instant.fromEpochSeconds(user.createdUtc.toLong())
-                val formatter = DateTimeFormatter
-                    .ofPattern("MMM dd, yyyy")
-                    .withLocale(LocalLocale.current.platformLocale)
-                    .withZone(ZoneId.systemDefault())
 
-                Text("REDDIT AGE")
-                Text(formatElapsedTimeLocalized(created))
-                Row {
-                    Icon(Icons.Default.Cake, contentDescription = null)
-                    Text(formatter.format(created.toJavaInstant()))
+                },
+                bottomBar = {
+                    TabBar(selected = 4)
+                }) { innerPadding ->
+                Column(
+                    verticalArrangement = Arrangement.Top, modifier = Modifier.padding(innerPadding)
+                ) {
+                    SecondaryScrollableTabRow(
+                        selectedTabIndex = currentTab.currentPage.coerceAtMost(tabs.size - 1),
+                        modifier = Modifier.fillMaxWidth(),
+                        edgePadding = 0.dp
+                    ) {
+                        tabs.forEachIndexed { index, tab ->
+                            Tab(selected = index == currentTab.currentPage, onClick = {
+                                scope.launch { currentTab.animateScrollToPage(index) }
+                            }, text = { Text(tab.name) })
+                        }
+                    }
+                    HorizontalPager(
+                        state = currentTab, modifier = Modifier.fillMaxSize()
+                    ) {
+                        val page = tabs[it]
+                        val viewModel = viewModels[page]
+                        val currentAccount = LocalRedditAccount.current
+                        if (viewModel != null) {
+                            PostFeedViewer(
+                                viewModel = viewModel,
+                                filter = { true }
+                            ) { thing, isMostVisible ->
+                                when (thing) {
+                                    is PostData -> DefaultPostView(
+                                        thing,
+                                        isMostVisible = isMostVisible,
+                                        markAsRead = {
+                                            viewModel.visitPost(
+                                                thing,
+                                                currentAccount.id
+                                            )
+                                        },
+                                        read = viewModel.isPostRead(thing),
+                                        showHidden = page == ProfileTabs.Hidden,
+                                    )
+
+                                    is CommentData -> CommentView(
+                                        thing,
+                                    )
+                                }
+                            }
+                        } else {
+                            AboutTab(
+                                profileViewModel.userProfile.value,
+                                modifier = Modifier.padding(horizontal = 8.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@HiltViewModel(assistedFactory = ProfileViewModel.Factory::class)
-class ProfileViewModel @AssistedInject constructor(
-    accountsRepository: AccountsRepository,
-    api: RedditAPIService,
-    @Assisted username: String
-) :
-    ViewModel() {
-    val currentUser = accountsRepository.activeAccount.map { it.info!!.username }
-
-    val userProfile: MutableState<UserDTO?> = mutableStateOf(null)
-
-    init {
-        viewModelScope.launch {
-            val res = api.getUser(username)
-            if (res.isSuccessful) {
-                userProfile.value = res.body()?.data
-            }
-        }
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(username: String): ProfileViewModel
     }
 }

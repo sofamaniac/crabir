@@ -18,18 +18,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -45,7 +42,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
 import com.sofamaniac.crabir.navigation.HistoryRoute
 import com.sofamaniac.crabir.navigation.HomeRoute
@@ -60,8 +56,6 @@ import com.sofamaniac.crabir.navigation.profileGraph
 import com.sofamaniac.crabir.navigation.settingsGraph
 import com.sofamaniac.crabir.navigation.subredditGraph
 import com.sofamaniac.crabir.settings.theme.ConfigureMaterialTheme
-import com.sofamaniac.crabir.settings.theme.CrabirTheme
-import com.sofamaniac.crabir.settings.theme.DefaultDarkTheme
 import com.sofamaniac.crabir.settings.theme.rememberAppTheme
 import com.sofamaniac.crabir.ui.InboxView
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
@@ -77,12 +71,6 @@ import me.saket.telephoto.zoomable.coil3.ZoomableAsyncImage
 
 @HiltAndroidApp
 class CrabirApp : Application()
-
-val LocalTheme = compositionLocalOf<CrabirTheme> { DefaultDarkTheme }
-val LocalDrawerState = compositionLocalOf<DrawerState> { error("No drawer state provided") }
-val LocalRedditAccount = compositionLocalOf<RedditAccount> { RedditAccount.anonymous() }
-val LocalSharedTransitionScope =
-    compositionLocalOf<SharedTransitionScope> { error("No shared transition scope provided") }
 
 
 @AndroidEntryPoint
@@ -201,7 +189,7 @@ fun NavigationGraph(
         }
         composable<SearchRoute> { navBackStackEntry ->
             val search = navBackStackEntry.toRoute<SearchRoute>()
-            SearchTab(search, animatedVisibilityScope = this@composable)
+            SearchTab(search)
         }
         composable<InboxRoute> {
             InboxView()

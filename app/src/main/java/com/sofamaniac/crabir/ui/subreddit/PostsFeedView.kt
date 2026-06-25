@@ -10,6 +10,7 @@ package com.sofamaniac.crabir.ui.subreddit
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,6 +66,7 @@ import com.sofamaniac.crabir.settings.filters.FiltersSettings
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.SortMenu
+import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.post.CompactView
 import com.sofamaniac.crabir.ui.post.card.PostCard
 import kotlinx.coroutines.flow.filterNotNull
@@ -181,6 +183,19 @@ fun <T : VotableData> PostFeedViewer(
                 val post = posts[index]
                 if (post != null && filter(post)) {
                     itemView(post, isMostVisible)
+                }
+            }
+            item {
+                val appendState = posts.loadState.append
+                if (appendState is LoadState.NotLoading && appendState.endOfPaginationReached) {
+                    ThemedCard() {
+                        Text("End of Feed reached")
+                    }
+                } else if (appendState is LoadState.Error) {
+                    ThemedCard(modifier = Modifier.clickable { posts.retry() }) {
+                        Text("Error while loading: ${appendState.error.localizedMessage}")
+                        Text("Click to retry")
+                    }
                 }
             }
         }
