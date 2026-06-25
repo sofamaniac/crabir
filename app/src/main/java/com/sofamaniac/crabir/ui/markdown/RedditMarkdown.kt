@@ -170,13 +170,13 @@ fun redditLinkHandler(): LinkInteractionListener {
 
 @Composable
 fun redditUriHandler(): UriHandler {
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val uriHandler = LocalUriHandler.current
     return object : UriHandler {
         override fun openUri(uri: String) {
             try {
                 Log.d("redditUriHandler", "navigating to : ${uri.toLocalUrl()}")
-                navController.navigate(uri.toLocalUrl())
+                navController!!.navigate(uri.toLocalUrl())
                 //uriHandler.openUri(link.url)
             } catch (e: IllegalArgumentException) {
                 Log.i("redditUriHandler", "failed to open link in app: $e")

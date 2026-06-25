@@ -41,7 +41,7 @@ fun PostInfo(
     likes: Boolean?,
     markAsRead: () -> Unit = {},
 ) {
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val theme = LocalTheme.current
     Row(
         modifier = modifier
@@ -87,7 +87,7 @@ fun PostInfo(
                     )
                 }
                 Flair(post.linkFlair, modifier = Modifier.clickable {
-                    navController.navigate(
+                    navController?.navigate(
                         SearchRoute(
                             subreddit = post.subreddit.name,
                             flair = post.linkFlair.text

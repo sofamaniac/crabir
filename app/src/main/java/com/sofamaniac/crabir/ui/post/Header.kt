@@ -49,7 +49,7 @@ fun PostHeader(
     showSubredditIcon: Boolean = true,
     showPrefix: Boolean = false,
 ) {
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val theme = LocalTheme.current
     FlowRow(
         modifier = modifier
@@ -66,7 +66,7 @@ fun PostHeader(
                     .size(24.dp)
                     .clip(CircleShape)
                     .clickable(onClick = {
-                        navController.navigate(SubredditRoute(post.subreddit.name))
+                        navController?.navigate(SubredditRoute(post.subreddit.name))
                     })
             )
         }
@@ -76,7 +76,7 @@ fun PostHeader(
                     tag = "Subreddit",
                     styles = TextLinkStyles(style = SpanStyle(color = theme.highlight)),
                     linkInteractionListener = {
-                        navController.navigate(SubredditRoute(post.subreddit.name))
+                        navController?.navigate(SubredditRoute(post.subreddit.name))
                     })
             ) {
                 append(
@@ -90,7 +90,7 @@ fun PostHeader(
                         tag = "User",
                         styles = TextLinkStyles(style = SpanStyle(color = theme.secondaryText)),
                         linkInteractionListener = {
-                            navController.navigate(
+                            navController?.navigate(
                                 ProfileRoute(
                                     post.author.username,
                                     ProfileTabs.Overview

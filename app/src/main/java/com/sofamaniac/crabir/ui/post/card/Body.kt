@@ -30,10 +30,10 @@ internal fun PostBody(
     markdownState: MarkdownState,
     markAsRead: () -> Unit = {},
 ) {
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     fun goFullscreen(route: Route) {
         markAsRead()
-        navController.navigate(route)
+        navController?.navigate(route)
     }
 
 

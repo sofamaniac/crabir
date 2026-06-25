@@ -107,44 +107,42 @@ internal fun PostCardContent(
         {}
     }
     val markdownState by interactions.markdown.collectAsState()
-
-
-        ThemedCard(
-            shape = RoundedCornerShape(0),
-            modifier = Modifier
-                .fillMaxWidth(),
-            onClick = openPost,
-        ) {
-            PostHeader(
-                post,
-                showSubredditIcon = settings.cardSettings.showSubredditIcon,
-                modifier = modifier.padding(vertical = 8.dp),
-                showPrefix = settings.prefixCommunity
-            )
-            val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
-            PostInfo(
-                post,
-                modifier = modifier,
-                enableThumbnail = enablePreview && settings.cardSettings.thumbnailForLinkPreview,
-                likes = likes,
-                read = read,
-                markAsRead = markAsRead
-            )
-            PostBody(
-                post,
-                canPlayVideo = canStartVideo,
-                enableFullHeightImage = settings.cardSettings.enableFullHeightImage,
-                enableTextPreview = settings.cardSettings.enableTextPreview && !post.spoiler,
-                maxLines = settings.cardSettings.maxLines,
-                enableLinkFullSizePreview = !settings.cardSettings.thumbnailForLinkPreview,
-                markAsRead = markAsRead,
-                markdownState = markdownState,
-            )
-            BottomRow(post, modifier, interactions = interactions) {
-                bottomRowAction()
-            }
+    ThemedCard(
+        shape = RoundedCornerShape(0),
+        modifier = Modifier
+            .fillMaxWidth(),
+        onClick = openPost,
+    ) {
+        PostHeader(
+            post,
+            showSubredditIcon = settings.cardSettings.showSubredditIcon,
+            modifier = modifier.padding(vertical = 8.dp),
+            showPrefix = settings.prefixCommunity
+        )
+        val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
+        PostInfo(
+            post,
+            modifier = modifier,
+            enableThumbnail = enablePreview && settings.cardSettings.thumbnailForLinkPreview,
+            likes = likes,
+            read = read,
+            markAsRead = markAsRead
+        )
+        PostBody(
+            post,
+            canPlayVideo = canStartVideo,
+            enableFullHeightImage = settings.cardSettings.enableFullHeightImage,
+            enableTextPreview = settings.cardSettings.enableTextPreview && !post.spoiler,
+            maxLines = settings.cardSettings.maxLines,
+            enableLinkFullSizePreview = !settings.cardSettings.thumbnailForLinkPreview,
+            markAsRead = markAsRead,
+            markdownState = markdownState,
+        )
+        BottomRow(post, modifier, interactions = interactions) {
+            bottomRowAction()
         }
     }
+}
 
 @Preview()
 @Composable

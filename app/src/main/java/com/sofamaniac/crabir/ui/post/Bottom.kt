@@ -74,7 +74,6 @@ fun BottomRow(
     interactions: LinkInteraction,
     action: @Composable () -> Unit = {},
 ) {
-    LocalNavController.current!!
     val likes by interactions.likes.collectAsState(post.relationship.liked)
     val saved by interactions.saved.collectAsState(post.relationship.saved)
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
@@ -138,7 +137,7 @@ private fun PostOptions(
         prettyPrintIndent = " "
     }
     var showOptions by remember { mutableStateOf(false) }
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
     val currentAccount = LocalRedditAccount.current
@@ -193,7 +192,7 @@ private fun PostOptions(
                         )
                     },
                     modifier = Modifier.clickable {
-                        navController.navigate(SubredditRoute(post.subreddit.name))
+                        navController?.navigate(SubredditRoute(post.subreddit.name))
                     }
                 )
                 ListItem(
@@ -207,7 +206,7 @@ private fun PostOptions(
                         )
                     },
                     modifier = Modifier.clickable {
-                        navController.navigate(
+                        navController?.navigate(
                             ProfileRoute(
                                 author = post.author.username,
                                 tab = ProfileTabs.Overview
