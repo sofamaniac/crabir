@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.settings.ui
+package com.sofamaniac.crabir.settings.helper
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

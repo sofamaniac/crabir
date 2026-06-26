@@ -25,14 +25,11 @@ import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.domain.model.AuthStateSerializer
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -156,46 +153,29 @@ class AccountsRepositoryImplRoom @Inject constructor(
 
 }
 
-//@Singleton
-class AccountsRepositoryImpl(
-    context: Context,
-    coroutineScope: CoroutineScope
+@Singleton
+class AccountsRepositoryImpl @Inject constructor(
+    @ApplicationContext context: Context,
 ) : AccountsRepository {
     private val dataStore: DataStore<Accounts> = context.accountsDataStore
-    private val accountsData: StateFlow<Accounts> = dataStore.data.stateIn(
-        scope = coroutineScope,
-        started = SharingStarted.Eagerly,
-        initialValue = Accounts(emptyList(), -1)
-    )
+    private val accountsData: Flow<Accounts> = dataStore.data
 
-    override val accounts: StateFlow<List<RedditAccount>> = accountsData.map {
+    override val accounts: Flow<List<RedditAccount>> = accountsData.map {
         Log.d("AccountsRepositoryImpl", "accounts: ${it.accounts}")
         it.accounts
-    }.stateIn(
-        scope = coroutineScope,
-        started = SharingStarted.Eagerly,
-        initialValue = emptyList()
-    )
+    }
 
-    override val activeAccountId: StateFlow<Int> = accountsData.map { accounts ->
+    override val activeAccountId: Flow<Int> = accountsData.map { accounts ->
         Log.d("AccountsRepositoryImpl", "activeId: ${accounts.activeId}")
         accounts.activeId
-    }.stateIn(
-        scope = coroutineScope,
-        started = SharingStarted.Eagerly,
-        initialValue = -1
-    )
+    }
 
 
-    override val activeAccount: StateFlow<RedditAccount> =
+    override val activeAccount: Flow<RedditAccount> =
         accounts.combine(activeAccountId) { accounts, activeId ->
             accounts.firstOrNull { account -> account.id == activeId }
                 ?: RedditAccount.anonymous()
-        }.stateIn(
-            scope = coroutineScope,
-            started = SharingStarted.Eagerly,
-            initialValue = RedditAccount.anonymous()
-        )
+        }
 
     override suspend fun addAccount(account: RedditAccount) {
         Log.d("AccountsRepositoryImpl", "addAccount: $account")
@@ -217,13 +197,10 @@ class AccountsRepositoryImpl(
     }
 
     override suspend fun deleteAccount(accountId: Int) {
-        if (accountId == -1) {
-            return
-        }
         Log.d("AccountsRepositoryImpl", "deleteAccount: $accountId")
         dataStore.updateData { accounts ->
             accounts.copy(
-                activeId = -1,
+                activeId = if (accountId == accounts.activeId) -1 else accounts.activeId,
                 accounts = accounts.accounts.filter { it.id != accountId }
             )
         }

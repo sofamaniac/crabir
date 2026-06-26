@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.sofamaniac.crabir.data.local.dao.AccountsDao
 import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
-import com.sofamaniac.crabir.data.local.dao.MultiDao
-import com.sofamaniac.crabir.data.local.dao.SubredditDao
+import com.sofamaniac.crabir.data.local.dao.MultiRepository
+import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.dao.VotableDao
 import com.sofamaniac.crabir.data.local.database.AccountDatabase
@@ -66,12 +66,12 @@ object DatabaseModule {
     }
 
     @Provides
-    fun subredditDao(database: AppDatabase): SubredditDao {
+    fun subredditDao(database: AppDatabase): SubredditRepository {
         return database.subredditDao()
     }
 
     @Provides
-    fun multiDao(database: AppDatabase): MultiDao {
+    fun multiDao(database: AppDatabase): MultiRepository {
         return database.multiDao()
     }
 

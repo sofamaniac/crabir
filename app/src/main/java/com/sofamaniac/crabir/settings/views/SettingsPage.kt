@@ -25,8 +25,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.sofamaniac.crabir.settings.ui.ListSelector
-import com.sofamaniac.crabir.settings.ui.SwitchTile
+import com.sofamaniac.crabir.settings.helper.ListSelector
+import com.sofamaniac.crabir.settings.helper.SwitchTile
 import kotlinx.coroutines.launch
 
 @Composable

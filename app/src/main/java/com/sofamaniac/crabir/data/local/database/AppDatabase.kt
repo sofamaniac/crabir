@@ -5,8 +5,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.sofamaniac.crabir.data.local.dao.AccountsDao
 import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
-import com.sofamaniac.crabir.data.local.dao.MultiDao
-import com.sofamaniac.crabir.data.local.dao.SubredditDao
+import com.sofamaniac.crabir.data.local.dao.MultiRepository
+import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.dao.VotableDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
@@ -38,7 +38,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun visitedCommunityDao(): CommunityViewDao
     abstract fun votableDao(): VotableDao
 
-    abstract fun subredditDao(): SubredditDao
+    abstract fun subredditDao(): SubredditRepository
 
-    abstract fun multiDao(): MultiDao
+    abstract fun multiDao(): MultiRepository
 }

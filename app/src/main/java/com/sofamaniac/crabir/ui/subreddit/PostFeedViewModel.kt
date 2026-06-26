@@ -16,19 +16,21 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.sofamaniac.crabir.data.local.dao.CommunityDao
-import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
+import com.sofamaniac.crabir.domain.model.CommunityData
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
+import com.sofamaniac.crabir.domain.repository.CommunityRepository
+import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.domain.repository.feed.FeedSource
 import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository
+import com.sofamaniac.crabir.settings.views.Views
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,15 +55,15 @@ interface FeedViewModelInterface<T : VotableData> {
     fun isPostRead(post: PostData): Boolean
 }
 
-abstract class PostFeedViewModel<T>(
-    private val id: Fullname,
+abstract class PostFeedViewModel<T : CommunityData>(
+    private val name: Fullname,
     private val repository: PostFeedRepository<FeedParams>,
     private val visitedPostsDao: VisitedPostsDao,
-    private val communityDao: CommunityDao<T>,
-    private val viewDao: CommunityViewDao,
+    private val communityRepository: CommunityRepository<T>,
+    private val communityView: CommunityViewRepository,
 ) : ViewModel(), FeedViewModelInterface<PostData> {
 
-    override val entity: Flow<CommunityViewEntity?> = viewDao.getCommunityFlow(id)
+    override val entity: Flow<CommunityViewEntity?> = communityView.getCommunityFlow(name)
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -105,11 +107,21 @@ abstract class PostFeedViewModel<T>(
             viewModelScope
         )
 
+    open suspend fun createViewEntity(name: Fullname): CommunityViewEntity {
+        val info = communityRepository.getByName(name)
+        if (info == null) {
+            Log.e("PostFeedViewModel", "Failed to find $name in community repository")
+            return CommunityViewEntity(name, displayName = "")
+        } else {
+            return CommunityViewEntity(name, displayName = info.displayNamePrefixed)
+        }
+    }
+
     fun updateData(data: T?) {
         Log.d("PostFeedViewModel", "updateData: $data")
         if (data == null) return
         viewModelScope.launch(Dispatchers.IO) {
-            communityDao.upsert(data)
+            communityRepository.upsert(data)
         }
     }
 
@@ -125,13 +137,19 @@ abstract class PostFeedViewModel<T>(
         if (needRefresh) {
             Log.d("PostFeedViewModel", "updateSort: Updating sort to $sort")
             viewModelScope.launch(Dispatchers.IO) {
-                val view = (entity.first() ?: CommunityViewEntity(id, displayName = "")).copy(
-                    sort = sort,
-                    timeframe = timeframe
-                )
-                viewDao.upsert(view)
+                val entity = entity.first() ?: createViewEntity(name)
+                val new = entity.copy(sort = sort, timeframe = timeframe)
+                communityView.upsert(new)
             }
             refresh()
+        }
+    }
+
+    fun updateView(view: Views) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val entity = entity.first() ?: createViewEntity(name)
+            val new = entity.copy(view = view)
+            communityView.upsert(new)
         }
     }
 

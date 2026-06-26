@@ -34,11 +34,11 @@ fun CompactView(
             factory.create(post)
         }),
 ) {
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val onClick = {
         if (clickable) {
             markAsRead()
-            navController.navigate(PostRoute(post.permalink))
+            navController?.navigate(PostRoute(post.permalink))
         }
     }
     val likes by viewModel.likes.collectAsState(post.relationship.liked)

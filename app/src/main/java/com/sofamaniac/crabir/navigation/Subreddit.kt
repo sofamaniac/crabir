@@ -17,8 +17,7 @@ fun NavGraphBuilder.subredditGraph(navController: NavController) {
     { navBackStackEntry ->
         val subreddit = navBackStackEntry.toRoute<SubredditRoute>().subreddit
         SubredditViewer(
-            subreddit,
-            animatedVisibilityScope = this@composable
+            subreddit
         )
     }
     composable(
@@ -32,7 +31,7 @@ fun NavGraphBuilder.subredditGraph(navController: NavController) {
     ) { navBackStackEntry ->
         val params = navBackStackEntry.arguments
         val subreddit = params!!.getString("subreddit")!!
-        SubredditViewer(subreddit = subreddit, animatedVisibilityScope = this@composable)
+        SubredditViewer(subreddit = subreddit)
     }
     composable<MultiRoute>(
         typeMap = mapOf(typeOf<Fullname>() to NullableFullnameType)

@@ -36,8 +36,8 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.ui.TabBar
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
-import com.sofamaniac.crabir.ui.subreddit.DefaultPostView
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
+import com.sofamaniac.crabir.ui.subreddit.PostView
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -178,7 +178,7 @@ fun ProfileView(
                                 filter = { true }
                             ) { thing, isMostVisible ->
                                 when (thing) {
-                                    is PostData -> DefaultPostView(
+                                    is PostData -> PostView(
                                         thing,
                                         isMostVisible = isMostVisible,
                                         markAsRead = {

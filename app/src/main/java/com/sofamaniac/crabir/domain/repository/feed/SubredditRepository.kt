@@ -5,7 +5,7 @@
 package com.sofamaniac.crabir.domain.repository.feed
 
 import android.util.Log
-import com.sofamaniac.crabir.data.local.dao.SubredditDao
+import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.SubscribeAction
@@ -19,7 +19,7 @@ import jakarta.inject.Singleton
 
 @Singleton
 class SubredditCache @Inject constructor(
-    private val dao: SubredditDao
+    private val dao: SubredditRepository
 ) {
     suspend fun save(subreddit: SubredditData) {
         dao.upsert(subreddit)

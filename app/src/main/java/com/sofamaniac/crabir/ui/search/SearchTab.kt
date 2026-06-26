@@ -80,10 +80,10 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
-import com.sofamaniac.crabir.settings.ui.ListSelector
+import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.ui.TimeframeMenu
-import com.sofamaniac.crabir.ui.subreddit.DefaultPostView
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
+import com.sofamaniac.crabir.ui.subreddit.PostView
 import com.sofamaniac.crabir.ui.subredditList.Tile
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import dagger.assisted.Assisted
@@ -234,7 +234,7 @@ private fun InnerTab(
 ) {
     val currentAccount = LocalRedditAccount.current
     PostFeedViewer(viewModel) { post, isMosVisible ->
-        DefaultPostView(
+        PostView(
             post, isMostVisible = isMosVisible, markAsRead = {
                 viewModel.visitPost(post, currentAccount.id)
             },

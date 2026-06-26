@@ -38,8 +38,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.settings.ui.SettingHeader
-import com.sofamaniac.crabir.settings.ui.SwitchTile
+import com.sofamaniac.crabir.settings.helper.SettingHeader
+import com.sofamaniac.crabir.settings.helper.SwitchTile
 import kotlinx.coroutines.launch
 
 @Composable

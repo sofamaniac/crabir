@@ -175,7 +175,7 @@ fun NavigationGraph(
         exitTransition = { ExitTransition.None }
     ) {
         composable<HomeRoute> {
-            HomeViewer(animatedVisibilityScope = this@composable)
+            HomeViewer()
         }
 
         profileGraph(navController = navController)
@@ -196,7 +196,7 @@ fun NavigationGraph(
 
         }
         composable<HistoryRoute> {
-            HistoryViewer(animatedVisibilityScope = this@composable)
+            HistoryViewer()
         }
         composable(
             route = "videoPreview?url={url}",

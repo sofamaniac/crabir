@@ -103,4 +103,6 @@
     <string name="search_post_tab">Posts</string>
     <string name="search_communities_tab">Communities</string>
     <string name="search_users_tab">Users</string>
+    <string name="sort_timeframe">%1$s • %2$s</string>
+    <string name="settings">Settings</string>
 </resources>

@@ -4,7 +4,6 @@
 
 package com.sofamaniac.crabir.ui.subreddit
 
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,16 +41,15 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
-import com.sofamaniac.crabir.data.local.dao.SubredditDao
+import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import com.sofamaniac.crabir.domain.repository.feed.SubredditPostsRepository
-import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.SubredditInfoRoute
 import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
+import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.TabBar
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import dagger.assisted.Assisted
@@ -72,27 +69,24 @@ fun SubredditViewer(
     viewModel: SubredditViewModel = hiltViewModel<SubredditViewModel, SubredditViewModel.Factory> { factory ->
         factory.create(subreddit)
     },
-    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val params by viewModel.params.collectAsState()
-    val navController = LocalNavController.current!!
     val feedInfo by viewModel.info.collectAsState()
+    val entity by viewModel.entity.collectAsState(null)
+    val defaultView = rememberViewSettings().defaultView
+    if (feedInfo == null) return
     val topBar = @Composable {
         TopBar(
             subreddit,
             params,
+            name = feedInfo!!.name,
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
-            scrollBehavior = scrollBehavior
-        ) {
-            if (feedInfo == null) return@TopBar
-            IconButton(onClick = {
-                navController.navigate(SubredditInfoRoute(feedInfo!!.name))
-            }) {
-                Icon(Icons.Default.Info, contentDescription = null)
-            }
-        }
+            scrollBehavior = scrollBehavior,
+            view = entity?.view ?: defaultView,
+            updateView = viewModel::updateView
+        )
     }
     val bottomBar = @Composable {
         TabBar(2)
@@ -198,17 +192,17 @@ fun SubredditInfo(info: SubredditData, viewModel: SubredditViewModel) {
 class SubredditViewModel @AssistedInject constructor(
     private val repository: SubredditPostsRepository,
     visitedPostsDao: VisitedPostsDao,
-    communityDao: SubredditDao,
-    viewDao: CommunityViewDao,
+    communityDao: SubredditRepository,
+    viewDao: CommunityViewRepository,
     private val subredditCache: SubredditCache,
     /** Subreddit's fullname */
     @Assisted subredditName: String,
 ) : PostFeedViewModel<SubredditData>(
-    id = Fullname(subredditName),
+    name = Fullname(subredditName),
     repository,
     visitedPostsDao,
     communityDao,
-    viewDao
+    viewDao,
 ) {
 
     val name = Fullname(subredditName)

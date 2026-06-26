@@ -12,12 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
-import com.sofamaniac.crabir.data.local.dao.MultiDao
+import com.sofamaniac.crabir.data.local.dao.MultiRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.remote.dto.MultiData
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.MultiPostsRepository
+import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.TabBar
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -42,14 +43,19 @@ fun MultiView(
     val scope = rememberCoroutineScope()
     val params by viewModel.params.collectAsState()
     val info by viewModel.info.collectAsState()
+    val entity by viewModel.entity.collectAsState(null)
+    val defaultView = rememberViewSettings().defaultView
     if (info == null) return
     val topBar = @Composable {
         TopBar(
             info!!.displayName,
             params,
+            name,
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
-            scrollBehavior = scrollBehavior
+            scrollBehavior = scrollBehavior,
+            view = entity?.view ?: defaultView,
+            updateView = viewModel::updateView
         )
     }
     val bottomBar = @Composable {
@@ -72,15 +78,15 @@ fun MultiView(
 class MultiViewModel @AssistedInject constructor(
     repository: MultiPostsRepository,
     visitedPostsDao: VisitedPostsDao,
-    communityDao: MultiDao,
-    viewDao: CommunityViewDao,
+    communityDao: MultiRepository,
+    viewRepository: CommunityViewRepository,
     @Assisted("name") name: String,
 ) : PostFeedViewModel<MultiData>(
-    id = Fullname(name),
+    name = Fullname(name),
     repository,
     visitedPostsDao,
     communityDao,
-    viewDao
+    viewRepository,
 ) {
 
 

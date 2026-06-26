@@ -9,22 +9,6 @@ import dagger.hilt.android.components.ViewModelComponent
 
 @Module
 @InstallIn(ViewModelComponent::class)
-object ThreadModule {
-
-//    @Provides
-//    fun provideThreadRepository(
-//        api: RedditAPIService,
-//        visitedPostsDao: VisitedPostsDao,
-//        votableRepository: VotableRepository
-//    ): ThreadRepository {
-//        return ThreadRepositoryImpl(api, visitedPostsDao, votableRepository)
-//
-//    }
-
-}
-
-@Module
-@InstallIn(ViewModelComponent::class)
 abstract class ThreadModuleInterface {
     @Binds
     abstract fun bindsThreadRepository(

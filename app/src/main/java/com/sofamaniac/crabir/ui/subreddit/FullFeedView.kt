@@ -77,14 +77,15 @@ fun FullFeedView(
                     filter = filter,
                     modifier = Modifier.padding(innerPadding)
                 ) { post, isMosVisible ->
-                    DefaultPostView(
+                    PostView(
                         post,
                         isMostVisible = isMosVisible,
                         read = viewModel.isPostRead(post),
                         markAsRead = {
                             viewModel.visitPost(post, currentAccount.id)
                         },
-                        showHidden = false
+                        showHidden = false,
+                        view = communityEntity?.view,
                     )
                 }
 

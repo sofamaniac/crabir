@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.settings.ui
+package com.sofamaniac.crabir.settings.helper
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size

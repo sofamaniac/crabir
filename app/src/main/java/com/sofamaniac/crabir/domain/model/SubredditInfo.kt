@@ -9,7 +9,6 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditIcon
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditId
-import com.sofamaniac.crabir.domain.repository.DataInterface
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -47,7 +46,7 @@ data class SubredditData(
     val showMedia: Boolean,
     val description: ParsedMarkdown,
     val userIsMuted: Boolean?,
-    val displayName: String,
+    override val displayName: String,
     val headerImg: String?,
     val title: String,
     val previousNames: List<String>,
@@ -64,7 +63,7 @@ data class SubredditData(
     val subscribers: Int,
     val submitTextLabel: String,
     val linkFlairPosition: String,
-    val displayNamePrefixed: String,
+    override val displayNamePrefixed: String,
     val keyColor: String?,
     val url: String,
     val quarantine: Boolean,
@@ -79,7 +78,7 @@ data class SubredditData(
     val subredditType: String,
     val userIsSubscriber: Boolean = false,
     val userHasFavorited: Boolean = false,
-) : DataInterface {
+) : CommunityData {
     @Ignore
     val icon: SubredditIcon =
         when {

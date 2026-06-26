@@ -4,7 +4,6 @@
 
 package com.sofamaniac.crabir.ui.subreddit
 
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -17,12 +16,14 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
-import com.sofamaniac.crabir.data.local.dao.SubredditDao
+import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
+import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.HomeRepository
+import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.TabBar
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -33,20 +34,25 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeViewer(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel(),
-    animatedVisibilityScope: AnimatedVisibilityScope
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
     val title = stringResource(R.string.Home)
     val params by viewModel.params.collectAsState()
+    val entity by viewModel.entity.collectAsState(null)
+    val defaultView = rememberViewSettings().defaultView
     val topBar = @Composable {
         TopBar(
             title,
             params,
+            name = Fullname("_HOME"),
+            disableInfo = true,
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
-            scrollBehavior = scrollBehavior
+            scrollBehavior = scrollBehavior,
+            updateView = viewModel::updateView,
+            view = entity?.view ?: defaultView
         )
     }
     val bottomBar = @Composable {
@@ -70,14 +76,18 @@ fun HomeViewer(
 class HomeViewModel @Inject constructor(
     repository: HomeRepository,
     visitedPostsDao: VisitedPostsDao,
-    communityDao: SubredditDao,
-    viewDao: CommunityViewDao
+    communityDao: SubredditRepository,
+    viewDao: CommunityViewRepository,
 ) : PostFeedViewModel<SubredditData>(
-    id = Fullname("_HOME"),
+    name = Fullname("_HOME"),
     repository,
     visitedPostsDao,
     communityDao,
-    viewDao
-)
+    viewDao,
+) {
+    override suspend fun createViewEntity(name: Fullname): CommunityViewEntity {
+        return CommunityViewEntity(name = name, displayName = "Home")
+    }
+}
 
 

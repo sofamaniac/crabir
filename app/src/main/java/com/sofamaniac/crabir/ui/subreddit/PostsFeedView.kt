@@ -13,28 +13,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -42,35 +28,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import com.sofamaniac.crabir.LocalDrawerState
-import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.data.remote.dto.Timeframe
-import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
-import com.sofamaniac.crabir.domain.repository.feed.FeedParams
-import com.sofamaniac.crabir.settings.filters.FiltersSettings
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
-import com.sofamaniac.crabir.ui.SortMenu
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.post.CompactView
 import com.sofamaniac.crabir.ui.post.card.PostCard
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
 import kotlin.math.max
 
 /**
@@ -202,88 +177,20 @@ fun <T : VotableData> PostFeedViewer(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(
-    title: String,
-    params: FeedParams,
-    updateSort: (Sort, Timeframe?) -> Unit,
-    refresh: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior?,
-    infoButton: (@Composable () -> Unit)? = null,
-) {
-    val scope = rememberCoroutineScope()
-    val theme = LocalTheme.current
-    val drawerState = LocalDrawerState.current
-
-    TopAppBar(
-        scrollBehavior = scrollBehavior,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = theme.toolbarBackground,
-            scrolledContainerColor = theme.toolbarBackground,
-            titleContentColor = theme.toolbarText,
-        ),
-        title = {
-            Column {
-                Text(title)
-                Row(
-                    modifier = Modifier.padding(horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val sortString = stringResource(params.sort.representation)
-                    val timeString = params.timeframe?.let { stringResource(it.representation) }
-                    val fullString = if (params.timeframe != null) {
-                        "$sortString • $timeString"
-                    } else {
-                        sortString
-                    }
-                    Text(fullString, style = MaterialTheme.typography.labelSmall)
-                }
-            }
-        },
-        navigationIcon = {
-            IconButton(onClick = {
-                scope.launch { drawerState.open() }
-            }) { Icon(Icons.Default.Menu, "Open Drawer") }
-        },
-        actions = {
-            // Sort Dropdown
-            var showMenu by remember { mutableStateOf(false) }
-            IconButton(onClick = { showMenu = !showMenu }) {
-                Icon(Icons.Filled.MoreVert, "Options")
-            }
-
-            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                // TODO
-                DropdownMenuItem(onClick = { }, text = { Text("Settings") })
-                DropdownMenuItem(onClick = { }, text = { Text("Info") })
-                DropdownMenuItem(onClick = { refresh() }, text = { Text("Refresh") })
-            }
-            infoButton?.invoke()
-            SortMenu<Sort> { sort, timeframe ->
-                updateSort(sort, timeframe)
-            }
-        }
-    )
-}
-
-@Composable
-fun DefaultPostView(
+fun PostView(
     thing: PostData,
     isMostVisible: Boolean,
     read: Boolean,
     markAsRead: () -> Unit,
     showHidden: Boolean,
+    view: Views,
 ) {
-
-    val viewSettings = rememberViewSettings()
-    val canStartVideo =
-        viewSettings.defaultColumns == 1 && isMostVisible
-    when (viewSettings.defaultView) {
+    when (view) {
         Views.Card -> PostCard(
             thing,
             markAsRead = markAsRead,
-            canStartVideo = canStartVideo,
+            canStartVideo = isMostVisible,
             read = read,
             showHidden = showHidden,
         )
@@ -291,26 +198,23 @@ fun DefaultPostView(
         Views.Compact -> CompactView(
             thing,
             markAsRead = markAsRead,
-            canStartVideo = canStartVideo,
+            canStartVideo = isMostVisible,
             read = read,
             showHidden = showHidden,
         )
-
-        else ->
-            PostCard(
-                thing,
-                markAsRead = markAsRead,
-                read = read,
-                canStartVideo = canStartVideo,
-                showHidden = showHidden,
-            )
     }
 }
 
-private fun FiltersSettings.filter(post: PostData): Boolean {
-    return titleFilters.any { Regex(it).matches(post.title) }
-            || domainFilters.any { Regex(it).matches(post.url) }
-            || subredditFilters.any { Regex(it).matches(post.subreddit.name) }
-            || authorFilters.any { Regex(it).matches(post.author.username) }
-            || flairFilters.any { Regex(it).matches(post.linkFlair.text) }
+@Composable
+fun PostView(
+    thing: PostData,
+    isMostVisible: Boolean,
+    read: Boolean,
+    markAsRead: () -> Unit,
+    showHidden: Boolean,
+    view: Views? = null
+) {
+    val viewSettings = rememberViewSettings()
+    val view = if (!viewSettings.rememberView) viewSettings.defaultView else view
+    PostView(thing, isMostVisible, read, markAsRead, showHidden, view ?: viewSettings.defaultView)
 }

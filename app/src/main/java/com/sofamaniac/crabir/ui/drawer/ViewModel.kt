@@ -13,8 +13,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.BuildConfig
-import com.sofamaniac.crabir.data.local.dao.MultiDao
-import com.sofamaniac.crabir.data.local.dao.SubredditDao
+import com.sofamaniac.crabir.data.local.dao.MultiRepository
+import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.remote.dto.MultiData
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
@@ -58,8 +58,8 @@ class DrawerViewModel @Inject constructor(
     private val accountsRepository: AccountsRepository,
     private val subsRepository: SubscriptionsRepository,
     private val redditApi: RedditAPIService,
-    private val subredditDao: SubredditDao,
-    private val multiDao: MultiDao,
+    private val subredditDao: SubredditRepository,
+    private val multiDao: MultiRepository,
 ) : ViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()

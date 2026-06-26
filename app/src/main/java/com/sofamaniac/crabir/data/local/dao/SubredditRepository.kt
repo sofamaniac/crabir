@@ -10,6 +10,7 @@ import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.MultiData
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.repository.CommunityRepository
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -30,18 +31,8 @@ interface CommunityViewDao {
     suspend fun update(entity: CommunityViewEntity)
 }
 
-interface CommunityDao<T> {
-    suspend fun insert(community: T)
-
-    suspend fun upsert(entity: T)
-
-    suspend fun getByName(name: Fullname): T?
-
-    suspend fun deleteAll()
-}
-
 @Dao
-interface SubredditDao : CommunityDao<SubredditData> {
+interface SubredditRepository : CommunityRepository<SubredditData> {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     override suspend fun insert(community: SubredditData)
 
@@ -63,7 +54,7 @@ interface SubredditDao : CommunityDao<SubredditData> {
 }
 
 @Dao
-interface MultiDao : CommunityDao<MultiData> {
+interface MultiRepository : CommunityRepository<MultiData> {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     override suspend fun insert(community: MultiData)
 
