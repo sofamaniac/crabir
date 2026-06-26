@@ -22,6 +22,7 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.navigation.NavController
 import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.m3.Markdown
@@ -151,20 +152,24 @@ private fun InnerRedditMarkdown(
 
 @Composable
 fun redditLinkHandler(): LinkInteractionListener {
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val uriHandler = LocalUriHandler.current
     return LinkInteractionListener { link ->
         Log.d("redditLinkHandler", "redditLinkHandler: $link")
         if (link is LinkAnnotation.Url) {
-            try {
-                Log.d("redditLinkHandler", "navigating to : ${link.url.toLocalUrl()}")
-                navController.navigate(link.url.toLocalUrl())
-                //uriHandler.openUri(link.url)
-            } catch (e: IllegalArgumentException) {
-                Log.i("redditLinkHandler", "failed to open link in app: $e")
-                uriHandler.openUri(link.url)
-            }
+            openLink(navController, uriHandler, link.url)
         }
+    }
+}
+
+private fun openLink(navController: NavController?, uriHandler: UriHandler, link: String) {
+    try {
+        Log.d("redditLinkHandler", "navigating to : ${link.toLocalUrl()}")
+        navController?.navigate(link.toLocalUrl().replace("//", "/"))
+        //uriHandler.openUri(link.url)
+    } catch (e: IllegalArgumentException) {
+        Log.i("redditLinkHandler", "failed to open link in app: $e")
+        uriHandler.openUri(link)
     }
 }
 
@@ -174,14 +179,7 @@ fun redditUriHandler(): UriHandler {
     val uriHandler = LocalUriHandler.current
     return object : UriHandler {
         override fun openUri(uri: String) {
-            try {
-                Log.d("redditUriHandler", "navigating to : ${uri.toLocalUrl()}")
-                navController!!.navigate(uri.toLocalUrl())
-                //uriHandler.openUri(link.url)
-            } catch (e: IllegalArgumentException) {
-                Log.i("redditUriHandler", "failed to open link in app: $e")
-                uriHandler.openUri(uri)
-            }
+            openLink(navController, uriHandler, uri)
         }
     }
 }

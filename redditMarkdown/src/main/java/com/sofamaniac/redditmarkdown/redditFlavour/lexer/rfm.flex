@@ -245,7 +245,7 @@ PATH=({PATH_PART}+ | ("(" {PATH_PART}* ")"? {PATH_PART}*)) ("(" {PATH_PART}* ")"
 // See pushbackAutolink method
 GFM_AUTOLINK = (("http" "s"? | "ftp" | "file")"://" | "www.") {HOST_PART} ("." {HOST_PART})* (":" [0-9]+)? ("/" {PATH})? "/"?
 
-REDDIT_AUTOLINK_CONTENT = "/"? [ru] "/" [a-zA-Z0-9_-]{2,24}
+REDDIT_AUTOLINK_CONTENT = "/"? [ru] "/" [a-zA-Z0-9_-]{2,24} ("/" {PATH})? "/"?
 
 REDDIT_AUTOLINK = {REDDIT_AUTOLINK_CONTENT}
 
