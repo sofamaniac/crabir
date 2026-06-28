@@ -205,7 +205,8 @@ fun PostCreator(
             onSelect = { flair ->
                 viewModel.state = viewModel.state.copy(flairId = flair.id)
             },
-            onClickEdit = {
+            onClickEdit = { flair ->
+                viewModel.state = viewModel.state.copy(flairId = flair.id)
                 showFlairEdit = true
             },
             onDismiss = { showFlairDialog = false }
