@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ShapeDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,10 +21,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.navigation.CommentCreatorRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.ui.ThemedCard
-import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import com.sofamaniac.crabir.ui.post.BottomRow
 import com.sofamaniac.crabir.ui.post.LinkViewModel
 import com.sofamaniac.crabir.ui.post.PostHeader
@@ -104,39 +103,32 @@ fun PostCard(
     body: @Composable ColumnScope.() -> Unit,
 ) {
     val likes by viewModel.likes.collectAsState(null)
+    val navController = LocalNavController.current
     val modifier = modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
 
     ThemedCard(
-            shape = RoundedCornerShape(0),
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            PostHeader(
-                post,
-                modifier = modifier.padding(vertical = 8.dp)
-            )
-            val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
-            PostInfo(
-                post,
-                modifier = modifier,
-                enableThumbnail = enablePreview && !post.isCrosspost,
-                likes = likes
-            )
-            body()
-            BottomRow(post, modifier, interactions = viewModel) {
-                ReplyButton(parentId = post.name, submitComment = threadViewModel::submitComment) {
-                    ThemedCard(modifier = Modifier.padding(all = 16.dp)) {
-                        Text(post.author.username, modifier = modifier)
-                        Text(post.title, modifier = modifier)
-                        RedditMarkdown(
-                            post.selftext.markdown,
-                            maxLines = 5,
-                            modifier = modifier,
-                        )
-                    }
-                }
-            }
+        shape = RoundedCornerShape(0),
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        PostHeader(
+            post,
+            modifier = modifier.padding(vertical = 8.dp)
+        )
+        val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
+        PostInfo(
+            post,
+            modifier = modifier,
+            enableThumbnail = enablePreview && !post.isCrosspost,
+            likes = likes
+        )
+        body()
+        BottomRow(post, modifier, interactions = viewModel) {
+            ReplyButton(onClick = {
+                navController?.navigate(CommentCreatorRoute(post.name))
+            })
         }
+    }
 }

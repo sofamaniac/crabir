@@ -16,7 +16,7 @@ interface VotableRepository<T : VotableData> {
 
     val api: RedditAPIService
     val votableDao: VotableDao
-    fun insert(things: List<T>) {
+    fun insert(things: Iterable<T>) {
         for (thing in things) {
             votableDao.insert(thing.toEntity())
         }
@@ -31,6 +31,10 @@ interface VotableRepository<T : VotableData> {
 
     fun update(name: Fullname, data: VotableData) {
         votableDao.update(name, data.toEntity().data)
+    }
+
+    fun clear() {
+        votableDao.clear()
     }
 
     suspend fun delete(name: Fullname) {
@@ -73,7 +77,7 @@ interface VotableRepository<T : VotableData> {
         }
     }
 
-    suspend fun vote(name: Fullname, upvote: Boolean): Result<Unit> {
+    suspend fun vote(name: Fullname, upvote: Boolean?): Result<Unit> {
         val thing: VotableData? = get(name).first()
         if (thing == null) {
             Log.e("PostRepository", "Post not found in cache")

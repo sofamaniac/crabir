@@ -1,8 +1,9 @@
-package com.sofamaniac.crabir.ui.markdown
+package com.sofamaniac.crabir.ui.editor
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -33,10 +34,10 @@ import com.sofamaniac.crabir.LocalTheme
 @Composable
 fun Editor(
     state: TextFieldState,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.Companion,
     snackbarHostState: SnackbarHostState? = null,
     topBar: @Composable () -> Unit = {},
-    beforeEditor: @Composable () -> Unit = {},
+    beforeEditor: @Composable ColumnScope.() -> Unit = {},
 ) {
     val theme = LocalTheme.current
     Scaffold(

@@ -24,9 +24,9 @@ import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.ui.editor.postEditor.FlairDialog
+import com.sofamaniac.crabir.ui.editor.postEditor.FlairEditBox
 import com.sofamaniac.crabir.ui.post.LinkInteraction
-import com.sofamaniac.crabir.ui.postEditor.FlairDialog
-import com.sofamaniac.crabir.ui.postEditor.FlairEditBox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

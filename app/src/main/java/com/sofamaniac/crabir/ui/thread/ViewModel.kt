@@ -33,7 +33,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -58,10 +57,11 @@ class ThreadViewModel @AssistedInject constructor(
     private var _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
-    private var _comments = MutableStateFlow<List<CommentType>>(emptyList())
-    val comments: StateFlow<List<CommentType>> = _comments.asStateFlow()
+    //private var _comments = MutableStateFlow<List<CommentType>>(emptyList())
+    //val comments: StateFlow<List<CommentType>> = _comments.asStateFlow()
     private var _post = MutableStateFlow<PostData?>(null)
     override val post: Flow<PostData?> = _post.asStateFlow()
+    val comments = repository.comments
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override var markdown: StateFlow<State> = _post.flatMapLatest { post ->
@@ -76,7 +76,8 @@ class ThreadViewModel @AssistedInject constructor(
     private val _markdownComments: MutableMap<Fullname, StateFlow<State>> = mutableMapOf()
     override fun getMarkdownState(name: Fullname): StateFlow<State> {
         if (!_markdownComments.contains(name)) {
-            val comment = _comments.value.findComment(name)!!
+            //val comment = _comments.value.findComment(name)!!
+            val comment = comments.value.find { it.name == name } as CommentType.Comment
             _markdownComments[name] =
                 parseMarkdownFlow(
                     comment.comment.body.markdown,
@@ -170,23 +171,31 @@ class ThreadViewModel @AssistedInject constructor(
 
     fun collapseComment(name: Fullname, collapsed: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            _comments.update { comments ->
-                comments.updateComment(name) {
-                    val comment = (it as CommentType.Comment).comment
-                    CommentType.Comment(comment.copy(collapsed = collapsed))
-                }
-            }
+
+            val comment =
+                (comments.value.find { it.name == name } as CommentType.Comment).comment
+            repository.updateComment(
+                name,
+                CommentType.Comment(comment.copy(collapsed = collapsed))
+            )
+//            _comments.update { comments ->
+//                comments.updateComment(name) {
+//                    val comment = (it as CommentType.Comment).comment
+//                    CommentType.Comment(comment.copy(collapsed = collapsed))
+//                }
+//            }
         }
     }
 
     private suspend fun fetchAsync() {
         _isRefreshing.value = true
-        _comments.value = repository.getComments(
+        repository.getComments(
             permalink,
             sort = _sort.value,
             comment = comment,
             context = context
         )
+        Log.d("ThreadViewModel", "commentFlow: ${comments.value.count()}")
         // If post was not found set it here.
         _post.value = getPost() ?: _post.value
         _sort.value = _sort.value ?: _post.value?.suggestedSort
@@ -201,7 +210,7 @@ class ThreadViewModel @AssistedInject constructor(
 
     fun fetchMoreComments(more: CommentType.More) {
         viewModelScope.launch(Dispatchers.IO) {
-            _comments.value = repository.getMoreComments(more)
+            repository.getMoreComments(more)
         }
     }
 
@@ -213,7 +222,6 @@ class ThreadViewModel @AssistedInject constructor(
 
     fun refresh() {
         repository.refresh()
-        _comments.value = emptyList()
         fetchComments()
     }
 
@@ -228,77 +236,70 @@ class ThreadViewModel @AssistedInject constructor(
             var commentData = CommentDataMapper.map(commentDTO.data)
             commentData =
                 commentData.copy(relationship = commentData.relationship.copy(liked = true))
-            if (parent == _post.value?.name) {
-                _comments.update {
-                    it + CommentType.Comment(commentData.copy(depth = 0))
-                }
-            } else {
-                _comments.update {
-                    it.updateComment(parent) { c ->
-                        c as CommentType.Comment
-                        val replies =
-                            c.comment.replies + CommentType.Comment(commentData.copy(depth = c.depth + 1))
-                        c.copy(comment = c.comment.copy(replies = replies))
-                    }
-                }
-            }
+            // TODO
+//            if (parent == _post.value?.name) {
+//                _comments.update {
+//                    it + CommentType.Comment(commentData.copy(depth = 0))
+//                }
+//            } else {
+//                _comments.update {
+//                    it.updateComment(parent) { c ->
+//                        c as CommentType.Comment
+//                        val replies =
+//                            c.comment.replies + CommentType.Comment(commentData.copy(depth = c.depth + 1))
+//                        c.copy(comment = c.comment.copy(replies = replies))
+//                    }
+//                }
+//            }
         }
     }
 
     override fun upvote(name: Fullname) {
         viewModelScope.launch(Dispatchers.IO) {
-            val likes = comments.value.findComment(name)?.comment?.relationship?.liked
+            val comment = repository.comments.value.find { it.name == name }
+            val likes = comment?.relationship?.liked
             if (likes != true) {
                 repository.upvote(name)
             } else {
                 repository.neutralVote(name)
             }
-            _comments.update {
-                it.updateComment(name) { c ->
-                    val comment = (c as CommentType.Comment).comment
-                    val newLikes = if (likes != true) {
-                        true
-                    } else {
-                        null
-                    }
-                    CommentType.Comment(
-                        comment.copy(
-                            relationship = comment.relationship.copy(
-                                liked = newLikes
-                            )
-                        ).updateScore(likes, newLikes)
-                    )
-                }
+            val newLikes = if (likes != true) {
+                true
+            } else {
+                null
             }
+            val newComment =
+                comment!!.copy(
+                    relationship = comment.relationship.copy(
+                        liked = newLikes
+                    )
+                ).updateScore(likes, newLikes)
+            repository.updateComment(comment.name, newComment as CommentType)
 
         }
     }
 
     override fun downvote(name: Fullname) {
         viewModelScope.launch(Dispatchers.IO) {
-            val likes = comments.value.findComment(name)?.comment?.relationship?.liked
+            val comment = repository.comments.value.find { it.name == name }
+            val likes = comment?.relationship?.liked
             if (likes != false) {
                 repository.downvote(name)
             } else {
                 repository.neutralVote(name)
             }
-            _comments.update {
-                it.updateComment(name) { c ->
-                    val comment = (c as CommentType.Comment).comment
-                    val newLikes = if (likes != false) {
-                        false
-                    } else {
-                        null
-                    }
-                    CommentType.Comment(
-                        comment.copy(
-                            relationship = comment.relationship.copy(
-                                liked = newLikes
-                            )
-                        ).updateScore(likes, newLikes)
-                    )
-                }
+            val newLikes = if (likes != false) {
+                false
+            } else {
+                null
             }
+            val newComment =
+                comment!!.copy(
+                    relationship = comment.relationship.copy(
+                        liked = newLikes
+                    )
+                ).updateScore(likes, newLikes)
+            repository.updateComment(comment.name, newComment as CommentType)
         }
     }
 
@@ -309,20 +310,14 @@ class ThreadViewModel @AssistedInject constructor(
             } else {
                 repository.unsave(name)
             }
-        }
-        _comments.update {
-            it.updateComment(name) { c ->
-                val comment = (c as CommentType.Comment).comment
-                CommentType.Comment(
-                    comment.copy(
-                        relationship = comment.relationship.copy(
-                            saved = target
-                        )
-                    )
+            val comment = repository.comments.value.find { it.name == name }!!
+            val newComment = comment.copy(
+                relationship = comment.relationship.copy(
+                    saved = target
                 )
-            }
+            )
+            repository.updateComment(name, newComment as CommentType)
         }
-
     }
 
     fun visitPost(post: PostData, visitedBy: Int) {
@@ -351,51 +346,51 @@ class ThreadViewModel @AssistedInject constructor(
     }
 }
 
-fun List<CommentType>.updateComment(
-    name: Fullname,
-    update: (CommentType) -> CommentType
-): List<CommentType> {
-    return map { comment ->
-        when {
-            comment.name == name -> update(comment)
-            comment is CommentType.Comment ->
-                CommentType.Comment(
-                    comment.comment.updateReplies(
-                        replies = comment.comment.replies.updateComment(
-                            name,
-                            update
-                        )
-                    )
-                )
-
-            else -> comment
-        }
-    }
-
-}
-
-fun List<CommentType>.count(): Int {
-    return this.sumOf {
-        1 + when (it) {
-            is CommentType.Comment -> it.comment.replies.count()
-            is CommentType.More -> 1
-        }
-    }
-}
-
-fun List<CommentType>.findComment(name: Fullname): CommentType.Comment? {
-    for (comment in this) {
-        if (comment.name == name && comment is CommentType.Comment) {
-            return comment
-        }
-    }
-    for (comment in this) {
-        if (comment is CommentType.Comment) {
-            val res = comment.comment.replies.findComment(name)
-            if (res != null) {
-                return res
-            }
-        }
-    }
-    return null
-}
+//fun List<CommentType>.updateComment(
+//    name: Fullname,
+//    update: (CommentType) -> CommentType
+//): List<CommentType> {
+//    return map { comment ->
+//        when {
+//            comment.name == name -> update(comment)
+//            comment is CommentType.Comment ->
+//                CommentType.Comment(
+//                    comment.comment.updateReplies(
+//                        replies = comment.comment.replies.updateComment(
+//                            name,
+//                            update
+//                        )
+//                    )
+//                )
+//
+//            else -> comment
+//        }
+//    }
+//
+//}
+//
+//fun List<CommentType>.count(): Int {
+//    return this.sumOf {
+//        1 + when (it) {
+//            is CommentType.Comment -> it.comment.replies.count()
+//            is CommentType.More -> 1
+//        }
+//    }
+//}
+//
+//fun List<CommentType>.findComment(name: Fullname): CommentType.Comment? {
+//    for (comment in this) {
+//        if (comment.name == name && comment is CommentType.Comment) {
+//            return comment
+//        }
+//    }
+//    for (comment in this) {
+//        if (comment is CommentType.Comment) {
+//            val res = comment.comment.replies.findComment(name)
+//            if (res != null) {
+//                return res
+//            }
+//        }
+//    }
+//    return null
+//}

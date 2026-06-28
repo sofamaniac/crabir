@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui.postEditor
+package com.sofamaniac.crabir.ui.editor.postEditor
 
 import android.content.Context
 import android.net.Uri
@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
-import com.sofamaniac.crabir.data.remote.reddit.CrosspostSubmissionBuilder
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.GalleryItem
 import com.sofamaniac.crabir.data.remote.reddit.MediaUploadInterface
@@ -24,10 +23,6 @@ import com.sofamaniac.crabir.data.remote.reddit.makeMediaUploadBody
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.SubredditData
-import com.sofamaniac.crabir.domain.repository.LinksRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -192,59 +187,6 @@ class PostCreatorViewModel @Inject constructor(
                 Result.failure(Exception("Failed to submit post: ${res.errorBody()}"))
             }
         }
-    }
-}
-
-@HiltViewModel(assistedFactory = CrosspostCreatorViewModel.Factory::class)
-class CrosspostCreatorViewModel @AssistedInject constructor(
-    @Assisted val parentFullname: String,
-    api: RedditAPIService,
-    communities: SubredditRepository,
-    linksRepository: LinksRepository,
-) : CreatorViewModel(api, communities) {
-    var state by mutableStateOf(
-        CrosspostSubmissionBuilder(
-            crosspostFullname = Fullname(
-                parentFullname
-            )
-        )
-    )
-    val post = linksRepository.get(Fullname(parentFullname))
-
-    var loading by mutableStateOf(false)
-
-    suspend fun submit(): Result<Unit> {
-        loading = true
-        state = state.copy(
-            title = titleState.text as String,
-            subreddit = community?.displayName ?: ""
-        )
-        val submission = state.build()
-        if (submission.isFailure) {
-            Log.e("PostCreatorViewModel", "submit: ${submission.exceptionOrNull()}")
-            error = submission.exceptionOrNull() as SubmissionBuilderError?
-            loading = false
-            return Result.failure(error!!)
-        } else {
-            val res = api.submitPost(submission.getOrThrow())
-            loading = false
-            return if (res.isSuccessful) {
-                val response = res.body()
-                Log.d("PostCreatorViewModel", "submit: $response")
-                if (response?.json?.errors?.isNotEmpty() == true) {
-                    Result.failure(Exception(response.json.errors.toString()))
-                } else {
-                    Result.success(Unit)
-                }
-            } else {
-                Result.failure(Exception("Failed to submit post: ${res.errorBody()}"))
-            }
-        }
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(parentFullname: String): CrosspostCreatorViewModel
     }
 }
 

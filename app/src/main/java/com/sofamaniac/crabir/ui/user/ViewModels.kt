@@ -20,7 +20,7 @@ import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
-import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
@@ -106,7 +106,7 @@ class CommentsViewModel @AssistedInject constructor(
     @Assisted username: String,
     repository: CommentsRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel<CommentData>(username, repository, visitedPostsDao), SortProfileTab {
+) : ProfileFeedViewModel<CommentType>(username, repository, visitedPostsDao), SortProfileTab {
     @AssistedFactory
     interface Factory {
         fun create(username: String): CommentsViewModel

@@ -9,7 +9,7 @@ import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
-import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
@@ -60,11 +60,11 @@ abstract class PostFeedRepository<Params> : FeedRepositoryCommon<Params, PostDat
     }
 }
 
-abstract class CommentFeedRepository<Params> : FeedRepositoryCommon<Params, CommentData>() {
-    override fun thingToData(thing: Thing): CommentData? {
+abstract class CommentFeedRepository<Params> : FeedRepositoryCommon<Params, CommentType>() {
+    override fun thingToData(thing: Thing): CommentType? {
         return when (thing) {
             is Thing.Comment -> {
-                CommentDataMapper.map(thing.data)
+                CommentType.Comment(CommentDataMapper.map(thing.data))
             }
 
             else -> {

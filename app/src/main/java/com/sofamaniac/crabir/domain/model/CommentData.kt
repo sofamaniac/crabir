@@ -8,11 +8,49 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 
 @Serializable
-sealed class CommentType() {
-    data class Comment(val comment: CommentData) : CommentType()
-    data class More(val data: MoreData) : CommentType()
+sealed class CommentType : VotableData {
+    @Serializable
+    data class Comment(val comment: CommentData) : CommentType() {
+        override fun copy(
+            relationship: Relationship?,
+            score: Score?
+        ): VotableData {
+            return copy(comment = comment.copy(relationship = relationship, score = score))
+        }
 
-    val name: Fullname
+        override val relationship: Relationship = comment.relationship
+        override val score: Score = comment.score
+        override val body: ParsedMarkdown = comment.body
+
+        override fun toEntity(): VotableEntity {
+            return VotableEntity(id = comment.name, data = Json.encodeToString(this))
+        }
+
+        override val id: String = comment.id
+    }
+
+    @Serializable
+    data class More(val data: MoreData) : CommentType() {
+        override fun copy(
+            relationship: Relationship?,
+            score: Score?
+        ): VotableData {
+            return this
+        }
+
+        override val relationship: Relationship = throw Exception("More has no relationship")
+        override val score: Score = throw Exception("More has no score")
+        override val body: ParsedMarkdown = throw Exception("More has no body")
+
+        override fun toEntity(): VotableEntity {
+            return VotableEntity(id = data.name, data = Json.encodeToString(this))
+        }
+
+        override val id: String
+            get() = TODO("Not yet implemented")
+    }
+
+    override val name: Fullname
         get() =
             when (this) {
                 is Comment -> comment.name
@@ -44,7 +82,8 @@ data class CommentData(
     val bodyHtml: String,
     val parentId: Fullname,
     val permalink: String,
-    val replies: List<CommentType>,
+    val replies: Int,
+    //val replies: List<CommentType>,
     val author: AuthorInfo,
     val isSubmitter: Boolean,
     override val relationship: Relationship,
@@ -64,7 +103,7 @@ data class CommentData(
         return super.updateScore(oldLikes, newLikes) as CommentData
     }
 
-    fun updateReplies(replies: List<CommentType>): CommentData = copy(replies = replies)
+    //fun updateReplies(replies: List<CommentType>): CommentData = copy(replies = replies)
 
     override fun toEntity(): VotableEntity {
         return VotableEntity(

@@ -24,4 +24,7 @@ interface VotableDao {
 
     @Query("DELETE FROM votableTable WHERE id = :id")
     fun delete(id: Fullname)
+
+    @Query("DELETE FROM votableTable")
+    fun clear()
 }

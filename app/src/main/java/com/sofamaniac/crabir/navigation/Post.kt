@@ -14,27 +14,17 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.toRoute
-import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.Kind
-import com.sofamaniac.crabir.ui.postEditor.CrosspostCreator
-import com.sofamaniac.crabir.ui.postEditor.PostCreator
 import com.sofamaniac.crabir.ui.thread.ThreadView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import kotlin.reflect.typeOf
 
 @Serializable
 class PostRoute(val postPermalink: String, val comment: String? = null, val context: Int? = null) :
     Route
 
-@Serializable
-class PostCreatorRoute(val kind: Kind, val communityId: Fullname?) : Route
-
-@Serializable
-class CrosspostCreatorRoute(val post: Fullname) : Route
 
 
 private const val ROUTE = "/r/{subreddit}/comments/{id}/{title}"
@@ -141,22 +131,6 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
             context = route.context,
             dismiss = { navController.popBackStack() }
         )
-    }
-
-    composable<PostCreatorRoute>(
-        typeMap = mapOf(typeOf<Fullname?>() to NullableFullnameType)
-    ) {
-        val route = it.toRoute<PostCreatorRoute>()
-        PostCreator(kind = route.kind, communityId = route.communityId, onDismissRequest = {
-            navController.popBackStack()
-        })
-    }
-
-    composable<CrosspostCreatorRoute>(
-        typeMap = mapOf(typeOf<Fullname>() to FullnameType)
-    ) {
-        val route = it.toRoute<CrosspostCreatorRoute>()
-        CrosspostCreator(route.post)
     }
 
 }

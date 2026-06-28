@@ -146,13 +146,16 @@ object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
         CommentData::permalink fromProperty from::permalink
         CommentData::score fromValue from.toScore()
         CommentData::subredditInfo fromValue from.toSubredditInfo()
-        CommentData::replies fromValue from.mapReplies()
+        //CommentData::replies fromValue from.mapReplies()
+        CommentData::replies fromValue from.countReplies()
         CommentData::createdUtc fromProperty from::created_utc
         CommentData::mediaMetadata fromProperty from::media_metadata
         CommentData::isSubmitter fromProperty from::is_submitter
     }
 
 }
+
+private fun CommentDTO.countReplies(): Int = replies.size
 
 private fun CommentDTO.mapReplies(): List<CommentType> = replies.data.children.map {
     when (it) {
@@ -161,6 +164,7 @@ private fun CommentDTO.mapReplies(): List<CommentType> = replies.data.children.m
         else -> throw IllegalArgumentException("Unknown comment type: ${it.javaClass.name}")
     }
 }
+
 private fun CommentDTO.markdown(): ParsedMarkdown {
     return ParsedMarkdown(body, media_metadata)
 }

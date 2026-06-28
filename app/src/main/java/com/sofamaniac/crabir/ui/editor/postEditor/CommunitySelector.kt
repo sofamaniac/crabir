@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui.postEditor
+package com.sofamaniac.crabir.ui.editor.postEditor
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable

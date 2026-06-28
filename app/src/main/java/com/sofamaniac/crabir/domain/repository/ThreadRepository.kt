@@ -1,37 +1,41 @@
 package com.sofamaniac.crabir.domain.repository
 
+import android.util.Log
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
-import com.sofamaniac.crabir.data.remote.reddit.DOWNVOTED
 import com.sofamaniac.crabir.data.remote.reddit.MoreResponseOuter
-import com.sofamaniac.crabir.data.remote.reddit.NEUTRAL
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
-import com.sofamaniac.crabir.data.remote.reddit.UPVOTED
 import com.sofamaniac.crabir.data.remote.reddit.postCommentBody
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.ui.thread.updateComment
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import retrofit2.Response
 import javax.inject.Inject
 
 interface ThreadRepository {
+
+    val comments: StateFlow<Iterable<CommentType>>
     suspend fun getComments(
         permalink: String,
         sort: Sort? = null,
         timeframe: Timeframe? = null,
         comment: String? = null,
         context: Int? = null,
-    ): List<CommentType>
+    ): Unit
 
     suspend fun getPost(name: Fullname): PostData?
-    suspend fun getMoreComments(more: CommentType.More): List<CommentType>
+    suspend fun getMoreComments(more: CommentType.More): Unit
 
     suspend fun postComment(parentId: Fullname, comment: String): Response<MoreResponseOuter>
+
+    suspend fun updateComment(name: Fullname, value: CommentType)
 
     /** Extract fullname from post permalink. */
     fun getPostId(permalink: String): Fullname
@@ -47,6 +51,100 @@ interface ThreadRepository {
 
 }
 
+class Forest private constructor(
+    val comments: Map<Fullname, CommentType>,
+    val next: Map<Fullname, Fullname>,
+    val root: Fullname
+) : Iterable<CommentType> {
+    companion object {
+        fun empty(): Forest {
+            return Forest(emptyMap(), emptyMap(), Fullname("EmptyForest"))
+        }
+
+        fun create(l: List<Thing>, root: Fullname, initialCapacity: Int): Forest {
+            val stack = ArrayDeque<Thing>(initialCapacity)
+            val comments = mutableMapOf<Fullname, CommentType>()
+            val next = mutableMapOf<Fullname, Fullname>()
+            for (comment in l.reversed()) {
+                stack.addLast(comment)
+            }
+            var lastSeen: Fullname = root
+            while (stack.isNotEmpty()) {
+                val current = stack.removeLast()
+                val comment = when (current) {
+                    is Thing.Comment -> CommentType.Comment(CommentDataMapper.map(current.data))
+                    is Thing.More -> CommentType.More(current.data)
+                    else -> continue
+                }
+                next[lastSeen] = current.name
+                comments[current.name] = comment
+                lastSeen = current.name
+                if (current is Thing.Comment) {
+                    for (child in current.data.replies.reversed()) {
+                        stack.addLast(child)
+                    }
+                }
+            }
+            return Forest(comments, next, root)
+        }
+    }
+
+    fun updateComment(name: Fullname, value: CommentType): Forest {
+        val newTable = comments + (
+                name to value
+                )
+        return Forest(newTable, next, root)
+    }
+
+    fun insert(root: Fullname, l: List<Thing>, initialCapacity: Int): Forest {
+        val stack = ArrayDeque<Thing>(initialCapacity)
+        val comments = this.comments.toMutableMap()
+        val next = this.next.toMutableMap()
+        for (comment in l.reversed()) {
+            stack.addLast(comment)
+        }
+        var lastSeen: Fullname = root
+        val endNext = next[root]
+        while (stack.isNotEmpty()) {
+            val current = stack.removeLast()
+            val comment = when (current) {
+                is Thing.Comment -> CommentType.Comment(CommentDataMapper.map(current.data))
+                is Thing.More -> CommentType.More(current.data)
+                else -> continue
+            }
+            next[lastSeen] = current.name
+            comments[current.name] = comment
+            lastSeen = current.name
+            if (current is Thing.Comment) {
+                for (child in current.data.replies.reversed()) {
+                    stack.addLast(child)
+                }
+            }
+        }
+        endNext?.let {
+            next[lastSeen] = it
+        }
+        return Forest(comments, next, this.root)
+    }
+
+    override fun iterator(): Iterator<CommentType> {
+        return object : Iterator<CommentType> {
+            var current = this@Forest.root
+            override fun next(): CommentType {
+                Log.d("ForestIterator", "$current -> $next")
+                val next = this@Forest.next[current]
+                if (next == null) throw NoSuchElementException()
+                current = next
+                return this@Forest.comments[next] ?: throw NoSuchElementException()
+            }
+
+            override fun hasNext(): Boolean {
+                return this@Forest.next[current] != null
+            }
+        }
+    }
+}
+
 class ThreadRepositoryImpl @Inject constructor(
     val api: RedditAPIService,
     val visitedPostsDao: VisitedPostsDao,
@@ -55,7 +153,9 @@ class ThreadRepositoryImpl @Inject constructor(
 ) :
     ThreadRepository {
     private var post: PostData? = null
-    private var comments: List<CommentType> = emptyList()
+    private val forest: MutableStateFlow<Forest> = MutableStateFlow(Forest.empty())
+    override val comments: StateFlow<Iterable<CommentType>> = forest
+
 
     suspend fun fetchThread(
         permalink: String,
@@ -63,7 +163,7 @@ class ThreadRepositoryImpl @Inject constructor(
         comment: String? = null,
         context: Int? = null
     ) {
-        if (post != null && comments.isNotEmpty()) {
+        if (post != null && forest.value.comments.isNotEmpty()) {
             return
         }
         val response = api.getThread(permalink, sort = sort, comment = comment, context = context)
@@ -72,13 +172,14 @@ class ThreadRepositoryImpl @Inject constructor(
             if (body != null) {
                 val data = body.post.data.children.first()
                 post = PostDataMapper.map(data.data)
-                for (comment in body.comments.data.children) {
-                    comments += if (comment is Thing.Comment) {
-                        CommentType.Comment(CommentDataMapper.map(comment.data))
-                    } else {
-                        CommentType.More((comment as Thing.More).data)
-                    }
+                forest.update {
+                    Forest.create(
+                        body.comments.data.children,
+                        post!!.name,
+                        post!!.numComments
+                    )
                 }
+                commentsRepository.insert(forest.value)
                 postsRepository.insert(listOf(post!!))
             }
         }
@@ -99,9 +200,9 @@ class ThreadRepositoryImpl @Inject constructor(
         timeframe: Timeframe?,
         comment: String?,
         context: Int?,
-    ): List<CommentType> {
+    ) {
         fetchThread(permalink, sort, comment = comment, context = context)
-        return comments
+        Log.d("ThreadRepositoryImpl", "forest: ${forest.value.next}")
     }
 
     override fun getPostId(permalink: String): Fullname {
@@ -110,7 +211,7 @@ class ThreadRepositoryImpl @Inject constructor(
         return Fullname("t3_${segments[index + 1]}")
     }
 
-    override suspend fun getMoreComments(more: CommentType.More): List<CommentType> {
+    override suspend fun getMoreComments(more: CommentType.More) {
         val response = api.getMoreComments(
             post!!.name,
             more.data.children.take(100).joinToString(",")
@@ -125,20 +226,26 @@ class ThreadRepositoryImpl @Inject constructor(
                         CommentType.More((comment as Thing.More).data)
                     }
                 }
-                comments = if (more.data.parentId == post!!.name) {
-                    comments.replaceMore(more, children)
-                } else {
-                    comments.updateComment(more.data.parentId) { comment ->
-                        if (comment is CommentType.Comment) {
-                            comment.replaceMore(more, children)
-                        } else {
-                            comment
-                        }
-                    }
+                forest.update {
+                    it.insert(
+                        more.data.parentId,
+                        body.json.data.things,
+                        body.json.data.things.size
+                    )
                 }
+//                comments = if (more.data.parentId == post!!.name) {
+//                    comments.replaceMore(more, children)
+//                } else {
+//                    comments.updateComment(more.data.parentId) { comment ->
+//                        if (comment is CommentType.Comment) {
+//                            comment.replaceMore(more, children)
+//                        } else {
+//                            comment
+//                        }
+//                    }
+//                }
             }
         }
-        return comments
     }
 
     override suspend fun postComment(
@@ -149,106 +256,117 @@ class ThreadRepositoryImpl @Inject constructor(
         return api.postComment(body)
     }
 
+    override suspend fun updateComment(
+        name: Fullname,
+        value: CommentType
+    ) {
+        forest.update {
+            it.updateComment(name, value)
+        }
+        commentsRepository.update(name, value)
+    }
+
     override fun refresh() {
-        comments = emptyList()
+        //comments = emptyList()
+        forest.value = Forest.empty()
     }
 
     override suspend fun upvote(fullname: Fullname) {
-        api.vote(fullname, UPVOTED)
+        commentsRepository.upvote(fullname)
     }
 
     override suspend fun neutralVote(fullname: Fullname) {
-        api.vote(fullname, NEUTRAL)
+        commentsRepository.vote(fullname, null)
     }
 
     override suspend fun downvote(fullname: Fullname) {
-        api.vote(fullname, DOWNVOTED)
+        commentsRepository.downvote(fullname)
     }
 
     override suspend fun save(fullname: Fullname) {
-        api.save(fullname)
+        commentsRepository.save(fullname)
     }
 
     override suspend fun unsave(fullname: Fullname) {
-        api.save(fullname)
+        commentsRepository.unsave(fullname)
     }
 
 }
 
-fun List<CommentType>.replaceMore(
-    more: CommentType.More,
-    children: List<CommentType>
-): List<CommentType> {
-    val withoutMore = filter {
-        when (it) {
-            is CommentType.Comment -> true
-            is CommentType.More -> it.name != more.name
-        }
-    }
-    return children.fold(withoutMore) { acc, c ->
-        val res = acc.insertComment(c)
-        if (!res.second) {
-            acc + c
-        } else {
-            res.first
-        }
-    }
-}
-
-fun CommentType.Comment.replaceMore(
-    more: CommentType.More,
-    replies: List<CommentType>
-): CommentType {
-    val withoutMore = comment.replies.filter {
-        when (it) {
-            is CommentType.Comment -> true
-            is CommentType.More -> it.name != more.name
-        }
-    }
-    return replies.fold(
-        this.copy(comment = comment.copy(replies = withoutMore)) as CommentType,
-    ) { acc, reply ->
-        acc.insertReply(reply)
-    }
-}
-
-fun CommentType.insertReply(reply: CommentType): CommentType {
-    when (this) {
-        is CommentType.More -> {
-            return this
-        }
-
-        is CommentType.Comment -> {
-            val replies: List<CommentType> = if (reply.parentId == this.name) {
-                comment.replies + reply
-            } else {
-                comment.replies.map { it.insertReply(reply) }
-            }
-            return this.copy(comment = comment.copy(replies = replies))
-        }
-    }
-}
-
-/** Try to insert the comment into the list given in respect with `parentId`,
- * the boolean is true when the element was inserted */
-fun List<CommentType>.insertComment(
-    comment: CommentType
-): Pair<List<CommentType>, Boolean> {
-    var inserted = false
-    val result = this.map { c ->
-        if (c is CommentType.Comment) {
-            if (c.name == comment.parentId) {
-                val children = c.comment.replies + comment
-                inserted = true
-                c.copy(comment = c.comment.copy(replies = children))
-            } else {
-                val children = c.comment.replies.insertComment(comment)
-                inserted = inserted || children.second
-                c.copy(comment = c.comment.copy(replies = children.first))
-            }
-        } else {
-            c
-        }
-    }
-    return Pair(result, inserted)
-}
+//fun List<CommentType>.replaceMore(
+//    more: CommentType.More,
+//    children: List<CommentType>
+//): List<CommentType> {
+//    val withoutMore = filter {
+//        when (it) {
+//            is CommentType.Comment -> true
+//            is CommentType.More -> it.name != more.name
+//        }
+//    }
+//    return children.fold(withoutMore) { acc, c ->
+//        val res = acc.insertComment(c)
+//        if (!res.second) {
+//            acc + c
+//        } else {
+//            res.first
+//        }
+//    }
+//}
+//
+//fun CommentType.Comment.replaceMore(
+//    more: CommentType.More,
+//    replies: List<CommentType>
+//): CommentType {
+//    val withoutMore = comment.replies.filter {
+//        when (it) {
+//            is CommentType.Comment -> true
+//            is CommentType.More -> it.name != more.name
+//        }
+//    }
+//    return replies.fold(
+//        this.copy(comment = comment.copy(replies = withoutMore)) as CommentType,
+//    ) { acc, reply ->
+//        acc.insertReply(reply)
+//    }
+//}
+//
+//fun CommentType.insertReply(reply: CommentType): CommentType {
+//    when (this) {
+//        is CommentType.More -> {
+//            return this
+//        }
+//
+//        is CommentType.Comment -> {
+//            val replies: List<CommentType> = if (reply.parentId == this.name) {
+//                comment.replies + reply
+//            } else {
+//                comment.replies.map { it.insertReply(reply) }
+//            }
+//            return this.copy(comment = comment.copy(replies = replies))
+//        }
+//    }
+//}
+//
+///** Try to insert the comment into the list given in respect with `parentId`,
+// * the boolean is true when the element was inserted */
+//fun List<CommentType>.insertComment(
+//    comment: CommentType
+//): Pair<List<CommentType>, Boolean> {
+//    var inserted = false
+//    val result = this.map { c ->
+//        if (c is CommentType.Comment) {
+//            if (c.name == comment.parentId) {
+//                val children = c.comment.replies + comment
+//                inserted = true
+//                c.copy(comment = c.comment.copy(replies = children))
+//            } else {
+//                val children = c.comment.replies.insertComment(comment)
+//                inserted = inserted || children.second
+//                c.copy(comment = c.comment.copy(replies = children.first))
+//            }
+//        } else {
+//            c
+//        }
+//    }
+//    return Pair(result, inserted)
+//}

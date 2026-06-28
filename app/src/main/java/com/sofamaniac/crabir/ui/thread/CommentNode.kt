@@ -41,6 +41,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.navigation.CommentCreatorRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.settings.theme.ADMIN_CARTOUCHE_COLOR
@@ -68,7 +69,7 @@ interface CommentViewModelInterface : VotableInteraction {
 }
 
 fun LazyListScope.replies(
-    replies: List<CommentType>,
+    replies: Iterable<CommentType>,
     viewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
     enableAnimation: Boolean = true,
@@ -129,9 +130,9 @@ fun LazyListScope.commentNode(
         CommentContent(comment, viewModel, modifier, enableAnimation)
     }
     //AnimatedVisibility(!comment.collapsed) {
-    if (!comment.collapsed) {
-        replies(comment.replies, viewModel, modifier, enableAnimation)
-    }
+//    if (!comment.collapsed) {
+//        replies(comment.replies, viewModel, modifier, enableAnimation)
+//    }
     //}
 }
 
@@ -164,7 +165,8 @@ private fun CollapsedComment(
         Text(authorString, color = theme.secondaryText)
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            "+${comment.replies.size}",
+            //"+${comment.replies.size}",
+            "+${comment.replies}",
             color = Color.White,
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.cartouche(backgroundColor = Color.Green)
@@ -216,7 +218,7 @@ fun BottomRow(
 ) {
     val likes = comment.relationship.liked
     val saved = comment.relationship.saved
-    val markdownState by viewModel.markdown.collectAsState()
+    val navController = LocalNavController.current
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -226,18 +228,8 @@ fun BottomRow(
         UpButton(likes, onClick = { viewModel.upvote(comment.name) })
         DownButton(likes, onClick = { viewModel.downvote(comment.name) })
         SavedButton(saved, onClick = { viewModel.save(comment.name, !saved) })
-        ReplyButton(parentId = comment.name, submitComment = { name, comment ->
-            viewModel.submitComment(name, comment)
-        }) {
-            ThemedCard(modifier = Modifier.padding(all = 16.dp)) {
-                Text(comment.author.username, modifier = modifier)
-                RedditMarkdown(
-                    markdownState,
-                    maxLines = 5,
-                    modifier = modifier,
-                    key = comment.name
-                )
-            }
+        ReplyButton {
+            navController?.navigate(CommentCreatorRoute(comment.name))
         }
         if (BuildConfig.DEBUG) {
             IconButton(onClick = {

@@ -50,6 +50,7 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.navigation.SimpleImageRoute
 import com.sofamaniac.crabir.navigation.SubscriptionsRoute
+import com.sofamaniac.crabir.navigation.editorGraph
 import com.sofamaniac.crabir.navigation.imagesGraph
 import com.sofamaniac.crabir.navigation.postGraph
 import com.sofamaniac.crabir.navigation.profileGraph
@@ -172,7 +173,7 @@ fun NavigationGraph(
             .fillMaxSize()
             .imePadding(),
         enterTransition = { EnterTransition.None },
-        exitTransition = { ExitTransition.None }
+        exitTransition = { ExitTransition.None },
     ) {
         composable<HomeRoute> {
             HomeViewer()
@@ -183,6 +184,7 @@ fun NavigationGraph(
         subredditGraph(navController = navController)
         imagesGraph(navController = navController)
         settingsGraph(navController = navController)
+        editorGraph(navController = navController)
 
         composable<SubscriptionsRoute> {
             SubredditListViewer(navController = navController)
