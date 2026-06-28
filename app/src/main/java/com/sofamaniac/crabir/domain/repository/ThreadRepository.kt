@@ -57,35 +57,12 @@ class Forest private constructor(
     val root: Fullname
 ) : Iterable<CommentType> {
     companion object {
-        fun empty(): Forest {
-            return Forest(emptyMap(), emptyMap(), Fullname("EmptyForest"))
+        fun empty(root: Fullname = Fullname("EmptyRoute")): Forest {
+            return Forest(emptyMap(), emptyMap(), root)
         }
 
         fun create(l: List<Thing>, root: Fullname, initialCapacity: Int): Forest {
-            val stack = ArrayDeque<Thing>(initialCapacity)
-            val comments = mutableMapOf<Fullname, CommentType>()
-            val next = mutableMapOf<Fullname, Fullname>()
-            for (comment in l.reversed()) {
-                stack.addLast(comment)
-            }
-            var lastSeen: Fullname = root
-            while (stack.isNotEmpty()) {
-                val current = stack.removeLast()
-                val comment = when (current) {
-                    is Thing.Comment -> CommentType.Comment(CommentDataMapper.map(current.data))
-                    is Thing.More -> CommentType.More(current.data)
-                    else -> continue
-                }
-                next[lastSeen] = current.name
-                comments[current.name] = comment
-                lastSeen = current.name
-                if (current is Thing.Comment) {
-                    for (child in current.data.replies.reversed()) {
-                        stack.addLast(child)
-                    }
-                }
-            }
-            return Forest(comments, next, root)
+            return empty(root).insert(root, l, initialCapacity)
         }
     }
 
@@ -96,7 +73,12 @@ class Forest private constructor(
         return Forest(newTable, next, root)
     }
 
-    fun insert(root: Fullname, l: List<Thing>, initialCapacity: Int): Forest {
+    fun insert(
+        root: Fullname,
+        l: List<Thing>,
+        initialCapacity: Int,
+        removeRoot: Boolean = false
+    ): Forest {
         val stack = ArrayDeque<Thing>(initialCapacity)
         val comments = this.comments.toMutableMap()
         val next = this.next.toMutableMap()
@@ -105,6 +87,10 @@ class Forest private constructor(
         }
         var lastSeen: Fullname = root
         val endNext = next[root]
+        if (removeRoot) {
+            lastSeen = next.entries.find { (_, value) -> value == root }!!.key
+            comments.remove(root)
+        }
         while (stack.isNotEmpty()) {
             val current = stack.removeLast()
             val comment = when (current) {
@@ -131,7 +117,6 @@ class Forest private constructor(
         return object : Iterator<CommentType> {
             var current = this@Forest.root
             override fun next(): CommentType {
-                Log.d("ForestIterator", "$current -> $next")
                 val next = this@Forest.next[current]
                 if (next == null) throw NoSuchElementException()
                 current = next
@@ -219,31 +204,9 @@ class ThreadRepositoryImpl @Inject constructor(
         if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
-                val children = body.json.data.things.map { comment ->
-                    if (comment is Thing.Comment) {
-                        CommentType.Comment(CommentDataMapper.map(comment.data))
-                    } else {
-                        CommentType.More((comment as Thing.More).data)
-                    }
-                }
-                forest.update {
-                    it.insert(
-                        more.data.parentId,
-                        body.json.data.things,
-                        body.json.data.things.size
-                    )
-                }
-//                comments = if (more.data.parentId == post!!.name) {
-//                    comments.replaceMore(more, children)
-//                } else {
-//                    comments.updateComment(more.data.parentId) { comment ->
-//                        if (comment is CommentType.Comment) {
-//                            comment.replaceMore(more, children)
-//                        } else {
-//                            comment
-//                        }
-//                    }
-//                }
+                val things = body.json.data.things
+                forest.value =
+                    forest.value.insert(more.data.name, things, things.size, removeRoot = true)
             }
         }
     }

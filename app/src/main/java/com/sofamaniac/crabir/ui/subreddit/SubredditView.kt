@@ -100,14 +100,6 @@ fun SubredditViewer(
             val info = feedInfo
             if (info != null) {
                 SubredditInfo(info, viewModel)
-            } else if (subreddit != "all" && subreddit != "popular") {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("Loading...")
-                }
             }
         }
     )

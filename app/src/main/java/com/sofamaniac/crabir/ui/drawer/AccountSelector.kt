@@ -40,7 +40,7 @@ import java.util.Collections
 @Composable
 fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: (Int) -> Unit) {
     val iconModifier = Modifier
-        .size(48.dp)
+        .size(32.dp)
         .padding(4.dp)
         .clip(CircleShape)
     val accounts by viewModel.accountsList.collectAsState(initial = Collections.emptyList())
