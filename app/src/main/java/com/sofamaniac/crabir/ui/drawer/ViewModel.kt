@@ -91,7 +91,7 @@ class DrawerViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             for (accounts in accountsRepository.accounts.first()) {
-                if (accounts.info == null || accounts.isAnonymous() || accounts.isUninitialized()) {
+                if (accounts.isUninitialized()) {
                     accountsRepository.deleteAccount(accounts.id)
                 }
             }
@@ -100,7 +100,7 @@ class DrawerViewModel @Inject constructor(
                 setupAnonymous()
                 return@launch
             }
-            if (activeAccount.info?.username.isNullOrBlank()) {
+            if (activeAccount.info?.username.isNullOrBlank() && !activeAccount.isAnonymous()) {
                 fetchUserInfo()
             }
         }
@@ -124,7 +124,9 @@ class DrawerViewModel @Inject constructor(
 
     @OptIn(ExperimentalUuidApi::class)
     private suspend fun setupAnonymous() {
-        if (accountsRepository.accounts.first().any { it.isAnonymous() && it.auth.isAuthorized }) {
+        if (accountsRepository.accounts.first()
+                .any { it.isAnonymous() && it.auth.refreshToken != null }
+        ) {
             Log.i("LoginViewModel", "Anonymous account already set up")
             return
         }
@@ -182,10 +184,7 @@ class DrawerViewModel @Inject constructor(
                 "Setting active account to '${activeAccount.first().info?.username ?: "Anonymous"}'"
             )
             if (account.isAnonymous()) {
-                if (account.auth.accessToken.isNullOrBlank()) {
-                    setupAnonymous()
-                }
-                return@launch
+                setupAnonymous()
             } else if (account.info?.username.isNullOrBlank()) {
                 fetchUserInfo()
             }

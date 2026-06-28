@@ -29,6 +29,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -157,6 +158,8 @@ class AccountsRepositoryImplRoom @Inject constructor(
 class AccountsRepositoryImpl @Inject constructor(
     @ApplicationContext context: Context,
 ) : AccountsRepository {
+
+
     private val dataStore: DataStore<Accounts> = context.accountsDataStore
     private val accountsData: Flow<Accounts> = dataStore.data
 
@@ -180,7 +183,9 @@ class AccountsRepositoryImpl @Inject constructor(
     override suspend fun addAccount(account: RedditAccount) {
         Log.d("AccountsRepositoryImpl", "addAccount: $account")
         dataStore.updateData { accounts ->
-            if (accounts.accounts.any { (it.info?.name ?: "") == account.info?.name }) {
+            if (accounts.accounts.any {
+                    (it.info?.name ?: "") == account.info?.name || it.id == account.id
+                }) {
                 Log.e("AccountsRepositoryImpl", "Account already exists: $account")
                 accounts
             } else {
@@ -191,6 +196,7 @@ class AccountsRepositoryImpl @Inject constructor(
 
     override suspend fun setActiveAccount(accountId: Int) {
         Log.d("AccountsRepositoryImpl", "setActiveAccount: $accountId")
+        if (activeAccountId.first() == accountId) return
         dataStore.updateData { accounts ->
             accounts.copy(activeId = accountId)
         }

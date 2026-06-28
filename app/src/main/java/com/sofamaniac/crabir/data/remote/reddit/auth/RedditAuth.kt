@@ -20,6 +20,7 @@ import net.openid.appauth.AuthorizationService
 import net.openid.appauth.ClientAuthentication
 import okhttp3.Interceptor
 import okhttp3.Response
+import okio.IOException
 import kotlin.coroutines.resume
 
 
@@ -52,13 +53,15 @@ class RedditAuthenticator @Inject constructor(
             return chain.proceed(request)
         }
 
+        if (activeAccount.auth.accessToken == null) {
+            Log.e("RedditAuthenticator", "No access token found")
+            //chain.proceed(chain.request())
+            throw IOException("No authentication found")
+        }
         val newAccessToken = if (activeAccount.auth.needsTokenRefresh) {
             refreshToken(activeAccount)
         } else {
             activeAccount.auth.accessToken
-        }
-        if (activeAccount.auth.accessToken == null) {
-            chain.proceed(chain.request())
         }
 
         val request = chain.request().newBuilder()
@@ -68,6 +71,7 @@ class RedditAuthenticator @Inject constructor(
     }
 
     private fun refreshToken(account: RedditAccount): String? {
+        Log.d("RedditAuthenticator", "Refreshing token for ${account.id}")
         return try {
             runBlocking<String?> {
                 suspendCancellableCoroutine { continuation ->
