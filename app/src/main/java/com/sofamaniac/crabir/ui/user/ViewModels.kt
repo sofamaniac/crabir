@@ -57,9 +57,8 @@ class ProfileViewModel @AssistedInject constructor(
     accountsRepository: AccountsRepository,
     api: RedditAPIService,
     @Assisted username: String
-) :
-    ViewModel() {
-    val currentUser = accountsRepository.activeAccount.map { it.info!!.username }
+) : ViewModel() {
+    val currentUser = accountsRepository.activeAccount.map { it.info?.username }
 
     val userProfile: MutableState<UserDTO?> = mutableStateOf(null)
 
@@ -77,6 +76,7 @@ class ProfileViewModel @AssistedInject constructor(
         fun create(username: String): ProfileViewModel
     }
 }
+
 @HiltViewModel(assistedFactory = SavedViewModel.Factory::class)
 class SavedViewModel @AssistedInject constructor(
     @Assisted username: String,

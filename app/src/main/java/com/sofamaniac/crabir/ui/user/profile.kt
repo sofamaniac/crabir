@@ -20,8 +20,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -38,7 +36,6 @@ import com.sofamaniac.crabir.ui.TabBar
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subreddit.PostView
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -75,9 +72,11 @@ fun ProfileView(
         factory.create(user)
     },
 ) {
-    val isConnectedUser by remember { profileViewModel.currentUser.map { it == user } }.collectAsState(
-        true
-    )
+//    val isConnectedUser by remember { profileViewModel.currentUser.map { it == user } }.collectAsState(
+//        true
+//    )
+    val currentUser = LocalRedditAccount.current
+    val isConnectedUser = currentUser.info?.username == user
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val tabs = if (isConnectedUser) ProfileTabs.entries else ProfileTabs.publicTabs
     val initialIndex = tabs.indexOf(initialTab).coerceIn(0, tabs.size)
