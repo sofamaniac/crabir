@@ -5,7 +5,6 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLink
 import androidx.navigation.navDeepLink
-import com.sofamaniac.crabir.domain.model.Fullname
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -24,14 +23,30 @@ object InboxRoute : Route
 object HistoryRoute : Route
 
 @Serializable
-class SubredditRoute(val subreddit: String) : Route
+/**
+ * @param subreddit the prefixed display name of the subreddit
+ */
+class SubredditRoute(val subreddit: String) : Route {
+    init {
+        assert(subreddit.startsWith("r/"))
+    }
+}
 
 
 @Serializable
-class SubredditInfoRoute(val subreddit: Fullname) : Route
+class SubredditInfoRoute(val subreddit: String) : Route {
+
+    init {
+        assert(subreddit.startsWith("r/"))
+    }
+}
 
 @Serializable
-class MultiRoute(val name: Fullname) : Route
+class MultiRoute(val name: String) : Route {
+    init {
+        assert(name.startsWith("m/"))
+    }
+}
 
 @Serializable
 object LicensesRoute : Route

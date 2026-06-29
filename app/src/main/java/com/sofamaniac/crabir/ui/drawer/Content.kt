@@ -170,7 +170,7 @@ fun DrawerContent(
                         viewModel.visitCommunity(multi.data)
                         navController?.navigate(
                             MultiRoute(
-                                multi.name
+                                multi.data.displayNamePrefixed
                             )
                         )
                     }

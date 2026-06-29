@@ -19,8 +19,8 @@ import com.sofamaniac.crabir.navigation.SubredditRoute
 enum class FeedButtons(val icon: ImageVector, val route: Route) {
     Home(Icons.Default.Home, HomeRoute),
     Default(Icons.Default.RssFeed, HomeRoute),
-    Popular(Icons.Default.Moving, SubredditRoute("popular")),
-    All(Icons.Default.BarChart, SubredditRoute("all")),
+    Popular(Icons.Default.Moving, SubredditRoute("r/popular")),
+    All(Icons.Default.BarChart, SubredditRoute("r/all")),
     Saved(Icons.Default.BookmarkBorder, SavedRoute),
     History(Icons.Default.History, HistoryRoute),
     Search(Icons.Default.Search, SearchRoute()),

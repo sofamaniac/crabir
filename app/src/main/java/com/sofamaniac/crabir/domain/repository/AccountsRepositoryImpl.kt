@@ -187,7 +187,12 @@ class AccountsRepositoryImpl @Inject constructor(
                     (it.info?.name ?: "") == account.info?.name || it.id == account.id
                 }) {
                 Log.e("AccountsRepositoryImpl", "Account already exists: $account")
-                accounts
+                val i = accounts.accounts.indexOfFirst {
+                    (it.info?.name ?: "") == account.info?.name || it.id == account.id
+                }
+                val accountsList = accounts.accounts.toMutableList()
+                accountsList[i] = account
+                accounts.copy(accounts = accountsList)
             } else {
                 accounts.copy(accounts = accounts.accounts + account)
             }

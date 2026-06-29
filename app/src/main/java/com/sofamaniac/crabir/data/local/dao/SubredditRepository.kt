@@ -8,7 +8,6 @@ import androidx.room.Update
 import androidx.room.Upsert
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.MultiData
-import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.CommunityRepository
 import kotlinx.coroutines.flow.Flow
@@ -19,10 +18,10 @@ interface CommunityViewDao {
     suspend fun insert(community: CommunityViewEntity)
 
     @Query("SELECT * FROM visitedCommunity WHERE name = :name")
-    suspend fun getByName(name: Fullname): CommunityViewEntity?
+    suspend fun getByName(name: String): CommunityViewEntity?
 
     @Query("SELECT * FROM visitedCommunity WHERE name = :name")
-    fun getCommunityFlow(name: Fullname): Flow<CommunityViewEntity?>
+    fun getCommunityFlow(name: String): Flow<CommunityViewEntity?>
 
     @Upsert
     suspend fun upsert(entity: CommunityViewEntity)
@@ -43,11 +42,14 @@ interface SubredditRepository : CommunityRepository<SubredditData> {
     suspend fun getById(id: String): SubredditData?
 
 
-    @Query("SELECT * FROM subreddits WHERE name = :name")
-    override suspend fun getByName(name: Fullname): SubredditData?
+    @Query("SELECT * FROM subreddits WHERE displayNamePrefixed = :slug")
+    override suspend fun getBySlug(slug: String): SubredditData?
 
     @Query("SELECT * FROM subreddits WHERE userIsSubscriber = 1")
     suspend fun getSubscribed(): List<SubredditData>
+
+//    @Query("SELECT * FROM subreddits WHERE displayName = :displayName")
+//    suspend fun getBySlug(displayName: String): SubredditData?
 
     @Query("DELETE FROM subreddits")
     override suspend fun deleteAll()
@@ -62,8 +64,8 @@ interface MultiRepository : CommunityRepository<MultiData> {
     override suspend fun upsert(entity: MultiData)
 
 
-    @Query("SELECT * FROM multireddits WHERE name = :name")
-    override suspend fun getByName(name: Fullname): MultiData?
+    @Query("SELECT * FROM multireddits WHERE displayNamePrefixed = :slug")
+    override suspend fun getBySlug(slug: String): MultiData?
 
     @Query("SELECT * FROM multireddits")
     suspend fun getAll(): List<MultiData>

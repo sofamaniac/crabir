@@ -34,7 +34,6 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.SubredditAPI
 import com.sofamaniac.crabir.data.remote.reddit.SubscribeAction
-import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -52,16 +51,15 @@ import kotlinx.coroutines.launch
 class SubredditInfoViewModel @AssistedInject constructor(
     private val subredditCache: SubredditCache,
     private val redditApi: SubredditAPI,
-    /** Subreddit's fullname */
+    /** Subreddit's prefixed name */
     @Assisted subredditName: String,
 ) : ViewModel() {
 
     val info: MutableStateFlow<SubredditData?> = MutableStateFlow(null)
-    val name: Fullname = Fullname(subredditName)
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            info.value = subredditCache.get(name)
+            info.value = subredditCache.get(subredditName)
         }
     }
 
@@ -134,10 +132,10 @@ fun FavoriteButton(hasFavorited: Boolean, onClick: () -> Unit = {}) {
 
 @Composable
 fun SubredditInfoView(
-    subreddit: Fullname,
+    subreddit: String,
     viewModel: SubredditInfoViewModel =
         hiltViewModel<SubredditInfoViewModel, SubredditInfoViewModel.Factory> { factory ->
-            factory.create(subreddit.name)
+            factory.create(subreddit)
         }
 ) {
     val infoOpt by viewModel.info.collectAsState()

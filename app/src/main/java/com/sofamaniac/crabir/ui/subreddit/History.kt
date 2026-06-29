@@ -16,6 +16,7 @@ import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.local.entities.asVotableData
+import com.sofamaniac.crabir.data.remote.reddit.HISTORY
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.PostData
@@ -48,7 +49,7 @@ fun HistoryViewer(
         TopBar(
             title,
             params,
-            name = Fullname("_HISTORY"),
+            slug = HISTORY,
             disableInfo = true,
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
@@ -80,13 +81,13 @@ class HistoryViewModel @Inject constructor(
     communityDao: SubredditRepository,
     viewDao: CommunityViewRepository,
 ) : PostFeedViewModel<SubredditData>(
-    name = Fullname("_HISTORY"),
+    displayName = HISTORY,
     repository,
     visitedPostsDao,
     communityDao,
     viewDao,
 ) {
-    override suspend fun createViewEntity(name: Fullname): CommunityViewEntity {
+    override suspend fun createViewEntity(name: String): CommunityViewEntity {
         return CommunityViewEntity(name = name, displayName = "History")
     }
 }

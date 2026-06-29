@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.subreddit
 
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -15,7 +14,6 @@ import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.local.dao.MultiRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.remote.dto.MultiData
-import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.MultiPostsRepository
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
@@ -32,12 +30,11 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MultiView(
-    name: Fullname,
+    name: String,
     modifier: Modifier = Modifier,
     viewModel: MultiViewModel = hiltViewModel<MultiViewModel, MultiViewModel.Factory> { factory ->
-        factory.create(name.name)
+        factory.create(name)
     },
-    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
@@ -50,7 +47,7 @@ fun MultiView(
         TopBar(
             info!!.displayName,
             params,
-            name,
+            info!!.displayNamePrefixed,
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
@@ -80,9 +77,9 @@ class MultiViewModel @AssistedInject constructor(
     visitedPostsDao: VisitedPostsDao,
     communityDao: MultiRepository,
     viewRepository: CommunityViewRepository,
-    @Assisted("name") name: String,
+    @Assisted("name") slug: String,
 ) : PostFeedViewModel<MultiData>(
-    name = Fullname(name),
+    displayName = slug,
     repository,
     visitedPostsDao,
     communityDao,
@@ -94,8 +91,9 @@ class MultiViewModel @AssistedInject constructor(
     val info = _info.asStateFlow()
 
     init {
+        assert(slug.startsWith("m/"))
         viewModelScope.launch(Dispatchers.IO) {
-            _info.value = communityDao.getByName(Fullname(name)) ?: return@launch
+            _info.value = communityDao.getBySlug(slug) ?: return@launch
             repository.updateMulti(_info.value!!.permalink)
         }
     }

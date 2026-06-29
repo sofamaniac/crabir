@@ -19,7 +19,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
-import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.data.remote.reddit.HOME
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.HomeRepository
@@ -46,7 +46,7 @@ fun HomeViewer(
         TopBar(
             title,
             params,
-            name = Fullname("_HOME"),
+            slug = HOME,
             disableInfo = true,
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
@@ -79,13 +79,13 @@ class HomeViewModel @Inject constructor(
     communityDao: SubredditRepository,
     viewDao: CommunityViewRepository,
 ) : PostFeedViewModel<SubredditData>(
-    name = Fullname("_HOME"),
+    displayName = HOME,
     repository,
     visitedPostsDao,
     communityDao,
     viewDao,
 ) {
-    override suspend fun createViewEntity(name: Fullname): CommunityViewEntity {
+    override suspend fun createViewEntity(name: String): CommunityViewEntity {
         return CommunityViewEntity(name = name, displayName = "Home")
     }
 }

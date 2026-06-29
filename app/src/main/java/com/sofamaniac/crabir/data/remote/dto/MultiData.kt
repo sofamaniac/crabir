@@ -27,10 +27,8 @@ data class MultiData(
     @SerialName("created") val created: Double,
     @SerialName("visibility") val visibility: String,
     @SerialName("key_color") val keyColor: String? = null,
-
-    ) : CommunityData {
-    @Ignore
     override val displayNamePrefixed: String = "m/$displayName"
+    ) : CommunityData {
 
     @Ignore
     override val id: String = name.name

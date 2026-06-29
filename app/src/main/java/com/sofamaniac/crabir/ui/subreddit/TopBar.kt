@@ -42,7 +42,6 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
-import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SettingsRoute
@@ -59,7 +58,7 @@ import kotlinx.coroutines.launch
 fun TopBar(
     title: String,
     params: FeedParams,
-    name: Fullname,
+    slug: String,
     disableInfo: Boolean = false,
     updateSort: (Sort, Timeframe?) -> Unit,
     refresh: () -> Unit,
@@ -121,14 +120,14 @@ fun TopBar(
                 }, text = { Text(stringResource(R.string.settings)) })
                 if (!disableInfo) {
                     DropdownMenuItem(onClick = {
-                        navController?.navigate(SubredditInfoRoute(name))
+                        navController?.navigate(SubredditInfoRoute(slug))
                     }, text = { Text("Info") })
                 }
                 DropdownMenuItem(onClick = { refresh() }, text = { Text("Refresh") })
             }
             if (!disableInfo) {
                 IconButton(onClick = {
-                    navController?.navigate(SubredditInfoRoute(name))
+                    navController?.navigate(SubredditInfoRoute(slug))
                 }) {
                     Icon(Icons.Default.Info, contentDescription = null)
                 }

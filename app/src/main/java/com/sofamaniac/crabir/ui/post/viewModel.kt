@@ -56,15 +56,21 @@ interface LinkInteraction : VotableInteraction {
 
 @HiltViewModel(assistedFactory = LinkViewModel.Factory::class)
 open class LinkViewModel @AssistedInject constructor(
-    @Assisted("post") post: PostData,
+    @Assisted("post") initialPost: PostData,
     private val posts: LinksRepository,
     private val history: VisitedPostsDao,
-) : VotableViewModel<PostData>(post.name.name, post.subreddit.name, posts), PostViewModelInterface {
+) : VotableViewModel<PostData>(
+    initialPost.name.name,
+    initialPost.subreddit.name,
+    posts,
+    initialPost
+),
+    PostViewModelInterface {
 
-    override val post = posts.get(post.name).map { it ?: post }.stateIn(
+    override val post = posts.get(initialPost.name).map { it ?: initialPost }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
-        initialValue = post
+        initialValue = initialPost
     )
 
     private var _flairs = MutableStateFlow(emptyList<FlairInfo>())

@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
 @Serializable
-class PostCreatorRoute(val kind: Kind, val communityId: Fullname?) : Route
+class PostCreatorRoute(val kind: Kind, val communitySlug: String?) : Route
 
 @Serializable
 class CrosspostCreatorRoute(val post: Fullname) : Route
@@ -29,7 +29,7 @@ fun NavGraphBuilder.editorGraph(navController: NavController) {
         typeMap = mapOf(typeOf<Fullname?>() to NullableFullnameType)
     ) {
         val route = it.toRoute<PostCreatorRoute>()
-        PostCreator(kind = route.kind, communityId = route.communityId, onDismissRequest = {
+        PostCreator(kind = route.kind, communitySlug = route.communitySlug, onDismissRequest = {
             navController.popBackStack()
         })
     }

@@ -31,6 +31,9 @@ import com.sofamaniac.crabir.data.remote.dto.post.Sort as PostSort
 
 internal const val API_LIMIT = 100
 
+const val HOME = "_HOME"
+const val HISTORY = "_HISTORY"
+
 interface RedditAPIService :
     VotableAPI,
     PostAPI,
@@ -70,8 +73,13 @@ interface RedditAPIService :
     ): Response<MoreResponseOuter>
 
 
-    @GET("r/{subreddit}/api/link_flair_v2.json")
-    suspend fun getPostFlair(@Path("subreddit") subreddit: String): Response<List<FlairInfo>>
+    @GET("{subreddit}/api/link_flair_v2.json")
+    suspend fun getPostFlair(
+        @Path(
+            "subreddit",
+            encoded = true
+        ) subreddit: String
+    ): Response<List<FlairInfo>>
 
     @FormUrlEncoded
     @POST("api/report")

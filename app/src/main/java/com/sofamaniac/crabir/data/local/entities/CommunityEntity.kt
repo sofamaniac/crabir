@@ -4,13 +4,12 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
-import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.settings.views.Views
 
 @Entity(tableName = "visitedCommunity")
 data class CommunityViewEntity(
     @PrimaryKey
-    val name: Fullname,
+    val name: String,
     val displayName: String,
     val sort: Sort? = null,
     val timeframe: Timeframe? = null,

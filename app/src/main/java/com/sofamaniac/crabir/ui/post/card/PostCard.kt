@@ -69,7 +69,6 @@ fun PostCard(
         markAsRead,
         canStartVideo = canStartVideo,
         read = read,
-        likes = likes,
         interactions = viewModel,
     ) {
         OpenThreadButton(
@@ -86,7 +85,6 @@ internal fun PostCardContent(
     markAsRead: () -> Unit = {},
     canStartVideo: Boolean = false,
     read: Boolean = false,
-    likes: Boolean?,
     interactions: LinkInteraction,
     bottomRowAction: @Composable () -> Unit,
 ) {
@@ -120,6 +118,7 @@ internal fun PostCardContent(
             showPrefix = settings.prefixCommunity
         )
         val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
+        val likes by interactions.likes.collectAsState(post.relationship.liked)
         PostInfo(
             post,
             modifier = modifier,
@@ -156,7 +155,6 @@ internal fun PostCardPreview() {
             markAsRead = {},
             canStartVideo = false,
             read = false,
-            likes = post.relationship.liked,
             interactions = viewModel,
         ) {
             OpenThreadButton(

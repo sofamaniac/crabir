@@ -20,7 +20,6 @@ import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.data.remote.reddit.SubmissionBuilderError
 import com.sofamaniac.crabir.data.remote.reddit.makeMediaUploadBody
-import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.SubredditData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,9 +59,9 @@ abstract class CreatorViewModel(
         }
     }
 
-    fun setSubreddit(subreddit: Fullname) {
+    fun setSubreddit(subreddit: String) {
         viewModelScope.launch {
-            val sub = communities.getByName(subreddit)
+            val sub = communities.getBySlug(subreddit)
             if (sub == null) return@launch
             community = sub
             getRules()

@@ -25,8 +25,13 @@ interface SubredditAPI {
         @Query("sr_detail") srDetail: Boolean = true,
     ): Response<Listing<Post>>
 
-    @GET("/r/{subreddit}/about.json")
-    suspend fun getSubInfo(@Path("subreddit") subreddit: String): Response<Subreddit>
+    @GET("{subreddit}/about.json")
+    suspend fun getSubInfo(
+        @Path(
+            "subreddit",
+            encoded = true
+        ) subreddit: String
+    ): Response<Subreddit>
 
     /** Get the list of subreddits the user is subscribed to. */
     @GET("/subreddits/mine/subscriber")
@@ -41,9 +46,9 @@ interface SubredditAPI {
      *
      * @param subreddit The name of the subreddit without the `r/` prefix
      * */
-    @GET("/r/{subreddit}/{sort}.json")
+    @GET("{subreddit}/{sort}.json")
     suspend fun getSubreddit(
-        @Path("subreddit") subreddit: String,
+        @Path("subreddit", encoded = true) subreddit: String,
         @Path("sort") sort: Sort = Sort.Best,
         @Query("after") after: Fullname? = null,
         @Query("before") before: String? = null,
@@ -67,8 +72,8 @@ interface SubredditAPI {
         @Field("sr_name") subreddit: String,
     ): Response<Unit>
 
-    @GET("r/{subreddit}/about/rules.json")
-    suspend fun getRules(@Path("subreddit") subreddit: String): Response<Rules>
+    @GET("{subreddit}/about/rules.json")
+    suspend fun getRules(@Path("subreddit", encoded = true) subreddit: String): Response<Rules>
 
     @POST("api/favorite")
     suspend fun favorite(

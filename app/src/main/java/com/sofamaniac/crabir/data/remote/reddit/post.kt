@@ -90,18 +90,18 @@ interface PostAPI {
     suspend fun delete(@Field("id") name: Fullname): Response<Unit>
 
     @FormUrlEncoded
-    @POST("r/{subreddit}/api/selectflair")
+    @POST("{subreddit}/api/selectflair")
     suspend fun selectFlair(
-        @Path("subreddit") subreddit: String,
+        @Path("subreddit", encoded = true) subreddit: String,
         @Field("link") postFullname: Fullname,
         @Field("flair_template_id") flairId: String,
         @Field("text") text: String?,
     ): Response<Unit>
 
     @FormUrlEncoded
-    @POST("r/{subreddit}/api/selectflair")
+    @POST("{subreddit}/api/selectflair")
     suspend fun getFlairs(
-        @Path("subreddit") subreddit: String,
+        @Path("subreddit", encoded = true) subreddit: String,
         @Field("link") postFullname: Fullname,
     ): Response<List<FlairInfo>>
 

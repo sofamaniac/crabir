@@ -43,7 +43,6 @@ import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
@@ -72,15 +71,16 @@ fun SubredditViewer(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val params by viewModel.params.collectAsState()
-    val feedInfo by viewModel.info.collectAsState()
+    val feedInfoOpt by viewModel.info.collectAsState()
     val entity by viewModel.entity.collectAsState(null)
     val defaultView = rememberViewSettings().defaultView
-    if (feedInfo == null) return
+    if (feedInfoOpt == null) return
+    val feedInfo = feedInfoOpt!!
     val topBar = @Composable {
         TopBar(
-            subreddit,
+            feedInfo.displayName,
             params,
-            name = feedInfo!!.name,
+            slug = subreddit,
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
@@ -96,9 +96,8 @@ fun SubredditViewer(
         topBar, bottomBar, viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         filter = rememberPostsFilter(whitelistSubreddit = listOf(subreddit)),
-        feedInfo = {
-            val info = feedInfo
-            if (info != null) {
+        feedInfo = feedInfo?.let { info ->
+            {
                 SubredditInfo(info, viewModel)
             }
         }
@@ -187,30 +186,31 @@ class SubredditViewModel @AssistedInject constructor(
     communityDao: SubredditRepository,
     viewDao: CommunityViewRepository,
     private val subredditCache: SubredditCache,
-    /** Subreddit's fullname */
-    @Assisted subredditName: String,
+    /** Subreddit's prefixed display name */
+    @Assisted slug: String,
 ) : PostFeedViewModel<SubredditData>(
-    name = Fullname(subredditName),
+    displayName = slug,
     repository,
     visitedPostsDao,
     communityDao,
     viewDao,
 ) {
 
-    val name = Fullname(subredditName)
     private val _info = MutableStateFlow<SubredditData?>(null)
     val info = _info.asStateFlow()
 
     init {
-        repository.updateSubreddit(name)
+        assert(slug.startsWith("r/"))
+        repository.updateSubreddit(slug)
         viewModelScope.launch {
-            _info.value = subredditCache.get(name)
+            _info.value = subredditCache.get(slug)
             if (_info.value == null) {
                 _info.value = repository.getInfo()
                 updateData(_info.value)
             }
         }
     }
+
     fun subscribe() {
         viewModelScope.launch {
             repository.subscribe()
@@ -237,7 +237,7 @@ class SubredditViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(subreddit: String): SubredditViewModel
+        fun create(slug: String): SubredditViewModel
     }
 
 }

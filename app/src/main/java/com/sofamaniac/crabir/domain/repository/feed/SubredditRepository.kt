@@ -25,8 +25,8 @@ class SubredditCache @Inject constructor(
         dao.upsert(subreddit)
     }
 
-    suspend fun get(name: Fullname): SubredditData? {
-        return dao.getByName(name)
+    suspend fun get(displayName: String): SubredditData? {
+        return dao.getBySlug(displayName)
     }
 }
 
@@ -52,8 +52,11 @@ class SubredditPostsRepository @Inject constructor(
         }
     }
 
-    fun updateSubreddit(subreddit: Fullname) {
-        currentSubreddit = subreddit.name
+    /**
+     * @param subreddit the non prefixed display name of the subreddit
+     * */
+    fun updateSubreddit(subreddit: String) {
+        currentSubreddit = subreddit
     }
 
     suspend fun subscribe(): Result<Unit> {

@@ -2,16 +2,15 @@ package com.sofamaniac.crabir.domain.repository
 
 import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
-import com.sofamaniac.crabir.domain.model.Fullname
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
 interface CommunityViewRepository {
     suspend fun insert(community: CommunityViewEntity)
 
-    suspend fun getByName(name: Fullname): CommunityViewEntity?
+    suspend fun getByName(name: String): CommunityViewEntity?
 
-    fun getCommunityFlow(name: Fullname): Flow<CommunityViewEntity?>
+    fun getCommunityFlow(name: String): Flow<CommunityViewEntity?>
 
     suspend fun upsert(entity: CommunityViewEntity)
 
@@ -24,11 +23,11 @@ class RoomRepository @Inject constructor(private val communityViewDao: Community
         communityViewDao.insert(community)
     }
 
-    override suspend fun getByName(name: Fullname): CommunityViewEntity? {
+    override suspend fun getByName(name: String): CommunityViewEntity? {
         return communityViewDao.getByName(name)
     }
 
-    override fun getCommunityFlow(name: Fullname): Flow<CommunityViewEntity?> {
+    override fun getCommunityFlow(name: String): Flow<CommunityViewEntity?> {
         return communityViewDao.getCommunityFlow(name)
     }
 

@@ -39,12 +39,18 @@ open class VotableViewModel<T : VotableData>(
     val name: String,
     val subreddit: String,
     private val posts: VotableRepository<T>,
+    initialData: T? = null,
 ) : ViewModel(), VotableInteraction {
 
     val fullname =
         Fullname(name)
 
     private var _post = posts.get(fullname)
+        .stateIn(
+            viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = initialData
+        )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override var markdown: StateFlow<MarkdownState> = _post.flatMapLatest { post ->
@@ -84,8 +90,8 @@ open class VotableViewModel<T : VotableData>(
     }
 
 
-    override val likes = posts.get(fullname).map { it?.relationship?.liked }
-    override val saved = posts.get(fullname).map { it?.relationship?.saved ?: false }
+    override val likes = _post.map { it?.relationship?.liked }
+    override val saved = _post.map { it?.relationship?.saved ?: false }
 
     var _rules = MutableStateFlow(Rules())
     override val rules: StateFlow<Rules> = _rules

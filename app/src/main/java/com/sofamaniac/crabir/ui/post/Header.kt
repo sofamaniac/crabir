@@ -66,7 +66,7 @@ fun PostHeader(
                     .size(24.dp)
                     .clip(CircleShape)
                     .clickable(onClick = {
-                        navController?.navigate(SubredditRoute(post.subreddit.name))
+                        navController?.navigate(SubredditRoute(post.subreddit.subredditPrefixed))
                     })
             )
         }
@@ -76,7 +76,7 @@ fun PostHeader(
                     tag = "Subreddit",
                     styles = TextLinkStyles(style = SpanStyle(color = theme.highlight)),
                     linkInteractionListener = {
-                        navController?.navigate(SubredditRoute(post.subreddit.name))
+                        navController?.navigate(SubredditRoute(post.subreddit.subredditPrefixed))
                     })
             ) {
                 append(

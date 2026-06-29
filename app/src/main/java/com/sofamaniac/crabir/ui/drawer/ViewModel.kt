@@ -177,6 +177,7 @@ class DrawerViewModel @Inject constructor(
 
     fun setActiveAccount(accountId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
+            if (activeAccount.first().id == accountId) return@launch
             accountsRepository.setActiveAccount(accountId)
             val account = activeAccount.first()
             Log.d(

@@ -56,14 +56,14 @@ interface FeedViewModelInterface<T : VotableData> {
 }
 
 abstract class PostFeedViewModel<T : CommunityData>(
-    private val name: Fullname,
+    private val displayName: String,
     private val repository: PostFeedRepository<FeedParams>,
     private val visitedPostsDao: VisitedPostsDao,
     private val communityRepository: CommunityRepository<T>,
     private val communityView: CommunityViewRepository,
 ) : ViewModel(), FeedViewModelInterface<PostData> {
 
-    override val entity: Flow<CommunityViewEntity?> = communityView.getCommunityFlow(name)
+    override val entity: Flow<CommunityViewEntity?> = communityView.getCommunityFlow(displayName)
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -107,8 +107,8 @@ abstract class PostFeedViewModel<T : CommunityData>(
             viewModelScope
         )
 
-    open suspend fun createViewEntity(name: Fullname): CommunityViewEntity {
-        val info = communityRepository.getByName(name)
+    open suspend fun createViewEntity(name: String): CommunityViewEntity {
+        val info = communityRepository.getBySlug(name)
         if (info == null) {
             Log.e("PostFeedViewModel", "Failed to find $name in community repository")
             return CommunityViewEntity(name, displayName = "")
@@ -137,7 +137,7 @@ abstract class PostFeedViewModel<T : CommunityData>(
         if (needRefresh) {
             Log.d("PostFeedViewModel", "updateSort: Updating sort to $sort")
             viewModelScope.launch(Dispatchers.IO) {
-                val entity = entity.first() ?: createViewEntity(name)
+                val entity = entity.first() ?: createViewEntity(displayName)
                 val new = entity.copy(sort = sort, timeframe = timeframe)
                 communityView.upsert(new)
             }
@@ -147,7 +147,7 @@ abstract class PostFeedViewModel<T : CommunityData>(
 
     fun updateView(view: Views) {
         viewModelScope.launch(Dispatchers.IO) {
-            val entity = entity.first() ?: createViewEntity(name)
+            val entity = entity.first() ?: createViewEntity(displayName)
             val new = entity.copy(view = view)
             communityView.upsert(new)
         }

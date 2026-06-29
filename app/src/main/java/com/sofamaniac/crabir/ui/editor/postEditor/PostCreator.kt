@@ -53,7 +53,6 @@ import com.sofamaniac.crabir.data.remote.reddit.InvalidUrl
 import com.sofamaniac.crabir.data.remote.reddit.MissingTitle
 import com.sofamaniac.crabir.data.remote.reddit.MissingUrl
 import com.sofamaniac.crabir.data.remote.reddit.PostSubmissionBuilder
-import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.cartouche
@@ -64,16 +63,16 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCreator(
-    communityId: Fullname? = null,
+    communitySlug: String? = null,
     kind: Kind = Kind.Self,
     viewModel: PostCreatorViewModel = hiltViewModel(),
     onDismissRequest: () -> Unit,
 ) {
-    LaunchedEffect(communityId, kind) {
-        Log.d("PostCreator", "PostCreator: $communityId $kind")
+    LaunchedEffect(communitySlug, kind) {
+        Log.d("PostCreator", "PostCreator: $communitySlug $kind")
         viewModel.state = PostSubmissionBuilder()
-        if (communityId != null) {
-            viewModel.setSubreddit(communityId)
+        if (communitySlug != null) {
+            viewModel.setSubreddit(communitySlug)
         }
         viewModel.state = viewModel.state.copy(kind = kind)
     }
