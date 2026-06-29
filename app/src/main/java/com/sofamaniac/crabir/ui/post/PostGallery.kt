@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.post
 
-import android.os.Build
 import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
@@ -46,6 +45,7 @@ import com.sofamaniac.crabir.navigation.FullscreenGalleryRoute
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.crabirBlurStyle
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
@@ -54,6 +54,9 @@ import com.sofamaniac.crabir.ui.media.image.ImageView
 import com.sofamaniac.crabir.ui.media.videoPlayer.DecoratedVideoPlayer
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayer
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
+import dev.chrisbanes.haze.HazeInputScale
+import dev.chrisbanes.haze.blur.blurEffect
+import dev.chrisbanes.haze.hazeEffect
 
 @Composable
 fun PostGallery(
@@ -153,13 +156,19 @@ fun EmbeddedGallery(
                         contentScale = ContentScale.FillBounds,
                         contentDescription = null,
                     )
-                } else if (backgroundUrl != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                } else if (backgroundUrl != null) {
                     // If available, blur background
+                    val blurStyle = crabirBlurStyle()
                     AsyncImage(
                         backgroundUrl,
                         modifier = innerModifier
-                            .fillMaxSize()
-                            .blur(40.dp),
+                            .hazeEffect {
+                                inputScale = HazeInputScale.Fixed(0.5f)
+                                blurEffect {
+                                    style = blurStyle
+                                }
+                            }
+                            .fillMaxSize(),
                         contentScale = ContentScale.FillBounds,
                         contentDescription = null,
                     )

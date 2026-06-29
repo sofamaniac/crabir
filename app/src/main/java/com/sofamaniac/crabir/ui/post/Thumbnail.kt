@@ -23,12 +23,17 @@ import com.sofamaniac.crabir.navigation.FullscreenGalleryRoute
 import com.sofamaniac.crabir.navigation.FullscreenImageRoute
 import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.ui.crabirBlurStyle
+import dev.chrisbanes.haze.HazeInputScale
+import dev.chrisbanes.haze.blur.blurEffect
+import dev.chrisbanes.haze.hazeEffect
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 @Composable
 fun Thumbnail(
     post: PostData,
     markAsRead: () -> Unit,
+    blur: Boolean = false,
 ) {
     val thumbnailURL = post.getThumbnailUrl()
     val uriHandler = LocalUriHandler.current
@@ -43,7 +48,15 @@ fun Thumbnail(
             else -> uriHandler.openUri(post.url)
         }
     }
+    val blurStyle = crabirBlurStyle()
     val modifier = Modifier
+        .hazeEffect {
+            inputScale = HazeInputScale.Fixed(0.5f)
+            blurEffect {
+                style = blurStyle
+                blurEnabled = blur && thumbnailURL != null
+            }
+        }
         .fillMaxWidth(fraction = 0.2f)
         .aspectRatio(1f)
         .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))

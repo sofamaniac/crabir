@@ -188,7 +188,7 @@ fun DrawerContent(
                         )
                         navController?.navigate(
                             SubredditRoute(
-                                subreddit.data.displayName
+                                subreddit.data.displayNamePrefixed
                             )
                         )
                     }

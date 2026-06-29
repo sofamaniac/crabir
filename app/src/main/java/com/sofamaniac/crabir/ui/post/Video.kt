@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
@@ -43,6 +42,7 @@ import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.VIDEO_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.YOUTUBE_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.crabirBlurStyle
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
@@ -51,6 +51,9 @@ import com.sofamaniac.crabir.ui.media.image.ImageView
 import com.sofamaniac.crabir.ui.media.videoPlayer.DecoratedVideoPlayer
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayer
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
+import dev.chrisbanes.haze.HazeInputScale
+import dev.chrisbanes.haze.blur.blurEffect
+import dev.chrisbanes.haze.hazeEffect
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -63,7 +66,14 @@ fun PostVideo(
     val video = getVideoUrl(post)
     val filters = rememberFiltersSettings()
     val blur = post.spoiler || (post.over18 && filters.blurNSFW)
-    val placeholderModifier = if (blur) Modifier.blur(40.dp) else Modifier
+    val blurStyle = crabirBlurStyle()
+    val placeholderModifier = Modifier.hazeEffect {
+        inputScale = HazeInputScale.Fixed(0.5f)
+        blurEffect {
+            style = blurStyle
+            blurEnabled
+        }
+    }
     val placeholder =
         @Composable {
             ImageView(
@@ -131,7 +141,7 @@ fun PostVideo(
             }) {
                 Icon(
                     Icons.Default.Fullscreen,
-                    contentDescription = "Go fullscreen",
+                    contentDescription = null,
                     tint = Color.White
                 )
             }

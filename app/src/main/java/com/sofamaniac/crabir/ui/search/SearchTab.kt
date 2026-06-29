@@ -279,7 +279,7 @@ private fun InnerTab(viewModel: CommunitySearchViewModel) {
                         .clickable {
                             navController.navigate(
                                 SubredditRoute(
-                                    subreddit.displayName
+                                    subreddit.displayNamePrefixed
                                 )
                             )
                         }

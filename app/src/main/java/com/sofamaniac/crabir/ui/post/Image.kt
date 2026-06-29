@@ -19,9 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.LocalSharedTransitionScope
@@ -34,11 +32,15 @@ import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.SharedElementKey
 import com.sofamaniac.crabir.ui.SharedElementType
+import com.sofamaniac.crabir.ui.crabirBlurStyle
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.image.DownloadButton
 import com.sofamaniac.crabir.ui.media.image.ImageView
+import dev.chrisbanes.haze.HazeInputScale
+import dev.chrisbanes.haze.blur.blurEffect
+import dev.chrisbanes.haze.hazeEffect
 import me.saket.telephoto.zoomable.rememberZoomableState
 
 private fun PostData.getImage(): MediaResource {
@@ -66,17 +68,22 @@ fun PostImage(
     val filters = rememberFiltersSettings()
     val blur = post.spoiler || (post.over18 && filters.blurNSFW)
     val mediaResource = post.getImage()
-    val modifier = if (blur) {
-        modifier.blur(40.dp)
-    } else {
-        modifier
-    }.let { modifier ->
-        if (mediaResource.aspectRatio > 0) {
-            modifier.aspectRatio(mediaResource.aspectRatio)
-        } else {
-            modifier
+    val blurStyle = crabirBlurStyle()
+    val modifier = Modifier
+        .hazeEffect {
+            inputScale = HazeInputScale.Fixed(0.5f)
+            blurEffect {
+                style = blurStyle
+                blurEnabled = blur
+            }
+        }.then(modifier)
+        .let { modifier ->
+            if (mediaResource.aspectRatio > 0) {
+                modifier.aspectRatio(mediaResource.aspectRatio)
+            } else {
+                modifier
+            }
         }
-    }
     ImageView(
         post,
         quality = quality,

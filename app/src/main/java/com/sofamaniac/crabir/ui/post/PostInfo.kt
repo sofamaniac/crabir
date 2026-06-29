@@ -23,6 +23,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SearchRoute
+import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.Flair
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.votable.ScoreString
@@ -43,6 +44,7 @@ fun PostInfo(
 ) {
     val navController = LocalNavController.current
     val theme = LocalTheme.current
+    val blur = rememberFiltersSettings().blurNSFW && post.over18
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -119,7 +121,7 @@ fun PostInfo(
             }
         }
         if (enableThumbnail) {
-            Thumbnail(post, markAsRead = markAsRead)
+            Thumbnail(post, markAsRead = markAsRead, blur = blur)
         }
     }
 }

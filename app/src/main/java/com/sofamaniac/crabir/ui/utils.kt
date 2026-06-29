@@ -4,7 +4,9 @@
 
 package com.sofamaniac.crabir.ui
 
+import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.domain.model.Fullname
+import dev.chrisbanes.haze.blur.HazeBlurStyle
 import java.time.Clock
 import java.time.Duration
 import java.util.Locale
@@ -32,3 +34,7 @@ enum class SharedElementType {
 }
 
 data class SharedElementKey(val name: Fullname, val type: SharedElementType)
+
+fun crabirBlurStyle(): HazeBlurStyle {
+    return HazeBlurStyle(blurRadius = 40.dp, colorEffects = null, noiseFactor = 0f)
+}
