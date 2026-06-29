@@ -23,8 +23,8 @@ import com.sofamaniac.crabir.data.remote.reddit.makeMediaUploadBody
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.SubredditData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 abstract class CreatorViewModel(
     protected val api: RedditAPIService,

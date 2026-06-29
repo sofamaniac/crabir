@@ -42,6 +42,7 @@ import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FiltersSettingsPage() {
     val navController = LocalNavController.current

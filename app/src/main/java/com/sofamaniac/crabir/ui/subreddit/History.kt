@@ -28,10 +28,10 @@ import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.TabBar
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

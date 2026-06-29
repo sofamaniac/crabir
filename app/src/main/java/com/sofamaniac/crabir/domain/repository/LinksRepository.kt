@@ -6,9 +6,9 @@ import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import kotlinx.coroutines.flow.first
-import javax.inject.Inject
-import javax.inject.Singleton
 
 interface LinksRepository : VotableRepository<PostData> {
     suspend fun markNSFW(name: Fullname)

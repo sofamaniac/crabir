@@ -4,8 +4,8 @@ import com.sofamaniac.crabir.data.local.dao.VotableDao
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.VotableData
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 @Singleton
 class CommentsRepository @Inject constructor(

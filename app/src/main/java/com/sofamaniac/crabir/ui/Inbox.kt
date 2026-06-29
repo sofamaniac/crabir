@@ -41,8 +41,8 @@ import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)

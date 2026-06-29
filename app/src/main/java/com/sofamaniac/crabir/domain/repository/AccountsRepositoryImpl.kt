@@ -26,6 +26,8 @@ import com.sofamaniac.crabir.domain.model.AuthStateSerializer
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -39,8 +41,6 @@ import net.openid.appauth.AuthState
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Collections.emptyList
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Serializable
 data class Accounts(

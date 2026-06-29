@@ -30,9 +30,9 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ThemeRoute
 import com.sofamaniac.crabir.navigation.ViewsSettingRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

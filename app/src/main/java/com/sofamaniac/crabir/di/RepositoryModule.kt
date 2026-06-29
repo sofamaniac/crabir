@@ -7,7 +7,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import com.sofamaniac.crabir.domain.repository.RoomRepository as RoomCommunityViewRepository
 
 @Module

@@ -12,5 +12,5 @@ kotlin {
     }
 }
 dependencies {
-    implementation("org.jetbrains:markdown:0.7.3")
+    api(libs.markdown)
 }

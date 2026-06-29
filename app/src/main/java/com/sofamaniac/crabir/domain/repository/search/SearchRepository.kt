@@ -11,7 +11,7 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ListingRepository
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 class PostSearchRepository @Inject constructor(
     private val api: RedditAPIService,
