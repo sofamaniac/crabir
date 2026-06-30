@@ -71,7 +71,7 @@ fun PostVideo(
         inputScale = HazeInputScale.Fixed(0.5f)
         blurEffect {
             style = blurStyle
-            blurEnabled
+            blurEnabled = blur
         }
     }
     val placeholder =
