@@ -69,9 +69,6 @@ fun PostImage(
 ) {
     val quality = Quality.High
     val goFullscreen = {
-//        fullscreenManager.push {
-//            FullscreenImageView(post)
-//        }
         goFullscreen(FullscreenImageRoute(post.name))
     }
     val mediaResource = post.getImage()
@@ -93,13 +90,13 @@ fun PostImage(
                 modifier
             }
         }
-    Box(modifier) {
+    Box(modifier.clickable(enabled = enabled) {
+        goFullscreen()
+    }) {
         ImageView(
             post,
             quality = quality,
-            modifier = Modifier.clickable(enabled = enabled) {
-                goFullscreen()
-            },
+            modifier = Modifier.fillMaxSize(),
             allowTransformation = false
         )
         if (blurred != null && blur) {
