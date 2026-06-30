@@ -29,7 +29,6 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.FullscreenImageRoute
 import com.sofamaniac.crabir.navigation.Route
-import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.SharedElementKey
 import com.sofamaniac.crabir.ui.SharedElementType
 import com.sofamaniac.crabir.ui.crabirBlurStyle
@@ -56,6 +55,7 @@ fun PostImage(
     post: PostData,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    blur: Boolean = false,
     goFullscreen: (Route) -> Unit
 ) {
     val quality = Quality.High
@@ -65,8 +65,6 @@ fun PostImage(
 //        }
         goFullscreen(FullscreenImageRoute(post.name))
     }
-    val filters = rememberFiltersSettings()
-    val blur = post.spoiler || (post.over18 && filters.blurNSFW)
     val mediaResource = post.getImage()
     val blurStyle = crabirBlurStyle()
     val modifier = Modifier

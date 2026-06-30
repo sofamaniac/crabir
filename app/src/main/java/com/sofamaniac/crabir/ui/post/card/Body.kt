@@ -9,6 +9,7 @@ import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.Route
+import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import com.sofamaniac.crabir.ui.post.PostGallery
 import com.sofamaniac.crabir.ui.post.PostImage
@@ -36,84 +37,89 @@ internal fun PostBody(
         navController?.navigate(route)
     }
 
+    val filters = rememberFiltersSettings()
+    val blur = post.spoiler || (post.over18 && filters.blurNSFW)
 
     val selftextView = @Composable {
-            RedditMarkdown(
-                markdownState,
-                maxLines = maxLines,
-                modifier = modifier.padding(horizontal = 16.dp),
-                key = post.name,
-                //onClick = { goFullscreen(PostRoute(post.permalink, null)) }
+        RedditMarkdown(
+            markdownState,
+            maxLines = maxLines,
+            modifier = modifier.padding(horizontal = 16.dp),
+            key = post.name,
+        )
+    }
+    when (post.kind) {
+        Kind.Image -> {
+            PostImage(
+                post,
+                modifier.fillMaxWidth(),
+                goFullscreen = ::goFullscreen,
+                blur = blur,
             )
         }
-        when (post.kind) {
-            Kind.Image -> {
+
+        Kind.Video -> {
+            PostVideo(
+                post,
+                modifier.fillMaxWidth(),
+                canPlayVideo = canPlayVideo,
+                blur = blur,
+                goFullscreen = ::goFullscreen
+            )
+        }
+
+        Kind.Link -> {
+            if (enableLinkFullSizePreview) {
                 PostImage(
                     post,
                     modifier.fillMaxWidth(),
+                    enabled = false,
+                    blur = blur,
                     goFullscreen = ::goFullscreen,
                 )
-            }
-
-            Kind.Video -> {
-                PostVideo(
-                    post,
-                    modifier.fillMaxWidth(),
-                    canPlayVideo = canPlayVideo,
-                    goFullscreen = ::goFullscreen
-                )
-            }
-
-            Kind.Link -> {
-                if (enableLinkFullSizePreview) {
-                    PostImage(
-                        post,
-                        modifier.fillMaxWidth(),
-                        enabled = false,
-                        goFullscreen = ::goFullscreen,
-                    )
-                }
-            }
-
-            Kind.Gallery -> {
-                PostGallery(
-                    post,
-                    modifier.fillMaxWidth(),
-                    canPlayVideo = canPlayVideo,
-                    goFullscreen = ::goFullscreen,
-                )
-            }
-
-            Kind.YoutubeVideo -> {
-                YoutubeVideo(
-                    post,
-                    modifier.fillMaxWidth(),
-                )
-            }
-
-            Kind.Streamable -> {
-                StreamableVideo(
-                    post,
-                    canPlayVideo = canPlayVideo,
-                    modifier = modifier.fillMaxWidth(),
-                    goFullscreen = ::goFullscreen
-                )
-            }
-
-            else -> {
-                val selftext = post.selftext.markdown
-                if (selftext.markdown.isNotBlank() && enableTextPreview) {
-                    selftextView()
-                    return
-                }
             }
         }
-        if (forceShowSelftext) {
+
+        Kind.Gallery -> {
+            PostGallery(
+                post,
+                modifier.fillMaxWidth(),
+                canPlayVideo = canPlayVideo,
+                blur = blur,
+                goFullscreen = ::goFullscreen,
+            )
+        }
+
+        Kind.YoutubeVideo -> {
+            YoutubeVideo(
+                post,
+                modifier.fillMaxWidth(),
+            )
+        }
+
+        Kind.Streamable -> {
+            StreamableVideo(
+                post,
+                canPlayVideo = canPlayVideo,
+                modifier = modifier.fillMaxWidth(),
+                goFullscreen = ::goFullscreen
+            )
+        }
+
+        else -> {
             val selftext = post.selftext.markdown
             if (selftext.markdown.isNotBlank() && enableTextPreview) {
                 selftextView()
+                return
             }
         }
+    }
+    if (forceShowSelftext) {
+        val selftext = post.selftext.markdown
+        if (selftext.markdown.isNotBlank() && enableTextPreview) {
+            selftextView()
+        }
+    }
 }
 
 

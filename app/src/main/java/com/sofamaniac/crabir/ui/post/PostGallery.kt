@@ -43,7 +43,6 @@ import com.sofamaniac.crabir.domain.model.Gallery
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.FullscreenGalleryRoute
 import com.sofamaniac.crabir.navigation.Route
-import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.crabirBlurStyle
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
@@ -63,6 +62,7 @@ fun PostGallery(
     post: PostData,
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = false,
+    blur: Boolean = false,
     goFullscreen: (Route) -> Unit,
 ) {
     val gallery = post.gallery
@@ -77,9 +77,6 @@ fun PostGallery(
         currentPage = state.currentPage
     }
 
-    //val fullscreenManager = LocalFullscreenHandler.current!!
-    val filters = rememberFiltersSettings()
-    val blur = post.spoiler || (post.over18 && filters.blurNSFW)
     EmbeddedGallery(
         state,
         gallery,

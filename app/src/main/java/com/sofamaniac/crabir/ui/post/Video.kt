@@ -37,7 +37,6 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
 import com.sofamaniac.crabir.navigation.Route
-import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.VIDEO_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.YOUTUBE_CARTOUCHE_COLOR
@@ -61,11 +60,10 @@ fun PostVideo(
     post: PostData,
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = false,
+    blur: Boolean = false,
     goFullscreen: (Route) -> Unit
 ) {
     val video = getVideoUrl(post)
-    val filters = rememberFiltersSettings()
-    val blur = post.spoiler || (post.over18 && filters.blurNSFW)
     val blurStyle = crabirBlurStyle()
     val placeholderModifier = Modifier.hazeEffect {
         inputScale = HazeInputScale.Fixed(0.5f)
