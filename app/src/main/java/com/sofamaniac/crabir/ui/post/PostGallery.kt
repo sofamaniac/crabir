@@ -122,11 +122,11 @@ fun EmbeddedGallery(
             Box {
                 val blurBackground = when (metadata) {
                     is MediaMetadata.Gif -> {
-                        metadata.obfuscated.lastOrNull()?.toMediaResource()?.url
+                        metadata.obfuscated.minByOrNull { it.width }?.toMediaResource()?.url
                     }
 
                     is MediaMetadata.Image -> {
-                        metadata.obfuscated.lastOrNull()?.toMediaResource()?.url
+                        metadata.obfuscated.minByOrNull { it.width }?.toMediaResource()?.url
                     }
 
                     else -> {
@@ -135,12 +135,12 @@ fun EmbeddedGallery(
                 }
                 val backgroundUrl = when (metadata) {
                     is MediaMetadata.Gif -> {
-                        val resource = metadata.preview.lastOrNull()?.toMediaResource()
+                        val resource = metadata.preview.minByOrNull { it.width }?.toMediaResource()
                         resource?.url
                     }
 
                     is MediaMetadata.Image -> {
-                        metadata.preview.lastOrNull()?.url
+                        metadata.preview.minByOrNull { it.width }?.url
                     }
 
                     else -> null

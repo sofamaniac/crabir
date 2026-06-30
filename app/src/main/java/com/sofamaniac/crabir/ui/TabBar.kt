@@ -67,13 +67,12 @@ fun TabBar(
                         // TODO: ask user to log in
                         return@Tab
                     }
-                    navController.navigate(tab.route)
-//                    navController.navigate(tab.route) {
-//                        popUpTo(navController.graph.startDestinationId) {
-//                            saveState = index == 0
-//                        }
-//                        launchSingleTop = true
-//                    }
+                    navController.navigate(tab.route) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = index == 0
+                        }
+                        launchSingleTop = true
+                    }
                 },
                 icon = { Icon(tab.icon, contentDescription = stringResource(tab.label)) },
             )

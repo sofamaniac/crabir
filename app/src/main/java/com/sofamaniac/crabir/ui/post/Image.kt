@@ -6,6 +6,7 @@ package com.sofamaniac.crabir.ui.post
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -20,8 +21,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalSharedTransitionScope
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.MediaResource
@@ -50,6 +53,12 @@ private fun PostData.getImage(): MediaResource {
     }
 }
 
+internal fun PostData.getObfuscated(): MediaResource? {
+    val image = preview?.images[0] ?: return null
+    val variant = image.variants?.obfuscated// ?: image.variants?.nsfw
+    return variant?.resolutions?.minByOrNull { it.width }?.toMediaResource()
+}
+
 @Composable
 fun PostImage(
     post: PostData,
@@ -67,12 +76,14 @@ fun PostImage(
     }
     val mediaResource = post.getImage()
     val blurStyle = crabirBlurStyle()
+    val blurred = post.getObfuscated()
     val modifier = Modifier
         .hazeEffect {
             inputScale = HazeInputScale.Fixed(0.5f)
             blurEffect {
                 style = blurStyle
-                blurEnabled = blur
+                // Blur only if not obfuscated preview is available
+                blurEnabled = blur && blurred == null
             }
         }.then(modifier)
         .let { modifier ->
@@ -82,14 +93,24 @@ fun PostImage(
                 modifier
             }
         }
-    ImageView(
-        post,
-        quality = quality,
-        modifier = modifier.clickable(enabled = enabled) {
-            goFullscreen()
-        },
-        allowTransformation = false
-    )
+    Box(modifier) {
+        ImageView(
+            post,
+            quality = quality,
+            modifier = Modifier.clickable(enabled = enabled) {
+                goFullscreen()
+            },
+            allowTransformation = false
+        )
+        if (blurred != null && blur) {
+            AsyncImage(
+                blurred.url,
+                modifier = Modifier.fillMaxSize(),
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds
+            )
+        }
+    }
 
 }
 

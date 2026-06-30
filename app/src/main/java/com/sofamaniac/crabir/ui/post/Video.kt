@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
+import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
@@ -74,12 +75,22 @@ fun PostVideo(
     }
     val placeholder =
         @Composable {
-            ImageView(
-                post,
-                quality = Quality.High,
-                allowTransformation = false,
-                modifier = placeholderModifier.fillMaxSize()
-            )
+            val image = post.getObfuscated()
+            if (image != null && blur) {
+                AsyncImage(
+                    image.url,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.FillBounds
+                )
+            } else {
+                ImageView(
+                    post = post, modifier = placeholderModifier.fillMaxSize(),
+                    allowTransformation = false,
+                    contentScale = ContentScale.FillBounds,
+                    quality = Quality.Medium,
+                )
+            }
         }
     val uriHandler = LocalUriHandler.current
 

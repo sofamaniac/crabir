@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -20,9 +21,11 @@ import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.navigation.NavController
 import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
 import com.mikepenz.markdown.compose.components.markdownComponents
@@ -136,7 +139,25 @@ private fun InnerRedditMarkdown(
             //animations = markdownAnimations(animateTextSize = { Modifier.fillMaxSize() }),
             components = markdownComponents(
                 inlineImage = { model ->
-                    ClickableMarkdownInlineImage(model.content, model.node, linkInteractionListener)
+                    if (enableImages) {
+                        ClickableMarkdownInlineImage(
+                            model.content,
+                            model.node,
+                            linkInteractionListener
+                        )
+                    } else {
+                        val string = buildAnnotatedString {
+                            withLink(
+                                LinkAnnotation.Url(
+                                    model.content,
+                                    linkInteractionListener = linkInteractionListener
+                                )
+                            ) {
+                                append(model.content)
+                            }
+                        }
+                        Text(string)
+                    }
                 },
             ),
             annotator = RedditAnnotator(
