@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.user
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -35,6 +36,7 @@ fun CommentView(
     thing: CommentData,
 ) {
     val navController = LocalNavController.current!!
+    Log.d("CommentView", "comment ${thing.body}")
     ThemedCard(
         modifier = Modifier.clickable {
             navController.navigate(
@@ -47,7 +49,7 @@ fun CommentView(
     ) {
         OpenedComment(
             thing,
-            viewModel = hiltViewModel<CommentViewModel, CommentViewModel.Factory> { factory ->
+            viewModel = hiltViewModel<CommentViewModel, CommentViewModel.Factory>(key = thing.id) { factory ->
                 factory.create(thing)
             },
             enableAnimation = false,
