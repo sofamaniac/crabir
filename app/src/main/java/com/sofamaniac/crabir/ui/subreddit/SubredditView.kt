@@ -71,14 +71,12 @@ fun SubredditViewer(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val params by viewModel.params.collectAsState()
-    val feedInfoOpt by viewModel.info.collectAsState()
+    val feedInfo by viewModel.info.collectAsState()
     val entity by viewModel.entity.collectAsState(null)
     val defaultView = rememberViewSettings().defaultView
-    if (feedInfoOpt == null) return
-    val feedInfo = feedInfoOpt!!
     val topBar = @Composable {
         TopBar(
-            feedInfo.displayName,
+            feedInfo?.displayName ?: subreddit,
             params,
             slug = subreddit,
             updateSort = viewModel::updateSort,

@@ -29,18 +29,6 @@ import com.sofamaniac.crabir.LocalTheme
  *
  * Code fully written by Claude.ai
  */
-//@Composable
-//fun HeightRestrictedWithGradient(
-//    maxHeight: Dp,
-//    modifier: Modifier = Modifier,
-//    //gradientColors: List<Color> = listOf(Color.Transparent, Color.Black),
-//    gradientHeight: Dp = 64.dp,
-//    content: @Composable () -> Unit,
-//) {
-//    Box(modifier = modifier.heightIn(max = maxHeight)) {
-//        content()
-//    }
-//}
 @Composable
 fun HeightRestrictedWithGradient(
     maxHeight: Dp,
