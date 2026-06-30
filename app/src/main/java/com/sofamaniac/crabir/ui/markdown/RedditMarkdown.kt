@@ -5,7 +5,9 @@
 package com.sofamaniac.crabir.ui.markdown
 
 import android.util.Log
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -107,6 +109,7 @@ private fun HeightRestrictedMarkdown(
                 enableImages = enableImages,
                 key = key,
                 spoilers = spoilers,
+                modifier = Modifier.height(IntrinsicSize.Min)
             )
         }
     }

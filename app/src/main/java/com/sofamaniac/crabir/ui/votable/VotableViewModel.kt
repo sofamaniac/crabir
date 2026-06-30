@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.votable
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mikepenz.markdown.model.parseMarkdownFlow
@@ -48,47 +47,24 @@ open class VotableViewModel<T : VotableData>(
     private var _post = posts.get(fullname)
         .stateIn(
             viewModelScope,
-            started = SharingStarted.Lazily,
+            started = SharingStarted.Eagerly,
             initialValue = initialData
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override var markdown: StateFlow<MarkdownState> = _post.flatMapLatest { post ->
-        if (post == null) flowOf(MarkdownState.Loading())
-        else parseMarkdownFlow(post.body.markdown, flavour = RedditFlavourDescriptor(true))
+
+    override val markdown: StateFlow<MarkdownState> = if (initialData != null) {
+        parseMarkdownFlow(initialData.body.markdown, flavour = RedditFlavourDescriptor(true))
+    } else {
+        _post.flatMapLatest { post ->
+            if (post == null) flowOf(MarkdownState.Loading())
+            else parseMarkdownFlow(post.body.markdown, flavour = RedditFlavourDescriptor(true))
+        }
     }.stateIn(
         viewModelScope,
         started = SharingStarted.Lazily,
         initialValue = MarkdownState.Loading()
     )
-
-    init {
-        require(name.contains("_"))
-        viewModelScope.launch(Dispatchers.Default) {
-            val post = posts.getValue(fullname)
-            if (post != null) {
-                markdown = parseMarkdownFlow(
-                    post.body.markdown,
-                    flavour = RedditFlavourDescriptor(true)
-                ).stateIn(
-                    viewModelScope,
-                    started = SharingStarted.Lazily,
-                    initialValue = MarkdownState.Loading()
-                )
-            } else {
-                Log.e("VotableViewModel", "$fullname not found")
-                markdown = parseMarkdownFlow(
-                    "",
-                    flavour = RedditFlavourDescriptor(true)
-                ).stateIn(
-                    viewModelScope,
-                    started = SharingStarted.Lazily,
-                    initialValue = MarkdownState.Loading()
-                )
-            }
-        }
-    }
-
 
     override val likes = _post.map { it?.relationship?.liked }
     override val saved = _post.map { it?.relationship?.saved ?: false }
