@@ -6,7 +6,6 @@ package com.sofamaniac.crabir.ui.markdown
 
 import android.util.Log
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -133,8 +132,8 @@ private fun InnerRedditMarkdown(
             typography = typography,
             imageTransformer = Coil3ImageTransformerImpl,
             // Disable animations
-            // animations = markdownAnimations(animateTextSize = { this }),
-            animations = markdownAnimations(animateTextSize = { Modifier.fillMaxSize() }),
+            animations = markdownAnimations(animateTextSize = { this }),
+            //animations = markdownAnimations(animateTextSize = { Modifier.fillMaxSize() }),
             components = markdownComponents(
                 inlineImage = { model ->
                     ClickableMarkdownInlineImage(model.content, model.node, linkInteractionListener)
