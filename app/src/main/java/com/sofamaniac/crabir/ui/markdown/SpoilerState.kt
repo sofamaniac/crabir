@@ -8,6 +8,8 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 interface SpoilerState {
     fun getState(spoiler: String): Boolean?
     fun setState(spoiler: String, target: Boolean)
+
+    fun insert(spoiler: String)
 }
 
 class SpoilerStateImpl(private val state: SnapshotStateMap<String, Boolean> = mutableStateMapOf()) :
@@ -16,6 +18,12 @@ class SpoilerStateImpl(private val state: SnapshotStateMap<String, Boolean> = mu
 
     override fun setState(spoiler: String, target: Boolean) {
         state[spoiler] = target
+    }
+
+    override fun insert(spoiler: String) {
+        if (!state.containsKey(spoiler)) {
+            state[spoiler] = false
+        }
     }
 
 }

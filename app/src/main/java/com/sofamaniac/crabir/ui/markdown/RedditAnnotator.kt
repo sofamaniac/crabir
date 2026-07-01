@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.markdown
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
@@ -49,8 +50,13 @@ class RedditAnnotator(
             style = style,
         )
         val linkInteractionListenerChild =
-            if (spoilers.getState(text) != false || depth > 0) linkInteractionListener else {
-                LinkInteractionListener { spoilers.setState(text, true) }
+            if (spoilers.getState(text) != false || depth > 0) {
+                linkInteractionListener
+            } else {
+                LinkInteractionListener {
+                    Log.d("RedditAnnotator", "Clicked on spoiler: $text")
+                    spoilers.setState(text, true)
+                }
             }
         RedditAnnotatorSettings(
             linkTextSpanStyle = if (spoilers.getState(text) == true) typography.textLink else linkStyle,
@@ -114,7 +120,7 @@ class RedditAnnotator(
                 }
 
                 RedditFlavourElementType.SPOILER if depth == 0 -> {
-                    spoilers.setState(text, false)
+                    spoilers.insert(text)
                     val settings = makeSettings(text)
                     withStyle(
                         SpanStyle(
