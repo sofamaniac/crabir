@@ -17,7 +17,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -146,27 +145,22 @@ fun MainScreen(
             VideoPlayerManager.releasePlayer()
         }
     }
-    CompositionLocalProvider(LocalNavController provides navController) {
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
-        ConfigureMaterialTheme {
-            val theme = rememberAppTheme()
-            if (theme == null) {
-                return@ConfigureMaterialTheme
-            }
-            CompositionLocalProvider(LocalTheme provides theme) {
-                CompositionLocalProvider(LocalDrawerState provides drawerState) {
-                    val currentAccount = rememberCurrentAccount()
-                    CompositionLocalProvider(LocalRedditAccount provides currentAccount) {
-                        SharedTransitionLayout {
-                            CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
-                                NavigationGraph(
-                                    navController,
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    ConfigureMaterialTheme {
+        val theme = rememberAppTheme()
+        if (theme == null) {
+            return@ConfigureMaterialTheme
+        }
+        val currentAccount = rememberCurrentAccount()
+        CompositionLocalProvider(
+            LocalNavController provides navController,
+            LocalTheme provides theme,
+            LocalDrawerState provides drawerState,
+            LocalRedditAccount provides currentAccount,
+        ) {
+            NavigationGraph(
+                navController,
+            )
         }
     }
 }
@@ -176,7 +170,7 @@ fun MainScreen(
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     NavHost(
         navController = navController,

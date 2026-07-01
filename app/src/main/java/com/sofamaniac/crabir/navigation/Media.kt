@@ -64,8 +64,7 @@ fun NavGraphBuilder.imagesGraph(navController: NavController) {
         val route = it.toRoute<FullscreenImageRoute>()
         FullscreenImageView(
             route.post,
-            dismiss = { navController.popBackStack() },
-            animatedVisibilityScope = this@composable
+            dismiss = { navController.popBackStack() }
         )
     }
     composable<FullscreenVideoRoute>(

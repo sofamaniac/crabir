@@ -22,6 +22,7 @@ import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.model.CommunityData
+import com.sofamaniac.crabir.domain.model.DUMMY_POST
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
@@ -38,6 +39,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -53,6 +55,32 @@ interface FeedViewModelInterface<T : VotableData> {
     fun visitPost(post: PostData, visitedBy: Int)
 
     fun isPostRead(post: PostData): Boolean
+}
+
+object FeedViewModelInterfacePreview : FeedViewModelInterface<PostData> {
+    override val listState: LazyStaggeredGridState = LazyStaggeredGridState()
+    override val data: Flow<PagingData<PostData>> =
+        flowOf(PagingData.from(List(100) {
+            DUMMY_POST.copy(
+                id = it.toString(),
+                name = Fullname(it.toString())
+            )
+        }))
+    override var needScrollToTop: Boolean = false
+    override val entity: Flow<CommunityViewEntity?> = flowOf(null)
+
+    override fun refresh() {
+    }
+
+    override fun visitPost(
+        post: PostData,
+        visitedBy: Int,
+    ) {
+    }
+
+    override fun isPostRead(post: PostData): Boolean {
+        return false
+    }
 }
 
 abstract class PostFeedViewModel<T : CommunityData>(

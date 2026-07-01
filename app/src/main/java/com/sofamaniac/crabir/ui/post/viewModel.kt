@@ -143,10 +143,10 @@ open class LinkViewModel(
     }
 }
 
-interface PostViewModelInterface : LinkInteraction, VotableInteraction
+interface PostViewModelInterface : LinkInteraction
 
-class DummyInteraction : LinkInteraction, ViewModel() {
-    private var _post = MutableStateFlow(DUMMY_POST.copy(kind = Kind.Self))
+class DummyInteraction(post: PostData = DUMMY_POST) : PostViewModelInterface, ViewModel() {
+    private var _post = MutableStateFlow(post.copy(kind = Kind.Self))
     override val post: StateFlow<PostData> = _post
     override val flairs: StateFlow<List<FlairInfo>> = MutableStateFlow(emptyList())
     override val markdown: StateFlow<State> =

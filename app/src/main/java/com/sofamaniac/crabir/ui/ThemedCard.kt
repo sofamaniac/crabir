@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
 
 @Composable
@@ -19,7 +20,7 @@ fun ThemedCard(
     elevation: CardElevation = CardDefaults.cardElevation(),
     border: BorderStroke? = null,
     highlight: Boolean = false,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     val theme = LocalTheme.current
     val background = if (highlight) {
@@ -41,10 +42,10 @@ fun ThemedCard(
 fun ThemedCard(
     modifier: Modifier = Modifier,
     shape: Shape = CardDefaults.shape,
-    elevation: CardElevation = CardDefaults.cardElevation(),
+    elevation: CardElevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
     border: BorderStroke? = null,
     onClick: () -> Unit,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     val theme = LocalTheme.current
     Card(
@@ -52,8 +53,8 @@ fun ThemedCard(
         shape = shape,
         elevation = elevation,
         border = border,
-        content = content,
         colors = CardDefaults.cardColors().copy(containerColor = theme.cardBackground),
-        onClick = onClick
+        onClick = onClick,
+        content = content,
     )
 }

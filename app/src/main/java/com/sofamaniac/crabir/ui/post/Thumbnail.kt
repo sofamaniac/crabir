@@ -38,15 +38,16 @@ fun Thumbnail(
     val thumbnailURL = post.getThumbnailUrl()
     val uriHandler = LocalUriHandler.current
     //val fullscreenManager = LocalFullscreenHandler.current!!
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val goFullscreen = {
         markAsRead()
         when (post.kind) {
-            Kind.Image -> navController.navigate(FullscreenImageRoute(post.name))
-            Kind.Gallery -> navController.navigate(FullscreenGalleryRoute(post.name))
-            Kind.Video -> navController.navigate(FullscreenVideoRoute(post.name))
+            Kind.Image -> navController?.navigate(FullscreenImageRoute(post.name))
+            Kind.Gallery -> navController?.navigate(FullscreenGalleryRoute(post.name))
+            Kind.Video -> navController?.navigate(FullscreenVideoRoute(post.name))
             else -> uriHandler.openUri(post.url)
         }
+        Unit
     }
     val blurStyle = crabirBlurStyle()
     val modifier = Modifier

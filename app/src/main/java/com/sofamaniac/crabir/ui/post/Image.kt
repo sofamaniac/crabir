@@ -4,7 +4,6 @@
 
 package com.sofamaniac.crabir.ui.post
 
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -24,15 +23,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.core.net.toUri
 import coil3.compose.AsyncImage
-import com.sofamaniac.crabir.LocalSharedTransitionScope
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.FullscreenImageRoute
 import com.sofamaniac.crabir.navigation.Route
-import com.sofamaniac.crabir.ui.SharedElementKey
-import com.sofamaniac.crabir.ui.SharedElementType
 import com.sofamaniac.crabir.ui.crabirBlurStyle
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
@@ -117,15 +113,12 @@ fun FullscreenImageView(
     post: Fullname,
     viewModel: PostDataViewModel = koinViewModel { parametersOf(post) },
     dismiss: () -> Unit,
-    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     var quality by remember { mutableStateOf(Quality.High) }
     var showDecorations by remember { mutableStateOf(true) }
     val postData by viewModel.post.collectAsState(initial = null)
     if (postData == null) return
-    val sharedTransitionScope = LocalSharedTransitionScope.current
     val zoomableState = rememberZoomableState()
-    with(sharedTransitionScope) {
         VerticalSwipeToDismiss(
             onDismiss = dismiss,
             enabled = zoomableState.contentTransformation.scaleMetadata.userZoom == 1.0f,
@@ -148,23 +141,13 @@ fun FullscreenImageView(
                 postData!!,
                 zoomableState = zoomableState,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .sharedElement(
-                        sharedTransitionScope.rememberSharedContentState(
-                            key = SharedElementKey(
-                                postData!!.name,
-                                SharedElementType.Content
-                            )
-                        ),
-                        animatedVisibilityScope
-                    ),
+                    .fillMaxSize(),
                 quality = quality,
                 onClick = {
                     showDecorations = !showDecorations
                 }
             )
         }
-    }
 }
 
 internal fun PostData.getSourceUrl(): String = preview?.images?.firstOrNull()?.source?.url ?: url

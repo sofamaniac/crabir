@@ -33,19 +33,30 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.PreviewLocalComposition
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.post.CompactView
+import com.sofamaniac.crabir.ui.post.DummyInteraction
+import com.sofamaniac.crabir.ui.post.LinkViewModel
+import com.sofamaniac.crabir.ui.post.PostViewModelInterface
 import com.sofamaniac.crabir.ui.post.card.PostCard
 import kotlinx.coroutines.flow.filterNotNull
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.KoinApplicationPreview
+import org.koin.core.parameter.parametersOf
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import org.koin.plugin.module.dsl.viewModel
 import kotlin.math.max
 
 /**
@@ -62,7 +73,7 @@ fun <T : VotableData> PostFeedViewer(
     filter: (T) -> Boolean = { true },
     // If set to {}, breaks pull to refresh
     feedInfo: (@Composable () -> Unit)? = null,
-    itemView: @Composable (thing: T, isMostVisible: Boolean) -> Unit
+    itemView: @Composable (thing: T, isMostVisible: Boolean) -> Unit,
 ) {
 
     val posts = viewModel.data.collectAsLazyPagingItems()
@@ -109,6 +120,7 @@ fun <T : VotableData> PostFeedViewer(
 
     val viewSettings = rememberViewSettings()
     val state = rememberPullToRefreshState()
+    val theme = LocalTheme.current
 
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,
@@ -138,10 +150,10 @@ fun <T : VotableData> PostFeedViewer(
         if (posts.itemCount == 0) return@PullToRefreshBox
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Fixed(viewSettings.defaultColumns),
-            verticalItemSpacing = 2.dp,
+            verticalItemSpacing = 8.dp,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
-                .background(Color.Gray)
+                .background(theme.background)
                 .fillMaxSize(),
             state = listState,
         ) {
@@ -185,6 +197,7 @@ fun PostView(
     markAsRead: () -> Unit,
     showHidden: Boolean,
     view: Views,
+    viewModel: PostViewModelInterface,
 ) {
     when (view) {
         Views.Card -> PostCard(
@@ -193,6 +206,7 @@ fun PostView(
             canStartVideo = isMostVisible,
             read = read,
             showHidden = showHidden,
+            viewModel = viewModel,
         )
 
         Views.Compact -> CompactView(
@@ -201,6 +215,7 @@ fun PostView(
             canStartVideo = isMostVisible,
             read = read,
             showHidden = showHidden,
+            viewModel = viewModel,
         )
     }
 }
@@ -212,9 +227,47 @@ fun PostView(
     read: Boolean,
     markAsRead: () -> Unit,
     showHidden: Boolean,
-    view: Views? = null
+    view: Views? = null,
+    viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = thing.id) {
+        parametersOf(
+            thing
+        )
+    },
 ) {
     val viewSettings = rememberViewSettings()
     val view = if (!viewSettings.rememberView) viewSettings.defaultView else view
-    PostView(thing, isMostVisible, read, markAsRead, showHidden, view ?: viewSettings.defaultView)
+    PostView(
+        thing,
+        isMostVisible,
+        read,
+        markAsRead,
+        showHidden,
+        view ?: viewSettings.defaultView,
+        viewModel = viewModel
+    )
+}
+
+@Preview
+@Composable
+private fun PostFeedPreview() {
+    PreviewLocalComposition {
+        KoinApplicationPreview(application = {
+            modules(module {
+                viewModel<DummyInteraction>() bind PostViewModelInterface::class
+            })
+        }) {
+            PostFeedViewer(
+                viewModel = FeedViewModelInterfacePreview
+            ) { post, mostVisible ->
+                PostView(
+                    thing = post,
+                    isMostVisible = mostVisible,
+                    read = false,
+                    markAsRead = {},
+                    showHidden = false,
+                    viewModel = koinViewModel<DummyInteraction>()
+                )
+            }
+        }
+    }
 }

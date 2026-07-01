@@ -25,6 +25,7 @@ import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.SubscriptionsRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -51,37 +52,54 @@ sealed class LoginState {
     data class Error(val message: Throwable) : LoginState()
 }
 
-@KoinViewModel
-class DrawerViewModel(
+abstract class DrawerViewModel : ViewModel() {
+    abstract val accountsList: Flow<List<RedditAccount>>
+    abstract val activeAccount: Flow<RedditAccount>
+    abstract val loginState: StateFlow<LoginState>
+    abstract val selectingAccount: StateFlow<Boolean>
+    abstract val subscriptions: StateFlow<List<Thing.Subreddit>>
+    abstract val multis: StateFlow<List<Thing.Multi>>
+    abstract fun setActiveAccount(accountId: Int)
+    abstract fun toggleSelectAccount()
+    abstract fun logout()
+    abstract fun createAuthIntent(): Intent
+    abstract fun visitCommunity(data: SubredditData)
+    abstract fun visitCommunity(data: MultiData)
+    abstract fun handleAuthResult(intent: Intent?)
+}
+
+@KoinViewModel(binds = [DrawerViewModel::class])
+class DrawerViewModelImpl(
     private val authService: AuthorizationService,
     private val accountsRepository: AccountsRepository,
     private val subsRepository: SubscriptionsRepository,
     private val redditApi: RedditAPIService,
     private val subredditDao: SubredditRepository,
     private val multiDao: MultiRepository,
-) : ViewModel() {
+) : DrawerViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
-    val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
+    override val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
 
 
-    val accountsList = accountsRepository.accounts
-    val activeAccount = accountsRepository.activeAccount
+    override val accountsList = accountsRepository.accounts
+    override val activeAccount = accountsRepository.activeAccount
 
     private val _selectingAccount = MutableStateFlow(false)
-    val selectingAccount = _selectingAccount.asStateFlow()
+    override val selectingAccount = _selectingAccount.asStateFlow()
 
-    fun toggleSelectAccount() {
+    override fun toggleSelectAccount() {
         _selectingAccount.value = !_selectingAccount.value
     }
 
-    val serviceConfig = AuthConfig()
+    private val serviceConfig = AuthConfig()
 
-    val subscriptions: StateFlow<List<Thing.Subreddit>> = subsRepository.subscriptions.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = emptyList<Thing.Subreddit>()
-    )
-    val multis: StateFlow<List<Thing.Multi>> = subsRepository.multis.stateIn(
+    override val subscriptions: StateFlow<List<Thing.Subreddit>> =
+        subsRepository.subscriptions.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptyList<Thing.Subreddit>()
+        )
+    override val multis: StateFlow<List<Thing.Multi>> = subsRepository.multis.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
         initialValue = emptyList<Thing.Multi>()
@@ -105,7 +123,7 @@ class DrawerViewModel(
         }
     }
 
-    fun logout() {
+    override fun logout() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val res = redditApi.logout(activeAccount.first().auth.refreshToken!!)
@@ -174,7 +192,7 @@ class DrawerViewModel(
         }
     }
 
-    fun setActiveAccount(accountId: Int) {
+    override fun setActiveAccount(accountId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             if (activeAccount.first().id == accountId) return@launch
             accountsRepository.setActiveAccount(accountId)
@@ -191,14 +209,14 @@ class DrawerViewModel(
         }
     }
 
-    fun createAuthIntent(): Intent {
+    override fun createAuthIntent(): Intent {
         val authRequest = serviceConfig.createAuthorizationRequest()
         val intent = authService.getAuthorizationRequestIntent(authRequest)
         Log.d("LoginViewModel", "Creating auth intent: $intent")
         return intent
     }
 
-    fun handleAuthResult(intent: Intent?) {
+    override fun handleAuthResult(intent: Intent?) {
         Log.d("LoginViewModel", "Handling auth result ${intent?.data}")
         if (intent == null) {
             _loginState.update { LoginState.Error(Exception("Login cancelled")) }
@@ -275,13 +293,13 @@ class DrawerViewModel(
         }
     }
 
-    fun visitCommunity(data: SubredditData) {
+    override fun visitCommunity(data: SubredditData) {
         viewModelScope.launch(Dispatchers.IO) {
             subredditDao.upsert(data)
         }
     }
 
-    fun visitCommunity(data: MultiData) {
+    override fun visitCommunity(data: MultiData) {
         viewModelScope.launch(Dispatchers.IO) {
             multiDao.upsert(data)
         }

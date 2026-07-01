@@ -55,7 +55,7 @@ fun PostInfo(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             val width = if (enableThumbnail) 0.8f else 1f
             val titleModifier = Modifier.fillMaxWidth(fraction = width)

@@ -29,7 +29,11 @@ fun CompactView(
     canStartVideo: Boolean = false,
     read: Boolean = false,
     showHidden: Boolean = false,
-    viewModel: LinkViewModel = koinViewModel(key = post.id) { parametersOf(post) }
+    viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = post.id) {
+        parametersOf(
+            post
+        )
+    },
 ) {
     val navController = LocalNavController.current
     val onClick = {
@@ -39,7 +43,9 @@ fun CompactView(
         }
     }
     val likes by viewModel.likes.collectAsState(post.relationship.liked)
-    val post by viewModel.post.collectAsState(post)
+    val postOpt by viewModel.post.collectAsState(post)
+    if (postOpt == null) return
+    val post = postOpt!!
     if (!showHidden && post.relationship.hidden) {
         return
     }

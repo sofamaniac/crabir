@@ -43,7 +43,7 @@ fun FullFeedView(
     val scope = rememberCoroutineScope()
 
     val communityEntity by viewModel.entity.collectAsState(initial = null)
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val drawerState = LocalDrawerState.current
     val currentAccount = LocalRedditAccount.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -96,7 +96,7 @@ fun FullFeedView(
                             showBottomSheet = false
                         },
                         createPost = { kind ->
-                            navController.navigate(
+                            navController?.navigate(
                                 PostCreatorRoute(
                                     kind,
                                     communityEntity?.name
@@ -116,5 +116,7 @@ fun FullFeedView(
         }
     }
 }
+
+
 
 
