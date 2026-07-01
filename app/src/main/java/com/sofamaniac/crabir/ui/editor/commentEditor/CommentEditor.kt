@@ -35,6 +35,7 @@ fun CommentEditor(
     if (parentData == null) return
     Editor(
         state = viewModel.replyState,
+        label = { Text("Type comment") },
         topBar = {
             TopAppBar(
                 title = { Text("Comment") },

@@ -86,6 +86,7 @@ fun PostCreator(
         modifier = Modifier.background(theme.cardBackground),
         state = viewModel.textState,
         snackbarHostState = snackbarHostState,
+        label = { Text("Post content") },
         topBar = {
             TopAppBar(
                 navigationIcon = {
