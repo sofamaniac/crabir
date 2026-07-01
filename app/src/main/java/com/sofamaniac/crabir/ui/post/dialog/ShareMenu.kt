@@ -50,7 +50,7 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
                 },
                 modifier = Modifier.clickable {
                     val intent = Intent(Intent.ACTION_SEND).apply {
-                        putExtra(Intent.EXTRA_TEXT, post.url.toString())
+                        putExtra(Intent.EXTRA_TEXT, post.url)
                         type = "text/plain"
                     }
                     val shareIntent = Intent.createChooser(intent, null)

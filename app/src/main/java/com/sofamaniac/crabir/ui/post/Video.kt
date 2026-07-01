@@ -234,6 +234,7 @@ fun FullscreenVideo(
         VideoPlayer(
             video,
             startPlaying = true,
+            mute = false,
             modifier = Modifier
                 .fillMaxSize()
         )

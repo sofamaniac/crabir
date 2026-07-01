@@ -182,6 +182,7 @@ private fun FilterEditor(
     val colors = ListItemDefaults.colors()
         .copy(
             containerColor = CardDefaults.cardColors().containerColor,
+            selectedContainerColor = CardDefaults.cardColors().containerColor
         )
     BasicAlertDialog(onDismissRequest) {
         Card() {

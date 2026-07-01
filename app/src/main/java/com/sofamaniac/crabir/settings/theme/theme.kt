@@ -297,9 +297,6 @@ fun ConfigureMaterialTheme(
 ) {
 
     val themeSettings = rememberThemeSettings()
-    if (themeSettings == null) {
-        return
-    }
     val context = LocalContext.current
     val darkModeEnabled = when (themeSettings.mode) {
         ThemeMode.Dark -> true

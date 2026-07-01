@@ -146,7 +146,7 @@ fun ViewsSettingsPage() {
                                 target = target.coerceIn(1, 100)
                                 settingsDataStore.updateData {
                                     Log.d("ViewsSettingsPage", "maxLines: $target")
-                                    it.copy(cardSettings = it.cardSettings.copy(maxLines = target.toInt()))
+                                    it.copy(cardSettings = it.cardSettings.copy(maxLines = target))
                                 }
                             }
                         }

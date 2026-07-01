@@ -113,7 +113,9 @@ fun OpenThreadButton(onClick: () -> Unit) {
     TooltipBox(
         tooltip = { PlainTooltip { Text(description) } },
         state = rememberTooltipState(),
-        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+            TooltipAnchorPosition.Above,
+        ),
     ) {
         IconButton(onClick = onClick) {
             Icon(

@@ -64,15 +64,13 @@ fun DecoratedVideoPlayer(
         if (startPlaying) {
             VideoPlayerManager.setMediaItem(media.url)
             player.playWhenReady = true
-            player.mute()
+            player.volume = 0f
         }
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            if (currentUrl == media.url) {
-                VideoPlayerManager.stopPlayer()
-            }
+            // Do not stop player here to allow seamless transition to fullscreen
         }
     }
 
@@ -147,6 +145,7 @@ fun VideoPlayer(
     modifier: Modifier = Modifier,
     placeholder: @Composable () -> Unit = {},
     startPlaying: Boolean = false,
+    mute: Boolean = true,
 ) {
     val context = LocalContext.current
     val player = remember { VideoPlayerManager.getInstance(context) }
@@ -158,15 +157,7 @@ fun VideoPlayer(
         if (startPlaying) {
             VideoPlayerManager.setMediaItem(media.url)
             player.playWhenReady = true
-            player.mute()
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            if (currentUrl == media.url) {
-                VideoPlayerManager.stopPlayer()
-            }
+            if (mute) player.volume = 0f else player.volume = 1f
         }
     }
 
