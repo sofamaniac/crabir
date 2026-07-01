@@ -90,13 +90,11 @@ data class CommentsResponse(
 
 @Serializable
 data class MoreResponseOuter(
-    val json: MoreResponse
+    val json: MoreResult
 )
 
 @Serializable
-data class MoreResponse(
-    val data: MoreResponseData
-)
+data class MoreResult(val data: MoreResponseData? = null, val errors: List<List<String>>? = null)
 
 @Serializable
 data class MoreResponseData(

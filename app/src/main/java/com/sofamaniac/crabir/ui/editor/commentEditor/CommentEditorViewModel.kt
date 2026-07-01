@@ -2,7 +2,7 @@ package com.sofamaniac.crabir.ui.editor.commentEditor
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.sofamaniac.crabir.data.remote.reddit.MoreResponseOuter
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.postCommentBody
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -14,7 +14,6 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = CommentEditorViewModel.Factory::class)
 class CommentEditorViewModel @AssistedInject constructor(
@@ -34,10 +33,17 @@ class CommentEditorViewModel @AssistedInject constructor(
 
     val replyState = TextFieldState()
 
-    fun submitComment() {
-        viewModelScope.launch {
-            val body = postCommentBody(parent, replyState.text.toString())
-            api.postComment(body)
+    fun finalize(): String {
+        return replyState.text.toString()
+    }
+
+    suspend fun submitComment(): Result<MoreResponseOuter> {
+        val body = postCommentBody(parent, replyState.text.toString())
+        val res = api.postComment(body)
+        return if (res.isSuccessful) {
+            Result.success(res.body()!!)
+        } else {
+            Result.failure(Exception(res.errorBody()?.string()))
         }
     }
 

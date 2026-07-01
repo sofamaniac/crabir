@@ -54,6 +54,9 @@ class ThreadViewModel @AssistedInject constructor(
     override val rules: StateFlow<Rules>
         get() = TODO("Not yet implemented")
 
+    private val replyState = MutableStateFlow<Fullname?>(null)
+    val reply: StateFlow<Fullname?> = replyState.asStateFlow()
+
     private var _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
@@ -178,12 +181,6 @@ class ThreadViewModel @AssistedInject constructor(
                 name,
                 CommentType.Comment(comment.copy(collapsed = collapsed))
             )
-//            _comments.update { comments ->
-//                comments.updateComment(name) {
-//                    val comment = (it as CommentType.Comment).comment
-//                    CommentType.Comment(comment.copy(collapsed = collapsed))
-//                }
-//            }
         }
     }
 
@@ -225,32 +222,27 @@ class ThreadViewModel @AssistedInject constructor(
         fetchComments()
     }
 
+    override fun replyTo(name: Fullname?) {
+        replyState.value = name
+    }
+
     override fun submitComment(parent: Fullname, body: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val response = repository.postComment(parent, body)
             if (!response.isSuccessful) {
                 return@launch
             }
-            val comment = response.body()?.json?.data?.things?.firstOrNull() ?: return@launch
+            val result = response.body()?.json ?: return@launch
+            // TODO display error if any
+            val comment = result.data?.things?.firstOrNull() ?: return@launch
             val commentDTO = comment as Thing.Comment
             var commentData = CommentDataMapper.map(commentDTO.data)
             commentData =
                 commentData.copy(relationship = commentData.relationship.copy(liked = true))
-            // TODO
-//            if (parent == _post.value?.name) {
-//                _comments.update {
-//                    it + CommentType.Comment(commentData.copy(depth = 0))
-//                }
-//            } else {
-//                _comments.update {
-//                    it.updateComment(parent) { c ->
-//                        c as CommentType.Comment
-//                        val replies =
-//                            c.comment.replies + CommentType.Comment(commentData.copy(depth = c.depth + 1))
-//                        c.copy(comment = c.comment.copy(replies = replies))
-//                    }
-//                }
-//            }
+            val p = comments.value.find { it.name == parent }
+            commentData = commentData.copy(depth = (p?.depth ?: 0) + 1)
+            repository.insertReply(parent, CommentType.Comment(commentData))
+            replyState.value = null
         }
     }
 

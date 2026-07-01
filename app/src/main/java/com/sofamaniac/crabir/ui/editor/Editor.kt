@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
@@ -83,6 +84,13 @@ fun Editor(
 @Composable
 private fun BottomBar(state: TextFieldState) {
 
+    FlexibleBottomAppBar(modifier = Modifier.imePadding()) {
+        EditorActions(state)
+    }
+}
+
+@Composable
+fun RowScope.EditorActions(state: TextFieldState) {
     fun TextFieldBuffer.insertModifier(before: String, after: String = before) {
         val start = selection.start
         val end = selection.end
@@ -91,49 +99,46 @@ private fun BottomBar(state: TextFieldState) {
         selection =
             TextRange(start + before.length, end + before.length)
     }
-
-    FlexibleBottomAppBar(modifier = Modifier.imePadding()) {
-        IconButton(onClick = {
-            state.edit {
-                insertModifier("**")
-            }
-        }) {
-            Icon(Icons.Default.FormatBold, contentDescription = "Insert bold")
+    IconButton(onClick = {
+        state.edit {
+            insertModifier("**")
         }
-        IconButton(onClick = {
-            state.edit {
-                insertModifier("*")
-            }
-        }) {
-            Icon(Icons.Default.FormatItalic, contentDescription = "Insert italic")
+    }) {
+        Icon(Icons.Default.FormatBold, contentDescription = "Insert bold")
+    }
+    IconButton(onClick = {
+        state.edit {
+            insertModifier("*")
         }
-        IconButton(onClick = {
-            state.edit {
-                insertModifier("[", "]()")
-            }
-        }) {
-            Icon(Icons.Default.InsertLink, contentDescription = "Insert link")
+    }) {
+        Icon(Icons.Default.FormatItalic, contentDescription = "Insert italic")
+    }
+    IconButton(onClick = {
+        state.edit {
+            insertModifier("[", "]()")
         }
-        IconButton(onClick = {
-            state.edit {
-                insertModifier("> ", after = "")
-            }
-        }) {
-            Icon(Icons.Default.FormatQuote, contentDescription = "Insert quote")
+    }) {
+        Icon(Icons.Default.InsertLink, contentDescription = "Insert link")
+    }
+    IconButton(onClick = {
+        state.edit {
+            insertModifier("> ", after = "")
         }
-        IconButton(onClick = {
-            state.edit {
-                insertModifier(">!", "!<")
-            }
-        }) {
-            Icon(Icons.Default.Warning, contentDescription = "Insert spoiler")
+    }) {
+        Icon(Icons.Default.FormatQuote, contentDescription = "Insert quote")
+    }
+    IconButton(onClick = {
+        state.edit {
+            insertModifier(">!", "!<")
         }
-        IconButton(onClick = {
-            state.edit {
-                insertModifier("```", "```")
-            }
-        }) {
-            Icon(Icons.Default.Code, contentDescription = "Insert code block")
+    }) {
+        Icon(Icons.Default.Warning, contentDescription = "Insert spoiler")
+    }
+    IconButton(onClick = {
+        state.edit {
+            insertModifier("```", "```")
         }
+    }) {
+        Icon(Icons.Default.Code, contentDescription = "Insert code block")
     }
 }

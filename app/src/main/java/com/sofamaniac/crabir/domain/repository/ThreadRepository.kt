@@ -49,6 +49,12 @@ interface ThreadRepository {
     suspend fun save(fullname: Fullname)
     suspend fun unsave(fullname: Fullname)
 
+    /** Insert a comment into the thread
+     * @param parent The name of the parent comment
+     * @param comment The data of the comment
+     */
+    fun insertReply(parent: Fullname, comment: CommentType)
+
 }
 
 class Forest private constructor(
@@ -71,6 +77,21 @@ class Forest private constructor(
                 name to value
                 )
         return Forest(newTable, next, root)
+    }
+
+    fun insertReply(
+        root: Fullname,
+        comment: CommentType,
+    ): Forest {
+        val comments = this.comments.toMutableMap()
+        val next = this.next.toMutableMap()
+        val endNext = next[root]
+        next[root] = comment.name
+        comments[comment.name] = comment
+        endNext?.let {
+            next[comment.name] = it
+        }
+        return Forest(comments, next, this.root)
     }
 
     fun insert(
@@ -204,9 +225,11 @@ class ThreadRepositoryImpl @Inject constructor(
         if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
-                val things = body.json.data.things
-                forest.value =
-                    forest.value.insert(more.data.name, things, things.size, removeRoot = true)
+                // TODO display error
+                val things = body.json.data?.things ?: return
+                forest.update {
+                    it.insert(more.data.name, things, things.size, removeRoot = true)
+                }
             }
         }
     }
@@ -227,6 +250,14 @@ class ThreadRepositoryImpl @Inject constructor(
             it.updateComment(name, value)
         }
         commentsRepository.update(name, value)
+    }
+
+    override fun insertReply(parent: Fullname, comment: CommentType) {
+        forest.update {
+            Log.d("ThreadRepositoryImpl", "insertReply: $comment")
+            it.insertReply(parent, comment)
+        }
+        commentsRepository.insert(comment)
     }
 
     override fun refresh() {
@@ -255,81 +286,3 @@ class ThreadRepositoryImpl @Inject constructor(
     }
 
 }
-
-//fun List<CommentType>.replaceMore(
-//    more: CommentType.More,
-//    children: List<CommentType>
-//): List<CommentType> {
-//    val withoutMore = filter {
-//        when (it) {
-//            is CommentType.Comment -> true
-//            is CommentType.More -> it.name != more.name
-//        }
-//    }
-//    return children.fold(withoutMore) { acc, c ->
-//        val res = acc.insertComment(c)
-//        if (!res.second) {
-//            acc + c
-//        } else {
-//            res.first
-//        }
-//    }
-//}
-//
-//fun CommentType.Comment.replaceMore(
-//    more: CommentType.More,
-//    replies: List<CommentType>
-//): CommentType {
-//    val withoutMore = comment.replies.filter {
-//        when (it) {
-//            is CommentType.Comment -> true
-//            is CommentType.More -> it.name != more.name
-//        }
-//    }
-//    return replies.fold(
-//        this.copy(comment = comment.copy(replies = withoutMore)) as CommentType,
-//    ) { acc, reply ->
-//        acc.insertReply(reply)
-//    }
-//}
-//
-//fun CommentType.insertReply(reply: CommentType): CommentType {
-//    when (this) {
-//        is CommentType.More -> {
-//            return this
-//        }
-//
-//        is CommentType.Comment -> {
-//            val replies: List<CommentType> = if (reply.parentId == this.name) {
-//                comment.replies + reply
-//            } else {
-//                comment.replies.map { it.insertReply(reply) }
-//            }
-//            return this.copy(comment = comment.copy(replies = replies))
-//        }
-//    }
-//}
-//
-///** Try to insert the comment into the list given in respect with `parentId`,
-// * the boolean is true when the element was inserted */
-//fun List<CommentType>.insertComment(
-//    comment: CommentType
-//): Pair<List<CommentType>, Boolean> {
-//    var inserted = false
-//    val result = this.map { c ->
-//        if (c is CommentType.Comment) {
-//            if (c.name == comment.parentId) {
-//                val children = c.comment.replies + comment
-//                inserted = true
-//                c.copy(comment = c.comment.copy(replies = children))
-//            } else {
-//                val children = c.comment.replies.insertComment(comment)
-//                inserted = inserted || children.second
-//                c.copy(comment = c.comment.copy(replies = children.first))
-//            }
-//        } else {
-//            c
-//        }
-//    }
-//    return Pair(result, inserted)
-//}

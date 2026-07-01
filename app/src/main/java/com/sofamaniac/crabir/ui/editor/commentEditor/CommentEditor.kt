@@ -11,6 +11,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -22,6 +23,7 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.editor.Editor
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
+import kotlinx.coroutines.launch
 
 @Composable
 fun CommentEditor(
@@ -33,6 +35,7 @@ fun CommentEditor(
     val navController = LocalNavController.current
     val parentData by viewModel.parentData.collectAsState(null)
     if (parentData == null) return
+    val scope = rememberCoroutineScope()
     Editor(
         state = viewModel.replyState,
         label = { Text("Type comment") },
@@ -51,8 +54,9 @@ fun CommentEditor(
                 },
                 actions = {
                     IconButton(onClick = {
-                        viewModel.submitComment()
-                        navController?.popBackStack()
+                        scope.launch {
+                            navController?.popBackStack()
+                        }
                     }) {
                         Icon(
                             Icons.AutoMirrored.Filled.Send,

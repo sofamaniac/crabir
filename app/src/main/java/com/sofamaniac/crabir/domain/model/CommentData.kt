@@ -17,7 +17,7 @@ sealed class CommentType : VotableData {
         ): VotableData {
             return copy(comment = comment.copy(relationship = relationship, score = score))
         }
-
+        override val author: AuthorInfo = comment.author
         override val relationship: Relationship = comment.relationship
         override val score: Score = comment.score
         override val body: ParsedMarkdown = comment.body
@@ -38,6 +38,7 @@ sealed class CommentType : VotableData {
             return this
         }
 
+        override val author: AuthorInfo? = null
         override val relationship: Relationship get() = throw Exception("More has no relationship")
         override val score: Score get() = throw Exception("More has no score")
         override val body: ParsedMarkdown get() = throw Exception("More has no body")
@@ -84,7 +85,7 @@ data class CommentData(
     val permalink: String,
     val replies: Int,
     //val replies: List<CommentType>,
-    val author: AuthorInfo,
+    override val author: AuthorInfo,
     val isSubmitter: Boolean,
     override val relationship: Relationship,
     val subredditInfo: SubredditInfo,

@@ -21,7 +21,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.navigation.CommentCreatorRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.ui.ThemedCard
@@ -126,9 +125,7 @@ fun PostCard(
         )
         body()
         BottomRow(post, modifier, interactions = viewModel) {
-            ReplyButton(onClick = {
-                navController?.navigate(CommentCreatorRoute(post.name))
-            })
+            ReplyButton(post.name, threadViewModel)
         }
     }
 }

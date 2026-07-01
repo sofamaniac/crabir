@@ -17,7 +17,7 @@ data class PostData(
     override val relationship: Relationship,
     val createdUtc: Instant,
     val edited: Instant?,
-    val author: AuthorInfo,
+    override val author: AuthorInfo,
     val subreddit: SubredditInfo,
     override val score: Score,
     val url: String,

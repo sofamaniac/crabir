@@ -64,6 +64,10 @@ class CommentViewModel @AssistedInject constructor(
 ) : CommentViewModelInterface, ViewModel() {
     override val openComment: StateFlow<Fullname?> = MutableStateFlow(comment.name)
 
+    override fun replyTo(name: Fullname?) {
+
+    }
+
     override val markdown = parseMarkdownFlow(comment.body.markdown).stateIn(
         viewModelScope,
         started = SharingStarted.Lazily,

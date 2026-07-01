@@ -39,9 +39,7 @@ import com.mikepenz.markdown.model.State
 import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentData
-import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.navigation.CommentCreatorRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.settings.theme.ADMIN_CARTOUCHE_COLOR
@@ -63,29 +61,11 @@ import kotlinx.coroutines.flow.map
 
 interface CommentViewModelInterface : VotableInteraction {
     val openComment: StateFlow<Fullname?>
+
+    fun replyTo(name: Fullname?)
     fun submitComment(parent: Fullname, body: String)
 
     fun getMarkdownState(name: Fullname): StateFlow<State>
-}
-
-fun LazyListScope.replies(
-    replies: Iterable<CommentType>,
-    viewModel: ThreadViewModel,
-    modifier: Modifier = Modifier,
-    enableAnimation: Boolean = true,
-) {
-    replies.forEach { comment ->
-        when (comment) {
-            is CommentType.Comment -> commentNode(
-                comment.comment,
-                viewModel,
-                modifier,
-                enableAnimation
-            )
-
-            is CommentType.More -> MoreNode(comment, viewModel, modifier)
-        }
-    }
 }
 
 @Composable
@@ -129,11 +109,6 @@ fun LazyListScope.commentNode(
     item {
         CommentContent(comment, viewModel, modifier, enableAnimation)
     }
-    //AnimatedVisibility(!comment.collapsed) {
-//    if (!comment.collapsed) {
-//        replies(comment.replies, viewModel, modifier, enableAnimation)
-//    }
-    //}
 }
 
 @Composable
@@ -218,7 +193,6 @@ fun BottomRow(
 ) {
     val likes = comment.relationship.liked
     val saved = comment.relationship.saved
-    val navController = LocalNavController.current
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -228,13 +202,13 @@ fun BottomRow(
         UpButton(likes, onClick = { viewModel.upvote(comment.name) })
         DownButton(likes, onClick = { viewModel.downvote(comment.name) })
         SavedButton(saved, onClick = { viewModel.save(comment.name, !saved) })
-        ReplyButton {
-            navController?.navigate(CommentCreatorRoute(comment.name))
-        }
+        ReplyButton(comment.name, viewModel)
         if (BuildConfig.DEBUG) {
             IconButton(onClick = {
                 Log.d("CommentNode", "$comment")
-            }) { Icon(Icons.Default.BugReport, contentDescription = null) }
+            }) {
+                Icon(Icons.Default.BugReport, contentDescription = null)
+            }
         }
     }
 }

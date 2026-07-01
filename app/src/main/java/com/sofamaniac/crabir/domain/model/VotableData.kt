@@ -4,6 +4,7 @@ import com.sofamaniac.crabir.data.local.entities.VotableEntity
 import com.sofamaniac.crabir.domain.repository.DataInterface
 
 interface VotableData : DataInterface {
+    val author: AuthorInfo?
     val relationship: Relationship
     val score: Score
     val body: ParsedMarkdown

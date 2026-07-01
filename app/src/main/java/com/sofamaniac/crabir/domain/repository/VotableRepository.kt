@@ -17,9 +17,11 @@ interface VotableRepository<T : VotableData> {
     val api: RedditAPIService
     val votableDao: VotableDao
     fun insert(things: Iterable<T>) {
-        for (thing in things) {
-            votableDao.insert(thing.toEntity())
-        }
+        votableDao.insert(things.map { it.toEntity() })
+    }
+
+    fun insert(thing: VotableData) {
+        votableDao.insert(thing.toEntity())
     }
 
     fun get(name: Fullname): Flow<T?> =

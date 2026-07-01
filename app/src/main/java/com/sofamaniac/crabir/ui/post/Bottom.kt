@@ -19,10 +19,11 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
@@ -44,7 +45,6 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.R
@@ -125,7 +125,7 @@ fun OpenThreadButton(onClick: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalSerializationApi::class)
+@OptIn(ExperimentalSerializationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun PostOptions(
     post: PostData,
@@ -146,119 +146,117 @@ private fun PostOptions(
         Icon(Icons.Default.MoreVert, "more", tint = Color.Gray)
     }
     if (showOptions) {
-        Dialog(onDismissRequest = { showOptions = false }) {
-            Card {
-                if (post.canModPost) {
-                    ListItem(
-                        leadingContent = {
-                            Icon(
-                                Icons.Default.Shield,
-                                contentDescription = null
-                            )
-                        },
-                        headlineContent = { Text(stringResource(R.string.moderation)) },
-                    )
-                }
-                if (post.author.authorFullname == currentAccount.info?.name?.name) {
-                    ListItem(
-                        modifier = Modifier.clickable {
-                            currentDialog = PostDialog.Edit
-                        },
-                        leadingContent = {
-                            Icon(
-                                Icons.Default.Edit,
-                                contentDescription = null
-                            )
-                        },
-                        headlineContent = { Text(stringResource(R.string.edit)) },
-                    )
-                }
+        ModalBottomSheet(onDismissRequest = { showOptions = false }) {
+            if (post.canModPost) {
                 ListItem(
                     leadingContent = {
-                        SubredditIcon(
-                            post.subreddit.name,
-                            icon = post.subredditDetails?.icon,
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
+                        Icon(
+                            Icons.Default.Shield,
+                            contentDescription = null
                         )
                     },
-                    headlineContent = {
-                        Text(
-                            stringResource(
-                                R.string.go_to_subreddit,
-                                post.subreddit.name
-                            )
-                        )
-                    },
-                    modifier = Modifier.clickable {
-                        navController?.navigate(SubredditRoute(post.subreddit.name))
-                    }
+                    headlineContent = { Text(stringResource(R.string.moderation)) },
                 )
+            }
+            if (post.author.authorFullname == currentAccount.info?.name?.name) {
                 ListItem(
-                    leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
-                    headlineContent = {
-                        Text(
-                            stringResource(
-                                R.string.go_to_profile,
-                                post.author.username
-                            )
+                    modifier = Modifier.clickable {
+                        currentDialog = PostDialog.Edit
+                    },
+                    leadingContent = {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = null
                         )
                     },
-                    modifier = Modifier.clickable {
-                        navController?.navigate(
-                            ProfileRoute(
-                                author = post.author.username,
-                                tab = ProfileTabs.Overview
-                            )
-                        )
-                    }
+                    headlineContent = { Text(stringResource(R.string.edit)) },
                 )
-                ListItem(
-                    headlineContent = {
-                        val text =
-                            if (post.relationship.hidden) R.string.unhide_post else R.string.hide_post
-                        Text(stringResource(text))
-                    },
-                    modifier = Modifier.clickable {
-                        if (post.relationship.hidden) {
-                            interaction.unhide()
-                        } else {
-                            interaction.hide()
-                        }
-                    })
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.report)) },
-                    modifier = Modifier.clickable {
-                        interaction.fetchRules()
-                        currentDialog = PostDialog.Report
-                    })
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.mute)) },
-                    modifier = Modifier.clickable {
-                        currentDialog = PostDialog.Report
-                    })
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.share)) },
-                    modifier = Modifier.clickable {
-                        currentDialog = PostDialog.Share
-                    })
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.copy)) },
-                    modifier = Modifier.clickable {
-                        scope.launch {
-                            val clipData = ClipData.newPlainText("Post URL", post.url)
-                            val clipEntry = ClipEntry(clipData)
-                            clipboard.setClipEntry(clipEntry)
-                        }
-                    })
-                if (BuildConfig.DEBUG) {
-                    ListItem(
-                        headlineContent = { Text(stringResource(R.string.post_content)) },
-                        modifier = Modifier.clickable {
-                            Log.d("Post", prettyJson.encodeToString(post))
-                        })
+            }
+            ListItem(
+                leadingContent = {
+                    SubredditIcon(
+                        post.subreddit.name,
+                        icon = post.subredditDetails?.icon,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                    )
+                },
+                headlineContent = {
+                    Text(
+                        stringResource(
+                            R.string.go_to_subreddit,
+                            post.subreddit.name
+                        )
+                    )
+                },
+                modifier = Modifier.clickable {
+                    navController?.navigate(SubredditRoute(post.subreddit.name))
                 }
+            )
+            ListItem(
+                leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
+                headlineContent = {
+                    Text(
+                        stringResource(
+                            R.string.go_to_profile,
+                            post.author.username
+                        )
+                    )
+                },
+                modifier = Modifier.clickable {
+                    navController?.navigate(
+                        ProfileRoute(
+                            author = post.author.username,
+                            tab = ProfileTabs.Overview
+                        )
+                    )
+                }
+            )
+            ListItem(
+                headlineContent = {
+                    val text =
+                        if (post.relationship.hidden) R.string.unhide_post else R.string.hide_post
+                    Text(stringResource(text))
+                },
+                modifier = Modifier.clickable {
+                    if (post.relationship.hidden) {
+                        interaction.unhide()
+                    } else {
+                        interaction.hide()
+                    }
+                })
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.report)) },
+                modifier = Modifier.clickable {
+                    interaction.fetchRules()
+                    currentDialog = PostDialog.Report
+                })
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.mute)) },
+                modifier = Modifier.clickable {
+                    currentDialog = PostDialog.Report
+                })
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.share)) },
+                modifier = Modifier.clickable {
+                    currentDialog = PostDialog.Share
+                })
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.copy)) },
+                modifier = Modifier.clickable {
+                    scope.launch {
+                        val clipData = ClipData.newPlainText("Post URL", post.url)
+                        val clipEntry = ClipEntry(clipData)
+                        clipboard.setClipEntry(clipEntry)
+                    }
+                })
+            if (BuildConfig.DEBUG) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.post_content)) },
+                    modifier = Modifier.clickable {
+                        Log.d("Post", prettyJson.encodeToString(post))
+                    })
             }
         }
     }
