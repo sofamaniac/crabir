@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player.REPEAT_MODE_ONE
+import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.Tracks
 import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,6 +71,24 @@ object VideoPlayerManager {
         player?.stop()
         _currentUrl.update { null }
         _hasFirstFrame.update { false }
+    }
+
+    fun setTrack(group: Tracks.Group, index: Int = 0) {
+        player?.trackSelectionParameters = player?.trackSelectionParameters
+            ?.buildUpon()
+            ?.setOverrideForType(TrackSelectionOverride(group.mediaTrackGroup, index))
+            ?.build() ?: return
+    }
+
+    fun setAutoTrack() {
+        player?.trackSelectionParameters = player?.trackSelectionParameters
+            ?.buildUpon()
+            ?.clearOverrides()
+            ?.build() ?: return
+    }
+
+    fun isAuto(): Boolean {
+        return player?.trackSelectionParameters?.overrides?.isEmpty() ?: true
     }
 
 

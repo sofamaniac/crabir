@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -37,6 +38,7 @@ fun AlwaysOnInfo(modifier: Modifier = Modifier) {
         if (showMuteButton) {
             MuteButton(
                 player,
+                colors = IconButtonDefaults.iconButtonColors().copy(contentColor = Color.White),
                 modifier = Modifier
                     .cartouche(backgroundColor)
                     .size(32.dp)
