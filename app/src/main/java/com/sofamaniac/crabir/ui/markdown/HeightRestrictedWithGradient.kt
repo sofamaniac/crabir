@@ -6,11 +6,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
@@ -21,73 +29,108 @@ import com.sofamaniac.crabir.LocalTheme
  * that content continues below.
  *
  * @param maxHeight      The maximum height before clipping kicks in.
- * @param gradientColors Colors used for the bottom fade (top → bottom).
- *                       Defaults to transparent → black.
  * @param gradientHeight How tall the gradient overlay should be.
  * @param modifier       Modifier applied to the outer container.
  * @param content        The composable content to display.
  *
- * Code fully written by Claude.ai
+ * Code fully written by Gemini
  */
 @Composable
 fun HeightRestrictedWithGradient(
     maxHeight: Dp,
     modifier: Modifier = Modifier,
-    //gradientColors: List<Color> = listOf(Color.Transparent, Color.Black),
     gradientHeight: Dp = 64.dp,
     content: @Composable () -> Unit,
 ) {
     val theme = LocalTheme.current
     val gradientColors = listOf(Color.Transparent, theme.cardBackground)
-    SubcomposeLayout(modifier = modifier.clipToBounds()) { constraints ->
-        val maxHeightPx = maxHeight.roundToPx()
 
-        // 1. Measure content with an unconstrained height so we know its real size.
-        val contentPlaceables = subcompose("content", content).map { measurable ->
-            measurable.measure(constraints.copy(maxHeight = Int.MAX_VALUE))
-        }
+    val measurePolicy = remember(maxHeight, gradientHeight, gradientColors) {
+        object : MeasurePolicy {
+            override fun MeasureScope.measure(
+                measurables: List<Measurable>,
+                constraints: Constraints
+            ): MeasureResult {
+                val maxHeightPx = maxHeight.roundToPx()
+                val contentMeasurable = measurables[0]
+                val gradientMeasurable = measurables[1]
 
-        val contentWidth = contentPlaceables.maxOfOrNull { it.width } ?: 0
-        val contentHeight = contentPlaceables.maxOfOrNull { it.height } ?: 0
+                // Measure content with an unconstrained height to know its real size.
+                val contentPlaceable =
+                    contentMeasurable.measure(constraints.copy(maxHeight = Int.MAX_VALUE))
 
-        val isTaller = contentHeight > maxHeightPx
-        val layoutHeight = if (isTaller) maxHeightPx else contentHeight
+                val contentWidth = contentPlaceable.width
+                val contentHeight = contentPlaceable.height
 
-        // 2. Measure + place the gradient overlay only when content is taller.
-        val gradientPlaceables = if (isTaller) {
-            val gradientHeightPx = gradientHeight.roundToPx()
-            subcompose("gradient") {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(gradientHeight)
-                        .background(
-                            brush = Brush.verticalGradient(gradientColors)
+                val isTaller = contentHeight > maxHeightPx
+                val layoutHeight = if (isTaller) maxHeightPx else contentHeight
+
+                val gradientPlaceable = if (isTaller) {
+                    val gradientHeightPx = gradientHeight.roundToPx()
+                    gradientMeasurable.measure(
+                        Constraints.fixed(
+                            width = contentWidth,
+                            height = gradientHeightPx
                         )
-                )
-            }.map { measurable ->
-                measurable.measure(
-                    constraints.copy(
-                        minWidth = contentWidth,
-                        maxWidth = contentWidth,
-                        minHeight = gradientHeightPx,
-                        maxHeight = gradientHeightPx,
                     )
-                )
+                } else null
+
+                return layout(width = contentWidth, height = layoutHeight) {
+                    contentPlaceable.placeRelative(x = 0, y = 0)
+                    gradientPlaceable?.placeRelative(
+                        x = 0,
+                        y = layoutHeight - gradientPlaceable.height
+                    )
+                }
             }
-        } else emptyList()
 
-        layout(width = contentWidth, height = layoutHeight) {
-            // Place content, clipped naturally by the layout's own height.
-            contentPlaceables.forEach { it.placeRelative(x = 0, y = 0) }
+            override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                measurables: List<IntrinsicMeasurable>,
+                width: Int
+            ): Int {
+                val contentHeight = measurables[0].minIntrinsicHeight(width)
+                return minOf(contentHeight, maxHeight.roundToPx())
+            }
 
-            // Pin the gradient to the bottom of the visible area.
-            gradientPlaceables.forEach { placeable ->
-                placeable.placeRelative(
-                    x = 0,
-                    y = layoutHeight - placeable.height,
-                )
+            override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                measurables: List<IntrinsicMeasurable>,
+                width: Int
+            ): Int {
+                val contentHeight = measurables[0].maxIntrinsicHeight(width)
+                return minOf(contentHeight, maxHeight.roundToPx())
+            }
+
+            override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                measurables: List<IntrinsicMeasurable>,
+                height: Int
+            ): Int {
+                return measurables[0].minIntrinsicWidth(height)
+            }
+
+            override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                measurables: List<IntrinsicMeasurable>,
+                height: Int
+            ): Int {
+                return measurables[0].maxIntrinsicWidth(height)
             }
         }
     }
+
+    Layout(
+        modifier = modifier.clipToBounds(),
+        content = {
+            // We wrap content in a Box to ensure it's treated as a single measurable
+            Box { content() }
+            // The gradient overlay
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(gradientHeight)
+                    .background(
+                        brush = Brush.verticalGradient(gradientColors)
+                    )
+            )
+        },
+        measurePolicy = measurePolicy
+    )
 }
