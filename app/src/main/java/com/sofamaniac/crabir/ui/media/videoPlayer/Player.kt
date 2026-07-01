@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.ContentFrame
+import androidx.media3.ui.compose.SURFACE_TYPE_TEXTURE_VIEW
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.ui.cartouche
@@ -178,6 +179,7 @@ fun VideoPlayer(
         if (currentUrl == media.url) {
             ContentFrame(
                 player = player,
+                surfaceType = SURFACE_TYPE_TEXTURE_VIEW,
                 modifier = Modifier
                     .fillMaxSize()
                     .align(Alignment.Center)
