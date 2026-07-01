@@ -9,15 +9,13 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.domain.repository.LinksRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
 
-@HiltViewModel(assistedFactory = CommentEditorViewModel.Factory::class)
-class CommentEditorViewModel @AssistedInject constructor(
-    @Assisted parentRaw: String,
+@KoinViewModel
+class CommentEditorViewModel(
+    @InjectedParam parentRaw: String,
     commentRepository: CommentsRepository,
     postRepository: LinksRepository,
     private val api: RedditAPIService,
@@ -45,10 +43,5 @@ class CommentEditorViewModel @AssistedInject constructor(
         } else {
             Result.failure(Exception(res.errorBody()?.string()))
         }
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(parentRaw: String): CommentEditorViewModel
     }
 }

@@ -15,8 +15,9 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.mikepenz.aboutlibraries)
     alias(libs.plugins.mikepenz.aboutlibraries.android)
+    alias(libs.plugins.koin.compiler)
     id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android")
+    //id("com.google.dagger.hilt.android")
     id("tech.mappie.plugin")
     id("androidx.room")
     id("kotlin-parcelize")
@@ -133,12 +134,22 @@ dependencies {
     implementation(libs.androidx.datastore)
     implementation(libs.kotlinx.coroutines.core)
 
-    implementation(libs.hilt.android)
-    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
+    // DI
+    //implementation(libs.hilt.android)
+    //implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.core)
+    implementation(libs.koin.annotations)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.androidx.compose.navigation)
+
+
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.adaptive.layout)
 //    implementation(libs.androidx.compose.adaptive.navigation)
-    ksp(libs.hilt.android.compiler)
+    //ksp(libs.hilt.android.compiler)
     ksp(libs.kotlin.metadata.jvm)
 
 

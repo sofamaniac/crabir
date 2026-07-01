@@ -13,11 +13,6 @@ import com.sofamaniac.crabir.data.remote.streamable.StreamableAPI
 import com.sofamaniac.crabir.data.remote.utils.URISerializer
 import com.sofamaniac.crabir.data.remote.utils.URLSerializer
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import jakarta.inject.Singleton
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import net.openid.appauth.AuthorizationService
@@ -26,6 +21,11 @@ import nl.adaptivity.xmlutil.serialization.XML
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Configuration
+import org.koin.core.annotation.Module
+import org.koin.core.annotation.Single
+import org.koin.core.annotation.Singleton
 import retrofit2.Retrofit
 import java.net.URI
 import java.net.URL
@@ -33,12 +33,13 @@ import java.util.concurrent.TimeUnit
 
 private const val BASE_URL = "https://oauth.reddit.com/"
 
-@Module
-@InstallIn(SingletonComponent::class)
-object NetworkModule {
 
-    @Provides
-    @Singleton
+@Module(includes = [AccountsModule::class, AuthModule::class])
+@ComponentScan
+@Configuration
+class NetworkModule {
+
+    @Single
     fun provideRedditAuthenticator(
         accountsRepository: AccountsRepository,
         authService: AuthorizationService,
@@ -49,20 +50,17 @@ object NetworkModule {
         )
     }
 
-    @Provides
-    @Singleton
+    @Single
     fun provideRateLimiter(): RateLimitInterceptor {
         return RateLimitInterceptor()
     }
 
-    @Provides
-    @Singleton
+    @Single
     fun provideForceJsonInterceptor(): ForceJsonInterceptor {
         return ForceJsonInterceptor()
     }
 
-    @Provides
-    @Singleton
+    @Single
     fun provideOkHttpClient(
         authInterceptor: RedditAuthenticator,
         rateLimitInterceptor: RateLimitInterceptor,
@@ -80,7 +78,6 @@ object NetworkModule {
     }
 
 
-    @Provides
     @Singleton
     fun provideJson(): Json {
         return Json {
@@ -94,8 +91,7 @@ object NetworkModule {
         }
     }
 
-    @Provides
-    @Singleton
+    @Single
     fun provideRedditApiService(
         okHttpClient: OkHttpClient,
         json: Json
@@ -109,8 +105,7 @@ object NetworkModule {
             .create(RedditAPIService::class.java)
     }
 
-    @Provides
-    @Singleton
+    @Single
     fun provideSubredditAPIService(
         okHttpClient: OkHttpClient,
         json: Json
@@ -118,8 +113,7 @@ object NetworkModule {
         return provideRedditApiService(okHttpClient, json)
     }
 
-    @Provides
-    @Singleton
+    @Single
     fun mediaUploaderService(): MediaUploadInterface {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.HEADERS
@@ -137,8 +131,7 @@ object NetworkModule {
             .client(client).build().create(MediaUploadInterface::class.java)
     }
 
-    @Provides
-    @Singleton
+    @Single
     fun provideStreamableAPI(
         json: Json
     ): StreamableAPI {

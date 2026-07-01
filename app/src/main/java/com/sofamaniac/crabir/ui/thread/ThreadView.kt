@@ -31,12 +31,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.ui.editor.EditorActions
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * @param comment Focal point of the view
@@ -55,12 +56,11 @@ fun ThreadView(
         ?: LocalNavController.current?.currentBackStackEntry?.toRoute<PostRoute>()?.postPermalink
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    val viewModel: ThreadViewModel =
-        hiltViewModel<ThreadViewModel, ThreadViewModel.Factory>(key = link) { factory ->
-            // TODO user setting initial sort
-            // TODO remember last set sort
-            factory.create(link!!, comment = comment, context = context, initialSort = null)
-        }
+    val viewModel: ThreadViewModel = koinViewModel {
+        // TODO user setting initial sort
+        // TODO remember last set sort
+        parametersOf(link!!, comment, context, null)
+    }
     val showReplySheet by viewModel.reply.collectAsState()
 
     Scaffold(

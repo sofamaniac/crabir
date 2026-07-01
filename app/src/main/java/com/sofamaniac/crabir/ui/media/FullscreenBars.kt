@@ -28,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.PostData
@@ -41,6 +40,8 @@ import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.SavedButton
 import com.sofamaniac.crabir.ui.votable.ScoreString
 import com.sofamaniac.crabir.ui.votable.UpButton
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ColumnScope.FullscreenTopBar(
@@ -79,11 +80,9 @@ fun ColumnScope.FullscreenTopBar(
 fun ColumnScope.FullscreenBottomBar(
     post: PostData,
     enabled: Boolean,
-    viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
-        key = post.id,
-        creationCallback = { factory ->
-            factory.create(post)
-        }),
+    viewModel: LinkViewModel = koinViewModel(
+        key = post.id
+    ) { parametersOf(post) },
     title: @Composable () -> Unit = {}
 ) {
     val theme = LocalTheme.current

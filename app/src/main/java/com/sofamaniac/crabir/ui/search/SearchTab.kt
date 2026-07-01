@@ -61,7 +61,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -86,12 +85,12 @@ import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subreddit.PostView
 import com.sofamaniac.crabir.ui.subredditList.Tile
 import com.sofamaniac.crabir.ui.user.ProfileTabs
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
+import org.koin.core.parameter.parametersOf
 import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,14 +99,14 @@ fun SearchTab(
     searchQuery: SearchRoute,
     modifier: Modifier = Modifier,
     initialTab: Int = if (searchQuery.flair.isNotBlank()) 0 else 1,
-    commonViewModel: SearchCommonViewModel = hiltViewModel<SearchCommonViewModel, SearchCommonViewModel.Factory>() { factory ->
+    commonViewModel: SearchCommonViewModel = koinViewModel() {
         val initialQuery =
             if (searchQuery.flair.isNotBlank()) "flair:\"${searchQuery.flair}\"" else ""
-        SearchCommonViewModel(initialQuery)
+        parametersOf(initialQuery)
     },
 ) {
     val viewModels = listOf(
-        hiltViewModel<PostSearchViewModel, PostSearchViewModel.Factory>(key = "PostSearch") { factory ->
+        koinViewModel<PostSearchViewModel>(key = "PostSearch") {
             val subreddit = searchQuery.subreddit.ifBlank { null }
             val params = PostSearchParams(
                 query = commonViewModel.query,
@@ -116,10 +115,10 @@ fun SearchTab(
                 type = "link",
                 sort = PostSearchSort.Relevance
             )
-            factory.create(params)
+            parametersOf(params)
         },
-        hiltViewModel<CommunitySearchViewModel>(key = "CommunitySearch"),
-        hiltViewModel<UserSearchViewModel>(key = "UserSearch"),
+        koinViewModel<CommunitySearchViewModel>(key = "CommunitySearch"),
+        koinViewModel<UserSearchViewModel>(key = "UserSearch"),
         //hiltViewModel<CommentSearchViewModel>(key = "CommentSearch"),
     )
     val tabs = listOf(
@@ -210,8 +209,8 @@ fun SearchTab(
     }
 }
 
-@HiltViewModel(assistedFactory = SearchCommonViewModel.Factory::class)
-class SearchCommonViewModel @AssistedInject constructor(@Assisted query: String) : ViewModel() {
+@KoinViewModel
+class SearchCommonViewModel(@InjectedParam query: String) : ViewModel() {
     val queryState = TextFieldState(initialText = query)
     val query: String get() = queryState.text as String
     var showSettings = MutableStateFlow(false)
@@ -219,12 +218,6 @@ class SearchCommonViewModel @AssistedInject constructor(@Assisted query: String)
     fun onQueryUpdate(q: String) {
         queryState.edit { replace(0, length, q) }
     }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(query: String): SearchCommonViewModel
-    }
-
 }
 
 

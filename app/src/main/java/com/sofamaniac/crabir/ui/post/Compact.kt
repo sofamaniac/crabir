@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
@@ -18,6 +17,8 @@ import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.ScoreString
 import com.sofamaniac.crabir.ui.votable.UpButton
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun CompactView(
@@ -28,11 +29,7 @@ fun CompactView(
     canStartVideo: Boolean = false,
     read: Boolean = false,
     showHidden: Boolean = false,
-    viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
-        key = post.id,
-        creationCallback = { factory ->
-            factory.create(post)
-        }),
+    viewModel: LinkViewModel = koinViewModel(key = post.id) { parametersOf(post) }
 ) {
     val navController = LocalNavController.current
     val onClick = {

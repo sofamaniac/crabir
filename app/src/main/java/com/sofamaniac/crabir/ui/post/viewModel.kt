@@ -16,10 +16,6 @@ import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.ui.votable.VotableInteraction
 import com.sofamaniac.crabir.ui.votable.VotableViewModel
 import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +24,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
 
 interface LinkInteraction : VotableInteraction {
     val post: Flow<PostData?>
@@ -54,9 +52,9 @@ interface LinkInteraction : VotableInteraction {
 }
 
 
-@HiltViewModel(assistedFactory = LinkViewModel.Factory::class)
-open class LinkViewModel @AssistedInject constructor(
-    @Assisted("post") initialPost: PostData,
+@KoinViewModel
+open class LinkViewModel(
+    @InjectedParam initialPost: PostData,
     private val posts: LinksRepository,
     private val history: VisitedPostsDao,
 ) : VotableViewModel<PostData>(
@@ -142,13 +140,6 @@ open class LinkViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             posts.setInboxReplies(fullname, enabled)
         }
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(
-            @Assisted("post") post: PostData
-        ): LinkViewModel
     }
 }
 

@@ -36,10 +36,6 @@ import com.sofamaniac.crabir.domain.repository.profile.SavedRepository
 import com.sofamaniac.crabir.domain.repository.profile.SubmittedRepository
 import com.sofamaniac.crabir.domain.repository.profile.UpvotedRepository
 import com.sofamaniac.crabir.ui.subreddit.FeedViewModelInterface
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,11 +45,13 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
 
-@HiltViewModel(assistedFactory = ProfileViewModel.Factory::class)
-class ProfileViewModel @AssistedInject constructor(
+@KoinViewModel
+class ProfileViewModel(
     api: RedditAPIService,
-    @Assisted username: String
+    @InjectedParam username: String,
 ) : ViewModel() {
     val userProfile: MutableState<UserDTO?> = mutableStateOf(null)
 
@@ -65,47 +63,30 @@ class ProfileViewModel @AssistedInject constructor(
             }
         }
     }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(username: String): ProfileViewModel
-    }
 }
 
-@HiltViewModel(assistedFactory = SavedViewModel.Factory::class)
-class SavedViewModel @AssistedInject constructor(
-    @Assisted username: String,
+@KoinViewModel
+class SavedViewModel(
+    @InjectedParam username: String,
     repository: SavedRepository,
     visitedPostsDao: VisitedPostsDao,
 ) : ProfileFeedViewModel<VotableData>(username, repository, visitedPostsDao) {
-    @AssistedFactory
-    interface Factory {
-        fun create(username: String): SavedViewModel
-    }
 }
 
-@HiltViewModel(assistedFactory = OverviewViewModel.Factory::class)
-class OverviewViewModel @AssistedInject constructor(
-    @Assisted username: String,
+@KoinViewModel
+class OverviewViewModel(
+    @InjectedParam username: String,
     repository: OverviewRepository,
     visitedPostsDao: VisitedPostsDao,
 ) : ProfileFeedViewModel<VotableData>(username, repository, visitedPostsDao) {
-    @AssistedFactory
-    interface Factory {
-        fun create(username: String): OverviewViewModel
-    }
 }
 
-@HiltViewModel(assistedFactory = CommentsViewModel.Factory::class)
-class CommentsViewModel @AssistedInject constructor(
-    @Assisted username: String,
+@KoinViewModel
+class CommentsViewModel(
+    @InjectedParam username: String,
     repository: CommentsRepository,
     visitedPostsDao: VisitedPostsDao,
 ) : ProfileFeedViewModel<CommentType>(username, repository, visitedPostsDao), SortProfileTab {
-    @AssistedFactory
-    interface Factory {
-        fun create(username: String): CommentsViewModel
-    }
 
     override fun updateSort(sort: ProfileSort, timeframe: Timeframe?) {
         val needRefresh = params.value.sort != sort || params.value.timeframe != timeframe
@@ -122,52 +103,36 @@ class CommentsViewModel @AssistedInject constructor(
 
 }
 
-@HiltViewModel(assistedFactory = UpvotedViewModel.Factory::class)
-class UpvotedViewModel @AssistedInject constructor(
-    @Assisted username: String,
+@KoinViewModel
+class UpvotedViewModel(
+    @InjectedParam username: String,
     repository: UpvotedRepository,
     visitedPostsDao: VisitedPostsDao,
 ) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao) {
-    @AssistedFactory
-    interface Factory {
-        fun create(username: String): UpvotedViewModel
-    }
 }
 
-@HiltViewModel(assistedFactory = DownvotedViewModel.Factory::class)
-class DownvotedViewModel @AssistedInject constructor(
-    @Assisted username: String,
+@KoinViewModel
+class DownvotedViewModel(
+    @InjectedParam username: String,
     repository: DownvotedRepository,
     visitedPostsDao: VisitedPostsDao,
 ) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao) {
-    @AssistedFactory
-    interface Factory {
-        fun create(username: String): DownvotedViewModel
-    }
 }
 
-@HiltViewModel(assistedFactory = HiddenViewModel.Factory::class)
-class HiddenViewModel @AssistedInject constructor(
-    @Assisted username: String,
+@KoinViewModel
+class HiddenViewModel(
+    @InjectedParam username: String,
     repository: HiddenRepository,
     visitedPostsDao: VisitedPostsDao,
 ) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao) {
-    @AssistedFactory
-    interface Factory {
-        fun create(username: String): HiddenViewModel
-    }
 }
 
-@HiltViewModel(assistedFactory = SubmittedViewModel.Factory::class)
-class SubmittedViewModel @AssistedInject constructor(
-    @Assisted username: String,
+@KoinViewModel
+class SubmittedViewModel(
+    @InjectedParam username: String,
     repository: SubmittedRepository,
     visitedPostsDao: VisitedPostsDao,
 ) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao), SortProfileTab {
-    @AssistedFactory
-    interface Factory {
-        fun create(username: String): SubmittedViewModel
-    }
 
     override fun updateSort(sort: ProfileSort, timeframe: Timeframe?) {
         val needRefresh = params.value.sort != sort || params.value.timeframe != timeframe

@@ -11,7 +11,6 @@ package com.sofamaniac.crabir.data.remote.reddit.auth
 import android.util.Log
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
-import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -21,10 +20,12 @@ import net.openid.appauth.ClientAuthentication
 import okhttp3.Interceptor
 import okhttp3.Response
 import okio.IOException
+import org.koin.core.annotation.Singleton
 import kotlin.coroutines.resume
 
 
-class RedditAuthenticator @Inject constructor(
+@Singleton
+class RedditAuthenticator(
     private val accountsRepository: AccountsRepository,
     private val authService: AuthorizationService,
     private val clientAuth: ClientAuthentication,

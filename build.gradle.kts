@@ -11,7 +11,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization) apply false
     id("com.google.devtools.ksp") version "2.3.2"
     id("com.google.dagger.hilt.android") version "2.59.2" apply false
-    id("tech.mappie.plugin") version "2.3.10-2.4.1" apply true
+    id("tech.mappie.plugin") version "2.3.20-2.4.1" apply true
     id("androidx.room") version "2.8.4" apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
 }

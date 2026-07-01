@@ -42,7 +42,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import com.sofamaniac.crabir.domain.repository.rememberCurrentAccount
 import com.sofamaniac.crabir.navigation.HistoryRoute
 import com.sofamaniac.crabir.navigation.HomeRoute
 import com.sofamaniac.crabir.navigation.InboxRoute
@@ -61,20 +60,36 @@ import com.sofamaniac.crabir.settings.theme.rememberAppTheme
 import com.sofamaniac.crabir.ui.InboxView
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
+import com.sofamaniac.crabir.ui.rememberCurrentAccount
 import com.sofamaniac.crabir.ui.search.SearchTab
 import com.sofamaniac.crabir.ui.subreddit.HistoryViewer
 import com.sofamaniac.crabir.ui.subreddit.HomeViewer
 import com.sofamaniac.crabir.ui.subredditList.SubredditListViewer
-import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.HiltAndroidApp
 import me.saket.telephoto.zoomable.coil3.ZoomableAsyncImage
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.annotation.KoinApplication
+import org.koin.core.annotation.KoinViewModelScopeApi
+import org.koin.core.logger.Level
+import org.koin.core.option.viewModelScopeFactory
+import org.koin.plugin.module.dsl.startKoin
 
 
-@HiltAndroidApp
-class CrabirApp : Application()
+@KoinApplication
+class CrabirApp : Application() {
+    @OptIn(KoinViewModelScopeApi::class)
+    override fun onCreate() {
+        super.onCreate()
+        startKoin<CrabirApp> {
+            androidLogger(Level.DEBUG)
+            androidContext(this@CrabirApp)
+            //            modules(appModule)
+            options(viewModelScopeFactory())
+        }
+    }
+}
 
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     lateinit var navController: NavHostController
     lateinit var uriHandler: UriHandler
@@ -113,29 +128,8 @@ class MainActivity : ComponentActivity() {
             uriHandler = LocalUriHandler.current
 
             // Setup nav controller
-            CompositionLocalProvider(LocalNavController provides navController) {
-                val drawerState = rememberDrawerState(DrawerValue.Closed)
-                ConfigureMaterialTheme {
-                    val theme = rememberAppTheme()
-                    if (theme == null) {
-                        return@ConfigureMaterialTheme
-                    }
-                    CompositionLocalProvider(LocalTheme provides theme) {
-                        CompositionLocalProvider(LocalDrawerState provides drawerState) {
-                            val currentAccount = rememberCurrentAccount()
-                            CompositionLocalProvider(LocalRedditAccount provides currentAccount) {
-                                SharedTransitionLayout {
-                                    CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
-                                        MainScreen(
-                                            navController = navController,
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            MainScreen(navController = navController)
+
         }
     }
 }
@@ -145,7 +139,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(
     navController: NavHostController,
-    modifier: Modifier = Modifier
 ) {
 
     DisposableEffect(Unit) {
@@ -153,10 +146,29 @@ fun MainScreen(
             VideoPlayerManager.releasePlayer()
         }
     }
-
-    NavigationGraph(
-        navController,
-    )
+    CompositionLocalProvider(LocalNavController provides navController) {
+        val drawerState = rememberDrawerState(DrawerValue.Closed)
+        ConfigureMaterialTheme {
+            val theme = rememberAppTheme()
+            if (theme == null) {
+                return@ConfigureMaterialTheme
+            }
+            CompositionLocalProvider(LocalTheme provides theme) {
+                CompositionLocalProvider(LocalDrawerState provides drawerState) {
+                    val currentAccount = rememberCurrentAccount()
+                    CompositionLocalProvider(LocalRedditAccount provides currentAccount) {
+                        SharedTransitionLayout {
+                            CompositionLocalProvider(LocalSharedTransitionScope provides this@SharedTransitionLayout) {
+                                NavigationGraph(
+                                    navController,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 
@@ -187,7 +199,7 @@ fun NavigationGraph(
         editorGraph(navController = navController)
 
         composable<SubscriptionsRoute> {
-            SubredditListViewer(navController = navController)
+            SubredditListViewer()
         }
         composable<SearchRoute> { navBackStackEntry ->
             val search = navBackStackEntry.toRoute<SearchRoute>()
@@ -236,4 +248,3 @@ fun NavigationGraph(
         }
     }
 }
-

@@ -29,7 +29,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -54,6 +53,8 @@ import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.blur.blurEffect
 import dev.chrisbanes.haze.hazeEffect
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -199,9 +200,7 @@ fun getVideoUrl(post: PostData): MediaResource? {
 @Composable
 fun FullscreenVideo(
     post: Fullname,
-    viewModel: PostDataViewModel = hiltViewModel<PostDataViewModel, PostDataViewModel.Factory> { factory ->
-        factory.create(post.name)
-    },
+    viewModel: PostDataViewModel = koinViewModel { parametersOf(post) },
     dismiss: () -> Unit
 ) {
     val post = viewModel.post.collectAsState(initial = null).value ?: return

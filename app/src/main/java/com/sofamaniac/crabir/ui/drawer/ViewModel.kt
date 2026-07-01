@@ -24,8 +24,6 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.SubscriptionsRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -42,6 +40,7 @@ import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.TokenRequest
 import net.openid.appauth.TokenResponse
+import org.koin.core.annotation.KoinViewModel
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -52,8 +51,8 @@ sealed class LoginState {
     data class Error(val message: Throwable) : LoginState()
 }
 
-@HiltViewModel
-class DrawerViewModel @Inject constructor(
+@KoinViewModel
+class DrawerViewModel(
     private val authService: AuthorizationService,
     private val accountsRepository: AccountsRepository,
     private val subsRepository: SubscriptionsRepository,

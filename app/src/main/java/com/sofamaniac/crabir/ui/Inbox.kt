@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.LocalTheme
@@ -40,14 +39,14 @@ import com.sofamaniac.crabir.data.remote.dto.emptyListing
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
-import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.KoinViewModel
 import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InboxView(viewModel: InboxViewModel = hiltViewModel()) {
+fun InboxView(viewModel: InboxViewModel = koinViewModel()) {
     val messages by viewModel.messages
     Scaffold(topBar = { TopAppBar(title = { Text("Inbox") }) }) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
@@ -159,8 +158,8 @@ fun Message(
     }
 }
 
-@HiltViewModel
-class InboxViewModel @Inject constructor(inbox: RedditAPIService) : ViewModel() {
+@KoinViewModel
+class InboxViewModel(inbox: RedditAPIService) : ViewModel() {
     var _messages: MutableState<Thing.Listing<Thing>> = mutableStateOf(emptyListing())
     val messages: State<Thing.Listing<Thing>> = _messages
 

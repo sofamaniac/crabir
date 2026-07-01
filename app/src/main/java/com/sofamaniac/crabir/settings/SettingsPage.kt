@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
@@ -29,10 +28,10 @@ import com.sofamaniac.crabir.navigation.LicensesRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ThemeRoute
 import com.sofamaniac.crabir.navigation.ViewsSettingRoute
-import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,7 +84,7 @@ fun SettingsPage() {
 
 
 @Composable
-internal fun DebugOptionsView(viewModel: DebugOptionViewModel = hiltViewModel()) {
+internal fun DebugOptionsView(viewModel: DebugOptionViewModel = koinViewModel()) {
     Scaffold { padding ->
         LazyColumn(modifier = Modifier.padding(padding)) {
             item {
@@ -105,8 +104,8 @@ internal fun DebugOptionsView(viewModel: DebugOptionViewModel = hiltViewModel())
     }
 }
 
-@HiltViewModel
-internal class DebugOptionViewModel @Inject constructor(
+@KoinViewModel
+internal class DebugOptionViewModel(
     private val visitedPostsDao: VisitedPostsDao
 ) : ViewModel() {
     fun clearHistory() {

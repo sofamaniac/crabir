@@ -4,9 +4,10 @@ import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.repository.LinksRepository
-import jakarta.inject.Inject
+import org.koin.core.annotation.ViewModelScope
 
-class MultiPostsRepository @Inject constructor(
+@ViewModelScope
+class MultiPostsRepository(
     override val votableRepository: LinksRepository,
     val api: RedditAPIService,
 ) : PostFeedRepository<FeedParams>() {

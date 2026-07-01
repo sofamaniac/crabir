@@ -43,7 +43,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalSnackBarHost
@@ -63,12 +62,13 @@ import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import java.util.Collections.emptyList
 
 @Composable
 fun DrawerContent(
     modifier: Modifier = Modifier,
-    viewModel: DrawerViewModel = hiltViewModel(),
+    viewModel: DrawerViewModel = koinViewModel(),
 ) {
     val navController = LocalNavController.current
     val subscriptions = viewModel.subscriptions.collectAsState(initial = emptyList())

@@ -29,11 +29,6 @@ import com.sofamaniac.crabir.domain.repository.search.PostSearchParams
 import com.sofamaniac.crabir.domain.repository.search.PostSearchRepository
 import com.sofamaniac.crabir.domain.repository.search.UserSearchRepository
 import com.sofamaniac.crabir.ui.subreddit.FeedViewModelInterface
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -46,6 +41,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
 
 interface SearchParams<This> {
     val query: String
@@ -115,11 +112,11 @@ abstract class SearchViewModel<Params : SearchParams<Params>, Data : DataInterfa
 
 }
 
-@HiltViewModel(assistedFactory = PostSearchViewModel.Factory::class)
-class PostSearchViewModel @AssistedInject constructor(
+@KoinViewModel
+class PostSearchViewModel(
     repository: PostSearchRepository,
     val visitedPostsDao: VisitedPostsDao,
-    @Assisted initialParams: PostSearchParams,
+    @InjectedParam initialParams: PostSearchParams,
 ) : SearchViewModel<PostSearchParams, PostData>(repository, initialParams),
     FeedViewModelInterface<PostData> {
     override val entity: Flow<CommunityViewEntity?> = flowOf(null)
@@ -164,17 +161,10 @@ class PostSearchViewModel @AssistedInject constructor(
             visitedPostsDao.getPost(post.name) != null
         }
     }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(
-            params: PostSearchParams
-        ): PostSearchViewModel
-    }
 }
 
-@HiltViewModel
-class CommunitySearchViewModel @Inject constructor(
+@KoinViewModel
+class CommunitySearchViewModel(
     repository: CommunitySearchRepository,
     subscriptionsRepository: SubscriptionsRepository,
 ) : SearchViewModel<CommunitySearchParams, SubredditData>(
@@ -202,8 +192,8 @@ class CommunitySearchViewModel @Inject constructor(
     }
 }
 
-@HiltViewModel
-class UserSearchViewModel @Inject constructor(
+@KoinViewModel
+class UserSearchViewModel(
     repository: UserSearchRepository,
 ) : SearchViewModel<PostSearchParams, UserDTO>(
     repository, initialParams =

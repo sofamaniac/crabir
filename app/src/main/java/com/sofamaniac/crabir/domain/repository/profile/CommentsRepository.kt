@@ -10,9 +10,10 @@ import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.domain.repository.feed.CommentFeedRepository
-import jakarta.inject.Inject
+import org.koin.core.annotation.ViewModelScope
 
-class CommentsRepository @Inject constructor(
+@ViewModelScope
+class CommentsRepository(
     override val votableRepository: CommentsRepository,
     val api: RedditAPIService,
 ) : CommentFeedRepository<ProfileFeedParams>() {

@@ -7,26 +7,18 @@ import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
 
-@HiltViewModel(assistedFactory = PostDataViewModel.Factory::class)
-class PostDataViewModel @AssistedInject constructor(
+@KoinViewModel
+class PostDataViewModel(
     private val repository: LinksRepository,
     private val visitedPostsDao: VisitedPostsDao,
-    @Assisted name: String,
+    @InjectedParam val name: Fullname,
 ) : ViewModel() {
-    val fullname = Fullname(name)
-    val post = repository.get(fullname)
-
-    @AssistedFactory
-    interface Factory {
-        fun create(name: String): PostDataViewModel
-    }
+    val post = repository.get(name)
 
     fun visitPost(post: PostData, visitedBy: Int) {
         viewModelScope.launch(Dispatchers.IO) {

@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.core.net.toUri
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
@@ -19,18 +18,18 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
+import org.koin.core.parameter.parametersOf
 
-@HiltViewModel(assistedFactory = StreamableViewModel.Factory::class)
-class StreamableViewModel @AssistedInject constructor(
-    @Assisted post: PostData,
+@KoinViewModel
+class StreamableViewModel(
+    @InjectedParam post: PostData,
     api: StreamableAPI
 ) : ViewModel() {
     private val _video: MutableStateFlow<Video?> = MutableStateFlow(null)
@@ -52,11 +51,6 @@ class StreamableViewModel @AssistedInject constructor(
             }
         }
     }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(post: PostData): StreamableViewModel
-    }
 }
 
 @Composable
@@ -64,14 +58,9 @@ fun StreamableVideo(
     post: PostData,
     canPlayVideo: Boolean,
     modifier: Modifier = Modifier,
-    goFullscreen: (Route) -> Unit
+    goFullscreen: (Route) -> Unit,
+    viewModel: StreamableViewModel = koinViewModel { parametersOf(post) }
 ) {
-    val viewModel: StreamableViewModel =
-        hiltViewModel<StreamableViewModel, StreamableViewModel.Factory> { factory ->
-            factory.create(
-                post
-            )
-        }
     val video by viewModel.video.collectAsState()
     val thumbnailUrl by viewModel.thumbnailUrl.collectAsState()
     val filters = rememberFiltersSettings()

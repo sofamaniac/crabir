@@ -10,24 +10,15 @@ package com.sofamaniac.crabir.domain.repository
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.util.fastFirstOrNull
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
 import androidx.datastore.dataStore
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
 import com.sofamaniac.crabir.data.local.dao.AccountsDao
 import com.sofamaniac.crabir.data.local.entities.toDomainModel
 import com.sofamaniac.crabir.data.local.entities.toEntity
 import com.sofamaniac.crabir.domain.model.AuthStateSerializer
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import jakarta.inject.Inject
-import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -38,6 +29,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import net.openid.appauth.AuthState
+import org.koin.core.annotation.Singleton
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Collections.emptyList
@@ -95,20 +87,10 @@ object AccountsSerializer : Serializer<Accounts> {
 
 }
 
-@Composable
-fun rememberCurrentAccount(viewModel: CurrentAccountViewModel = hiltViewModel()): RedditAccount {
-    val account by viewModel.account.collectAsState(RedditAccount.anonymous())
-    return account
-}
 
-@HiltViewModel
-class CurrentAccountViewModel @Inject constructor(accountsDao: AccountsDao) : ViewModel() {
-    val account =
-        accountsDao.getActiveAccount().map { it?.toDomainModel() ?: RedditAccount.anonymous() }
-}
 
 @Singleton
-class AccountsRepositoryImplRoom @Inject constructor(
+class AccountsRepositoryImplRoom(
     private val accountsDao: AccountsDao,
 ) : AccountsRepository {
     override val accounts: Flow<List<RedditAccount>> =
@@ -154,9 +136,9 @@ class AccountsRepositoryImplRoom @Inject constructor(
 
 }
 
-@Singleton
-class AccountsRepositoryImpl @Inject constructor(
-    @ApplicationContext context: Context,
+@Singleton(binds = [AccountsRepository::class])
+class AccountsRepositoryImpl(
+    context: Context,
 ) : AccountsRepository {
 
 

@@ -11,9 +11,10 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ListingRepository
-import jakarta.inject.Inject
+import org.koin.core.annotation.ViewModelScope
 
-class PostSearchRepository @Inject constructor(
+@ViewModelScope
+class PostSearchRepository(
     private val api: RedditAPIService,
     private val votableRepository: LinksRepository
 ) :
@@ -48,7 +49,8 @@ class PostSearchRepository @Inject constructor(
     }
 }
 
-class CommunitySearchRepository @Inject constructor(private val api: RedditAPIService) :
+@ViewModelScope
+class CommunitySearchRepository(private val api: RedditAPIService) :
     ListingRepository<CommunitySearchParams, SubredditData>() {
     override fun thingToData(thing: Thing): SubredditData? {
         if (thing !is Thing.Subreddit) return null
@@ -71,7 +73,8 @@ class CommunitySearchRepository @Inject constructor(private val api: RedditAPISe
     }
 }
 
-class UserSearchRepository @Inject constructor(private val api: RedditAPIService) :
+@ViewModelScope
+class UserSearchRepository(private val api: RedditAPIService) :
     ListingRepository<PostSearchParams, UserDTO>() {
     override fun thingToData(thing: Thing): UserDTO? {
         if (thing !is Thing.User) return null

@@ -10,7 +10,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
@@ -27,17 +26,17 @@ import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.TabBar
-import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
-import jakarta.inject.Singleton
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.KoinViewModel
+import org.koin.core.annotation.Singleton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryViewer(
     modifier: Modifier = Modifier,
-    viewModel: HistoryViewModel = hiltViewModel(),
+    viewModel: HistoryViewModel = koinViewModel(),
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
@@ -74,8 +73,8 @@ fun HistoryViewer(
 }
 
 
-@HiltViewModel
-class HistoryViewModel @Inject constructor(
+@KoinViewModel
+class HistoryViewModel(
     repository: HistoryRepository,
     visitedPostsDao: VisitedPostsDao,
     communityDao: SubredditRepository,
@@ -93,7 +92,7 @@ class HistoryViewModel @Inject constructor(
 }
 
 @Singleton
-class HistoryRepository @Inject constructor(
+class HistoryRepository(
     private val visitedPostsDao: VisitedPostsDao,
     override val votableRepository: LinksRepository,
 ) : PostFeedRepository<FeedParams>() {

@@ -23,18 +23,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.ui.search.CommunitySearchViewModel
 import com.sofamaniac.crabir.ui.subredditList.Tile
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CommunitySearch(
     viewModel: CreatorViewModel,
-    searchViewModel: CommunitySearchViewModel = hiltViewModel(),
+    searchViewModel: CommunitySearchViewModel = koinViewModel(),
     onDismiss: () -> Unit = {}
 ) {
     val searchState = rememberSearchBarState()

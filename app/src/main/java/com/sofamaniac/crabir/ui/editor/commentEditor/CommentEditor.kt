@@ -14,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -24,13 +23,13 @@ import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.editor.Editor
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun CommentEditor(
     parent: Fullname,
-    viewModel: CommentEditorViewModel = hiltViewModel<CommentEditorViewModel, CommentEditorViewModel.Factory> { factory ->
-        factory.create(parent.name)
-    }
+    viewModel: CommentEditorViewModel = koinViewModel { parametersOf(parent.name) }
 ) {
     val navController = LocalNavController.current
     val parentData by viewModel.parentData.collectAsState(null)

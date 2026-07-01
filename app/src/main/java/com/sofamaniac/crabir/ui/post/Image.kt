@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.core.net.toUri
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalSharedTransitionScope
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -44,6 +43,8 @@ import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.blur.blurEffect
 import dev.chrisbanes.haze.hazeEffect
 import me.saket.telephoto.zoomable.rememberZoomableState
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 private fun PostData.getImage(): MediaResource {
     return if (preview != null) {
@@ -114,9 +115,7 @@ fun PostImage(
 @Composable
 fun FullscreenImageView(
     post: Fullname,
-    viewModel: PostDataViewModel = hiltViewModel<PostDataViewModel, PostDataViewModel.Factory> { factory ->
-        factory.create(post.name)
-    },
+    viewModel: PostDataViewModel = koinViewModel { parametersOf(post) },
     dismiss: () -> Unit,
     animatedVisibilityScope: AnimatedVisibilityScope,
 ) {

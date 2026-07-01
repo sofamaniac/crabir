@@ -10,9 +10,10 @@ import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository
-import jakarta.inject.Inject
+import org.koin.core.annotation.ViewModelScope
 
-class SubmittedRepository @Inject constructor(
+@ViewModelScope
+class SubmittedRepository(
     override val votableRepository: LinksRepository,
     val api: RedditAPIService,
 ) : PostFeedRepository<ProfileFeedParams>() {

@@ -8,11 +8,10 @@ import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.repository.LinksRepository
-import jakarta.inject.Inject
-import jakarta.inject.Singleton
+import org.koin.core.annotation.Singleton
 
 @Singleton
-class HomeRepository @Inject constructor(
+class HomeRepository(
     override val votableRepository: LinksRepository,
     val api: RedditAPIService
 ) : PostFeedRepository<FeedParams>() {

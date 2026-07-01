@@ -2,8 +2,8 @@ package com.sofamaniac.crabir.domain.repository
 
 import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
-import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import org.koin.core.annotation.Singleton
 
 interface CommunityViewRepository {
     suspend fun insert(community: CommunityViewEntity)
@@ -17,7 +17,8 @@ interface CommunityViewRepository {
     suspend fun update(entity: CommunityViewEntity)
 }
 
-class RoomRepository @Inject constructor(private val communityViewDao: CommunityViewDao) :
+@Singleton(binds = [CommunityViewRepository::class])
+class CommunityViewRepositoryImpl(private val communityViewDao: CommunityViewDao) :
     CommunityViewRepository {
     override suspend fun insert(community: CommunityViewEntity) {
         communityViewDao.insert(community)

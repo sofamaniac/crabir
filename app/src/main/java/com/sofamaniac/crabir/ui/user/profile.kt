@@ -25,7 +25,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalSnackBarHost
@@ -38,6 +37,8 @@ import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subreddit.PostView
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 
 @Serializable
@@ -68,8 +69,8 @@ fun ProfileView(
     user: String,
     modifier: Modifier = Modifier,
     initialTab: ProfileTabs = ProfileTabs.Overview,
-    profileViewModel: ProfileViewModel = hiltViewModel<ProfileViewModel, ProfileViewModel.Factory> { factory ->
-        factory.create(user)
+    profileViewModel: ProfileViewModel = koinViewModel<ProfileViewModel> {
+        parametersOf(user)
     },
 ) {
 //    val isConnectedUser by remember { profileViewModel.currentUser.map { it == user } }.collectAsState(
@@ -84,41 +85,13 @@ fun ProfileView(
     val scope = rememberCoroutineScope()
 
     val viewModels: Map<ProfileTabs, ProfileFeedViewModel<out VotableData>> = mapOf(
-        ProfileTabs.Overview to hiltViewModel<OverviewViewModel, OverviewViewModel.Factory> { factory ->
-            factory.create(
-                user
-            )
-        },
-        ProfileTabs.Saved to hiltViewModel<SavedViewModel, SavedViewModel.Factory> { factory ->
-            factory.create(
-                user
-            )
-        },
-        ProfileTabs.Comments to hiltViewModel<CommentsViewModel, CommentsViewModel.Factory> { factory ->
-            factory.create(
-                user
-            )
-        },
-        ProfileTabs.Upvoted to hiltViewModel<UpvotedViewModel, UpvotedViewModel.Factory> { factory ->
-            factory.create(
-                user
-            )
-        },
-        ProfileTabs.Downvoted to hiltViewModel<DownvotedViewModel, DownvotedViewModel.Factory> { factory ->
-            factory.create(
-                user
-            )
-        },
-        ProfileTabs.Hidden to hiltViewModel<HiddenViewModel, HiddenViewModel.Factory> { factory ->
-            factory.create(
-                user
-            )
-        },
-        ProfileTabs.Posts to hiltViewModel<SubmittedViewModel, SubmittedViewModel.Factory> { factory ->
-            factory.create(
-                user
-            )
-        }
+        ProfileTabs.Overview to koinViewModel<OverviewViewModel> { parametersOf(user) },
+        ProfileTabs.Saved to koinViewModel<SavedViewModel> { parametersOf(user) },
+        ProfileTabs.Comments to koinViewModel<CommentsViewModel> { parametersOf(user) },
+        ProfileTabs.Upvoted to koinViewModel<UpvotedViewModel> { parametersOf(user) },
+        ProfileTabs.Downvoted to koinViewModel<DownvotedViewModel> { parametersOf(user) },
+        ProfileTabs.Hidden to koinViewModel<HiddenViewModel> { parametersOf(user) },
+        ProfileTabs.Posts to koinViewModel<SubmittedViewModel> { parametersOf(user) },
     )
 
 

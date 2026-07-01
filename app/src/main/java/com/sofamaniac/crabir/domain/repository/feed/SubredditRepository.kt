@@ -13,12 +13,12 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
-import jakarta.inject.Inject
-import jakarta.inject.Singleton
+import org.koin.core.annotation.Singleton
+import org.koin.core.annotation.ViewModelScope
 
 
 @Singleton
-class SubredditCache @Inject constructor(
+class SubredditCache(
     private val dao: SubredditRepository
 ) {
     suspend fun save(subreddit: SubredditData) {
@@ -30,7 +30,8 @@ class SubredditCache @Inject constructor(
     }
 }
 
-class SubredditPostsRepository @Inject constructor(
+@ViewModelScope
+class SubredditPostsRepository(
     override val votableRepository: LinksRepository,
     val api: RedditAPIService,
 ) : PostFeedRepository<FeedParams>() {

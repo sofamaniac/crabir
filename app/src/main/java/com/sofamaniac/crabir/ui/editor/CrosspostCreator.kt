@@ -44,7 +44,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.remote.reddit.CrosspostSubmissionBuilder
@@ -61,19 +60,17 @@ import com.sofamaniac.crabir.ui.editor.postEditor.CommunitySelector
 import com.sofamaniac.crabir.ui.editor.postEditor.CreatorViewModel
 import com.sofamaniac.crabir.ui.post.PostHeader
 import com.sofamaniac.crabir.ui.post.PostInfo
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrosspostCreator(
     post: Fullname,
-    viewModel: CrosspostCreatorViewModel = hiltViewModel<CrosspostCreatorViewModel, CrosspostCreatorViewModel.Factory> { factory ->
-        factory.create(post.name)
-    }
+    viewModel: CrosspostCreatorViewModel = koinViewModel { parametersOf(post) }
 ) {
     val navController = LocalNavController.current
     val theme = LocalTheme.current
@@ -227,21 +224,19 @@ internal fun CrosspostView(
     }
 }
 
-@HiltViewModel(assistedFactory = CrosspostCreatorViewModel.Factory::class)
-class CrosspostCreatorViewModel @AssistedInject constructor(
-    @Assisted val parentFullname: String,
+@KoinViewModel
+class CrosspostCreatorViewModel(
+    @InjectedParam val parentFullname: Fullname,
     api: RedditAPIService,
     communities: SubredditRepository,
     linksRepository: LinksRepository,
 ) : CreatorViewModel(api, communities) {
     var state by mutableStateOf(
         CrosspostSubmissionBuilder(
-            crosspostFullname = Fullname(
-                parentFullname
-            )
+            crosspostFullname = parentFullname
         )
     )
-    val post = linksRepository.get(Fullname(parentFullname))
+    val post = linksRepository.get(parentFullname)
 
     var loading by mutableStateOf(false)
 
@@ -272,10 +267,5 @@ class CrosspostCreatorViewModel @AssistedInject constructor(
                 Result.failure(Exception("Failed to submit post: ${res.errorBody()}"))
             }
         }
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(parentFullname: String): CrosspostCreatorViewModel
     }
 }

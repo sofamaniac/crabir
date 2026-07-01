@@ -6,16 +6,14 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.domain.model.Gallery
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
 
 
-@HiltViewModel(assistedFactory = GalleryViewModel.Factory::class)
-class GalleryViewModel @AssistedInject constructor(
-    @Assisted val gallery: Gallery,
-    @Assisted val context: Context
+@KoinViewModel
+class GalleryViewModel(
+    @InjectedParam val gallery: Gallery,
+    val context: Context
 ) : ViewModel() {
 
     var players: Map<String, ExoPlayer> = emptyMap()
@@ -44,11 +42,6 @@ class GalleryViewModel @AssistedInject constructor(
             player.value.release()
         }
         players = emptyMap()
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(gallery: Gallery, context: Context): GalleryViewModel
     }
 
 }

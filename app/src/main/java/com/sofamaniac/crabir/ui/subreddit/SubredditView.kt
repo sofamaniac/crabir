@@ -37,7 +37,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalTheme
@@ -51,13 +50,13 @@ import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.TabBar
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
+import org.koin.core.parameter.parametersOf
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
@@ -65,9 +64,7 @@ import kotlinx.coroutines.launch
 fun SubredditViewer(
     subreddit: String,
     modifier: Modifier = Modifier,
-    viewModel: SubredditViewModel = hiltViewModel<SubredditViewModel, SubredditViewModel.Factory> { factory ->
-        factory.create(subreddit)
-    },
+    viewModel: SubredditViewModel = koinViewModel { parametersOf(subreddit) },
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val params by viewModel.params.collectAsState()
@@ -177,15 +174,15 @@ fun SubredditInfo(info: SubredditData, viewModel: SubredditViewModel) {
     }
 }
 
-@HiltViewModel(assistedFactory = SubredditViewModel.Factory::class)
-class SubredditViewModel @AssistedInject constructor(
+@KoinViewModel
+class SubredditViewModel(
     private val repository: SubredditPostsRepository,
     visitedPostsDao: VisitedPostsDao,
     communityDao: SubredditRepository,
     viewDao: CommunityViewRepository,
     private val subredditCache: SubredditCache,
     /** Subreddit's prefixed display name */
-    @Assisted slug: String,
+    @InjectedParam slug: String,
 ) : PostFeedViewModel<SubredditData>(
     displayName = slug,
     repository,
@@ -231,11 +228,6 @@ class SubredditViewModel @AssistedInject constructor(
             _info.value = repository.getInfo()
             updateData(_info.value)
         }
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(slug: String): SubredditViewModel
     }
 
 }

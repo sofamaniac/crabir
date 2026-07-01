@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mikepenz.markdown.model.State
@@ -18,10 +17,6 @@ import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.thread.CommentViewModelInterface
 import com.sofamaniac.crabir.ui.thread.OpenedComment
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +25,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun CommentView(
@@ -49,17 +48,15 @@ fun CommentView(
     ) {
         OpenedComment(
             thing,
-            viewModel = hiltViewModel<CommentViewModel, CommentViewModel.Factory>(key = thing.id) { factory ->
-                factory.create(thing)
-            },
+            viewModel = koinViewModel<CommentViewModel> { parametersOf(thing) },
             enableAnimation = false,
         )
     }
 }
 
-@HiltViewModel(assistedFactory = CommentViewModel.Factory::class)
-class CommentViewModel @AssistedInject constructor(
-    @Assisted val comment: CommentData,
+@KoinViewModel
+class CommentViewModel(
+    @InjectedParam val comment: CommentData,
     private val commentsRepository: CommentsRepository,
 ) : CommentViewModelInterface, ViewModel() {
     override val openComment: StateFlow<Fullname?> = MutableStateFlow(comment.name)
@@ -117,11 +114,6 @@ class CommentViewModel @AssistedInject constructor(
 
     override fun report(reason: String) {
         TODO("Not yet implemented")
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(comment: CommentData): CommentViewModel
     }
 
 }

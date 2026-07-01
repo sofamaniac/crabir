@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.LocalTheme
@@ -39,20 +38,20 @@ import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
+import org.koin.core.parameter.parametersOf
 
-@HiltViewModel(assistedFactory = SubredditInfoViewModel.Factory::class)
-class SubredditInfoViewModel @AssistedInject constructor(
+@KoinViewModel
+class SubredditInfoViewModel(
     private val subredditCache: SubredditCache,
     private val redditApi: SubredditAPI,
     /** Subreddit's prefixed name */
-    @Assisted subredditName: String,
+    @InjectedParam subredditName: String,
 ) : ViewModel() {
 
     val info: MutableStateFlow<SubredditData?> = MutableStateFlow(null)
@@ -100,10 +99,6 @@ class SubredditInfoViewModel @AssistedInject constructor(
         _subscribe(SubscribeAction.UNSUBSCRIBE)
     }
 
-    @AssistedFactory
-    interface Factory {
-        fun create(subredditName: String): SubredditInfoViewModel
-    }
 }
 
 @Composable
@@ -133,10 +128,7 @@ fun FavoriteButton(hasFavorited: Boolean, onClick: () -> Unit = {}) {
 @Composable
 fun SubredditInfoView(
     subreddit: String,
-    viewModel: SubredditInfoViewModel =
-        hiltViewModel<SubredditInfoViewModel, SubredditInfoViewModel.Factory> { factory ->
-            factory.create(subreddit)
-        }
+    viewModel: SubredditInfoViewModel = koinViewModel { parametersOf(subreddit) },
 ) {
     val infoOpt by viewModel.info.collectAsState()
 

@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
@@ -26,6 +25,8 @@ import com.sofamaniac.crabir.ui.post.OpenThreadButton
 import com.sofamaniac.crabir.ui.post.PostHeader
 import com.sofamaniac.crabir.ui.post.PostInfo
 import com.sofamaniac.crabir.ui.post.PostViewModelInterface
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Composable function that displays a single post in a Card format.
@@ -48,12 +49,11 @@ fun PostCard(
     canStartVideo: Boolean = false,
     read: Boolean = false,
     showHidden: Boolean = false,
-    viewModel: PostViewModelInterface = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
-        key = post.id,
-        creationCallback = { factory ->
-            factory.create(post)
-        }
-    ),
+    viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = post.id) {
+        parametersOf(
+            post
+        )
+    },
 ) {
     val postOpt by viewModel.post.collectAsState(post)
     if (postOpt == null) return

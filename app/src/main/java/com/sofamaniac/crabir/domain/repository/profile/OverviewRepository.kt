@@ -11,10 +11,11 @@ import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.MixedRepository
 import com.sofamaniac.crabir.domain.repository.feed.MixedFeedRepository
-import jakarta.inject.Inject
+import org.koin.core.annotation.ViewModelScope
 import retrofit2.Response
 
-class OverviewRepository @Inject constructor(
+@ViewModelScope
+class OverviewRepository(
     override val votableRepository: MixedRepository,
     val api: RedditAPIService,
 ) : MixedFeedRepository<ProfileFeedParams>() {

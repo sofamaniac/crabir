@@ -46,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.InvalidUrl
@@ -59,13 +58,14 @@ import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.editor.Editor
 import com.sofamaniac.crabir.ui.mapColor
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCreator(
     communitySlug: String? = null,
     kind: Kind = Kind.Self,
-    viewModel: PostCreatorViewModel = hiltViewModel(),
+    viewModel: PostCreatorViewModel = koinViewModel(),
     onDismissRequest: () -> Unit,
 ) {
     LaunchedEffect(communitySlug, kind) {

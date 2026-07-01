@@ -35,7 +35,6 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -56,6 +55,8 @@ import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.blur.blurEffect
 import dev.chrisbanes.haze.hazeEffect
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun PostGallery(
@@ -262,9 +263,7 @@ fun EmbeddedGallery(
 fun FullscreenGallery(
     post: Fullname,
     initialPage: Int = 0,
-    viewModel: PostDataViewModel = hiltViewModel<PostDataViewModel, PostDataViewModel.Factory> { factory ->
-        factory.create(post.name)
-    },
+    viewModel: PostDataViewModel = koinViewModel { parametersOf(post) },
     dismiss: () -> Unit,
     onPageChanged: (Int) -> Unit = {},
 ) {

@@ -19,10 +19,6 @@ import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
 import com.sofamaniac.crabir.ui.post.PostViewModelInterface
 import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -35,16 +31,18 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
 
-@HiltViewModel(assistedFactory = ThreadViewModel.Factory::class)
-class ThreadViewModel @AssistedInject constructor(
+@KoinViewModel
+class ThreadViewModel(
     private val repository: ThreadRepository,
     private val visitedPostsDao: VisitedPostsDao,
     private val linksRepository: LinksRepository,
-    @Assisted("permalink") val permalink: String,
-    @Assisted("comment") val comment: String?,
-    @Assisted val context: Int?,
-    @Assisted val initialSort: Sort?,
+    @InjectedParam val permalink: String,
+    @InjectedParam val comment: String?,
+    @InjectedParam val context: Int?,
+    @InjectedParam val initialSort: Sort?,
 ) : ViewModel(), CommentViewModelInterface, PostViewModelInterface {
 
     var name: Fullname = repository.getPostId(permalink)
@@ -325,16 +323,6 @@ class ThreadViewModel @AssistedInject constructor(
 
     override fun report(reason: String) {
         TODO("Not yet implemented")
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(
-            @Assisted("permalink") permalink: String,
-            @Assisted("comment") comment: String? = null,
-            context: Int? = null,
-            initialSort: Sort?,
-        ): ThreadViewModel
     }
 }
 

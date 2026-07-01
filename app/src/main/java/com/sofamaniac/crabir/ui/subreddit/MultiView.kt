@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.local.dao.MultiRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
@@ -18,22 +17,22 @@ import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.MultiPostsRepository
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.TabBar
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MultiView(
-    name: String,
+    slug: String,
     modifier: Modifier = Modifier,
-    viewModel: MultiViewModel = hiltViewModel<MultiViewModel, MultiViewModel.Factory> { factory ->
-        factory.create(name)
+    viewModel: MultiViewModel = koinViewModel<MultiViewModel> {
+        parametersOf(slug)
     },
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -71,13 +70,13 @@ fun MultiView(
     )
 }
 
-@HiltViewModel(assistedFactory = MultiViewModel.Factory::class)
-class MultiViewModel @AssistedInject constructor(
+@KoinViewModel
+class MultiViewModel(
     repository: MultiPostsRepository,
     visitedPostsDao: VisitedPostsDao,
     communityDao: MultiRepository,
     viewRepository: CommunityViewRepository,
-    @Assisted("name") slug: String,
+    @InjectedParam slug: String,
 ) : PostFeedViewModel<MultiData>(
     displayName = slug,
     repository,
@@ -97,14 +96,6 @@ class MultiViewModel @AssistedInject constructor(
             repository.updateMulti(_info.value!!.permalink)
         }
     }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(
-            @Assisted("name") name: String
-        ): MultiViewModel
-    }
-
 }
 
 

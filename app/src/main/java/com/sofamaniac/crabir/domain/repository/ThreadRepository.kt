@@ -13,10 +13,10 @@ import com.sofamaniac.crabir.data.remote.reddit.postCommentBody
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
-import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import org.koin.core.annotation.ViewModelScope
 import retrofit2.Response
 
 interface ThreadRepository {
@@ -151,7 +151,8 @@ class Forest private constructor(
     }
 }
 
-class ThreadRepositoryImpl @Inject constructor(
+@ViewModelScope
+class ThreadRepositoryImpl(
     val api: RedditAPIService,
     val visitedPostsDao: VisitedPostsDao,
     val commentsRepository: CommentsRepository,

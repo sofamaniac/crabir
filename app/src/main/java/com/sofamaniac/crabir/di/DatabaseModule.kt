@@ -10,21 +10,17 @@ import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.dao.VotableDao
 import com.sofamaniac.crabir.data.local.database.AccountDatabase
 import com.sofamaniac.crabir.data.local.database.AppDatabase
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import jakarta.inject.Singleton
+import org.koin.core.annotation.Configuration
+import org.koin.core.annotation.Module
+import org.koin.core.annotation.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class)
+@Configuration
 object DatabaseModule {
 
-    @Provides
     @Singleton
     fun provideAppDatabase(
-        @ApplicationContext context: Context
+        context: Context
     ): AppDatabase {
         return Room.databaseBuilder(
             context,
@@ -34,9 +30,8 @@ object DatabaseModule {
             .build()
     }
 
-    @Provides
     @Singleton
-    fun provideAccountDatabase(@ApplicationContext context: Context): AccountDatabase {
+    fun provideAccountDatabase(context: Context): AccountDatabase {
         return Room.databaseBuilder(
             context,
             AccountDatabase::class.java,
@@ -45,32 +40,32 @@ object DatabaseModule {
             .build()
     }
 
-    @Provides
+    @Singleton
     fun provideAccountsDao(database: AccountDatabase): AccountsDao {
         return database.accountsDao()
     }
 
-    @Provides
+    @Singleton
     fun provideVisitedPostsDao(database: AppDatabase): VisitedPostsDao {
         return database.visitedPostsDao()
     }
 
-    @Provides
+    @Singleton
     fun provideVisitedCommunitiesDao(database: AppDatabase): CommunityViewDao {
         return database.visitedCommunityDao()
     }
 
-    @Provides
+    @Singleton
     fun provideVotableDao(database: AppDatabase): VotableDao {
         return database.votableDao()
     }
 
-    @Provides
+    @Singleton
     fun subredditDao(database: AppDatabase): SubredditRepository {
         return database.subredditDao()
     }
 
-    @Provides
+    @Singleton
     fun multiDao(database: AppDatabase): MultiRepository {
         return database.multiDao()
     }

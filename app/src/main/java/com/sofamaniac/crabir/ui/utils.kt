@@ -4,9 +4,17 @@
 
 package com.sofamaniac.crabir.ui
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import dev.chrisbanes.haze.blur.HazeBlurStyle
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.KoinViewModel
 import java.time.Clock
 import java.time.Duration
 import java.util.Locale
@@ -37,4 +45,16 @@ data class SharedElementKey(val name: Fullname, val type: SharedElementType)
 
 fun crabirBlurStyle(): HazeBlurStyle {
     return HazeBlurStyle(blurRadius = 40.dp, colorEffects = null, noiseFactor = 0f)
+}
+
+@Composable
+fun rememberCurrentAccount(): RedditAccount {
+    val viewModel: CurrentAccountViewModel = koinViewModel()
+    val account by viewModel.account.collectAsState(RedditAccount.anonymous())
+    return account
+}
+
+@KoinViewModel
+class CurrentAccountViewModel(accountsRepository: AccountsRepository) : ViewModel() {
+    val account = accountsRepository.activeAccount
 }

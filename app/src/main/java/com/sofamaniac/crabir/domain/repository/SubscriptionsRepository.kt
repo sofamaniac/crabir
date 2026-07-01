@@ -9,8 +9,6 @@ import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
-import jakarta.inject.Inject
-import jakarta.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,10 +18,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import org.koin.core.annotation.Singleton
 import retrofit2.Response
 
 @Singleton
-class SubscriptionsRepository @Inject constructor(
+class SubscriptionsRepository(
     val api: RedditAPIService,
     val accountsRepository: AccountsRepository,
     val subredditCache: SubredditCache,

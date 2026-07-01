@@ -17,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
@@ -29,6 +28,8 @@ import com.sofamaniac.crabir.ui.post.LinkViewModel
 import com.sofamaniac.crabir.ui.post.PostHeader
 import com.sofamaniac.crabir.ui.post.PostInfo
 import com.sofamaniac.crabir.ui.post.card.PostBody
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 internal fun PostView(
@@ -92,17 +93,11 @@ internal fun CrossPostView(
 fun PostCard(
     post: PostData,
     modifier: Modifier = Modifier,
-    viewModel: LinkViewModel = hiltViewModel<LinkViewModel, LinkViewModel.Factory>(
-        key = post.id,
-        creationCallback = { factory ->
-            factory.create(post)
-        }
-    ),
+    viewModel: LinkViewModel = koinViewModel { parametersOf(post) },
     threadViewModel: ThreadViewModel,
     body: @Composable ColumnScope.() -> Unit,
 ) {
     val likes by viewModel.likes.collectAsState(null)
-    val navController = LocalNavController.current
     val modifier = modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
