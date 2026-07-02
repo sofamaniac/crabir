@@ -1,7 +1,6 @@
 package com.sofamaniac.crabir.ui.editor.postEditor
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +9,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.maxLength
@@ -29,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -48,7 +52,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalRedditAccount
-import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.InvalidUrl
 import com.sofamaniac.crabir.data.remote.reddit.MissingTitle
@@ -58,12 +61,11 @@ import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.editor.AccountSelector
-import com.sofamaniac.crabir.ui.editor.Editor
+import com.sofamaniac.crabir.ui.editor.EditorBottomBar
 import com.sofamaniac.crabir.ui.mapColor
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCreator(
     communitySlug: String? = null,
@@ -80,7 +82,6 @@ fun PostCreator(
         viewModel.state = viewModel.state.copy(kind = kind)
     }
     val context = LocalContext.current
-    val theme = LocalTheme.current
     var showFlairDialog by remember { mutableStateOf(false) }
     var showFlairEdit by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -88,150 +89,194 @@ fun PostCreator(
     val initialAccount = LocalRedditAccount.current
     var selectedAccount by remember { mutableStateOf(initialAccount) }
     val accounts by viewModel.accounts.collectAsState(emptyList())
-    Editor(
-        modifier = Modifier.background(theme.cardBackground),
-        state = viewModel.textState,
-        snackbarHostState = snackbarHostState,
-        label = { Text("Post content") },
+    fun submit() {
+        scope.launch {
+            val res = viewModel.submit(context, account = selectedAccount)
+            if (res.isSuccess) {
+                onDismissRequest()
+            } else {
+                snackbarHostState.showSnackbar(res.exceptionOrNull()!!.message!!)
+            }
+        }
+    }
+    Scaffold(
+        modifier = Modifier.imePadding(),
         topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = onDismissRequest) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
-                    }
-                },
-                title = { Text("Create post") },
-                actions = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            val res = viewModel.submit(context, account = selectedAccount)
-                            if (res.isSuccess) {
-                                onDismissRequest()
-                            } else {
-                                snackbarHostState.showSnackbar(res.exceptionOrNull()!!.message!!)
+            EditorTopBar(onDismissRequest, ::submit)
+        },
+        bottomBar = {
+            EditorBottomBar(viewModel.textState)
+        }
+    ) { innerPadding ->
+
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item {
+                CommunitySelector(viewModel)
+            }
+            item {
+                Column {
+                    TextField(
+                        state = viewModel.titleState,
+                        label = { Text("Title") },
+                        inputTransformation = InputTransformation.maxLength(300),
+                        modifier = Modifier.fillMaxWidth(),
+                        isError = viewModel.error is MissingTitle,
+                        supportingText = {
+                            if (viewModel.error is MissingTitle)
+                                Text("Missing title", color = MaterialTheme.colorScheme.error)
+                        },
+                        trailingIcon = {
+                            if (viewModel.error is MissingTitle)
+                                Icon(
+                                    Icons.Filled.Error,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                        }
+                    )
+                    Text(
+                        "${viewModel.titleState.text.length}/300",
+                        modifier = Modifier.align(Alignment.End)
+                    )
+                }
+            }
+            if (viewModel.state.flairId != null) {
+                item {
+                    val flair = viewModel.flairs.find { it.id == viewModel.state.flairId }
+                    val text = viewModel.state.flairText ?: flair?.text ?: ""
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text)
+                        if (flair?.textEditable == true) {
+                            Spacer(modifier = Modifier.weight(1f))
+                            TextButton(onClick = { showFlairEdit = true }) {
+                                Text("Edit flair")
                             }
                         }
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                     }
                 }
-            )
-        })
-    {
-        CommunitySelector(viewModel)
-        Column(
-        ) {
-            TextField(
-                state = viewModel.titleState,
-                label = { Text("Title") },
-                inputTransformation = InputTransformation.maxLength(300),
-                modifier = Modifier.fillMaxWidth(),
-                isError = viewModel.error is MissingTitle,
-                supportingText = {
-                    if (viewModel.error is MissingTitle)
-                        Text("Missing title", color = MaterialTheme.colorScheme.error)
-                },
-                trailingIcon = {
-                    if (viewModel.error is MissingTitle)
-                        Icon(
-                            Icons.Filled.Error,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error
+            }
+            item {
+                TextButton(onClick = { showFlairDialog = true }) {
+                    Text("Change Flair")
+                }
+            }
+            item {
+                AccountSelector(accounts, selectedAccount) { newId ->
+                    selectedAccount = accounts.find { it.id == newId }!!
+                }
+            }
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        onClick = {
+                            viewModel.state = viewModel.state.copy(nsfw = !viewModel.state.nsfw)
+                        },
+                        selected = viewModel.state.nsfw,
+                        colors = FilterChipDefaults.filterChipColors().copy(
+                            selectedContainerColor = Color.Red,
+                        ),
+                        label = {
+                            Text("NSFW")
+                        },
+                    )
+                    FilterChip(
+                        onClick = {
+                            viewModel.state =
+                                viewModel.state.copy(spoiler = !viewModel.state.spoiler)
+                        },
+                        selected = viewModel.state.spoiler,
+                        label = {
+                            Text("SPOILER")
+                        }
+                    )
+                }
+            }
+            item {
+                when (viewModel.state.kind) {
+                    Kind.Link -> {
+                        UrlField(viewModel)
+                    }
+
+                    Kind.Image, Kind.Video -> {
+                        MediaPicker(viewModel)
+                    }
+
+                    Kind.Self -> {
+                        TextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 100.dp),
+                            state = viewModel.textState,
+                            placeholder = { Text("Type content") },
+                            label = { Text("Content") }
                         )
-                }
-            )
-            Text(
-                "${viewModel.titleState.text.length}/300",
-                modifier = Modifier.align(Alignment.End)
-            )
-        }
-        if (viewModel.state.flairId != null) {
-            val flair = viewModel.flairs.find { it.id == viewModel.state.flairId }
-            val text = viewModel.state.flairText ?: flair?.text ?: ""
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text)
-                if (flair?.textEditable == true) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    TextButton(onClick = { showFlairEdit = true }) {
-                        Text("Edit flair")
                     }
+
+                    else -> {}
                 }
             }
         }
-        TextButton(onClick = { showFlairDialog = true }) {
-            Text("Change Flair")
-        }
-        AccountSelector(accounts, selectedAccount) { newId ->
-            selectedAccount = accounts.find { it.id == newId }!!
-        }
-        when (viewModel.state.kind) {
-            Kind.Link -> {
-                UrlField(viewModel)
+
+        if (viewModel.loading) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
-
-            Kind.Image, Kind.Video -> {
-                MediaPicker(viewModel)
-            }
-
-            else -> {}
         }
-
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(
-                onClick = {
-                    viewModel.state = viewModel.state.copy(nsfw = !viewModel.state.nsfw)
+        if (showFlairDialog) {
+            LaunchedEffect(viewModel) {
+                viewModel.getFlairs()
+            }
+            FlairDialog(
+                viewModel.flairs,
+                onSelect = { flair ->
+                    viewModel.state = viewModel.state.copy(flairId = flair.id)
                 },
-                selected = viewModel.state.nsfw,
-                colors = FilterChipDefaults.filterChipColors().copy(
-                    selectedContainerColor = Color.Red,
-                ),
-                label = {
-                    Text("NSFW")
+                onClickEdit = { flair ->
+                    viewModel.state = viewModel.state.copy(flairId = flair.id)
+                    showFlairEdit = true
                 },
+                onDismiss = { showFlairDialog = false }
             )
-            FilterChip(
-                onClick = {
-                    viewModel.state = viewModel.state.copy(spoiler = !viewModel.state.spoiler)
+        }
+        if (showFlairEdit) {
+            val initialText = viewModel.state.flairText
+            FlairEditBox(
+                initialText,
+                viewModel.flairs.find { it.id == viewModel.state.flairId }!!,
+                onConfirm = { flairText ->
+                    viewModel.state = viewModel.state.copy(flairText = flairText)
                 },
-                selected = viewModel.state.spoiler,
-                label = {
-                    Text("SPOILER")
-                }
+                onDismiss = { showFlairEdit = false }
             )
         }
     }
-    if (viewModel.loading) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+}
+
+@Composable
+private fun EditorTopBar(
+    onDismissRequest: () -> Unit,
+    submit: () -> Unit,
+) {
+    TopAppBar(
+        navigationIcon = {
+            IconButton(onClick = onDismissRequest) {
+                Icon(Icons.Default.Close, contentDescription = "Close")
+            }
+        },
+        title = { Text("Create post") },
+        actions = {
+            IconButton(onClick = {
+                submit()
+            }) {
+                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+            }
         }
-    }
-    if (showFlairDialog) {
-        LaunchedEffect(viewModel) {
-            viewModel.getFlairs()
-        }
-        FlairDialog(
-            viewModel.flairs,
-            onSelect = { flair ->
-                viewModel.state = viewModel.state.copy(flairId = flair.id)
-            },
-            onClickEdit = { flair ->
-                viewModel.state = viewModel.state.copy(flairId = flair.id)
-                showFlairEdit = true
-            },
-            onDismiss = { showFlairDialog = false }
-        )
-    }
-    if (showFlairEdit) {
-        val initialText = viewModel.state.flairText
-        FlairEditBox(
-            initialText,
-            viewModel.flairs.find { it.id == viewModel.state.flairId }!!,
-            onConfirm = { flairText ->
-                viewModel.state = viewModel.state.copy(flairText = flairText)
-            },
-            onDismiss = { showFlairEdit = false }
-        )
-    }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

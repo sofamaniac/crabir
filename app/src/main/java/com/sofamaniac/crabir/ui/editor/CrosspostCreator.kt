@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.remote.reddit.CrosspostSubmissionBuilder
@@ -54,6 +55,7 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.ThemedCard
@@ -61,6 +63,7 @@ import com.sofamaniac.crabir.ui.editor.postEditor.CommunitySelector
 import com.sofamaniac.crabir.ui.editor.postEditor.CreatorViewModel
 import com.sofamaniac.crabir.ui.post.PostHeader
 import com.sofamaniac.crabir.ui.post.PostInfo
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.annotation.InjectedParam
@@ -89,6 +92,9 @@ fun CrosspostCreator(
     }
     val scope = rememberCoroutineScope()
     val snackbar = remember { SnackbarHostState() }
+    val initialAccount = LocalRedditAccount.current
+    var selectedAccount by remember { mutableStateOf(initialAccount) }
+    val accounts by viewModel.accounts.collectAsState(emptyList())
     Box {
         Scaffold(
             modifier = Modifier.background(theme.cardBackground),
@@ -153,7 +159,9 @@ fun CrosspostCreator(
                         Text("Flair")
                     }
                 }
-
+                AccountSelector(accounts, selectedAccount) { newId ->
+                    selectedAccount = accounts.find { it.id == newId }!!
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FilterChip(
                         onClick = {
@@ -232,6 +240,7 @@ class CrosspostCreatorViewModel(
     api: RedditAPIService,
     communities: SubredditRepository,
     linksRepository: LinksRepository,
+    private val accountsRepository: AccountsRepository,
 ) : CreatorViewModel(api, communities) {
     var state by mutableStateOf(
         CrosspostSubmissionBuilder(
@@ -241,6 +250,7 @@ class CrosspostCreatorViewModel(
     val post = linksRepository.get(parentFullname)
 
     var loading by mutableStateOf(false)
+    val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
 
     suspend fun submit(account: RedditAccount?): Result<Unit> {
         loading = true

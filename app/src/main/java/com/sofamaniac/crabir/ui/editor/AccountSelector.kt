@@ -1,5 +1,7 @@
 package com.sofamaniac.crabir.ui.editor
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.domain.model.RedditAccount
@@ -25,7 +28,10 @@ fun AccountSelector(
     onAccountSelection: (Int) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val otherAccounts =
+        accounts.filter { it != activeAccount && !it.isAnonymous() && !it.isUninitialized() }
     ExposedDropdownMenuBox(
+        modifier = Modifier.border(border = BorderStroke(2.dp, color = Color.Gray)),
         expanded = expanded,
         onExpandedChange = { expanded = !expanded }
     ) {
@@ -40,13 +46,15 @@ fun AccountSelector(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            for (account in accounts) {
-                if (account == activeAccount || account.isAnonymous() || account.isUninitialized()) continue
+            for (account in otherAccounts) {
                 AccountTile(
                     account,
                     onClick = { onAccountSelection(account.id) }
                 )
 
+            }
+            if (otherAccounts.isEmpty()) {
+                DropdownMenuItem(onClick = {}, text = { Text("No other accounts") })
             }
         }
     }
