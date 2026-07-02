@@ -36,9 +36,8 @@ interface FeedRepository<Params, T : VotableData> {
     }
 }
 
-abstract class FeedRepositoryCommon<Params, T : VotableData>(
-    //val api: RedditAPIService,
-) : FeedRepository<Params, T>, ListingRepository<Params, T>() {
+abstract class FeedRepositoryCommon<Params, T : VotableData>
+    : FeedRepository<Params, T>, ListingRepository<Params, T>() {
     override suspend fun onResponseSuccess(things: List<Thing>) {
         super.onResponseSuccess(things)
         val votableList = things.mapNotNull { thingToData(it) }

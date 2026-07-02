@@ -29,6 +29,7 @@ import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.ui.TabBar
@@ -73,9 +74,9 @@ fun ProfileView(
         parametersOf(user)
     },
 ) {
-//    val isConnectedUser by remember { profileViewModel.currentUser.map { it == user } }.collectAsState(
-//        true
-//    )
+    //    val isConnectedUser by remember { profileViewModel.currentUser.map { it == user } }.collectAsState(
+    //        true
+    //    )
     val currentUser = LocalRedditAccount.current
     val isConnectedUser = currentUser.info?.username == user
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -166,6 +167,10 @@ fun ProfileView(
                                     is CommentData -> CommentView(
                                         thing,
                                     )
+
+                                    is CommentType.Comment -> CommentView(thing.comment)
+
+                                    else -> Text("Unknown type ${thing::class}")
                                 }
                             }
                         } else {
