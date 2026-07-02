@@ -3,6 +3,8 @@ package com.sofamaniac.crabir.ui.drawer
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,23 +31,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.ui.ThemedCard
-import java.util.Collections
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: (Int) -> Unit) {
+fun AccountSelector(
+    viewModel: DrawerViewModel,
+    expanded: Boolean,
+    onAccountSelection: (Int) -> Unit,
+) {
     val iconModifier = Modifier
-        .size(32.dp)
+        .size(48.dp)
         .padding(4.dp)
         .clip(CircleShape)
-    val accounts by viewModel.accountsList.collectAsState(initial = Collections.emptyList())
-    Log.d("AccountSelector", "accounts: $accounts")
+    val otherAccounts by viewModel.otherAccounts.collectAsState(initial = emptyList())
     var showWarningDialog by remember { mutableStateOf(false) }
     val authLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -53,53 +59,73 @@ fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: (Int) -> Uni
         viewModel.handleAuthResult(result.data)
     }
     val currentAccount by viewModel.activeAccount.collectAsState(initial = RedditAccount.anonymous())
+    val rotation =
+        animateFloatAsState(targetValue = if (expanded) 180f else 0f, label = "rotation")
     Column {
-        for (account in accounts.sortedByDescending { it.id }) {
-            if (account.id == currentAccount.id || account.isAnonymous()) continue
-            AccountTile(
-                account,
-                onClick = {
-                    onAccountSelection(account.id)
-                },
-                iconModifier = iconModifier
-            )
-        }
-        if (!currentAccount.isAnonymous()) {
-            AccountTile(
-                RedditAccount.anonymous(),
-                onClick = {
-                    onAccountSelection(RedditAccount.anonymous().id)
+        AccountTile(
+            currentAccount,
+            onClick = viewModel::toggleSelectAccount,
+            iconModifier = iconModifier,
+            badge = {
+                Icon(
+                    Icons.Default.ArrowDropDown,
+                    contentDescription = "Select account",
+                    modifier = Modifier
+                        .size(32.dp)
+                        .rotate(rotation.value)
+                )
+            }
+        )
+        AnimatedVisibility(expanded) {
+            Column {
+                for (account in otherAccounts) {
+                    AccountTile(
+                        account,
+                        onClick = {
+                            onAccountSelection(account.id)
+                        },
+                        iconModifier = iconModifier
+                    )
                 }
-            )
+                if (!currentAccount.isAnonymous()) {
+                    AccountTile(
+                        RedditAccount.anonymous(),
+                        onClick = {
+                            onAccountSelection(RedditAccount.anonymous().id)
+                        },
+                        iconModifier = iconModifier
+                    )
+                }
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "Add account",
+                            modifier = iconModifier
+                        )
+                    },
+                    label = { Text("Add account") },
+                    selected = false,
+                    onClick = {
+                        showWarningDialog = true
+                    }
+                )
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = "Logout",
+                            modifier = iconModifier
+                        )
+                    },
+                    label = { Text("Logout") },
+                    selected = false,
+                    onClick = {
+                        viewModel.logout()
+                    }
+                )
+            }
         }
-        NavigationDrawerItem(
-            icon = {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = "Add account",
-                    modifier = iconModifier
-                )
-            },
-            label = { Text("Add account") },
-            selected = false,
-            onClick = {
-                showWarningDialog = true
-            }
-        )
-        NavigationDrawerItem(
-            icon = {
-                Icon(
-                    Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = "Logout",
-                    modifier = iconModifier
-                )
-            },
-            label = { Text("Logout") },
-            selected = false,
-            onClick = {
-                viewModel.logout()
-            }
-        )
     }
     if (showWarningDialog) {
         BasicAlertDialog(onDismissRequest = { showWarningDialog = false }) {
@@ -109,14 +135,11 @@ fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: (Int) -> Uni
                 )
                 ListItem(
                     headlineContent = {
-                        Text(
-                            "You may not be able to log in on the next page because reddit is broken." +
-                                    "Open reddit in your browser and log in before proceeding."
-                        )
+                        Text(stringResource(R.string.login_warning))
                     },
                     modifier = Modifier.padding(16.dp)
                 )
-                Row() {
+                Row {
                     TextButton(onClick = { showWarningDialog = false }) {
                         Text(stringResource(R.string.cancel))
                     }
@@ -140,7 +163,7 @@ fun AccountTile(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     iconModifier: Modifier = Modifier,
-    badge: @Composable (() -> Unit)? = null
+    badge: @Composable (() -> Unit)? = null,
 ) {
     val image = if (account.info == null) {
         @Composable {

@@ -26,6 +26,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -159,6 +160,12 @@ fun MainScreen(
             LocalDrawerState provides drawerState,
             LocalRedditAccount provides currentAccount,
         ) {
+            LaunchedEffect(currentAccount) {
+                navController.navigate(HomeRoute) {
+                    popUpTo(0) { inclusive = true }
+                    //launchSingleTop = true
+                }
+            }
             NavigationGraph(
                 navController,
             )
