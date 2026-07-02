@@ -8,6 +8,7 @@
 
 package com.sofamaniac.crabir.ui.drawer
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -73,7 +74,6 @@ fun DrawerContent(
     val drawerState = LocalDrawerState.current
     val loginState by viewModel.loginState.collectAsState()
 
-
     val snackbarHostState = LocalSnackBarHost.current
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Error) {
@@ -117,7 +117,10 @@ fun DrawerContent(
             }
         },
         accountSelector = {
-            AccountSelector(viewModel, expanded = selectingAccount) { id ->
+            AccountSelector(
+                viewModel,
+                expanded = selectingAccount
+            ) { id ->
                 coroutineScope.launch {
                     drawerState.close()
                     viewModel.toggleSelectAccount()
@@ -126,7 +129,6 @@ fun DrawerContent(
             }
         },
         modifier = modifier,
-        drawerState = drawerState
     )
 }
 
@@ -141,6 +143,7 @@ internal fun DrawerContentStateless(
     modifier: Modifier = Modifier,
     drawerState: DrawerState = LocalDrawerState.current,
 ) {
+    Log.d("DrawerContentStateless", "recompose ${drawerState.isClosed}")
     ModalDrawerSheet(drawerState = drawerState) {
         LazyColumn(
             modifier = modifier
@@ -265,7 +268,7 @@ fun BlurTile() {
 
 @Preview
 @Composable
-fun DrawerContentPreview() {
+private fun DrawerContentPreview() {
     PreviewLocalComposition {
         ConfigureMaterialTheme {
             DrawerContentStateless(

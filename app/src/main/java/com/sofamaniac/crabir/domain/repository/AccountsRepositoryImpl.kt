@@ -32,7 +32,6 @@ import net.openid.appauth.AuthState
 import org.koin.core.annotation.Singleton
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.Collections.emptyList
 
 @Serializable
 data class Accounts(
@@ -242,7 +241,7 @@ class AccountsRepositoryImpl(
 
     override suspend fun clearAll() {
         dataStore.updateData {
-            Accounts(emptyList(), -1)
+            AccountsSerializer.defaultValue
         }
     }
 }

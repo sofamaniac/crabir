@@ -36,6 +36,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.InvalidUrl
@@ -55,6 +57,7 @@ import com.sofamaniac.crabir.data.remote.reddit.PostSubmissionBuilder
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.editor.AccountSelector
 import com.sofamaniac.crabir.ui.editor.Editor
 import com.sofamaniac.crabir.ui.mapColor
 import kotlinx.coroutines.launch
@@ -82,6 +85,9 @@ fun PostCreator(
     var showFlairEdit by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    val initialAccount = LocalRedditAccount.current
+    var selectedAccount by remember { mutableStateOf(initialAccount) }
+    val accounts by viewModel.accounts.collectAsState(emptyList())
     Editor(
         modifier = Modifier.background(theme.cardBackground),
         state = viewModel.textState,
@@ -98,8 +104,7 @@ fun PostCreator(
                 actions = {
                     IconButton(onClick = {
                         scope.launch {
-                            // TODO: allow to change account
-                            val res = viewModel.submit(context, account = null)
+                            val res = viewModel.submit(context, account = selectedAccount)
                             if (res.isSuccess) {
                                 onDismissRequest()
                             } else {
@@ -155,6 +160,9 @@ fun PostCreator(
         }
         TextButton(onClick = { showFlairDialog = true }) {
             Text("Change Flair")
+        }
+        AccountSelector(accounts, selectedAccount) { newId ->
+            selectedAccount = accounts.find { it.id == newId }!!
         }
         when (viewModel.state.kind) {
             Kind.Link -> {
@@ -234,7 +242,7 @@ fun FlairDialog(
     flairText: String? = null,
     onSelect: (FlairInfo) -> Unit,
     onClickEdit: (FlairInfo) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     BasicAlertDialog(onDismissRequest = onDismiss) {
         ThemedCard() {
@@ -282,7 +290,7 @@ fun FlairEditBox(
     initialText: String? = null,
     flair: FlairInfo,
     onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val initialText = if (initialText.isNullOrBlank()) flair.text else initialText
     val textFieldState =

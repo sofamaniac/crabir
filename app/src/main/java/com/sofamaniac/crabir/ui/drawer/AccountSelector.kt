@@ -50,7 +50,6 @@ fun AccountSelector(
         .size(48.dp)
         .padding(4.dp)
         .clip(CircleShape)
-    val otherAccounts by viewModel.otherAccounts.collectAsState(initial = emptyList())
     var showWarningDialog by remember { mutableStateOf(false) }
     val authLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -58,12 +57,13 @@ fun AccountSelector(
         Log.d("AccountSelector", "Result: $result")
         viewModel.handleAuthResult(result.data)
     }
-    val currentAccount by viewModel.activeAccount.collectAsState(initial = RedditAccount.anonymous())
     val rotation =
         animateFloatAsState(targetValue = if (expanded) 180f else 0f, label = "rotation")
+    val activeAccount by viewModel.activeAccount.collectAsState(RedditAccount.anonymous())
+    val otherAccounts by viewModel.otherAccounts.collectAsState(emptyList())
     Column {
         AccountTile(
-            currentAccount,
+            activeAccount,
             onClick = viewModel::toggleSelectAccount,
             iconModifier = iconModifier,
             badge = {
@@ -87,7 +87,7 @@ fun AccountSelector(
                         iconModifier = iconModifier
                     )
                 }
-                if (!currentAccount.isAnonymous()) {
+                if (!activeAccount.isAnonymous()) {
                     AccountTile(
                         RedditAccount.anonymous(),
                         onClick = {

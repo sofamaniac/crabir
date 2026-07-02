@@ -147,13 +147,19 @@ fun MainScreen(
             VideoPlayerManager.releasePlayer()
         }
     }
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val drawerState = rememberDrawerState(DrawerValue.Closed, confirmStateChange = {
+        Log.d("DrawerState", "Trying to change drawer state to $it")
+        true
+    })
     ConfigureMaterialTheme {
         val theme = rememberAppTheme()
         if (theme == null) {
             return@ConfigureMaterialTheme
         }
         val currentAccount = rememberCurrentAccount()
+        if (currentAccount.isUninitialized()) {
+            return@ConfigureMaterialTheme
+        }
         CompositionLocalProvider(
             LocalNavController provides navController,
             LocalTheme provides theme,

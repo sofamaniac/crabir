@@ -23,6 +23,8 @@ import com.sofamaniac.crabir.data.remote.reddit.makeMediaUploadBody
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.repository.AccountsRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 
@@ -82,7 +84,8 @@ abstract class CreatorViewModel(
 class PostCreatorViewModel(
     api: RedditAPIService,
     communities: SubredditRepository,
-    private val mediaUploader: MediaUploadInterface
+    private val mediaUploader: MediaUploadInterface,
+    private val accountsRepository: AccountsRepository,
 ) : CreatorViewModel(api, communities) {
     var state by mutableStateOf(PostSubmissionBuilder())
     val textState = TextFieldState()
@@ -91,6 +94,8 @@ class PostCreatorViewModel(
     var media: List<Uri> by mutableStateOf(emptyList())
     var captions: MutableMap<Uri, String> = mutableMapOf()
     var loading by mutableStateOf(false)
+
+    val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
 
     fun setKind(context: Context) {
         if (media.size > 1) {

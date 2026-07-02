@@ -39,9 +39,9 @@ class RedditAuthenticator(
         val activeAccount = overrideAccount ?: runBlocking { activeAccount.first() }
         Log.d("RedditAuthenticator", "Authenticating with ${activeAccount.auth.accessToken}")
 
-        if (request.url.host.contains("www.reddit.com")) {
+        if (request.isUnauthenticated()) {
             // Disable auth on non oauth endpoints
-            Log.w("RedditAuthenticator", "Non oauth endpoint (${chain.request().url})")
+            Log.w("RedditAuthenticator", "Non oauth endpoint (${request.url})")
             val request =
                 chain.request().newBuilder().header("Authorization", authorizationHeader).build()
             return chain.proceed(request)

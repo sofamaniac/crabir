@@ -13,6 +13,7 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import dev.chrisbanes.haze.blur.HazeBlurStyle
+import net.openid.appauth.AuthState
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.annotation.KoinViewModel
 import java.time.Clock
@@ -50,7 +51,7 @@ fun crabirBlurStyle(): HazeBlurStyle {
 @Composable
 fun rememberCurrentAccount(): RedditAccount {
     val viewModel: CurrentAccountViewModel = koinViewModel()
-    val account by viewModel.account.collectAsState(RedditAccount.anonymous())
+    val account by viewModel.account.collectAsState(RedditAccount.uninitialized(-2, AuthState()))
     return account
 }
 
