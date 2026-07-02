@@ -36,6 +36,7 @@ class SubredditPostsRepository(
     val api: RedditAPIService,
 ) : PostFeedRepository<FeedParams>() {
     private var currentSubreddit: String? = null
+    private var info: SubredditData? = null
 
     suspend fun getInfo(): SubredditData? {
         if (currentSubreddit == null) {
@@ -46,7 +47,8 @@ class SubredditPostsRepository(
             if (!res.isSuccessful) {
                 return null
             }
-            return res.body()?.data?.let { SubredditDTOMapper.map(it) }
+            info = SubredditDTOMapper.map(res.body()!!.data)
+            return info
         } catch (e: Exception) {
             Log.e("SubredditPostsRepository", "Failed to get subreddit info", e)
             return null
@@ -61,8 +63,8 @@ class SubredditPostsRepository(
     }
 
     suspend fun subscribe(): Result<Unit> {
-        val subreddit = currentSubreddit ?: return Result.failure(Exception("No subreddit set"))
-        val res = api.subscribe(SubscribeAction.SUBSCRIBE, subreddit)
+        val subreddit = info ?: return Result.failure(Exception("No info for subreddit"))
+        val res = api.subscribe(SubscribeAction.SUBSCRIBE, subreddit.name)
         return if (res.isSuccessful) {
             Result.success(Unit)
         } else {
@@ -71,8 +73,8 @@ class SubredditPostsRepository(
     }
 
     suspend fun unsubscribe(): Result<Unit> {
-        val subreddit = currentSubreddit ?: return Result.failure(Exception("No subreddit set"))
-        val res = api.subscribe(SubscribeAction.UNSUBSCRIBE, subreddit)
+        val subreddit = info ?: return Result.failure(Exception("No info for subreddit"))
+        val res = api.subscribe(SubscribeAction.UNSUBSCRIBE, subreddit.name)
         return if (res.isSuccessful) {
             Result.success(Unit)
         } else {
@@ -81,8 +83,8 @@ class SubredditPostsRepository(
     }
 
     suspend fun favorite(favorite: Boolean): Result<Unit> {
-        val subreddit = currentSubreddit ?: return Result.failure(Exception("No subreddit set"))
-        val res = api.favorite(subreddit, favorite)
+        val subreddit = info ?: return Result.failure(Exception("No info for subreddit"))
+        val res = api.favorite(subreddit.displayName, favorite)
         return if (res.isSuccessful) {
             Result.success(Unit)
         } else {

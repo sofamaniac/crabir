@@ -10,10 +10,14 @@ package com.sofamaniac.crabir.ui.post
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Shuffle
 import androidx.compose.material3.Icon
@@ -24,8 +28,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
@@ -51,24 +58,24 @@ fun PostHeader(
 ) {
     val navController = LocalNavController.current
     val theme = LocalTheme.current
-    FlowRow(
+    Row(
         modifier = modifier
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        //verticalAlignment = Alignment.CenterVertically,
-        itemVerticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         if (showSubredditIcon) {
             SubredditIcon(
                 post.subreddit.name,
                 post.subredditDetails?.icon,
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(32.dp)
                     .clip(CircleShape)
                     .clickable(onClick = {
                         navController?.navigate(SubredditRoute(post.subreddit.subredditPrefixed))
                     })
             )
+            Spacer(modifier = Modifier.width(4.dp))
         }
         val text = buildAnnotatedString {
             withLink(
@@ -105,21 +112,38 @@ fun PostHeader(
                 withSeparator { append(post.domain) }
             }
             withSeparator { append(formatElapsedTimeLocalized(post.createdUtc)) }
+            if (post.isCrosspost) appendInlineContent("crosspost", "crosspost")
         }
-        Text(text, style = MaterialTheme.typography.bodySmall.copy(color = theme.secondaryText))
-        if (post.isCrosspost) Icon(
-            Icons.Outlined.Shuffle,
-            contentDescription = "Crosspost",
-            modifier = Modifier.size(16.dp),
-            tint = Color.Green
+        val iconSize = 16.dp
+        val density = LocalDensity.current
+        val iconSizeSp = with(density) { iconSize.toSp() }
+        val inlineContent = mapOf(
+            "crosspost" to InlineTextContent(
+                Placeholder(
+                    iconSizeSp,
+                    iconSizeSp,
+                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                )
+            ) {
+                Icon(
+                    Icons.Outlined.Shuffle,
+                    contentDescription = "Crosspost",
+                    modifier = Modifier.size(16.dp),
+                    tint = Color.Green
+                )
+            },
         )
-        // TODO: take last edit into account
+        Text(
+            text,
+            inlineContent = inlineContent,
+            style = MaterialTheme.typography.bodySmall.copy(color = theme.secondaryText)
+        )
     }
 }
 
 fun <R : Any> AnnotatedString.Builder.withSeparator(
     separator: String = " · ",
-    block: AnnotatedString.Builder.() -> R
+    block: AnnotatedString.Builder.() -> R,
 ): R {
     append(separator)
     return block(this)

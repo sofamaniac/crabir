@@ -39,6 +39,7 @@ data class SubredditData(
     override val name: Fullname,
     val defaultSet: Boolean,
     val bannerImg: String,
+    val bannerBackgroundImage: String? = null,
     val allowedMediaInComments: List<String>,
     val userIsBanned: Boolean?,
     val freeFormReports: Boolean?,

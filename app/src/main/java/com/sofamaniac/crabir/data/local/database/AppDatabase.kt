@@ -30,7 +30,7 @@ abstract class AccountDatabase : RoomDatabase() {
         SubredditData::class,
         MultiData::class
     ],
-    version = 14
+    version = 15
 )
 @TypeConverters(RoomConverters::class)
 abstract class AppDatabase : RoomDatabase() {

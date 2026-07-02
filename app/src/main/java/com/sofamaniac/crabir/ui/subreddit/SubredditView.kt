@@ -17,13 +17,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -109,7 +107,7 @@ fun SubredditInfo(info: SubredditData, viewModel: SubredditViewModel) {
     ) {
         Box {
             AsyncImage(
-                info.bannerImg,
+                info.bannerImg.ifBlank { info.bannerBackgroundImage ?: "" },
                 "Banner background image",
                 modifier = Modifier.fillMaxWidth(),
                 contentScale = ContentScale.FillWidth
@@ -143,6 +141,8 @@ fun SubredditInfo(info: SubredditData, viewModel: SubredditViewModel) {
                 IconButton(onClick = {}) {
                     Icon(Icons.Default.MoreVert, contentDescription = "More options")
                 }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 SubscribeButton(info.userIsSubscriber) {
                     if (info.userIsSubscriber) {
                         viewModel.unsubscribe()
@@ -152,21 +152,6 @@ fun SubredditInfo(info: SubredditData, viewModel: SubredditViewModel) {
                 }
                 FavoriteButton(info.userHasFavorited) {
                     viewModel.favorite(!info.userHasFavorited)
-                }
-                val joined = info.userIsSubscriber
-                OutlinedButton(onClick = {
-                    if (joined) {
-                        viewModel.unsubscribe()
-                    } else {
-                        viewModel.subscribe()
-                    }
-                }) {
-                    val icon = if (joined) Icons.Default.CheckCircle else null
-                    val text = if (joined) "Joined" else "Subscribe"
-                    if (icon != null) {
-                        Icon(Icons.Default.CheckCircle, contentDescription = null)
-                    }
-                    Text(text)
                 }
             }
             RedditMarkdown(info.publicDescription)

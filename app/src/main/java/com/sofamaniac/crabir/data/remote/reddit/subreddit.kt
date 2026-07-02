@@ -75,9 +75,10 @@ interface SubredditAPI {
     @GET("{subreddit}/about/rules.json")
     suspend fun getRules(@Path("subreddit", encoded = true) subreddit: String): Response<Rules>
 
+    @FormUrlEncoded
     @POST("api/favorite")
     suspend fun favorite(
-        @Query("sr_name") name: String,
-        @Query("make_favorite") favorite: Boolean
+        @Field("sr_name") name: String,
+        @Field("make_favorite") favorite: Boolean,
     ): Response<Unit>
 }
