@@ -71,6 +71,7 @@ fun StreamableVideo(
     }
     PostVideo(
         video!!.toMediaResource(),
+        key = post.id,
         canPlayVideo = canPlayVideo,
         blur = blur,
         modifier = modifier.clickable(enabled = blur) { goFullscreen() },

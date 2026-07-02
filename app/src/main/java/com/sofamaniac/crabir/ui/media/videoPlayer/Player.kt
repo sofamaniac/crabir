@@ -40,6 +40,7 @@ import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
 @Composable
 fun DecoratedVideoPlayer(
     media: MediaResource,
+    key: String,
     modifier: Modifier = Modifier,
     placeholder: @Composable () -> Unit = {
         Surface(color = Color.Gray, modifier = Modifier.fillMaxSize()) {
@@ -59,12 +60,15 @@ fun DecoratedVideoPlayer(
     val context = LocalContext.current
     val player = remember { VideoPlayerManager.getInstance(context) }
     val currentUrl by VideoPlayerManager.currentUrl.collectAsState()
+    val currentKey by VideoPlayerManager.currentKey.collectAsState()
     val hasFirstFrame by VideoPlayerManager.hasFirstFrame.collectAsState()
+
+    val showDecoration = !hasFirstFrame || !startPlaying || currentKey != key
 
 
     LaunchedEffect(startPlaying) {
         if (startPlaying) {
-            VideoPlayerManager.setMediaItem(media.url)
+            VideoPlayerManager.setMediaItem(media.url, key)
             player.playWhenReady = true
             player.volume = if (startMuted) 0f else 1f
         }
@@ -72,7 +76,7 @@ fun DecoratedVideoPlayer(
 
     @Composable
     fun BoxScope.loadDecoration() {
-        if (!hasFirstFrame || !startPlaying) {
+        if (showDecoration) {
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -100,7 +104,7 @@ fun DecoratedVideoPlayer(
             .aspectRatio(media.aspectRatio)
         if (clickable) {
             mod.clickable {
-                VideoPlayerManager.setMediaItem(media.url)
+                VideoPlayerManager.setMediaItem(media.url, key)
                 showControls = !showControls
             }
         } else {
@@ -111,9 +115,9 @@ fun DecoratedVideoPlayer(
         modifier = modifier
     ) {
 
-        VideoPlayer(media, placeholder = placeholder, startPlaying = startPlaying)
-
-        if (currentUrl.checkEquality(media.url.toUri()) && hasFirstFrame) {
+        VideoPlayer(media, key, placeholder = placeholder, startPlaying = startPlaying)
+        val showFrame = currentUrl.checkEquality(media.url.toUri()) && currentKey == key
+        if (showFrame && hasFirstFrame) {
             if (showControls) {
                 PlayerControls(
                     fullscreenButton = fullscreenButton,
@@ -138,6 +142,7 @@ fun DecoratedVideoPlayer(
 @Composable
 fun VideoPlayer(
     media: MediaResource,
+    key: String,
     modifier: Modifier = Modifier,
     placeholder: @Composable () -> Unit = {},
     startPlaying: Boolean = false,
@@ -148,11 +153,12 @@ fun VideoPlayer(
     val currentUrl by VideoPlayerManager.currentUrl.collectAsState()
     val hasFirstFrame by VideoPlayerManager.hasFirstFrame.collectAsState()
     val mediaUri = media.url.toUri()
+    val currentKey by VideoPlayerManager.currentKey.collectAsState()
 
 
     LaunchedEffect(startPlaying) {
         if (startPlaying) {
-            VideoPlayerManager.setMediaItem(media.url)
+            VideoPlayerManager.setMediaItem(media.url, key)
             player.playWhenReady = true
             if (mute) player.volume = 0f else player.volume = 1f
         }
@@ -163,8 +169,9 @@ fun VideoPlayer(
             .fillMaxSize()
             .aspectRatio(media.aspectRatio)
     ) {
+        val showFrame = currentUrl.checkEquality(mediaUri) && currentKey == key
 
-        if (currentUrl.checkEquality(mediaUri)) {
+        if (showFrame) {
             ContentFrame(
                 player = player,
                 surfaceType = SURFACE_TYPE_TEXTURE_VIEW,
@@ -173,7 +180,7 @@ fun VideoPlayer(
                     .align(Alignment.Center)
             )
         }
-        if (!hasFirstFrame || !currentUrl.checkEquality(mediaUri)) {
+        if (!hasFirstFrame || !showFrame) {
             placeholder()
         }
     }

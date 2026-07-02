@@ -21,6 +21,9 @@ object VideoPlayerManager {
     private var _currentUrl: MutableStateFlow<Uri?> = MutableStateFlow(null)
 
     var currentUrl: StateFlow<Uri?> = _currentUrl.asStateFlow()
+
+    private var _currentKey: MutableStateFlow<String?> = MutableStateFlow(null)
+    var currentKey: StateFlow<String?> = _currentKey.asStateFlow()
     private var _hasFirstFrame = MutableStateFlow(false)
     val hasFirstFrame = _hasFirstFrame.asStateFlow()
 
@@ -49,8 +52,9 @@ object VideoPlayerManager {
         return player!!
     }
 
-    fun setMediaItem(uri: String) {
+    fun setMediaItem(uri: String, key: String) {
         val newUri = uri.toUri()
+        _currentKey.value = key
         if (_currentUrl.value.checkEquality(newUri)) {
             return
         }

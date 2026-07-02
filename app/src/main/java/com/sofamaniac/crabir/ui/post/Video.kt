@@ -119,6 +119,7 @@ fun PostVideo(
         }
         PostVideo(
             video,
+            key = post.id,
             canPlayVideo,
             blur,
             modifier = modifier,
@@ -131,6 +132,7 @@ fun PostVideo(
 @Composable
 fun PostVideo(
     video: MediaResource,
+    key: String,
     canPlayVideo: Boolean,
     blur: Boolean,
     modifier: Modifier = Modifier,
@@ -139,6 +141,7 @@ fun PostVideo(
 ) {
     DecoratedVideoPlayer(
         video,
+        key = key,
         startPlaying = canPlayVideo && !blur,
         placeholder = placeholder,
         clickable = !blur,
@@ -233,6 +236,7 @@ fun FullscreenVideo(
     ) {
         VideoPlayer(
             video,
+            key = post.id,
             startPlaying = true,
             mute = false,
             modifier = Modifier

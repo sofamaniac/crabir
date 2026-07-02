@@ -184,6 +184,7 @@ fun EmbeddedGallery(
                         is MediaMetadata.Gif ->
                             DecoratedVideoPlayer(
                                 media = metadata.toMediaResource(),
+                                key = metadata.id ?: page.toString(),
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .align(Alignment.Center),
@@ -343,6 +344,7 @@ fun FullscreenGallery(
                 is MediaMetadata.Gif ->
                     VideoPlayer(
                         media = metadata.toMediaResource(),
+                        key = metadata.id ?: page.toString(),
                         modifier = Modifier.fillMaxSize(),
                         startPlaying = state.currentPage == page,
                         placeholder = {
