@@ -349,6 +349,7 @@ fun FullscreenGallery(
                             ImageView(
                                 metadata.preview.last().toMediaResource(),
                                 allowTransformation = false,
+                                modifier = Modifier.fillMaxSize(),
                             )
                         },
                     )
