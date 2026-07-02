@@ -1,7 +1,9 @@
 package com.sofamaniac.crabir.ui.media.videoPlayer
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player.REPEAT_MODE_ONE
@@ -16,9 +18,9 @@ import kotlinx.coroutines.flow.update
 object VideoPlayerManager {
     private var player: ExoPlayer? = null
 
-    private var _currentUrl: MutableStateFlow<String?> = MutableStateFlow(null)
+    private var _currentUrl: MutableStateFlow<Uri?> = MutableStateFlow(null)
 
-    var currentUrl: StateFlow<String?> = _currentUrl.asStateFlow()
+    var currentUrl: StateFlow<Uri?> = _currentUrl.asStateFlow()
     private var _hasFirstFrame = MutableStateFlow(false)
     val hasFirstFrame = _hasFirstFrame.asStateFlow()
 
@@ -48,16 +50,18 @@ object VideoPlayerManager {
     }
 
     fun setMediaItem(uri: String) {
-        if (_currentUrl.value == uri) {
+        val newUri = uri.toUri()
+        if (_currentUrl.value.checkEquality(newUri)) {
             return
         }
         val mediaItem = MediaItem.fromUri(uri)
         player?.apply {
+            Log.d("VideoPlayerManager", "Setting media item $uri")
             setMediaItem(mediaItem)
             _hasFirstFrame.update { false }
             prepare()
         }
-        _currentUrl.update { uri }
+        _currentUrl.update { newUri }
     }
 
     fun releasePlayer() {
@@ -92,4 +96,8 @@ object VideoPlayerManager {
     }
 
 
+}
+
+internal fun Uri?.checkEquality(other: Uri?): Boolean {
+    return this?.host == other?.host && this?.path == other?.path
 }

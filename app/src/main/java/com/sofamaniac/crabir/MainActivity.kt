@@ -142,6 +142,7 @@ fun MainScreen(
 
     DisposableEffect(Unit) {
         onDispose {
+            Log.d("MainScreen", "onDispose")
             VideoPlayerManager.releasePlayer()
         }
     }

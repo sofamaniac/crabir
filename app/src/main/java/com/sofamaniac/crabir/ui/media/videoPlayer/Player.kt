@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.ui.media.videoPlayer
 
 import androidx.annotation.OptIn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -13,7 +14,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.ContentFrame
 import androidx.media3.ui.compose.SURFACE_TYPE_TEXTURE_VIEW
@@ -50,6 +51,7 @@ fun DecoratedVideoPlayer(
     },
     fullscreenButton: @Composable (() -> Unit)? = null,
     startPlaying: Boolean = false,
+    startMuted: Boolean = true,
     clickable: Boolean = true,
 ) {
     var showControls by remember { mutableStateOf(false) }
@@ -64,13 +66,7 @@ fun DecoratedVideoPlayer(
         if (startPlaying) {
             VideoPlayerManager.setMediaItem(media.url)
             player.playWhenReady = true
-            player.volume = 0f
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            // Do not stop player here to allow seamless transition to fullscreen
+            player.volume = if (startMuted) 0f else 1f
         }
     }
 
@@ -88,10 +84,10 @@ fun DecoratedVideoPlayer(
         if (!hasFirstFrame && startPlaying) {
             CircularProgressIndicator(
                 color = Color.White,
-                trackColor = Color.White,
                 strokeWidth = 2.dp,
                 modifier = Modifier
-                    .size(16.dp)
+                    .size(48.dp)
+                    .background(color = Color.Black.copy(alpha = 0.3f))
                     .align(Alignment.BottomEnd)
                     .padding(8.dp)
             )
@@ -117,7 +113,7 @@ fun DecoratedVideoPlayer(
 
         VideoPlayer(media, placeholder = placeholder, startPlaying = startPlaying)
 
-        if (currentUrl == media.url && hasFirstFrame) {
+        if (currentUrl.checkEquality(media.url.toUri()) && hasFirstFrame) {
             if (showControls) {
                 PlayerControls(
                     fullscreenButton = fullscreenButton,
@@ -151,6 +147,7 @@ fun VideoPlayer(
     val player = remember { VideoPlayerManager.getInstance(context) }
     val currentUrl by VideoPlayerManager.currentUrl.collectAsState()
     val hasFirstFrame by VideoPlayerManager.hasFirstFrame.collectAsState()
+    val mediaUri = media.url.toUri()
 
 
     LaunchedEffect(startPlaying) {
@@ -167,7 +164,7 @@ fun VideoPlayer(
             .aspectRatio(media.aspectRatio)
     ) {
 
-        if (currentUrl == media.url) {
+        if (currentUrl.checkEquality(mediaUri)) {
             ContentFrame(
                 player = player,
                 surfaceType = SURFACE_TYPE_TEXTURE_VIEW,
@@ -176,7 +173,7 @@ fun VideoPlayer(
                     .align(Alignment.Center)
             )
         }
-        if (!hasFirstFrame || currentUrl != media.url) {
+        if (!hasFirstFrame || !currentUrl.checkEquality(mediaUri)) {
             placeholder()
         }
     }
