@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
 import androidx.compose.material3.animateFloatingActionButton
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -68,10 +69,14 @@ fun Fab(viewModel: FeedViewModelInterface<PostData>, toggleBottomSheet: () -> Un
                         if (checkedProgress > 0.5f) Icons.Default.Close else Icons.Default.Add
                     }
                 }
+                val tint = contentColorFor(theme.highlight)
                 Icon(
                     icon,
                     contentDescription = null,
-                    modifier = Modifier.animateIcon({ checkedProgress })
+                    modifier = Modifier.animateIcon(
+                        { checkedProgress },
+                        color = { tint }
+                    ),
                 )
             }
         }
