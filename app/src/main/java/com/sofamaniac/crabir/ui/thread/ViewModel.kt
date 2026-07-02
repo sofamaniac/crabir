@@ -239,7 +239,7 @@ class ThreadViewModel(
             commentData =
                 commentData.copy(relationship = commentData.relationship.copy(liked = true))
             val p = comments.value.find { it.name == parent }
-            commentData = commentData.copy(depth = (p?.depth ?: 0) + 1)
+            commentData = commentData.copy(depth = (p?.depth ?: -1) + 1)
             repository.insertReply(parent, CommentType.Comment(commentData))
             replyState.value = null
         }
