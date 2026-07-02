@@ -8,11 +8,17 @@ import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.post.PostId
 import com.sofamaniac.crabir.data.remote.utils.CommentsResponseSerializer
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import kotlinx.serialization.Serializable
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Tag
 
 interface ThreadAPI {
     /**
@@ -78,8 +84,22 @@ interface ThreadAPI {
         @Query("api_type") apiType: String = "json",
         @Query("sort") sort: Sort? = null,
     ): Response<MoreResponseOuter>
+
+    @POST("api/comment")
+    suspend fun submitComment(
+        @Body body: RequestBody,
+        @Tag account: RedditAccount?,
+    ): Response<MoreResponseOuter>
 }
 
+fun commentSubmissionBody(parentId: Fullname, text: String): RequestBody {
+    return MultipartBody.Builder().setType(MultipartBody.FORM)
+        .addFormDataPart("api_type", "json")
+        .addFormDataPart("text", text)
+        .addFormDataPart("thing_id", parentId.name)
+        .addFormDataPart("raw_json", "1")
+        .build()
+}
 @Serializable(with = CommentsResponseSerializer::class)
 data class CommentsResponse(
     /** Contains only 1 (one) [Post] */

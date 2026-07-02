@@ -9,10 +9,11 @@ import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.crabir.data.remote.reddit.MoreResponseOuter
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
-import com.sofamaniac.crabir.data.remote.reddit.postCommentBody
+import com.sofamaniac.crabir.data.remote.reddit.commentSubmissionBody
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -33,7 +34,16 @@ interface ThreadRepository {
     suspend fun getPost(name: Fullname): PostData?
     suspend fun getMoreComments(more: CommentType.More): Unit
 
-    suspend fun postComment(parentId: Fullname, comment: String): Response<MoreResponseOuter>
+    /** Submit a reply
+     * @param parentId The name of the parent to the reply
+     * @param comment The text of the comment
+     * @param account The account to use to submit the comment, if null the current active account will be used
+     */
+    suspend fun postComment(
+        parentId: Fullname,
+        comment: String,
+        account: RedditAccount?,
+    ): Response<MoreResponseOuter>
 
     suspend fun updateComment(name: Fullname, value: CommentType)
 
@@ -60,7 +70,7 @@ interface ThreadRepository {
 class Forest private constructor(
     val comments: Map<Fullname, CommentType>,
     val next: Map<Fullname, Fullname>,
-    val root: Fullname
+    val root: Fullname,
 ) : Iterable<CommentType> {
     companion object {
         fun empty(root: Fullname = Fullname("EmptyRoute")): Forest {
@@ -98,7 +108,7 @@ class Forest private constructor(
         root: Fullname,
         l: List<Thing>,
         initialCapacity: Int,
-        removeRoot: Boolean = false
+        removeRoot: Boolean = false,
     ): Forest {
         val stack = ArrayDeque<Thing>(initialCapacity)
         val comments = this.comments.toMutableMap()
@@ -168,7 +178,7 @@ class ThreadRepositoryImpl(
         permalink: String,
         sort: Sort? = null,
         comment: String? = null,
-        context: Int? = null
+        context: Int? = null,
     ) {
         if (post != null && forest.value.comments.isNotEmpty()) {
             return
@@ -237,15 +247,16 @@ class ThreadRepositoryImpl(
 
     override suspend fun postComment(
         parentId: Fullname,
-        comment: String
+        comment: String,
+        account: RedditAccount?,
     ): Response<MoreResponseOuter> {
-        val body = postCommentBody(parentId, comment)
-        return api.postComment(body)
+        val body = commentSubmissionBody(parentId, comment)
+        return api.submitComment(body, account)
     }
 
     override suspend fun updateComment(
         name: Fullname,
-        value: CommentType
+        value: CommentType,
     ) {
         forest.update {
             it.updateComment(name, value)

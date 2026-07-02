@@ -34,27 +34,18 @@ class RedditAuthenticator(
     private val activeAccount: Flow<RedditAccount> = accountsRepository.activeAccount
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val activeAccount = runBlocking { activeAccount.first() }
+        val request = chain.request()
+        val overrideAccount = request.tag(RedditAccount::class.java)
+        val activeAccount = overrideAccount ?: runBlocking { activeAccount.first() }
         Log.d("RedditAuthenticator", "Authenticating with ${activeAccount.auth.accessToken}")
 
-//        if (activeAccount.isAnonymous()) {
-//            Log.w("RedditAuthenticator", "Anonymous account")
-//            // TODO
-//            //return null // Anonymous account
-//            Log.d("RedditAuthenticator", "auth: ${activeAccount.auth.accessToken}")
-//            Log.d("RedditAuthenticator", "${chain.request().headers}")
-//
-//            return chain.proceed(chain.request())
-//        } else
-        if (chain.request().url.host.contains("www.reddit.com")) {
+        if (request.url.host.contains("www.reddit.com")) {
             // Disable auth on non oauth endpoints
             Log.w("RedditAuthenticator", "Non oauth endpoint (${chain.request().url})")
             val request =
                 chain.request().newBuilder().header("Authorization", authorizationHeader).build()
             return chain.proceed(request)
-        }
-
-        if (activeAccount.auth.accessToken == null) {
+        } else if (activeAccount.auth.accessToken == null) {
             Log.e("RedditAuthenticator", "No access token found")
             //chain.proceed(chain.request())
             throw IOException("No authentication found")
@@ -65,10 +56,10 @@ class RedditAuthenticator(
             activeAccount.auth.accessToken
         }
 
-        val request = chain.request().newBuilder()
+        val newRequest = request.newBuilder()
             .header("Authorization", "Bearer $newAccessToken").build()
 
-        return chain.proceed(request)
+        return chain.proceed(newRequest)
     }
 
     private fun refreshToken(account: RedditAccount): String? {

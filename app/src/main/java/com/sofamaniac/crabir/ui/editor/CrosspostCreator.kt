@@ -53,6 +53,7 @@ import com.sofamaniac.crabir.data.remote.reddit.SubmissionBuilderError
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.ThemedCard
@@ -103,7 +104,8 @@ fun CrosspostCreator(
                     actions = {
                         IconButton(onClick = {
                             scope.launch {
-                                val res = viewModel.submit()
+                                // TODO: allow to change account
+                                val res = viewModel.submit(account = null)
                                 if (res.isSuccess) {
                                     navController?.popBackStack()
                                 } else {
@@ -240,7 +242,7 @@ class CrosspostCreatorViewModel(
 
     var loading by mutableStateOf(false)
 
-    suspend fun submit(): Result<Unit> {
+    suspend fun submit(account: RedditAccount?): Result<Unit> {
         loading = true
         state = state.copy(
             title = titleState.text as String,
@@ -253,7 +255,7 @@ class CrosspostCreatorViewModel(
             loading = false
             return Result.failure(error!!)
         } else {
-            val res = api.submitPost(submission.getOrThrow())
+            val res = api.submitPost(submission.getOrThrow(), account = account)
             loading = false
             return if (res.isSuccessful) {
                 val response = res.body()

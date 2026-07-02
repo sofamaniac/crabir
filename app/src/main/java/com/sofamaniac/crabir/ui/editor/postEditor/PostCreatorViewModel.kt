@@ -21,6 +21,7 @@ import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.data.remote.reddit.SubmissionBuilderError
 import com.sofamaniac.crabir.data.remote.reddit.makeMediaUploadBody
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
@@ -107,12 +108,16 @@ class PostCreatorViewModel(
         }
     }
 
-    suspend fun uploadMedia(context: Context, kind: String = "link"): List<String> {
+    suspend fun uploadMedia(
+        context: Context,
+        kind: String = "link",
+        account: RedditAccount?,
+    ): List<String> {
         if (media.isNotEmpty()) {
             val uploadResponse = media.map {
                 Log.d("PostCreatorViewModel", "submit: uploading $it")
                 val mimetype = getMimeType(it, context)
-                val result = api.uploadMedia(it.toString(), mimetype)
+                val result = api.uploadMedia(it.toString(), mimetype, account)
                 if (result.isSuccessful) {
                     result.body()!!
                 } else {
@@ -138,7 +143,7 @@ class PostCreatorViewModel(
         }
     }
 
-    suspend fun submit(context: Context): Result<Unit> {
+    suspend fun submit(context: Context, account: RedditAccount?): Result<Unit> {
         loading = true
         state = state.copy(
             title = titleState.text as String,
@@ -156,7 +161,8 @@ class PostCreatorViewModel(
         } else {
             val mediaIds = uploadMedia(
                 context,
-                kind = if (state.kind == Kind.Gallery) "gallery" else "link"
+                kind = if (state.kind == Kind.Gallery) "gallery" else "link",
+                account,
             )
             val items = mediaIds.map {
                 GalleryItem(mediaId = it)
@@ -168,9 +174,9 @@ class PostCreatorViewModel(
             val res = if (state.kind == Kind.Gallery) {
                 val gallery = state.toGallerySubmission()
                 val galleryFinal = gallery.copy(items = items)
-                api.submitGalleryPost(galleryFinal)
+                api.submitGalleryPost(galleryFinal, account)
             } else {
-                api.submitPost(submission.getOrThrow())
+                api.submitPost(submission.getOrThrow(), account)
             }
             loading = false
             return if (res.isSuccessful) {

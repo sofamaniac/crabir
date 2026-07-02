@@ -4,8 +4,9 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import com.sofamaniac.crabir.data.remote.reddit.MoreResponseOuter
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
-import com.sofamaniac.crabir.data.remote.reddit.postCommentBody
+import com.sofamaniac.crabir.data.remote.reddit.commentSubmissionBody
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.domain.repository.LinksRepository
@@ -35,9 +36,9 @@ class CommentEditorViewModel(
         return replyState.text.toString()
     }
 
-    suspend fun submitComment(): Result<MoreResponseOuter> {
-        val body = postCommentBody(parent, replyState.text.toString())
-        val res = api.postComment(body)
+    suspend fun submitComment(account: RedditAccount?): Result<MoreResponseOuter> {
+        val body = commentSubmissionBody(parent, replyState.text.toString())
+        val res = api.submitComment(body, account = account)
         return if (res.isSuccessful) {
             Result.success(res.body()!!)
         } else {

@@ -98,7 +98,8 @@ fun PostCreator(
                 actions = {
                     IconButton(onClick = {
                         scope.launch {
-                            val res = viewModel.submit(context)
+                            // TODO: allow to change account
+                            val res = viewModel.submit(context, account = null)
                             if (res.isSuccess) {
                                 onDismissRequest()
                             } else {

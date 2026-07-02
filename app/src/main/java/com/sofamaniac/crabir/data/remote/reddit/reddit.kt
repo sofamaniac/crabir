@@ -16,10 +16,7 @@ import com.sofamaniac.crabir.data.remote.reddit.auth.RedditAuthApi
 import com.sofamaniac.crabir.domain.model.Fullname
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import retrofit2.Response
-import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -67,10 +64,6 @@ interface RedditAPIService :
     ): Response<Listing<Post>>
 
 
-    @POST("api/comment")
-    suspend fun postComment(
-        @Body body: RequestBody
-    ): Response<MoreResponseOuter>
 
 
     @GET("{subreddit}/api/link_flair_v2.json")
@@ -104,14 +97,6 @@ enum class SubscribeAction {
 }
 
 
-fun postCommentBody(parentId: Fullname, text: String): RequestBody {
-    return MultipartBody.Builder().setType(MultipartBody.FORM)
-        .addFormDataPart("api_type", "json")
-        .addFormDataPart("text", text)
-        .addFormDataPart("thing_id", parentId.name)
-        .addFormDataPart("raw_json", "1")
-        .build()
-}
 
 @Serializable
 data class Rules(

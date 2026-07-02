@@ -40,6 +40,7 @@ import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.settings.theme.ADMIN_CARTOUCHE_COLOR
@@ -63,7 +64,7 @@ interface CommentViewModelInterface : VotableInteraction {
     val openComment: StateFlow<Fullname?>
 
     fun replyTo(name: Fullname?)
-    fun submitComment(parent: Fullname, body: String)
+    fun submitComment(parent: Fullname, body: String, account: RedditAccount?)
 
     fun getMarkdownState(name: Fullname): StateFlow<State>
 }

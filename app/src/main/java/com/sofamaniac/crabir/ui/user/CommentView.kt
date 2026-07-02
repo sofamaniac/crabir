@@ -11,6 +11,7 @@ import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
@@ -73,7 +74,8 @@ class CommentViewModel(
 
     override fun submitComment(
         parent: Fullname,
-        body: String
+        body: String,
+        account: RedditAccount?,
     ) {
         TODO("Not yet implemented")
     }

@@ -8,6 +8,7 @@ import android.content.Context
 import android.net.Uri
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import nl.adaptivity.xmlutil.serialization.XmlElement
@@ -24,6 +25,7 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Tag
 import retrofit2.http.Url
 
 interface PostAPI {
@@ -36,18 +38,23 @@ interface PostAPI {
 
     @FormUrlEncoded
     @POST("api/submit")
-    suspend fun submitPost(@FieldMap post: Map<String, String>): Response<PostResponse>
+    suspend fun submitPost(
+        @FieldMap post: Map<String, String>,
+        @Tag account: RedditAccount?,
+    ): Response<PostResponse>
 
     @POST("api/submit_gallery_post.json")
     suspend fun submitGalleryPost(
-        @Body body: GallerySubmission
+        @Body body: GallerySubmission,
+        @Tag account: RedditAccount?,
     ): Response<PostResponse>
 
     @FormUrlEncoded
     @POST("api/media/asset.json")
     suspend fun uploadMedia(
         @Field("filepath") filepath: String,
-        @Field("mimetype") mimetype: String
+        @Field("mimetype") mimetype: String,
+        @Tag account: RedditAccount?,
     ): Response<MediaUploadResponse>
 
     @FormUrlEncoded
@@ -110,12 +117,12 @@ interface PostAPI {
 
 @Serializable
 data class PostResponse(
-    val json: PostResponseInner
+    val json: PostResponseInner,
 )
 
 @Serializable
 data class PostResponseInner(
-    val errors: List<List<String>> = emptyList()
+    val errors: List<List<String>> = emptyList(),
 )
 
 
@@ -131,13 +138,13 @@ data class MediaPushResponse(
     @XmlSerialName("Location") @XmlElement(true) val location: String,
     @XmlSerialName("Bucket") @XmlElement(true) val bucket: String,
     @XmlSerialName("Key") @XmlElement(true) val key: String,
-    @XmlSerialName("ETag") @XmlElement(true) val etag: String
+    @XmlSerialName("ETag") @XmlElement(true) val etag: String,
 )
 
 @Serializable
 data class MediaUploadResponse(
     val args: Args,
-    val asset: Asset
+    val asset: Asset,
 )
 
 @Serializable
@@ -149,7 +156,7 @@ data class Asset(
 @Serializable
 data class Args(
     val action: String,
-    val fields: List<MediaField>
+    val fields: List<MediaField>,
 )
 
 @Serializable
@@ -174,7 +181,7 @@ class MissingGallery(cause: Throwable? = null) : SubmissionBuilderError("Missing
 data class GalleryItem(
     val caption: String = "",
     @SerialName("outbound_url") val outboundUrl: String = "",
-    @SerialName("media_id") val mediaId: String
+    @SerialName("media_id") val mediaId: String,
 )
 
 @Serializable

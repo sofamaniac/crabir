@@ -108,7 +108,12 @@ fun ReplyBottomSheet(viewModel: ThreadViewModel) {
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 TextButton(onClick = {
-                    viewModel.submitComment(parent.name, textFieldState.text.toString())
+                    // TODO: allow to change account
+                    viewModel.submitComment(
+                        parent.name,
+                        textFieldState.text.toString(),
+                        account = null
+                    )
                 }) {
                     Text("Submit")
                 }

@@ -15,6 +15,7 @@ import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
 import com.sofamaniac.crabir.ui.post.PostViewModelInterface
@@ -224,9 +225,9 @@ class ThreadViewModel(
         replyState.value = name
     }
 
-    override fun submitComment(parent: Fullname, body: String) {
+    override fun submitComment(parent: Fullname, body: String, account: RedditAccount?) {
         viewModelScope.launch(Dispatchers.IO) {
-            val response = repository.postComment(parent, body)
+            val response = repository.postComment(parent, body, account = account)
             if (!response.isSuccessful) {
                 return@launch
             }
