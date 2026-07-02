@@ -25,7 +25,7 @@ interface LinksRepository : VotableRepository<PostData> {
 @Singleton
 class LinksRepositoryImpl(
     override val api: RedditAPIService,
-    override val votableDao: VotableDao
+    override val votableDao: VotableDao,
 ) :
     LinksRepository {
     override suspend fun markNSFW(name: Fullname) {
@@ -133,7 +133,7 @@ object DummyLinksRepository : LinksRepository {
     override suspend fun editFlair(
         name: Fullname,
         flairId: String,
-        text: String?
+        text: String?,
     ) {
     }
 
@@ -143,7 +143,7 @@ object DummyLinksRepository : LinksRepository {
 
     override suspend fun setInboxReplies(
         name: Fullname,
-        enabled: Boolean
+        enabled: Boolean,
     ) {
     }
 
@@ -156,7 +156,7 @@ object DummyLinksRepository : LinksRepository {
     }
 
     override val api: RedditAPIService
-        get() = TODO("Not yet implemented")
+        get() = throw NotImplementedError()
     override val votableDao: VotableDao
-        get() = TODO("Not yet implemented")
+        get() = throw NotImplementedError()
 }

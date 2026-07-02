@@ -71,7 +71,6 @@ object DebugOptionsRoute : Route
 
 interface Route
 
-// TODO move closer in the navgraph. Maybe one per tab ? Or move its initalisation to the tabs ?
 val LocalNavController = compositionLocalOf<NavController?> { null }
 val BASE_URLS = listOf(
     "www.reddit.com",

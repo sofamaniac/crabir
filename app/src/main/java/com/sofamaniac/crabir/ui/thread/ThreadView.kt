@@ -27,14 +27,19 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.toRoute
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
+import com.sofamaniac.crabir.ui.editor.AccountSelector
 import com.sofamaniac.crabir.ui.editor.EditorActions
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -92,6 +97,9 @@ fun ReplyBottomSheet(viewModel: ThreadViewModel) {
     val parent = if (parentName == post?.name) post else comments.find { it.name == parentName }
     if (parent == null) return
     val textFieldState = rememberTextFieldState()
+    val initialAccount = LocalRedditAccount.current
+    var selectedAccount by remember { mutableStateOf(initialAccount) }
+    val accounts by viewModel.accounts.collectAsState(emptyList())
     ModalBottomSheet(
         modifier = Modifier
             .imePadding()
@@ -99,24 +107,28 @@ fun ReplyBottomSheet(viewModel: ThreadViewModel) {
             .fillMaxWidth(),
         onDismissRequest = { viewModel.replyTo(null) }
     ) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 TextButton(onClick = { viewModel.replyTo(null) }) {
                     Text(stringResource(R.string.cancel))
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 TextButton(onClick = {
-                    // TODO: allow to change account
                     viewModel.submitComment(
                         parent.name,
                         textFieldState.text.toString(),
-                        account = null
+                        account = selectedAccount
                     )
                 }) {
                     Text("Submit")
                 }
+            }
+            AccountSelector(accounts, selectedAccount) { newId ->
+                selectedAccount = accounts.find { it.id == newId }!!
             }
             TextField(
                 modifier = Modifier

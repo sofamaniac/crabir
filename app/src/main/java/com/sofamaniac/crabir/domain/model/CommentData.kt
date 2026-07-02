@@ -47,8 +47,7 @@ sealed class CommentType : VotableData {
             return VotableEntity(id = data.name, data = Json.encodeToString(this))
         }
 
-        override val id: String
-            get() = TODO("Not yet implemented")
+        override val id: String = name.name
     }
 
     override val name: Fullname

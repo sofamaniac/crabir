@@ -16,6 +16,7 @@ import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
 import com.sofamaniac.crabir.ui.post.PostViewModelInterface
@@ -40,6 +41,7 @@ class ThreadViewModel(
     private val repository: ThreadRepository,
     private val visitedPostsDao: VisitedPostsDao,
     private val linksRepository: LinksRepository,
+    private val accountsRepository: AccountsRepository,
     @InjectedParam val permalink: String,
     @InjectedParam val comment: String?,
     @InjectedParam val context: Int?,
@@ -47,6 +49,8 @@ class ThreadViewModel(
 ) : ViewModel(), CommentViewModelInterface, PostViewModelInterface {
 
     var name: Fullname = repository.getPostId(permalink)
+
+    val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
 
     override val likes: Flow<Boolean?> = flowOf(null)
     override val saved: Flow<Boolean> = flowOf(false)

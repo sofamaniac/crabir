@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
+import com.sofamaniac.crabir.navigation.LocalNavController
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -46,10 +47,11 @@ import org.koin.androidx.compose.koinViewModel
 fun TopBar(scrollBehavior: TopAppBarScrollBehavior?) {
     var expanded by remember { mutableStateOf(true) }
     var currentSearch by remember { mutableStateOf("") }
+    val navController = LocalNavController.current
     TopAppBar(scrollBehavior = scrollBehavior, title = {
         Row {
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to Home")
+            IconButton(onClick = { navController?.popBackStack() }) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
             }
             SearchBar(
                 inputField = {
@@ -61,7 +63,7 @@ fun TopBar(scrollBehavior: TopAppBarScrollBehavior?) {
                         expanded = expanded,
                         onExpandedChange = { expanded = it },
 
-                    )
+                        )
                 },
                 expanded = expanded,
                 onExpandedChange = { expanded = it },

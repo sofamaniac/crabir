@@ -53,7 +53,7 @@ fun NavGraphBuilder.profileGraph(navController: NavController) {
     composable<SavedRoute> {
         val currentAccount = LocalRedditAccount.current
         if (currentAccount.isAnonymous()) {
-            // TODO: ask user to log in
+            // TODO: ask user to log in (should be done at SavedRoute creation site)
             return@composable
         }
         ProfileView(

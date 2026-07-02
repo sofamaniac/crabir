@@ -110,7 +110,6 @@ fun CrosspostCreator(
                     actions = {
                         IconButton(onClick = {
                             scope.launch {
-                                // TODO: allow to change account
                                 val res = viewModel.submit(account = null)
                                 if (res.isSuccess) {
                                     navController?.popBackStack()

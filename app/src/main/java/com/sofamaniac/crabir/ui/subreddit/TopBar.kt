@@ -112,17 +112,25 @@ fun TopBar(
             }
 
             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                // TODO
-                DropdownMenuItem(onClick = {
-                    showViewSelect = true
-                }, text = { Text("Post view") })
-                DropdownMenuItem(onClick = {
-                    navController?.navigate(SettingsRoute)
-                }, text = { Text(stringResource(R.string.settings)) })
+                DropdownMenuItem(
+                    onClick = {
+                        showViewSelect = true
+                    },
+                    text = { Text("Post view") }
+                )
+                DropdownMenuItem(
+                    onClick = {
+                        navController?.navigate(SettingsRoute)
+                    },
+                    text = { Text(stringResource(R.string.settings)) }
+                )
                 if (!disableInfo) {
-                    DropdownMenuItem(onClick = {
-                        navController?.navigate(SubredditInfoRoute(slug))
-                    }, text = { Text("Info") })
+                    DropdownMenuItem(
+                        onClick = {
+                            navController?.navigate(SubredditInfoRoute(slug))
+                        },
+                        text = { Text("Info") }
+                    )
                 }
                 DropdownMenuItem(onClick = { refresh() }, text = { Text("Refresh") })
             }
