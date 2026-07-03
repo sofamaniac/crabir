@@ -2,7 +2,7 @@ package com.sofamaniac.crabir.domain.repository
 
 import android.util.Log
 import com.sofamaniac.crabir.data.local.dao.VotableDao
-import com.sofamaniac.crabir.data.local.entities.asVotableData
+import com.sofamaniac.crabir.data.local.entities.VotableEntity
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -16,6 +16,7 @@ interface VotableRepository<T : VotableData> {
 
     val api: RedditAPIService
     val votableDao: VotableDao
+    fun VotableEntity?.into(): T?
     fun insert(things: Iterable<T>) {
         votableDao.insert(things.map { it.toEntity() })
     }
@@ -25,11 +26,11 @@ interface VotableRepository<T : VotableData> {
     }
 
     fun get(name: Fullname): Flow<T?> =
-        votableDao.get(name).map { it?.asVotableData() as? T? }
+        votableDao.get(name).map { it?.into() }
             .distinctUntilChanged()
 
     fun getValue(name: Fullname): T? =
-        votableDao.getValue(name)?.asVotableData() as? T?
+        votableDao.getValue(name)?.into()
 
     fun update(name: Fullname, data: VotableData) {
         votableDao.update(name, data.toEntity().data)
