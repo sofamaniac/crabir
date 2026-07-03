@@ -24,6 +24,8 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
+import com.sofamaniac.crabir.settings.post.FlairSettings
+import com.sofamaniac.crabir.settings.post.rememberPostsSettings
 import com.sofamaniac.crabir.ui.Flair
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.votable.ScoreString
@@ -40,6 +42,7 @@ fun PostInfo(
     enableThumbnail: Boolean = true,
     read: Boolean = false,
     likes: Boolean?,
+    flairSettings: FlairSettings = rememberPostsSettings().flairSettings,
     markAsRead: () -> Unit = {},
 ) {
     val navController = LocalNavController.current
@@ -88,14 +91,21 @@ fun PostInfo(
                             .cartouche(Color.Transparent)
                     )
                 }
-                Flair(post.linkFlair, modifier = Modifier.clickable {
-                    navController?.navigate(
-                        SearchRoute(
-                            subreddit = post.subreddit.name,
-                            flair = post.linkFlair.text
-                        )
+                if (flairSettings.showFlair) {
+                    Flair(
+                        post.linkFlair,
+                        showColor = flairSettings.showFlairColor,
+                        showEmoji = flairSettings.showFlairEmoji,
+                        modifier = Modifier.clickable(enabled = flairSettings.clickable) {
+                            navController?.navigate(
+                                SearchRoute(
+                                    subreddit = post.subreddit.name,
+                                    flair = post.linkFlair.text
+                                )
+                            )
+                        }
                     )
-                })
+                }
             }
 
             Row(

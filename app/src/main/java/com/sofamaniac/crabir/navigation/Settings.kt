@@ -10,8 +10,12 @@ import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.settings.DebugOptionsView
+import com.sofamaniac.crabir.settings.GeneralSettingsPage
+import com.sofamaniac.crabir.settings.GeneralSettingsRoute
 import com.sofamaniac.crabir.settings.SettingsPage
 import com.sofamaniac.crabir.settings.filters.FiltersSettingsPage
+import com.sofamaniac.crabir.settings.post.PostSettingsPage
+import com.sofamaniac.crabir.settings.post.PostSettingsRoute
 import com.sofamaniac.crabir.settings.theme.ThemeEditor
 import com.sofamaniac.crabir.settings.theme.ThemeSettingsPage
 import com.sofamaniac.crabir.settings.views.ViewsSettingsPage
@@ -24,6 +28,9 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
     composable<SettingsRoute> {
         SettingsPage()
     }
+    composable<GeneralSettingsRoute> {
+        GeneralSettingsPage()
+    }
     composable<ThemeRoute> {
         ThemeSettingsPage()
     }
@@ -35,6 +42,9 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
     }
     composable<FiltersSettingRoute> {
         FiltersSettingsPage()
+    }
+    composable<PostSettingsRoute> {
+        PostSettingsPage()
     }
     composable<DebugOptionsRoute> {
         DebugOptionsView()

@@ -3,6 +3,7 @@ package com.sofamaniac.crabir.settings.helper
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -12,6 +13,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SwitchTile(
     headlineContent: @Composable () -> Unit,
@@ -25,15 +27,16 @@ fun SwitchTile(
 ) {
     val theme = LocalTheme.current
     ListItem(
+        onClick = { onCheckedChange(!checked) },
         modifier = Modifier.selectable(
             selected = checked,
             role = Role.Switch,
             enabled = enabled,
             onClick = {
                 onCheckedChange(!checked)
-            }
-        ),
-        headlineContent = { headlineContent() },
+            }),
+        enabled = enabled,
+        content = { headlineContent() },
         supportingContent = supportingContent,
         leadingContent = leadingContent,
         trailingContent = {
@@ -43,6 +46,6 @@ fun SwitchTile(
                 onCheckedChange = onCheckedChange,
                 colors = SwitchDefaults.colors().copy(checkedThumbColor = theme.postTitle)
             )
-        }
+        },
     )
 }

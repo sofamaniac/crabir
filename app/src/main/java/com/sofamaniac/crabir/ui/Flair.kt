@@ -32,7 +32,12 @@ import kotlin.math.min
 
 
 @Composable
-fun FlairRichtext(richText: List<LinkFlairRichtext>, color: Color, modifier: Modifier = Modifier) {
+fun FlairRichtext(
+    richText: List<LinkFlairRichtext>,
+    color: Color,
+    modifier: Modifier = Modifier,
+    showEmoji: Boolean = true,
+) {
     val annotatedString = buildAnnotatedString {
         for (e in richText) {
             when (e) {
@@ -40,10 +45,13 @@ fun FlairRichtext(richText: List<LinkFlairRichtext>, color: Color, modifier: Mod
                     append(e.text)
                 }
 
-                is LinkFlairRichtextEmoji -> {
+                is LinkFlairRichtextEmoji if showEmoji -> {
                     appendInlineContent(e.url, e.emoji)
                 }
 
+                is LinkFlairRichtextEmoji -> {
+                    append(e.emoji)
+                }
             }
         }
     }
@@ -119,10 +127,20 @@ fun Color.invert(bw: Boolean = true): Color {
 
 
 @Composable
-fun Flair(flair: Flair, modifier: Modifier = Modifier) {
+fun Flair(
+    flair: Flair,
+    modifier: Modifier = Modifier,
+    showColor: Boolean = true,
+    showEmoji: Boolean = true,
+) {
     if (flair.text.isEmpty() && flair.richText.isEmpty()) return
-    val backgroundColor = mapColor(flair.backgroundColor, default = Color.DarkGray)
-    var textColor = mapColor(flair.textColor, default = backgroundColor.invert(bw = true))
+    val backgroundColor =
+        if (showColor) mapColor(flair.backgroundColor, default = Color.DarkGray) else Color.DarkGray
+    var textColor =
+        if (showColor) mapColor(
+            flair.textColor,
+            default = backgroundColor.invert(bw = true)
+        ) else Color.White
     val l1 = backgroundColor.luminance() + 0.05
     val l2 = textColor.luminance() + 0.05
     val contrastRatio = max(l1, l2) / min(l1, l2)
@@ -133,7 +151,7 @@ fun Flair(flair: Flair, modifier: Modifier = Modifier) {
     when (flair.type) {
         "richtext" -> {
             if (flair.richText.isNotEmpty()) {
-                FlairRichtext(flair.richText, textColor, modifier)
+                FlairRichtext(flair.richText, textColor, modifier, showEmoji)
             } else {
                 Text(
                     text = flair.text,

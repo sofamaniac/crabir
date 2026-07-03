@@ -9,10 +9,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import dev.chrisbanes.haze.blur.HazeBlurStyle
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import net.openid.appauth.AuthState
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.annotation.KoinViewModel
@@ -22,7 +25,7 @@ import java.util.Locale
 
 fun formatElapsedTimeLocalized(
     creationDate: kotlin.time.Instant,
-    locale: Locale = Locale.getDefault()
+    locale: Locale = Locale.getDefault(),
 ): String {
     val end = Clock.systemUTC().millis()
     val duration = Duration.ofMillis(kotlin.math.abs(end - creationDate.toEpochMilliseconds()))
@@ -51,11 +54,15 @@ fun crabirBlurStyle(): HazeBlurStyle {
 @Composable
 fun rememberCurrentAccount(): RedditAccount {
     val viewModel: CurrentAccountViewModel = koinViewModel()
-    val account by viewModel.account.collectAsState(RedditAccount.uninitialized(-2, AuthState()))
+    val account by viewModel.account.collectAsState()
     return account
 }
 
 @KoinViewModel
 class CurrentAccountViewModel(accountsRepository: AccountsRepository) : ViewModel() {
-    val account = accountsRepository.activeAccount
+    val account = accountsRepository.activeAccount.stateIn(
+        viewModelScope,
+        started = SharingStarted.Lazily,
+        RedditAccount.uninitialized(-2, AuthState())
+    )
 }

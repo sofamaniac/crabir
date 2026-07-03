@@ -69,6 +69,7 @@ object FiltersSettingRoute : Route
 @Serializable
 object DebugOptionsRoute : Route
 
+
 interface Route
 
 val LocalNavController = compositionLocalOf<NavController?> { null }

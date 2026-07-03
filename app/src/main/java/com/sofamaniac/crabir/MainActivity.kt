@@ -151,13 +151,15 @@ fun MainScreen(
         Log.d("DrawerState", "Trying to change drawer state to $it")
         true
     })
+    val currentAccount = rememberCurrentAccount()
+    if (currentAccount.isUninitialized()) {
+        Log.d("MainScreen", "User is uninit")
+        return
+    }
     ConfigureMaterialTheme {
         val theme = rememberAppTheme()
         if (theme == null) {
-            return@ConfigureMaterialTheme
-        }
-        val currentAccount = rememberCurrentAccount()
-        if (currentAccount.isUninitialized()) {
+            Log.d("MainScreen", "Theme is null")
             return@ConfigureMaterialTheme
         }
         CompositionLocalProvider(

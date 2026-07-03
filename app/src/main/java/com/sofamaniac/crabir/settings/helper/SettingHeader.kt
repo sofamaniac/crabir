@@ -18,7 +18,7 @@ fun SettingHeader(title: String) {
             title,
             color = theme.highlight,
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(start = 8.dp)
+            modifier = Modifier.padding(start = 32.dp)
         )
         HorizontalDivider()
     }
