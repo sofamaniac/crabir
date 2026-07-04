@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -212,6 +213,19 @@ data class ThemeSettings(
     val lightModeStartTime: Int = 6,
     val lightModeEndTime: Int = 18,
 ) {
+
+    fun currentTheme(default: ThemeMode): CrabirTheme {
+        assert(default != ThemeMode.System)
+        val mode = if (mode == ThemeMode.System) default else mode
+        return when (mode) {
+            ThemeMode.Dark -> dark
+            ThemeMode.Light -> light
+            else -> {
+                throw Exception("Unreachable code")
+            }
+        }
+    }
+
     companion object {
         val DEFAULT = ThemeSettings(DefaultDarkTheme, DefaultLightTheme, ThemeMode.System, true)
     }
@@ -248,33 +262,39 @@ fun rememberThemeSettings(): ThemeSettings {
 }
 
 @Composable
-fun rememberAppTheme(): CrabirTheme? {
+fun rememberThemeMode(): ThemeMode {
     val theme = rememberThemeSettings()
-    val colorScheme = MaterialTheme.colorScheme
-    val dynamicTheme = CrabirTheme.fromColorScheme(colorScheme)
-    setSystemBarsColor()(theme.mode)
-    if (theme.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        return dynamicTheme
-    }
-    Log.d("rememberAppTheme", "rememberAppTheme: ${theme.mode}")
-    val mode = when (theme.mode) {
+    return when (theme.mode) {
         ThemeMode.System -> if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
         else -> theme.mode
-    }
-    return when (mode) {
-        ThemeMode.Dark -> theme.dark
-        ThemeMode.Light -> theme.light
-        else -> theme.dark
     }
 }
 
 @Composable
-fun setSystemBarsColor(): (ThemeMode) -> Unit {
+fun rememberAppTheme(): CrabirTheme {
+    val theme = rememberThemeSettings()
+    val colorScheme = MaterialTheme.colorScheme
+    val dynamicTheme = CrabirTheme.fromColorScheme(colorScheme)
+    val mode = rememberThemeMode()
+    val crabirTheme = theme.currentTheme(mode)
+    setSystemBarsColor()(theme.mode, crabirTheme.toolbarBackground)
+    if (theme.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        return dynamicTheme
+    }
+    Log.d("rememberAppTheme", "rememberAppTheme: ${theme.mode}")
+    return crabirTheme
+}
+
+@Composable
+fun setSystemBarsColor(): (ThemeMode, Color) -> Unit {
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
     val windowInsetsController =
         WindowCompat.getInsetsController(window!!, window.decorView)
-    return { mode ->
+    return { mode, color ->
+        if (Build.VERSION.SDK_INT < 35) {
+            window.navigationBarColor = color.toArgb()
+        }
         when (mode) {
             ThemeMode.Dark -> {
                 windowInsetsController.isAppearanceLightStatusBars = false
@@ -293,7 +313,7 @@ fun setSystemBarsColor(): (ThemeMode) -> Unit {
 
 @Composable
 fun ConfigureMaterialTheme(
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
 
     val themeSettings = rememberThemeSettings()
