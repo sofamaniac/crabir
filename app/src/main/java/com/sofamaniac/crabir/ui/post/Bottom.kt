@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Comment
-import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
@@ -24,12 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
-import androidx.compose.material3.TooltipAnchorPosition
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,7 +35,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.BuildConfig
@@ -52,11 +44,18 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
+import com.sofamaniac.crabir.settings.post.ButtonsSettings
+import com.sofamaniac.crabir.settings.post.rememberPostsSettings
+import com.sofamaniac.crabir.ui.post.buttons.HideButton
+import com.sofamaniac.crabir.ui.post.buttons.HideButtonLong
+import com.sofamaniac.crabir.ui.post.buttons.MuteButton
+import com.sofamaniac.crabir.ui.post.buttons.OpenInAppButton
+import com.sofamaniac.crabir.ui.post.buttons.OpenInAppLong
+import com.sofamaniac.crabir.ui.post.buttons.ShareButton
+import com.sofamaniac.crabir.ui.post.buttons.ShareButtonLong
 import com.sofamaniac.crabir.ui.post.dialog.EditDialogue
-import com.sofamaniac.crabir.ui.post.dialog.MuteDialog
 import com.sofamaniac.crabir.ui.post.dialog.PostDialog
 import com.sofamaniac.crabir.ui.post.dialog.ReportMenu
-import com.sofamaniac.crabir.ui.post.dialog.ShareMenu
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.votable.DownButton
@@ -72,7 +71,8 @@ fun BottomRow(
     post: PostData,
     modifier: Modifier = Modifier,
     interactions: LinkInteraction,
-    action: @Composable () -> Unit = {},
+    buttonsSettings: ButtonsSettings = rememberPostsSettings().buttonsSettings,
+    action: (@Composable () -> Unit)? = null,
 ) {
     val likes by interactions.likes.collectAsState(post.relationship.liked)
     val saved by interactions.saved.collectAsState(post.relationship.saved)
@@ -80,50 +80,17 @@ fun BottomRow(
         UpButton(likes, onClick = { interactions.upvote(post.name) })
         DownButton(likes, onClick = { interactions.downvote(post.name) })
         SavedButton(saved, onClick = { interactions.save(post.name, !saved) })
-        action()
-        OpenInAppButton(post)
-        PostOptions(post, interactions)
-    }
-}
-
-@Composable
-fun OpenInAppButton(
-    post: PostData,
-) {
-    val uriHandler = LocalUriHandler.current
-    val description = stringResource(R.string.open_in_app)
-    TooltipBox(
-        tooltip = { PlainTooltip { Text(description) } },
-        state = rememberTooltipState(),
-        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
-            TooltipAnchorPosition.Above
-        ),
-    ) {
-        IconButton(onClick = {
-            uriHandler.openUri(post.url)
-        }) {
-            Icon(Icons.AutoMirrored.Outlined.ExitToApp, description, tint = Color.Gray)
+        action?.invoke()
+        if (buttonsSettings.openInApp) {
+            OpenInAppButton(post)
         }
-    }
-}
-
-@Composable
-fun OpenThreadButton(onClick: () -> Unit) {
-    val description = stringResource(R.string.open_comments)
-    TooltipBox(
-        tooltip = { PlainTooltip { Text(description) } },
-        state = rememberTooltipState(),
-        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
-            TooltipAnchorPosition.Above,
-        ),
-    ) {
-        IconButton(onClick = onClick) {
-            Icon(
-                Icons.AutoMirrored.Filled.Comment,
-                contentDescription = description,
-                tint = Color.Gray
-            )
+        if (buttonsSettings.hide) {
+            HideButton(post, interactions)
         }
+        if (buttonsSettings.share) {
+            ShareButton(post)
+        }
+        PostOptions(post, interactions, buttonsSettings)
     }
 }
 
@@ -132,7 +99,8 @@ fun OpenThreadButton(onClick: () -> Unit) {
 private fun PostOptions(
     post: PostData,
     interaction: LinkInteraction,
-    modifier: Modifier = Modifier
+    buttonsSettings: ButtonsSettings,
+    modifier: Modifier = Modifier,
 ) {
     val prettyJson = Json {
         prettyPrint = true
@@ -140,8 +108,6 @@ private fun PostOptions(
     }
     var showOptions by remember { mutableStateOf(false) }
     val navController = LocalNavController.current
-    val clipboard = LocalClipboard.current
-    val scope = rememberCoroutineScope()
     val currentAccount = LocalRedditAccount.current
     var currentDialog: PostDialog? by remember { mutableStateOf(null) }
     IconButton(onClick = { showOptions = true }) {
@@ -150,143 +116,155 @@ private fun PostOptions(
     if (showOptions) {
         ModalBottomSheet(onDismissRequest = { showOptions = false }) {
             if (post.canModPost) {
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            Icons.Default.Shield,
-                            contentDescription = null
-                        )
-                    },
-                    headlineContent = { Text(stringResource(R.string.moderation)) },
-                )
+                ModerationButton(post)
             }
             if (post.author.authorFullname == currentAccount.info?.name?.name) {
-                ListItem(
-                    modifier = Modifier.clickable {
-                        currentDialog = PostDialog.Edit
-                    },
-                    leadingContent = {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = null
-                        )
-                    },
-                    headlineContent = { Text(stringResource(R.string.edit)) },
+                EditButton(linkInteraction = interaction)
+            }
+            GoToSubredditButton(post) {
+                showOptions = false
+                navController?.navigate(SubredditRoute(post.subreddit.subredditPrefixed))
+            }
+            GoToUserButton(post) {
+                showOptions = false
+                navController?.navigate(
+                    ProfileRoute(
+                        author = post.author.username,
+                        tab = ProfileTabs.Overview
+                    )
                 )
             }
-            ListItem(
-                leadingContent = {
-                    SubredditIcon(
-                        post.subreddit.name,
-                        icon = post.subredditDetails?.icon,
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(CircleShape)
-                    )
-                },
-                headlineContent = {
-                    Text(
-                        stringResource(
-                            R.string.go_to_subreddit,
-                            post.subreddit.name
-                        )
-                    )
-                },
-                modifier = Modifier.clickable {
-                    navController?.navigate(SubredditRoute(post.subreddit.name))
-                }
-            )
-            ListItem(
-                leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
-                headlineContent = {
-                    Text(
-                        stringResource(
-                            R.string.go_to_profile,
-                            post.author.username
-                        )
-                    )
-                },
-                modifier = Modifier.clickable {
-                    navController?.navigate(
-                        ProfileRoute(
-                            author = post.author.username,
-                            tab = ProfileTabs.Overview
-                        )
-                    )
-                }
-            )
-            ListItem(
-                headlineContent = {
-                    val text =
-                        if (post.relationship.hidden) R.string.unhide_post else R.string.hide_post
-                    Text(stringResource(text))
-                },
-                modifier = Modifier.clickable {
-                    if (post.relationship.hidden) {
-                        interaction.unhide()
-                    } else {
-                        interaction.hide()
-                    }
-                })
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.report)) },
-                modifier = Modifier.clickable {
-                    interaction.fetchRules()
-                    currentDialog = PostDialog.Report
-                })
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.mute)) },
-                modifier = Modifier.clickable {
-                    currentDialog = PostDialog.Report
-                })
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.share)) },
-                modifier = Modifier.clickable {
-                    currentDialog = PostDialog.Share
-                })
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.copy)) },
-                modifier = Modifier.clickable {
-                    scope.launch {
-                        val clipData = ClipData.newPlainText("Post URL", post.url)
-                        val clipEntry = ClipEntry(clipData)
-                        clipboard.setClipEntry(clipEntry)
-                    }
-                })
+            if (!buttonsSettings.hide) {
+                HideButtonLong(post, interaction, onClick = { showOptions = false })
+            }
+            ReportButton(interaction)
+            MuteButton(post, onDismissRequest = { showOptions = false })
+            if (!buttonsSettings.share) {
+                ShareButtonLong(post) { showOptions = false }
+            }
+            CopyButton(post)
+            if (!buttonsSettings.openInApp) {
+                OpenInAppLong(post, buttonsSettings)
+            }
             if (BuildConfig.DEBUG) {
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.post_content)) },
-                    modifier = Modifier.clickable {
-                        Log.d("Post", prettyJson.encodeToString(post))
-                    })
+                DebugContentItem(post, prettyJson)
             }
         }
     }
-    when (currentDialog) {
-        PostDialog.Mute -> {
-            MuteDialog(post) {
-                currentDialog = null
-            }
-        }
+}
 
-        PostDialog.Report -> {
-            ReportMenu(interaction) {
-                currentDialog = null
-            }
-        }
+@Composable
+private fun ModerationButton(post: PostData) {
+    ListItem(
+        leadingContent = {
+            Icon(
+                Icons.Default.Shield,
+                contentDescription = null
+            )
+        },
+        headlineContent = { Text(stringResource(R.string.moderation)) },
+    )
+}
 
-        PostDialog.Share -> {
-            ShareMenu(post) {
-                currentDialog = null
-            }
+@Composable
+private fun EditButton(linkInteraction: LinkInteraction) {
+    var showDialog by remember { mutableStateOf(false) }
+    ListItem(
+        modifier = Modifier.clickable(onClick = { showDialog = true }),
+        leadingContent = {
+            Icon(
+                Icons.Default.Edit,
+                contentDescription = null
+            )
+        },
+        headlineContent = { Text(stringResource(R.string.edit)) },
+    )
+    if (showDialog) {
+        EditDialogue(linkInteraction) {
+            showDialog = false
         }
-
-        PostDialog.Edit -> {
-            EditDialogue(interaction) {
-                currentDialog = null
-            }
-        }
-
-        else -> {}
     }
+}
+
+@Composable
+private fun GoToSubredditButton(post: PostData, onClick: () -> Unit) {
+    ListItem(
+        leadingContent = {
+            SubredditIcon(
+                post.subreddit.name,
+                icon = post.subredditDetails?.icon,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+            )
+        },
+        headlineContent = {
+            Text(
+                stringResource(
+                    R.string.go_to_subreddit,
+                    post.subreddit.subredditPrefixed
+                )
+            )
+        },
+        modifier = Modifier.clickable(onClick = onClick)
+    )
+}
+
+@Composable
+private fun GoToUserButton(post: PostData, onClick: () -> Unit) {
+    ListItem(
+        leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
+        headlineContent = {
+            Text(
+                stringResource(
+                    R.string.go_to_profile,
+                    post.author.username
+                )
+            )
+        },
+        modifier = Modifier.clickable(onClick = onClick)
+    )
+}
+
+@Composable
+private fun ReportButton(interaction: LinkInteraction) {
+    var showMenu by remember { mutableStateOf(false) }
+    ListItem(
+        headlineContent = { Text(stringResource(R.string.report)) },
+        modifier = Modifier.clickable {
+            interaction.fetchRules()
+        }
+    )
+    if (showMenu) {
+        ReportMenu(interaction) {
+            showMenu = false
+        }
+    }
+}
+
+@Composable
+private fun CopyButton(post: PostData) {
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
+    ListItem(
+        headlineContent = { Text(stringResource(R.string.copy)) },
+        modifier = Modifier.clickable {
+            scope.launch {
+                val clipData = ClipData.newPlainText("Post URL", post.url)
+                val clipEntry = ClipEntry(clipData)
+                clipboard.setClipEntry(clipEntry)
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalSerializationApi::class)
+@Composable
+private fun DebugContentItem(post: PostData, json: Json) {
+    ListItem(
+        headlineContent = { Text(stringResource(R.string.post_content)) },
+        modifier = Modifier.clickable {
+            Log.d("Post", json.encodeToString(post))
+        }
+    )
 }

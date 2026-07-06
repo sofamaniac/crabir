@@ -34,7 +34,7 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.ui.post.LinkViewModel
-import com.sofamaniac.crabir.ui.post.OpenThreadButton
+import com.sofamaniac.crabir.ui.post.buttons.OpenThreadButton
 import com.sofamaniac.crabir.ui.post.dialog.ShareMenu
 import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.SavedButton

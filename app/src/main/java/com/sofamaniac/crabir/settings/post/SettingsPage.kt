@@ -70,7 +70,8 @@ fun PostSettingsPage() {
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
             //awardsSettings(postSettings, ::updateAwardsSettings)
-            flairSettings(postSettings, ::updateFlairSettings)
+            flairSettings(postSettings.flairSettings, ::updateFlairSettings)
+            buttonsSettings(postSettings.buttonsSettings, ::updateButtonsSettings)
         }
     }
 }
@@ -110,7 +111,7 @@ fun LazyListScope.awardsSettings(
 }
 
 fun LazyListScope.flairSettings(
-    postSettings: PostSettings,
+    flairSettings: FlairSettings,
     updateFlairSettings: (transform: (FlairSettings) -> FlairSettings) -> Unit,
 ) {
     item {
@@ -119,7 +120,7 @@ fun LazyListScope.flairSettings(
     item {
         SwitchTile(
             headlineContent = { Text("Show flair") },
-            checked = postSettings.flairSettings.showFlair,
+            checked = flairSettings.showFlair,
             onCheckedChange = { target ->
                 updateFlairSettings { it.copy(showFlair = target) }
             },
@@ -128,8 +129,8 @@ fun LazyListScope.flairSettings(
     item {
         SwitchTile(
             headlineContent = { Text("Show flair color") },
-            enabled = postSettings.flairSettings.showFlair,
-            checked = postSettings.flairSettings.showFlairColor,
+            enabled = flairSettings.showFlair,
+            checked = flairSettings.showFlairColor,
             onCheckedChange = { target ->
                 updateFlairSettings { it.copy(showFlairColor = target) }
             },
@@ -138,8 +139,8 @@ fun LazyListScope.flairSettings(
     item {
         SwitchTile(
             headlineContent = { Text("Show flair emoji") },
-            enabled = postSettings.flairSettings.showFlair,
-            checked = postSettings.flairSettings.showFlairEmoji,
+            enabled = flairSettings.showFlair,
+            checked = flairSettings.showFlairEmoji,
             onCheckedChange = { target ->
                 updateFlairSettings { it.copy(showFlairEmoji = target) }
             },
@@ -148,10 +149,64 @@ fun LazyListScope.flairSettings(
     item {
         SwitchTile(
             headlineContent = { Text("Click on flair to search") },
-            enabled = postSettings.flairSettings.showFlair,
-            checked = postSettings.flairSettings.clickable,
+            enabled = flairSettings.showFlair,
+            checked = flairSettings.clickable,
             onCheckedChange = { target ->
                 updateFlairSettings { it.copy(clickable = target) }
+            },
+        )
+    }
+}
+
+fun LazyListScope.buttonsSettings(
+    buttonsSettings: ButtonsSettings,
+    updateButtonsSettings: (transform: (ButtonsSettings) -> ButtonsSettings) -> Unit,
+) {
+    item {
+        SettingHeader("Buttons settings")
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text("Show comments") },
+            checked = buttonsSettings.comments,
+            onCheckedChange = { target ->
+                updateButtonsSettings { it.copy(comments = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text("Hide post") },
+            checked = buttonsSettings.hide,
+            onCheckedChange = { target ->
+                updateButtonsSettings { it.copy(hide = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text("Share post") },
+            checked = buttonsSettings.share,
+            onCheckedChange = { target ->
+                updateButtonsSettings { it.copy(share = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text("Open in app") },
+            checked = buttonsSettings.openInApp,
+            onCheckedChange = { target ->
+                updateButtonsSettings { it.copy(openInApp = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text("Mark as read") },
+            checked = buttonsSettings.markAsRead,
+            onCheckedChange = { target ->
+                updateButtonsSettings { it.copy(markAsRead = target) }
             },
         )
     }

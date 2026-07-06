@@ -14,16 +14,17 @@ import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
+import com.sofamaniac.crabir.settings.post.rememberPostsSettings
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.post.BottomRow
 import com.sofamaniac.crabir.ui.post.DummyInteraction
 import com.sofamaniac.crabir.ui.post.LinkInteraction
 import com.sofamaniac.crabir.ui.post.LinkViewModel
-import com.sofamaniac.crabir.ui.post.OpenThreadButton
 import com.sofamaniac.crabir.ui.post.PostHeader
 import com.sofamaniac.crabir.ui.post.PostInfo
 import com.sofamaniac.crabir.ui.post.PostViewModelInterface
+import com.sofamaniac.crabir.ui.post.buttons.OpenThreadButton
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -68,11 +69,7 @@ fun PostCard(
         canStartVideo = canStartVideo,
         read = read,
         interactions = viewModel,
-    ) {
-        OpenThreadButton(
-            onClick = markAsRead
-        )
-    }
+    )
 }
 
 @Composable
@@ -84,7 +81,6 @@ internal fun PostCardContent(
     canStartVideo: Boolean = false,
     read: Boolean = false,
     interactions: LinkInteraction,
-    bottomRowAction: @Composable () -> Unit,
 ) {
 
     val viewSettings = rememberViewSettings()
@@ -102,6 +98,7 @@ internal fun PostCardContent(
     } else {
         {}
     }
+    val showOpenButton = rememberPostsSettings().buttonsSettings.comments
     val markdownState by interactions.markdown.collectAsState()
     ThemedCard(
         roundedCorners = viewSettings.cardSettings.roundedCorners,
@@ -135,13 +132,21 @@ internal fun PostCardContent(
             markAsRead = markAsRead,
             markdownState = markdownState,
         )
-        BottomRow(post, modifier, interactions = interactions) {
-            bottomRowAction()
-        }
+        BottomRow(
+            post,
+            modifier,
+            interactions = interactions,
+            action = if (!showOpenButton) null else {
+                {
+                    OpenThreadButton(openPost)
+                }
+            }
+        )
+
     }
 }
 
-@Preview()
+@Preview
 @Composable
 internal fun PostCardPreview() {
     val viewModel: DummyInteraction = viewModel()
@@ -154,11 +159,7 @@ internal fun PostCardPreview() {
             canStartVideo = false,
             read = false,
             interactions = viewModel,
-        ) {
-            OpenThreadButton(
-                onClick = {}
-            )
-        }
+        )
     }
 }
 

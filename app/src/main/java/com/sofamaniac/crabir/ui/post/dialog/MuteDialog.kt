@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MuteDialog(post: PostData, onClick: () -> Unit) {
+fun MuteDialog(post: PostData, onDismissRequest: () -> Unit, onClick: () -> Unit) {
     val context = LocalContext.current
     val settingsDataStore = remember(context) { context.filtersDataStore }
     val scope = rememberCoroutineScope()
@@ -36,7 +36,7 @@ fun MuteDialog(post: PostData, onClick: () -> Unit) {
     val subreddit = post.subreddit.name
     val flair = post.linkFlair.text
     val domain = post.url.toUri().host
-    BasicAlertDialog(onDismissRequest = onClick) {
+    BasicAlertDialog(onDismissRequest = onDismissRequest) {
         Card() {
             ListItem(
                 headlineContent = { Text(stringResource(R.string.mute_posts_from_user, username)) },
