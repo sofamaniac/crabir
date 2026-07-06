@@ -44,6 +44,8 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
+import com.sofamaniac.crabir.settings.post.InfoSettings
+import com.sofamaniac.crabir.settings.post.rememberPostsSettings
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import com.sofamaniac.crabir.ui.user.ProfileTabs
@@ -55,9 +57,29 @@ fun PostHeader(
     modifier: Modifier = Modifier,
     showSubredditIcon: Boolean = true,
     showPrefix: Boolean = false,
+    settings: InfoSettings = rememberPostsSettings().infoSettings,
 ) {
     val navController = LocalNavController.current
     val theme = LocalTheme.current
+    val iconSize = 16.dp
+    val density = LocalDensity.current
+    val iconSizeSp = with(density) { iconSize.toSp() }
+    val inlineContent = mapOf(
+        "crosspost" to InlineTextContent(
+            Placeholder(
+                iconSizeSp,
+                iconSizeSp,
+                placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+            )
+        ) {
+            Icon(
+                Icons.Outlined.Shuffle,
+                contentDescription = "Crosspost",
+                modifier = Modifier.size(16.dp),
+                tint = Color.Green
+            )
+        },
+    )
     Row(
         modifier = modifier
             .fillMaxWidth(),
@@ -71,42 +93,56 @@ fun PostHeader(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .clickable(onClick = {
-                        navController?.navigate(SubredditRoute(post.subreddit.subredditPrefixed))
-                    })
+                    .clickable(
+                        enabled = settings.clickableCommunity,
+                        onClick = {
+                            navController?.navigate(SubredditRoute(post.subreddit.subredditPrefixed))
+                        }
+                    )
             )
             Spacer(modifier = Modifier.width(4.dp))
         }
         val text = buildAnnotatedString {
-            withLink(
-                LinkAnnotation.Clickable(
-                    tag = "Subreddit",
-                    styles = TextLinkStyles(style = SpanStyle(color = theme.highlight)),
-                    linkInteractionListener = {
-                        navController?.navigate(SubredditRoute(post.subreddit.subredditPrefixed))
-                    })
-            ) {
+            fun AnnotatedString.Builder.appendCommunity() {
                 append(
                     if (showPrefix) post.subreddit.subredditPrefixed
                     else post.subreddit.name
                 )
             }
-            withSeparator {
+            if (settings.clickableCommunity) {
                 withLink(
                     LinkAnnotation.Clickable(
-                        tag = "User",
-                        styles = TextLinkStyles(style = SpanStyle(color = theme.secondaryText)),
+                        tag = "Subreddit",
+                        styles = TextLinkStyles(style = SpanStyle(color = theme.highlight)),
                         linkInteractionListener = {
-                            navController?.navigate(
-                                ProfileRoute(
-                                    post.author.username,
-                                    ProfileTabs.Overview
-                                )
-                            )
+                            navController?.navigate(SubredditRoute(post.subreddit.subredditPrefixed))
                         })
                 ) {
-                    append(post.author.username)
+                    appendCommunity()
                 }
+            } else {
+                appendCommunity()
+            }
+            if (settings.clickableAuthor && settings.showAuthor) {
+                withSeparator {
+                    withLink(
+                        LinkAnnotation.Clickable(
+                            tag = "User",
+                            styles = TextLinkStyles(style = SpanStyle(color = theme.secondaryText)),
+                            linkInteractionListener = {
+                                navController?.navigate(
+                                    ProfileRoute(
+                                        post.author.username,
+                                        ProfileTabs.Overview
+                                    )
+                                )
+                            })
+                    ) {
+                        append(post.author.username)
+                    }
+                }
+            } else if (settings.showAuthor) {
+                append(post.author.username)
             }
             if (post.kind != Kind.Self) {
                 withSeparator { append(post.domain) }
@@ -114,25 +150,6 @@ fun PostHeader(
             withSeparator { append(formatElapsedTimeLocalized(post.createdUtc)) }
             if (post.isCrosspost) appendInlineContent("crosspost", "crosspost")
         }
-        val iconSize = 16.dp
-        val density = LocalDensity.current
-        val iconSizeSp = with(density) { iconSize.toSp() }
-        val inlineContent = mapOf(
-            "crosspost" to InlineTextContent(
-                Placeholder(
-                    iconSizeSp,
-                    iconSizeSp,
-                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center
-                )
-            ) {
-                Icon(
-                    Icons.Outlined.Shuffle,
-                    contentDescription = "Crosspost",
-                    modifier = Modifier.size(16.dp),
-                    tint = Color.Green
-                )
-            },
-        )
         Text(
             text,
             inlineContent = inlineContent,
