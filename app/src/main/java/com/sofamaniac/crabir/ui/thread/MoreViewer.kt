@@ -2,7 +2,6 @@ package com.sofamaniac.crabir.ui.thread
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +32,7 @@ fun MoreViewer(
     ThemedCard(
         modifier = modifier
             .depthIndent(more.depth.coerceAtLeast(0)),
-        shape = RoundedCornerShape(0),
+        roundedCorners = false,
         onClick = {
             if (more.data.count > 0) {
                 viewModel.fetchMoreComments(more)

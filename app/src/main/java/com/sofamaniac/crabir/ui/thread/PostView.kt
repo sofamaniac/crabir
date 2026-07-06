@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.runtime.Composable
@@ -103,7 +102,7 @@ fun PostCard(
         .padding(bottom = 4.dp)
 
     ThemedCard(
-        shape = RoundedCornerShape(0),
+        roundedCorners = false,
         modifier = Modifier
             .fillMaxWidth()
     ) {

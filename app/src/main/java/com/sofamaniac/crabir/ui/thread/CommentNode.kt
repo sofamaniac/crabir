@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material3.HorizontalDivider
@@ -82,7 +81,7 @@ fun CommentContent(
     Column {
         if (comment.depth == 0) HorizontalDivider()
         ThemedCard(
-            shape = RoundedCornerShape(0),
+            roundedCorners = false,
             modifier = modifier
                 .fillMaxWidth()
                 .depthIndent(comment.depth.coerceAtLeast(0))

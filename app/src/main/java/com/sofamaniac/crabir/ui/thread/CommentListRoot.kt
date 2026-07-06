@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -71,7 +70,7 @@ fun CommentListRoot(
                 if (!comment.isNullOrBlank()) {
                     ThemedCard(
                         //modifier = modifier,
-                        shape = RoundedCornerShape(0),
+                        roundedCorners = false,
                         onClick = {
                             navController.navigate(PostRoute(postPermalink = viewModel.permalink))
                         }
@@ -90,7 +89,7 @@ fun CommentListRoot(
                 if (!comment.isNullOrBlank() && context == null) {
                     ThemedCard(
                         //modifier = modifier,
-                        shape = RoundedCornerShape(0),
+                        roundedCorners = false,
                         onClick = {
                             navController.navigate(
                                 PostRoute(
@@ -147,34 +146,6 @@ fun CommentListRoot(
                     is CommentType.More -> MoreNode(comment, viewModel)
                 }
             }
-//            replies(
-//                comments, viewModel,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .background(color = theme.cardBackground)
-//            )
-//            items(comments.size, key = { index -> comments[index].name }) { index ->
-//                when (val comment = comments[index]) {
-//                    is CommentType.Comment -> CommentNode(
-//                        comment.comment,
-//                        viewModel,
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .background(color = theme.cardBackground)
-//                            .depthIndent(comment.depth.coerceAtLeast(0), color = Color.Gray)
-//                    )
-//
-//                    is CommentType.More -> MoreViewer(
-//                        comment,
-//                        viewModel,
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .background(color = theme.cardBackground)
-//                            .depthIndent(comment.depth, color = Color.Gray)
-//                    )
-//                }
-//                HorizontalDivider()
-//            }
             item {
                 Spacer(modifier = Modifier.fillParentMaxHeight(0.1f))
             }
@@ -182,16 +153,3 @@ fun CommentListRoot(
     }
 }
 
-//fun List<CommentType>.flattenComments(): List<CommentType> {
-//    val comments = emptyList<CommentType>().toMutableList()
-//    for (comment in this) {
-//        comments += comment
-//        if (comment is CommentType.Comment) {
-//            if (!comment.comment.collapsed) {
-//                comments += comment.comment.replies.flattenComments()
-//            }
-//        }
-//    }
-//    return comments
-//}
-//

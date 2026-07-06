@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalSnackBarHost
+import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostCreatorRoute
@@ -48,6 +49,7 @@ fun FullFeedView(
     val drawerState = LocalDrawerState.current
     val currentAccount = LocalRedditAccount.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val theme = LocalTheme.current
     CompositionLocalProvider(LocalSnackBarHost provides snackbarHostState) {
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -56,6 +58,7 @@ fun FullFeedView(
             },
         ) {
             Scaffold(
+                containerColor = theme.background,
                 snackbarHost = {
                     SnackbarHost(snackbarHostState)
                 },

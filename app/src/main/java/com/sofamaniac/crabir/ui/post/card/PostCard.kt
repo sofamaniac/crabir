@@ -3,7 +3,6 @@ package com.sofamaniac.crabir.ui.post.card
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -88,7 +87,7 @@ internal fun PostCardContent(
     bottomRowAction: @Composable () -> Unit,
 ) {
 
-    val settings = rememberViewSettings()
+    val viewSettings = rememberViewSettings()
     // We do not apply the padding on the column, but on each of its children except []
     // to have images that take the full width
     val modifier = Modifier
@@ -105,23 +104,23 @@ internal fun PostCardContent(
     }
     val markdownState by interactions.markdown.collectAsState()
     ThemedCard(
-        shape = RoundedCornerShape(0),
+        roundedCorners = viewSettings.cardSettings.roundedCorners,
         modifier = Modifier
             .fillMaxWidth(),
         onClick = openPost,
     ) {
         PostHeader(
             post,
-            showSubredditIcon = settings.cardSettings.showSubredditIcon,
+            showSubredditIcon = viewSettings.cardSettings.showSubredditIcon,
             modifier = modifier.padding(vertical = 8.dp),
-            showPrefix = settings.prefixCommunity
+            showPrefix = viewSettings.prefixCommunity
         )
         val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
         val likes by interactions.likes.collectAsState(post.relationship.liked)
         PostInfo(
             post,
             modifier = modifier,
-            enableThumbnail = enablePreview && settings.cardSettings.thumbnailForLinkPreview,
+            enableThumbnail = enablePreview && viewSettings.cardSettings.thumbnailForLinkPreview,
             likes = likes,
             read = read,
             markAsRead = markAsRead
@@ -129,10 +128,10 @@ internal fun PostCardContent(
         PostBody(
             post,
             canPlayVideo = canStartVideo,
-            enableFullHeightImage = settings.cardSettings.enableFullHeightImage,
-            enableTextPreview = settings.cardSettings.enableTextPreview && !post.spoiler,
-            maxLines = settings.cardSettings.maxLines,
-            enableLinkFullSizePreview = !settings.cardSettings.thumbnailForLinkPreview,
+            enableFullHeightImage = viewSettings.cardSettings.enableFullHeightImage,
+            enableTextPreview = viewSettings.cardSettings.enableTextPreview && !post.spoiler,
+            maxLines = viewSettings.cardSettings.maxLines,
+            enableLinkFullSizePreview = !viewSettings.cardSettings.thumbnailForLinkPreview,
             markAsRead = markAsRead,
             markdownState = markdownState,
         )

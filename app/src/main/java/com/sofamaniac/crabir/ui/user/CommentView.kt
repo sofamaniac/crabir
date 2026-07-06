@@ -2,8 +2,10 @@ package com.sofamaniac.crabir.ui.user
 
 import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mikepenz.markdown.model.State
@@ -35,11 +37,13 @@ import org.koin.core.parameter.parametersOf
 fun CommentView(
     thing: CommentData,
 ) {
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     Log.d("CommentView", "comment ${thing.body}")
     ThemedCard(
+        roundedCorners = false,
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.clickable {
-            navController.navigate(
+            navController?.navigate(
                 PostRoute(
                     thing.permalink,
                     comment = thing.id,
