@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,10 +26,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,6 +72,8 @@ fun SubredditViewer(
     val feedInfo by viewModel.info.collectAsState()
     val entity by viewModel.entity.collectAsState(null)
     val defaultView = rememberViewSettings().defaultView
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
     val topBar = @Composable {
         TopBar(
             feedInfo?.displayName ?: subreddit,
@@ -78,7 +83,8 @@ fun SubredditViewer(
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
             view = entity?.view ?: defaultView,
-            updateView = viewModel::updateView
+            updateView = viewModel::updateView,
+            openDrawer = { scope.launch { drawerState.open() } }
         )
     }
     val bottomBar = @Composable {
@@ -89,6 +95,7 @@ fun SubredditViewer(
         topBar, bottomBar, viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         filter = rememberPostsFilter(whitelistSubreddit = listOf(subreddit)),
+        drawerState = drawerState,
         feedInfo = feedInfo?.let { info ->
             {
                 SubredditInfo(info, viewModel)

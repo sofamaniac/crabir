@@ -14,6 +14,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -23,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.datastore.dataStore
+import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.settings.DataStoreJsonSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -286,6 +288,34 @@ fun rememberAppTheme(): CrabirTheme {
 }
 
 @Composable
+fun ConfigureCrabirTheme(content: @Composable () -> Unit) {
+    val context = LocalContext.current
+    val themeDataStore = remember(context) { context.themeDataStore }
+    val themeSettings by themeDataStore.data.collectAsState(
+        initial = null,
+    )
+    val mode = when (themeSettings?.mode) {
+        ThemeMode.System, null -> if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
+        else -> themeSettings!!.mode
+    }
+    val crabirTheme = themeSettings?.currentTheme(mode) ?: DefaultDarkTheme
+    setSystemBarsColor()(mode, crabirTheme.toolbarBackground)
+    val theme = if ((themeSettings?.dynamicColor
+            ?: false) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    ) {
+        val colorScheme = MaterialTheme.colorScheme
+        CrabirTheme.fromColorScheme(colorScheme)
+    } else {
+        themeSettings?.currentTheme(mode) ?: DefaultDarkTheme
+    }
+    CompositionLocalProvider(LocalTheme provides theme) {
+        ConfigureMaterialTheme {
+            content()
+        }
+    }
+}
+
+@Composable
 fun setSystemBarsColor(): (ThemeMode, Color) -> Unit {
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
@@ -312,7 +342,7 @@ fun setSystemBarsColor(): (ThemeMode, Color) -> Unit {
 }
 
 @Composable
-fun ConfigureMaterialTheme(
+private fun ConfigureMaterialTheme(
     content: @Composable () -> Unit,
 ) {
 

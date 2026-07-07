@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.ui.subreddit
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ModalNavigationDrawer
@@ -18,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.LocalTheme
@@ -37,6 +37,7 @@ fun FullFeedView(
     bottomBar: @Composable () -> Unit,
     viewModel: FeedViewModelInterface<PostData>,
     modifier: Modifier = Modifier,
+    drawerState: DrawerState,
     filter: (PostData) -> Boolean = rememberPostsFilter(),
     feedInfo: (@Composable () -> Unit)? = null,
 ) {
@@ -46,7 +47,6 @@ fun FullFeedView(
 
     val communityEntity by viewModel.entity.collectAsState(initial = null)
     val navController = LocalNavController.current
-    val drawerState = LocalDrawerState.current
     val currentAccount = LocalRedditAccount.current
     val snackbarHostState = remember { SnackbarHostState() }
     val theme = LocalTheme.current
@@ -54,7 +54,7 @@ fun FullFeedView(
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
-                DrawerContent()
+                DrawerContent(drawerState)
             },
         ) {
             Scaffold(

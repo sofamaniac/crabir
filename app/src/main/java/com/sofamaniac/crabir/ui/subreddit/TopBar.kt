@@ -38,7 +38,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
@@ -63,13 +62,13 @@ fun TopBar(
     disableInfo: Boolean = false,
     updateSort: (Sort, Timeframe?) -> Unit,
     refresh: () -> Unit,
+    openDrawer: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior?,
     view: Views,
     updateView: (Views) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val theme = LocalTheme.current
-    val drawerState = LocalDrawerState.current
     val navController = LocalNavController.current
 
     var showViewSelect by remember { mutableStateOf(false) }
@@ -100,9 +99,7 @@ fun TopBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = {
-                scope.launch { drawerState.open() }
-            }) { Icon(Icons.Default.Menu, "Open Drawer") }
+            IconButton(onClick = openDrawer) { Icon(Icons.Default.Menu, "Open Drawer") }
         },
         actions = {
             // Sort Dropdown

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,6 +32,7 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,7 +44,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.PreviewLocalComposition
 import com.sofamaniac.crabir.data.remote.dto.Thing
@@ -54,7 +55,6 @@ import com.sofamaniac.crabir.navigation.MultiRoute
 import com.sofamaniac.crabir.navigation.SettingsRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.filters.filtersDataStore
-import com.sofamaniac.crabir.settings.theme.ConfigureMaterialTheme
 import com.sofamaniac.crabir.settings.theme.ThemeMode
 import com.sofamaniac.crabir.settings.theme.themeDataStore
 import kotlinx.coroutines.flow.map
@@ -63,6 +63,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun DrawerContent(
+    drawerState: DrawerState,
     modifier: Modifier = Modifier,
     viewModel: DrawerViewModel = koinViewModel(),
 ) {
@@ -71,7 +72,6 @@ fun DrawerContent(
     val multis by viewModel.multis.collectAsState()
     val selectingAccount by viewModel.selectingAccount.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val drawerState = LocalDrawerState.current
     val loginState by viewModel.loginState.collectAsState()
 
     val snackbarHostState = LocalSnackBarHost.current
@@ -81,7 +81,8 @@ fun DrawerContent(
         }
     }
 
-    DrawerContentStateless(
+    DrawerContent(
+        drawerState = drawerState,
         sortedSubscriptions = sortedSubscriptions,
         multis = multis,
         onFeedClick = { feed ->
@@ -133,15 +134,15 @@ fun DrawerContent(
 }
 
 @Composable
-internal fun DrawerContentStateless(
+internal fun DrawerContent(
     sortedSubscriptions: List<Thing.Subreddit>,
+    drawerState: DrawerState,
     multis: List<Thing.Multi>,
     onFeedClick: (FeedButtons) -> Unit,
     onMultiClick: (Thing.Multi) -> Unit,
     onSubredditClick: (Thing.Subreddit) -> Unit,
     accountSelector: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    drawerState: DrawerState = LocalDrawerState.current,
 ) {
     Log.d("DrawerContentStateless", "recompose ${drawerState.isClosed}")
     ModalDrawerSheet(drawerState = drawerState) {
@@ -157,19 +158,23 @@ internal fun DrawerContentStateless(
             item { HorizontalDivider() }
 
             items(FeedButtons.entries.toList()) { feed ->
-                NavigationDrawerItem(label = { Text(feed.name) }, icon = {
-                    Icon(
-                        feed.icon,
-                        contentDescription = feed.name,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }, selected = false, onClick = {
-                    onFeedClick(feed)
-                })
+                NavigationDrawerItem(
+                    label = { Text(feed.name) }, icon = {
+                        Icon(
+                            feed.icon,
+                            contentDescription = feed.name,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    },
+                    selected = false,
+                    onClick = {
+                        onFeedClick(feed)
+                    }
+                )
             }
             item { HorizontalDivider() }
             item { BlurTile() }
-            item { SettingsTile() }
+            item { SettingsTile(drawerState) }
             item { HorizontalDivider() }
             items(multis) { multi ->
                 MultiTile(multi) {
@@ -187,9 +192,8 @@ internal fun DrawerContentStateless(
 }
 
 @Composable
-fun SettingsTile() {
+private fun SettingsTile(drawerState: DrawerState) {
     val coroutineScope = rememberCoroutineScope()
-    val drawerState = LocalDrawerState.current
     val navController = LocalNavController.current
     val context = LocalContext.current
     val themeDataStore = remember { context.themeDataStore }
@@ -234,7 +238,7 @@ fun SettingsTile() {
 }
 
 @Composable
-fun BlurTile() {
+private fun BlurTile() {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val filtersDataStore = remember { context.filtersDataStore }
@@ -270,45 +274,44 @@ fun BlurTile() {
 @Composable
 private fun DrawerContentPreview() {
     PreviewLocalComposition {
-        ConfigureMaterialTheme {
-            DrawerContentStateless(
-                sortedSubscriptions = listOf(
-                    Thing.Subreddit(
-                        dummySubredditData().copy(
-                            displayName = "Kotlin",
-                            displayNamePrefixed = "r/Kotlin"
-                        )
-                    ),
-                    Thing.Subreddit(
-                        dummySubredditData().copy(
-                            displayName = "AndroidDev",
-                            displayNamePrefixed = "r/AndroidDev"
-                        )
+        DrawerContent(
+            drawerState = rememberDrawerState(DrawerValue.Closed),
+            sortedSubscriptions = listOf(
+                Thing.Subreddit(
+                    dummySubredditData().copy(
+                        displayName = "Kotlin",
+                        displayNamePrefixed = "r/Kotlin"
                     )
                 ),
-                multis = emptyList(),
-                onFeedClick = {},
-                onMultiClick = {},
-                onSubredditClick = {},
-                accountSelector = {
-                    AccountTile(
-                        account = RedditAccount.anonymous(),
-                        onClick = {},
-                        iconModifier = Modifier
-                            .size(48.dp)
-                            .padding(4.dp)
-                            .clip(CircleShape),
-                        badge = {
-                            Icon(
-                                Icons.Default.ArrowDropDown,
-                                contentDescription = null,
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
+                Thing.Subreddit(
+                    dummySubredditData().copy(
+                        displayName = "AndroidDev",
+                        displayNamePrefixed = "r/AndroidDev"
                     )
-                }
-            )
-        }
+                )
+            ),
+            multis = emptyList(),
+            onFeedClick = {},
+            onMultiClick = {},
+            onSubredditClick = {},
+            accountSelector = {
+                AccountTile(
+                    account = RedditAccount.anonymous(),
+                    onClick = {},
+                    iconModifier = Modifier
+                        .size(48.dp)
+                        .padding(4.dp)
+                        .clip(CircleShape),
+                    badge = {
+                        Icon(
+                            Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                )
+            }
+        )
     }
 }
 

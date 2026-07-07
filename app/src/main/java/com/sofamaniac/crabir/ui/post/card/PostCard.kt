@@ -102,11 +102,10 @@ internal fun PostCardContent(
     val context = LocalContext.current
     val connectionState = context.onWifiConnection
     val settings by interactions.linksSettings.collectAsState(initial = null)
-    if (settings == null) return
-    val canStartVideo = when (settings!!.autoPlayVideos) {
+    val canStartVideo = when (settings?.autoPlayVideos) {
         AutoPlayVideo.Always -> true
         AutoPlayVideo.Wifi -> connectionState && isMostVisible
-        AutoPlayVideo.Never -> false
+        else -> false
     }
     Log.d("PostCard", "canStartVideo: $canStartVideo")
     // We do not apply the padding on the column, but on each of its children except []

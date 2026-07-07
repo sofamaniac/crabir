@@ -24,11 +24,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.sofamaniac.crabir.LocalDrawerState
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.domain.repository.profile.ProfileSort
 import com.sofamaniac.crabir.ui.SortMenu
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -37,10 +35,10 @@ fun TopBar(
     user: String,
     userInfo: UserDTO?,
     modifier: Modifier = Modifier,
-    viewModel: ProfileFeedViewModel<*>?
+    viewModel: ProfileFeedViewModel<*>?,
+    openDrawer: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val drawerState = LocalDrawerState.current
     TwoRowsTopAppBar(
         scrollBehavior = scrollBehavior,
         modifier = modifier.background(Color.Transparent),
@@ -81,7 +79,7 @@ fun TopBar(
                 }
             }
         }, navigationIcon = {
-            IconButton(onClick = { scope.launch { drawerState.open() } }) {
+            IconButton(onClick = openDrawer) {
                 Icon(
                     Icons.Default.Menu, "Open Drawer"
                 )

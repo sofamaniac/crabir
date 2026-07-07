@@ -1,7 +1,9 @@
 package com.sofamaniac.crabir.ui.subreddit
 
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -41,17 +43,18 @@ fun MultiView(
     val info by viewModel.info.collectAsState()
     val entity by viewModel.entity.collectAsState(null)
     val defaultView = rememberViewSettings().defaultView
-    if (info == null) return
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val topBar = @Composable {
         TopBar(
-            info!!.displayName,
+            info?.displayName ?: "",
             params,
-            info!!.displayNamePrefixed,
+            info?.displayNamePrefixed ?: "",
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
             view = entity?.view ?: defaultView,
-            updateView = viewModel::updateView
+            updateView = viewModel::updateView,
+            openDrawer = { scope.launch { drawerState.open() } }
         )
     }
     val bottomBar = @Composable {
@@ -66,7 +69,8 @@ fun MultiView(
     }
     FullFeedView(
         topBar, bottomBar, viewModel,
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        drawerState = drawerState,
     )
 }
 

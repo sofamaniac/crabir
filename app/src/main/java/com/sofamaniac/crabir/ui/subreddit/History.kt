@@ -1,7 +1,9 @@
 package com.sofamaniac.crabir.ui.subreddit
 
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -44,11 +46,13 @@ fun HistoryViewer(
     val entity by viewModel.entity.collectAsState(null)
     val defaultView = rememberViewSettings().defaultView
     val params by viewModel.params.collectAsState()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val topBar = @Composable {
         TopBar(
             title,
             params,
             slug = HISTORY,
+            openDrawer = { scope.launch { drawerState.open() } },
             disableInfo = true,
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
@@ -68,7 +72,8 @@ fun HistoryViewer(
         topBar,
         bottomBar,
         viewModel,
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        drawerState = drawerState,
     )
 }
 
@@ -101,7 +106,7 @@ class HistoryRepository(
 
     override suspend fun getThings(
         after: Fullname,
-        params: FeedParams
+        params: FeedParams,
     ): PagedResponse<Fullname> {
         val timestamp = try {
             if (after.name.isBlank()) {

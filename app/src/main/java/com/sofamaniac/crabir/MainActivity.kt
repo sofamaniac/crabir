@@ -15,14 +15,10 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -55,8 +51,7 @@ import com.sofamaniac.crabir.navigation.postGraph
 import com.sofamaniac.crabir.navigation.profileGraph
 import com.sofamaniac.crabir.navigation.settingsGraph
 import com.sofamaniac.crabir.navigation.subredditGraph
-import com.sofamaniac.crabir.settings.theme.ConfigureMaterialTheme
-import com.sofamaniac.crabir.settings.theme.rememberAppTheme
+import com.sofamaniac.crabir.settings.theme.ConfigureCrabirTheme
 import com.sofamaniac.crabir.ui.InboxView
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
@@ -67,10 +62,8 @@ import com.sofamaniac.crabir.ui.subreddit.HomeViewer
 import com.sofamaniac.crabir.ui.subredditList.SubredditListViewer
 import me.saket.telephoto.zoomable.coil3.ZoomableAsyncImage
 import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
 import org.koin.core.annotation.KoinApplication
 import org.koin.core.annotation.KoinViewModelScopeApi
-import org.koin.core.logger.Level
 import org.koin.core.option.viewModelScopeFactory
 import org.koin.plugin.module.dsl.startKoin
 
@@ -81,9 +74,8 @@ class CrabirApp : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin<CrabirApp> {
-            androidLogger(Level.DEBUG)
+            //androidLogger(Level.DEBUG)
             androidContext(this@CrabirApp)
-            //            modules(appModule)
             options(viewModelScopeFactory())
         }
     }
@@ -147,25 +139,14 @@ fun MainScreen(
             VideoPlayerManager.releasePlayer()
         }
     }
-    val drawerState = rememberDrawerState(DrawerValue.Closed, confirmStateChange = {
-        Log.d("DrawerState", "Trying to change drawer state to $it")
-        true
-    })
     val currentAccount = rememberCurrentAccount()
     if (currentAccount.isUninitialized()) {
         Log.d("MainScreen", "User is uninit")
         return
     }
-    ConfigureMaterialTheme {
-        val theme = rememberAppTheme()
-        if (theme == null) {
-            Log.d("MainScreen", "Theme is null")
-            return@ConfigureMaterialTheme
-        }
+    ConfigureCrabirTheme {
         CompositionLocalProvider(
             LocalNavController provides navController,
-            LocalTheme provides theme,
-            LocalDrawerState provides drawerState,
             LocalRedditAccount provides currentAccount,
         ) {
             LaunchedEffect(currentAccount) {
@@ -194,8 +175,8 @@ fun NavigationGraph(
         modifier = modifier
             .fillMaxSize()
             .imePadding(),
-        enterTransition = { EnterTransition.None },
-        exitTransition = { ExitTransition.None },
+        //        enterTransition = { EnterTransition.None },
+        //        exitTransition = { ExitTransition.None },
     ) {
         composable<HomeRoute> {
             HomeViewer()

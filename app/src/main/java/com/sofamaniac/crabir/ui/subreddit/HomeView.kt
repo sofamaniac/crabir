@@ -4,8 +4,10 @@
 
 package com.sofamaniac.crabir.ui.subreddit
 
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -41,6 +43,7 @@ fun HomeViewer(
     val params by viewModel.params.collectAsState()
     val entity by viewModel.entity.collectAsState(null)
     val defaultView = rememberViewSettings().defaultView
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val topBar = @Composable {
         TopBar(
             title,
@@ -51,7 +54,8 @@ fun HomeViewer(
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
             updateView = viewModel::updateView,
-            view = entity?.view ?: defaultView
+            view = entity?.view ?: defaultView,
+            openDrawer = { scope.launch { drawerState.open() } }
         )
     }
     val bottomBar = @Composable {
@@ -66,7 +70,8 @@ fun HomeViewer(
         bottomBar,
         viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        feedInfo = null
+        feedInfo = null,
+        drawerState = drawerState,
     )
 
 }
