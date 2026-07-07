@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.media.videoPlayer
 
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -62,15 +63,20 @@ fun DecoratedVideoPlayer(
     val currentUrl by VideoPlayerManager.currentUrl.collectAsState()
     val currentKey by VideoPlayerManager.currentKey.collectAsState()
     val hasFirstFrame by VideoPlayerManager.hasFirstFrame.collectAsState()
+    var startPlaying by remember { mutableStateOf(startPlaying) }
 
     val showDecoration = !hasFirstFrame || !startPlaying || currentKey != key
 
 
     LaunchedEffect(startPlaying) {
+        Log.d("DecoratedVideoPlayer", "startPlaying: $startPlaying")
         if (startPlaying) {
             VideoPlayerManager.setMediaItem(media.url, key)
             player.playWhenReady = true
             player.volume = if (startMuted) 0f else 1f
+        } else {
+            player.playWhenReady = false
+            player.stop()
         }
     }
 
@@ -105,6 +111,7 @@ fun DecoratedVideoPlayer(
         if (clickable) {
             mod.clickable {
                 VideoPlayerManager.setMediaItem(media.url, key)
+                startPlaying = true
                 showControls = !showControls
             }
         } else {

@@ -61,9 +61,8 @@ fun ThreadView(
         ?: LocalNavController.current?.currentBackStackEntry?.toRoute<PostRoute>()?.postPermalink
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    val viewModel: ThreadViewModel = koinViewModel {
+    val viewModel: ThreadViewModel = koinViewModel(key = permalink) {
         // TODO user setting initial sort
-        // TODO remember last set sort
         parametersOf(link!!, comment, context, null)
     }
     val showReplySheet by viewModel.reply.collectAsState()

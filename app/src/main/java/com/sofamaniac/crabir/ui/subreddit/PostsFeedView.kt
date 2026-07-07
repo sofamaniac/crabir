@@ -203,7 +203,7 @@ fun PostView(
         Views.Card -> PostCard(
             thing,
             markAsRead = markAsRead,
-            canStartVideo = isMostVisible,
+            isMostVisible = isMostVisible,
             read = read,
             showHidden = showHidden,
             viewModel = viewModel,

@@ -13,6 +13,9 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
+import com.sofamaniac.crabir.settings.post.LinksSettings
+import com.sofamaniac.crabir.settings.post.PostSettingsDefaults
+import com.sofamaniac.crabir.settings.post.PostSettingsRepository
 import com.sofamaniac.crabir.ui.votable.VotableInteraction
 import com.sofamaniac.crabir.ui.votable.VotableViewModel
 import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
@@ -21,6 +24,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -30,6 +34,7 @@ import org.koin.core.annotation.KoinViewModel
 interface LinkInteraction : VotableInteraction {
     val post: Flow<PostData?>
     val flairs: StateFlow<List<FlairInfo>>
+    val linksSettings: Flow<LinksSettings>
     fun hide()
 
     fun unhide()
@@ -57,6 +62,7 @@ open class LinkViewModel(
     @InjectedParam initialPost: PostData,
     private val posts: LinksRepository,
     private val history: VisitedPostsDao,
+    private val settings: PostSettingsRepository,
 ) : VotableViewModel<PostData>(
     initialPost.name.name,
     initialPost.subreddit.name,
@@ -65,6 +71,7 @@ open class LinkViewModel(
 ),
     PostViewModelInterface {
 
+    override val linksSettings: Flow<LinksSettings> = settings.postSettings.map { it.linksSettings }
     override val post = posts.get(initialPost.name).map { it ?: initialPost }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
@@ -148,6 +155,8 @@ interface PostViewModelInterface : LinkInteraction
 class DummyInteraction(post: PostData = DUMMY_POST) : PostViewModelInterface, ViewModel() {
     private var _post = MutableStateFlow(post.copy(kind = Kind.Self))
     override val post: StateFlow<PostData> = _post
+    override val linksSettings: Flow<LinksSettings> =
+        flowOf(PostSettingsDefaults.defaultLinksSettings)
     override val flairs: StateFlow<List<FlairInfo>> = MutableStateFlow(emptyList())
     override val markdown: StateFlow<State> =
         parseMarkdownFlow(

@@ -7,9 +7,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.dataStore
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.DataStoreJsonSerializer
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
+import org.koin.core.annotation.Singleton
 
 @Serializable
 data class AwardSettings(
@@ -46,7 +49,15 @@ data class ButtonsSettings(
 enum class AutoPlayVideo {
     Always,
     Wifi,
-    Never,
+    Never;
+
+    fun toStringResource(): Int {
+        return when (this) {
+            Always -> R.string.autoplay_always
+            Wifi -> R.string.autoplay_wifi
+            Never -> R.string.autoplay_never
+        }
+    }
 }
 
 @Serializable
@@ -118,4 +129,16 @@ fun rememberPostsSettings(): PostSettings {
         initial = PostSettingsDefaults.defaultPostSettings,
     )
     return postSettings
+}
+
+
+interface PostSettingsRepository {
+    val postSettings: Flow<PostSettings>
+}
+
+@Singleton(binds = [PostSettingsRepository::class])
+class PostSettingsRepositoryImpl(
+    private val context: Context,
+) : PostSettingsRepository {
+    override val postSettings: Flow<PostSettings> = context.postSettingsDataStore.data
 }

@@ -19,6 +19,7 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
+import com.sofamaniac.crabir.settings.post.PostSettingsRepository
 import com.sofamaniac.crabir.ui.post.PostViewModelInterface
 import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -42,6 +44,7 @@ class ThreadViewModel(
     private val visitedPostsDao: VisitedPostsDao,
     private val linksRepository: LinksRepository,
     private val accountsRepository: AccountsRepository,
+    private val postSettingsRepository: PostSettingsRepository,
     @InjectedParam val permalink: String,
     @InjectedParam val comment: String?,
     @InjectedParam val context: Int?,
@@ -52,6 +55,7 @@ class ThreadViewModel(
 
     val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
 
+    override val linksSettings = postSettingsRepository.postSettings.map { it.linksSettings }
     override val likes: Flow<Boolean?> = flowOf(null)
     override val saved: Flow<Boolean> = flowOf(false)
     override val rules: StateFlow<Rules>
@@ -158,6 +162,11 @@ class ThreadViewModel(
 
     private val _sort = MutableStateFlow<Sort?>(null)
     val sort: StateFlow<Sort?> = _sort.asStateFlow()
+
+    override fun onCleared() {
+        Log.d("ThreadViewModel", "onCleared: $name")
+        super.onCleared()
+    }
 
     init {
         _sort.value = initialSort

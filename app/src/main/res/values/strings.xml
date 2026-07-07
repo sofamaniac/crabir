@@ -109,4 +109,7 @@
     <string name="login_warning">If you cannot log in on the next page, try rotating your phone in landscape mode and close the cookie banner that appears behind the login prompt.</string>
     <string name="awards_settings_header">Awards</string>
     <string name="back">Go back</string>
+    <string name="autoplay_always">Always</string>
+    <string name="autoplay_wifi">When on Wifi</string>
+    <string name="autoplay_never">Never</string>
 </resources>

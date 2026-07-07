@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +43,7 @@ fun <T> ListSelector(
         Spacer(modifier = Modifier.size(24.dp))
     },
     headlineContent: @Composable () -> Unit = {},
-    optionLabel: @Composable (T) -> String = { it.toString() }
+    optionLabel: @Composable (T) -> String = { it.toString() },
 ) {
     ListItem(
         modifier = modifier,
@@ -67,10 +68,14 @@ internal fun <T> Menu(
     selected: T,
     onOptionSelected: (T) -> Unit,
     label: @Composable () -> Unit = {},
-    optionLabel: @Composable (T) -> String = { it.toString() }
+    optionLabel: @Composable (T) -> String = { it.toString() },
 ) {
     var expanded by remember { mutableStateOf(false) }
     val textFieldState = rememberTextFieldState(optionLabel(selected))
+    val text = optionLabel(selected)
+    LaunchedEffect(selected) {
+        textFieldState.setTextAndPlaceCursorAtEnd(text)
+    }
 
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
         TextField(

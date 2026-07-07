@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.settings.post
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -18,9 +19,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import kotlinx.coroutines.launch
@@ -56,6 +57,10 @@ fun PostSettingsPage() {
         update { it.copy(buttonsSettings = transform(it.buttonsSettings)) }
     }
 
+    fun updateLinksSettings(transform: (LinksSettings) -> LinksSettings) {
+        update { it.copy(linksSettings = transform(it.linksSettings)) }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Post Settings") }, navigationIcon = {
@@ -71,6 +76,8 @@ fun PostSettingsPage() {
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
             //awardsSettings(postSettings, ::updateAwardsSettings)
             flairSettings(postSettings.flairSettings, ::updateFlairSettings)
+            infoSettings(postSettings.infoSettings, ::updateInfoSettings)
+            linksSettings(postSettings.linksSettings, ::updateLinksSettings)
             buttonsSettings(postSettings.buttonsSettings, ::updateButtonsSettings)
         }
     }
@@ -93,7 +100,6 @@ fun LazyListScope.awardsSettings(
         )
     }
     item {
-        val theme = LocalTheme.current
         val enabled = postSettings.awardSettings.showAwards
         SwitchTile(
             headlineContent = {
@@ -106,6 +112,84 @@ fun LazyListScope.awardsSettings(
             onCheckedChange = { target ->
                 updateAwardsSettings { it.copy(clickableAwards = target) }
             }
+        )
+    }
+}
+
+fun LazyListScope.linksSettings(
+    linksSettings: LinksSettings,
+    updateLinksSettings: (transform: (LinksSettings) -> LinksSettings) -> Unit,
+) {
+    item {
+        SettingHeader("Links settings")
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text("Upvote on save") },
+            checked = linksSettings.upvoteOnSave,
+            onCheckedChange = { target ->
+                updateLinksSettings { it.copy(upvoteOnSave = target) }
+            },
+        )
+    }
+    item {
+        Log.d("LinksSettings", "linksSettings: ${linksSettings.autoPlayVideos}")
+        ListSelector(
+            AutoPlayVideo.entries,
+            headlineContent = { Text("Autoplay videos") },
+            selectedOption = linksSettings.autoPlayVideos,
+            onOptionSelected = { autoplay ->
+                updateLinksSettings { it.copy(autoPlayVideos = autoplay) }
+            },
+            optionLabel = {
+                stringResource(it.toStringResource())
+            }
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text("Start videos muted") },
+            checked = linksSettings.startMuted,
+            onCheckedChange = { target ->
+                updateLinksSettings { it.copy(startMuted = target) }
+            },
+        )
+    }
+}
+
+fun LazyListScope.infoSettings(
+    infoSettings: InfoSettings,
+    updateInfoSettings: (transform: (InfoSettings) -> InfoSettings) -> Unit,
+) {
+    item {
+        SettingHeader("Info settings")
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text("Show author") },
+            checked = infoSettings.showAuthor,
+            onCheckedChange = { target ->
+                updateInfoSettings { it.copy(showAuthor = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text("Tap on author to go to profile") },
+            enabled = infoSettings.showAuthor,
+            checked = infoSettings.clickableAuthor,
+            onCheckedChange = { target ->
+                updateInfoSettings { it.copy(clickableAuthor = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text("Show community") },
+            checked = infoSettings.clickableCommunity,
+            onCheckedChange = { target ->
+                updateInfoSettings { it.copy(clickableCommunity = target) }
+            },
         )
     }
 }

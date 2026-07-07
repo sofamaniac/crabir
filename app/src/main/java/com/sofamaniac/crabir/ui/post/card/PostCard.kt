@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.post.card
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -7,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -14,6 +16,8 @@ import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
+import com.sofamaniac.crabir.onWifiConnection
+import com.sofamaniac.crabir.settings.post.AutoPlayVideo
 import com.sofamaniac.crabir.settings.post.rememberPostsSettings
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.ThemedCard
@@ -46,9 +50,9 @@ fun PostCard(
     modifier: Modifier = Modifier,
     clickable: Boolean = true,
     markAsRead: () -> Unit = {},
-    canStartVideo: Boolean = false,
     read: Boolean = false,
     showHidden: Boolean = false,
+    isMostVisible: Boolean,
     viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = post.id) {
         parametersOf(
             post
@@ -66,24 +70,45 @@ fun PostCard(
         modifier,
         clickable,
         markAsRead,
-        canStartVideo = canStartVideo,
         read = read,
         interactions = viewModel,
+        isMostVisible = isMostVisible,
     )
 }
 
+//@Composable
+//internal fun canStartVideo(): Boolean {
+//    val autoplay = rememberPostsSettings().linksSettings.autoPlayVideos
+//    if (autoplay == AutoPlayVideo.Never) {
+//        return false
+//    }
+//    val context = LocalContext.current
+//    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+//    val netInfo = connectivityManager.allNetworks
+//}
+//
 @Composable
 internal fun PostCardContent(
     post: PostData,
     modifier: Modifier = Modifier,
     clickable: Boolean = true,
     markAsRead: () -> Unit = {},
-    canStartVideo: Boolean = false,
+    isMostVisible: Boolean = false,
     read: Boolean = false,
     interactions: LinkInteraction,
 ) {
 
     val viewSettings = rememberViewSettings()
+    val context = LocalContext.current
+    val connectionState = context.onWifiConnection
+    val settings by interactions.linksSettings.collectAsState(initial = null)
+    if (settings == null) return
+    val canStartVideo = when (settings!!.autoPlayVideos) {
+        AutoPlayVideo.Always -> true
+        AutoPlayVideo.Wifi -> connectionState && isMostVisible
+        AutoPlayVideo.Never -> false
+    }
+    Log.d("PostCard", "canStartVideo: $canStartVideo")
     // We do not apply the padding on the column, but on each of its children except []
     // to have images that take the full width
     val modifier = Modifier
@@ -156,7 +181,7 @@ internal fun PostCardPreview() {
             post,
             clickable = false,
             markAsRead = {},
-            canStartVideo = false,
+            isMostVisible = false,
             read = false,
             interactions = viewModel,
         )
