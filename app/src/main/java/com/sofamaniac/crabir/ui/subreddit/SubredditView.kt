@@ -90,17 +90,18 @@ fun SubredditViewer(
     val bottomBar = @Composable {
         TabBar(2)
     }
+    val feedInfoView = feedInfo?.let { info ->
+        @Composable {
+            SubredditInfo(info, viewModel)
+        }
+    }
 
     FullFeedView(
         topBar, bottomBar, viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         filter = rememberPostsFilter(whitelistSubreddit = listOf(subreddit)),
         drawerState = drawerState,
-        feedInfo = feedInfo?.let { info ->
-            {
-                SubredditInfo(info, viewModel)
-            }
-        }
+        feedInfo = feedInfoView
     )
 }
 

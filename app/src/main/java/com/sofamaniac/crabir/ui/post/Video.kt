@@ -66,14 +66,6 @@ fun PostVideo(
     goFullscreen: (Route) -> Unit
 ) {
     val video = getVideoUrl(post)
-    val blurStyle = crabirBlurStyle()
-    val placeholderModifier = Modifier.hazeEffect {
-        inputScale = HazeInputScale.Fixed(0.5f)
-        blurEffect {
-            style = blurStyle
-            blurEnabled = blur
-        }
-    }
     val placeholder =
         @Composable {
             val image = post.getObfuscated()
@@ -85,8 +77,17 @@ fun PostVideo(
                     contentScale = ContentScale.FillBounds
                 )
             } else {
+                val blurStyle = crabirBlurStyle()
+                val placeholderModifier = Modifier.hazeEffect {
+                    inputScale = HazeInputScale.Fixed(0.5f)
+                    blurEffect {
+                        style = blurStyle
+                        blurEnabled = blur
+                    }
+                }
                 ImageView(
-                    post = post, modifier = placeholderModifier.fillMaxSize(),
+                    post = post,
+                    modifier = placeholderModifier.fillMaxSize(),
                     allowTransformation = false,
                     contentScale = ContentScale.FillBounds,
                     quality = Quality.Medium,
@@ -142,7 +143,7 @@ fun PostVideo(
     DecoratedVideoPlayer(
         video,
         key = key,
-        startPlaying = canPlayVideo && !blur,
+        autostart = canPlayVideo && !blur,
         placeholder = placeholder,
         clickable = !blur,
         modifier = modifier.clickable(enabled = blur) {

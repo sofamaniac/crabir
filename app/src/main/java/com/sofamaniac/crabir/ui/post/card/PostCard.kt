@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.post.card
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -107,9 +106,8 @@ internal fun PostCardContent(
         AutoPlayVideo.Wifi -> connectionState && isMostVisible
         else -> false
     }
-    Log.d("PostCard", "canStartVideo: $canStartVideo")
-    // We do not apply the padding on the column, but on each of its children except []
-    // to have images that take the full width
+    // We do not apply the padding on the column, but on each of its children except
+    // the body to have images that take the full width
     val modifier = Modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)

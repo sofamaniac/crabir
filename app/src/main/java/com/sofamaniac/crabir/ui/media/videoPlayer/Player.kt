@@ -52,7 +52,7 @@ fun DecoratedVideoPlayer(
         Text("Gif", modifier = Modifier.cartouche(GIF_CARTOUCHE_COLOR))
     },
     fullscreenButton: @Composable (() -> Unit)? = null,
-    startPlaying: Boolean = false,
+    autostart: Boolean = false,
     startMuted: Boolean = true,
     clickable: Boolean = true,
 ) {
@@ -63,20 +63,16 @@ fun DecoratedVideoPlayer(
     val currentUrl by VideoPlayerManager.currentUrl.collectAsState()
     val currentKey by VideoPlayerManager.currentKey.collectAsState()
     val hasFirstFrame by VideoPlayerManager.hasFirstFrame.collectAsState()
-    var startPlaying by remember { mutableStateOf(startPlaying) }
+    val loading = currentKey == key && !hasFirstFrame && player.playWhenReady
 
-    val showDecoration = !hasFirstFrame || !startPlaying || currentKey != key
+    val showDecoration = !hasFirstFrame || !player.playWhenReady || currentKey != key
 
-
-    LaunchedEffect(startPlaying) {
-        Log.d("DecoratedVideoPlayer", "startPlaying: $startPlaying")
-        if (startPlaying) {
+    LaunchedEffect(autostart) {
+        Log.d("DecoratedVideoPlayer", "key: $key, startPlaying: $autostart")
+        if (autostart) {
             VideoPlayerManager.setMediaItem(media.url, key)
             player.playWhenReady = true
             player.volume = if (startMuted) 0f else 1f
-        } else {
-            player.playWhenReady = false
-            player.stop()
         }
     }
 
@@ -91,7 +87,7 @@ fun DecoratedVideoPlayer(
                 cartouche?.invoke()
             }
         }
-        if (!hasFirstFrame && startPlaying) {
+        if (loading) {
             CircularProgressIndicator(
                 color = Color.White,
                 strokeWidth = 2.dp,
@@ -111,7 +107,7 @@ fun DecoratedVideoPlayer(
         if (clickable) {
             mod.clickable {
                 VideoPlayerManager.setMediaItem(media.url, key)
-                startPlaying = true
+                player.playWhenReady = true
                 showControls = !showControls
             }
         } else {
@@ -122,7 +118,7 @@ fun DecoratedVideoPlayer(
         modifier = modifier
     ) {
 
-        VideoPlayer(media, key, placeholder = placeholder, startPlaying = startPlaying)
+        VideoPlayer(media, key, placeholder = placeholder, startPlaying = autostart)
         val showFrame = currentUrl.checkEquality(media.url.toUri()) && currentKey == key
         if (showFrame && hasFirstFrame) {
             if (showControls) {

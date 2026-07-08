@@ -27,7 +27,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -50,7 +50,7 @@ import com.sofamaniac.crabir.ui.post.DummyInteraction
 import com.sofamaniac.crabir.ui.post.LinkViewModel
 import com.sofamaniac.crabir.ui.post.PostViewModelInterface
 import com.sofamaniac.crabir.ui.post.card.PostCard
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.distinctUntilChanged
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplicationPreview
 import org.koin.core.parameter.parametersOf
@@ -88,35 +88,28 @@ fun <T : VotableData> PostFeedViewer(
         }
     }
 
-    var mostVisibleItemIndex by remember { mutableIntStateOf(0) }
+    var mostVisibleItemKey: String? by remember { mutableStateOf(null) }
 
-    LaunchedEffect(listState) {
+    LaunchedEffect(listState, feedInfo) {
         snapshotFlow {
-            if (!listState.isScrollInProgress) {
-                listState.layoutInfo.visibleItemsInfo
-                    .maxByOrNull { item ->
-                        val itemTop = maxOf(item.offset.y, 0)
-                        val itemBottom =
-                            minOf(
-                                item.offset.y + item.size.height,
-                                listState.layoutInfo.viewportEndOffset
-                            )
-                        val visibleHeight = (itemBottom - itemTop).toFloat()
-                        visibleHeight / max(item.size.height, 1).toFloat()
-                    }?.index ?: 0
-            } else {
-                null
-            }
-        }
-            .filterNotNull()
+            listState.layoutInfo.visibleItemsInfo
+                .maxByOrNull { item ->
+                    // Compute the visible fraction for each item
+                    val itemTop = maxOf(item.offset.y, 0)
+                    val itemBottom =
+                        minOf(
+                            item.offset.y + item.size.height,
+                            listState.layoutInfo.viewportEndOffset
+                        )
+                    val visibleHeight = (itemBottom - itemTop).toFloat()
+                    visibleHeight / max(item.size.height, 1).toFloat()
+                }?.key as? String?
+        }.distinctUntilChanged()
             .collect { index ->
-                mostVisibleItemIndex = if (feedInfo != null) {
-                    index - 1
-                } else {
-                    index
-                }
+                mostVisibleItemKey = index as? String?
             }
     }
+    Log.d("PostFeedViewer", "mostVisibleItemIndex: $mostVisibleItemKey")
 
     val viewSettings = rememberViewSettings()
     val state = rememberPullToRefreshState()
@@ -166,8 +159,8 @@ fun <T : VotableData> PostFeedViewer(
                 }
             }
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
-                val isMostVisible = index == mostVisibleItemIndex
                 val post = posts[index]
+                val isMostVisible = mostVisibleItemKey == post?.id
                 if (post != null && filter(post)) {
                     itemView(post, isMostVisible)
                 }
