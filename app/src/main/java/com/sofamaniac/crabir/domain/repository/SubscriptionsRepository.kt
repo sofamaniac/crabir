@@ -61,7 +61,7 @@ class SubscriptionsRepository(
 
 
     private suspend fun <T : Thing> makeRequest(
-        request: suspend () -> Response<Listing<T>>
+        request: suspend () -> Response<Listing<T>>,
     ): PagedResponse<T> {
         val response = request()
         if (response.isSuccessful) {
@@ -87,9 +87,9 @@ class SubscriptionsRepository(
         var after: Fullname? = Fullname("")
         var subs: List<Subreddit> = emptyList()
         while (after != null) {
-            val response = getSubreddits(after)
-            after = response.data.lastOrNull()?.data?.name
-            subs = subs.plus(response.data)
+            val response = runCatching { getSubreddits(after) }.getOrNull()
+            after = response?.data?.lastOrNull()?.data?.name
+            subs = subs.plus(response?.data ?: emptyList())
         }
         Log.d(
             "SubscriptionsRepository",
@@ -103,7 +103,12 @@ class SubscriptionsRepository(
     }
 
     suspend fun loadMultis(): List<Thing.Multi> {
-        val response = api.getMultireddits()
+        val result = runCatching { api.getMultireddits() }
+        if (result.isFailure) {
+            Log.e("SubscriptionsRepository", "Error loading multis: ${result.exceptionOrNull()}")
+            return emptyList()
+        }
+        val response = result.getOrThrow()
         if (response.isSuccessful) {
             return response.body() ?: emptyList()
         } else {
