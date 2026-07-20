@@ -16,53 +16,51 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 object VideoPlayerManager {
-    private var player: ExoPlayer? = null
+    private lateinit var player: ExoPlayer
 
     private var _currentUrl: MutableStateFlow<Uri?> = MutableStateFlow(null)
 
-    var currentUrl: StateFlow<Uri?> = _currentUrl.asStateFlow()
-
     private var _currentKey: MutableStateFlow<String?> = MutableStateFlow(null)
     var currentKey: StateFlow<String?> = _currentKey.asStateFlow()
-    private var _hasFirstFrame = MutableStateFlow(false)
-    val hasFirstFrame = _hasFirstFrame.asStateFlow()
 
     private var _hasAudio = MutableStateFlow(false)
     val hasAudio = _hasAudio.asStateFlow()
 
-    fun getInstance(context: Context): ExoPlayer {
-        if (player == null) {
-            player = ExoPlayer.Builder(context).build().apply {
-                repeatMode = REPEAT_MODE_ONE
-                addListener(object : androidx.media3.common.Player.Listener {
-                    override fun onRenderedFirstFrame() {
-                        super.onRenderedFirstFrame()
-                        _hasFirstFrame.update { true }
-                    }
+    fun initialize(context: Context) {
+        player = ExoPlayer.Builder(context).build().apply {
+            repeatMode = REPEAT_MODE_ONE
+            addListener(object : androidx.media3.common.Player.Listener {
 
-                    override fun onTracksChanged(tracks: Tracks) {
-                        super.onTracksChanged(tracks)
-                        _hasAudio.update {
-                            tracks.groups.any { it.type == C.TRACK_TYPE_AUDIO }
-                        }
+                override fun onTracksChanged(tracks: Tracks) {
+                    super.onTracksChanged(tracks)
+                    _hasAudio.update {
+                        tracks.groups.any { it.type == C.TRACK_TYPE_AUDIO }
                     }
-                })
-            }
+                }
+            })
         }
-        return player!!
     }
 
-    fun setMediaItem(uri: String, key: String) {
+    fun getInstance(): ExoPlayer {
+        return player
+    }
+
+    fun setMediaItem(uri: String, key: String, playWhenReady: Boolean = true, volume: Float = 0f) {
         val newUri = uri.toUri()
         _currentKey.value = key
         if (_currentUrl.value.checkEquality(newUri)) {
+            player.apply {
+                this.playWhenReady = playWhenReady
+                this.volume = volume
+            }
             return
         }
         val mediaItem = MediaItem.fromUri(uri)
-        player?.apply {
+        player.apply {
             Log.d("VideoPlayerManager", "Setting media item $uri")
             setMediaItem(mediaItem)
-            _hasFirstFrame.update { false }
+            this.playWhenReady = playWhenReady
+            this.volume = volume
             prepare()
         }
         _currentUrl.update { newUri }
@@ -70,33 +68,32 @@ object VideoPlayerManager {
 
     fun releasePlayer() {
         stopPlayer()
-        player?.release()
-        player = null
+        player.release()
     }
 
     fun stopPlayer() {
         Log.d("VideoPlayerManager", "Stopping player")
-        player?.stop()
+        player.stop()
         _currentUrl.update { null }
-        _hasFirstFrame.update { false }
+        _currentKey.update { null }
     }
 
     fun setTrack(group: Tracks.Group, index: Int = 0) {
-        player?.trackSelectionParameters = player?.trackSelectionParameters
-            ?.buildUpon()
-            ?.setOverrideForType(TrackSelectionOverride(group.mediaTrackGroup, index))
-            ?.build() ?: return
+        player.trackSelectionParameters = player.trackSelectionParameters
+            .buildUpon()
+            .setOverrideForType(TrackSelectionOverride(group.mediaTrackGroup, index))
+            .build() ?: return
     }
 
     fun setAutoTrack() {
-        player?.trackSelectionParameters = player?.trackSelectionParameters
-            ?.buildUpon()
-            ?.clearOverrides()
-            ?.build() ?: return
+        player.trackSelectionParameters = player.trackSelectionParameters
+            .buildUpon()
+            .clearOverrides()
+            .build() ?: return
     }
 
     fun isAuto(): Boolean {
-        return player?.trackSelectionParameters?.overrides?.isEmpty() ?: true
+        return player.trackSelectionParameters.overrides?.isEmpty() ?: true
     }
 
 

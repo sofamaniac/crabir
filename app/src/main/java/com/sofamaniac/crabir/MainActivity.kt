@@ -23,11 +23,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
@@ -38,6 +44,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
+import coil3.ImageLoader
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.disk.DiskCache
+import coil3.memory.MemoryCache
+import coil3.memoryCacheMaxSizePercentWhileInBackground
+import coil3.util.DebugLogger
 import com.sofamaniac.crabir.navigation.HistoryRoute
 import com.sofamaniac.crabir.navigation.HomeRoute
 import com.sofamaniac.crabir.navigation.InboxRoute
@@ -133,10 +145,43 @@ fun MainScreen(
     navController: NavHostController,
 ) {
 
-    DisposableEffect(Unit) {
+    setSingletonImageLoaderFactory { context ->
+        ImageLoader.Builder(context).memoryCache {
+            MemoryCache.Builder().maxSizePercent(context, 0.25)
+                .build()
+        }.diskCache {
+            // 2go
+            DiskCache.Builder()
+                .maxSizeBytes(2 * 1024 * 1024).build()
+        }
+            .memoryCacheMaxSizePercentWhileInBackground(0.10) // 10% when backgrounded
+            .logger(DebugLogger())
+            .build()
+    }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(context) {
+        VideoPlayerManager.initialize(context)
+    }
+
+    val lifecycleOwner by rememberUpdatedState(LocalLifecycleOwner.current)
+    val player = VideoPlayerManager.getInstance()
+
+    DisposableEffect(lifecycleOwner) {
+        val lifecycle = lifecycleOwner.lifecycle
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_PAUSE -> player.pause()
+                Lifecycle.Event.ON_RESUME -> player.play()
+                Lifecycle.Event.ON_DESTROY -> VideoPlayerManager.releasePlayer()
+                else -> {}
+            }
+        }
+        lifecycle.addObserver(observer)
         onDispose {
             Log.d("MainScreen", "onDispose")
-            VideoPlayerManager.releasePlayer()
+            lifecycle.removeObserver(observer)
         }
     }
     val currentAccount = rememberCurrentAccount()

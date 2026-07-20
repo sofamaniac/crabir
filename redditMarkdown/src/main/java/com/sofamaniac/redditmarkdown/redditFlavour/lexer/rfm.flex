@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui.markdown.redditFlavour.lexer;
+package com.sofamaniac.crabir.redditMarkdown.lexer;
 
 import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourElementType;import org.intellij.markdown.MarkdownTokenTypes;
 import org.intellij.markdown.flavours.gfm.GFMTokenTypes;

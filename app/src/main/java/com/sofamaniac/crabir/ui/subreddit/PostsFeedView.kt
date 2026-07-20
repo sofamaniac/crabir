@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -77,8 +78,14 @@ fun <T : VotableData> PostFeedViewer(
 ) {
 
     val posts = viewModel.data.collectAsLazyPagingItems()
-    val listState = viewModel.listState
-
+    // Use another list state when they are no items.
+    // See https://issuetracker.google.com/issues/177245496#comment24
+    // This is necessary because when going back from another page,
+    // posts is at first empty and causes the list to lose its scroll state.
+    val listState = when (posts.itemCount) {
+        0 -> rememberLazyStaggeredGridState()
+        else -> viewModel.listState
+    }
 
     LaunchedEffect(posts.loadState.refresh) {
         if (posts.loadState.refresh is LoadState.NotLoading && viewModel.needScrollToTop) {
@@ -106,7 +113,7 @@ fun <T : VotableData> PostFeedViewer(
                 }?.key as? String?
         }.distinctUntilChanged()
             .collect { index ->
-                mostVisibleItemKey = index as? String?
+                mostVisibleItemKey = index
             }
     }
     Log.d("PostFeedViewer", "mostVisibleItemIndex: $mostVisibleItemKey")
@@ -137,10 +144,6 @@ fun <T : VotableData> PostFeedViewer(
             }
         }
     ) {
-        // Do not render the lazylist if there are no items
-        // This is necessary because when going back from another page,
-        // posts is at first empty and causes the list to lose its scroll state.
-        if (posts.itemCount == 0) return@PullToRefreshBox
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Fixed(viewSettings.defaultColumns),
             verticalItemSpacing = 8.dp,
@@ -160,8 +163,8 @@ fun <T : VotableData> PostFeedViewer(
             }
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
                 val post = posts[index]
-                val isMostVisible = mostVisibleItemKey == post?.id
                 if (post != null && filter(post)) {
+                    val isMostVisible = mostVisibleItemKey == post.id
                     itemView(post, isMostVisible)
                 }
             }
@@ -174,7 +177,6 @@ fun <T : VotableData> PostFeedViewer(
                 } else if (appendState is LoadState.Error) {
                     ThemedCard(modifier = Modifier.clickable { posts.retry() }) {
                         Text("Error while loading: ${appendState.error.localizedMessage}")
-                        Text("Click to retry")
                     }
                 }
             }

@@ -23,8 +23,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
@@ -51,7 +53,7 @@ fun CommentListRoot(
         modifier = modifier.fillMaxSize()
     ) {
         val comments by viewModel.comments.collectAsState()
-        val post by viewModel.post.collectAsState(initial = null)
+        val post by viewModel.post.collectAsState()
         if (post == null) return@PullToRefreshBox
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -76,7 +78,7 @@ fun CommentListRoot(
                         }
                     ) {
                         Text(
-                            "See full thread",
+                            stringResource(R.string.see_full_thread),
                             style = MaterialTheme.typography.titleSmall,
                             color = theme.highlight,
                             modifier = Modifier.padding(8.dp)
@@ -101,7 +103,7 @@ fun CommentListRoot(
                         }
                     ) {
                         Text(
-                            "Show full context",
+                            stringResource(R.string.show_full_context),
                             style = MaterialTheme.typography.titleSmall,
                             color = theme.highlight,
                             modifier = Modifier.padding(8.dp)
@@ -121,11 +123,12 @@ fun CommentListRoot(
                         Icon(Icons.AutoMirrored.Filled.Comment, contentDescription = null)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            "No comments",
+                            stringResource(R.string.no_comments),
                         )
                     }
                 }
             }
+            // If a comment is collapsed skip all following comment with greater depth
             var skipping: Int? = null
             for (comment in comments) {
                 if (skipping != null && comment.depth > skipping) continue

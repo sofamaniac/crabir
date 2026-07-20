@@ -24,12 +24,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.ContentFrame
-import androidx.media3.ui.compose.SURFACE_TYPE_TEXTURE_VIEW
+import androidx.media3.ui.compose.state.rememberPresentationState
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.ui.cartouche
@@ -58,21 +56,23 @@ fun DecoratedVideoPlayer(
 ) {
     var showControls by remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
-    val player = remember { VideoPlayerManager.getInstance(context) }
-    val currentUrl by VideoPlayerManager.currentUrl.collectAsState()
+    val player = remember { VideoPlayerManager.getInstance() }
     val currentKey by VideoPlayerManager.currentKey.collectAsState()
-    val hasFirstFrame by VideoPlayerManager.hasFirstFrame.collectAsState()
-    val loading = currentKey == key && !hasFirstFrame && player.playWhenReady
+    val presentationState = rememberPresentationState(player)
+    val isActive = currentKey == key
+    val loading = isActive && presentationState.coverSurface
 
-    val showDecoration = !hasFirstFrame || !player.playWhenReady || currentKey != key
+    val showDecoration = presentationState.coverSurface || !player.playWhenReady || !isActive
 
     LaunchedEffect(autostart) {
         Log.d("DecoratedVideoPlayer", "key: $key, startPlaying: $autostart")
         if (autostart) {
-            VideoPlayerManager.setMediaItem(media.url, key)
-            player.playWhenReady = true
-            player.volume = if (startMuted) 0f else 1f
+            VideoPlayerManager.setMediaItem(
+                media.url,
+                key,
+                playWhenReady = true,
+                volume = if (startMuted) 0f else 1f
+            )
         }
     }
 
@@ -106,9 +106,12 @@ fun DecoratedVideoPlayer(
             .aspectRatio(media.aspectRatio)
         if (clickable) {
             mod.clickable {
-                VideoPlayerManager.setMediaItem(media.url, key)
-                player.playWhenReady = true
-                showControls = !showControls
+                if (!isActive) {
+                    VideoPlayerManager.setMediaItem(media.url, key)
+                    player.playWhenReady = true
+                } else {
+                    showControls = !showControls
+                }
             }
         } else {
             mod
@@ -119,8 +122,7 @@ fun DecoratedVideoPlayer(
     ) {
 
         VideoPlayer(media, key, placeholder = placeholder, startPlaying = autostart)
-        val showFrame = currentUrl.checkEquality(media.url.toUri()) && currentKey == key
-        if (showFrame && hasFirstFrame) {
+        if (isActive && !presentationState.coverSurface) {
             if (showControls) {
                 PlayerControls(
                     fullscreenButton = fullscreenButton,
@@ -151,19 +153,19 @@ fun VideoPlayer(
     startPlaying: Boolean = false,
     mute: Boolean = true,
 ) {
-    val context = LocalContext.current
-    val player = remember { VideoPlayerManager.getInstance(context) }
-    val currentUrl by VideoPlayerManager.currentUrl.collectAsState()
-    val hasFirstFrame by VideoPlayerManager.hasFirstFrame.collectAsState()
-    val mediaUri = media.url.toUri()
+    val player = remember { VideoPlayerManager.getInstance() }
     val currentKey by VideoPlayerManager.currentKey.collectAsState()
+    val isActive = currentKey == key
 
 
     LaunchedEffect(startPlaying) {
         if (startPlaying) {
-            VideoPlayerManager.setMediaItem(media.url, key)
-            player.playWhenReady = true
-            if (mute) player.volume = 0f else player.volume = 1f
+            VideoPlayerManager.setMediaItem(
+                media.url,
+                key,
+                playWhenReady = true,
+                volume = if (mute) 0f else 1f
+            )
         }
     }
 
@@ -172,18 +174,17 @@ fun VideoPlayer(
             .fillMaxSize()
             .aspectRatio(media.aspectRatio)
     ) {
-        val showFrame = currentUrl.checkEquality(mediaUri) && currentKey == key
 
-        if (showFrame) {
+        if (isActive) {
             ContentFrame(
                 player = player,
-                surfaceType = SURFACE_TYPE_TEXTURE_VIEW,
+                //surfaceType = SURFACE_TYPE_TEXTURE_VIEW,
                 modifier = Modifier
                     .fillMaxSize()
-                    .align(Alignment.Center)
+                    .align(Alignment.Center),
+                shutter = { placeholder() }
             )
-        }
-        if (!hasFirstFrame || !showFrame) {
+        } else {
             placeholder()
         }
     }

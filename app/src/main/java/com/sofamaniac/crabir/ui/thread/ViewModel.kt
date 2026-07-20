@@ -70,7 +70,7 @@ class ThreadViewModel(
     //private var _comments = MutableStateFlow<List<CommentType>>(emptyList())
     //val comments: StateFlow<List<CommentType>> = _comments.asStateFlow()
     private var _post = MutableStateFlow<PostData?>(null)
-    override val post: Flow<PostData?> = _post.asStateFlow()
+    override val post: StateFlow<PostData?> = _post.asStateFlow()
     val comments = repository.comments
 
     @OptIn(ExperimentalCoroutinesApi::class)

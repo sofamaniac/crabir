@@ -10,9 +10,9 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.ui.media.SimpleFullscreenImage
+import com.sofamaniac.crabir.ui.media.videoPlayer.FullscreenVideo
 import com.sofamaniac.crabir.ui.post.FullscreenGallery
 import com.sofamaniac.crabir.ui.post.FullscreenImageView
-import com.sofamaniac.crabir.ui.post.FullscreenVideo
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 

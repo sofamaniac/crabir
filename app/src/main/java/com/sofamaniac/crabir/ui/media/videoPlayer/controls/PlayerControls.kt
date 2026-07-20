@@ -24,7 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
@@ -40,8 +39,7 @@ fun PlayerControls(
     modifier: Modifier = Modifier,
     fullscreenButton: @Composable (() -> Unit)? = null,
 ) {
-    val context = LocalContext.current
-    val player = VideoPlayerManager.getInstance(context)
+    val player = VideoPlayerManager.getInstance()
     var showQualityMenu by remember { mutableStateOf(false) }
     var currentTracks by remember { mutableStateOf(player.currentTracks) }
 

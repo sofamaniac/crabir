@@ -37,7 +37,7 @@ import kotlin.math.sign
 
 @Composable
 fun VerticalSwipeToDismiss(
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
     velocityThreshold: Float = 5000f,
     threshold: Float = 0.3f,

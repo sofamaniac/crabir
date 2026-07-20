@@ -112,4 +112,7 @@
     <string name="autoplay_always">Always</string>
     <string name="autoplay_wifi">When on Wifi</string>
     <string name="autoplay_never">Never</string>
+    <string name="see_full_thread">See full thread</string>
+    <string name="show_full_context">Show full context</string>
+    <string name="no_comments">No comments</string>
 </resources>
