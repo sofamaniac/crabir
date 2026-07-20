@@ -39,6 +39,7 @@ object VideoPlayerManager {
                 }
             })
         }
+        Log.d("VideoPlayerManager", "Initializing player")
     }
 
     fun getInstance(): ExoPlayer {

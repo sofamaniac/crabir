@@ -55,6 +55,8 @@ interface FeedViewModelInterface<T : VotableData> {
     fun visitPost(post: PostData, visitedBy: Int)
 
     fun isPostRead(post: PostData): Boolean
+
+    fun initialize()
 }
 
 object FeedViewModelInterfacePreview : FeedViewModelInterface<PostData> {
@@ -81,6 +83,8 @@ object FeedViewModelInterfacePreview : FeedViewModelInterface<PostData> {
     override fun isPostRead(post: PostData): Boolean {
         return false
     }
+
+    override fun initialize() {}
 }
 
 abstract class PostFeedViewModel<T : CommunityData>(
@@ -93,7 +97,11 @@ abstract class PostFeedViewModel<T : CommunityData>(
 
     override val entity: Flow<CommunityViewEntity?> = communityView.getCommunityFlow(displayName)
 
-    init {
+    private var initialized = false
+
+    override fun initialize() {
+        if (initialized) return
+        initialized = true
         viewModelScope.launch(Dispatchers.IO) {
             val e = entity.firstOrNull()
             Log.d("PostFeedViewModel", "init: $e")

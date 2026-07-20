@@ -27,10 +27,9 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -95,9 +94,8 @@ fun <T : VotableData> PostFeedViewer(
         }
     }
 
-    var mostVisibleItemKey: String? by remember { mutableStateOf(null) }
 
-    LaunchedEffect(listState, feedInfo) {
+    val mostVisibleItemKey by remember(listState) {
         snapshotFlow {
             listState.layoutInfo.visibleItemsInfo
                 .maxByOrNull { item ->
@@ -112,10 +110,28 @@ fun <T : VotableData> PostFeedViewer(
                     visibleHeight / max(item.size.height, 1).toFloat()
                 }?.key as? String?
         }.distinctUntilChanged()
-            .collect { index ->
-                mostVisibleItemKey = index
-            }
-    }
+    }.collectAsState(null)
+
+    //    var mostVisibleItemKey: String? by remember { mutableStateOf(null) }
+    //    LaunchedEffect(listState, feedInfo) {
+    //        snapshotFlow {
+    //            listState.layoutInfo.visibleItemsInfo
+    //                .maxByOrNull { item ->
+    //                    // Compute the visible fraction for each item
+    //                    val itemTop = maxOf(item.offset.y, 0)
+    //                    val itemBottom =
+    //                        minOf(
+    //                            item.offset.y + item.size.height,
+    //                            listState.layoutInfo.viewportEndOffset
+    //                        )
+    //                    val visibleHeight = (itemBottom - itemTop).toFloat()
+    //                    visibleHeight / max(item.size.height, 1).toFloat()
+    //                }?.key as? String?
+    //        }.distinctUntilChanged()
+    //            .collect { index ->
+    //                mostVisibleItemKey = index
+    //            }
+    //    }
     Log.d("PostFeedViewer", "mostVisibleItemIndex: $mostVisibleItemKey")
 
     val viewSettings = rememberViewSettings()

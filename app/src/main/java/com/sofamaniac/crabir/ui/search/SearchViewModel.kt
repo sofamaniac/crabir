@@ -161,6 +161,8 @@ class PostSearchViewModel(
             visitedPostsDao.getPost(post.name) != null
         }
     }
+
+    override fun initialize() {}
 }
 
 @KoinViewModel

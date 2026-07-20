@@ -206,6 +206,8 @@ abstract class ProfileFeedViewModel<T : VotableData>(
             visitedPostsDao.getPost(post.name) != null
         }
     }
+
+    override fun initialize() {}
 }
 
 interface SortProfileTab {

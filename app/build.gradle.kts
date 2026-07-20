@@ -31,6 +31,7 @@ android {
     compileSdk = 37
     defaultConfig {
         applicationId = "com.sofamaniac.crabir"
+        // Cannot run on < 26 because of formatElapsedTimeLocalized
         minSdk = 28
         targetSdk = 37
         versionCode = 13

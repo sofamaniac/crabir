@@ -28,7 +28,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.lifecycle.Lifecycle
@@ -47,6 +46,7 @@ import androidx.navigation.toRoute
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.disk.DiskCache
+import coil3.disk.directory
 import coil3.memory.MemoryCache
 import coil3.memoryCacheMaxSizePercentWhileInBackground
 import coil3.util.DebugLogger
@@ -125,12 +125,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        VideoPlayerManager.initialize(this)
         enableEdgeToEdge()
         setContent {
 
             navController = rememberNavController()
             uriHandler = LocalUriHandler.current
-
             // Setup nav controller
             MainScreen(navController = navController)
 
@@ -152,23 +152,18 @@ fun MainScreen(
         }.diskCache {
             // 2go
             DiskCache.Builder()
-                .maxSizeBytes(2 * 1024 * 1024).build()
+                .maxSizeBytes(2 * 1024 * 1024)
+                .directory(context.cacheDir.resolve("image_cache")).build()
         }
             .memoryCacheMaxSizePercentWhileInBackground(0.10) // 10% when backgrounded
             .logger(DebugLogger())
             .build()
     }
 
-    val context = LocalContext.current
-
-    LaunchedEffect(context) {
-        VideoPlayerManager.initialize(context)
-    }
 
     val lifecycleOwner by rememberUpdatedState(LocalLifecycleOwner.current)
-    val player = VideoPlayerManager.getInstance()
-
     DisposableEffect(lifecycleOwner) {
+        val player = VideoPlayerManager.getInstance()
         val lifecycle = lifecycleOwner.lifecycle
         val observer = LifecycleEventObserver { _, event ->
             when (event) {

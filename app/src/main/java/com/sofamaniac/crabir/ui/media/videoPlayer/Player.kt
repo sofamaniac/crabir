@@ -73,6 +73,8 @@ fun DecoratedVideoPlayer(
                 playWhenReady = true,
                 volume = if (startMuted) 0f else 1f
             )
+        } else if (isActive) {
+            player.pause()
         }
     }
 
@@ -100,23 +102,23 @@ fun DecoratedVideoPlayer(
         }
     }
 
-    val modifier = remember {
-        val mod = modifier
-            .fillMaxWidth()
-            .aspectRatio(media.aspectRatio)
-        if (clickable) {
-            mod.clickable {
-                if (!isActive) {
-                    VideoPlayerManager.setMediaItem(media.url, key)
-                    player.playWhenReady = true
-                } else {
-                    showControls = !showControls
+    val modifier = modifier
+        .fillMaxWidth()
+        .aspectRatio(media.aspectRatio)
+        .let { mod ->
+            if (clickable) {
+                mod.clickable {
+                    if (!isActive) {
+                        VideoPlayerManager.setMediaItem(media.url, key)
+                        player.playWhenReady = true
+                    } else {
+                        showControls = !showControls
+                    }
                 }
+            } else {
+                mod
             }
-        } else {
-            mod
         }
-    }
     Box(
         modifier = modifier
     ) {

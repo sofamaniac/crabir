@@ -102,7 +102,7 @@ internal fun PostCardContent(
     val connectionState = context.onWifiConnection
     val settings by interactions.linksSettings.collectAsState(initial = null)
     val canStartVideo = when (settings?.autoPlayVideos) {
-        AutoPlayVideo.Always -> true
+        AutoPlayVideo.Always -> isMostVisible
         AutoPlayVideo.Wifi -> connectionState && isMostVisible
         else -> false
     }

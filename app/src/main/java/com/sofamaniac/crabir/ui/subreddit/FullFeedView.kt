@@ -12,6 +12,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +42,9 @@ fun FullFeedView(
     filter: (PostData) -> Boolean = rememberPostsFilter(),
     feedInfo: (@Composable () -> Unit)? = null,
 ) {
+    LaunchedEffect(viewModel) {
+        viewModel.initialize()
+    }
     var showBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
     val scope = rememberCoroutineScope()
