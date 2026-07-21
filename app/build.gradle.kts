@@ -126,6 +126,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.core.splashscreen)
     //noinspection LoginCredentials
     implementation(libs.appauth)
     debugImplementation(libs.androidx.compose.ui.tooling)
