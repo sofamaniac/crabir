@@ -24,10 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,12 +69,7 @@ fun PostGallery(
         return
     }
 
-    var currentPage by rememberSaveable { mutableIntStateOf(0) }
-    val state = rememberPagerState(initialPage = currentPage, pageCount = { gallery.images.size })
-
-    LaunchedEffect(state.currentPage) {
-        currentPage = state.currentPage
-    }
+    val state = rememberPagerState(initialPage = 0, pageCount = { gallery.images.size })
 
     EmbeddedGallery(
         state,
@@ -86,7 +79,7 @@ fun PostGallery(
             .fillMaxSize()
             .aspectRatio(gallery.aspectRatio),
         goFullscreen = {
-            goFullscreen(FullscreenGalleryRoute(post.name))
+            goFullscreen(FullscreenGalleryRoute(post.name, page = state.currentPage))
         },
         canPlayVideo = canPlayVideo
     )
@@ -151,7 +144,7 @@ fun EmbeddedGallery(
                         blurBackground,
                         modifier = modifier
                             .fillMaxSize(),
-                        contentScale = ContentScale.FillBounds,
+                        contentScale = ContentScale.Crop,
                         contentDescription = null,
                     )
                 } else if (backgroundUrl != null) {
@@ -277,7 +270,7 @@ fun FullscreenGallery(
         showDecorations = !showDecorations
     }
     var showControls by remember { mutableStateOf(false) }
-    var enableDismiss by remember { mutableStateOf(false) }
+    var enableDismiss by remember { mutableStateOf(true) }
     LaunchedEffect(state.currentPage) {
         onPageChanged(state.currentPage)
         enableDismiss = true
@@ -336,8 +329,7 @@ fun FullscreenGallery(
                         allowTransformation = true,
                         onClick = onClick,
                         onZoomChange = { zoom ->
-                            Log.d("FullscreenGallery", "onZoomChange: $zoom")
-                            enableDismiss = zoom == 1f
+                            enableDismiss = zoom == 1f || zoom == 0f
                         }
                     )
 

@@ -33,6 +33,10 @@ sealed class Richtext() {
     ) : Richtext()
 
     @Serializable
+    @SerialName("hr")
+    class HorizontalRule() : Richtext()
+
+    @Serializable
     @SerialName("par")
     data class Paragraph(
         @SerialName("c") val children: List<Richtext>,

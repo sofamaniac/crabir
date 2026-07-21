@@ -1,13 +1,10 @@
 package com.sofamaniac.crabir.ui.media.image
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import coil3.ImageLoader
 import coil3.compose.AsyncImage
-import coil3.disk.DiskCache
-import coil3.memory.MemoryCache
 import com.sofamaniac.crabir.domain.model.MediaResource
 import me.saket.telephoto.zoomable.ZoomableState
 import me.saket.telephoto.zoomable.coil3.ZoomableAsyncImage
@@ -21,32 +18,49 @@ fun TransformableImage(
     enabled: Boolean = true,
     contentScale: ContentScale = ContentScale.Fit,
     zoomableState: ZoomableState,
+    onZoomChange: (Float) -> Unit = {},
     onClick: () -> Unit = {},
 ) {
-    val context = LocalContext.current
-    val imageLoader = ImageLoader.Builder(context).memoryCache {
-        MemoryCache.Builder().maxSizePercent(context, 0.25).build()
-    }.diskCache {
-        // 2go
-        DiskCache.Builder().maxSizeBytes(2 * 1024 * 1024).build()
-    }.build()
+    LaunchedEffect(zoomableState.contentTransformation.scale) {
+        onZoomChange(zoomableState.contentTransformation.scaleMetadata.userZoom)
+    }
+    TransformableImage(
+        source.url,
+        contentDescription,
+        modifier,
+        enabled,
+        contentScale,
+        zoomableState,
+        onClick
+    )
+}
+
+@Composable
+fun TransformableImage(
+    source: String,
+    contentDescription: String,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    contentScale: ContentScale = ContentScale.Fit,
+    zoomableState: ZoomableState,
+    onClick: () -> Unit = {},
+) {
     if (enabled) {
         ZoomableAsyncImage(
-            source.url,
+            source,
             contentDescription,
             modifier,
-            imageLoader = imageLoader,
+            //            imageLoader = ImageLoader.Builder(LocalContext.current).build(),
             state = rememberZoomableImageState(zoomableState),
             contentScale = contentScale,
             onClick = { onClick() },
         )
     } else {
         AsyncImage(
-            source.url,
+            source,
             contentDescription,
             modifier,
             contentScale = contentScale,
         )
     }
-
 }

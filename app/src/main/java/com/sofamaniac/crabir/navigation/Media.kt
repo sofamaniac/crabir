@@ -32,7 +32,7 @@ class FullscreenImageRoute(val post: Fullname) : Route
 class FullscreenVideoRoute(val post: Fullname) : Route
 
 @Serializable
-class FullscreenGalleryRoute(val post: Fullname) : Route
+class FullscreenGalleryRoute(val post: Fullname, val page: Int = 0) : Route
 fun NavGraphBuilder.imagesGraph(navController: NavController) {
     for (url in URLS) {
         Log.d("NavGraph", "registering $url/{url}")
@@ -89,6 +89,9 @@ fun NavGraphBuilder.imagesGraph(navController: NavController) {
         typeMap = mapOf(typeOf<Fullname>() to FullnameType)
     ) {
         val route = it.toRoute<FullscreenGalleryRoute>()
-        FullscreenGallery(route.post, dismiss = { navController.popBackStack() })
+        FullscreenGallery(
+            route.post,
+            initialPage = route.page,
+            dismiss = { navController.popBackStack() })
     }
 }

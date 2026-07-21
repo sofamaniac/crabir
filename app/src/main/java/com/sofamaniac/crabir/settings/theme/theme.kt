@@ -298,7 +298,8 @@ fun ConfigureCrabirTheme(content: @Composable () -> Unit) {
         ThemeMode.System, null -> if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
         else -> themeSettings!!.mode
     }
-    val crabirTheme = themeSettings?.currentTheme(mode) ?: DefaultDarkTheme
+    val crabirTheme = themeSettings?.currentTheme(mode)
+        ?: if (mode == ThemeMode.Dark) DefaultDarkTheme else DefaultLightTheme
     setSystemBarsColor()(mode, crabirTheme.toolbarBackground)
     val theme = if ((themeSettings?.dynamicColor
             ?: false) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
@@ -306,7 +307,7 @@ fun ConfigureCrabirTheme(content: @Composable () -> Unit) {
         val colorScheme = MaterialTheme.colorScheme
         CrabirTheme.fromColorScheme(colorScheme)
     } else {
-        themeSettings?.currentTheme(mode) ?: DefaultDarkTheme
+        crabirTheme
     }
     CompositionLocalProvider(LocalTheme provides theme) {
         ConfigureMaterialTheme {

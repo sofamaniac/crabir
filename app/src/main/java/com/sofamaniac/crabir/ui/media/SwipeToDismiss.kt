@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.IntOffset
@@ -42,6 +43,7 @@ fun VerticalSwipeToDismiss(
     velocityThreshold: Float = 5000f,
     threshold: Float = 0.3f,
     enabled: Boolean = true,
+    backgroundColor: Color = Color.Black,
     topBar: @Composable ColumnScope.() -> Unit = {},
     bottomBar: @Composable ColumnScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
@@ -68,7 +70,11 @@ fun VerticalSwipeToDismiss(
     var isDismissing by remember { mutableStateOf(false) }
     val themeMode = rememberThemeMode()
     DisposableEffect(theme.mode) {
-        updateBars(ThemeMode.Dark, Color.Black)
+        if (backgroundColor.luminance() > 0.5) {
+            updateBars(ThemeMode.Light, Color.White)
+        } else {
+            updateBars(ThemeMode.Dark, Color.Black)
+        }
         onDispose {
             updateBars(theme.mode, theme.currentTheme(themeMode).toolbarBackground)
         }
@@ -77,7 +83,7 @@ fun VerticalSwipeToDismiss(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color.Black)
+            .background(color = backgroundColor)
             .draggable(
                 enabled = enabled,
                 state = state,
@@ -101,6 +107,7 @@ fun VerticalSwipeToDismiss(
         Column(
             content = content,
             modifier = Modifier
+                .fillMaxSize()
                 .offset { IntOffset(0, offsetY.value.roundToInt()) }
         )
         Column(

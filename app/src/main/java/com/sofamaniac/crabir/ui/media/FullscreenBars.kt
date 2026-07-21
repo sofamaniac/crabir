@@ -5,9 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -61,7 +63,9 @@ fun ColumnScope.FullscreenTopBar(
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 4.dp)
+            modifier = Modifier
+                .padding(horizontal = 4.dp)
+                .height(IntrinsicSize.Min)
         ) {
             IconButton(onClick = { navController?.popBackStack() }) {
                 Icon(
@@ -101,7 +105,10 @@ fun ColumnScope.FullscreenBottomBar(
         label = "decoration animation"
     ) {
 
-        Column(verticalArrangement = Arrangement.Bottom) {
+        Column(
+            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier.height(IntrinsicSize.Min)
+        ) {
             title()
 
             Text(
