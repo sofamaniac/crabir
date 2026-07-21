@@ -62,7 +62,7 @@ fun rememberCurrentAccount(): RedditAccount {
 class CurrentAccountViewModel(accountsRepository: AccountsRepository) : ViewModel() {
     val account = accountsRepository.activeAccount.stateIn(
         viewModelScope,
-        started = SharingStarted.Lazily,
+        started = SharingStarted.Eagerly,
         RedditAccount.uninitialized(-2, AuthState())
     )
 }

@@ -8,6 +8,7 @@
 
 package com.sofamaniac.crabir
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Intent
 import android.os.Bundle
@@ -131,20 +132,16 @@ class MainActivity : ComponentActivity() {
 
             navController = rememberNavController()
             uriHandler = LocalUriHandler.current
-            // Setup nav controller
+            setImageLoader()
             MainScreen(navController = navController)
 
         }
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("ComposableNaming")
 @Composable
-fun MainScreen(
-    navController: NavHostController,
-) {
-
+fun setImageLoader() {
     setSingletonImageLoaderFactory { context ->
         ImageLoader.Builder(context).memoryCache {
             MemoryCache.Builder().maxSizePercent(context, 0.25)
@@ -159,7 +156,14 @@ fun MainScreen(
             .logger(DebugLogger())
             .build()
     }
+}
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreen(
+    navController: NavHostController,
+) {
 
     val lifecycleOwner by rememberUpdatedState(LocalLifecycleOwner.current)
     DisposableEffect(lifecycleOwner) {
@@ -180,19 +184,18 @@ fun MainScreen(
         }
     }
     val currentAccount = rememberCurrentAccount()
-    if (currentAccount.isUninitialized()) {
-        Log.d("MainScreen", "User is uninit")
-        return
-    }
     ConfigureCrabirTheme {
         CompositionLocalProvider(
             LocalNavController provides navController,
             LocalRedditAccount provides currentAccount,
         ) {
+
             LaunchedEffect(currentAccount) {
-                navController.navigate(HomeRoute) {
-                    popUpTo(0) { inclusive = true }
-                    //launchSingleTop = true
+                if (!currentAccount.isUninitialized()) {
+                    navController.navigate(HomeRoute) {
+                        popUpTo(0) { inclusive = true }
+                        //launchSingleTop = true
+                    }
                 }
             }
             NavigationGraph(
