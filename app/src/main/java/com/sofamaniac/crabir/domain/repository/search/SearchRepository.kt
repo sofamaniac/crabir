@@ -1,12 +1,12 @@
 package com.sofamaniac.crabir.domain.repository.search
 
+import androidx.paging.PagingSource
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
@@ -16,7 +16,7 @@ import org.koin.core.annotation.ViewModelScope
 @ViewModelScope
 class PostSearchRepository(
     private val api: RedditAPIService,
-    private val votableRepository: LinksRepository
+    private val votableRepository: LinksRepository,
 ) :
     ListingRepository<PostSearchParams, PostData>() {
     override fun thingToData(thing: Thing): PostData? {
@@ -32,9 +32,9 @@ class PostSearchRepository(
 
     override suspend fun getThings(
         after: Fullname,
-        params: PostSearchParams
-    ): PagedResponse<Fullname> {
-        if (params.query.length < 3) return PagedResponse()
+        params: PostSearchParams,
+    ): PagingSource.LoadResult<Fullname, Fullname> {
+        if (params.query.length < 3) return PagingSource.LoadResult.Page(emptyList(), null, null)
         return makeRequest {
             api.search(
                 subreddit = params.subreddit ?: "all",
@@ -59,9 +59,9 @@ class CommunitySearchRepository(private val api: RedditAPIService) :
 
     override suspend fun getThings(
         after: Fullname,
-        params: CommunitySearchParams
-    ): PagedResponse<Fullname> {
-        if (params.query.length < 3) return PagedResponse()
+        params: CommunitySearchParams,
+    ): PagingSource.LoadResult<Fullname, Fullname> {
+        if (params.query.length < 3) return PagingSource.LoadResult.Page(emptyList(), null, null)
         return makeRequest {
             api.searchSubreddits(
                 query = params.query,
@@ -84,9 +84,9 @@ class UserSearchRepository(private val api: RedditAPIService) :
 
     override suspend fun getThings(
         after: Fullname,
-        params: PostSearchParams
-    ): PagedResponse<Fullname> {
-        if (params.query.length < 3) return PagedResponse()
+        params: PostSearchParams,
+    ): PagingSource.LoadResult<Fullname, Fullname> {
+        if (params.query.length < 3) return PagingSource.LoadResult.Page(emptyList(), null, null)
         return makeRequest {
             api.search(
                 subreddit = params.subreddit ?: "all",

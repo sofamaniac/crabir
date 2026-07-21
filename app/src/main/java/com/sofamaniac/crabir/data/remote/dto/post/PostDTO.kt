@@ -27,6 +27,7 @@ import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Relationship
+import com.sofamaniac.crabir.domain.model.RichtextDocument
 import com.sofamaniac.crabir.domain.model.Score
 import com.sofamaniac.crabir.domain.model.Selftext
 import com.sofamaniac.crabir.domain.model.SubredditInfo
@@ -96,7 +97,7 @@ data class PostDTO(
 
     // Ban Info
     @Serializable(with = InstantAsFloatSerializer::class)
-    @SerialName("banned_at_utc") val bannedAtUtc: Instant = Instant.DISTANT_FUTURE,
+    @SerialName("banned_at_utc") val bannedAtUtc: Instant? = null,
     @SerialName("banned_by") val bannedBy: String? = null,
 
     // ================================================ //
@@ -137,6 +138,7 @@ data class PostDTO(
     // Selftext
     @SerialName("selftext") val selftextRaw: String = "",
     @SerialName("selftext_html") val selftextHtml: String? = null,
+    @SerialName("rtjson") val richtext: RichtextDocument = RichtextDocument(emptyList()),
 
     // Creation Info
     @SerialName("created") val created: Double = 0.0,
@@ -266,7 +268,8 @@ private fun PostDTO.toScore() = Score(
 
 private fun PostDTO.toSelftext() = Selftext(
     markdown = ParsedMarkdown(selftextRaw, mediaMetadata),
-    html = selftextHtml ?: ""
+    html = selftextHtml ?: "",
+    richtext = richtext
 )
 
 private fun PostDTO.toLinkFlair() = Flair(

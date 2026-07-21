@@ -19,11 +19,13 @@ import com.sofamaniac.crabir.domain.model.Flair
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.domain.model.Relationship
+import com.sofamaniac.crabir.domain.model.RichtextDocument
 import com.sofamaniac.crabir.domain.model.Score
 import com.sofamaniac.crabir.domain.model.SubredditInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import tech.mappie.api.ObjectMappie
+import java.util.Collections
 import kotlin.time.Instant
 
 @Serializable
@@ -41,6 +43,7 @@ data class CommentDTO(
     val body: String,
     @SerialName("body_html")
     val bodyHtml: String,
+    @SerialName("rtjson") val richtext: RichtextDocument = RichtextDocument(Collections.emptyList()),
     val depth: Int = -1,
     @SerialName("parent_id")
     val parentId: Fullname,
@@ -130,7 +133,7 @@ data class CommentDTO(
     val total_awards_received: Int = 0,
     val treatment_tags: List<String> = emptyList(),
     val unrepliable_reason: String? = null,
-    val user_reports: List<String> = emptyList()
+    val user_reports: List<String> = emptyList(),
 )
 
 object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {

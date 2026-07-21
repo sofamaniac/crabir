@@ -9,7 +9,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Selftext(
     val markdown: ParsedMarkdown,
-    val html: String
+    val html: String,
+    val richtext: RichtextDocument = RichtextDocument(emptyList()),
 ) {
 
     companion object {

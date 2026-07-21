@@ -5,12 +5,12 @@
 package com.sofamaniac.crabir.domain.repository.feed
 
 import android.util.Log
+import androidx.paging.PagingSource
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.SubscribeAction
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import org.koin.core.annotation.Singleton
@@ -94,9 +94,10 @@ class SubredditPostsRepository(
 
     override suspend fun getThings(
         after: Fullname,
-        params: FeedParams
-    ): PagedResponse<Fullname> {
-        val subreddit = currentSubreddit ?: return PagedResponse()
+        params: FeedParams,
+    ): PagingSource.LoadResult<Fullname, Fullname> {
+        val subreddit =
+            currentSubreddit ?: return PagingSource.LoadResult.Page(emptyList(), null, null)
         return makeRequest {
             api.getSubreddit(
                 subreddit = subreddit,

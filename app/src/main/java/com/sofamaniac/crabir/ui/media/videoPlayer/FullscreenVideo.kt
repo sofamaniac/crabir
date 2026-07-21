@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
@@ -65,6 +66,29 @@ fun FullscreenVideo(
         VideoPlayer(
             video,
             key = post.id,
+            startPlaying = true,
+            mute = false,
+            modifier = Modifier
+                .fillMaxSize()
+        )
+    }
+}
+
+@Composable
+fun FullscreenVideo(
+    url: String,
+    dismiss: () -> Unit,
+) {
+
+    val mediaResource = MediaResource(url, 1f, 1, 1)
+    VerticalSwipeToDismiss(
+        onDismiss = dismiss,
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        VideoPlayer(
+            mediaResource,
+            key = url,
             startPlaying = true,
             mute = false,
             modifier = Modifier

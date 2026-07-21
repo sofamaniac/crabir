@@ -5,7 +5,6 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PagedResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
@@ -31,16 +30,24 @@ abstract class ListingRepository<Params, Data : DataInterface> {
 
     abstract fun thingToData(thing: Thing): Data?
 
-    abstract suspend fun getThings(after: Fullname, params: Params): PagedResponse<Fullname>
+    abstract suspend fun getThings(
+        after: Fullname,
+        params: Params,
+    ): PagingSource.LoadResult<Fullname, Fullname>
 
 
     protected suspend fun <T : Thing> makeRequest(
-        request: suspend () -> Response<Thing.Listing<T>>
-    ): PagedResponse<Fullname> {
-        val response = request()
+        request: suspend () -> Response<Thing.Listing<T>>,
+    ): PagingSource.LoadResult<Fullname, Fullname> {
+        val response = try {
+            request()
+        } catch (e: Exception) {
+            Log.e("makeRequest", "Error making request", e)
+            return PagingSource.LoadResult.Error(e)
+        }
         if (response.isSuccessful) {
             val listing = response.body()
-            listing?.let {
+            if (listing != null) {
                 val things = listing.data.children
                     .filter { thing -> !_seenThings.contains(thing.name) }
                 things.forEach { data ->
@@ -52,16 +59,22 @@ abstract class ListingRepository<Params, Data : DataInterface> {
                 val thingsName = things.map { thing ->
                     thing.name
                 }
-                return PagedResponse(
+                return PagingSource.LoadResult.Page(
                     data = thingsName,
-                    after = it.data.after,
-                    total = it.size
+                    nextKey = listing.data.after,
+                    prevKey = null
+                )
+            } else {
+                return PagingSource.LoadResult.Page(
+                    data = emptyList(),
+                    nextKey = null,
+                    prevKey = null
                 )
             }
-            return PagedResponse()
+        } else {
+            Log.e("makeRequest", "Error making request : ${response.errorBody()}")
+            return PagingSource.LoadResult.Error(Exception("Error making request ${response.errorBody()}"))
         }
-        Log.e("makeRequest", "Error making request : ${response.errorBody()}")
-        return PagedResponse()
     }
 }
 
@@ -81,12 +94,18 @@ class ListingSource<Params, Data : DataInterface>(
         }
         try {
             val page = getThings(params.key!!)
+            if (page is LoadResult.Error) {
+                return LoadResult.Error(page.throwable)
+            }
+            if (page !is LoadResult.Page) {
+                return LoadResult.Error(Exception("Invalid load result"))
+            }
             val data = page.data.mapNotNull { id ->
                 repository.cache[id]
             }
             return LoadResult.Page(
                 prevKey = null,
-                nextKey = page.after,
+                nextKey = page.nextKey,
                 data = data
             )
         } catch (e: Exception) {
@@ -95,7 +114,7 @@ class ListingSource<Params, Data : DataInterface>(
 
     }
 
-    private suspend fun getThings(after: Fullname): PagedResponse<Fullname> {
+    private suspend fun getThings(after: Fullname): PagingSource.LoadResult<Fullname, Fullname> {
         return repository.getThings(after, params)
     }
 }

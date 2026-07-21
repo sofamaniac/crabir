@@ -12,6 +12,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.paging.PagingSource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
@@ -19,7 +20,6 @@ import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.local.entities.asVotableData
 import com.sofamaniac.crabir.data.remote.reddit.HISTORY
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
@@ -107,7 +107,7 @@ class HistoryRepository(
     override suspend fun getThings(
         after: Fullname,
         params: FeedParams,
-    ): PagedResponse<Fullname> {
+    ): PagingSource.LoadResult<Fullname, Fullname> {
         val timestamp = try {
             if (after.name.isBlank()) {
                 System.currentTimeMillis()
@@ -115,11 +115,7 @@ class HistoryRepository(
                 after.name.toLong()
             }
         } catch (e: NumberFormatException) {
-            return PagedResponse(
-                data = emptyList(),
-                after = null,
-                total = 0
-            )
+            return PagingSource.LoadResult.Error(e)
         }
         val entities =
             visitedPostsDao.getHistory(before = timestamp)
@@ -129,10 +125,10 @@ class HistoryRepository(
         val nextPage = entities.lastOrNull()?.let {
             visitedPostsDao.getPost(it.id)
         }
-        return PagedResponse(
-            data = entities.map { it.id },
-            after = nextPage?.id,
-            total = entities.size
+        return PagingSource.LoadResult.Page(
+            entities.map { it.id },
+            nextKey = nextPage?.id,
+            prevKey = null
         )
     }
 }

@@ -5,9 +5,9 @@
 package com.sofamaniac.crabir.domain.repository.profile
 
 import android.util.Log
+import androidx.paging.PagingSource
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.MixedRepository
 import com.sofamaniac.crabir.domain.repository.feed.MixedFeedRepository
@@ -21,8 +21,8 @@ class OverviewRepository(
 ) : MixedFeedRepository<ProfileFeedParams>() {
     override suspend fun getThings(
         after: Fullname,
-        params: ProfileFeedParams
-    ): PagedResponse<Fullname> {
+        params: ProfileFeedParams,
+    ): PagingSource.LoadResult<Fullname, Fullname> {
         return makeRequest {
             if (params.username == RedditAccount.ANONYMOUS) {
                 Log.w("OverviewRepository", "getPosts: User is anonymous")

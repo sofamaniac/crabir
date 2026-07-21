@@ -112,28 +112,6 @@ fun <T : VotableData> PostFeedViewer(
         }.distinctUntilChanged()
     }.collectAsState(null)
 
-    //    var mostVisibleItemKey: String? by remember { mutableStateOf(null) }
-    //    LaunchedEffect(listState, feedInfo) {
-    //        snapshotFlow {
-    //            listState.layoutInfo.visibleItemsInfo
-    //                .maxByOrNull { item ->
-    //                    // Compute the visible fraction for each item
-    //                    val itemTop = maxOf(item.offset.y, 0)
-    //                    val itemBottom =
-    //                        minOf(
-    //                            item.offset.y + item.size.height,
-    //                            listState.layoutInfo.viewportEndOffset
-    //                        )
-    //                    val visibleHeight = (itemBottom - itemTop).toFloat()
-    //                    visibleHeight / max(item.size.height, 1).toFloat()
-    //                }?.key as? String?
-    //        }.distinctUntilChanged()
-    //            .collect { index ->
-    //                mostVisibleItemKey = index
-    //            }
-    //    }
-    Log.d("PostFeedViewer", "mostVisibleItemIndex: $mostVisibleItemKey")
-
     val viewSettings = rememberViewSettings()
     val state = rememberPullToRefreshState()
     val theme = LocalTheme.current

@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.data.remote.interceptors.CountInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.ForceJsonInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.RateLimitInterceptor
@@ -13,6 +14,7 @@ import com.sofamaniac.crabir.data.remote.streamable.StreamableAPI
 import com.sofamaniac.crabir.data.remote.utils.URISerializer
 import com.sofamaniac.crabir.data.remote.utils.URLSerializer
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import net.openid.appauth.AuthorizationService
@@ -78,10 +80,12 @@ class NetworkModule {
     }
 
 
+    @OptIn(ExperimentalSerializationApi::class)
     @Singleton
     fun provideJson(): Json {
         return Json {
             ignoreUnknownKeys = true
+            exceptionsWithDebugInfo = BuildConfig.DEBUG
             isLenient = true
             coerceInputValues = true
             serializersModule = SerializersModule {

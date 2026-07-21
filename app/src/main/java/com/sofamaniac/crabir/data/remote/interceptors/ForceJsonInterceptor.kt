@@ -8,6 +8,8 @@ import okhttp3.Response
  * For legacy reasons, all JSON response bodies currently have <, >, and &
  * replaced with &lt;, &gt;, and &amp;, respectively.
  * If you wish to opt out of this behaviour, add a raw_json=1 parameter to your request.
+ *
+ * Also add rtj=all to all requests.
  */
 class ForceJsonInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -16,7 +18,9 @@ class ForceJsonInterceptor : Interceptor {
             .addHeader("Accept", "application/json")
             .build()
         val url = headerRequest.url.newBuilder()
-            .addQueryParameter("raw_json", "1").build()
+            .addQueryParameter("raw_json", "1")
+            .addQueryParameter("rtj", "all")
+            .build()
         val request = headerRequest.newBuilder().url(url).build()
         return chain.proceed(request)
     }

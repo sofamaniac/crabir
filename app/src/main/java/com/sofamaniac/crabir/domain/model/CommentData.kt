@@ -80,6 +80,7 @@ data class CommentData(
     val depth: Int,
     val bodyMd: ParsedMarkdown,
     val bodyHtml: String,
+    val richtext: RichtextDocument = RichtextDocument(emptyList()),
     val parentId: Fullname,
     val permalink: String,
     val replies: Int,
@@ -93,7 +94,7 @@ data class CommentData(
     val createdUtc: Instant,
     val edited: Instant?,
     val mediaMetadata: Map<String, MediaMetadata>,
-    val distinguished: String? = ""
+    val distinguished: String? = "",
 ) : VotableData {
     override val body: ParsedMarkdown = bodyMd
     override fun copy(relationship: Relationship?, score: Score?): CommentData =

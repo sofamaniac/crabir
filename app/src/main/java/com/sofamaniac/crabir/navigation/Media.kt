@@ -73,6 +73,18 @@ fun NavGraphBuilder.imagesGraph(navController: NavController) {
         val route = it.toRoute<FullscreenVideoRoute>()
         FullscreenVideo(route.post, dismiss = { navController.popBackStack() })
     }
+    composable(
+        route = "v.redd.it/{url}",
+        deepLinks = listOf(
+            navDeepLink { uriPattern = "v.redd.it/{url}" }
+        ),
+    ) {
+        val url = it.arguments?.getString("url")
+        Log.d("NavGraph", "Opening video: ${url}")
+        if (url != null) {
+            FullscreenVideo("https://v.redd.it/${url}") { navController.popBackStack() }
+        }
+    }
     composable<FullscreenGalleryRoute>(
         typeMap = mapOf(typeOf<Fullname>() to FullnameType)
     ) {

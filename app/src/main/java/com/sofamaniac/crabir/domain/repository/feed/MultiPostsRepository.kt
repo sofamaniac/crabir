@@ -1,8 +1,8 @@
 package com.sofamaniac.crabir.domain.repository.feed
 
+import androidx.paging.PagingSource
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import org.koin.core.annotation.ViewModelScope
 
@@ -20,8 +20,8 @@ class MultiPostsRepository(
     override suspend fun getThings(
         after: Fullname,
         params: FeedParams,
-    ): PagedResponse<Fullname> {
-        val subreddit = currentMulti ?: return PagedResponse()
+    ): PagingSource.LoadResult<Fullname, Fullname> {
+        val subreddit = currentMulti ?: return PagingSource.LoadResult.Page(emptyList(), null, null)
         return makeRequest {
             api.getMultireddit(
                 path = subreddit,

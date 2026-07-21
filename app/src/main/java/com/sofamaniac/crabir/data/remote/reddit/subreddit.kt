@@ -34,7 +34,7 @@ interface SubredditAPI {
     ): Response<Subreddit>
 
     /** Get the list of subreddits the user is subscribed to. */
-    @GET("/subreddits/mine/subscriber")
+    @GET("/subreddits/mine/subscriber.json")
     suspend fun getSubreddits(
         @Query("after") after: Fullname? = null,
         @Query("before") before: String? = null,
