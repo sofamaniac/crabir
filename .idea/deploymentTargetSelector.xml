@@ -46,12 +46,12 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="ExposedDropdownMenuSample">
+      <SelectionState runConfigName="TestRTJson">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-04-08T14:24:00.351285990Z">
+        <DropdownSelection timestamp="2026-07-20T13:11:03.861997950Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="Default" identifier="serial=pegasus:33473;connection=0174eb9b" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/sofamaniac/.android/avd/Medium_Phone_2.avd" />
             </handle>
           </Target>
         </DropdownSelection>

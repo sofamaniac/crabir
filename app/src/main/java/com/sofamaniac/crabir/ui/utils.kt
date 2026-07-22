@@ -4,16 +4,23 @@
 
 package com.sofamaniac.crabir.ui
 
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import dev.chrisbanes.haze.blur.HazeBlurStyle
+import dev.chrisbanes.haze.blur.HazeColorEffect
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import net.openid.appauth.AuthState
@@ -40,15 +47,17 @@ fun formatElapsedTimeLocalized(
     }
 }
 
-enum class SharedElementType {
-    Post,
-    Content,
-}
-
-data class SharedElementKey(val name: Fullname, val type: SharedElementType)
-
+@Composable
 fun crabirBlurStyle(): HazeBlurStyle {
-    return HazeBlurStyle(blurRadius = 40.dp, colorEffects = null, noiseFactor = 0f)
+    val theme = LocalTheme.current
+    return HazeBlurStyle(
+        blurRadius = 40.dp,
+        colorEffects = null,
+        noiseFactor = 0f,
+        fallbackColorEffect = HazeColorEffect.tint(
+            color = theme.cardBackground.copy(alpha = 0.2f)
+        )
+    )
 }
 
 @Composable
@@ -64,5 +73,22 @@ class CurrentAccountViewModel(accountsRepository: AccountsRepository) : ViewMode
         viewModelScope,
         started = SharingStarted.Eagerly,
         RedditAccount.uninitialized(-2, AuthState())
+    )
+}
+
+/** Make composable clickable while preventing touch event in children */
+fun Modifier.protectedTouch(onClick: () -> Unit): Modifier {
+    val pass = PointerEventPass.Initial
+    return this.then(
+        Modifier.pointerInput(pass) {
+            awaitEachGesture {
+                val down = awaitFirstDown(pass = pass)
+                down.consume()
+                val up = waitForUpOrCancellation(pass = pass)
+                if (up != null) {
+                    onClick()
+                }
+            }
+        }
     )
 }

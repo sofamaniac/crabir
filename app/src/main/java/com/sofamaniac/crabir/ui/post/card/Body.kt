@@ -8,14 +8,16 @@ import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
-import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
+import com.sofamaniac.crabir.ui.markdown.HeightRestrictedWithGradient
 import com.sofamaniac.crabir.ui.post.PostGallery
 import com.sofamaniac.crabir.ui.post.PostImage
 import com.sofamaniac.crabir.ui.post.PostVideo
 import com.sofamaniac.crabir.ui.post.StreamableVideo
 import com.sofamaniac.crabir.ui.post.YoutubeVideo
+import com.sofamaniac.crabir.ui.richtext.Richtext
 import com.mikepenz.markdown.model.State as MarkdownState
 
 @Composable
@@ -41,12 +43,21 @@ internal fun PostBody(
     val blur = post.spoiler || (post.over18 && filters.blurNSFW)
 
     val selftextView = @Composable {
-        RedditMarkdown(
-            markdownState,
-            maxLines = maxLines,
-            modifier = modifier.padding(horizontal = 16.dp),
-            key = post.name,
-        )
+        if (maxLines != null) {
+            HeightRestrictedWithGradient(
+                maxHeight = (24 * maxLines).dp,
+                modifier = modifier.padding(horizontal = 16.dp),
+                onClick = { goFullscreen(PostRoute(post.permalink)) }
+            ) {
+                Richtext(post.selftext.richtext, mediaMetadata = post.mediaMetadata)
+            }
+        } else {
+            Richtext(
+                post.selftext.richtext,
+                mediaMetadata = post.mediaMetadata,
+                modifier = modifier.padding(horizontal = 16.dp)
+            )
+        }
     }
     when (post.kind) {
         Kind.Image -> {

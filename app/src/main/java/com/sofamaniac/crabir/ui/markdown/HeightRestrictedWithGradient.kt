@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.ui.protectedTouch
 
 /**
  * A layout that restricts its content to [maxHeight]. When the content exceeds
@@ -40,6 +41,7 @@ fun HeightRestrictedWithGradient(
     maxHeight: Dp,
     modifier: Modifier = Modifier,
     gradientHeight: Dp = 64.dp,
+    onClick: () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     val theme = LocalTheme.current
@@ -49,7 +51,7 @@ fun HeightRestrictedWithGradient(
         object : MeasurePolicy {
             override fun MeasureScope.measure(
                 measurables: List<Measurable>,
-                constraints: Constraints
+                constraints: Constraints,
             ): MeasureResult {
                 val maxHeightPx = maxHeight.roundToPx()
                 val contentMeasurable = measurables[0]
@@ -86,7 +88,7 @@ fun HeightRestrictedWithGradient(
 
             override fun IntrinsicMeasureScope.minIntrinsicHeight(
                 measurables: List<IntrinsicMeasurable>,
-                width: Int
+                width: Int,
             ): Int {
                 val contentHeight = measurables[0].minIntrinsicHeight(width)
                 return minOf(contentHeight, maxHeight.roundToPx())
@@ -94,7 +96,7 @@ fun HeightRestrictedWithGradient(
 
             override fun IntrinsicMeasureScope.maxIntrinsicHeight(
                 measurables: List<IntrinsicMeasurable>,
-                width: Int
+                width: Int,
             ): Int {
                 val contentHeight = measurables[0].maxIntrinsicHeight(width)
                 return minOf(contentHeight, maxHeight.roundToPx())
@@ -102,14 +104,14 @@ fun HeightRestrictedWithGradient(
 
             override fun IntrinsicMeasureScope.minIntrinsicWidth(
                 measurables: List<IntrinsicMeasurable>,
-                height: Int
+                height: Int,
             ): Int {
                 return measurables[0].minIntrinsicWidth(height)
             }
 
             override fun IntrinsicMeasureScope.maxIntrinsicWidth(
                 measurables: List<IntrinsicMeasurable>,
-                height: Int
+                height: Int,
             ): Int {
                 return measurables[0].maxIntrinsicWidth(height)
             }
@@ -117,7 +119,9 @@ fun HeightRestrictedWithGradient(
     }
 
     Layout(
-        modifier = modifier.clipToBounds(),
+        modifier = modifier
+            .clipToBounds()
+            .protectedTouch(onClick),
         content = {
             // We wrap content in a Box to ensure it's treated as a single measurable
             Box { content() }

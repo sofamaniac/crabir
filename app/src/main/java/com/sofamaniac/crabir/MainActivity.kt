@@ -23,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
@@ -31,10 +32,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
+import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
@@ -135,10 +138,31 @@ class MainActivity : ComponentActivity() {
             navController = rememberNavController()
             uriHandler = LocalUriHandler.current
             setImageLoader()
-            MainScreen(navController = navController)
-
+            CompositionLocalProvider(
+                LocalUriHandler provides CrabirUriHandler(
+                    navController,
+                    uriHandler
+                )
+            ) {
+                MainScreen(navController = navController)
+            }
         }
     }
+}
+
+@Immutable
+data class CrabirUriHandler(val navController: NavController, val fallback: UriHandler) :
+    UriHandler {
+    override fun openUri(uri: String) {
+        try {
+            val request = NavDeepLinkRequest.Builder.fromUri(uri.toUri()).build()
+            navController.navigate(request)
+        } catch (_: IllegalArgumentException) {
+            Log.i("CrabirUriHandler", "could not open: $uri")
+            fallback.openUri(uri)
+        }
+    }
+
 }
 
 @SuppressLint("ComposableNaming")

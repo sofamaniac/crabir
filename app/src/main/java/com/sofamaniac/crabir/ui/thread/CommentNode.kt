@@ -49,7 +49,7 @@ import com.sofamaniac.crabir.ui.Flair
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
-import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
+import com.sofamaniac.crabir.ui.richtext.Richtext
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.SavedButton
@@ -174,11 +174,12 @@ fun ColumnScope.OpenedComment(
     Spacer(modifier = Modifier.height(8.dp))
     TopRow(comment, modifier = innerModifier)
     Spacer(modifier = Modifier.height(8.dp))
-    RedditMarkdown(
-        markdownState,
-        modifier = innerModifier,
-        key = comment.name,
-    )
+    Richtext(comment.richtext, modifier = innerModifier, mediaMetadata = comment.mediaMetadata)
+    //    RedditMarkdown(
+    //        markdownState,
+    //        modifier = innerModifier,
+    //        key = comment.name,
+    //    )
     Spacer(modifier = Modifier.height(8.dp))
     AnimatedVisibility(showBottomBar) {
         BottomRow(comment, viewModel)
