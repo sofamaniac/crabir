@@ -2,31 +2,23 @@ package com.sofamaniac.crabir.ui.votable
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.VotableRepository
-import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import com.mikepenz.markdown.model.State as MarkdownState
 
 interface VotableInteraction {
-    val likes: Flow<Boolean?>
-    val saved: Flow<Boolean>
+    val likes: StateFlow<Boolean?>
+    val saved: StateFlow<Boolean>
     val rules: StateFlow<Rules>
 
-    val markdown: StateFlow<MarkdownState>
     fun upvote(name: Fullname)
     fun downvote(name: Fullname)
     fun save(name: Fullname, target: Boolean)
@@ -51,23 +43,10 @@ open class VotableViewModel<T : VotableData>(
             initialValue = initialData
         )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-
-    override val markdown: StateFlow<MarkdownState> = if (initialData != null) {
-        parseMarkdownFlow(initialData.body.markdown, flavour = RedditFlavourDescriptor(true))
-    } else {
-        _post.flatMapLatest { post ->
-            if (post == null) flowOf(MarkdownState.Loading())
-            else parseMarkdownFlow(post.body.markdown, flavour = RedditFlavourDescriptor(true))
-        }
-    }.stateIn(
-        viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = MarkdownState.Loading()
-    )
-
     override val likes = _post.map { it?.relationship?.liked }
+        .stateIn(viewModelScope, SharingStarted.Lazily, initialData?.relationship?.liked)
     override val saved = _post.map { it?.relationship?.saved ?: false }
+        .stateIn(viewModelScope, SharingStarted.Lazily, initialData?.relationship?.saved ?: false)
 
     var _rules = MutableStateFlow(Rules())
     override val rules: StateFlow<Rules> = _rules

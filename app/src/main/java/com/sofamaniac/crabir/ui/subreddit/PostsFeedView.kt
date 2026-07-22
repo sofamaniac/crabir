@@ -193,7 +193,6 @@ fun PostView(
             thing,
             markAsRead = markAsRead,
             isMostVisible = isMostVisible,
-            read = read,
             showHidden = showHidden,
             viewModel = viewModel,
         )
@@ -202,7 +201,6 @@ fun PostView(
             thing,
             markAsRead = markAsRead,
             canStartVideo = isMostVisible,
-            read = read,
             showHidden = showHidden,
             viewModel = viewModel,
         )

@@ -218,7 +218,7 @@ internal fun CrosspostView(
             post,
             modifier = modifier,
             enableThumbnail = enablePreview && !post.isCrosspost,
-            likes = post.relationship.liked
+            likes = { post.relationship.liked }
         )
         Column {
             PostHeader(post, showSubredditIcon = false)
@@ -226,7 +226,7 @@ internal fun CrosspostView(
                 post,
                 modifier = modifier,
                 enableThumbnail = true,
-                likes = post.relationship.liked,
+                likes = { post.relationship.liked }
             )
         }
     }

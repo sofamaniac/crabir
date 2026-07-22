@@ -34,13 +34,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
@@ -127,6 +127,8 @@ class PostSearchViewModel(
     )
 
     override var needScrollToTop = false
+    private val history = visitedPostsDao.getHistoryFlow()
+        .stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList())
 
     fun setSubreddit(subreddit: String) {
         _params.update {
@@ -157,9 +159,7 @@ class PostSearchViewModel(
     }
 
     override fun isPostRead(post: PostData): Boolean {
-        return runBlocking(Dispatchers.IO) {
-            visitedPostsDao.getPost(post.name) != null
-        }
+        return history.value.contains(post.name)
     }
 
     override fun initialize() {}
@@ -205,15 +205,3 @@ class UserSearchViewModel(
             sort = PostSearchSort.Relevance
         )
 )
-
-//@HiltViewModel
-//class CommentSearchViewModel @Inject constructor(
-//    repository: CommentSearchRepository,
-//) : SearchViewModel<CommentData>(
-//    repository, initialParams =
-//        SearchParams(
-//            query = "",
-//            type = "comment",
-//            sort = CommunitySearchSort.Relevance
-//        )
-//)

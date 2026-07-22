@@ -34,7 +34,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.mikepenz.markdown.model.State
 import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentData
@@ -65,7 +64,6 @@ interface CommentViewModelInterface : VotableInteraction {
     fun replyTo(name: Fullname?)
     fun submitComment(parent: Fullname, body: String, account: RedditAccount?)
 
-    fun getMarkdownState(name: Fullname): StateFlow<State>
 }
 
 @Composable
@@ -166,7 +164,6 @@ fun ColumnScope.OpenedComment(
     val showBottomBar by remember(comment.name, context) {
         viewModel.openComment.map { it == comment.name || !enableAnimation }
     }.collectAsState(initial = !enableAnimation)
-    val markdownState by viewModel.getMarkdownState(comment.name).collectAsState()
 
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)

@@ -55,9 +55,10 @@ class ThreadViewModel(
 
     val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
 
+    override val read = MutableStateFlow(false)
     override val linksSettings = postSettingsRepository.postSettings.map { it.linksSettings }
-    override val likes: Flow<Boolean?> = flowOf(null)
-    override val saved: Flow<Boolean> = flowOf(false)
+    override val likes: StateFlow<Boolean?> = MutableStateFlow(null)
+    override val saved: StateFlow<Boolean> = MutableStateFlow(false)
     override val rules: StateFlow<Rules>
         get() = TODO("Not yet implemented")
 
@@ -74,7 +75,7 @@ class ThreadViewModel(
     val comments = repository.comments
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override var markdown: StateFlow<State> = _post.flatMapLatest { post ->
+    var markdown: StateFlow<State> = _post.flatMapLatest { post ->
         if (post == null) flowOf(State.Loading())
         else parseMarkdownFlow(post.body.markdown, flavour = RedditFlavourDescriptor(true))
     }.stateIn(
@@ -82,25 +83,6 @@ class ThreadViewModel(
         started = SharingStarted.Lazily,
         initialValue = State.Loading()
     )
-
-    private val _markdownComments: MutableMap<Fullname, StateFlow<State>> = mutableMapOf()
-    override fun getMarkdownState(name: Fullname): StateFlow<State> {
-        if (!_markdownComments.contains(name)) {
-            //val comment = _comments.value.findComment(name)!!
-            val comment = comments.value.find { it.name == name } as CommentType.Comment
-            _markdownComments[name] =
-                parseMarkdownFlow(
-                    comment.comment.body.markdown,
-                    flavour = RedditFlavourDescriptor(true)
-                )
-                    .stateIn(
-                        viewModelScope,
-                        started = SharingStarted.Lazily,
-                        initialValue = State.Loading()
-                    )
-        }
-        return _markdownComments[name]!!
-    }
 
     //override val post: StateFlow<PostData?> = _post.asStateFlow()
     override val flairs: StateFlow<List<FlairInfo>>

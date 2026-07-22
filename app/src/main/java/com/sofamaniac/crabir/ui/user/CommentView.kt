@@ -8,8 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mikepenz.markdown.model.State
-import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -21,12 +19,8 @@ import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.thread.CommentViewModelInterface
 import com.sofamaniac.crabir.ui.thread.OpenedComment
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.annotation.InjectedParam
@@ -70,12 +64,6 @@ class CommentViewModel(
 
     }
 
-    override val markdown = parseMarkdownFlow(comment.body.markdown).stateIn(
-        viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = State.Loading()
-    )
-
     override fun submitComment(
         parent: Fullname,
         body: String,
@@ -84,10 +72,8 @@ class CommentViewModel(
         TODO("Not yet implemented")
     }
 
-    override fun getMarkdownState(name: Fullname): StateFlow<State> = markdown
-
-    override val likes: Flow<Boolean?> = flowOf(comment.relationship.liked)
-    override val saved: Flow<Boolean> = flowOf(comment.relationship.saved)
+    override val likes: StateFlow<Boolean?> = MutableStateFlow(comment.relationship.liked)
+    override val saved: StateFlow<Boolean> = MutableStateFlow(comment.relationship.saved)
     override val rules: StateFlow<Rules>
         get() = TODO("Not yet implemented")
 

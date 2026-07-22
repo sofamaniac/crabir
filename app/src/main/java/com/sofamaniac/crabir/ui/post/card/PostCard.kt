@@ -2,6 +2,7 @@ package com.sofamaniac.crabir.ui.post.card
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -49,7 +50,6 @@ fun PostCard(
     modifier: Modifier = Modifier,
     clickable: Boolean = true,
     markAsRead: () -> Unit = {},
-    read: Boolean = false,
     showHidden: Boolean = false,
     isMostVisible: Boolean,
     viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = post.id) {
@@ -59,20 +59,22 @@ fun PostCard(
     },
 ) {
     val postOpt by viewModel.post.collectAsState(post)
-    if (postOpt == null) return
-    val post = postOpt!!
-    if (!showHidden && post.relationship.hidden) {
-        return
+    if (postOpt == null) {
+        ThemedCard(modifier = Modifier.height(100.dp)) {}
+    } else {
+        val post = postOpt!!
+        if (!showHidden && post.relationship.hidden) {
+            return
+        }
+        PostCardContent(
+            post,
+            modifier,
+            clickable,
+            markAsRead,
+            interactions = viewModel,
+            isMostVisible = isMostVisible,
+        )
     }
-    PostCardContent(
-        post,
-        modifier,
-        clickable,
-        markAsRead,
-        read = read,
-        interactions = viewModel,
-        isMostVisible = isMostVisible,
-    )
 }
 
 //@Composable
@@ -93,7 +95,6 @@ internal fun PostCardContent(
     clickable: Boolean = true,
     markAsRead: () -> Unit = {},
     isMostVisible: Boolean = false,
-    read: Boolean = false,
     interactions: LinkInteraction,
 ) {
 
@@ -121,7 +122,6 @@ internal fun PostCardContent(
         {}
     }
     val showOpenButton = rememberPostsSettings().buttonsSettings.comments
-    val markdownState by interactions.markdown.collectAsState()
     ThemedCard(
         roundedCorners = viewSettings.cardSettings.roundedCorners,
         modifier = Modifier
@@ -135,12 +135,13 @@ internal fun PostCardContent(
             showPrefix = viewSettings.prefixCommunity
         )
         val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
-        val likes by interactions.likes.collectAsState(post.relationship.liked)
+        val likes by interactions.likes.collectAsState()
+        val read by interactions.read.collectAsState()
         PostInfo(
             post,
             modifier = modifier,
             enableThumbnail = enablePreview && viewSettings.cardSettings.thumbnailForLinkPreview,
-            likes = likes,
+            likes = { likes },
             read = read,
             markAsRead = markAsRead
         )
@@ -152,7 +153,6 @@ internal fun PostCardContent(
             maxLines = viewSettings.cardSettings.maxLines,
             enableLinkFullSizePreview = !viewSettings.cardSettings.thumbnailForLinkPreview,
             markAsRead = markAsRead,
-            markdownState = markdownState,
         )
         BottomRow(
             post,
@@ -179,7 +179,6 @@ internal fun PostCardPreview() {
             clickable = false,
             markAsRead = {},
             isMostVisible = false,
-            read = false,
             interactions = viewModel,
         )
     }

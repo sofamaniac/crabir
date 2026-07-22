@@ -27,7 +27,6 @@ fun CompactView(
     clickable: Boolean = true,
     markAsRead: () -> Unit = {},
     canStartVideo: Boolean = false,
-    read: Boolean = false,
     showHidden: Boolean = false,
     viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = post.id) {
         parametersOf(
@@ -42,8 +41,9 @@ fun CompactView(
             navController?.navigate(PostRoute(post.permalink))
         }
     }
-    val likes by viewModel.likes.collectAsState(post.relationship.liked)
-    val postOpt by viewModel.post.collectAsState(post)
+    val likes by viewModel.likes.collectAsState()
+    val postOpt by viewModel.post.collectAsState()
+    val read by viewModel.read.collectAsState()
     if (postOpt == null) return
     val post = postOpt!!
     if (!showHidden && post.relationship.hidden) {
@@ -68,7 +68,7 @@ fun CompactView(
                     modifier,
                     enableThumbnail = true,
                     read = read,
-                    likes = likes,
+                    likes = { likes },
                 )
                 PostHeader(post, showSubredditIcon = false, modifier = modifier)
             }

@@ -2,8 +2,6 @@ package com.sofamaniac.crabir.ui.post
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mikepenz.markdown.model.State
-import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
@@ -18,7 +16,6 @@ import com.sofamaniac.crabir.settings.post.PostSettingsDefaults
 import com.sofamaniac.crabir.settings.post.PostSettingsRepository
 import com.sofamaniac.crabir.ui.votable.VotableInteraction
 import com.sofamaniac.crabir.ui.votable.VotableViewModel
-import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,9 +29,10 @@ import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 interface LinkInteraction : VotableInteraction {
-    val post: Flow<PostData?>
+    val post: StateFlow<PostData?>
     val flairs: StateFlow<List<FlairInfo>>
     val linksSettings: Flow<LinksSettings>
+    val read: StateFlow<Boolean>
     fun hide()
 
     fun unhide()
@@ -81,9 +79,15 @@ open class LinkViewModel(
     private var _flairs = MutableStateFlow(emptyList<FlairInfo>())
     override val flairs: StateFlow<List<FlairInfo>> = _flairs
 
+    override val read = history.contains(initialPost.name).stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        false
+    )
+
     fun markPost(post: PostData, visitedBy: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val entity: VisitedPostEntity =
+            val entity =
                 VisitedPostEntity(post.name, System.currentTimeMillis(), visitedBy)
             history.insert(entity)
         }
@@ -153,16 +157,12 @@ open class LinkViewModel(
 interface PostViewModelInterface : LinkInteraction
 
 class DummyInteraction(post: PostData = DUMMY_POST) : PostViewModelInterface, ViewModel() {
+    override val read = flowOf(false).stateIn(viewModelScope, SharingStarted.Lazily, false)
     private var _post = MutableStateFlow(post.copy(kind = Kind.Self))
     override val post: StateFlow<PostData> = _post
     override val linksSettings: Flow<LinksSettings> =
         flowOf(PostSettingsDefaults.defaultLinksSettings)
     override val flairs: StateFlow<List<FlairInfo>> = MutableStateFlow(emptyList())
-    override val markdown: StateFlow<State> =
-        parseMarkdownFlow(
-            DUMMY_POST.selftext.markdown.markdown,
-            flavour = RedditFlavourDescriptor(true)
-        ).stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = State.Loading())
 
     override fun hide() {
     }
@@ -198,8 +198,10 @@ class DummyInteraction(post: PostData = DUMMY_POST) : PostViewModelInterface, Vi
     override fun setInboxReplies(enabled: Boolean) {
     }
 
-    override val likes: Flow<Boolean?> = _post.map { it.relationship.liked }
-    override val saved: Flow<Boolean> = _post.map { it.relationship.saved }
+    override val likes: StateFlow<Boolean?> =
+        _post.map { it.relationship.liked }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+    override val saved: StateFlow<Boolean> =
+        _post.map { it.relationship.saved }.stateIn(viewModelScope, SharingStarted.Lazily, false)
     override val rules: StateFlow<Rules> = MutableStateFlow(Rules())
 
     override fun upvote(name: Fullname) {

@@ -18,7 +18,6 @@ import com.sofamaniac.crabir.ui.post.PostVideo
 import com.sofamaniac.crabir.ui.post.StreamableVideo
 import com.sofamaniac.crabir.ui.post.YoutubeVideo
 import com.sofamaniac.crabir.ui.richtext.Richtext
-import com.mikepenz.markdown.model.State as MarkdownState
 
 @Composable
 internal fun PostBody(
@@ -30,7 +29,6 @@ internal fun PostBody(
     maxLines: Int?,
     enableLinkFullSizePreview: Boolean = true,
     forceShowSelftext: Boolean = false,
-    markdownState: MarkdownState,
     markAsRead: () -> Unit = {},
 ) {
     val navController = LocalNavController.current

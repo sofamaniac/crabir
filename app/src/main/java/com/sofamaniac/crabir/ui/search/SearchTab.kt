@@ -125,7 +125,7 @@ fun SearchTab(
         stringResource(R.string.search_post_tab),
         stringResource(R.string.search_communities_tab),
         stringResource(R.string.search_users_tab)
-    )//, "Comments")
+    ) //, "Comments")
     val scope = rememberCoroutineScope()
     val currentTab = rememberPagerState(initialPage = initialTab, pageCount = { tabs.size })
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -200,8 +200,8 @@ fun SearchTab(
                         is UserSearchViewModel ->
                             InnerTab(viewModel)
 
-//                        is CommentSearchViewModel ->
-//                            InnerTab(viewModel)
+                        //                        is CommentSearchViewModel ->
+                        //                            InnerTab(viewModel)
                     }
                 }
             }
@@ -223,7 +223,7 @@ class SearchCommonViewModel(@InjectedParam query: String) : ViewModel() {
 
 @Composable
 private fun InnerTab(
-    viewModel: PostSearchViewModel
+    viewModel: PostSearchViewModel,
 ) {
     val currentAccount = LocalRedditAccount.current
     PostFeedViewer(viewModel) { post, isMosVisible ->
@@ -389,7 +389,7 @@ fun TopBar(
 inline fun <reified Sort> SortMenu(
     currentValue: Sort,
     currentTimeframe: Timeframe? = null,
-    crossinline onSelect: (Sort, Timeframe?) -> Unit
+    crossinline onSelect: (Sort, Timeframe?) -> Unit,
 ) where Sort : Enum<Sort>, Sort : SortInterface {
     val sortString = stringResource(currentValue.representation)
     val timeframeString = currentTimeframe?.let { stringResource(it.representation) }
