@@ -88,7 +88,7 @@ sealed class Richtext() {
     @Serializable
     @SerialName("table")
     data class Table(
-        @SerialName("h") val headers: List<TableHeader>,
+        @SerialName("h") val headers: List<TableHeader> = emptyList(),
         @SerialName("c") val rows: List<List<TableCell>>,
     ) : Richtext(), ContainerBlock
 
@@ -139,8 +139,8 @@ sealed class Richtext() {
 
 @Serializable
 data class TableHeader(
-    @SerialName("a") val alignment: TableAlignment,
-    @SerialName("c") val children: List<Richtext>,
+    @SerialName("a") val alignment: TableAlignment = TableAlignment.Center,
+    @SerialName("c") val children: List<Richtext> = emptyList(),
 )
 
 @Serializable
