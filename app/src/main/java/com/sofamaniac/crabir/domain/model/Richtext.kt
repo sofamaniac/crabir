@@ -122,15 +122,18 @@ sealed class Richtext() {
 
     @Serializable
     @SerialName("img")
-    data class Image(val id: String) : Richtext(), LeafBlock
+    data class Image(val id: String, @SerialName("c") val caption: String? = null) : Richtext(),
+        LeafBlock
 
     @Serializable
     @SerialName("gif")
-    data class Gif(val id: String) : Richtext(), LeafBlock
+    data class Gif(val id: String, @SerialName("c") val caption: String? = null) : Richtext(),
+        LeafBlock
 
     @Serializable
     @SerialName("video")
-    data class Video(val id: String) : Richtext(), LeafBlock
+    data class Video(val id: String, @SerialName("c") val caption: String? = null) : Richtext(),
+        LeafBlock
 
     @Serializable
     @SerialName("br")

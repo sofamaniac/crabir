@@ -34,12 +34,12 @@ class FullscreenVideoRoute(val post: Fullname) : Route
 @Serializable
 class FullscreenGalleryRoute(val post: Fullname, val page: Int = 0) : Route
 fun NavGraphBuilder.imagesGraph(navController: NavController) {
-    for (url in URLS) {
-        Log.d("NavGraph", "registering $url/{url}")
+    for (base in URLS) {
+        Log.d("NavGraph", "registering $base/{url}")
         composable(
-            route = "$url/{url}",
+            route = "$base/{url}",
             deepLinks = listOf(
-                navDeepLink { uriPattern = "$url/{url}" }
+                navDeepLink { uriPattern = "$base/{url}" }
             ),
             arguments = listOf(
                 navArgument("url") {
@@ -50,7 +50,7 @@ fun NavGraphBuilder.imagesGraph(navController: NavController) {
             val url = it.arguments?.getString("url")
             Log.d("NavGraph", "Opening image: ${url}")
             if (url != null) {
-                SimpleFullscreenImage(url)
+                SimpleFullscreenImage("https://i.redd.it/$url")
             }
         }
     }

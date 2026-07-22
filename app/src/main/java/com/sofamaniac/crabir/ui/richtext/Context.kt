@@ -37,6 +37,7 @@ data class RichtextStyle(
     val spoilerCurtain: Color,
     val codeBackground: Color,
     val blockquoteStyle: BlockquoteStyle,
+    val tableStyle: TableStyle,
 )
 
 @Composable
@@ -47,7 +48,29 @@ fun defaultRichtextStyle(): RichtextStyle {
         linkStyle = linkStyle,
         spoilerCurtain = theme.contentColor,
         codeBackground = theme.secondaryText.copy(alpha = 0.3f),
-        blockquoteStyle = defaultBlockquoteStyle()
+        blockquoteStyle = defaultBlockquoteStyle(),
+        tableStyle = defaultTableStyle()
+    )
+}
+
+@Immutable
+data class TableStyle(
+    val headerBackground: Color,
+    val rowBackground1: Color,
+    val rowBackground2: Color,
+    val cellPadding: Dp,
+)
+
+@Composable
+fun defaultTableStyle(): TableStyle {
+    val headerColor = Color(0xFF333333)
+    val rowColor1 = Color(0xFF464646)
+    val rowColor2 = Color(0xFF333232)
+    return TableStyle(
+        headerBackground = headerColor,
+        rowBackground1 = rowColor1,
+        rowBackground2 = rowColor2,
+        cellPadding = 8.dp
     )
 }
 

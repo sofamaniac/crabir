@@ -2,23 +2,26 @@ package com.sofamaniac.crabir.ui.richtext
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalGridApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Grid
+import androidx.compose.foundation.layout.GridTrackSize
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
@@ -91,7 +93,7 @@ fun Spoiler(spoiler: Richtext.Spoiler, context: Context) {
 }
 
 @Composable
-internal fun InnerImage(media: MediaMetadata) {
+internal fun InnerImage(media: MediaMetadata, caption: String? = null) {
     val url = when (media) {
         is MediaMetadata.Gif -> media.source?.gifUrl
 
@@ -103,7 +105,7 @@ internal fun InnerImage(media: MediaMetadata) {
         val navController = LocalNavController.current
         AsyncImage(
             model = url,
-            contentDescription = null,
+            contentDescription = caption,
             modifier = Modifier
                 .fillMaxSize()
                 .clickable {
@@ -118,7 +120,7 @@ internal fun InnerImage(media: MediaMetadata) {
 fun Image(image: Richtext.Image, context: Context) {
     val media = context.mediaMetadata[image.id]
     if (media != null) {
-        InnerImage(media)
+        InnerImage(media, image.caption)
     }
 }
 
@@ -130,10 +132,10 @@ fun Video(video: Richtext.Video, context: Context) {
     Box(modifier = Modifier.clickable {
         uriHandler.openUri("https://v.redd.it/${video.id}")
     }) {
-        AsyncImage("https://preview.redd.it/${video.id}.jpg", contentDescription = null)
+        AsyncImage("https://preview.redd.it/${video.id}.jpg", contentDescription = video.caption)
         Icon(
             Icons.Default.PlayArrow,
-            contentDescription = null,
+            contentDescription = "Play video",
             modifier = Modifier.align(Alignment.Center)
         )
     }
@@ -143,13 +145,13 @@ fun Video(video: Richtext.Video, context: Context) {
 fun Gif(image: Richtext.Gif, context: Context) {
     val media = context.mediaMetadata[image.id]
     if (image.id.contains("|")) {
-        val id = image.id.split("|")[0]
+        val id = image.id.split("|")[1]
         val gifUrl = "https://media.giphy.com/media/${id}/giphy.gif"
         val url = "https://giphy.com/gifs/${id}"
         val navController = LocalNavController.current
         AsyncImage(
             model = gifUrl,
-            contentDescription = null,
+            contentDescription = image.caption,
             modifier = Modifier
                 .fillMaxSize()
                 .clickable {
@@ -157,7 +159,7 @@ fun Gif(image: Richtext.Gif, context: Context) {
                 }
         )
     } else if (media != null) {
-        InnerImage(media)
+        InnerImage(media, caption = image.caption)
     }
 }
 
@@ -264,49 +266,62 @@ fun Code(code: Richtext.Code, context: Context) {
     }
 }
 
+@OptIn(ExperimentalGridApi::class)
 @Composable
 fun Table(table: Richtext.Table, context: Context) {
-    val widthFraction = 1.0 / table.headers.size.toDouble()
-    val headerColor = Color(0xFF333333)
-    val rowColor1 = Color(0xFF464646)
-    val rowColor2 = Color(0xFF333232)
-    LazyRow {
-        items(table.headers.size) { column ->
-            val header = table.headers[column]
-            val alignment = when (header.alignment) {
-                TableAlignment.Left -> Alignment.Start
-                TableAlignment.Right -> Alignment.End
-                TableAlignment.Center -> Alignment.CenterHorizontally
+    val style = context.style.tableStyle
+    fun TableAlignment.toAlignment(): Alignment = when (this) {
+        TableAlignment.Right -> Alignment.CenterEnd
+        TableAlignment.Left -> Alignment.CenterStart
+        TableAlignment.Center -> Alignment.Center
+    }
+    Box(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+        Grid(config = {
+            repeat(table.headers.size) {
+                column(GridTrackSize.Auto)
             }
-            Column(
-                horizontalAlignment = alignment,
-                modifier = Modifier.fillParentMaxWidth(widthFraction.toFloat())
-            ) {
+            repeat(table.rows.size + 1) {
+                row(GridTrackSize.Auto)
+            }
+            gap(1.dp)
+        }) {
+            table.headers.forEachIndexed { index, header ->
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(headerColor)
+                        .fillMaxSize()
+                        .background(style.headerBackground)
+                        .padding(style.cellPadding)
+                        .gridItem(row = 1, column = index + 1),
+                    contentAlignment = header.alignment.toAlignment()
                 ) {
-                    for (child in header.children) {
-                        context.configuration.render(child, context)
-                    }
-                }
-                HorizontalDivider()
-                table.rows.forEachIndexed { rowIndex, row ->
-                    val cell = row[column]
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(if ((rowIndex + column) % 2 == 0) rowColor1 else rowColor2)
-                    ) {
-                        for (child in cell.children) {
+                    Column {
+                        for (child in header.children) {
                             context.configuration.render(child, context)
                         }
                     }
-                    HorizontalDivider()
                 }
             }
-            VerticalDivider()
+            table.rows.forEachIndexed { rowIndex, row ->
+                row.forEachIndexed { columnIndex, cell ->
+                    val header = table.headers[columnIndex]
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                if ((rowIndex + columnIndex) % 2 == 0) style.rowBackground1 else style.rowBackground2
+                            )
+                            .padding(style.cellPadding)
+                            .gridItem(row = rowIndex + 2, column = columnIndex + 1),
+                        contentAlignment = header.alignment.toAlignment()
+                    ) {
+                        Column {
+                            for (child in cell.children) {
+                                context.configuration.render(child, context)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -317,7 +332,8 @@ fun Paragraph(
     paragraph: Richtext.Paragraph,
     context: Context,
 ) {
-    Column(modifier = Modifier.height(IntrinsicSize.Min)) {
+
+    FlowRow(modifier = Modifier.height(IntrinsicSize.Min)) {
         var index = 0
         while (index < paragraph.children.size) {
             if (paragraph.children[index] !is Richtext.TextNode) {

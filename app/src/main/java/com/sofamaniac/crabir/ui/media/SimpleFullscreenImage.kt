@@ -18,7 +18,6 @@ import me.saket.telephoto.zoomable.coil3.ZoomableAsyncImage
 @Composable
 fun SimpleFullscreenImage(url: String) {
     val navController = LocalNavController.current
-    val url = "https://i.redd.it/$url"
     var showOverlay by remember { mutableStateOf(true) }
 
     VerticalSwipeToDismiss(
