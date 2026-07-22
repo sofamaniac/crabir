@@ -73,7 +73,7 @@ fun Richtext(
 
 @Composable
 fun Spoiler(spoiler: Richtext.Spoiler, context: Context) {
-    var clicked by remember { mutableStateOf(false) }
+    var clicked by remember { mutableStateOf(!context.inSpoiler) }
     val context = context.copy(inSpoiler = true)
     Column(
         modifier = Modifier
