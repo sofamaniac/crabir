@@ -121,7 +121,7 @@ fun HeightRestrictedWithGradient(
     Layout(
         modifier = modifier
             .clipToBounds()
-            .protectedTouch(onClick),
+            .protectedTouch(onClick = onClick),
         content = {
             // We wrap content in a Box to ensure it's treated as a single measurable
             Box { content() }

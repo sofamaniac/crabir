@@ -73,11 +73,11 @@ fun Richtext(
 
 @Composable
 fun Spoiler(spoiler: Richtext.Spoiler, context: Context) {
-    var clicked by remember { mutableStateOf(!context.inSpoiler) }
+    var clicked by remember { mutableStateOf(context.inSpoiler) }
     val context = context.copy(inSpoiler = true)
     Column(
         modifier = Modifier
-            .protectedTouch { clicked = true }
+            .protectedTouch(enabled = !clicked) { clicked = true }
             .drawWithContent {
                 drawContent()
                 if (!clicked) {

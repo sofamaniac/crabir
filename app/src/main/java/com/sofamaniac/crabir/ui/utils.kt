@@ -77,8 +77,9 @@ class CurrentAccountViewModel(accountsRepository: AccountsRepository) : ViewMode
 }
 
 /** Make composable clickable while preventing touch event in children */
-fun Modifier.protectedTouch(onClick: () -> Unit): Modifier {
+fun Modifier.protectedTouch(enabled: Boolean = true, onClick: () -> Unit): Modifier {
     val pass = PointerEventPass.Initial
+    if (!enabled) return this
     return this.then(
         Modifier.pointerInput(pass) {
             awaitEachGesture {
