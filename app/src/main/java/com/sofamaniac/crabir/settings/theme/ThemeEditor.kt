@@ -189,7 +189,7 @@ fun ColorPickerDialogue(
                 .padding(16.dp), shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
         ) {
             ColorPicker(color, onColorChange, advancedMode)
-            Row() {
+            Row {
                 TextButton(onClick = { advancedMode = !advancedMode }) {
                     if (advancedMode) {
                         Text("Presets")

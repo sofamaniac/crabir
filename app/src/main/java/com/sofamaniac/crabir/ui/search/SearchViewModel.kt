@@ -122,7 +122,7 @@ class PostSearchViewModel(
     override val entity: Flow<CommunityViewEntity?> = flowOf(null)
     override val data: StateFlow<PagingData<PostData>> = items.stateIn(
         scope = viewModelScope,
-        started = kotlinx.coroutines.flow.SharingStarted.Lazily,
+        started = SharingStarted.Lazily,
         initialValue = PagingData.empty()
     )
 

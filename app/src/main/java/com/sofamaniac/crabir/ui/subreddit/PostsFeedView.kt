@@ -165,7 +165,7 @@ fun <T : VotableData> PostFeedViewer(
             item {
                 val appendState = posts.loadState.append
                 if (appendState is LoadState.NotLoading && appendState.endOfPaginationReached) {
-                    ThemedCard() {
+                    ThemedCard {
                         Text("End of Feed reached")
                     }
                 } else if (appendState is LoadState.Error) {

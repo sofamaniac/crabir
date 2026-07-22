@@ -389,7 +389,7 @@ data class RedditVideo(
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable(with = MediaMetadataSerializer::class)
 @JsonClassDiscriminator("e")
-sealed class MediaMetadata() {
+sealed class MediaMetadata {
 
     abstract val ratio: Float
     abstract val width: Int

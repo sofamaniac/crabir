@@ -24,7 +24,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonClassDiscriminator("e")
-sealed class Richtext() {
+sealed class Richtext {
 
     interface ContainerBlock
     interface LeafBlock
@@ -46,7 +46,7 @@ sealed class Richtext() {
 
     @Serializable
     @SerialName("hr")
-    class HorizontalRule() : Richtext(), LeafBlock
+    class HorizontalRule : Richtext(), LeafBlock
 
     @Serializable
     @SerialName("par")

@@ -172,7 +172,7 @@ fun SelectViewDialog(onDismiss: () -> Unit, selectedView: Views, updateView: (Vi
 
     val selectedView = if (useDefault) viewSettings.defaultView else selectedView
     BasicAlertDialog(onDismiss) {
-        ThemedCard() {
+        ThemedCard {
             Column(Modifier.selectableGroup()) {
                 for (view in Views.entries) {
                     ListItem(

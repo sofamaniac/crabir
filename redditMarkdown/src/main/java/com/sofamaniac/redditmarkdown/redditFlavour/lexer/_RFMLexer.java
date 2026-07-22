@@ -12,6 +12,7 @@ import org.intellij.markdown.lexer.GeneratedLexer;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class _RFMLexer implements GeneratedLexer {
      * at the beginning of a line
      * l is of the form l = 2*k, k a non negative integer
      */
-    private static final int ZZ_LEXSTATE[] = {
+    private static final int[] ZZ_LEXSTATE = {
             0, 0, 1, 1, 2, 2, 3, 3, 4, 4
     };
 
@@ -1525,13 +1526,13 @@ public class _RFMLexer implements GeneratedLexer {
         return offset == input ? ZZ_CMAP_BLOCKS[offset] : ZZ_CMAP_BLOCKS[ZZ_CMAP_TOP[input >> 8] | offset];
     }
 
-    private List<Integer> stateStack = new ArrayList<Integer>();
+    private final List<Integer> stateStack = new ArrayList<Integer>();
 
     private boolean isHeader = false;
 
     private int codeSpanBacktickslength = 0;
 
-    private ParseDelimited parseDelimited = new ParseDelimited();
+    private final ParseDelimited parseDelimited = new ParseDelimited();
 
     private IElementType parseDelimited(IElementType contentsType, boolean allowInlines) {
         char first = yycharat(0);
@@ -2080,7 +2081,6 @@ public class _RFMLexer implements GeneratedLexer {
                             zzFPos -= Character.charCount(zzInput);
                             zzFState = zzTransL[zzRowMapL[zzFState] + zzCMap(zzInput)];
                         }
-                        ;
                         zzMarkedPos = zzFPos;
                     }
             { return MarkdownTokenTypes.TEXT;
@@ -2161,9 +2161,7 @@ public class _RFMLexer implements GeneratedLexer {
         private static Set<String> getBlockTagsSet() {
             Set<String> result = new HashSet<String>();
             String[] tags = BLOCK_TAGS_STRING.split(", ");
-            for (String tag : tags) {
-                result.add(tag);
-            }
+            Collections.addAll(result, tags);
             return result;
         }
     }

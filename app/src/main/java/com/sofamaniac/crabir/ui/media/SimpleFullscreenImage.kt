@@ -21,7 +21,7 @@ fun SimpleFullscreenImage(url: String) {
     var showOverlay by remember { mutableStateOf(true) }
 
     VerticalSwipeToDismiss(
-        topBar = { ->
+        topBar = {
             FullscreenTopBar(enabled = showOverlay, actions = {
                 DownloadButton(url.toUri())
             })

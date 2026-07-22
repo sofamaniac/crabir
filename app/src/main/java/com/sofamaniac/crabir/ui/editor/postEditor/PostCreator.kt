@@ -290,7 +290,7 @@ fun FlairDialog(
     onDismiss: () -> Unit,
 ) {
     BasicAlertDialog(onDismissRequest = onDismiss) {
-        ThemedCard() {
+        ThemedCard {
             for (flair in flairs) {
                 val text = if (flair.id == flairId && flairText != null) {
                     flairText
@@ -341,7 +341,7 @@ fun FlairEditBox(
     val textFieldState =
         rememberTextFieldState(initialText = initialText)
     BasicAlertDialog(onDismissRequest = onDismiss) {
-        ThemedCard() {
+        ThemedCard {
             ListItem(headlineContent = {
                 Text(
                     "Edit flair text",
@@ -355,7 +355,7 @@ fun FlairEditBox(
                     )
                 }
             )
-            Row() {
+            Row {
                 TextButton(onClick = onDismiss) {
                     Text("Cancel")
                 }

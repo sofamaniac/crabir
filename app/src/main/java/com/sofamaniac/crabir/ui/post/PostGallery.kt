@@ -290,7 +290,7 @@ fun FullscreenGallery(
             FullscreenBottomBar(post, showDecorations) {
                 val title = gallery.images[state.currentPage].caption
                 if (showControls) {
-                    PlayerControls() {
+                    PlayerControls {
                         IconButton(onClick = dismiss) {
                             Icon(
                                 Icons.Default.FullscreenExit,

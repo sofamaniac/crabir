@@ -29,10 +29,10 @@ interface ThreadRepository {
         timeframe: Timeframe? = null,
         comment: String? = null,
         context: Int? = null,
-    ): Unit
+    )
 
     suspend fun getPost(name: Fullname): PostData?
-    suspend fun getMoreComments(more: CommentType.More): Unit
+    suspend fun getMoreComments(more: CommentType.More)
 
     /** Submit a reply
      * @param parentId The name of the parent to the reply

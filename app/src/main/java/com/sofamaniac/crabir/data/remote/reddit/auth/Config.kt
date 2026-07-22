@@ -13,8 +13,7 @@ import net.openid.appauth.ClientAuthentication
 import net.openid.appauth.ResponseTypeValues
 import kotlin.enums.enumEntries
 
-class AuthConfig(
-) {
+class AuthConfig {
     val authorizationEndpoint = "https://sh.reddit.com/api/v1/authorize.compact"
     private val tokenEndpoint = "https://www.reddit.com/api/v1/access_token"
     private val redirectUri = "com.sofamaniac.crabir://callback"

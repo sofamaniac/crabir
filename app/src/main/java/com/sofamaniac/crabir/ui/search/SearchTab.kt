@@ -99,7 +99,7 @@ fun SearchTab(
     searchQuery: SearchRoute,
     modifier: Modifier = Modifier,
     initialTab: Int = if (searchQuery.flair.isNotBlank()) 0 else 1,
-    commonViewModel: SearchCommonViewModel = koinViewModel() {
+    commonViewModel: SearchCommonViewModel = koinViewModel {
         val initialQuery =
             if (searchQuery.flair.isNotBlank()) "flair:\"${searchQuery.flair}\"" else ""
         parametersOf(initialQuery)

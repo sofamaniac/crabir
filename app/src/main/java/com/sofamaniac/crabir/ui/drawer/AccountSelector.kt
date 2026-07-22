@@ -129,7 +129,7 @@ fun AccountSelector(
     }
     if (showWarningDialog) {
         BasicAlertDialog(onDismissRequest = { showWarningDialog = false }) {
-            ThemedCard() {
+            ThemedCard {
                 ListItem(
                     headlineContent = { Text("Warning") }
                 )

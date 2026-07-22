@@ -71,16 +71,14 @@ class SavedViewModel(
     @InjectedParam username: String,
     repository: SavedRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel<VotableData>(username, repository, visitedPostsDao) {
-}
+) : ProfileFeedViewModel<VotableData>(username, repository, visitedPostsDao)
 
 @KoinViewModel
 class OverviewViewModel(
     @InjectedParam username: String,
     repository: OverviewRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel<VotableData>(username, repository, visitedPostsDao) {
-}
+) : ProfileFeedViewModel<VotableData>(username, repository, visitedPostsDao)
 
 @KoinViewModel
 class CommentsViewModel(
@@ -109,24 +107,21 @@ class UpvotedViewModel(
     @InjectedParam username: String,
     repository: UpvotedRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao) {
-}
+) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao)
 
 @KoinViewModel
 class DownvotedViewModel(
     @InjectedParam username: String,
     repository: DownvotedRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao) {
-}
+) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao)
 
 @KoinViewModel
 class HiddenViewModel(
     @InjectedParam username: String,
     repository: HiddenRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao) {
-}
+) : ProfileFeedViewModel<PostData>(username, repository, visitedPostsDao)
 
 @KoinViewModel
 class SubmittedViewModel(

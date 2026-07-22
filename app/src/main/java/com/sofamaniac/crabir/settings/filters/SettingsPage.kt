@@ -185,8 +185,8 @@ private fun FilterEditor(
             selectedContainerColor = CardDefaults.cardColors().containerColor
         )
     BasicAlertDialog(onDismissRequest) {
-        Card() {
-            LazyColumn() {
+        Card {
+            LazyColumn {
                 items(filters.size) { index ->
                     ListItem(
                         headlineContent = {

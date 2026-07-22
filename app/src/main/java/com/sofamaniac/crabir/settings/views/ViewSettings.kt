@@ -52,8 +52,7 @@ data class CardSettings(
     val thumbnailForLinkPreview: Boolean = true,
     val maxLines: Int = 5,
     val roundedCorners: Boolean = false,
-) {
-}
+)
 
 @Serializable
 data class FontSettings(

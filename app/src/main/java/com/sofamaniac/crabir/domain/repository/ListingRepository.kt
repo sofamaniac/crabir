@@ -114,7 +114,7 @@ class ListingSource<Params, Data : DataInterface>(
 
     }
 
-    private suspend fun getThings(after: Fullname): PagingSource.LoadResult<Fullname, Fullname> {
+    private suspend fun getThings(after: Fullname): LoadResult<Fullname, Fullname> {
         return repository.getThings(after, params)
     }
 }

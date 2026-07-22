@@ -139,7 +139,7 @@ fun SubredditInfoView(
     Scaffold(topBar = { TopBar(info.displayName) }) { padding ->
         LazyColumn(modifier = Modifier.padding(padding)) {
             item {
-                Row() {
+                Row {
                     SubredditIcon(info.displayName, info.icon)
                     Column {
                         Text(info.displayNamePrefixed, style = MaterialTheme.typography.titleMedium)

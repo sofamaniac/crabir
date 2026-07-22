@@ -37,7 +37,7 @@ fun MuteDialog(post: PostData, onDismissRequest: () -> Unit, onClick: () -> Unit
     val flair = post.linkFlair.text
     val domain = post.url.toUri().host
     BasicAlertDialog(onDismissRequest = onDismissRequest) {
-        Card() {
+        Card {
             ListItem(
                 headlineContent = { Text(stringResource(R.string.mute_posts_from_user, username)) },
                 leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
