@@ -2,12 +2,15 @@ package com.sofamaniac.crabir.ui.post
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,6 +21,8 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
+import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
+import com.sofamaniac.crabir.ui.cartouche
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +35,7 @@ import org.koin.core.parameter.parametersOf
 @KoinViewModel
 class StreamableViewModel(
     @InjectedParam post: PostData,
-    api: StreamableAPI
+    api: StreamableAPI,
 ) : ViewModel() {
     private val _video: MutableStateFlow<Video?> = MutableStateFlow(null)
     val video: StateFlow<Video?> = _video.asStateFlow()
@@ -59,7 +64,7 @@ fun StreamableVideo(
     canPlayVideo: Boolean,
     modifier: Modifier = Modifier,
     goFullscreen: (Route) -> Unit,
-    viewModel: StreamableViewModel = koinViewModel { parametersOf(post) }
+    viewModel: StreamableViewModel = koinViewModel { parametersOf(post) },
 ) {
     val video by viewModel.video.collectAsState()
     val thumbnailUrl by viewModel.thumbnailUrl.collectAsState()
@@ -76,6 +81,14 @@ fun StreamableVideo(
         blur = blur,
         modifier = modifier.clickable(enabled = blur) { goFullscreen() },
         goFullscreen = goFullscreen,
+        cartouche = {
+            Text(
+                "Streamable",
+                modifier = Modifier
+                    .padding(8.dp)
+                    .cartouche(GIF_CARTOUCHE_COLOR)
+            )
+        }
     ) {
         AsyncImage(
             model = thumbnailUrl,

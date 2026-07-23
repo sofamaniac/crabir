@@ -7,7 +7,9 @@ package com.sofamaniac.crabir.ui.post
 import androidx.annotation.OptIn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
@@ -47,7 +49,7 @@ fun PostVideo(
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = false,
     blur: Boolean = false,
-    goFullscreen: (Route) -> Unit
+    goFullscreen: (Route) -> Unit,
 ) {
     val video = getVideoUrl(post)
     val placeholder =
@@ -79,24 +81,31 @@ fun PostVideo(
             }
         }
     val uriHandler = LocalUriHandler.current
-
-    if (video == null) {
+    val cartouche = @Composable {
         val host = post.url.toUri().host
         val domain = host?.removePrefix("www.")?.split(".")?.firstOrNull()
         val isGif = post.url.toUri().lastPathSegment?.endsWith(".gif") ?: false
         val text = if (isGif) "GIF" else domain ?: "Video"
         val cartoucheColor = if (isGif) GIF_CARTOUCHE_COLOR else VIDEO_CARTOUCHE_COLOR
+        Text(
+            text,
+            modifier = Modifier
+                .padding(8.dp)
+                .cartouche(backgroundColor = cartoucheColor)
+        )
+    }
+
+    if (video == null) {
         Box(modifier = modifier.clickable {
             uriHandler.openUri(post.url)
         }) {
             placeholder()
-            Text(
-                text,
+            Box(
                 modifier = Modifier
-                    .padding(8.dp)
-                    .cartouche(backgroundColor = cartoucheColor)
                     .align(Alignment.TopEnd)
-            )
+            ) {
+                cartouche()
+            }
         }
     } else {
         val goFullscreen = {
@@ -109,6 +118,7 @@ fun PostVideo(
             blur,
             modifier = modifier,
             goFullscreen = goFullscreen,
+            cartouche = cartouche,
             placeholder = placeholder,
         )
     }
@@ -122,29 +132,43 @@ fun PostVideo(
     blur: Boolean,
     modifier: Modifier = Modifier,
     goFullscreen: () -> Unit,
+    cartouche: @Composable (() -> Unit)? = null,
     placeholder: @Composable () -> Unit,
 ) {
-    DecoratedVideoPlayer(
-        video,
-        key = key,
-        autostart = canPlayVideo && !blur,
-        placeholder = placeholder,
-        clickable = !blur,
-        modifier = modifier.clickable(enabled = blur) {
-            goFullscreen()
-        },
-        fullscreenButton = {
-            IconButton(onClick = {
-                goFullscreen()
-            }) {
-                Icon(
-                    Icons.Default.Fullscreen,
-                    contentDescription = null,
-                    tint = Color.White
-                )
+    if (blur) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(video.aspectRatio)
+                .clickable(onClick = goFullscreen)
+        ) {
+            placeholder()
+            Box(modifier = Modifier.align(Alignment.TopEnd)) {
+                cartouche?.invoke()
             }
         }
-    )
+    } else {
+        DecoratedVideoPlayer(
+            video,
+            key = key,
+            autostart = canPlayVideo,
+            placeholder = placeholder,
+            clickable = true,
+            modifier = modifier,
+            cartouche = cartouche,
+            fullscreenButton = {
+                IconButton(onClick = {
+                    goFullscreen()
+                }) {
+                    Icon(
+                        Icons.Default.Fullscreen,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+            }
+        )
+    }
 }
 
 @Composable
