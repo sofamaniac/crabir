@@ -76,7 +76,7 @@ fun PostInfo(
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 if (post.spoiler) {
                     Text(
@@ -96,14 +96,15 @@ fun PostInfo(
                         post.linkFlair,
                         showColor = flairSettings.showFlairColor,
                         showEmoji = flairSettings.showFlairEmoji,
-                        modifier = Modifier.clickable(enabled = flairSettings.clickable) {
-                            navController?.navigate(
-                                SearchRoute(
-                                    subreddit = post.subreddit.name,
-                                    flair = post.linkFlair.text
+                        modifier = Modifier
+                            .clickable(enabled = flairSettings.clickable) {
+                                navController?.navigate(
+                                    SearchRoute(
+                                        subreddit = post.subreddit.name,
+                                        flair = post.linkFlair.text
+                                    )
                                 )
-                            )
-                        }
+                            }
                     )
                 }
             }
