@@ -84,6 +84,9 @@ data class CommentDTO(
     val subject: String? = null,
     val type: String? = null,
     val context: String? = null,
+    val new: Boolean = false,
+    @SerialName("was_comment")
+    val wasComment: Boolean = false,
 
 
     @Serializable(with = InstantAsFloatSerializer::class)

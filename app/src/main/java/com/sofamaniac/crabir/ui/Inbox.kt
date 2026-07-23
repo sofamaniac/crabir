@@ -22,10 +22,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
@@ -33,13 +29,21 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.data.remote.dto.Thing
-import com.sofamaniac.crabir.data.remote.dto.emptyListing
-import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
+import com.sofamaniac.crabir.data.remote.dto.MessageDTO
+import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.MessageData
 import com.sofamaniac.crabir.domain.model.ParsedMarkdown
+import com.sofamaniac.crabir.domain.repository.InboxRepository
+import com.sofamaniac.crabir.domain.repository.feed.FeedSource
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.annotation.KoinViewModel
 import kotlin.time.Instant
@@ -47,18 +51,18 @@ import kotlin.time.Instant
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InboxView(viewModel: InboxViewModel = koinViewModel()) {
-    val messages by viewModel.messages
+    val messages = viewModel.data.collectAsLazyPagingItems()
     Scaffold(topBar = { TopAppBar(title = { Text("Inbox") }) }) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(messages.size, key = { index -> messages[index].name }) { index ->
+            items(messages.itemCount, key = messages.itemKey { it.name }) { index ->
                 val message = messages[index]
                 Column {
                     when (message) {
-                        is Thing.Message -> {
-                            Message(message, modifier = Modifier.padding(8.dp))
+                        is MessageData.Message -> {
+                            Message(message.message, modifier = Modifier.padding(8.dp))
                         }
 
-                        is Thing.Comment -> {
+                        is MessageData.Comment -> {
                             Message(message, modifier = Modifier.padding(8.dp))
                         }
 
@@ -73,8 +77,7 @@ fun InboxView(viewModel: InboxViewModel = koinViewModel()) {
 }
 
 @Composable
-fun Message(message: Thing.Message, modifier: Modifier = Modifier) {
-    val message = message.data
+fun Message(message: MessageDTO, modifier: Modifier = Modifier) {
     val header = @Composable {
         Row {
             Icon(Icons.Default.Mail, contentDescription = null)
@@ -91,8 +94,8 @@ fun Message(message: Thing.Message, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Message(message: Thing.Comment, modifier: Modifier = Modifier) {
-    val comment = message.data
+fun Message(message: MessageData.Comment, modifier: Modifier = Modifier) {
+    val comment = message.comment
     val icon = if (comment.type == "post_reply") {
         Icons.AutoMirrored.Filled.Message
     } else {
@@ -159,16 +162,16 @@ fun Message(
 }
 
 @KoinViewModel
-class InboxViewModel(inbox: RedditAPIService) : ViewModel() {
-    var _messages: MutableState<Thing.Listing<Thing>> = mutableStateOf(emptyListing())
-    val messages: State<Thing.Listing<Thing>> = _messages
-
-    init {
-        viewModelScope.launch {
-            val res = inbox.inbox()
-            if (res.isSuccessful) {
-                _messages.value = res.body()!!
-            }
+class InboxViewModel(repo: InboxRepository) : ViewModel() {
+    val feedSource = FeedSource(repo, Unit)
+    val data: Flow<PagingData<MessageData>> = Pager(
+        config = PagingConfig(pageSize = 100, prefetchDistance = 10, initialLoadSize = 100),
+        initialKey = Fullname(""),
+        pagingSourceFactory = {
+            feedSource
         }
-    }
+    )
+        .flow.cachedIn(
+            viewModelScope
+        )
 }
