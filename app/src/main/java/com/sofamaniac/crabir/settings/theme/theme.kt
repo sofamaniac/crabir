@@ -301,16 +301,17 @@ fun ConfigureCrabirTheme(content: @Composable () -> Unit) {
     val crabirTheme = themeSettings?.currentTheme(mode)
         ?: if (mode == ThemeMode.Dark) DefaultDarkTheme else DefaultLightTheme
     setSystemBarsColor()(mode, crabirTheme.toolbarBackground)
-    val theme = if ((themeSettings?.dynamicColor
-            ?: false) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-    ) {
-        val colorScheme = MaterialTheme.colorScheme
-        CrabirTheme.fromColorScheme(colorScheme)
-    } else {
-        crabirTheme
-    }
-    CompositionLocalProvider(LocalTheme provides theme) {
-        ConfigureMaterialTheme {
+    ConfigureMaterialTheme {
+        val theme =
+            if ((themeSettings?.dynamicColor
+                    ?: false) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+            ) {
+                val colorScheme = MaterialTheme.colorScheme
+                CrabirTheme.fromColorScheme(colorScheme)
+            } else {
+                crabirTheme
+            }
+        CompositionLocalProvider(LocalTheme provides theme) {
             content()
         }
     }
