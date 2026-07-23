@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.ui.richtext
 
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -135,7 +136,11 @@ open class RichtextComponents(
             }
 
             is Richtext.LineBreak -> {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(
+                    modifier = Modifier
+                        .height(4.dp)
+                        .fillMaxWidth(1f)
+                )
             }
 
             is Richtext.Link -> {

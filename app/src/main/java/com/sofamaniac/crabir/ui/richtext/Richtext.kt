@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.richtext
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -7,14 +8,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalGridApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Grid
 import androidx.compose.foundation.layout.GridTrackSize
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
@@ -348,17 +346,19 @@ fun Paragraph(
     context: Context,
 ) {
 
-    FlowRow(modifier = Modifier.height(IntrinsicSize.Min)) {
+    Column() {
         var index = 0
         while (index < paragraph.children.size) {
-            if (paragraph.children[index] !is Richtext.TextNode) {
+            Log.d("Paragraph", "Rendering $index / ${paragraph.children.size}")
+            while (index < paragraph.children.size && paragraph.children[index] !is Richtext.TextNode) {
+                Log.d("Paragraph", "Rendering ${paragraph.children[index]}")
                 context.configuration.render(paragraph.children[index], context)
-                index++
-                continue
+                index += 1
             }
             val res = paragraph.children.buildAnnotatedString(index, context)
             val currentString = res.first
             index = res.second
+            Log.d("Paragraph", "Rendering $currentString")
             Text(currentString)
         }
     }
@@ -387,12 +387,15 @@ fun Richtext.Text.toAnnotatedString(context: Context): AnnotatedString {
 }
 
 fun List<Richtext>.buildAnnotatedString(
-    start: Int = 0,
+    start: Int,
     context: Context,
 ): Pair<AnnotatedString, Int> {
     var index = start
     var currentString = AnnotatedString("")
     while (index < size) {
+        if (this[index] !is Richtext.TextNode) {
+            break
+        }
         val ext = when (val child = this[index]) {
             is Richtext.Text -> {
                 child.toAnnotatedString(context)
@@ -415,11 +418,14 @@ fun List<Richtext>.buildAnnotatedString(
             }
 
             else -> {
+                Log.e("Richtext", "Unknown child $child")
+                // avoid infinite loops
+                index += 1
                 break
             }
         }
         currentString += ext
-        index++
+        index += 1
     }
     return Pair(currentString, index)
 }
