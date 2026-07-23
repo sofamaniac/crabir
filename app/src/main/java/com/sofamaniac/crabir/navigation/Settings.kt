@@ -13,6 +13,8 @@ import com.sofamaniac.crabir.settings.DebugOptionsView
 import com.sofamaniac.crabir.settings.GeneralSettingsPage
 import com.sofamaniac.crabir.settings.GeneralSettingsRoute
 import com.sofamaniac.crabir.settings.SettingsPage
+import com.sofamaniac.crabir.settings.data.DataSettingsPage
+import com.sofamaniac.crabir.settings.data.DataSettingsRoute
 import com.sofamaniac.crabir.settings.filters.FiltersSettingsPage
 import com.sofamaniac.crabir.settings.post.PostSettingsPage
 import com.sofamaniac.crabir.settings.post.PostSettingsRoute
@@ -48,5 +50,8 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
     }
     composable<DebugOptionsRoute> {
         DebugOptionsView()
+    }
+    composable<DataSettingsRoute> {
+        DataSettingsPage()
     }
 }

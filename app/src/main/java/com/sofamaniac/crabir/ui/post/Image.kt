@@ -4,11 +4,15 @@
 
 package com.sofamaniac.crabir.ui.post
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FileDownloadOff
 import androidx.compose.material.icons.filled.Hd
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,14 +26,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import coil3.compose.AsyncImage
+import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.FullscreenImageRoute
 import com.sofamaniac.crabir.navigation.Route
+import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.ui.crabirBlurStyle
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
@@ -64,7 +72,17 @@ fun PostImage(
     blur: Boolean = false,
     goFullscreen: (Route) -> Unit,
 ) {
-    val quality = Quality.High
+    val dataSettings = LocalDataSettings.current
+    val quality = if (LocalContext.current.onWifiConnection) {
+        dataSettings.imageQuality.onWifi
+    } else {
+        dataSettings.imageQuality.onMobile
+    }
+    val loadImage = when (dataSettings.imageQuality.loadImage) {
+        com.sofamaniac.crabir.settings.data.NetworkPolicy.Always -> true
+        com.sofamaniac.crabir.settings.data.NetworkPolicy.Never -> false
+        com.sofamaniac.crabir.settings.data.NetworkPolicy.OnWifi -> LocalContext.current.onWifiConnection
+    }
     val goFullscreen = {
         goFullscreen(FullscreenImageRoute(post.name))
     }
@@ -75,8 +93,7 @@ fun PostImage(
         .fillMaxSize()
         .then(modifier)
         .let { modifier ->
-            if (blur && blurredImage == null) {
-                // Blur only if not obfuscated preview is available
+            if (blur && blurredImage == null) { // Blur only if not obfuscated preview is available
                 modifier.hazeEffect {
                     inputScale = HazeInputScale.Fixed(0.5f)
                     blurEffect {
@@ -95,12 +112,15 @@ fun PostImage(
             }
         }
         .clickable(enabled = enabled, onClick = goFullscreen)
-    if (blurredImage == null || !blur) {
+    if (!loadImage) {
+        UnloadedPlaceHolder(
+            modifier
+                .height(150.dp)
+                .clickable(enabled = enabled, onClick = goFullscreen)
+        )
+    } else if (blurredImage == null || !blur) {
         ImageView(
-            post,
-            quality = quality,
-            modifier = modifier,
-            allowTransformation = false
+            post, quality = quality, modifier = modifier, allowTransformation = false
         )
     } else {
         AsyncImage(
@@ -110,7 +130,19 @@ fun PostImage(
             contentScale = ContentScale.FillBounds
         )
     }
+}
 
+@Composable
+fun UnloadedPlaceHolder(modifier: Modifier = Modifier) {
+    Box(modifier.background(Color.Gray)) {
+        Icon(
+            Icons.Default.FileDownloadOff,
+            contentDescription = null,
+            modifier = Modifier
+                .size(100.dp)
+                .align(Alignment.Center),
+        )
+    }
 }
 
 @Composable
@@ -119,7 +151,13 @@ fun FullscreenImageView(
     viewModel: PostDataViewModel = koinViewModel { parametersOf(post) },
     dismiss: () -> Unit,
 ) {
-    var quality by remember { mutableStateOf(Quality.High) }
+    val dataSettings = LocalDataSettings.current
+    val initialQuality = if (LocalContext.current.onWifiConnection) {
+        dataSettings.imageQuality.onWifi
+    } else {
+        dataSettings.imageQuality.onMobile
+    }
+    var quality by remember { mutableStateOf(initialQuality) }
     var showDecorations by remember { mutableStateOf(true) }
     val postData by viewModel.post.collectAsState(initial = null)
     var enableDismiss by remember { mutableStateOf(true) }
@@ -131,7 +169,11 @@ fun FullscreenImageView(
             FullscreenTopBar(showDecorations, actions = {
                 DownloadButton(postData!!.getSourceUrl().toUri())
                 if (quality != Quality.Source) IconButton(onClick = { quality = Quality.Source }) {
-                    Icon(Icons.Default.Hd, contentDescription = null, tint = Color.White)
+                    Icon(
+                        Icons.Default.Hd,
+                        contentDescription = "Load highest quality available",
+                        tint = Color.White
+                    )
                 }
             })
         },
@@ -149,8 +191,7 @@ fun FullscreenImageView(
         Box(modifier = Modifier.fillMaxSize()) {
             ImageView(
                 postData!!,
-                allowTransformation = true,
-                //zoomableState = zoomableState,
+                allowTransformation = true, //zoomableState = zoomableState,
                 modifier = Modifier
                     .fillMaxSize()
                     .align(Alignment.Center),

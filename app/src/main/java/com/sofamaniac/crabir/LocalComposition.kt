@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.settings.data.DataSettingsDefault
 import com.sofamaniac.crabir.settings.filters.FiltersSettings
 import com.sofamaniac.crabir.settings.post.PostSettingsDefaults
 import com.sofamaniac.crabir.settings.theme.ConfigureCrabirTheme
@@ -19,6 +20,7 @@ val LocalSnackBarHost = compositionLocalOf<SnackbarHostState?> { null }
 val LocalViewSettings = compositionLocalOf { ViewSettings() }
 val LocalFiltersSettings = compositionLocalOf { FiltersSettings() }
 val LocalPostSettings = compositionLocalOf { PostSettingsDefaults.defaultPostSettings }
+val LocalDataSettings = compositionLocalOf { DataSettingsDefault.defaultDataSettings }
 
 /**Setup local providers for previews*/
 @Composable

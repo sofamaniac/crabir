@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
@@ -32,6 +33,7 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.navigation.ThemeRoute
 import com.sofamaniac.crabir.navigation.ViewsSettingRoute
+import com.sofamaniac.crabir.settings.data.DataSettingsRoute
 import com.sofamaniac.crabir.settings.post.PostSettingsRoute
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -80,6 +82,13 @@ fun SettingsPage() {
                 leadingContent = { Icon(Icons.Default.FilterList, contentDescription = null) },
                 modifier = Modifier.clickable {
                     navController?.navigate(FiltersSettingRoute)
+                }
+            )
+            ListItem(
+                headlineContent = { Text("Data") },
+                leadingContent = { Icon(Icons.Default.DataUsage, contentDescription = null) },
+                modifier = Modifier.clickable {
+                    navController?.navigate(DataSettingsRoute)
                 }
             )
             ListItem(

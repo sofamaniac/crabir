@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -32,14 +33,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Gallery
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.FullscreenGalleryRoute
 import com.sofamaniac.crabir.navigation.Route
+import com.sofamaniac.crabir.onWifiConnection
+import com.sofamaniac.crabir.settings.data.NetworkPolicy
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.crabirBlurStyle
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
@@ -76,8 +81,7 @@ fun PostGallery(
         gallery,
         blur = blur,
         modifier = modifier
-            .fillMaxSize()
-            .aspectRatio(gallery.aspectRatio),
+            .fillMaxSize(),
         goFullscreen = {
             goFullscreen(FullscreenGalleryRoute(post.name, page = state.currentPage))
         },
@@ -99,6 +103,30 @@ fun EmbeddedGallery(
         modifier.blur(40.dp)
     } else {
         modifier
+    }
+    val dataSettings = LocalDataSettings.current
+    val loadImage = when (dataSettings.imageQuality.loadImage) {
+        NetworkPolicy.Always -> true
+        NetworkPolicy.Never -> false
+        NetworkPolicy.OnWifi -> LocalContext.current.onWifiConnection
+    }
+
+    if (!loadImage) {
+        Box(
+            modifier = Modifier
+                .height(200.dp)
+                .clickable { goFullscreen() }) {
+            UnloadedPlaceHolder(modifier.fillMaxSize())
+            Text(
+                "Gallery",
+                modifier = Modifier
+                    .cartouche(Color.Black.copy(0.6f))
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp),
+                color = Color.White
+            )
+        }
+        return
     }
 
 
