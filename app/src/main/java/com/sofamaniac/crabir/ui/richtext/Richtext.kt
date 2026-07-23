@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +34,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -42,6 +45,7 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.sofamaniac.crabir.CrabirUriHandler
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.domain.model.Richtext
 import com.sofamaniac.crabir.domain.model.RichtextDocument
@@ -66,9 +70,19 @@ fun Richtext(
         mediaMetadata = mediaMetadata,
         style = style
     )
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        for (child in document.document) {
-            context.configuration.render(child, context)
+    CompositionLocalProvider(
+        LocalUriHandler provides CrabirUriHandler(
+            LocalNavController.current,
+            LocalUriHandler.current
+        )
+    ) {
+        Column(
+            modifier.semantics(mergeDescendants = true, properties = {}),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            for (child in document.document) {
+                context.configuration.render(child, context)
+            }
         }
     }
 }
@@ -211,7 +225,7 @@ fun Heading(heading: Richtext.Heading, context: Context) {
         6 -> MaterialTheme.typography.titleSmall
         else -> MaterialTheme.typography.headlineLarge
     }
-    Column {
+    Column(modifier = Modifier.semantics(mergeDescendants = true, properties = { heading() })) {
         var index = 0
         while (index < heading.children.size) {
             if (heading.children[index] !is Richtext.TextNode) {

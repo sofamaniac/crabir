@@ -139,25 +139,18 @@ class MainActivity : ComponentActivity() {
             navController = rememberNavController()
             uriHandler = LocalUriHandler.current
             setImageLoader()
-            CompositionLocalProvider(
-                LocalUriHandler provides CrabirUriHandler(
-                    navController,
-                    uriHandler
-                )
-            ) {
-                MainScreen(navController = navController)
-            }
+            MainScreen(navController = navController)
         }
     }
 }
 
 @Immutable
-data class CrabirUriHandler(val navController: NavController, val fallback: UriHandler) :
+data class CrabirUriHandler(val navController: NavController?, val fallback: UriHandler) :
     UriHandler {
     override fun openUri(uri: String) {
         try {
             val request = NavDeepLinkRequest.Builder.fromUri(uri.toUri()).build()
-            navController.navigate(request)
+            navController?.navigate(request)
         } catch (_: IllegalArgumentException) {
             Log.i("CrabirUriHandler", "could not open: $uri")
             fallback.openUri(uri)
