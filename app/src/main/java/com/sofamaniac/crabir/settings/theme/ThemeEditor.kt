@@ -14,9 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -53,8 +57,23 @@ fun ThemeEditor() {
 
     val theme =
         if (mode == ThemeMode.Dark) themeSettings.dark else themeSettings.light
+    val parentTheme = themeSettings.getParentTheme(mode)
     var activeColorField by remember { mutableStateOf<ColorFields?>(null) }
     val scope = rememberCoroutineScope()
+
+    fun updateColor(field: ColorFields, color: Color) {
+        val newTheme = theme.updateFieldValue(field, color)
+        scope.launch {
+            themeDataStore.updateData {
+                if (themeSettings.mode == ThemeMode.Dark) {
+                    themeSettings.copy(dark = newTheme)
+                } else {
+                    themeSettings.copy(light = newTheme)
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Theme editor") })
@@ -70,44 +89,48 @@ fun ThemeEditor() {
                     activeColorField = null
                 },
                 applyChanges = {
-                    scope.launch {
-                        themeDataStore.updateData {
-                            if (themeSettings.mode == ThemeMode.Dark) {
-                                themeSettings.copy(
-                                    dark = theme.updateFieldValue(
-                                        field,
-                                        currentColor
-                                    )
-                                )
-                            } else {
-                                themeSettings.copy(
-                                    light = theme.updateFieldValue(
-                                        field,
-                                        currentColor
-                                    )
-                                )
-                            }
-                        }
-                        activeColorField = null
-                    }
+                    updateColor(field, currentColor)
+                    activeColorField = null
                 }
             )
         }
         Column(modifier = Modifier.padding(paddingValues)) {
             ThemePreviewer { activeColorField = it }
-            TextButton(onClick = {
-                scope.launch {
-                    themeDataStore.updateData { ThemeSettings.DEFAULT }
-                }
-            }) {
-                Text("Reset to default")
-            }
             LazyColumn {
+                item {
+                    ListItem(headlineContent = {
+                        TextButton(onClick = {
+                            scope.launch {
+                                themeDataStore.updateData {
+                                    if (themeSettings.mode == ThemeMode.Dark) {
+                                        themeSettings.copy(dark = parentTheme)
+                                    } else {
+                                        themeSettings.copy(light = parentTheme)
+                                    }
+                                }
+                            }
+                        }) {
+                            Text("Reset to default")
+                        }
+                    })
+                }
+                item {
+                    ListItem(
+                        headlineContent = {
+                            TextButton(onClick = {}) {
+                                Text("Saved themes")
+                            }
+                        },
+                        trailingContent = {
+                            val totalThemes =
+                                themeSettings.collections.dark.size + themeSettings.collections.light.size
+                            Text("$totalThemes themes")
+                        })
+                }
                 items(ColorFields.entries.size, key = { ColorFields.entries[it] }) { field ->
                     val field = ColorFields.entries[field]
                     ListItem(
-                        headlineContent = { Text(field.name) },
-                        trailingContent = {
+                        leadingContent = {
                             Box(
                                 modifier = Modifier
                                     .size(16.dp)
@@ -122,6 +145,21 @@ fun ThemeEditor() {
                                     )
                             )
                         },
+                        headlineContent = { Text(field.name) },
+                        trailingContent = {
+                            val currentColor = theme.getFieldValue(field)
+                            val parentColor = parentTheme.getFieldValue(field)
+                            if (currentColor != parentColor) {
+                                IconButton(onClick = {
+                                    updateColor(field, parentColor)
+                                }) {
+                                    Icon(
+                                        Icons.AutoMirrored.Default.Undo,
+                                        contentDescription = "Reset color"
+                                    )
+                                }
+                            }
+                        },
                         modifier = Modifier.clickable {
                             activeColorField = field
                         },
@@ -135,7 +173,6 @@ fun ThemeEditor() {
 @Composable
 fun ThemePreviewer(setActiveField: (ColorFields) -> Unit) {
     val theme = rememberAppTheme()
-    if (theme == null) return
     Card(
         modifier = Modifier.padding(16.dp),
         colors = CardDefaults.cardColors(containerColor = theme.cardBackground)

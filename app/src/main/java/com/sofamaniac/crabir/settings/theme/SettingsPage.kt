@@ -6,21 +6,32 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ThemeEditorRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
@@ -35,14 +46,64 @@ fun ThemeSettingsPage() {
     val settings = rememberThemeSettings()
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current!!
+    val startTimeState = rememberTimePickerState(
+        initialHour = settings.lightModeStartTime,
+        initialMinute = 0,
+    )
+    val endTimeState = rememberTimePickerState(
+        initialHour = settings.lightModeEndTime,
+        initialMinute = 0,
+    )
 
-    Scaffold { innerPadding ->
+    var showStartTimeDialog by remember { mutableStateOf(false) }
+    var showEndTimeDialog by remember { mutableStateOf(false) }
+
+    if (showStartTimeDialog) {
+        TimePickerDialog(
+            onDismiss = { showStartTimeDialog = false },
+            onConfirm = {
+                scope.launch {
+                    themeDataStore.updateData {
+                        it.copy(lightModeStartTime = startTimeState.hour)
+                    }
+                }
+                showStartTimeDialog = false
+            }
+        ) {
+            TimePicker(state = startTimeState)
+        }
+    }
+    if (showEndTimeDialog) {
+        TimePickerDialog(
+            onDismiss = { showEndTimeDialog = false },
+            onConfirm = {
+                scope.launch {
+                    themeDataStore.updateData {
+                        it.copy(lightModeEndTime = endTimeState.hour)
+                    }
+                }
+                showEndTimeDialog = false
+            }
+        ) {
+            TimePicker(state = endTimeState)
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text("Theme settings") }, navigationIcon = {
+                BackButton {
+                    navController.popBackStack()
+                }
+            })
+        }
+    ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             ListSelector(
                 leadingContent = {
                     Icon(
                         Icons.Default.Brightness6,
-                        contentDescription = "Dark mode"
+                        contentDescription = null,
                     )
                 },
                 headlineContent = { Text("Theme") },
@@ -79,7 +140,49 @@ fun ThemeSettingsPage() {
                 },
                 icon = Icons.Default.Palette
             )
+            if (settings.mode == ThemeMode.Scheduled) {
+                ListItem(
+                    headlineContent = {
+                        Text("Light mode start time")
+                    },
+                    trailingContent = {
+                        val hour = "%02d".format(endTimeState.hour)
+                        val minute = "%02d".format(endTimeState.minute)
+                        Text(
+                            "${hour}:${minute}"
+                        )
+                    },
+                    modifier = Modifier.clickable {
+                        showStartTimeDialog = true
+                    }
+                )
+                ListItem(
+                    headlineContent = {
+                        Text("Light mode end time")
+                    },
+                    trailingContent = {
+                        val hour = "%02d".format(endTimeState.hour)
+                        val minute = "%02d".format(endTimeState.minute)
+                        Text(
+                            "${hour}:${minute}"
+                        )
+                    },
+                    modifier = Modifier.clickable {
+                        showEndTimeDialog = true
+                    }
+                )
+            }
         }
+    }
+}
+
+@Composable
+fun BackButton(onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
+        Icon(
+            Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = stringResource(R.string.back)
+        )
     }
 }
 
@@ -114,5 +217,28 @@ fun ConditionalListItem(
                 tint = contentColor
             )
         }
+    )
+}
+
+
+@Composable
+fun TimePickerDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        dismissButton = {
+            TextButton(onClick = { onDismiss() }) {
+                Text("Dismiss")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm() }) {
+                Text("OK")
+            }
+        },
+        text = { content() }
     )
 }

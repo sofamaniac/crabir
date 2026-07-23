@@ -4,6 +4,7 @@ package com.sofamaniac.crabir.settings.theme
 
 import android.app.Activity
 import android.content.Context
+import android.icu.util.Calendar
 import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -204,22 +205,50 @@ enum class ThemeMode {
     }
 }
 
+@Serializable
+data class ThemeCollections(
+    val light: Map<String, CrabirTheme> = buildMap {
+        put("default", DefaultLightTheme)
+    },
+    val dark: Map<String, CrabirTheme> = buildMap {
+        put("default", DefaultDarkTheme)
+    },
+)
+
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonIgnoreUnknownKeys
 data class ThemeSettings(
     val dark: CrabirTheme,
+    val darkParentTheme: String,
     val light: CrabirTheme,
+    val lightParentTheme: String,
     val mode: ThemeMode,
     val dynamicColor: Boolean,
+    val collections: ThemeCollections = ThemeCollections(),
     val lightModeStartTime: Int = 6,
     val lightModeEndTime: Int = 18,
 ) {
 
-    fun currentTheme(default: ThemeMode): CrabirTheme {
-        assert(default != ThemeMode.System)
-        val mode = if (mode == ThemeMode.System) default else mode
+    @Composable
+    fun currentMode(): ThemeMode {
         return when (mode) {
+            ThemeMode.Dark, ThemeMode.Light -> mode
+            ThemeMode.System -> if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
+            ThemeMode.Scheduled -> {
+                val currentTime = Calendar.getInstance()
+                if (currentTime.get(Calendar.HOUR_OF_DAY) in lightModeStartTime..lightModeEndTime) {
+                    ThemeMode.Light
+                } else {
+                    ThemeMode.Dark
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun currentTheme(): CrabirTheme {
+        return when (currentMode()) {
             ThemeMode.Dark -> dark
             ThemeMode.Light -> light
             else -> {
@@ -228,8 +257,25 @@ data class ThemeSettings(
         }
     }
 
+    fun getParentTheme(mode: ThemeMode): CrabirTheme {
+        return when (mode) {
+            ThemeMode.Dark -> collections.dark[darkParentTheme] ?: DefaultDarkTheme
+            ThemeMode.Light -> collections.light[lightParentTheme] ?: DefaultLightTheme
+            else -> {
+                throw Exception("Unreachable code")
+            }
+        }
+    }
+
     companion object {
-        val DEFAULT = ThemeSettings(DefaultDarkTheme, DefaultLightTheme, ThemeMode.System, true)
+        val DEFAULT = ThemeSettings(
+            DefaultDarkTheme,
+            "default",
+            DefaultLightTheme,
+            "default",
+            ThemeMode.System,
+            true
+        )
     }
 }
 
@@ -278,7 +324,7 @@ fun rememberAppTheme(): CrabirTheme {
     val colorScheme = MaterialTheme.colorScheme
     val dynamicTheme = CrabirTheme.fromColorScheme(colorScheme)
     val mode = rememberThemeMode()
-    val crabirTheme = theme.currentTheme(mode)
+    val crabirTheme = theme.currentTheme()
     setSystemBarsColor()(theme.mode, crabirTheme.toolbarBackground)
     if (theme.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         return dynamicTheme
@@ -294,11 +340,15 @@ fun ConfigureCrabirTheme(content: @Composable () -> Unit) {
     val themeSettings by themeDataStore.data.collectAsState(
         initial = null,
     )
-    val mode = when (themeSettings?.mode) {
-        ThemeMode.System, null -> if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
-        else -> themeSettings!!.mode
+    val mode = if (themeSettings != null) {
+        themeSettings!!.currentMode()
+    } else if (isSystemInDarkTheme()) {
+        ThemeMode.Dark
+    } else {
+        ThemeMode.Light
     }
-    val crabirTheme = themeSettings?.currentTheme(mode)
+
+    val crabirTheme = themeSettings?.currentTheme()
         ?: if (mode == ThemeMode.Dark) DefaultDarkTheme else DefaultLightTheme
     setSystemBarsColor()(mode, crabirTheme.toolbarBackground)
     ConfigureMaterialTheme {
@@ -350,10 +400,9 @@ private fun ConfigureMaterialTheme(
 
     val themeSettings = rememberThemeSettings()
     val context = LocalContext.current
-    val darkModeEnabled = when (themeSettings.mode) {
+    val darkModeEnabled = when (themeSettings.currentMode()) {
         ThemeMode.Dark -> true
         ThemeMode.Light -> false
-        ThemeMode.System -> isSystemInDarkTheme()
         else -> false
     }
 

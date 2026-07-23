@@ -27,7 +27,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.IntOffset
 import com.sofamaniac.crabir.settings.theme.ThemeMode
-import com.sofamaniac.crabir.settings.theme.rememberThemeMode
 import com.sofamaniac.crabir.settings.theme.rememberThemeSettings
 import com.sofamaniac.crabir.settings.theme.setSystemBarsColor
 import kotlinx.coroutines.launch
@@ -68,7 +67,7 @@ fun VerticalSwipeToDismiss(
     val theme = rememberThemeSettings()
     val updateBars = setSystemBarsColor()
     var isDismissing by remember { mutableStateOf(false) }
-    val themeMode = rememberThemeMode()
+    val toolbarBackground = theme.currentTheme().toolbarBackground
     DisposableEffect(theme.mode) {
         if (backgroundColor.luminance() > 0.5) {
             updateBars(ThemeMode.Light, Color.White)
@@ -76,7 +75,7 @@ fun VerticalSwipeToDismiss(
             updateBars(ThemeMode.Dark, Color.Black)
         }
         onDispose {
-            updateBars(theme.mode, theme.currentTheme(themeMode).toolbarBackground)
+            updateBars(theme.mode, toolbarBackground)
         }
     }
 
