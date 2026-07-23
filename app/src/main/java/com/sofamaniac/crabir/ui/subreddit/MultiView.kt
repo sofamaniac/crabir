@@ -12,12 +12,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.lifecycle.viewModelScope
+import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.data.local.dao.MultiRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.remote.dto.MultiData
 import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.MultiPostsRepository
-import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.TabBar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +42,7 @@ fun MultiView(
     val params by viewModel.params.collectAsState()
     val info by viewModel.info.collectAsState()
     val entity by viewModel.entity.collectAsState(null)
-    val defaultView = rememberViewSettings().defaultView
+    val defaultView = LocalViewSettings.current.defaultView
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val topBar = @Composable {
         TopBar(

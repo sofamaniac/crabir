@@ -12,14 +12,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sofamaniac.crabir.LocalPostSettings
+import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.settings.post.AutoPlayVideo
-import com.sofamaniac.crabir.settings.post.rememberPostsSettings
-import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.post.BottomRow
 import com.sofamaniac.crabir.ui.post.DummyInteraction
@@ -98,7 +98,7 @@ internal fun PostCardContent(
     interactions: LinkInteraction,
 ) {
 
-    val viewSettings = rememberViewSettings()
+    val viewSettings = LocalViewSettings.current
     val context = LocalContext.current
     val connectionState = context.onWifiConnection
     val settings by interactions.linksSettings.collectAsState(initial = null)
@@ -121,7 +121,7 @@ internal fun PostCardContent(
     } else {
         {}
     }
-    val showOpenButton = rememberPostsSettings().buttonsSettings.comments
+    val showOpenButton = LocalPostSettings.current.buttonsSettings.comments
     ThemedCard(
         roundedCorners = viewSettings.cardSettings.roundedCorners,
         modifier = Modifier

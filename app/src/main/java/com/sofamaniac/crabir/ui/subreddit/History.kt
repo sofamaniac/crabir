@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.paging.PagingSource
+import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
@@ -26,7 +27,6 @@ import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository
-import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.TabBar
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -44,7 +44,7 @@ fun HistoryViewer(
     val scope = rememberCoroutineScope()
     val title = stringResource(R.string.History)
     val entity by viewModel.entity.collectAsState(null)
-    val defaultView = rememberViewSettings().defaultView
+    val defaultView = LocalViewSettings.current.defaultView
     val params by viewModel.params.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val topBar = @Composable {

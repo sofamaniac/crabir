@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.LocalFiltersSettings
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.navigation.Route
-import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.ui.markdown.HeightRestrictedWithGradient
 import com.sofamaniac.crabir.ui.post.PostGallery
 import com.sofamaniac.crabir.ui.post.PostImage
@@ -37,7 +37,7 @@ internal fun PostBody(
         navController?.navigate(route)
     }
 
-    val filters = rememberFiltersSettings()
+    val filters = LocalFiltersSettings.current
     val blur = post.spoiler || (post.over18 && filters.blurNSFW)
 
     val selftextView = @Composable {

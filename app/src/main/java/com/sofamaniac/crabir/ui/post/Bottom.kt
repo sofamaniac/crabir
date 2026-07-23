@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.BuildConfig
+import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.PostData
@@ -45,7 +46,6 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.post.ButtonsSettings
-import com.sofamaniac.crabir.settings.post.rememberPostsSettings
 import com.sofamaniac.crabir.ui.post.buttons.HideButton
 import com.sofamaniac.crabir.ui.post.buttons.HideButtonLong
 import com.sofamaniac.crabir.ui.post.buttons.MuteButton
@@ -71,7 +71,7 @@ fun BottomRow(
     post: PostData,
     modifier: Modifier = Modifier,
     interactions: LinkInteraction,
-    buttonsSettings: ButtonsSettings = rememberPostsSettings().buttonsSettings,
+    buttonsSettings: ButtonsSettings = LocalPostSettings.current.buttonsSettings,
     action: (@Composable () -> Unit)? = null,
 ) {
     val likes by interactions.likes.collectAsState(post.relationship.liked)

@@ -38,6 +38,7 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
@@ -45,7 +46,6 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.post.InfoSettings
-import com.sofamaniac.crabir.settings.post.rememberPostsSettings
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import com.sofamaniac.crabir.ui.user.ProfileTabs
@@ -57,7 +57,7 @@ fun PostHeader(
     modifier: Modifier = Modifier,
     showSubredditIcon: Boolean = true,
     showPrefix: Boolean = false,
-    settings: InfoSettings = rememberPostsSettings().infoSettings,
+    settings: InfoSettings = LocalPostSettings.current.infoSettings,
 ) {
     val navController = LocalNavController.current
     val theme = LocalTheme.current

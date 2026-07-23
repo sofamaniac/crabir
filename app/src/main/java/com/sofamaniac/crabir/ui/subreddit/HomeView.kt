@@ -16,6 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
@@ -24,7 +25,6 @@ import com.sofamaniac.crabir.data.remote.reddit.HOME
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.HomeRepository
-import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.TabBar
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -35,14 +35,14 @@ import org.koin.core.annotation.KoinViewModel
 @Composable
 fun HomeViewer(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = koinViewModel()
+    viewModel: HomeViewModel = koinViewModel(),
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
     val title = stringResource(R.string.Home)
     val params by viewModel.params.collectAsState()
     val entity by viewModel.entity.collectAsState(null)
-    val defaultView = rememberViewSettings().defaultView
+    val defaultView = LocalViewSettings.current.defaultView
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val topBar = @Composable {
         TopBar(

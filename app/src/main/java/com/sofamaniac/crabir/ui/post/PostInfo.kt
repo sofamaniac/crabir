@@ -19,13 +19,13 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.LocalFiltersSettings
+import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SearchRoute
-import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.settings.post.FlairSettings
-import com.sofamaniac.crabir.settings.post.rememberPostsSettings
 import com.sofamaniac.crabir.ui.Flair
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.votable.ScoreString
@@ -42,12 +42,12 @@ fun PostInfo(
     enableThumbnail: Boolean = true,
     read: Boolean = false,
     likes: () -> Boolean?,
-    flairSettings: FlairSettings = rememberPostsSettings().flairSettings,
+    flairSettings: FlairSettings = LocalPostSettings.current.flairSettings,
     markAsRead: () -> Unit = {},
 ) {
     val navController = LocalNavController.current
     val theme = LocalTheme.current
-    val blur = rememberFiltersSettings().blurNSFW && post.over18
+    val blur = LocalFiltersSettings.current.blurNSFW && post.over18
     Row(
         modifier = modifier
             .fillMaxWidth()

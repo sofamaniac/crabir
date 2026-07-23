@@ -15,12 +15,12 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
+import com.sofamaniac.crabir.LocalFiltersSettings
 import com.sofamaniac.crabir.data.remote.streamable.StreamableAPI
 import com.sofamaniac.crabir.data.remote.streamable.Video
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
 import com.sofamaniac.crabir.navigation.Route
-import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.ui.cartouche
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -68,7 +68,7 @@ fun StreamableVideo(
 ) {
     val video by viewModel.video.collectAsState()
     val thumbnailUrl by viewModel.thumbnailUrl.collectAsState()
-    val filters = rememberFiltersSettings()
+    val filters = LocalFiltersSettings.current
     val blur = post.spoiler || (post.over18 && filters.blurNSFW)
     if (video == null) return
     val goFullscreen = {

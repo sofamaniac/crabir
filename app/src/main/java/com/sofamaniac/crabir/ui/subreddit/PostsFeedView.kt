@@ -39,11 +39,11 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.PreviewLocalComposition
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.settings.views.Views
-import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.post.CompactView
 import com.sofamaniac.crabir.ui.post.DummyInteraction
@@ -112,7 +112,7 @@ fun <T : VotableData> PostFeedViewer(
         }.distinctUntilChanged()
     }.collectAsState(null)
 
-    val viewSettings = rememberViewSettings()
+    val viewSettings = LocalViewSettings.current
     val state = rememberPullToRefreshState()
     val theme = LocalTheme.current
 
@@ -221,7 +221,7 @@ fun PostView(
         )
     },
 ) {
-    val viewSettings = rememberViewSettings()
+    val viewSettings = LocalViewSettings.current
     val view = if (!viewSettings.rememberView) viewSettings.defaultView else view
     PostView(
         thing,

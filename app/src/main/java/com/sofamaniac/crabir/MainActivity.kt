@@ -68,6 +68,7 @@ import com.sofamaniac.crabir.navigation.postGraph
 import com.sofamaniac.crabir.navigation.profileGraph
 import com.sofamaniac.crabir.navigation.settingsGraph
 import com.sofamaniac.crabir.navigation.subredditGraph
+import com.sofamaniac.crabir.settings.ConfigureSettings
 import com.sofamaniac.crabir.settings.theme.ConfigureCrabirTheme
 import com.sofamaniac.crabir.ui.InboxView
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
@@ -211,22 +212,24 @@ fun MainScreen(
     }
     val currentAccount = rememberCurrentAccount()
     ConfigureCrabirTheme {
-        CompositionLocalProvider(
-            LocalNavController provides navController,
-            LocalRedditAccount provides currentAccount,
-        ) {
+        ConfigureSettings {
+            CompositionLocalProvider(
+                LocalNavController provides navController,
+                LocalRedditAccount provides currentAccount,
+            ) {
 
-            LaunchedEffect(currentAccount) {
-                if (!currentAccount.isUninitialized()) {
-                    navController.navigate(HomeRoute) {
-                        popUpTo(0) { inclusive = true }
-                        //launchSingleTop = true
+                LaunchedEffect(currentAccount) {
+                    if (!currentAccount.isUninitialized()) {
+                        navController.navigate(HomeRoute) {
+                            popUpTo(0) { inclusive = true }
+                            //launchSingleTop = true
+                        }
                     }
                 }
+                NavigationGraph(
+                    navController,
+                )
             }
-            NavigationGraph(
-                navController,
-            )
         }
     }
 }

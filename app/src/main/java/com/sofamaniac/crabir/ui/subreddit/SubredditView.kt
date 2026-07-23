@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.domain.model.SubredditData
@@ -48,7 +49,6 @@ import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import com.sofamaniac.crabir.domain.repository.feed.SubredditPostsRepository
 import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
-import com.sofamaniac.crabir.settings.views.rememberViewSettings
 import com.sofamaniac.crabir.ui.TabBar
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,7 +71,7 @@ fun SubredditViewer(
     val params by viewModel.params.collectAsState()
     val feedInfo by viewModel.info.collectAsState()
     val entity by viewModel.entity.collectAsState(null)
-    val defaultView = rememberViewSettings().defaultView
+    val defaultView = LocalViewSettings.current.defaultView
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val topBar = @Composable {
