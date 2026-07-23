@@ -63,9 +63,10 @@ data class TableStyle(
 
 @Composable
 fun defaultTableStyle(): TableStyle {
-    val headerColor = Color(0xFF333333)
-    val rowColor1 = Color(0xFF464646)
-    val rowColor2 = Color(0xFF333232)
+    val theme = LocalTheme.current
+    val headerColor = theme.secondaryText.copy(alpha = 0.5f)
+    val rowColor1 = theme.secondaryText.copy(alpha = 0.1f)
+    val rowColor2 = theme.secondaryText.copy(alpha = 0.3f)
     return TableStyle(
         headerBackground = headerColor,
         rowBackground1 = rowColor1,
