@@ -71,16 +71,16 @@ fun CommentContent(
     comment: CommentData,
     viewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
-    enableAnimation: Boolean = true
+    enableAnimation: Boolean = true,
 ) {
 
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
-    Column {
+    Column(modifier = modifier) {
         if (comment.depth == 0) HorizontalDivider()
         ThemedCard(
             roundedCorners = false,
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .depthIndent(comment.depth.coerceAtLeast(0))
                 .combinedClickable(
@@ -102,10 +102,10 @@ fun LazyListScope.commentNode(
     comment: CommentData,
     viewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
-    enableAnimation: Boolean = true
+    enableAnimation: Boolean = true,
 ) {
-    item {
-        CommentContent(comment, viewModel, modifier, enableAnimation)
+    item(key = comment.name) {
+        CommentContent(comment, viewModel, modifier.animateItem(), enableAnimation)
     }
 }
 
@@ -158,7 +158,7 @@ fun ColumnScope.OpenedComment(
     comment: CommentData,
     viewModel: CommentViewModelInterface,
     modifier: Modifier = Modifier,
-    enableAnimation: Boolean = true
+    enableAnimation: Boolean = true,
 ) {
     val context = LocalContext.current
     val showBottomBar by remember(comment.name, context) {
@@ -187,7 +187,7 @@ fun ColumnScope.OpenedComment(
 fun BottomRow(
     comment: CommentData,
     viewModel: CommentViewModelInterface,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val likes = comment.relationship.liked
     val saved = comment.relationship.saved
