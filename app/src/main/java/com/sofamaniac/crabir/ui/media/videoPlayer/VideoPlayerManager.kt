@@ -10,6 +10,7 @@ import androidx.media3.common.Player.REPEAT_MODE_ONE
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.Tracks
 import androidx.media3.exoplayer.ExoPlayer
+import com.sofamaniac.crabir.settings.data.VideoQuality
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +27,8 @@ object VideoPlayerManager {
     private var _hasAudio = MutableStateFlow(false)
     val hasAudio = _hasAudio.asStateFlow()
 
+    var preferredQuality = VideoQuality.Auto
+
     fun initialize(context: Context) {
         player = ExoPlayer.Builder(context).build().apply {
             repeatMode = REPEAT_MODE_ONE
@@ -35,6 +38,27 @@ object VideoPlayerManager {
                     super.onTracksChanged(tracks)
                     _hasAudio.update {
                         tracks.groups.any { it.type == C.TRACK_TYPE_AUDIO }
+                    }
+                    when (preferredQuality) {
+                        VideoQuality.Low -> {
+                            val tracks = tracks.groups.firstOrNull { it.type == C.TRACK_TYPE_VIDEO }
+                            if (tracks != null) {
+                                setTrack(tracks, 0)
+                            }
+                        }
+
+                        VideoQuality.High -> {
+                            val tracks = tracks.groups.firstOrNull { it.type == C.TRACK_TYPE_VIDEO }
+                            if (tracks != null) {
+                                setTrack(tracks, tracks.length - 1)
+                            }
+                        }
+
+                        else -> {
+                            player.trackSelectionParameters =
+                                player.trackSelectionParameters.buildUpon().clearOverrides().build()
+                        }
+
                     }
                 }
             })
@@ -46,9 +70,18 @@ object VideoPlayerManager {
         return player
     }
 
-    fun setMediaItem(uri: String, key: String, playWhenReady: Boolean = true, volume: Float = 0f) {
+    fun setMediaItem(
+        uri: String,
+        key: String,
+        playWhenReady: Boolean = true,
+        volume: Float = 0f,
+        quality: VideoQuality = VideoQuality.Auto,
+    ) {
         val newUri = uri.toUri()
         _currentKey.value = key
+
+        preferredQuality = quality
+
         if (_currentUrl.value.checkEquality(newUri)) {
             player.apply {
                 this.playWhenReady = playWhenReady
@@ -80,21 +113,23 @@ object VideoPlayerManager {
     }
 
     fun setTrack(group: Tracks.Group, index: Int = 0) {
-        player.trackSelectionParameters = player.trackSelectionParameters
-            .buildUpon()
-            .setOverrideForType(TrackSelectionOverride(group.mediaTrackGroup, index))
-            .build() ?: return
+        player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+            .setOverrideForType(TrackSelectionOverride(group.mediaTrackGroup, index)).build()
     }
 
     fun setAutoTrack() {
-        player.trackSelectionParameters = player.trackSelectionParameters
-            .buildUpon()
-            .clearOverrides()
-            .build() ?: return
+        player.trackSelectionParameters =
+            player.trackSelectionParameters.buildUpon().clearOverrides().build()
     }
 
     fun isAuto(): Boolean {
-        return player.trackSelectionParameters.overrides?.isEmpty() ?: true
+        return player.trackSelectionParameters.overrides.isEmpty()
+    }
+
+    fun pause(key: String) {
+        if (_currentKey.value == key) {
+            player.pause()
+        }
     }
 
 

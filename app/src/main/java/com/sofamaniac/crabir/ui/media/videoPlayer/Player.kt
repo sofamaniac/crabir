@@ -25,11 +25,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.ContentFrame
 import androidx.media3.ui.compose.state.rememberPresentationState
 import com.sofamaniac.crabir.domain.model.MediaResource
+import com.sofamaniac.crabir.onWifiConnection
+import com.sofamaniac.crabir.settings.data.VideoQuality
+import com.sofamaniac.crabir.settings.data.rememberDataSettings
 import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.AlwaysOnInfo
@@ -54,6 +58,7 @@ fun DecoratedVideoPlayer(
     autostart: Boolean = false,
     startMuted: Boolean = true,
     clickable: Boolean = true,
+    quality: VideoQuality = VideoQuality.Auto,
 ) {
     var showControls by remember { mutableStateOf(false) }
 
@@ -72,10 +77,11 @@ fun DecoratedVideoPlayer(
                 media.url,
                 key,
                 playWhenReady = true,
-                volume = if (startMuted) 0f else 1f
+                volume = if (startMuted) 0f else 1f,
+                quality = quality,
             )
         } else if (isActive) {
-            player.pause()
+            VideoPlayerManager.pause(key)
         }
     }
 
@@ -110,7 +116,11 @@ fun DecoratedVideoPlayer(
             if (clickable) {
                 mod.clickable {
                     if (!isActive) {
-                        VideoPlayerManager.setMediaItem(media.url, key)
+                        VideoPlayerManager.setMediaItem(
+                            media.url,
+                            key,
+                            quality = quality,
+                        )
                         player.playWhenReady = true
                     } else {
                         showControls = !showControls
@@ -160,6 +170,13 @@ fun VideoPlayer(
     val currentKey by VideoPlayerManager.currentKey.collectAsState()
     val isActive = currentKey == key
 
+    val dataSettings = rememberDataSettings()
+    val context = LocalContext.current
+    val currentQuality = if (context.onWifiConnection) {
+        dataSettings.videoQuality.onWifi
+    } else {
+        dataSettings.videoQuality.onMobile
+    }
 
     LaunchedEffect(startPlaying) {
         if (startPlaying) {
@@ -167,7 +184,8 @@ fun VideoPlayer(
                 media.url,
                 key,
                 playWhenReady = true,
-                volume = if (mute) 0f else 1f
+                volume = if (mute) 0f else 1f,
+                quality = currentQuality
             )
         }
     }

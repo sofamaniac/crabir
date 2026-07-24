@@ -21,16 +21,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
+import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
 import com.sofamaniac.crabir.navigation.Route
+import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.VIDEO_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.YOUTUBE_CARTOUCHE_COLOR
@@ -148,6 +151,12 @@ fun PostVideo(
             }
         }
     } else {
+        val videoQualitySettings = LocalDataSettings.current.videoQuality
+        val videoQuality = if (LocalContext.current.onWifiConnection) {
+            videoQualitySettings.onWifi
+        } else {
+            videoQualitySettings.onMobile
+        }
         DecoratedVideoPlayer(
             video,
             key = key,
@@ -156,6 +165,7 @@ fun PostVideo(
             clickable = true,
             modifier = modifier,
             cartouche = cartouche,
+            quality = videoQuality,
             fullscreenButton = {
                 IconButton(onClick = {
                     goFullscreen()
