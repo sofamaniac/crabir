@@ -1,8 +1,4 @@
-/*
- * Copyright (c) 2025 Antoine Grimod
- */
-
-package com.sofamaniac.crabir.reddit
+package com.sofamaniac.crabir.data.remote.dto
 
 import kotlinx.serialization.Serializable
 
@@ -10,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class Thumbnail(
     val uri: String,
     val width: Int,
-    val height: Int
+    val height: Int,
 )

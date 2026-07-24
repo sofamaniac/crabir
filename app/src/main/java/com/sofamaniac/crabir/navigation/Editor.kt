@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
-import com.sofamaniac.crabir.ui.editor.CrosspostCreator
+import com.sofamaniac.crabir.ui.editor.crosspostEditor.CrosspostCreator
 import com.sofamaniac.crabir.ui.editor.postEditor.PostCreator
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf

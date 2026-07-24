@@ -6,6 +6,7 @@ import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -13,6 +14,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Tag
 
 interface SubredditAPI {
     @GET("{sort}.json")
@@ -30,7 +32,7 @@ interface SubredditAPI {
         @Path(
             "subreddit",
             encoded = true
-        ) subreddit: String
+        ) subreddit: String,
     ): Response<Subreddit>
 
     /** Get the list of subreddits the user is subscribed to. */
@@ -81,4 +83,14 @@ interface SubredditAPI {
         @Field("sr_name") name: String,
         @Field("make_favorite") favorite: Boolean,
     ): Response<Unit>
+
+    @GET("api/crosspostable_subreddits.json")
+    suspend fun getCrosspostableSubreddits(
+        @Query("sr_detail") details: Boolean = true,
+        @Query("after") after: Fullname? = null,
+        @Query("before") before: String? = null,
+        @Query("count") count: Int = 0,
+        @Query("limit") limit: Int = API_LIMIT,
+        @Tag account: RedditAccount? = null,
+    ): Response<Listing<Subreddit>>
 }

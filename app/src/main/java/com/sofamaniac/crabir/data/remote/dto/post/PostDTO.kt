@@ -9,6 +9,7 @@
 package com.sofamaniac.crabir.data.remote.dto.post
 
 import com.sofamaniac.crabir.data.remote.dto.LinkFlairRichtext
+import com.sofamaniac.crabir.data.remote.dto.Thumbnail
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetails
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
@@ -32,7 +33,6 @@ import com.sofamaniac.crabir.domain.model.Score
 import com.sofamaniac.crabir.domain.model.Selftext
 import com.sofamaniac.crabir.domain.model.SubredditInfo
 import com.sofamaniac.crabir.domain.model.getKind
-import com.sofamaniac.crabir.reddit.Thumbnail
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -469,7 +469,7 @@ data class MediaPreview(
     /** Url of the preview */
     @SerialName("u") val url: String? = null,
     @SerialName("x") val width: Int = 0,
-    @SerialName("y") val height: Int = 0
+    @SerialName("y") val height: Int = 0,
 ) {
     val ratio: Float
         get() = width.toFloat() / height.toFloat()

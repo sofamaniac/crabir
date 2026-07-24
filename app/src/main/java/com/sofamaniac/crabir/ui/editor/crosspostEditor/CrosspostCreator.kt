@@ -1,7 +1,8 @@
-package com.sofamaniac.crabir.ui.editor
+package com.sofamaniac.crabir.ui.editor.crosspostEditor
 
-import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,10 +10,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.insert
 import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Close
@@ -43,37 +47,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.data.local.dao.SubredditRepository
-import com.sofamaniac.crabir.data.remote.reddit.CrosspostSubmissionBuilder
 import com.sofamaniac.crabir.data.remote.reddit.MissingTitle
-import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
-import com.sofamaniac.crabir.data.remote.reddit.SubmissionBuilderError
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.domain.repository.AccountsRepository
-import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.settings.helper.SwitchTile
 import com.sofamaniac.crabir.ui.ThemedCard
+import com.sofamaniac.crabir.ui.editor.AccountSelector
 import com.sofamaniac.crabir.ui.editor.postEditor.CommunitySelector
-import com.sofamaniac.crabir.ui.editor.postEditor.CreatorViewModel
 import com.sofamaniac.crabir.ui.post.PostHeader
 import com.sofamaniac.crabir.ui.post.PostInfo
-import kotlinx.coroutines.flow.Flow
+import com.sofamaniac.crabir.ui.subredditList.Tile
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.annotation.InjectedParam
-import org.koin.core.annotation.KoinViewModel
 import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrosspostCreator(
     post: Fullname,
-    viewModel: CrosspostCreatorViewModel = koinViewModel { parametersOf(post) }
+    viewModel: CrosspostCreatorViewModel = koinViewModel { parametersOf(post) },
 ) {
     val navController = LocalNavController.current
     val theme = LocalTheme.current
@@ -127,8 +125,12 @@ fun CrosspostCreator(
                     .background(color = theme.cardBackground)
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                CommunitySelector(viewModel)
+                CommunitySelector(viewModel) { onDismiss ->
+                    CrosspostCommunitySearch(viewModel = viewModel, onDismiss = onDismiss)
+                }
                 TextField(
                     state = viewModel.titleState,
                     label = { Text("Title") },
@@ -159,6 +161,8 @@ fun CrosspostCreator(
                 }
                 AccountSelector(accounts, selectedAccount) { newId ->
                     selectedAccount = accounts.find { it.id == newId }!!
+                    viewModel.resetSubreddit()
+                    viewModel.setAccount(selectedAccount)
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FilterChip(
@@ -184,6 +188,14 @@ fun CrosspostCreator(
                         }
                     )
                 }
+                SwitchTile(
+                    leadingContent = {},
+                    headlineContent = { Text("Send reply notification") },
+                    checked = viewModel.state.sendReplies,
+                    onCheckedChange = {
+                        viewModel.state = viewModel.state.copy(sendReplies = it)
+                    }
+                )
                 CrosspostView(post)
             }
         }
@@ -203,24 +215,18 @@ internal fun CrosspostView(
     val modifier = modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
+    val theme = LocalTheme.current
 
     ThemedCard(
         roundedCorners = false,
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        PostHeader(
-            post,
-            modifier = modifier.padding(vertical = 8.dp)
-        )
-        val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
-        PostInfo(
-            post,
-            modifier = modifier,
-            enableThumbnail = enablePreview && !post.isCrosspost,
-            likes = { post.relationship.liked }
-        )
-        Column {
+        Column(
+            modifier = Modifier
+                .border(width = 1.dp, color = theme.secondaryText)
+                .padding(8.dp)
+        ) {
             PostHeader(post, showSubredditIcon = false)
             PostInfo(
                 post,
@@ -232,50 +238,52 @@ internal fun CrosspostView(
     }
 }
 
-@KoinViewModel
-class CrosspostCreatorViewModel(
-    @InjectedParam val parentFullname: Fullname,
-    api: RedditAPIService,
-    communities: SubredditRepository,
-    linksRepository: LinksRepository,
-    private val accountsRepository: AccountsRepository,
-) : CreatorViewModel(api, communities) {
-    var state by mutableStateOf(
-        CrosspostSubmissionBuilder(
-            crosspostFullname = parentFullname
-        )
-    )
-    val post = linksRepository.get(parentFullname)
-
-    var loading by mutableStateOf(false)
-    val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
-
-    suspend fun submit(account: RedditAccount?): Result<Unit> {
-        loading = true
-        state = state.copy(
-            title = titleState.text as String,
-            subreddit = community?.displayName ?: ""
-        )
-        val submission = state.build()
-        if (submission.isFailure) {
-            Log.e("PostCreatorViewModel", "submit: ${submission.exceptionOrNull()}")
-            error = submission.exceptionOrNull() as SubmissionBuilderError?
-            loading = false
-            return Result.failure(error!!)
-        } else {
-            val res = api.submitPost(submission.getOrThrow(), account = account)
-            loading = false
-            return if (res.isSuccessful) {
-                val response = res.body()
-                Log.d("PostCreatorViewModel", "submit: $response")
-                if (response?.json?.errors?.isNotEmpty() == true) {
-                    Result.failure(Exception(response.json.errors.toString()))
+@Composable
+fun CrosspostCommunitySearch(
+    viewModel: CrosspostCreatorViewModel,
+    onDismiss: () -> Unit,
+) {
+    val communities = viewModel.data.collectAsLazyPagingItems()
+    Dialog(onDismissRequest = onDismiss) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Select Community") },
+                    navigationIcon = {
+                        IconButton(onClick = onDismiss) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Close search"
+                            )
+                        }
+                    },
+                )
+            }
+        ) { paddingValues ->
+            LazyColumn(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+            ) {
+                if (communities.itemCount > 0) {
+                    items(
+                        count = communities.itemCount,
+                        key = communities.itemKey { p -> p.name }) { index ->
+                        val subreddit = communities[index]!!
+                        Tile(subreddit, modifier = Modifier.clickable {
+                            viewModel.setSubreddit(subreddit)
+                            onDismiss()
+                        })
+                    }
                 } else {
-                    Result.success(Unit)
+                    item {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                        }
+                    }
                 }
-            } else {
-                Result.failure(Exception("Failed to submit post: ${res.errorBody()}"))
             }
         }
     }
 }
+

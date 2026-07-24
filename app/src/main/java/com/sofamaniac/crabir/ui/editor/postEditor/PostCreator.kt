@@ -58,6 +58,7 @@ import com.sofamaniac.crabir.data.remote.reddit.MissingTitle
 import com.sofamaniac.crabir.data.remote.reddit.MissingUrl
 import com.sofamaniac.crabir.data.remote.reddit.PostSubmissionBuilder
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.settings.helper.SwitchTile
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.editor.AccountSelector
@@ -116,7 +117,9 @@ fun PostCreator(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
-                CommunitySelector(viewModel)
+                CommunitySelector(viewModel) { onDismiss ->
+                    CommunitySearch(viewModel, onDismiss = onDismiss)
+                }
             }
             item {
                 Column {
@@ -195,6 +198,15 @@ fun PostCreator(
                         }
                     )
                 }
+            }
+            item {
+                SwitchTile(
+                    headlineContent = { Text("Send reply notification") },
+                    checked = viewModel.state.sendReplies,
+                    onCheckedChange = {
+                        viewModel.state = viewModel.state.copy(sendReplies = it)
+                    }
+                )
             }
             item {
                 when (viewModel.state.kind) {

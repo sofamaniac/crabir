@@ -30,10 +30,9 @@ import org.koin.core.annotation.KoinViewModel
 
 abstract class CreatorViewModel(
     protected val api: RedditAPIService,
-    private val communities: SubredditRepository
 ) : ViewModel() {
     var community: SubredditData? by mutableStateOf(null)
-        private set
+        protected set
 
     var rules: Rules by mutableStateOf(Rules())
         private set
@@ -47,7 +46,7 @@ abstract class CreatorViewModel(
 
     suspend fun getRules() {
         if (rules.siteRules.isNotEmpty()) return
-        val res = api.getRules(community!!.displayName)
+        val res = api.getRules(community!!.displayNamePrefixed)
         if (res.isSuccessful) {
             rules = res.body()!!
         }
@@ -61,14 +60,9 @@ abstract class CreatorViewModel(
         }
     }
 
-    fun setSubreddit(subreddit: String) {
-        viewModelScope.launch {
-            val sub = communities.getBySlug(subreddit)
-            if (sub == null) return@launch
-            community = sub
-            getRules()
-            getFlairs()
-        }
+
+    fun resetSubreddit() {
+        community = null
     }
 
     suspend fun getFlairs() {
@@ -83,10 +77,10 @@ abstract class CreatorViewModel(
 @KoinViewModel
 class PostCreatorViewModel(
     api: RedditAPIService,
-    communities: SubredditRepository,
+    private val communities: SubredditRepository,
     private val mediaUploader: MediaUploadInterface,
     private val accountsRepository: AccountsRepository,
-) : CreatorViewModel(api, communities) {
+) : CreatorViewModel(api) {
     var state by mutableStateOf(PostSubmissionBuilder())
     val textState = TextFieldState()
     val urlState = TextFieldState()
@@ -110,6 +104,16 @@ class PostCreatorViewModel(
                 Log.d("PostCreatorViewModel", "setKind: video")
                 state.copy(kind = Kind.Video)
             }
+        }
+    }
+
+    fun setSubreddit(subreddit: String) {
+        viewModelScope.launch {
+            val sub = communities.getBySlug(subreddit)
+            if (sub == null) return@launch
+            community = sub
+            getRules()
+            getFlairs()
         }
     }
 

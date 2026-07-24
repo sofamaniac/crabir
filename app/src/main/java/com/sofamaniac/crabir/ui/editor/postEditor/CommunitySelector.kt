@@ -40,6 +40,7 @@ import kotlinx.coroutines.launch
 internal fun CommunitySelector(
     viewModel: CreatorViewModel,
     modifier: Modifier = Modifier,
+    communitySearch: @Composable (onDismiss: () -> Unit) -> Unit,
 ) {
     var showRules by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -48,7 +49,7 @@ internal fun CommunitySelector(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .clickable {
-                showSearch = true
+                showSearch = !showSearch
             }
             .semantics {
                 if (viewModel.error is MissingCommunity) {
@@ -113,6 +114,6 @@ internal fun CommunitySelector(
         }
     }
     if (showSearch) {
-        CommunitySearch(viewModel, onDismiss = { showSearch = false })
+        communitySearch({ showSearch = false })
     }
 }
