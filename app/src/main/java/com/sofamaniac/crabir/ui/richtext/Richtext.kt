@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.richtext
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalGridApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Grid
 import androidx.compose.foundation.layout.GridTrackSize
 import androidx.compose.foundation.layout.Row
@@ -59,14 +59,14 @@ fun Richtext(
     mediaMetadata: Map<String, MediaMetadata>,
     style: RichtextStyle = defaultRichtextStyle(),
 ) {
-    val configuration = DefaultRichtextComponents()
+    val components = DefaultRichtextComponents()
+    val configuration = Configuration(components, style)
     val context = Context(
-        inCode = false,
         inSpoiler = false,
         inList = ListState.None,
+        style = null,
         configuration = configuration,
         mediaMetadata = mediaMetadata,
-        style = style
     )
     CompositionLocalProvider(
         LocalUriHandler provides CrabirUriHandler(
@@ -79,7 +79,7 @@ fun Richtext(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             for (child in document.document) {
-                context.configuration.render(child, context)
+                context.configuration.components.render(child, context)
             }
         }
     }
@@ -95,11 +95,11 @@ fun Spoiler(spoiler: Richtext.Spoiler, context: Context) {
             .drawWithContent {
                 drawContent()
                 if (!clicked) {
-                    drawRect(context.style.spoilerCurtain)
+                    drawRect(context.configuration.styles.spoilerCurtain)
                 }
             }) {
         for (child in spoiler.children) {
-            context.configuration.render(child, context)
+            context.configuration.components.render(child, context)
         }
     }
 }
@@ -196,7 +196,7 @@ fun ListItem(item: Richtext.ListItem, context: Context, index: Int) {
             Text("${index + 1}.")
             Column {
                 for (child in item.children) {
-                    context.configuration.render(child, context)
+                    context.configuration.components.render(child, context)
                 }
             }
         }
@@ -205,7 +205,7 @@ fun ListItem(item: Richtext.ListItem, context: Context, index: Int) {
             Text("-")
             Column {
                 for (child in item.children) {
-                    context.configuration.render(child, context)
+                    context.configuration.components.render(child, context)
                 }
             }
         }
@@ -222,30 +222,32 @@ fun Heading(heading: Richtext.Heading, context: Context) {
         5 -> MaterialTheme.typography.titleMedium
         6 -> MaterialTheme.typography.titleSmall
         else -> MaterialTheme.typography.headlineLarge
-    }
-    Column(modifier = Modifier.semantics(mergeDescendants = true, properties = { heading() })) {
-        var index = 0
-        while (index < heading.children.size) {
-            if (heading.children[index] !is Richtext.TextNode) {
-                context.configuration.render(heading.children[index], context)
-                index++
-                continue
-            }
-            val res = heading.children.buildAnnotatedString(index, context)
-            val currentString = buildAnnotatedString {
-                withStyle(style.toSpanStyle()) {
-                    append(res.first)
+    }.toSpanStyle()
+    val context = context.copy(style = style.merge(context.style))
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(0.dp, alignment = Alignment.Start),
+        modifier = Modifier.semantics(mergeDescendants = true, properties = { heading() })
+    ) {
+        val tail = heading.children.fold(AnnotatedString("")) { acc, child ->
+            if (child is Richtext.TextNode) {
+                acc + child.toAnnotatedString(context)
+            } else {
+                if (acc.isNotEmpty()) {
+                    Text(acc)
                 }
+                context.configuration.components.render(child, context)
+                AnnotatedString("")
             }
-            index = res.second
-            Text(currentString)
+        }
+        if (tail.isNotEmpty()) {
+            Text(tail)
         }
     }
 }
 
 @Composable
 fun Blockquote(quote: Richtext.Blockquote, context: Context) {
-    val style = context.style.blockquoteStyle
+    val style = context.configuration.styles.blockquoteStyle
     Column(
         Modifier
             .drawBehind {
@@ -259,7 +261,7 @@ fun Blockquote(quote: Richtext.Blockquote, context: Context) {
             .padding(start = style.indent)
     ) {
         for (child in quote.children) {
-            context.configuration.render(child, context)
+            context.configuration.components.render(child, context)
         }
     }
 }
@@ -269,11 +271,13 @@ fun Code(code: Richtext.Code, context: Context) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(context.style.codeBackground)
+            .background(context.configuration.styles.codeBackground)
             .padding(all = 4.dp)
     ) {
+        val style =
+            (context.style ?: SpanStyle()).merge(SpanStyle(fontFamily = FontFamily.Monospace))
         for (child in code.children) {
-            context.configuration.render(child, context.copy(inCode = true))
+            context.configuration.components.render(child, context.copy(style = style))
         }
     }
 }
@@ -281,7 +285,7 @@ fun Code(code: Richtext.Code, context: Context) {
 @OptIn(ExperimentalGridApi::class)
 @Composable
 fun Table(table: Richtext.Table, context: Context) {
-    val style = context.style.tableStyle
+    val style = context.configuration.styles.tableStyle
     fun TableAlignment.toAlignment(): Alignment = when (this) {
         TableAlignment.Right -> Alignment.CenterEnd
         TableAlignment.Left -> Alignment.CenterStart
@@ -309,7 +313,7 @@ fun Table(table: Richtext.Table, context: Context) {
                 ) {
                     Column {
                         for (child in header.children) {
-                            context.configuration.render(child, context)
+                            context.configuration.components.render(child, context)
                         }
                     }
                 }
@@ -329,7 +333,7 @@ fun Table(table: Richtext.Table, context: Context) {
                     ) {
                         Column {
                             for (child in cell.children) {
-                                context.configuration.render(child, context)
+                                context.configuration.components.render(child, context)
                             }
                         }
                     }
@@ -346,35 +350,52 @@ fun Paragraph(
     context: Context,
 ) {
 
-    Column() {
-        var index = 0
-        while (index < paragraph.children.size) {
-            Log.d("Paragraph", "Rendering $index / ${paragraph.children.size}")
-            while (index < paragraph.children.size && paragraph.children[index] !is Richtext.TextNode) {
-                Log.d("Paragraph", "Rendering ${paragraph.children[index]}")
-                context.configuration.render(paragraph.children[index], context)
-                index += 1
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(0.dp, alignment = Alignment.Start),
+        modifier = Modifier.semantics(mergeDescendants = true, properties = {})
+    ) {
+        val tail = paragraph.children.fold(AnnotatedString("")) { acc, child ->
+            if (child is Richtext.TextNode) {
+                acc + child.toAnnotatedString(context)
+            } else {
+                if (acc.isNotEmpty()) {
+                    Text(acc)
+                }
+                context.configuration.components.render(child, context)
+                AnnotatedString("")
             }
-            val res = paragraph.children.buildAnnotatedString(index, context)
-            val currentString = res.first
-            index = res.second
-            Log.d("Paragraph", "Rendering $currentString")
-            Text(currentString)
         }
+        if (tail.isNotEmpty()) {
+            Text(tail)
+        }
+    }
+}
+
+fun AnnotatedString.Builder.withContext(
+    context: Context,
+    style: SpanStyle? = null,
+    builder: AnnotatedString.Builder.() -> Unit,
+) {
+    if (context.style != null || style != null) {
+        val style = SpanStyle().merge(context.style).merge(style)
+        pushStyle(style)
+    }
+    builder()
+    if (context.style != null || style != null) {
+        pop()
     }
 }
 
 fun Richtext.Text.toAnnotatedString(context: Context): AnnotatedString {
     var currentStart = 0
     return buildAnnotatedString {
-        val outerStyle =
-            if (context.inCode) SpanStyle(fontFamily = FontFamily.Monospace) else SpanStyle()
-        withStyle(outerStyle) {
+        withContext(context) {
             for (modifier in modifiers) {
                 if (currentStart < modifier.start) {
                     append(text.substring(currentStart, modifier.start))
                 }
-                withStyle(modifier.toSpanStyle(context.style)) {
+                val style = modifier.toSpanStyle(context.configuration.styles)
+                withStyle(style) {
                     append(text.substring(modifier.start, modifier.start + modifier.length))
                 }
                 currentStart = modifier.start + modifier.length
@@ -386,56 +407,31 @@ fun Richtext.Text.toAnnotatedString(context: Context): AnnotatedString {
     }
 }
 
-fun List<Richtext>.buildAnnotatedString(
-    start: Int,
-    context: Context,
-): Pair<AnnotatedString, Int> {
-    var index = start
-    var currentString = AnnotatedString("")
-    while (index < size) {
-        if (this[index] !is Richtext.TextNode) {
-            break
-        }
-        val ext = when (val child = this[index]) {
-            is Richtext.Text -> {
-                child.toAnnotatedString(context)
-            }
-
-            is Richtext.Link -> {
-                child.toAnnotatedString(context)
-            }
-
-            is Richtext.CommunityLink -> {
-                child.toAnnotatedString(context)
-            }
-
-            is Richtext.UserLink -> {
-                child.toAnnotatedString(context)
-            }
-
-            is Richtext.Raw -> {
-                AnnotatedString(child.text)
-            }
-
-            else -> {
-                Log.e("Richtext", "Unknown child $child")
-                // avoid infinite loops
-                index += 1
-                break
-            }
-        }
-        currentString += ext
-        index += 1
+fun Richtext.TextNode.toAnnotatedString(context: Context): AnnotatedString {
+    return when (this) {
+        is Richtext.Text -> toAnnotatedString(context)
+        is Richtext.Link -> toAnnotatedString(context)
+        is Richtext.CommunityLink -> toAnnotatedString(context)
+        is Richtext.UserLink -> toAnnotatedString(context)
+        is Richtext.Raw -> toAnnotatedString(context)
+        else -> throw Exception("Unknown text node ${this::class.simpleName}")
     }
-    return Pair(currentString, index)
 }
+
+fun Richtext.Raw.toAnnotatedString(context: Context): AnnotatedString {
+    return buildAnnotatedString {
+        withContext(context) {
+            append(this@toAnnotatedString.text)
+        }
+    }
+}
+
 
 fun Richtext.Link.toAnnotatedString(context: Context): AnnotatedString {
     return buildAnnotatedString {
         val text = Richtext.Text(text, modifiers)
         withLink(LinkAnnotation.Url(url)) {
-            withStyle(context.style.linkStyle)
-            {
+            withContext(context, context.configuration.styles.linkStyle) {
                 append(text.toAnnotatedString(context))
             }
         }
@@ -444,8 +440,8 @@ fun Richtext.Link.toAnnotatedString(context: Context): AnnotatedString {
 
 fun Richtext.CommunityLink.toAnnotatedString(context: Context): AnnotatedString {
     return buildAnnotatedString {
-        withLink(LinkAnnotation.Url("https://www.reddit.com/r/$community")) {
-            withStyle(context.style.linkStyle) {
+        withContext(context, context.configuration.styles.linkStyle) {
+            withLink(LinkAnnotation.Url("https://www.reddit.com/r/$community")) {
                 append("r/$community")
             }
         }
@@ -454,8 +450,8 @@ fun Richtext.CommunityLink.toAnnotatedString(context: Context): AnnotatedString 
 
 fun Richtext.UserLink.toAnnotatedString(context: Context): AnnotatedString {
     return buildAnnotatedString {
-        withLink(LinkAnnotation.Url("https://www.reddit.com/user/$user")) {
-            withStyle(context.style.linkStyle) {
+        withContext(context, context.configuration.styles.linkStyle) {
+            withLink(LinkAnnotation.Url("https://www.reddit.com/user/$user")) {
                 append("u/$user")
             }
         }

@@ -23,13 +23,17 @@ enum class ListState {
     None,
 }
 
+data class Configuration(
+    val components: RichtextComponents,
+    val styles: RichtextStyle,
+)
+
 data class Context(
-    val inCode: Boolean,
     val inSpoiler: Boolean,
     val inList: ListState,
-    val configuration: RichtextComponents,
+    val style: SpanStyle?,
     val mediaMetadata: Map<String, MediaMetadata>,
-    val style: RichtextStyle,
+    val configuration: Configuration,
 )
 
 @Immutable
