@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.domain.model.Kind
@@ -19,7 +20,7 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.onWifiConnection
-import com.sofamaniac.crabir.settings.post.AutoPlayVideo
+import com.sofamaniac.crabir.settings.data.NetworkPolicy
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.post.BottomRow
 import com.sofamaniac.crabir.ui.post.DummyInteraction
@@ -102,9 +103,10 @@ internal fun PostCardContent(
     val context = LocalContext.current
     val connectionState = context.onWifiConnection
     val settings by interactions.linksSettings.collectAsState(initial = null)
-    val canStartVideo = when (settings?.autoPlayVideos) {
-        AutoPlayVideo.Always -> isMostVisible
-        AutoPlayVideo.Wifi -> connectionState && isMostVisible
+    val videoSettings = LocalDataSettings.current.videoQuality
+    val canStartVideo = when (videoSettings.autostart) {
+        NetworkPolicy.Always -> isMostVisible
+        NetworkPolicy.OnWifi -> connectionState && isMostVisible
         else -> false
     }
     // We do not apply the padding on the column, but on each of its children except

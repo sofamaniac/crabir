@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.settings.post
 
-import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -21,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import kotlinx.coroutines.launch
@@ -130,20 +128,6 @@ fun LazyListScope.linksSettings(
             onCheckedChange = { target ->
                 updateLinksSettings { it.copy(upvoteOnSave = target) }
             },
-        )
-    }
-    item {
-        Log.d("LinksSettings", "linksSettings: ${linksSettings.autoPlayVideos}")
-        ListSelector(
-            AutoPlayVideo.entries,
-            headlineContent = { Text("Autoplay videos") },
-            selectedOption = linksSettings.autoPlayVideos,
-            onOptionSelected = { autoplay ->
-                updateLinksSettings { it.copy(autoPlayVideos = autoplay) }
-            },
-            optionLabel = {
-                stringResource(it.toStringResource())
-            }
         )
     }
     item {

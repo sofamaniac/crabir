@@ -3,8 +3,6 @@ package com.sofamaniac.crabir.ui.thread
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mikepenz.markdown.model.State
-import com.mikepenz.markdown.model.parseMarkdownFlow
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Thing
@@ -21,18 +19,12 @@ import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
 import com.sofamaniac.crabir.settings.post.PostSettingsRepository
 import com.sofamaniac.crabir.ui.post.PostViewModelInterface
-import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.core.annotation.InjectedParam
@@ -68,23 +60,10 @@ class ThreadViewModel(
     private var _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
-    //private var _comments = MutableStateFlow<List<CommentType>>(emptyList())
-    //val comments: StateFlow<List<CommentType>> = _comments.asStateFlow()
     private var _post = MutableStateFlow<PostData?>(null)
     override val post: StateFlow<PostData?> = _post.asStateFlow()
     val comments = repository.comments
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    var markdown: StateFlow<State> = _post.flatMapLatest { post ->
-        if (post == null) flowOf(State.Loading())
-        else parseMarkdownFlow(post.body.markdown, flavour = RedditFlavourDescriptor(true))
-    }.stateIn(
-        viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = State.Loading()
-    )
-
-    //override val post: StateFlow<PostData?> = _post.asStateFlow()
     override val flairs: StateFlow<List<FlairInfo>>
         get() = TODO("Not yet implemented")
 
@@ -144,11 +123,6 @@ class ThreadViewModel(
 
     private val _sort = MutableStateFlow<Sort?>(null)
     val sort: StateFlow<Sort?> = _sort.asStateFlow()
-
-    override fun onCleared() {
-        Log.d("ThreadViewModel", "onCleared: $name")
-        super.onCleared()
-    }
 
     init {
         _sort.value = initialSort

@@ -17,14 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.sofamaniac.crabir.LocalPostSettings
+import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.onWifiConnection
-import com.sofamaniac.crabir.settings.post.AutoPlayVideo
+import com.sofamaniac.crabir.settings.data.NetworkPolicy
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.post.BottomRow
 import com.sofamaniac.crabir.ui.post.LinkViewModel
@@ -41,14 +41,13 @@ internal fun PostView(
     modifier: Modifier = Modifier,
 ) {
     val currentAccount = LocalRedditAccount.current
-    val autoPlayVideos = LocalPostSettings.current.linksSettings.autoPlayVideos
+    val videoSettings = LocalDataSettings.current.videoQuality
     val connectionState = LocalContext.current.onWifiConnection
-    val canPlayVideo = when (autoPlayVideos) {
-        AutoPlayVideo.Always -> true
-        AutoPlayVideo.Wifi -> connectionState
-        AutoPlayVideo.Never -> false
+    val canPlayVideo = when (videoSettings.autostart) {
+        NetworkPolicy.Always -> true
+        NetworkPolicy.OnWifi -> connectionState
+        else -> false
     }
-    val markdownState by threadViewModel.markdown.collectAsState()
     PostCard(
         post,
         threadViewModel = threadViewModel

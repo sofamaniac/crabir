@@ -63,7 +63,6 @@ enum class AutoPlayVideo {
 @Serializable
 data class LinksSettings(
     val upvoteOnSave: Boolean,
-    val autoPlayVideos: AutoPlayVideo,
     val startMuted: Boolean,
 )
 
@@ -96,7 +95,6 @@ object PostSettingsDefaults {
 
     val defaultLinksSettings = LinksSettings(
         upvoteOnSave = false,
-        autoPlayVideos = AutoPlayVideo.Always,
         startMuted = false
     )
 
