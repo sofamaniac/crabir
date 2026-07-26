@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 interface SearchParams<This> {
     val query: String
@@ -54,10 +55,8 @@ abstract class SearchViewModel<Params : SearchParams<Params>, Data : DataInterfa
     val initialParams: Params,
 ) : ViewModel() {
     private val queryState = TextFieldState(initialText = initialParams.query)
-    var showSettings = MutableStateFlow(false)
 
     val listState = LazyStaggeredGridState()
-
 
 
     val query: String get() = queryState.text as String
@@ -91,7 +90,7 @@ abstract class SearchViewModel<Params : SearchParams<Params>, Data : DataInterfa
         if (q.length < 3) return
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
-            delay(500)
+            delay(500.milliseconds)
             search()
         }
     }
@@ -105,7 +104,7 @@ abstract class SearchViewModel<Params : SearchParams<Params>, Data : DataInterfa
         refresh()
     }
 
-    fun refresh() {
+    open fun refresh() {
         feedSource?.invalidate()
         repository.refresh()
     }
@@ -129,6 +128,11 @@ class PostSearchViewModel(
     override var needScrollToTop = false
     private val history = visitedPostsDao.getHistoryFlow()
         .stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList())
+
+    override fun refresh() {
+        needScrollToTop = true
+        super.refresh()
+    }
 
     fun setSubreddit(subreddit: String) {
         _params.update {

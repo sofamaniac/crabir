@@ -228,7 +228,9 @@ private fun InnerTab(
     val currentAccount = LocalRedditAccount.current
     PostFeedViewer(viewModel) { post, isMosVisible ->
         PostView(
-            post, isMostVisible = isMosVisible, markAsRead = {
+            post,
+            isMostVisible = isMosVisible,
+            markAsRead = {
                 viewModel.visitPost(post, currentAccount.id)
             },
             read = viewModel.isPostRead(post),
