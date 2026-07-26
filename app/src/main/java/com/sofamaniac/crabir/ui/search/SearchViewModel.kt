@@ -10,7 +10,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
@@ -32,12 +31,10 @@ import com.sofamaniac.crabir.ui.subreddit.FeedViewModelInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -118,7 +115,6 @@ class PostSearchViewModel(
     @InjectedParam initialParams: PostSearchParams,
 ) : SearchViewModel<PostSearchParams, PostData>(repository, initialParams),
     FeedViewModelInterface<PostData> {
-    override val entity: Flow<CommunityViewEntity?> = flowOf(null)
     override val data: StateFlow<PagingData<PostData>> = items.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -166,7 +162,6 @@ class PostSearchViewModel(
         return history.value.contains(post.name)
     }
 
-    override fun initialize() {}
 }
 
 @KoinViewModel

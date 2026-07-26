@@ -18,8 +18,6 @@ import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.remote.dto.MultiData
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
-import com.sofamaniac.crabir.data.remote.reddit.auth.AuthConfig
-import com.sofamaniac.crabir.data.remote.reddit.auth.BasicAuthClient
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
@@ -36,10 +34,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import net.openid.appauth.AuthState
-import net.openid.appauth.AuthorizationException
-import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import org.koin.core.annotation.KoinViewModel
 
@@ -82,6 +76,13 @@ class DrawerViewModelImpl(
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     override val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
 
+    private val flowManager =
+        AuthFlowManager(
+            authService,
+            accountsRepository,
+            redditApi,
+            updateState = { newVal -> _loginState.update { newVal } }
+        )
 
     override val accountsList = accountsRepository.accounts
     override val activeAccount = accountsRepository.activeAccount
@@ -100,7 +101,6 @@ class DrawerViewModelImpl(
         _selectingAccount.value = !_selectingAccount.value
     }
 
-    private val serviceConfig = AuthConfig()
 
     override val subscriptions: StateFlow<List<Thing.Subreddit>> =
         subsRepository.subscriptions.stateIn(
@@ -169,67 +169,19 @@ class DrawerViewModelImpl(
     }
 
     override fun createAuthIntent(): Intent {
-        val authRequest = serviceConfig.createAuthorizationRequest()
-        val intent = authService.getAuthorizationRequestIntent(authRequest)
-        Log.d("LoginViewModel", "Creating auth intent: $intent")
-        return intent
+        return flowManager.createAuthIntent()
     }
 
     override fun handleAuthResult(intent: Intent?) {
-        Log.d("LoginViewModel", "Handling auth result ${intent?.data}")
-        if (intent == null) {
-            _loginState.update { LoginState.Error(Exception("Login cancelled")) }
-            return
-        }
-
-        val authResponse = AuthorizationResponse.fromIntent(intent)
-        val authException = AuthorizationException.fromIntent(intent)
-
-        Log.d("LoginViewModel", "Auth response: $authResponse")
-
-
-        when {
-            authException != null -> {
-                Log.e("LoginViewModel", "Authorization exception: $authException")
-                _loginState.update { LoginState.Error(authException) }
-            }
-
-            authResponse != null -> {
-                _loginState.update { LoginState.Loading }
-                exchangeAuthCodeForToken(authResponse)
+        flowManager.handleAuthResult(intent, viewModelScope)
+        if (_loginState.value !is LoginState.Error) {
+            viewModelScope.launch {
+                fetchUserInfo()
             }
         }
     }
 
-
-    private fun exchangeAuthCodeForToken(authResponse: AuthorizationResponse) {
-        val clientAuth = BasicAuthClient
-        authService.performTokenRequest(
-            authResponse.createTokenExchangeRequest(),
-            clientAuth
-        ) { tokenResponse, ex ->
-            when {
-                ex != null -> {
-                    Log.e("LoginViewModel", "Token exchange failed: $ex")
-                    _loginState.value = LoginState.Error(ex)
-                }
-
-                tokenResponse != null -> {
-                    Log.d("LoginViewModel", "Got authorization token")
-                    val authState = AuthState(authResponse, tokenResponse, null)
-                    runBlocking(Dispatchers.IO) {
-                        save(authState)
-                    }
-                }
-
-                else -> {
-                    Log.e("LoginViewModel", "Something went wrong")
-                }
-            }
-        }
-    }
-
-    private suspend fun fetchUserInfo() {
+    suspend fun fetchUserInfo() {
         val currentAccount = accountsRepository.activeAccount.first()
         try {
             val user = redditApi.getIdentity()
@@ -261,20 +213,6 @@ class DrawerViewModelImpl(
     override fun visitCommunity(data: MultiData) {
         viewModelScope.launch(Dispatchers.IO) {
             multiDao.upsert(data)
-        }
-    }
-
-    private suspend fun save(authState: AuthState) {
-        try {
-            val id = (accountsRepository.accounts.first().maxByOrNull { it.id }?.id ?: 0) + 1
-            val newAccount = RedditAccount.uninitialized(id, authState)
-            accountsRepository.addAccount(newAccount)
-            accountsRepository.setActiveAccount(id)
-            Log.d("LoginViewModel", "save: fetching user info")
-            fetchUserInfo()
-        } catch (e: Exception) {
-            Log.e("LoginViewModel", "Failed to save account: $e")
-            _loginState.value = LoginState.Error(e)
         }
     }
 }

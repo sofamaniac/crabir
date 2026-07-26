@@ -17,7 +17,6 @@ plugins {
     alias(libs.plugins.mikepenz.aboutlibraries.android)
     alias(libs.plugins.koin.compiler)
     id("com.google.devtools.ksp")
-    //id("com.google.dagger.hilt.android")
     id("tech.mappie.plugin")
     id("androidx.room")
     id("kotlin-parcelize")
@@ -66,13 +65,13 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
-//    compileOptions {
-//        sourceCompatibility = JavaVersion.VERSION_21
-//        targetCompatibility = JavaVersion.VERSION_21
-//    }
-//    kotlinOptions {
-//        jvmTarget = "21"
-//    }
+    //    compileOptions {
+    //        sourceCompatibility = JavaVersion.VERSION_21
+    //        targetCompatibility = JavaVersion.VERSION_21
+    //    }
+    //    kotlinOptions {
+    //        jvmTarget = "21"
+    //    }
 
     buildFeatures {
         compose = true
@@ -92,9 +91,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-//    kotlinOptions {
-//        jvmTarget = "11"
-//    }
+    //    kotlinOptions {
+    //        jvmTarget = "11"
+    //    }
 }
 
 room {
@@ -137,8 +136,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
 
     // DI
-    //implementation(libs.hilt.android)
-    //implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.core)
     implementation(libs.koin.annotations)
@@ -150,8 +147,6 @@ dependencies {
 
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.adaptive.layout)
-//    implementation(libs.androidx.compose.adaptive.navigation)
-    //ksp(libs.hilt.android.compiler)
     ksp(libs.kotlin.metadata.jvm)
 
 
@@ -190,9 +185,9 @@ dependencies {
     implementation(libs.zoomable)
     runtimeOnly(libs.coil3.coil.gif)
     // TODO: switch to landscapist once zoomable can transmit single tap event to its parent
-//    implementation(libs.landscapist.coil)
-//    implementation(libs.landscapist.zoomable)
-//    implementation(libs.landscapist.image.gallery)
+    //    implementation(libs.landscapist.coil)
+    //    implementation(libs.landscapist.zoomable)
+    //    implementation(libs.landscapist.image.gallery)
 
     // Blur effect
     implementation(libs.haze)

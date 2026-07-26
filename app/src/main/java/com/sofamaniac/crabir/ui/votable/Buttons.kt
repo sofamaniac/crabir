@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.PlainTooltip
@@ -34,6 +35,7 @@ import kotlinx.coroutines.launch
 
 const val MAX_OFFSET = 10f
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpButton(likes: Boolean?, onClick: () -> Unit) {
     val theme = LocalTheme.current
@@ -81,6 +83,7 @@ fun UpButton(likes: Boolean?, onClick: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DownButton(likes: Boolean?, onClick: () -> Unit) {
     val theme = LocalTheme.current
@@ -129,6 +132,7 @@ fun DownButton(likes: Boolean?, onClick: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SavedButton(saved: Boolean, onClick: () -> Unit) {
     val theme = LocalTheme.current

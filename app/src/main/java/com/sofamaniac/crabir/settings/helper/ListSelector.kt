@@ -49,7 +49,7 @@ fun <T> ListSelector(
         modifier = modifier,
         leadingContent = leadingContent,
         //headlineContent = headlineContent,
-        headlineContent = {
+        content = {
             Menu(
                 options,
                 selectedOption,

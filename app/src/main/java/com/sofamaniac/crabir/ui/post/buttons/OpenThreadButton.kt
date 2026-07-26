@@ -2,6 +2,7 @@ package com.sofamaniac.crabir.ui.post.buttons
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Comment
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.PlainTooltip
@@ -15,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OpenThreadButton(onClick: () -> Unit) {
     val description = stringResource(R.string.open_comments)

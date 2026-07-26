@@ -39,9 +39,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.R
+import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
+import com.sofamaniac.crabir.data.remote.reddit.HOME
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SettingsRoute
@@ -64,14 +67,38 @@ fun TopBar(
     refresh: () -> Unit,
     openDrawer: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior?,
-    view: Views,
-    updateView: (Views) -> Unit,
+    entity: CommunityViewEntity,
 ) {
-    val scope = rememberCoroutineScope()
     val theme = LocalTheme.current
     val navController = LocalNavController.current
 
     var showViewSelect by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val viewSettingsStore = LocalContext.current.viewSettingDataStore
+    fun updateView(view: Views) {
+        scope.launch {
+            viewSettingsStore.updateData {
+                it.copy(
+                    rememberedViews = it.rememberedViews + (slug to entity.copy(view = view))
+                )
+            }
+        }
+    }
+
+    fun updateSortOuter(sort: Sort, timeframe: Timeframe? = null) {
+        updateSort(sort, timeframe)
+        scope.launch {
+            viewSettingsStore.updateData {
+                it.copy(
+                    rememberedViews = it.rememberedViews + (HOME to entity.copy(
+                        sort = sort,
+                        timeframe = timeframe
+                    ))
+                )
+            }
+        }
+    }
+
 
     TopAppBar(
         scrollBehavior = scrollBehavior,
@@ -139,22 +166,26 @@ fun TopBar(
                 }
             }
             SortMenu<Sort> { sort, timeframe ->
-                updateSort(sort, timeframe)
+                updateSortOuter(sort, timeframe)
             }
         }
     )
     if (showViewSelect) {
         SelectViewDialog(
             onDismiss = { showViewSelect = false },
-            selectedView = view,
-            updateView = updateView
+            selectedView = entity.view ?: LocalViewSettings.current.defaultView,
+            updateView = ::updateView
         )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectViewDialog(onDismiss: () -> Unit, selectedView: Views, updateView: (Views) -> Unit) {
+private fun SelectViewDialog(
+    onDismiss: () -> Unit,
+    selectedView: Views,
+    updateView: (Views) -> Unit,
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val viewSettingDataStore = remember(context) { context.viewSettingDataStore }
@@ -176,6 +207,8 @@ fun SelectViewDialog(onDismiss: () -> Unit, selectedView: Views, updateView: (Vi
             Column(Modifier.selectableGroup()) {
                 for (view in Views.entries) {
                     ListItem(
+                        selected = view == selectedView,
+                        onClick = { selectOption(view) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp)
@@ -184,7 +217,7 @@ fun SelectViewDialog(onDismiss: () -> Unit, selectedView: Views, updateView: (Vi
                                 onClick = { selectOption(view) },
                                 role = Role.RadioButton,
                             ),
-                        headlineContent = { Text(stringResource(view.toStringResource())) },
+                        content = { Text(stringResource(view.toStringResource())) },
                         trailingContent = {
                             RadioButton(
                                 selected = view == selectedView,

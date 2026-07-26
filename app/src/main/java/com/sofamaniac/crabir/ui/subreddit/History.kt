@@ -23,7 +23,6 @@ import com.sofamaniac.crabir.data.remote.reddit.HISTORY
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
-import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository
@@ -43,10 +42,11 @@ fun HistoryViewer(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
     val title = stringResource(R.string.History)
-    val entity by viewModel.entity.collectAsState(null)
-    val defaultView = LocalViewSettings.current.defaultView
     val params by viewModel.params.collectAsState()
+    val entity =
+        LocalViewSettings.current.rememberedViews[HISTORY] ?: defaultCommunityEntity(HISTORY, title)
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+
     val topBar = @Composable {
         TopBar(
             title,
@@ -57,8 +57,7 @@ fun HistoryViewer(
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
-            view = entity?.view ?: defaultView,
-            updateView = viewModel::updateView
+            entity = entity,
         )
     }
     val bottomBar = @Composable {
@@ -74,6 +73,7 @@ fun HistoryViewer(
         viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         drawerState = drawerState,
+        communityEntity = entity
     )
 }
 
@@ -83,13 +83,10 @@ class HistoryViewModel(
     repository: HistoryRepository,
     visitedPostsDao: VisitedPostsDao,
     communityDao: SubredditRepository,
-    viewDao: CommunityViewRepository,
 ) : PostFeedViewModel<SubredditData>(
-    displayName = HISTORY,
     repository,
     visitedPostsDao,
     communityDao,
-    viewDao,
 ) {
     override suspend fun createViewEntity(name: String): CommunityViewEntity {
         return CommunityViewEntity(name = name, displayName = "History")

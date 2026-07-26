@@ -23,7 +23,6 @@ import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.reddit.HOME
 import com.sofamaniac.crabir.domain.model.SubredditData
-import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.HomeRepository
 import com.sofamaniac.crabir.ui.TabBar
 import kotlinx.coroutines.launch
@@ -41,9 +40,10 @@ fun HomeViewer(
     val scope = rememberCoroutineScope()
     val title = stringResource(R.string.Home)
     val params by viewModel.params.collectAsState()
-    val entity by viewModel.entity.collectAsState(null)
-    val defaultView = LocalViewSettings.current.defaultView
+    val entity =
+        LocalViewSettings.current.rememberedViews[HOME] ?: defaultCommunityEntity(HOME, title)
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+
     val topBar = @Composable {
         TopBar(
             title,
@@ -53,9 +53,8 @@ fun HomeViewer(
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
-            updateView = viewModel::updateView,
-            view = entity?.view ?: defaultView,
-            openDrawer = { scope.launch { drawerState.open() } }
+            openDrawer = { scope.launch { drawerState.open() } },
+            entity = entity
         )
     }
     val bottomBar = @Composable {
@@ -72,6 +71,7 @@ fun HomeViewer(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         feedInfo = null,
         drawerState = drawerState,
+        communityEntity = entity,
     )
 
 }
@@ -81,13 +81,10 @@ class HomeViewModel(
     repository: HomeRepository,
     visitedPostsDao: VisitedPostsDao,
     communityDao: SubredditRepository,
-    viewDao: CommunityViewRepository,
 ) : PostFeedViewModel<SubredditData>(
-    displayName = HOME,
     repository,
     visitedPostsDao,
     communityDao,
-    viewDao,
 ) {
     override suspend fun createViewEntity(name: String): CommunityViewEntity {
         return CommunityViewEntity(name = name, displayName = "Home")

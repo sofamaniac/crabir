@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.dataStore
 import com.sofamaniac.crabir.R
+import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import kotlinx.serialization.Serializable
 
 enum class Views {
@@ -40,8 +41,7 @@ data class ViewSettings(
     //    val commentFontSettings: FontSettings = FontSettings(),
     val prefixCommunity: Boolean = true,
     val cardSettings: CardSettings = CardSettings(),
-    val rememberedViews: Map<String, Views> = emptyMap(),
-    val rememberedColumns: Map<String, Int> = emptyMap(),
+    val rememberedViews: Map<String, CommunityViewEntity> = emptyMap(),
 )
 
 @Serializable

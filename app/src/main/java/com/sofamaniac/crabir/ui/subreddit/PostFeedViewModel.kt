@@ -27,19 +27,15 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.CommunityRepository
-import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.domain.repository.feed.FeedSource
 import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository
-import com.sofamaniac.crabir.settings.views.Views
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -50,14 +46,12 @@ interface FeedViewModelInterface<T : VotableData> {
     val listState: LazyStaggeredGridState
     val data: Flow<PagingData<T>>
     var needScrollToTop: Boolean
-    val entity: Flow<CommunityViewEntity?>
 
     fun refresh()
     fun visitPost(post: PostData, visitedBy: Int)
 
     fun isPostRead(post: PostData): Boolean
 
-    fun initialize()
 }
 
 object FeedViewModelInterfacePreview : FeedViewModelInterface<PostData> {
@@ -70,7 +64,6 @@ object FeedViewModelInterfacePreview : FeedViewModelInterface<PostData> {
             )
         }))
     override var needScrollToTop: Boolean = false
-    override val entity: Flow<CommunityViewEntity?> = flowOf(null)
 
     override fun refresh() {
     }
@@ -85,32 +78,14 @@ object FeedViewModelInterfacePreview : FeedViewModelInterface<PostData> {
         return false
     }
 
-    override fun initialize() {}
 }
 
 abstract class PostFeedViewModel<T : CommunityData>(
-    private val displayName: String,
     private val repository: PostFeedRepository<FeedParams>,
     private val visitedPostsDao: VisitedPostsDao,
     private val communityRepository: CommunityRepository<T>,
-    private val communityView: CommunityViewRepository,
 ) : ViewModel(), FeedViewModelInterface<PostData> {
 
-    override val entity: Flow<CommunityViewEntity?> = communityView.getCommunityFlow(displayName)
-
-    private var initialized = false
-
-    override fun initialize() {
-        if (initialized) return
-        initialized = true
-        viewModelScope.launch(Dispatchers.IO) {
-            val e = entity.firstOrNull()
-            Log.d("PostFeedViewModel", "init: $e")
-            if (e?.sort != null) {
-                updateSort(e.sort, e.timeframe)
-            }
-        }
-    }
 
     override val listState = LazyStaggeredGridState()
     override var needScrollToTop = false
@@ -176,20 +151,7 @@ abstract class PostFeedViewModel<T : CommunityData>(
         }
         if (needRefresh) {
             Log.d("PostFeedViewModel", "updateSort: Updating sort to $sort")
-            viewModelScope.launch(Dispatchers.IO) {
-                val entity = entity.first() ?: createViewEntity(displayName)
-                val new = entity.copy(sort = sort, timeframe = timeframe)
-                communityView.upsert(new)
-            }
             refresh()
-        }
-    }
-
-    fun updateView(view: Views) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val entity = entity.first() ?: createViewEntity(displayName)
-            val new = entity.copy(view = view)
-            communityView.upsert(new)
         }
     }
 

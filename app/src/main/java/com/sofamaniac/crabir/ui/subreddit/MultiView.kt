@@ -41,9 +41,13 @@ fun MultiView(
     val scope = rememberCoroutineScope()
     val params by viewModel.params.collectAsState()
     val info by viewModel.info.collectAsState()
-    val entity by viewModel.entity.collectAsState(null)
-    val defaultView = LocalViewSettings.current.defaultView
+    val entity = LocalViewSettings.current.rememberedViews[slug] ?: defaultCommunityEntity(
+        slug,
+        info?.displayName ?: slug
+    )
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+
     val topBar = @Composable {
         TopBar(
             info?.displayName ?: "",
@@ -52,8 +56,7 @@ fun MultiView(
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
-            view = entity?.view ?: defaultView,
-            updateView = viewModel::updateView,
+            entity = entity,
             openDrawer = { scope.launch { drawerState.open() } }
         )
     }
@@ -71,6 +74,7 @@ fun MultiView(
         topBar, bottomBar, viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         drawerState = drawerState,
+        communityEntity = entity
     )
 }
 
@@ -82,11 +86,9 @@ class MultiViewModel(
     viewRepository: CommunityViewRepository,
     @InjectedParam slug: String,
 ) : PostFeedViewModel<MultiData>(
-    displayName = slug,
     repository,
     visitedPostsDao,
     communityDao,
-    viewRepository,
 ) {
 
 

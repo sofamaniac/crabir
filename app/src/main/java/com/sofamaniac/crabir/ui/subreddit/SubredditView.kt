@@ -45,7 +45,6 @@ import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.domain.model.SubredditData
-import com.sofamaniac.crabir.domain.repository.CommunityViewRepository
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import com.sofamaniac.crabir.domain.repository.feed.SubredditPostsRepository
 import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
@@ -70,10 +69,13 @@ fun SubredditViewer(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val params by viewModel.params.collectAsState()
     val feedInfo by viewModel.info.collectAsState()
-    val entity by viewModel.entity.collectAsState(null)
-    val defaultView = LocalViewSettings.current.defaultView
+    val entity = LocalViewSettings.current.rememberedViews[subreddit] ?: defaultCommunityEntity(
+        subreddit,
+        feedInfo?.displayName ?: subreddit
+    )
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
     val topBar = @Composable {
         TopBar(
             feedInfo?.displayName ?: subreddit,
@@ -81,9 +83,8 @@ fun SubredditViewer(
             slug = subreddit,
             updateSort = viewModel::updateSort,
             refresh = viewModel::refresh,
+            entity = entity,
             scrollBehavior = scrollBehavior,
-            view = entity?.view ?: defaultView,
-            updateView = viewModel::updateView,
             openDrawer = { scope.launch { drawerState.open() } }
         )
     }
@@ -101,7 +102,8 @@ fun SubredditViewer(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         filter = rememberPostsFilter(whitelistSubreddit = listOf(subreddit)),
         drawerState = drawerState,
-        feedInfo = feedInfoView
+        feedInfo = feedInfoView,
+        communityEntity = entity,
     )
 }
 
@@ -172,16 +174,13 @@ class SubredditViewModel(
     private val repository: SubredditPostsRepository,
     visitedPostsDao: VisitedPostsDao,
     communityDao: SubredditRepository,
-    viewDao: CommunityViewRepository,
     private val subredditCache: SubredditCache,
     /** Subreddit's prefixed display name */
     @InjectedParam slug: String,
 ) : PostFeedViewModel<SubredditData>(
-    displayName = slug,
     repository,
     visitedPostsDao,
     communityDao,
-    viewDao,
 ) {
 
     private val _info = MutableStateFlow<SubredditData?>(null)

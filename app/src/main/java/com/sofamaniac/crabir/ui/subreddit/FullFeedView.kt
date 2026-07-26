@@ -12,8 +12,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,6 +21,7 @@ import androidx.compose.ui.Modifier
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostCreatorRoute
@@ -39,17 +38,14 @@ fun FullFeedView(
     viewModel: FeedViewModelInterface<PostData>,
     modifier: Modifier = Modifier,
     drawerState: DrawerState,
+    communityEntity: CommunityViewEntity? = null,
     filter: (PostData) -> Boolean = rememberPostsFilter(),
     feedInfo: (@Composable () -> Unit)? = null,
 ) {
-    LaunchedEffect(viewModel) {
-        viewModel.initialize()
-    }
     var showBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
     val scope = rememberCoroutineScope()
 
-    val communityEntity by viewModel.entity.collectAsState(initial = null)
     val navController = LocalNavController.current
     val currentAccount = LocalRedditAccount.current
     val snackbarHostState = remember { SnackbarHostState() }

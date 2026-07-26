@@ -5,8 +5,10 @@ import androidx.room.PrimaryKey
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.settings.views.Views
+import kotlinx.serialization.Serializable
 
 @Entity(tableName = "visitedCommunity")
+@Serializable
 data class CommunityViewEntity(
     @PrimaryKey
     val name: String,

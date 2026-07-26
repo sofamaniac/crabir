@@ -20,6 +20,7 @@ import com.sofamaniac.crabir.settings.post.PostSettingsPage
 import com.sofamaniac.crabir.settings.post.PostSettingsRoute
 import com.sofamaniac.crabir.settings.theme.ThemeEditor
 import com.sofamaniac.crabir.settings.theme.ThemeSettingsPage
+import com.sofamaniac.crabir.settings.views.ViewManagerPage
 import com.sofamaniac.crabir.settings.views.ViewsSettingsPage
 
 fun NavGraphBuilder.settingsGraph(navController: NavController) {
@@ -41,6 +42,9 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
     }
     composable<ViewsSettingRoute> {
         ViewsSettingsPage()
+    }
+    composable<ViewManagerRoute> {
+        ViewManagerPage()
     }
     composable<FiltersSettingRoute> {
         FiltersSettingsPage()

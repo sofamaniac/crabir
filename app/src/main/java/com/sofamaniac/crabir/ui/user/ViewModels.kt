@@ -15,7 +15,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
@@ -42,7 +41,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -150,8 +148,6 @@ abstract class ProfileFeedViewModel<T : VotableData>(
     private val visitedPostsDao: VisitedPostsDao,
 ) : ViewModel(), FeedViewModelInterface<T> {
 
-    override val entity: Flow<CommunityViewEntity?> = flowOf(null)
-
     override val listState = LazyStaggeredGridState()
     override var needScrollToTop = false
     protected val _params = MutableStateFlow(
@@ -204,7 +200,6 @@ abstract class ProfileFeedViewModel<T : VotableData>(
         return history.value.contains(post.name)
     }
 
-    override fun initialize() {}
 }
 
 interface SortProfileTab {

@@ -64,6 +64,9 @@ object ThemeEditorRoute : Route
 object ViewsSettingRoute : Route
 
 @Serializable
+object ViewManagerRoute : Route
+
+@Serializable
 object FiltersSettingRoute : Route
 
 @Serializable

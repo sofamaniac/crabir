@@ -24,14 +24,14 @@ fun SwitchTile(
     enabled: Boolean = true,
 ) {
     ListItem(
-        onClick = { onCheckedChange(!checked) },
         modifier = Modifier.selectable(
             selected = checked,
             role = Role.Switch,
             enabled = enabled,
             onClick = {
                 onCheckedChange(!checked)
-            }),
+            }
+        ),
         enabled = enabled,
         content = { headlineContent() },
         supportingContent = supportingContent,

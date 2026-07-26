@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ViewComfy
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -29,11 +30,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.ViewManagerRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ViewsSettingsPage() {
     val context = LocalContext.current
@@ -73,8 +76,9 @@ fun ViewsSettingsPage() {
 
             item {
                 ListItem(
+                    enabled = true,
                     leadingContent = { Spacer(modifier = Modifier.size(24.dp)) },
-                    headlineContent = { Text("Default number of columns") },
+                    content = { Text("Default number of columns") },
                     trailingContent = { Text(viewSettings.defaultColumns.toString()) },
                     supportingContent = {
                         Slider(
@@ -106,6 +110,15 @@ fun ViewsSettingsPage() {
                     headlineContent = { Text("Remember view") },
                     supportingContent = { Text("Each community will remember the last view selected for that community") }
                 )
+            }
+            item {
+                ListItem(
+                    leadingContent = { Spacer(modifier = Modifier.size(24.dp)) },
+                    onClick = { navController?.navigate(ViewManagerRoute) },
+                    enabled = viewSettings.rememberView
+                ) {
+                    Text("Managed views")
+                }
             }
             item {
                 SwitchTile(
@@ -186,7 +199,7 @@ fun ViewsSettingsPage() {
             item {
                 ListItem(
                     leadingContent = { Spacer(modifier = Modifier.size(24.dp)) },
-                    headlineContent = {
+                    content = {
                         TextField(
                             enabled = viewSettings.cardSettings.enableTextPreview,
                             label = { Text("Number of lines") },
