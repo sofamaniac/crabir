@@ -13,19 +13,19 @@ import kotlinx.serialization.Serializable
 enum class Views {
     Card,
     Compact;
-//    SmallCard,
-//    Dense,
-//    Image,
-//    Swipe;
+    //    SmallCard,
+    //    Dense,
+    //    Image,
+    //    Swipe;
 
     fun toStringResource(): Int {
         return when (this) {
             Card -> R.string.ViewCard
             Compact -> R.string.ViewCompact
-//            SmallCard -> R.string.ViewSmallCard
-//            Dense -> R.string.ViewDense
-//            Image -> R.string.ViewImage
-//            Swipe -> R.string.ViewSwipe
+            //            SmallCard -> R.string.ViewSmallCard
+            //            Dense -> R.string.ViewDense
+            //            Image -> R.string.ViewImage
+            //            Swipe -> R.string.ViewSwipe
         }
     }
 }
@@ -36,12 +36,12 @@ data class ViewSettings(
     val defaultColumns: Int = 1,
     val rememberView: Boolean = true,
     val rememberColumns: Boolean = true,
-//    val postFontSettings: FontSettings = FontSettings(),
-//    val commentFontSettings: FontSettings = FontSettings(),
+    //    val postFontSettings: FontSettings = FontSettings(),
+    //    val commentFontSettings: FontSettings = FontSettings(),
     val prefixCommunity: Boolean = true,
     val cardSettings: CardSettings = CardSettings(),
     val rememberedViews: Map<String, Views> = emptyMap(),
-    val rememberedColumns: Map<String, Int> = emptyMap()
+    val rememberedColumns: Map<String, Int> = emptyMap(),
 )
 
 @Serializable
@@ -68,11 +68,11 @@ val Context.viewSettingDataStore by dataStore(
 )
 
 @Composable
-fun rememberViewSettings(): ViewSettings {
+internal fun rememberViewSettings(): ViewSettings? {
     val context = LocalContext.current
     val viewSettingDataStore = remember(context) { context.viewSettingDataStore }
     val viewSettings by viewSettingDataStore.data.collectAsState(
-        initial = ViewSettings(),
+        initial = null,
     )
     return viewSettings
 }

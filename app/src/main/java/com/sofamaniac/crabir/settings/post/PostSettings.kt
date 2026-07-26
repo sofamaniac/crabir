@@ -120,11 +120,11 @@ val Context.postSettingsDataStore by dataStore(
 )
 
 @Composable
-fun rememberPostsSettings(): PostSettings {
+internal fun rememberPostsSettings(): PostSettings? {
     val context = LocalContext.current
     val postSettingsDataStore = remember(context) { context.postSettingsDataStore }
     val postSettings by postSettingsDataStore.data.collectAsState(
-        initial = PostSettingsDefaults.defaultPostSettings,
+        initial = null,
     )
     return postSettings
 }

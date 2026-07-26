@@ -30,10 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.ContentFrame
 import androidx.media3.ui.compose.state.rememberPresentationState
+import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.settings.data.VideoQuality
-import com.sofamaniac.crabir.settings.data.rememberDataSettings
 import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.AlwaysOnInfo
@@ -170,7 +170,7 @@ fun VideoPlayer(
     val currentKey by VideoPlayerManager.currentKey.collectAsState()
     val isActive = currentKey == key
 
-    val dataSettings = rememberDataSettings()
+    val dataSettings = LocalDataSettings.current
     val context = LocalContext.current
     val currentQuality = if (context.onWifiConnection) {
         dataSettings.videoQuality.onWifi

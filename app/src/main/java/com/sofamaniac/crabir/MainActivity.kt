@@ -131,7 +131,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
+        var keepSplashOnScreen = true
         super.onCreate(savedInstanceState)
+        splashScreen.setKeepOnScreenCondition { keepSplashOnScreen }
         VideoPlayerManager.initialize(this)
         enableEdgeToEdge()
         setContent {
@@ -139,7 +141,9 @@ class MainActivity : ComponentActivity() {
             navController = rememberNavController()
             uriHandler = LocalUriHandler.current
             setImageLoader()
-            MainScreen(navController = navController)
+            MainScreen(navController = navController) {
+                keepSplashOnScreen = false
+            }
         }
     }
 }
@@ -183,6 +187,7 @@ fun setImageLoader() {
 @Composable
 fun MainScreen(
     navController: NavHostController,
+    onLoad: () -> Unit,
 ) {
 
     val lifecycleOwner by rememberUpdatedState(LocalLifecycleOwner.current)
@@ -210,6 +215,9 @@ fun MainScreen(
                 LocalNavController provides navController,
                 LocalRedditAccount provides currentAccount,
             ) {
+                if (!currentAccount.isUninitialized()) {
+                    onLoad()
+                }
 
                 LaunchedEffect(currentAccount) {
                     if (!currentAccount.isUninitialized()) {

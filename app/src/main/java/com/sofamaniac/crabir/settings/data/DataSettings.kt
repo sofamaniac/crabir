@@ -79,11 +79,11 @@ val Context.dataSettingsStore by dataStore(
 )
 
 @Composable
-fun rememberDataSettings(): DataSettings {
+internal fun rememberDataSettings(): DataSettings? {
     val context = LocalContext.current
     val dataSettingsStore = remember(context) { context.dataSettingsStore }
     val dataSettings by dataSettingsStore.data.collectAsState(
-        initial = DataSettingsDefault.defaultDataSettings,
+        initial = null,
     )
     return dataSettings
 }

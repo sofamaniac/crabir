@@ -13,10 +13,10 @@ import com.sofamaniac.crabir.settings.views.rememberViewSettings
 
 @Composable
 fun ConfigureSettings(content: @Composable () -> Unit) {
-    val postSettings = rememberPostsSettings()
-    val filtersSettings = rememberFiltersSettings()
-    val viewSettings = rememberViewSettings()
-    val dataSettings = rememberDataSettings()
+    val postSettings = rememberPostsSettings() ?: return
+    val filtersSettings = rememberFiltersSettings() ?: return
+    val viewSettings = rememberViewSettings() ?: return
+    val dataSettings = rememberDataSettings() ?: return
 
     CompositionLocalProvider(
         LocalPostSettings provides postSettings,

@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.datastore.dataStore
+import com.sofamaniac.crabir.LocalFiltersSettings
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.settings.DataStoreJsonSerializer
 import kotlinx.serialization.Serializable
@@ -33,11 +34,11 @@ val Context.filtersDataStore by dataStore(
 )
 
 @Composable
-fun rememberFiltersSettings(): FiltersSettings {
+internal fun rememberFiltersSettings(): FiltersSettings? {
     val context = LocalContext.current
     val filtersSettingsDataStore = remember(context) { context.filtersDataStore }
     val filtersSettings by filtersSettingsDataStore.data.collectAsState(
-        initial = FiltersSettings(),
+        initial = null,
     )
     return filtersSettings
 }
@@ -45,9 +46,9 @@ fun rememberFiltersSettings(): FiltersSettings {
 @Composable
 fun rememberPostsFilter(
     whitelistSubreddit: List<String> = emptyList(),
-    whitelistAuthor: List<String> = emptyList()
+    whitelistAuthor: List<String> = emptyList(),
 ): (PostData) -> Boolean {
-    val settings = rememberFiltersSettings()
+    val settings = LocalFiltersSettings.current
     return { post ->
         val title = post.title
         val author = post.author.username
