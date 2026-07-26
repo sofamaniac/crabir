@@ -18,7 +18,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Settings
@@ -80,6 +79,7 @@ import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
+import com.sofamaniac.crabir.settings.theme.BackButton
 import com.sofamaniac.crabir.ui.TimeframeMenu
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subreddit.PostView
@@ -356,7 +356,9 @@ fun TopBar(
     val showSettings by commonViewModel.showSettings.collectAsState()
     val focusRequest = remember { FocusRequester() }
     LaunchedEffect(Unit) {
-        focusRequest.requestFocus()
+        if (commonViewModel.query.isEmpty()) {
+            focusRequest.requestFocus()
+        }
     }
     TopAppBar(
         scrollBehavior = scrollBehavior,
@@ -369,17 +371,15 @@ fun TopBar(
             )
         },
         navigationIcon = {
-            IconButton(
-                enabled = enableSettings,
-                onClick = { navController?.popBackStack() }) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
-                )
+            BackButton {
+                navController?.popBackStack()
             }
         },
         actions = {
-            IconButton(onClick = { commonViewModel.showSettings.value = !showSettings }) {
+            IconButton(
+                enabled = enableSettings,
+                onClick = { commonViewModel.showSettings.value = !showSettings }
+            ) {
                 Icon(Icons.Default.Settings, contentDescription = "Search Settings")
             }
         }
