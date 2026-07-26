@@ -73,6 +73,7 @@ fun ViewsSettingsPage() {
 
             item {
                 ListItem(
+                    leadingContent = { Spacer(modifier = Modifier.size(24.dp)) },
                     headlineContent = { Text("Default number of columns") },
                     trailingContent = { Text(viewSettings.defaultColumns.toString()) },
                     supportingContent = {
@@ -185,11 +186,14 @@ fun ViewsSettingsPage() {
             item {
                 ListItem(
                     leadingContent = { Spacer(modifier = Modifier.size(24.dp)) },
-                    headlineContent = { Text("Number of lines") },
-                    trailingContent = {
+                    headlineContent = {
                         TextField(
+                            enabled = viewSettings.cardSettings.enableTextPreview,
+                            label = { Text("Number of lines") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             value = viewSettings.cardSettings.maxLines.toString(),
+                            supportingText = { Text("Maximum number of lines to preview") },
+                            suffix = { Text("lines") },
                             singleLine = true,
                             onValueChange = { target ->
                                 scope.launch {
