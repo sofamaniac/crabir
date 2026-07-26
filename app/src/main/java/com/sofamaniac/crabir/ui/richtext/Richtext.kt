@@ -440,8 +440,8 @@ fun Richtext.Link.toAnnotatedString(context: Context): AnnotatedString {
 
 fun Richtext.CommunityLink.toAnnotatedString(context: Context): AnnotatedString {
     return buildAnnotatedString {
-        withContext(context, context.configuration.styles.linkStyle) {
-            withLink(LinkAnnotation.Url("https://www.reddit.com/r/$community")) {
+        withLink(LinkAnnotation.Url("https://www.reddit.com/r/$community")) {
+            withContext(context, context.configuration.styles.linkStyle) {
                 append("r/$community")
             }
         }
@@ -450,8 +450,8 @@ fun Richtext.CommunityLink.toAnnotatedString(context: Context): AnnotatedString 
 
 fun Richtext.UserLink.toAnnotatedString(context: Context): AnnotatedString {
     return buildAnnotatedString {
-        withContext(context, context.configuration.styles.linkStyle) {
-            withLink(LinkAnnotation.Url("https://www.reddit.com/user/$user")) {
+        withLink(LinkAnnotation.Url("https://www.reddit.com/user/$user")) {
+            withContext(context, context.configuration.styles.linkStyle) {
                 append("u/$user")
             }
         }
