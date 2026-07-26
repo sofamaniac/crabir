@@ -106,11 +106,16 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        Log.d("MainActivity", "onNewIntent: $intent")
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        Log.d("MainActivity", "handleIntent: $intent")
         intent.data?.let { uri ->
             val request = NavDeepLinkRequest.Builder.fromUri(uri).build()
             try {
-                Log.d("MainActivity", "onNewIntent: request: $request")
+                Log.d("MainActivity", "handleIntent: request: $request")
                 val mediaUrl = listOf("i.redd.it", "preview.reddit.com", "preview.redd.it")
                 if (mediaUrl.contains(uri.host)) {
                     navController.navigate(
@@ -124,7 +129,13 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             } catch (e: IllegalArgumentException) {
-                uriHandler.openUri(uri.toString())
+                try {
+                    if (uri.scheme == "http" || uri.scheme == "https") {
+                        uriHandler.openUri(uri.toString())
+                    }
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "handleIntent: failed to open uri: $uri", e)
+                }
             }
         }
     }
@@ -143,6 +154,7 @@ class MainActivity : ComponentActivity() {
             setImageLoader()
             MainScreen(navController = navController) {
                 keepSplashOnScreen = false
+                handleIntent(intent)
             }
         }
     }
@@ -215,16 +227,12 @@ fun MainScreen(
                 LocalNavController provides navController,
                 LocalRedditAccount provides currentAccount,
             ) {
-                if (!currentAccount.isUninitialized()) {
-                    onLoad()
-                }
-
                 LaunchedEffect(currentAccount) {
                     if (!currentAccount.isUninitialized()) {
                         navController.navigate(HomeRoute) {
                             popUpTo(0) { inclusive = true }
-                            //launchSingleTop = true
                         }
+                        onLoad()
                     }
                 }
                 SetShortcuts()
@@ -266,7 +274,11 @@ fun NavigationGraph(
         composable<SubscriptionsRoute> {
             SubredditListViewer()
         }
-        composable<SearchRoute> { navBackStackEntry ->
+        composable<SearchRoute>(
+            deepLinks = listOf(
+                navDeepLink { uriPattern = "com.sofamaniac.crabir://search" }
+            )
+        ) { navBackStackEntry ->
             val search = navBackStackEntry.toRoute<SearchRoute>()
             SearchTab(search)
         }

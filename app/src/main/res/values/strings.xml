@@ -115,4 +115,12 @@
     <string name="see_full_thread">See full thread</string>
     <string name="show_full_context">Show full context</string>
     <string name="no_comments">No comments</string>
+    <string name="home_shortcut_short_label">Home</string>
+    <string name="home_shortcut_long_label">Go to home feed</string>
+    <string name="search_shortcut_short_label">Search</string>
+    <string name="search_shortcut_long_label">Search on Reddit</string>
+    <string name="popular_shortcut_short_label">r/popular</string>
+    <string name="popular_shortcut_long_label">Go to r/popular</string>
+    <string name="all_shortcut_short_label">r/all</string>
+    <string name="all_shortcut_long_label">Go to r/all</string>
 </resources>

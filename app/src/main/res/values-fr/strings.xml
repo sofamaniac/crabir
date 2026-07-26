@@ -89,4 +89,8 @@
     <string name="mute_flair">Mettre en sourdine le flair</string>
     <string name="nsfw_content">Contenu NSFW</string>
     <string name="filters">Filtres</string>
+    <string name="home_shortcut_short_label">Accueil</string>
+    <string name="home_shortcut_long_label">Aller à l\'accueil</string>
+    <string name="search_shortcut_short_label">Chercher</string>
+    <string name="search_shortcut_long_label">Chercher sur Reddit</string>
 </resources>

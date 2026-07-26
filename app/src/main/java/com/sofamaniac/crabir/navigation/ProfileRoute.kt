@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.ui.user.ProfileTabs
@@ -50,7 +51,10 @@ fun NavGraphBuilder.profileGraph(navController: NavController) {
             )
         }
     }
-    composable<SavedRoute> {
+    composable<SavedRoute>(
+        deepLinks = listOf(
+            navDeepLink { uriPattern = "com.sofamaniac.crabir://saved" }
+        )) {
         val currentAccount = LocalRedditAccount.current
         if (currentAccount.isAnonymous()) {
             // TODO: ask user to log in (should be done at SavedRoute creation site)

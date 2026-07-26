@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.ui.subreddit.MultiView
@@ -22,7 +23,9 @@ fun NavGraphBuilder.subredditGraph(navController: NavController) {
     }
     composable(
         route = "/r/{subreddit}",
-        deepLinks = stringLink("r/{subreddit}"),
+        deepLinks = stringLink("r/{subreddit}") + listOf(
+            navDeepLink { uriPattern = "com.sofamaniac.crabir://r/{subreddit}" }
+        ),
         arguments = listOf(
             navArgument("subreddit") {
                 type = NavType.StringType
