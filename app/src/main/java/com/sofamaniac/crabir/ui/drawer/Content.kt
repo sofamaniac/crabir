@@ -30,7 +30,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -44,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.LocalFiltersSettings
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.PreviewLocalComposition
 import com.sofamaniac.crabir.data.remote.dto.Thing
@@ -57,6 +57,7 @@ import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.filters.filtersDataStore
 import com.sofamaniac.crabir.settings.theme.ThemeMode
 import com.sofamaniac.crabir.settings.theme.themeDataStore
+import com.sofamaniac.crabir.ui.ThemedSwitch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -244,9 +245,7 @@ private fun BlurTile() {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val filtersDataStore = remember { context.filtersDataStore }
-    val blur by remember {
-        filtersDataStore.data.map { it.blurNSFW }
-    }.collectAsState(initial = false)
+    val blur = LocalFiltersSettings.current.blurNSFW
 
     fun toggle() {
         coroutineScope.launch {
@@ -262,10 +261,9 @@ private fun BlurTile() {
             Text("Blur NSFW")
         },
         badge = {
-            Switch(
-                blur, onCheckedChange = {
-                    toggle()
-                }
+            ThemedSwitch(
+                checked = blur,
+                onCheckedChange = { toggle() },
             )
         },
         onClick = { toggle() }

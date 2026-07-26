@@ -35,7 +35,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -80,6 +79,7 @@ import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.theme.BackButton
+import com.sofamaniac.crabir.ui.ThemedSwitch
 import com.sofamaniac.crabir.ui.TimeframeMenu
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subreddit.PostView
@@ -486,7 +486,7 @@ fun SearchSettings(viewModel: PostSearchViewModel) {
                 },
                 headlineContent = { Text("Restrict subreddit") },
                 trailingContent = {
-                    Switch(
+                    ThemedSwitch(
                         checked = params.restrictSubreddit,
                         onCheckedChange = {
                             viewModel.setRestrictSubreddit(it)
