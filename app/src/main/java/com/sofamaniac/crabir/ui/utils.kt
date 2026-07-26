@@ -16,12 +16,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sofamaniac.crabir.AccountManager
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import dev.chrisbanes.haze.blur.HazeBlurStyle
 import dev.chrisbanes.haze.blur.HazeColorEffect
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import net.openid.appauth.AuthState
 import org.koin.androidx.compose.koinViewModel
@@ -68,8 +69,10 @@ fun rememberCurrentAccount(): RedditAccount {
 }
 
 @KoinViewModel
-class CurrentAccountViewModel(accountsRepository: AccountsRepository) : ViewModel() {
-    val account = accountsRepository.activeAccount.stateIn(
+class CurrentAccountViewModel(accountManager: AccountManager) : ViewModel() {
+    val account = accountManager.accountsRepository.activeAccount.distinctUntilChanged { old, new ->
+        old.id == new.id && old.info == new.info
+    }.stateIn(
         viewModelScope,
         started = SharingStarted.Eagerly,
         RedditAccount.uninitialized(-2, AuthState())

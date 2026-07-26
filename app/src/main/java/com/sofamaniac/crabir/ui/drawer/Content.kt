@@ -74,6 +74,8 @@ fun DrawerContent(
     val coroutineScope = rememberCoroutineScope()
     val loginState by viewModel.loginState.collectAsState()
 
+    viewModel.initialize()
+
     val snackbarHostState = LocalSnackBarHost.current
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Error) {

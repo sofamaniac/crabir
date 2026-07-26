@@ -227,6 +227,7 @@ fun MainScreen(
                         }
                     }
                 }
+                SetShortcuts()
                 NavigationGraph(
                     navController,
                 )

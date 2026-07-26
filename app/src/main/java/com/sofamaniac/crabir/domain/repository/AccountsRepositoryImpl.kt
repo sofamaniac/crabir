@@ -74,7 +74,7 @@ object AccountsSerializer : Serializer<Accounts> {
 
     override suspend fun writeTo(
         t: Accounts,
-        output: OutputStream
+        output: OutputStream,
     ) {
         withContext(Dispatchers.IO) {
             output.write(
@@ -85,7 +85,6 @@ object AccountsSerializer : Serializer<Accounts> {
     }
 
 }
-
 
 
 @Singleton
@@ -115,7 +114,7 @@ class AccountsRepositoryImplRoom(
 
     override suspend fun updateAccount(
         accountId: Int,
-        account: RedditAccount
+        account: RedditAccount,
     ) {
         val newEntity = account.toEntity()
         accountsDao.updateAccount(accountId, newEntity)
@@ -123,7 +122,7 @@ class AccountsRepositoryImplRoom(
 
     override suspend fun updateAuthState(
         accountId: Int,
-        authState: AuthState
+        authState: AuthState,
     ) {
         val authState = Json.encodeToString(AuthStateSerializer, authState)
         accountsDao.updateAuthState(accountId, authState)
@@ -167,7 +166,7 @@ class AccountsRepositoryImpl(
             if (accounts.accounts.any {
                     (it.info?.name ?: "") == account.info?.name || it.id == account.id
                 }) {
-                Log.e("AccountsRepositoryImpl", "Account already exists: $account")
+                Log.w("AccountsRepositoryImpl", "Account already exists: $account")
                 val i = accounts.accounts.indexOfFirst {
                     (it.info?.name ?: "") == account.info?.name || it.id == account.id
                 }
@@ -181,8 +180,8 @@ class AccountsRepositoryImpl(
     }
 
     override suspend fun setActiveAccount(accountId: Int) {
-        Log.d("AccountsRepositoryImpl", "setActiveAccount: $accountId")
         if (activeAccountId.first() == accountId) return
+        Log.d("AccountsRepositoryImpl", "setActiveAccount: $accountId")
         dataStore.updateData { accounts ->
             accounts.copy(activeId = accountId)
         }
