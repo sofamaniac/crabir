@@ -10,8 +10,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.ThumbDown
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import com.sofamaniac.crabir.LocalTheme
@@ -58,6 +57,7 @@ fun UpButton(likes: Boolean?, onClick: () -> Unit) {
     val neutral = stringResource(R.string.neutral_vote)
     val upvote = stringResource(R.string.upvote)
     val description = if (likes == true) neutral else upvote
+    val icon = if (likes == true) R.drawable.filled_arrow_up else R.drawable.arrow_shape_up
     TooltipBox(
         tooltip = { PlainTooltip { Text(description) } },
         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
@@ -72,7 +72,11 @@ fun UpButton(likes: Boolean?, onClick: () -> Unit) {
             },
             modifier = Modifier.offset { IntOffset(0, offset.value.toInt()) }
         ) {
-            Icon(Icons.Filled.ThumbUp, description, tint = buttonColor.value)
+            Icon(
+                painter = painterResource(icon),
+                description,
+                tint = buttonColor.value
+            )
         }
     }
 }
@@ -84,7 +88,7 @@ fun DownButton(likes: Boolean?, onClick: () -> Unit) {
 
     suspend fun animate(likes: Boolean?) {
         if (likes == false) return
-        offset.animateTo(-MAX_OFFSET, animationSpec = tween(50, easing = EaseIn))
+        offset.animateTo(MAX_OFFSET, animationSpec = tween(50, easing = EaseIn))
         offset.animateTo(
             0f,
             animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium)
@@ -98,8 +102,9 @@ fun DownButton(likes: Boolean?, onClick: () -> Unit) {
         label = "button color"
     )
     val neutral = stringResource(R.string.neutral_vote)
-    val upvote = stringResource(R.string.downvote)
-    val description = if (likes == true) neutral else upvote
+    val downvote = stringResource(R.string.downvote)
+    val description = if (likes == false) neutral else downvote
+    val icon = if (likes == false) R.drawable.filled_arrow_up else R.drawable.arrow_shape_up
     TooltipBox(
         tooltip = { PlainTooltip { Text(description) } },
         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
@@ -114,7 +119,12 @@ fun DownButton(likes: Boolean?, onClick: () -> Unit) {
             },
             modifier = Modifier.offset { IntOffset(0, offset.value.toInt()) }
         ) {
-            Icon(Icons.Filled.ThumbDown, description, tint = buttonColor.value)
+            Icon(
+                painter = painterResource(icon),
+                description,
+                tint = buttonColor.value,
+                modifier = Modifier.scale(-1f)
+            )
         }
     }
 }
