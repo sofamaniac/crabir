@@ -142,7 +142,7 @@ fun PostVideo(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(video.aspectRatio)
+                .aspectRatio(video.aspectRatio, matchHeightConstraintsFirst = true)
                 .clickable(onClick = goFullscreen)
         ) {
             placeholder()

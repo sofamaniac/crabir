@@ -89,9 +89,7 @@ fun PostImage(
     val mediaResource = post.getImage()
     val blurStyle = crabirBlurStyle()
     val blurredImage = post.getObfuscated()
-    val modifier = Modifier
-        .fillMaxSize()
-        .then(modifier)
+    val innerModifier = modifier
         .let { modifier ->
             if (blur && blurredImage == null) { // Blur only if not obfuscated preview is available
                 modifier.hazeEffect {
@@ -106,29 +104,30 @@ fun PostImage(
         }
         .let { modifier ->
             if (mediaResource.hasValidAspectRatio) {
-                modifier.aspectRatio(mediaResource.aspectRatio)
+                modifier.aspectRatio(mediaResource.aspectRatio, matchHeightConstraintsFirst = true)
             } else {
                 modifier
             }
         }
-        .clickable(enabled = enabled, onClick = goFullscreen)
-    if (!loadImage) {
-        UnloadedPlaceHolder(
-            modifier
-                .height(150.dp)
-                .clickable(enabled = enabled, onClick = goFullscreen)
-        )
-    } else if (blurredImage == null || !blur) {
-        ImageView(
-            post, quality = quality, modifier = modifier, allowTransformation = false
-        )
-    } else {
-        AsyncImage(
-            blurredImage.url,
-            modifier = modifier,
-            contentDescription = null,
-            contentScale = ContentScale.FillBounds
-        )
+    Box(modifier = modifier.clickable(enabled = enabled, onClick = goFullscreen)) {
+        if (!loadImage) {
+            UnloadedPlaceHolder(
+                innerModifier
+                    .height(150.dp)
+                    .clickable(enabled = enabled, onClick = goFullscreen)
+            )
+        } else if (blurredImage == null || !blur) {
+            ImageView(
+                post, quality = quality, modifier = innerModifier, allowTransformation = false
+            )
+        } else {
+            AsyncImage(
+                blurredImage.url,
+                modifier = innerModifier,
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds
+            )
+        }
     }
 }
 

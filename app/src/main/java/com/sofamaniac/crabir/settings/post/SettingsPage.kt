@@ -3,10 +3,6 @@ package com.sofamaniac.crabir.settings.post
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -22,6 +18,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
+import com.sofamaniac.crabir.settings.theme.BackButton
 import kotlinx.coroutines.launch
 
 @Composable
@@ -62,12 +59,7 @@ fun PostSettingsPage() {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Post Settings") }, navigationIcon = {
-                IconButton(onClick = { navController?.popBackStack() }) {
-                    Icon(
-                        Icons.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )
-                }
+                BackButton { navController?.popBackStack() }
             })
         }
     ) { innerPadding ->

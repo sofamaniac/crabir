@@ -1,9 +1,13 @@
 package com.sofamaniac.crabir.ui.post.card
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalFiltersSettings
 import com.sofamaniac.crabir.domain.model.Kind
@@ -11,6 +15,7 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.navigation.Route
+import com.sofamaniac.crabir.settings.views.ImageHeight
 import com.sofamaniac.crabir.ui.markdown.HeightRestrictedWithGradient
 import com.sofamaniac.crabir.ui.post.PostGallery
 import com.sofamaniac.crabir.ui.post.PostImage
@@ -24,7 +29,7 @@ internal fun PostBody(
     post: PostData,
     modifier: Modifier = Modifier,
     canPlayVideo: Boolean = false,
-    enableFullHeightImage: Boolean = true,
+    imageHeight: ImageHeight = ImageHeight.Full,
     enableTextPreview: Boolean = true,
     maxLines: Int?,
     enableLinkFullSizePreview: Boolean = true,
@@ -57,11 +62,26 @@ internal fun PostBody(
             )
         }
     }
+    val screenHeight = LocalWindowInfo.current.containerDpSize.height
+    val mediaModifier = modifier
+        .fillMaxWidth()
+        .then(
+            when (imageHeight) {
+                ImageHeight.Full -> Modifier
+                ImageHeight.Fixed -> Modifier
+                    .height(200.dp)
+                    .clipToBounds()
+
+                ImageHeight.Screen -> Modifier
+                    .heightIn(max = screenHeight.times(0.8f))
+                    .clipToBounds()
+            }
+        )
     when (post.kind) {
         Kind.Image -> {
             PostImage(
                 post,
-                modifier.fillMaxWidth(),
+                modifier = mediaModifier,
                 goFullscreen = ::goFullscreen,
                 blur = blur,
             )
@@ -70,7 +90,7 @@ internal fun PostBody(
         Kind.Video -> {
             PostVideo(
                 post,
-                modifier.fillMaxWidth(),
+                modifier = mediaModifier,
                 canPlayVideo = canPlayVideo,
                 blur = blur,
                 goFullscreen = ::goFullscreen

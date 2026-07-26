@@ -150,7 +150,7 @@ internal fun PostCardContent(
         PostBody(
             post,
             canPlayVideo = canStartVideo,
-            enableFullHeightImage = viewSettings.cardSettings.enableFullHeightImage,
+            imageHeight = viewSettings.cardSettings.imageHeight,
             enableTextPreview = viewSettings.cardSettings.enableTextPreview && !post.spoiler,
             maxLines = viewSettings.cardSettings.maxLines,
             enableLinkFullSizePreview = !viewSettings.cardSettings.thumbnailForLinkPreview,

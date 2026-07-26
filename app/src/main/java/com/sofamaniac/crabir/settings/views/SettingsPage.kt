@@ -134,17 +134,24 @@ fun ViewsSettingsPage() {
                 )
             }
             item {
-                SwitchTile(
-                    checked = viewSettings.cardSettings.enableFullHeightImage,
-                    onCheckedChange = { target ->
+                ListSelector(
+                    options = ImageHeight.entries.toList(),
+                    selectedOption = viewSettings.cardSettings.imageHeight,
+                    headlineContent = { Text("Image height") },
+                    onOptionSelected = { target ->
                         scope.launch {
                             settingsDataStore.updateData {
-                                it.copy(cardSettings = it.cardSettings.copy(enableFullHeightImage = target))
+                                it.copy(cardSettings = it.cardSettings.copy(imageHeight = target))
                             }
                         }
                     },
-                    headlineContent = { Text("Enable full height image") },
-                    supportingContent = { Text("Disable for fixed height images") }
+                    optionLabel = {
+                        when (it) {
+                            ImageHeight.Full -> "Full"
+                            ImageHeight.Fixed -> "Fixed"
+                            ImageHeight.Screen -> "Limit to 80% of screen height"
+                        }
+                    }
                 )
             }
             item {

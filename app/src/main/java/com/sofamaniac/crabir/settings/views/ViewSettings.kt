@@ -45,9 +45,16 @@ data class ViewSettings(
 )
 
 @Serializable
+enum class ImageHeight {
+    Full,
+    Fixed,
+    Screen
+}
+
+@Serializable
 data class CardSettings(
     val showSubredditIcon: Boolean = true,
-    val enableFullHeightImage: Boolean = true,
+    val imageHeight: ImageHeight = ImageHeight.Full,
     val enableTextPreview: Boolean = true,
     val thumbnailForLinkPreview: Boolean = true,
     val maxLines: Int = 5,
