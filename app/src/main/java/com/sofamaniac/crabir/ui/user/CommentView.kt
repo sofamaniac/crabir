@@ -90,12 +90,15 @@ class CommentViewModel(
         }
     }
 
-    override fun save(name: Fullname, target: Boolean) {
+    override fun save(name: Fullname, target: Boolean, upvote: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             if (target) {
-                commentsRepository.unsave(name)
-            } else {
                 commentsRepository.save(name)
+                if (upvote) {
+                    commentsRepository.upvote(name)
+                }
+            } else {
+                commentsRepository.unsave(name)
             }
         }
     }

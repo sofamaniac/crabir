@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.dataStore
-import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.DataStoreJsonSerializer
 import kotlinx.coroutines.flow.Flow
@@ -18,8 +17,7 @@ import org.koin.core.annotation.Singleton
 data class AwardSettings(
     val showAwards: Boolean,
     val clickableAwards: Boolean,
-
-    )
+)
 
 @Serializable
 data class FlairSettings(
@@ -44,21 +42,6 @@ data class ButtonsSettings(
     val comments: Boolean,
     val openInApp: Boolean,
 )
-
-@Serializable
-enum class AutoPlayVideo {
-    Always,
-    Wifi,
-    Never;
-
-    fun toStringResource(): Int {
-        return when (this) {
-            Always -> R.string.autoplay_always
-            Wifi -> R.string.autoplay_wifi
-            Never -> R.string.autoplay_never
-        }
-    }
-}
 
 @Serializable
 data class LinksSettings(

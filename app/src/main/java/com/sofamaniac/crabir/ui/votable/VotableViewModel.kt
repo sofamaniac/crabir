@@ -21,7 +21,7 @@ interface VotableInteraction {
 
     fun upvote(name: Fullname)
     fun downvote(name: Fullname)
-    fun save(name: Fullname, target: Boolean)
+    fun save(name: Fullname, target: Boolean, upvote: Boolean)
     fun fetchRules()
     fun report(reason: String)
 }
@@ -29,59 +29,62 @@ interface VotableInteraction {
 open class VotableViewModel<T : VotableData>(
     val name: String,
     val subreddit: String,
-    private val posts: VotableRepository<T>,
+    private val repository: VotableRepository<T>,
     initialData: T? = null,
 ) : ViewModel(), VotableInteraction {
 
     val fullname =
         Fullname(name)
 
-    private var _post = posts.get(fullname)
+    private var postFlow = repository.get(fullname)
         .stateIn(
             viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = initialData
         )
 
-    override val likes = _post.map { it?.relationship?.liked }
+    override val likes = postFlow.map { it?.relationship?.liked }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialData?.relationship?.liked)
-    override val saved = _post.map { it?.relationship?.saved ?: false }
+    override val saved = postFlow.map { it?.relationship?.saved ?: false }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialData?.relationship?.saved ?: false)
 
-    var _rules = MutableStateFlow(Rules())
-    override val rules: StateFlow<Rules> = _rules
+    var rulesState = MutableStateFlow(Rules())
+    override val rules: StateFlow<Rules> = rulesState
 
     override fun fetchRules() {
-        if (_rules.value.rules.isNotEmpty()) return
+        if (rulesState.value.rules.isNotEmpty()) return
         viewModelScope.launch(Dispatchers.IO) {
-            _rules.value = posts.getRules(subreddit)
+            rulesState.value = repository.getRules(subreddit)
         }
     }
 
     override fun report(reason: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            posts.report(fullname, reason)
+            repository.report(fullname, reason)
         }
     }
 
     override fun upvote(name: Fullname) {
         viewModelScope.launch(Dispatchers.IO) {
-            posts.upvote(fullname)
+            repository.upvote(fullname)
         }
     }
 
     override fun downvote(name: Fullname) {
         viewModelScope.launch(Dispatchers.IO) {
-            posts.downvote(fullname)
+            repository.downvote(fullname)
         }
     }
 
-    override fun save(name: Fullname, target: Boolean) {
+    override fun save(name: Fullname, target: Boolean, upvote: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             if (target) {
-                posts.save(fullname)
+                repository.save(fullname)
+                if (upvote) {
+                    repository.upvote(fullname)
+                }
             } else {
-                posts.unsave(fullname)
+                repository.unsave(fullname)
             }
         }
     }

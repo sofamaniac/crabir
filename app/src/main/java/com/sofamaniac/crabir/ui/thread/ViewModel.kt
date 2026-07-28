@@ -260,17 +260,21 @@ class ThreadViewModel(
         }
     }
 
-    override fun save(name: Fullname, target: Boolean) {
+    override fun save(name: Fullname, target: Boolean, upvote: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             if (target) {
                 repository.save(name)
+                if (upvote) {
+                    repository.upvote(name)
+                }
             } else {
                 repository.unsave(name)
             }
             val comment = repository.comments.value.find { it.name == name }!!
             val newComment = comment.copy(
                 relationship = comment.relationship.copy(
-                    saved = target
+                    saved = target,
+                    liked = if (target && upvote) true else null
                 )
             )
             repository.updateComment(name, newComment as CommentType)
@@ -285,52 +289,3 @@ class ThreadViewModel(
         TODO("Not yet implemented")
     }
 }
-
-//fun List<CommentType>.updateComment(
-//    name: Fullname,
-//    update: (CommentType) -> CommentType
-//): List<CommentType> {
-//    return map { comment ->
-//        when {
-//            comment.name == name -> update(comment)
-//            comment is CommentType.Comment ->
-//                CommentType.Comment(
-//                    comment.comment.updateReplies(
-//                        replies = comment.comment.replies.updateComment(
-//                            name,
-//                            update
-//                        )
-//                    )
-//                )
-//
-//            else -> comment
-//        }
-//    }
-//
-//}
-//
-//fun List<CommentType>.count(): Int {
-//    return this.sumOf {
-//        1 + when (it) {
-//            is CommentType.Comment -> it.comment.replies.count()
-//            is CommentType.More -> 1
-//        }
-//    }
-//}
-//
-//fun List<CommentType>.findComment(name: Fullname): CommentType.Comment? {
-//    for (comment in this) {
-//        if (comment.name == name && comment is CommentType.Comment) {
-//            return comment
-//        }
-//    }
-//    for (comment in this) {
-//        if (comment is CommentType.Comment) {
-//            val res = comment.comment.replies.findComment(name)
-//            if (res != null) {
-//                return res
-//            }
-//        }
-//    }
-//    return null
-//}

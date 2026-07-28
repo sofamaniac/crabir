@@ -240,7 +240,7 @@ class DummyInteraction(post: PostData = DUMMY_POST) : PostViewModelInterface, Vi
             )
     }
 
-    override fun save(name: Fullname, target: Boolean) {
+    override fun save(name: Fullname, target: Boolean, upvote: Boolean) {
         _post.value = _post.value.copy(relationship = _post.value.relationship.copy(saved = target))
     }
 

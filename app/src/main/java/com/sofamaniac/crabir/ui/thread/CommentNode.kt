@@ -167,16 +167,10 @@ fun ColumnScope.OpenedComment(
 
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
-    //.padding(bottom = 8.dp)
     Spacer(modifier = Modifier.height(8.dp))
     TopRow(comment, modifier = innerModifier)
     Spacer(modifier = Modifier.height(8.dp))
     Richtext(comment.richtext, modifier = innerModifier, mediaMetadata = comment.mediaMetadata)
-    //    RedditMarkdown(
-    //        markdownState,
-    //        modifier = innerModifier,
-    //        key = comment.name,
-    //    )
     Spacer(modifier = Modifier.height(8.dp))
     AnimatedVisibility(showBottomBar) {
         BottomRow(comment, viewModel)
@@ -199,7 +193,7 @@ fun BottomRow(
     ) {
         UpButton(likes, onClick = { viewModel.upvote(comment.name) })
         DownButton(likes, onClick = { viewModel.downvote(comment.name) })
-        SavedButton(saved, onClick = { viewModel.save(comment.name, !saved) })
+        SavedButton(saved, onClick = { viewModel.save(comment.name, !saved, false) })
         ReplyButton(comment.name, viewModel)
         if (BuildConfig.DEBUG) {
             IconButton(onClick = {

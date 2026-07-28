@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.PostData
@@ -48,7 +49,7 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun ColumnScope.FullscreenTopBar(
     enabled: Boolean,
-    actions: @Composable () -> Unit = {}
+    actions: @Composable () -> Unit = {},
 ) {
     val navController = LocalNavController.current
     AnimatedVisibility(
@@ -87,7 +88,7 @@ fun ColumnScope.FullscreenBottomBar(
     viewModel: LinkViewModel = koinViewModel(
         key = post.id
     ) { parametersOf(post) },
-    title: @Composable () -> Unit = {}
+    title: @Composable () -> Unit = {},
 ) {
     val theme = LocalTheme.current
     val likes by viewModel.likes.collectAsState(post.relationship.liked)
@@ -95,6 +96,7 @@ fun ColumnScope.FullscreenBottomBar(
     val navController = LocalNavController.current
     val currentAccount = LocalRedditAccount.current
     var showShareMenu by remember { mutableStateOf(false) }
+    val upvoteOnSave = LocalPostSettings.current.linksSettings.upvoteOnSave
     AnimatedVisibility(
         visible = enabled,
         modifier = Modifier
@@ -127,7 +129,7 @@ fun ColumnScope.FullscreenBottomBar(
                     ScoreString(post.score.score, likes)
                     DownButton(likes, onClick = { viewModel.downvote(post.name) })
                 }
-                SavedButton(saved, onClick = { viewModel.save(post.name, !saved) })
+                SavedButton(saved, onClick = { viewModel.save(post.name, !saved, upvoteOnSave) })
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     OpenThreadButton {
                         viewModel.markPost(post, currentAccount.id)

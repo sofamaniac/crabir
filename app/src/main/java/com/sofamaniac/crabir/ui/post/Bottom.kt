@@ -76,17 +76,13 @@ fun BottomRow(
 ) {
     val likes by interactions.likes.collectAsState(post.relationship.liked)
     val saved by interactions.saved.collectAsState(post.relationship.saved)
-    //val upvoteOnSave = rememberPostsSettings().linksSettings.upvoteOnSave
     val upvoteOnSave =
         interactions.linksSettings.collectAsState(initial = null).value?.upvoteOnSave ?: false
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
         UpButton(likes, onClick = { interactions.upvote(post.name) })
         DownButton(likes, onClick = { interactions.downvote(post.name) })
         SavedButton(saved, onClick = {
-            interactions.save(post.name, !saved)
-            if (upvoteOnSave) {
-                interactions.upvote(post.name)
-            }
+            interactions.save(post.name, !saved, upvoteOnSave)
         })
         action?.invoke()
         if (buttonsSettings.openInApp) {
