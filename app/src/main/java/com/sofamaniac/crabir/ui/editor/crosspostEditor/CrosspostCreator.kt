@@ -57,6 +57,7 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.SwitchTile
+import com.sofamaniac.crabir.ui.CloseButton
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.editor.AccountSelector
 import com.sofamaniac.crabir.ui.editor.postEditor.CommunitySelector
@@ -99,9 +100,7 @@ fun CrosspostCreator(
             topBar = {
                 TopAppBar(
                     navigationIcon = {
-                        IconButton(onClick = { navController?.popBackStack() }) {
-                            Icon(Icons.Default.Close, contentDescription = "Close")
-                        }
+                        CloseButton { navController?.popBackStack() }
                     },
                     title = { Text("Create post") },
                     actions = {

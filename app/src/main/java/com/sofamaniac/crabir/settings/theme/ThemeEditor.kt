@@ -40,6 +40,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.ui.CloseButton
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,6 +62,7 @@ fun ThemeEditor() {
     val parentTheme = themeSettings.getParentTheme(mode)
     var activeColorField by remember { mutableStateOf<ColorFields?>(null) }
     val scope = rememberCoroutineScope()
+    val navController = LocalNavController.current
 
     fun updateColor(field: ColorFields, color: Color) {
         val newTheme = theme.updateFieldValue(field, color)
@@ -76,7 +79,9 @@ fun ThemeEditor() {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Theme editor") })
+            TopAppBar(title = { Text("Theme editor") }, navigationIcon = {
+                CloseButton { navController?.popBackStack() }
+            })
         },
     ) { paddingValues ->
         activeColorField?.let { field ->

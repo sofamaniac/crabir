@@ -19,7 +19,6 @@ import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Link
@@ -59,6 +58,7 @@ import com.sofamaniac.crabir.data.remote.reddit.MissingUrl
 import com.sofamaniac.crabir.data.remote.reddit.PostSubmissionBuilder
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.settings.helper.SwitchTile
+import com.sofamaniac.crabir.ui.CloseButton
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.editor.AccountSelector
@@ -276,9 +276,7 @@ private fun EditorTopBar(
 ) {
     TopAppBar(
         navigationIcon = {
-            IconButton(onClick = onDismissRequest) {
-                Icon(Icons.Default.Close, contentDescription = "Close")
-            }
+            CloseButton { onDismissRequest() }
         },
         title = { Text("Create post") },
         actions = {

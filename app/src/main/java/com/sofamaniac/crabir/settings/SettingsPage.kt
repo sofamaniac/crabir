@@ -39,7 +39,7 @@ import com.sofamaniac.crabir.navigation.ThemeRoute
 import com.sofamaniac.crabir.navigation.ViewsSettingRoute
 import com.sofamaniac.crabir.settings.data.DataSettingsRoute
 import com.sofamaniac.crabir.settings.post.PostSettingsRoute
-import com.sofamaniac.crabir.settings.theme.BackButton
+import com.sofamaniac.crabir.ui.BackButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable

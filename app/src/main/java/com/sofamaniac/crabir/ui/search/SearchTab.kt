@@ -78,7 +78,7 @@ import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
-import com.sofamaniac.crabir.settings.theme.BackButton
+import com.sofamaniac.crabir.ui.BackButton
 import com.sofamaniac.crabir.ui.ThemedSwitch
 import com.sofamaniac.crabir.ui.TimeframeMenu
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer

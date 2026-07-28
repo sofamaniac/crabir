@@ -6,12 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,11 +26,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ThemeEditorRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SwitchTile
+import com.sofamaniac.crabir.ui.BackButton
 import kotlinx.coroutines.launch
 
 @Composable
@@ -172,16 +170,6 @@ fun ThemeSettingsPage() {
                 )
             }
         }
-    }
-}
-
-@Composable
-fun BackButton(onClick: () -> Unit) {
-    IconButton(onClick = onClick) {
-        Icon(
-            Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = stringResource(R.string.back)
-        )
     }
 }
 
