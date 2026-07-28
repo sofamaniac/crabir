@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -159,7 +161,10 @@ fun <T : VotableData> PostFeedViewer(
                 val post = posts[index]
                 if (post != null && filter(post)) {
                     val isMostVisible = mostVisibleItemKey == post.id
-                    itemView(post, isMostVisible)
+                    Column {
+                        itemView(post, isMostVisible)
+                        HorizontalDivider()
+                    }
                 }
             }
             item {
@@ -182,15 +187,16 @@ fun <T : VotableData> PostFeedViewer(
 fun PostView(
     thing: PostData,
     isMostVisible: Boolean,
-    read: Boolean,
     markAsRead: () -> Unit,
     showHidden: Boolean,
     view: Views,
     viewModel: PostViewModelInterface,
+    modifier: Modifier = Modifier,
 ) {
     when (view) {
         Views.Card -> PostCard(
             thing,
+            modifier = modifier,
             markAsRead = markAsRead,
             isMostVisible = isMostVisible,
             showHidden = showHidden,
@@ -199,6 +205,7 @@ fun PostView(
 
         Views.Compact -> CompactView(
             thing,
+            modifier = modifier,
             markAsRead = markAsRead,
             canStartVideo = isMostVisible,
             showHidden = showHidden,
@@ -211,9 +218,9 @@ fun PostView(
 fun PostView(
     thing: PostData,
     isMostVisible: Boolean,
-    read: Boolean,
     markAsRead: () -> Unit,
     showHidden: Boolean,
+    modifier: Modifier = Modifier,
     view: Views? = null,
     viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = thing.id) {
         parametersOf(
@@ -226,11 +233,11 @@ fun PostView(
     PostView(
         thing,
         isMostVisible,
-        read,
         markAsRead,
         showHidden,
         view ?: viewSettings.defaultView,
-        viewModel = viewModel
+        viewModel = viewModel,
+        modifier = modifier,
     )
 }
 
@@ -249,7 +256,6 @@ private fun PostFeedPreview() {
                 PostView(
                     thing = post,
                     isMostVisible = mostVisible,
-                    read = false,
                     markAsRead = {},
                     showHidden = false,
                     viewModel = koinViewModel<DummyInteraction>()

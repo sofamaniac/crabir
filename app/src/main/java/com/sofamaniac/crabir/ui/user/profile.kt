@@ -162,7 +162,6 @@ fun ProfileView(
                                                 currentAccount.id
                                             )
                                         },
-                                        read = viewModel.isPostRead(thing),
                                         showHidden = page == ProfileTabs.Hidden,
                                     )
 

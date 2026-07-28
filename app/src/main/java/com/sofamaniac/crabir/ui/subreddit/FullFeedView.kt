@@ -84,7 +84,6 @@ fun FullFeedView(
                     PostView(
                         post,
                         isMostVisible = isMosVisible,
-                        read = viewModel.isPostRead(post),
                         markAsRead = {
                             viewModel.visitPost(post, currentAccount.id)
                         },

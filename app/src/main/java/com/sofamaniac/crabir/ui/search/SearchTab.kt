@@ -233,7 +233,6 @@ private fun InnerTab(
             markAsRead = {
                 viewModel.visitPost(post, currentAccount.id)
             },
-            read = viewModel.isPostRead(post),
             showHidden = false
         )
     }
