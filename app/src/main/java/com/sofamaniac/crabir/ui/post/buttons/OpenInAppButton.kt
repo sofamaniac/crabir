@@ -49,7 +49,7 @@ internal fun OpenInAppLong(post: PostData, buttonsSettings: ButtonsSettings) {
     if (!buttonsSettings.openInApp) {
         val uriHandler = LocalUriHandler.current
         ListItem(
-            headlineContent = { Text(stringResource(R.string.open_in_app)) },
+            content = { Text(stringResource(R.string.open_in_app)) },
             modifier = Modifier.clickable {
                 uriHandler.openUri(post.url)
             }

@@ -98,7 +98,7 @@ fun ThemeEditor() {
             ThemePreviewer { activeColorField = it }
             LazyColumn {
                 item {
-                    ListItem(headlineContent = {
+                    ListItem(content = {
                         TextButton(onClick = {
                             scope.launch {
                                 themeDataStore.updateData {
@@ -116,7 +116,7 @@ fun ThemeEditor() {
                 }
                 item {
                     ListItem(
-                        headlineContent = {
+                        content = {
                             TextButton(onClick = {}) {
                                 Text("Saved themes")
                             }
@@ -145,7 +145,7 @@ fun ThemeEditor() {
                                     )
                             )
                         },
-                        headlineContent = { Text(field.name) },
+                        content = { Text(field.name) },
                         trailingContent = {
                             val currentColor = theme.getFieldValue(field)
                             val parentColor = parentTheme.getFieldValue(field)

@@ -314,7 +314,7 @@ fun FlairDialog(
                         onSelect(flair)
                         onDismiss()
                     },
-                    headlineContent = {
+                    content = {
                         Text(
                             text,
                             color = mapColor(flair.textColor ?: "", Color.Unspecified),
@@ -354,14 +354,14 @@ fun FlairEditBox(
         rememberTextFieldState(initialText = initialText)
     BasicAlertDialog(onDismissRequest = onDismiss) {
         ThemedCard {
-            ListItem(headlineContent = {
+            ListItem(content = {
                 Text(
                     "Edit flair text",
                     style = MaterialTheme.typography.titleMedium
                 )
             })
             ListItem(
-                headlineContent = {
+                content = {
                     TextField(
                         state = textFieldState
                     )

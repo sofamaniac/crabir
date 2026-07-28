@@ -336,7 +336,7 @@ private fun InnerTab(viewModel: UserSearchViewModel) {
                                 .size(40.dp)
                                 .clip(CircleShape)
                         )
-                    }, headlineContent = {
+                    }, content = {
                         Text(user.username)
                     })
             }
@@ -405,7 +405,7 @@ inline fun <reified Sort> SortMenu(
         leadingContent = {
             Icon(Icons.AutoMirrored.Default.Sort, contentDescription = null)
         },
-        headlineContent = { Text("Sort") },
+        content = { Text("Sort") },
         trailingContent = {
             ExposedDropdownMenuBox(
                 expanded = showMenu,
@@ -484,7 +484,7 @@ fun SearchSettings(viewModel: PostSearchViewModel) {
                 modifier = Modifier.clickable {
                     viewModel.setRestrictSubreddit(!params.restrictSubreddit)
                 },
-                headlineContent = { Text("Restrict subreddit") },
+                content = { Text("Restrict subreddit") },
                 trailingContent = {
                     ThemedSwitch(
                         checked = params.restrictSubreddit,

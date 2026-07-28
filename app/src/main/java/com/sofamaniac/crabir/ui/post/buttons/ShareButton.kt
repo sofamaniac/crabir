@@ -22,7 +22,7 @@ import com.sofamaniac.crabir.ui.post.dialog.ShareMenu
 internal fun ShareButtonLong(post: PostData, closeMenu: () -> Unit) {
     var showMenu by remember { mutableStateOf(false) }
     ListItem(
-        headlineContent = { Text(stringResource(R.string.share)) },
+        content = { Text(stringResource(R.string.share)) },
         modifier = Modifier.clickable { showMenu = true }
     )
     if (showMenu) {

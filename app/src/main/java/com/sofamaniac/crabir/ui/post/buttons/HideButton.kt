@@ -17,7 +17,7 @@ import com.sofamaniac.crabir.ui.post.LinkInteraction
 @Composable
 internal fun HideButtonLong(post: PostData, interaction: LinkInteraction, onClick: () -> Unit) {
     ListItem(
-        headlineContent = {
+        content = {
             val text =
                 if (post.relationship.hidden) R.string.unhide_post else R.string.hide_post
             Text(stringResource(text))

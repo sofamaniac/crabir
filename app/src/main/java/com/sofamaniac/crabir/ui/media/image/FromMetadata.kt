@@ -24,11 +24,12 @@ fun ImageView(
     onClick: () -> Unit = {},
 ) {
     val preview = preview.images[0]
+    val resolutions = preview.resolutions.sortedBy { it.width }
     val image = when (quality) {
         Quality.Source -> preview.source
-        Quality.High -> preview.resolutions.last()
-        Quality.Medium -> preview.resolutions[preview.resolutions.size / 2]
-        Quality.Low -> preview.resolutions.first()
+        Quality.High -> resolutions.last()
+        Quality.Medium -> resolutions[preview.resolutions.size / 2]
+        Quality.Low -> resolutions.first()
     }.toMediaResource()
     TransformableImage(
         image,

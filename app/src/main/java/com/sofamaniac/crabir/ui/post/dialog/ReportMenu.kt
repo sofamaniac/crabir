@@ -51,7 +51,7 @@ fun ReportMenu(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
                                 onClick = null
                             )
                         },
-                        headlineContent = { Text(rules.rules[index].shortName) }
+                        content = { Text(rules.rules[index].shortName) }
                     )
                 }
                 items(rules.siteRules.size) { index ->
@@ -67,7 +67,7 @@ fun ReportMenu(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
                                 onClick = null
                             )
                         },
-                        headlineContent = { Text(rules.siteRules[index]) }
+                        content = { Text(rules.siteRules[index]) }
                     )
                 }
             }

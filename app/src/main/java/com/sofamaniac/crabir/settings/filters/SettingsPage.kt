@@ -109,7 +109,7 @@ fun FiltersSettingsPage() {
             }
             item {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.edit_title_filters)) },
+                    content = { Text(stringResource(R.string.edit_title_filters)) },
                     modifier = Modifier.clickable {
                         filtersToEdit = settings.titleFilters
                         editFilters =
@@ -119,7 +119,7 @@ fun FiltersSettingsPage() {
             }
             item {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.edit_author_filters)) },
+                    content = { Text(stringResource(R.string.edit_author_filters)) },
                     modifier = Modifier.clickable {
                         filtersToEdit = settings.authorFilters
                         editFilters =
@@ -129,7 +129,7 @@ fun FiltersSettingsPage() {
             }
             item {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.edit_subreddit_filters)) },
+                    content = { Text(stringResource(R.string.edit_subreddit_filters)) },
                     modifier = Modifier.clickable {
                         filtersToEdit = settings.subredditFilters
                         editFilters =
@@ -139,7 +139,7 @@ fun FiltersSettingsPage() {
             }
             item {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.edit_domains_filters)) },
+                    content = { Text(stringResource(R.string.edit_domains_filters)) },
                     modifier = Modifier.clickable {
                         filtersToEdit = settings.domainFilters
                         editFilters =
@@ -149,7 +149,7 @@ fun FiltersSettingsPage() {
             }
             item {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.edit_flair_filters)) },
+                    content = { Text(stringResource(R.string.edit_flair_filters)) },
                     modifier = Modifier.clickable {
                         filtersToEdit = settings.flairFilters
                         editFilters =
@@ -189,7 +189,7 @@ private fun FilterEditor(
             LazyColumn {
                 items(filters.size) { index ->
                     ListItem(
-                        headlineContent = {
+                        content = {
                             TextField(
                                 //enabled = editingIndex == index,
                                 singleLine = true,
@@ -218,7 +218,7 @@ private fun FilterEditor(
                 item {
                     ListItem(
                         colors = colors,
-                        headlineContent = {
+                        content = {
                             IconButton(onClick = {
                                 filters = filters + ""
                             }) {

@@ -131,10 +131,10 @@ fun AccountSelector(
         BasicAlertDialog(onDismissRequest = { showWarningDialog = false }) {
             ThemedCard {
                 ListItem(
-                    headlineContent = { Text("Warning") }
+                    content = { Text("Warning") }
                 )
                 ListItem(
-                    headlineContent = {
+                    content = {
                         Text(stringResource(R.string.login_warning))
                     },
                     modifier = Modifier.padding(16.dp)

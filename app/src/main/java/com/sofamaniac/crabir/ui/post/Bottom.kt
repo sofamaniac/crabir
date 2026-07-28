@@ -170,7 +170,7 @@ private fun ModerationButton(post: PostData) {
                 contentDescription = null
             )
         },
-        headlineContent = { Text(stringResource(R.string.moderation)) },
+        content = { Text(stringResource(R.string.moderation)) },
     )
 }
 
@@ -185,7 +185,7 @@ private fun EditButton(linkInteraction: LinkInteraction) {
                 contentDescription = null
             )
         },
-        headlineContent = { Text(stringResource(R.string.edit)) },
+        content = { Text(stringResource(R.string.edit)) },
     )
     if (showDialog) {
         EditDialogue(linkInteraction) {
@@ -206,7 +206,7 @@ private fun GoToSubredditButton(post: PostData, onClick: () -> Unit) {
                     .clip(CircleShape)
             )
         },
-        headlineContent = {
+        content = {
             Text(
                 stringResource(
                     R.string.go_to_subreddit,
@@ -222,7 +222,7 @@ private fun GoToSubredditButton(post: PostData, onClick: () -> Unit) {
 private fun GoToUserButton(post: PostData, onClick: () -> Unit) {
     ListItem(
         leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
-        headlineContent = {
+        content = {
             Text(
                 stringResource(
                     R.string.go_to_profile,
@@ -238,7 +238,7 @@ private fun GoToUserButton(post: PostData, onClick: () -> Unit) {
 private fun ReportButton(interaction: LinkInteraction) {
     var showMenu by remember { mutableStateOf(false) }
     ListItem(
-        headlineContent = { Text(stringResource(R.string.report)) },
+        content = { Text(stringResource(R.string.report)) },
         modifier = Modifier.clickable {
             interaction.fetchRules()
         }
@@ -255,7 +255,7 @@ private fun CopyButton(post: PostData) {
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
     ListItem(
-        headlineContent = { Text(stringResource(R.string.copy)) },
+        content = { Text(stringResource(R.string.copy)) },
         modifier = Modifier.clickable {
             scope.launch {
                 val clipData = ClipData.newPlainText("Post URL", post.url)
@@ -270,7 +270,7 @@ private fun CopyButton(post: PostData) {
 @Composable
 private fun DebugContentItem(post: PostData, json: Json) {
     ListItem(
-        headlineContent = { Text(stringResource(R.string.post_content)) },
+        content = { Text(stringResource(R.string.post_content)) },
         modifier = Modifier.clickable {
             Log.d("Post", json.encodeToString(post))
         }

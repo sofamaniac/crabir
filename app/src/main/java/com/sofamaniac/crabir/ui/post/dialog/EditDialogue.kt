@@ -43,16 +43,16 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
         Card(modifier = Modifier.padding(16.dp)) {
             ListItem(
                 modifier = Modifier.clickable { showFlairDialog = true },
-                headlineContent = { Text(stringResource(R.string.change_flair)) },
+                content = { Text(stringResource(R.string.change_flair)) },
                 trailingContent = {
                     Icon(Icons.Default.Edit, contentDescription = null)
                 }
             )
             if (post.kind == Kind.Self) {
-                ListItem(headlineContent = { Text(stringResource(R.string.edit_text)) })
+                ListItem(content = { Text(stringResource(R.string.edit_text)) })
             }
             ListItem(
-                headlineContent = { Text(stringResource(R.string.nsfw)) },
+                content = { Text(stringResource(R.string.nsfw)) },
                 trailingContent = {
                     Switch(
                         checked = post.over18,
@@ -68,7 +68,7 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
                 }
             )
             ListItem(
-                headlineContent = { Text(stringResource(R.string.spoiler)) },
+                content = { Text(stringResource(R.string.spoiler)) },
                 trailingContent = {
                     Switch(
                         checked = post.spoiler,
@@ -84,7 +84,7 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
                 }
             )
             ListItem(
-                headlineContent = { Text(stringResource(R.string.inbox_replies)) },
+                content = { Text(stringResource(R.string.inbox_replies)) },
                 trailingContent = {
                     Switch(
                         checked = post.sendReplies,
@@ -93,7 +93,7 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
                         }
                     )
                 })
-            ListItem(headlineContent = { Text(stringResource(R.string.delete)) })
+            ListItem(content = { Text(stringResource(R.string.delete)) })
         }
     }
 

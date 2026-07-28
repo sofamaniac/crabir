@@ -18,7 +18,7 @@ import com.sofamaniac.crabir.ui.post.dialog.MuteDialog
 internal fun MuteButton(post: PostData, onDismissRequest: () -> Unit) {
     var showMenu by remember { mutableStateOf(false) }
     ListItem(
-        headlineContent = { Text(stringResource(R.string.mute)) },
+        content = { Text(stringResource(R.string.mute)) },
         modifier = Modifier.clickable(onClick = { showMenu = true })
     )
     if (showMenu) {

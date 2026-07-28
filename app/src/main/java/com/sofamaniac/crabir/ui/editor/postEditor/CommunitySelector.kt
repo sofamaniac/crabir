@@ -100,11 +100,11 @@ internal fun CommunitySelector(
                 LazyColumn(state = rememberLazyListState()) {
                     items(viewModel.rules.rules.size) { index ->
                         val rule = viewModel.rules.rules[index]
-                        ListItem(headlineContent = { Text(rule.shortName) })
+                        ListItem(content = { Text(rule.shortName) })
                     }
                     items(viewModel.rules.siteRules.size) {
                         val rule = viewModel.rules.siteRules[it]
-                        ListItem(headlineContent = { Text(rule) })
+                        ListItem(content = { Text(rule) })
                     }
                 }
                 TextButton(onClick = { showRules = false }) {

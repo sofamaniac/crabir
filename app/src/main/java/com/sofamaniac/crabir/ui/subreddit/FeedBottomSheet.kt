@@ -26,17 +26,17 @@ fun FeedBottomSheet(
     sheetState: SheetState,
     onDismiss: () -> Unit,
     createPost: (Kind) -> Unit,
-    cancel: () -> Unit
+    cancel: () -> Unit,
 ) {
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
     ) {
-        ListItem(headlineContent = { Text(stringResource(R.string.create_post)) })
+        ListItem(content = { Text(stringResource(R.string.create_post)) })
         for (type in postTypes) {
             ListItem(
-                headlineContent = { Text(type.name) },
+                content = { Text(type.name) },
                 leadingContent = { Icon(type.icon, contentDescription = null) },
                 modifier = Modifier.clickable {
                     createPost(type.kind)

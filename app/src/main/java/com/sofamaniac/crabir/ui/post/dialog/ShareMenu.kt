@@ -40,7 +40,7 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
         Card(modifier = Modifier.padding(16.dp)) {
             ListItem(
                 leadingContent = { Icon(Icons.Default.Link, contentDescription = null) },
-                headlineContent = { Text(stringResource(R.string.share_link)) },
+                content = { Text(stringResource(R.string.share_link)) },
                 supportingContent = {
                     Text(
                         post.url,
@@ -64,7 +64,7 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
                         contentDescription = null
                     )
                 },
-                headlineContent = { Text(stringResource(R.string.share_post)) },
+                content = { Text(stringResource(R.string.share_post)) },
                 supportingContent = {
                     Text(
                         permalink,
@@ -89,7 +89,7 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
                         contentDescription = null
                     )
                 },
-                headlineContent = { Text(stringResource(R.string.share_title_link)) },
+                content = { Text(stringResource(R.string.share_title_link)) },
                 supportingContent = {
                     Text(
                         titleLink,
@@ -115,18 +115,18 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
                         contentDescription = null,
                     )
                 },
-                headlineContent = { Text(stringResource(R.string.crosspost)) },
+                content = { Text(stringResource(R.string.crosspost)) },
                 modifier = Modifier.clickable {
                     onDismissRequest()
                     navController.navigate(CrosspostCreatorRoute(post.name))
-//                    fullscreenManager.push {
-//                        CrosspostCreator(post)
-//                    }
+                    //                    fullscreenManager.push {
+                    //                        CrosspostCreator(post)
+                    //                    }
                 }
             )
             ListItem(
                 leadingContent = { Icon(Icons.Default.Link, contentDescription = null) },
-                headlineContent = { Text(stringResource(R.string.share_shortlink)) },
+                content = { Text(stringResource(R.string.share_shortlink)) },
                 supportingContent = {
                     Text(
                         post.shortlink,

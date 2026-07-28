@@ -39,7 +39,7 @@ fun MuteDialog(post: PostData, onDismissRequest: () -> Unit, onClick: () -> Unit
     BasicAlertDialog(onDismissRequest = onDismissRequest) {
         Card {
             ListItem(
-                headlineContent = { Text(stringResource(R.string.mute_posts_from_user, username)) },
+                content = { Text(stringResource(R.string.mute_posts_from_user, username)) },
                 leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
                 modifier = Modifier.clickable {
                     scope.launch {
@@ -49,7 +49,7 @@ fun MuteDialog(post: PostData, onDismissRequest: () -> Unit, onClick: () -> Unit
                 }
             )
             ListItem(
-                headlineContent = {
+                content = {
                     Text(
                         stringResource(
                             R.string.mute_posts_from_community,
@@ -67,7 +67,7 @@ fun MuteDialog(post: PostData, onDismissRequest: () -> Unit, onClick: () -> Unit
             )
             domain?.isNotBlank()?.let {
                 ListItem(
-                    headlineContent = {
+                    content = {
                         Text(
                             stringResource(
                                 R.string.mute_posts_from_domain,
@@ -86,7 +86,7 @@ fun MuteDialog(post: PostData, onDismissRequest: () -> Unit, onClick: () -> Unit
             }
             if (flair.isNotBlank()) {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.mute_flair)) },
+                    content = { Text(stringResource(R.string.mute_flair)) },
                     leadingContent = { Spacer(modifier = Modifier.size(16.dp)) },
                     modifier = Modifier.clickable {
                         scope.launch {
