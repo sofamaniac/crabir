@@ -144,7 +144,7 @@ data class CrabirTheme(
                 announcement = Color(0xff00ff00),
                 linkColor = Color(0xff4b91e2),
                 downvote = Color(0xFF448AFF),
-                secondaryText = colorScheme.onPrimaryFixedVariant,
+                secondaryText = colorScheme.secondary,
                 saved = Color(0xFFFFD740)
             )
         }
