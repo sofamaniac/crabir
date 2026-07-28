@@ -3,8 +3,6 @@ package com.sofamaniac.crabir.ui.thread
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
@@ -33,10 +31,9 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 class ThreadViewModel(
     private val repository: ThreadRepository,
-    private val visitedPostsDao: VisitedPostsDao,
     private val linksRepository: LinksRepository,
-    private val accountsRepository: AccountsRepository,
-    private val postSettingsRepository: PostSettingsRepository,
+    accountsRepository: AccountsRepository,
+    postSettingsRepository: PostSettingsRepository,
     @InjectedParam val permalink: String,
     @InjectedParam val comment: String?,
     @InjectedParam val context: Int?,
@@ -277,13 +274,6 @@ class ThreadViewModel(
                 )
             )
             repository.updateComment(name, newComment as CommentType)
-        }
-    }
-
-    fun visitPost(post: PostData, visitedBy: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val entity = VisitedPostEntity(post.name, System.currentTimeMillis(), visitedBy)
-            visitedPostsDao.insert(entity)
         }
     }
 

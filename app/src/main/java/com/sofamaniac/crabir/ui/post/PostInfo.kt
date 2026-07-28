@@ -43,7 +43,6 @@ fun PostInfo(
     read: Boolean = false,
     likes: () -> Boolean?,
     flairSettings: FlairSettings = LocalPostSettings.current.flairSettings,
-    markAsRead: () -> Unit = {},
 ) {
     val navController = LocalNavController.current
     val theme = LocalTheme.current
@@ -132,7 +131,7 @@ fun PostInfo(
             }
         }
         if (enableThumbnail) {
-            Thumbnail(post, markAsRead = markAsRead, blur = blur)
+            Thumbnail(post, blur = blur)
         }
     }
 }

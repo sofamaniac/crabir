@@ -45,6 +45,7 @@ import com.sofamaniac.crabir.navigation.FullscreenGalleryRoute
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.settings.data.NetworkPolicy
+import com.sofamaniac.crabir.ui.SaveToHistory
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.crabirBlurStyle
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
@@ -289,6 +290,7 @@ fun FullscreenGallery(
     dismiss: () -> Unit,
     onPageChanged: (Int) -> Unit = {},
 ) {
+    SaveToHistory(post)
     val post = viewModel.post.collectAsState(initial = null).value ?: return
     val gallery = post.gallery ?: return
     val state: PagerState =

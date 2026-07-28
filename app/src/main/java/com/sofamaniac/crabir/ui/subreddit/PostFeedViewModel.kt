@@ -18,7 +18,6 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
-import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.model.CommunityData
@@ -48,7 +47,6 @@ interface FeedViewModelInterface<T : VotableData> {
     var needScrollToTop: Boolean
 
     fun refresh()
-    fun visitPost(post: PostData, visitedBy: Int)
 
     fun isPostRead(post: PostData): Boolean
 
@@ -66,12 +64,6 @@ object FeedViewModelInterfacePreview : FeedViewModelInterface<PostData> {
     override var needScrollToTop: Boolean = false
 
     override fun refresh() {
-    }
-
-    override fun visitPost(
-        post: PostData,
-        visitedBy: Int,
-    ) {
     }
 
     override fun isPostRead(post: PostData): Boolean {
@@ -152,13 +144,6 @@ abstract class PostFeedViewModel<T : CommunityData>(
         if (needRefresh) {
             Log.d("PostFeedViewModel", "updateSort: Updating sort to $sort")
             refresh()
-        }
-    }
-
-    override fun visitPost(post: PostData, visitedBy: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val entity = VisitedPostEntity(post.name, System.currentTimeMillis(), visitedBy)
-            visitedPostsDao.insert(entity)
         }
     }
 

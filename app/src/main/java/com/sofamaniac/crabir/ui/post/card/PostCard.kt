@@ -50,7 +50,6 @@ fun PostCard(
     post: PostData,
     modifier: Modifier = Modifier,
     clickable: Boolean = true,
-    markAsRead: () -> Unit = {},
     showHidden: Boolean = false,
     isMostVisible: Boolean,
     viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = post.id) {
@@ -71,7 +70,6 @@ fun PostCard(
             post,
             modifier,
             clickable,
-            markAsRead,
             interactions = viewModel,
             isMostVisible = isMostVisible,
         )
@@ -94,7 +92,6 @@ internal fun PostCardContent(
     post: PostData,
     modifier: Modifier = Modifier,
     clickable: Boolean = true,
-    markAsRead: () -> Unit = {},
     isMostVisible: Boolean = false,
     interactions: LinkInteraction,
 ) {
@@ -117,7 +114,6 @@ internal fun PostCardContent(
     val navController = LocalNavController.current
     val openPost = if (clickable) {
         {
-            markAsRead()
             navController?.navigate(PostRoute(post.permalink)) ?: Unit
         }
     } else {
@@ -145,7 +141,6 @@ internal fun PostCardContent(
             enableThumbnail = enablePreview && viewSettings.cardSettings.thumbnailForLinkPreview,
             likes = { likes },
             read = read,
-            markAsRead = markAsRead
         )
         PostBody(
             post,
@@ -154,7 +149,6 @@ internal fun PostCardContent(
             enableTextPreview = viewSettings.cardSettings.enableTextPreview && !post.spoiler,
             maxLines = viewSettings.cardSettings.maxLines,
             enableLinkFullSizePreview = !viewSettings.cardSettings.thumbnailForLinkPreview,
-            markAsRead = markAsRead,
         )
         BottomRow(
             post,
@@ -179,7 +173,6 @@ internal fun PostCardPreview() {
         PostCardContent(
             post,
             clickable = false,
-            markAsRead = {},
             isMostVisible = false,
             interactions = viewModel,
         )

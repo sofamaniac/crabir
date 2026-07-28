@@ -187,7 +187,6 @@ fun <T : VotableData> PostFeedViewer(
 fun PostView(
     thing: PostData,
     isMostVisible: Boolean,
-    markAsRead: () -> Unit,
     showHidden: Boolean,
     view: Views,
     viewModel: PostViewModelInterface,
@@ -197,7 +196,6 @@ fun PostView(
         Views.Card -> PostCard(
             thing,
             modifier = modifier,
-            markAsRead = markAsRead,
             isMostVisible = isMostVisible,
             showHidden = showHidden,
             viewModel = viewModel,
@@ -206,8 +204,6 @@ fun PostView(
         Views.Compact -> CompactView(
             thing,
             modifier = modifier,
-            markAsRead = markAsRead,
-            canStartVideo = isMostVisible,
             showHidden = showHidden,
             viewModel = viewModel,
         )
@@ -218,7 +214,6 @@ fun PostView(
 fun PostView(
     thing: PostData,
     isMostVisible: Boolean,
-    markAsRead: () -> Unit,
     showHidden: Boolean,
     modifier: Modifier = Modifier,
     view: Views? = null,
@@ -233,7 +228,6 @@ fun PostView(
     PostView(
         thing,
         isMostVisible,
-        markAsRead,
         showHidden,
         view ?: viewSettings.defaultView,
         viewModel = viewModel,
@@ -256,7 +250,6 @@ private fun PostFeedPreview() {
                 PostView(
                     thing = post,
                     isMostVisible = mostVisible,
-                    markAsRead = {},
                     showHidden = false,
                     viewModel = koinViewModel<DummyInteraction>()
                 )

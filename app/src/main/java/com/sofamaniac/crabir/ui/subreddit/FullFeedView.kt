@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
@@ -47,7 +46,6 @@ fun FullFeedView(
     val scope = rememberCoroutineScope()
 
     val navController = LocalNavController.current
-    val currentAccount = LocalRedditAccount.current
     val snackbarHostState = remember { SnackbarHostState() }
     val theme = LocalTheme.current
     CompositionLocalProvider(LocalSnackBarHost provides snackbarHostState) {
@@ -84,9 +82,6 @@ fun FullFeedView(
                     PostView(
                         post,
                         isMostVisible = isMosVisible,
-                        markAsRead = {
-                            viewModel.visitPost(post, currentAccount.id)
-                        },
                         showHidden = false,
                         view = communityEntity?.view,
                     )

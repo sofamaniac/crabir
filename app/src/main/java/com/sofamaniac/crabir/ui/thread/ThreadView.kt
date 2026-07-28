@@ -39,6 +39,7 @@ import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
+import com.sofamaniac.crabir.ui.SaveToHistory
 import com.sofamaniac.crabir.ui.editor.AccountSelector
 import com.sofamaniac.crabir.ui.editor.EditorActions
 import org.koin.androidx.compose.koinViewModel
@@ -66,6 +67,8 @@ fun ThreadView(
         parametersOf(link!!, comment, context, null)
     }
     val showReplySheet by viewModel.reply.collectAsState()
+
+    SaveToHistory(viewModel.name)
 
     Scaffold(
         topBar = { TopBar(viewModel, scrollBehavior, dismiss) },

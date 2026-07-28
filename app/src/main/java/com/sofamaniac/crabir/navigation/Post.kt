@@ -26,7 +26,6 @@ class PostRoute(val postPermalink: String, val comment: String? = null, val cont
     Route
 
 
-
 private const val ROUTE = "/r/{subreddit}/comments/{id}/{title}"
 private const val SHORT_ROUTE = "/r/{subreddit}/s/{id}"
 private const val LONG_ROUTE = "/r/{subreddit}/comments/{id}/{title}/{commentId}"

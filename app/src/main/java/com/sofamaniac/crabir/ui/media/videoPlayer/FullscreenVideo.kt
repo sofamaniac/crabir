@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.MediaResource
+import com.sofamaniac.crabir.ui.SaveToHistory
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
@@ -38,6 +39,7 @@ fun FullscreenVideo(
     val post = viewModel.post.collectAsState(initial = null).value ?: return
     var showDecorations by remember { mutableStateOf(true) }
     val video = getVideoUrl(post)!!
+    SaveToHistory(post.name)
     VerticalSwipeToDismiss(
         topBar = {
             FullscreenTopBar(showDecorations, actions = { DownloadButton(video.url.toUri()) })

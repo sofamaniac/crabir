@@ -10,7 +10,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.data.remote.reddit.CommunitySearchSort
@@ -28,7 +27,6 @@ import com.sofamaniac.crabir.domain.repository.search.PostSearchParams
 import com.sofamaniac.crabir.domain.repository.search.PostSearchRepository
 import com.sofamaniac.crabir.domain.repository.search.UserSearchRepository
 import com.sofamaniac.crabir.ui.subreddit.FeedViewModelInterface
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -149,13 +147,6 @@ class PostSearchViewModel(
             it.copy(sort = sort, timeframe = timeframe)
         }
         refresh()
-    }
-
-    override fun visitPost(post: PostData, visitedBy: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val entity = VisitedPostEntity(post.name, System.currentTimeMillis(), visitedBy)
-            visitedPostsDao.insert(entity)
-        }
     }
 
     override fun isPostRead(post: PostData): Boolean {

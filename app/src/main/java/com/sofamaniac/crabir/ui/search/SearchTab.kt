@@ -64,7 +64,6 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
-import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
@@ -225,14 +224,10 @@ class SearchCommonViewModel(@InjectedParam query: String) : ViewModel() {
 private fun InnerTab(
     viewModel: PostSearchViewModel,
 ) {
-    val currentAccount = LocalRedditAccount.current
     PostFeedViewer(viewModel) { post, isMosVisible ->
         PostView(
             post,
             isMostVisible = isMosVisible,
-            markAsRead = {
-                viewModel.visitPost(post, currentAccount.id)
-            },
             showHidden = false
         )
     }

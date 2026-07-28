@@ -59,7 +59,7 @@ internal fun PostView(
                 maxLines = null,
                 enableLinkFullSizePreview = false,
                 forceShowSelftext = true,
-                markAsRead = { threadViewModel.visitPost(post, currentAccount.id) },
+                markAsRead = {},
             )
         } else {
             val parent = post.crosspostParentList.first()

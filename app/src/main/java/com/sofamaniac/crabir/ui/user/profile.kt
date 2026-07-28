@@ -146,7 +146,6 @@ fun ProfileView(
                     ) {
                         val page = tabs[it]
                         val viewModel = viewModels[page]
-                        val currentAccount = LocalRedditAccount.current
                         if (viewModel != null) {
                             PostFeedViewer(
                                 viewModel = viewModel,
@@ -156,12 +155,6 @@ fun ProfileView(
                                     is PostData -> PostView(
                                         thing,
                                         isMostVisible = isMostVisible,
-                                        markAsRead = {
-                                            viewModel.visitPost(
-                                                thing,
-                                                currentAccount.id
-                                            )
-                                        },
                                         showHidden = page == ProfileTabs.Hidden,
                                     )
 

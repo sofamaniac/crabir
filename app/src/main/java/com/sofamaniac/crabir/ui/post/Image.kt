@@ -38,6 +38,7 @@ import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.FullscreenImageRoute
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.onWifiConnection
+import com.sofamaniac.crabir.ui.SaveToHistory
 import com.sofamaniac.crabir.ui.crabirBlurStyle
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
@@ -160,6 +161,7 @@ fun FullscreenImageView(
     var showDecorations by remember { mutableStateOf(true) }
     val postData by viewModel.post.collectAsState(initial = null)
     var enableDismiss by remember { mutableStateOf(true) }
+    SaveToHistory(post)
     VerticalSwipeToDismiss(
         onDismiss = dismiss,
         enabled = true,

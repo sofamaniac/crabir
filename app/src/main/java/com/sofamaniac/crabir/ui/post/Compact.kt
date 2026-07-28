@@ -25,8 +25,6 @@ fun CompactView(
     post: PostData,
     modifier: Modifier = Modifier,
     clickable: Boolean = true,
-    markAsRead: () -> Unit = {},
-    canStartVideo: Boolean = false,
     showHidden: Boolean = false,
     viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = post.id) {
         parametersOf(
@@ -37,7 +35,6 @@ fun CompactView(
     val navController = LocalNavController.current
     val onClick = {
         if (clickable) {
-            markAsRead()
             navController?.navigate(PostRoute(post.permalink))
         }
     }

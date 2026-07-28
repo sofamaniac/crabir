@@ -4,7 +4,6 @@
 
 package com.sofamaniac.crabir.ui.user
 
-import android.util.Log
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +14,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
@@ -35,7 +33,6 @@ import com.sofamaniac.crabir.domain.repository.profile.SavedRepository
 import com.sofamaniac.crabir.domain.repository.profile.SubmittedRepository
 import com.sofamaniac.crabir.domain.repository.profile.UpvotedRepository
 import com.sofamaniac.crabir.ui.subreddit.FeedViewModelInterface
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -183,18 +180,6 @@ abstract class ProfileFeedViewModel<T : VotableData>(
         .flow.cachedIn(
             viewModelScope
         )
-
-    override fun visitPost(post: PostData, visitedBy: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val entity = VisitedPostEntity(
-                id = post.name,
-                visitedAt = System.currentTimeMillis(),
-                visitedBy = visitedBy
-            )
-            visitedPostsDao.insert(entity)
-            Log.d("PostFeedViewModel", "visitPost: Post visited (${post.id})")
-        }
-    }
 
     override fun isPostRead(post: PostData): Boolean {
         return history.value.contains(post.name)
