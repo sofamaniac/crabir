@@ -70,7 +70,7 @@ import com.sofamaniac.crabir.navigation.settingsGraph
 import com.sofamaniac.crabir.navigation.subredditGraph
 import com.sofamaniac.crabir.settings.ConfigureSettings
 import com.sofamaniac.crabir.settings.theme.ConfigureCrabirTheme
-import com.sofamaniac.crabir.ui.InboxView
+import com.sofamaniac.crabir.ui.inbox.InboxView
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 import com.sofamaniac.crabir.ui.rememberCurrentAccount

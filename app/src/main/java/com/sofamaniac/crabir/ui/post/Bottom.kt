@@ -43,6 +43,7 @@ import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.post.ButtonsSettings
@@ -51,6 +52,7 @@ import com.sofamaniac.crabir.ui.post.buttons.HideButtonLong
 import com.sofamaniac.crabir.ui.post.buttons.MuteButton
 import com.sofamaniac.crabir.ui.post.buttons.OpenInAppButton
 import com.sofamaniac.crabir.ui.post.buttons.OpenInAppLong
+import com.sofamaniac.crabir.ui.post.buttons.OpenThreadButton
 import com.sofamaniac.crabir.ui.post.buttons.ShareButton
 import com.sofamaniac.crabir.ui.post.buttons.ShareButtonLong
 import com.sofamaniac.crabir.ui.post.dialog.EditDialogue
@@ -78,13 +80,16 @@ fun BottomRow(
     val saved by interactions.saved.collectAsState(post.relationship.saved)
     val upvoteOnSave =
         interactions.linksSettings.collectAsState(initial = null).value?.upvoteOnSave ?: false
+    val navController = LocalNavController.current
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
         UpButton(likes, onClick = { interactions.upvote(post.name) })
         DownButton(likes, onClick = { interactions.downvote(post.name) })
         SavedButton(saved, onClick = {
             interactions.save(post.name, !saved, upvoteOnSave)
         })
-        action?.invoke()
+        if (buttonsSettings.comments) {
+            OpenThreadButton { navController?.navigate(PostRoute(post.permalink)) }
+        }
         if (buttonsSettings.openInApp) {
             OpenInAppButton(post)
         }

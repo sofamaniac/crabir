@@ -7,7 +7,22 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.MessageData
 import org.koin.core.annotation.ViewModelScope
 
-abstract class InboxRepository : ListingRepository<Unit, MessageData>()
+
+enum class InboxFeed {
+    Inbox,
+    Unread,
+    Sent,
+    Mentions
+}
+
+abstract class InboxRepository : ListingRepository<InboxFeed, MessageData>() {
+
+    abstract suspend fun readAll(): Result<Unit>
+
+    abstract suspend fun read(name: Fullname): Result<Unit>
+
+    abstract suspend fun unread(name: Fullname): Result<Unit>
+}
 
 @ViewModelScope
 class InboxRepositoryImpl(private val inbox: RedditAPIService) :
@@ -22,8 +37,64 @@ class InboxRepositoryImpl(private val inbox: RedditAPIService) :
 
     override suspend fun getThings(
         after: Fullname,
-        params: Unit,
+        params: InboxFeed,
     ): PagingSource.LoadResult<Fullname, Fullname> {
-        return makeRequest { inbox.inbox() }
+        return makeRequest {
+            when (params) {
+                InboxFeed.Inbox -> inbox.inbox(after = after)
+                InboxFeed.Unread -> inbox.unread(after = after)
+                InboxFeed.Sent -> inbox.sent(after = after)
+                InboxFeed.Mentions -> inbox.mentions(after = after)
+            }
+        }
+    }
+
+    override suspend fun readAll(): Result<Unit> {
+        try {
+            inbox.readAll()
+            cache.replaceAll { _, value ->
+                when (value) {
+                    is MessageData.Comment -> MessageData.Comment(value.comment.copy(new = false))
+                    is MessageData.Message -> MessageData.Message(value.message.copy(new = false))
+                }
+            }
+            return Result.success(Unit)
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+    }
+
+    override suspend fun read(name: Fullname): Result<Unit> {
+        try {
+            inbox.markRead(name.name)
+            val newMessage = when (val message = cache[name]) {
+                is MessageData.Comment -> MessageData.Comment(message.comment.copy(new = true))
+                is MessageData.Message -> MessageData.Message(message.message.copy(new = true))
+                null -> null
+            }
+            if (newMessage != null) {
+                cache[name] = newMessage
+            }
+            return Result.success(Unit)
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+    }
+
+    override suspend fun unread(name: Fullname): Result<Unit> {
+        try {
+            inbox.markUnread(name.name)
+            val newMessage = when (val message = cache[name]) {
+                is MessageData.Comment -> MessageData.Comment(message.comment.copy(new = false))
+                is MessageData.Message -> MessageData.Message(message.message.copy(new = false))
+                null -> null
+            }
+            if (newMessage != null) {
+                cache[name] = newMessage
+            }
+            return Result.success(Unit)
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
     }
 }

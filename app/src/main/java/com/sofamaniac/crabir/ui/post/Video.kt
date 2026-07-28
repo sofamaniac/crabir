@@ -28,6 +28,7 @@ import androidx.core.net.toUri
 import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalDataSettings
+import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Quality
@@ -88,7 +89,11 @@ fun PostVideo(
         val host = post.url.toUri().host
         val domain = host?.removePrefix("www.")?.split(".")?.firstOrNull()
         val isGif = post.url.toUri().lastPathSegment?.endsWith(".gif") ?: false
-        val text = if (isGif) "GIF" else domain ?: "Video"
+        val text = when {
+            isGif -> "GIF"
+            domain != null && domain.length >= 3 -> domain
+            else -> "Video"
+        }
         val cartoucheColor = if (isGif) GIF_CARTOUCHE_COLOR else VIDEO_CARTOUCHE_COLOR
         Text(
             text,
@@ -157,11 +162,13 @@ fun PostVideo(
         } else {
             videoQualitySettings.onMobile
         }
+        val startMuted = LocalPostSettings.current.linksSettings.startMuted
         DecoratedVideoPlayer(
             video,
             key = key,
             autostart = canPlayVideo,
             placeholder = placeholder,
+            startMuted = startMuted,
             clickable = true,
             modifier = modifier,
             cartouche = cartouche,

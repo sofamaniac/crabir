@@ -70,16 +70,23 @@ fun DecoratedVideoPlayer(
 
     val showDecoration = presentationState.coverSurface || !player.playWhenReady || !isActive
 
+    fun start() {
+        VideoPlayerManager.setMediaItem(
+            media.url,
+            key,
+            playWhenReady = true,
+            volume = if (startMuted) 0f else 1f,
+            quality = quality,
+        )
+    }
+
     LaunchedEffect(autostart) {
-        Log.d("DecoratedVideoPlayer", "key: $key, startPlaying: $autostart")
+        Log.d(
+            "DecoratedVideoPlayer",
+            "key: $key, startPlaying: $autostart, startMuted: $startMuted"
+        )
         if (autostart) {
-            VideoPlayerManager.setMediaItem(
-                media.url,
-                key,
-                playWhenReady = true,
-                volume = if (startMuted) 0f else 1f,
-                quality = quality,
-            )
+            start()
         } else if (isActive) {
             VideoPlayerManager.pause(key)
         }
@@ -116,12 +123,7 @@ fun DecoratedVideoPlayer(
             if (clickable) {
                 mod.clickable {
                     if (!isActive) {
-                        VideoPlayerManager.setMediaItem(
-                            media.url,
-                            key,
-                            quality = quality,
-                        )
-                        player.playWhenReady = true
+                        start()
                     } else {
                         showControls = !showControls
                     }
@@ -134,7 +136,13 @@ fun DecoratedVideoPlayer(
         modifier = modifier
     ) {
 
-        VideoPlayer(media, key, placeholder = placeholder, startPlaying = autostart)
+        VideoPlayer(
+            media,
+            key,
+            placeholder = placeholder,
+            startPlaying = autostart,
+            mute = startMuted
+        )
         if (isActive && !presentationState.coverSurface) {
             if (showControls) {
                 PlayerControls(
@@ -180,6 +188,10 @@ fun VideoPlayer(
 
     LaunchedEffect(startPlaying) {
         if (startPlaying) {
+            Log.d(
+                "VideoPlayer",
+                "key: $key, startPlaying: $startPlaying, startMuted: $mute"
+            )
             VideoPlayerManager.setMediaItem(
                 media.url,
                 key,

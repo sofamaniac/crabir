@@ -65,7 +65,7 @@ fun CompactView(
                     modifier,
                     enableThumbnail = true,
                     read = read,
-                    likes = { likes },
+                    likes = likes,
                 )
                 PostHeader(post, showSubredditIcon = false, modifier = modifier)
             }

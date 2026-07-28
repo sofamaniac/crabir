@@ -81,12 +81,16 @@ object VideoPlayerManager {
         _currentKey.value = key
 
         preferredQuality = quality
-
-        if (_currentUrl.value.checkEquality(newUri)) {
-            player.apply {
-                this.playWhenReady = playWhenReady
-                this.volume = volume
+        player.apply {
+            this.playWhenReady = playWhenReady
+            this.volume = volume
+            if (volume > 0) {
+                unmute()
+            } else {
+                mute()
             }
+        }
+        if (_currentUrl.value.checkEquality(newUri)) {
             return
         }
         val mediaItem = MediaItem.fromUri(uri)
@@ -94,7 +98,6 @@ object VideoPlayerManager {
             Log.d("VideoPlayerManager", "Setting media item $uri")
             setMediaItem(mediaItem)
             this.playWhenReady = playWhenReady
-            this.volume = volume
             prepare()
         }
         _currentUrl.update { newUri }

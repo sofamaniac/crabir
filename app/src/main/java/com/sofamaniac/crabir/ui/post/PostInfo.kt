@@ -41,7 +41,7 @@ fun PostInfo(
     modifier: Modifier = Modifier,
     enableThumbnail: Boolean = true,
     read: Boolean = false,
-    likes: () -> Boolean?,
+    likes: Boolean?,
     flairSettings: FlairSettings = LocalPostSettings.current.flairSettings,
 ) {
     val navController = LocalNavController.current
@@ -112,7 +112,7 @@ fun PostInfo(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(1.dp)
             ) {
-                ScoreString(post.score.score, likes())
+                ScoreString(post.score.score, likes)
                 Text(
                     buildAnnotatedString {
                         append(" · ")

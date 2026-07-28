@@ -111,6 +111,7 @@ sealed class Richtext {
     data class CommunityLink(
         @SerialName("t") val community: String,
         @SerialName("l") val l: Boolean,
+        @SerialName("f") val modifiers: List<TextModifier> = emptyList(),
     ) : Richtext(), TextNode
 
     @Serializable
@@ -118,6 +119,7 @@ sealed class Richtext {
     data class UserLink(
         @SerialName("t") val user: String,
         @SerialName("l") val l: Boolean,
+        @SerialName("f") val modifiers: List<TextModifier> = emptyList(),
     ) : Richtext(), TextNode
 
     @Serializable

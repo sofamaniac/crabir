@@ -90,7 +90,7 @@ internal fun CrossPostView(
             post,
             modifier = modifier,
             enableThumbnail = true,
-            likes = { post.relationship.liked },
+            likes = post.relationship.liked,
         )
     }
 }
@@ -123,7 +123,7 @@ fun PostCard(
             post,
             modifier = modifier,
             enableThumbnail = enablePreview && !post.isCrosspost,
-            likes = { likes }
+            likes = likes
         )
         body()
         BottomRow(post, modifier, interactions = viewModel) {

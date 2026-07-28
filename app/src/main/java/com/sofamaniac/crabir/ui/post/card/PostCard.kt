@@ -69,29 +69,16 @@ fun PostCard(
         PostCardContent(
             post,
             modifier,
-            clickable,
             interactions = viewModel,
             isMostVisible = isMostVisible,
         )
     }
 }
 
-//@Composable
-//internal fun canStartVideo(): Boolean {
-//    val autoplay = rememberPostsSettings().linksSettings.autoPlayVideos
-//    if (autoplay == AutoPlayVideo.Never) {
-//        return false
-//    }
-//    val context = LocalContext.current
-//    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-//    val netInfo = connectivityManager.allNetworks
-//}
-//
 @Composable
 internal fun PostCardContent(
     post: PostData,
     modifier: Modifier = Modifier,
-    clickable: Boolean = true,
     isMostVisible: Boolean = false,
     interactions: LinkInteraction,
 ) {
@@ -99,37 +86,32 @@ internal fun PostCardContent(
     val viewSettings = LocalViewSettings.current
     val context = LocalContext.current
     val connectionState = context.onWifiConnection
-    val settings by interactions.linksSettings.collectAsState(initial = null)
     val videoSettings = LocalDataSettings.current.videoQuality
     val canStartVideo = when (videoSettings.autostart) {
         NetworkPolicy.Always -> isMostVisible
         NetworkPolicy.OnWifi -> connectionState && isMostVisible
         else -> false
-    }
-    // We do not apply the padding on the column, but on each of its children except
+    } // We do not apply the padding on the column, but on each of its children except
     // the body to have images that take the full width
-    val modifier = Modifier
+    val innerModifier = Modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
     val navController = LocalNavController.current
-    val openPost = if (clickable) {
-        {
-            navController?.navigate(PostRoute(post.permalink)) ?: Unit
-        }
-    } else {
-        {}
+    val openPost = {
+        navController?.navigate(PostRoute(post.permalink)) ?: Unit
     }
     val showOpenButton = LocalPostSettings.current.buttonsSettings.comments
     ThemedCard(
         roundedCorners = viewSettings.cardSettings.roundedCorners,
-        modifier = Modifier
-            .fillMaxWidth(),
-        onClick = openPost,
+        modifier = modifier.fillMaxWidth(),
+        onClick = {
+            navController?.navigate(PostRoute(post.permalink)) ?: Unit
+        }
     ) {
         PostHeader(
             post,
             showSubredditIcon = viewSettings.cardSettings.showSubredditIcon,
-            modifier = modifier.padding(vertical = 8.dp),
+            modifier = innerModifier.padding(vertical = 8.dp),
             showPrefix = viewSettings.prefixCommunity
         )
         val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
@@ -137,9 +119,9 @@ internal fun PostCardContent(
         val read by interactions.read.collectAsState()
         PostInfo(
             post,
-            modifier = modifier,
+            modifier = innerModifier,
             enableThumbnail = enablePreview && viewSettings.cardSettings.thumbnailForLinkPreview,
-            likes = { likes },
+            likes = likes,
             read = read,
         )
         PostBody(
@@ -152,7 +134,7 @@ internal fun PostCardContent(
         )
         BottomRow(
             post,
-            modifier,
+            innerModifier,
             interactions = interactions,
             action = if (!showOpenButton) null else {
                 {
@@ -160,7 +142,6 @@ internal fun PostCardContent(
                 }
             }
         )
-
     }
 }
 
@@ -172,7 +153,6 @@ internal fun PostCardPreview() {
     AnimatedVisibility(visible = true) {
         PostCardContent(
             post,
-            clickable = false,
             isMostVisible = false,
             interactions = viewModel,
         )
