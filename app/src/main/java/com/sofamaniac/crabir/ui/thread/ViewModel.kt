@@ -20,9 +20,11 @@ import com.sofamaniac.crabir.ui.post.PostViewModelInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.core.annotation.InjectedParam
@@ -41,13 +43,19 @@ class ThreadViewModel(
 ) : ViewModel(), CommentViewModelInterface, PostViewModelInterface {
 
     var name: Fullname = repository.getPostId(permalink)
+    private var _post = MutableStateFlow<PostData?>(null)
+    override val post: StateFlow<PostData?> = _post.asStateFlow()
 
     val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
 
     override val read = MutableStateFlow(false)
     override val linksSettings = postSettingsRepository.postSettings.map { it.linksSettings }
-    override val likes: StateFlow<Boolean?> = MutableStateFlow(null)
-    override val saved: StateFlow<Boolean> = MutableStateFlow(false)
+    override val likes: StateFlow<Boolean?> = post.map {
+        it?.relationship?.liked ?: false
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+    override val saved: StateFlow<Boolean> = post.map {
+        it?.relationship?.liked ?: false
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
     override val rules: StateFlow<Rules>
         get() = TODO("Not yet implemented")
 
@@ -57,8 +65,6 @@ class ThreadViewModel(
     private var _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
-    private var _post = MutableStateFlow<PostData?>(null)
-    override val post: StateFlow<PostData?> = _post.asStateFlow()
     val comments = repository.comments
 
     override val flairs: StateFlow<List<FlairInfo>>

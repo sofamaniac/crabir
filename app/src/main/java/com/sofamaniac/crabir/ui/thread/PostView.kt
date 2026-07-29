@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalDataSettings
-import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -40,7 +39,6 @@ internal fun PostView(
     threadViewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val currentAccount = LocalRedditAccount.current
     val videoSettings = LocalDataSettings.current.videoQuality
     val connectionState = LocalContext.current.onWifiConnection
     val canPlayVideo = when (videoSettings.autostart) {
@@ -104,7 +102,7 @@ fun PostCard(
     threadViewModel: ThreadViewModel,
     body: @Composable ColumnScope.() -> Unit,
 ) {
-    val likes by viewModel.likes.collectAsState(null)
+    val likes by viewModel.likes.collectAsState()
     val modifier = modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
