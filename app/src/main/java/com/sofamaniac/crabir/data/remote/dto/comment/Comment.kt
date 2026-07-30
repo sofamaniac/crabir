@@ -17,6 +17,8 @@ import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Flair
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.Message
+import com.sofamaniac.crabir.domain.model.MessageType
 import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.domain.model.Relationship
 import com.sofamaniac.crabir.domain.model.RichtextDocument
@@ -56,7 +58,7 @@ data class CommentDTO(
     // AUTHOR INFORMATION
     // ================================================ //
     val author: String = "[deleted]",
-    val author_fullname: String = "[deleted]",
+    val author_fullname: Fullname = Fullname("[deleted]"),
     val author_is_blocked: Boolean = false,
     val author_patreon_flair: Boolean = false,
     val author_premium: Boolean = false,
@@ -81,10 +83,15 @@ data class CommentDTO(
     val subreddit_type: String = "",
 
     // FIELD WHEN MESSAGE
-    val subject: String? = null,
+    val subject: String = "",
+    @SerialName("link_title")
+    val linkTitle: String? = null,
     val type: String? = null,
-    val context: String? = null,
+    val context: String = "",
     val new: Boolean = false,
+    val dest: String = "",
+    @SerialName("num_comments")
+    val numComments: Int = 0,
     @SerialName("was_comment")
     val wasComment: Boolean = false,
 
@@ -160,6 +167,20 @@ object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
     }
 
 }
+
+object CommentMessageMapper : ObjectMappie<CommentDTO, Message>() {
+    override fun map(from: CommentDTO): Message = mapping {
+        Message::type fromValue from.getType()
+        Message::authorFullname fromProperty from::author_fullname
+        Message::createdUtc fromProperty from::created_utc
+        Message::replies fromValue ""
+    }
+}
+
+fun CommentDTO.getType(): MessageType {
+    return MessageType.fromString(type ?: "")
+}
+
 
 private fun CommentDTO.countReplies(): Int = replies.size
 

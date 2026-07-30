@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,6 +31,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
+import com.sofamaniac.crabir.ui.RefreshIndicator
 import com.sofamaniac.crabir.ui.ThemedCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,19 +40,24 @@ fun CommentListRoot(
     viewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
     comment: String? = null,
-    context: Int? = null
+    context: Int? = null,
 ) {
     val listState = rememberLazyListState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val theme = LocalTheme.current
     val navController = LocalNavController.current!!
+    val refreshBoxState = rememberPullToRefreshState()
 
     PullToRefreshBox(
+        state = refreshBoxState,
         isRefreshing = isRefreshing,
         onRefresh = {
             viewModel.refresh()
         },
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
+        indicator = {
+            RefreshIndicator(isRefreshing, state = refreshBoxState)
+        }
     ) {
         val comments by viewModel.comments.collectAsState()
         val post by viewModel.post.collectAsState()

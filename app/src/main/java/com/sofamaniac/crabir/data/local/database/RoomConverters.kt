@@ -3,8 +3,10 @@ package com.sofamaniac.crabir.data.local.database
 import androidx.room.TypeConverter
 import com.sofamaniac.crabir.data.remote.dto.SubredditInfo
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.MessageType
 import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import kotlinx.serialization.json.Json
+import kotlin.time.Instant
 
 class RoomConverters {
     @TypeConverter
@@ -55,5 +57,25 @@ class RoomConverters {
     @TypeConverter
     fun toParsedMarkdown(value: String): ParsedMarkdown {
         return ParsedMarkdown(value)
+    }
+
+    @TypeConverter
+    fun fromInstant(value: kotlin.time.Instant): Long {
+        return value.toEpochMilliseconds()
+    }
+
+    @TypeConverter
+    fun toInstant(value: Long): kotlin.time.Instant {
+        return Instant.fromEpochMilliseconds(value)
+    }
+
+    @TypeConverter
+    fun fromMessageType(value: MessageType): String {
+        return Json.encodeToString(value)
+    }
+
+    @TypeConverter
+    fun toMessageType(value: String): MessageType {
+        return Json.decodeFromString(value)
     }
 }

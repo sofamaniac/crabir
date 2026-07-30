@@ -35,12 +35,10 @@ fun RichtextDocument.Companion.fromHtml(html: String): RichtextDocument {
     if (par.children.isNotEmpty()) {
         fusedChildren.add(par)
     }
-    Log.d("Richtext", "Children: $fusedChildren")
     return RichtextDocument(fusedChildren)
 }
 
 private fun Richtext.Companion.fromHtml(node: Node, style: Int = 0): List<Richtext> {
-    Log.d("Richtext", "Node: $node")
     return when (node) {
         is Element -> fromHtml(node, style)
         is TextNode if (node.text().isNotBlank()) -> listOf(

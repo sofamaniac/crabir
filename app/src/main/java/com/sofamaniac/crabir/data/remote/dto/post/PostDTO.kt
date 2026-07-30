@@ -77,7 +77,7 @@ data class PostDTO(
     // AUTHOR INFORMATION
     // ================================================ //
     @SerialName("author") val author: String? = "",
-    @SerialName("author_fullname") val authorFullname: String = "",
+    @SerialName("author_fullname") val authorFullname: Fullname = Fullname(""),
     @SerialName("author_is_blocked") val authorIsBlocked: Boolean = false,
     @SerialName("author_patreon_flair") val authorPatreonFlair: Boolean = false,
     @SerialName("author_premium") val authorPremium: Boolean = false,

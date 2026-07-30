@@ -127,7 +127,7 @@ private fun PostOptions(
             if (post.canModPost) {
                 ModerationButton(post)
             }
-            if (post.author.authorFullname == currentAccount.info?.name?.name) {
+            if (post.author.authorFullname == currentAccount.info?.name) {
                 EditButton(linkInteraction = interaction)
             }
             GoToSubredditButton(post) {

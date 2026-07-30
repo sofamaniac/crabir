@@ -1,22 +1,28 @@
 package com.sofamaniac.crabir.domain.repository
 
 import androidx.paging.PagingSource
+import com.sofamaniac.crabir.data.local.dao.InboxDao
+import com.sofamaniac.crabir.data.remote.dto.MessageDTOMapper
 import com.sofamaniac.crabir.data.remote.dto.Thing
+import com.sofamaniac.crabir.data.remote.dto.comment.CommentMessageMapper
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.MessageData
+import com.sofamaniac.crabir.domain.model.Message
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import org.koin.core.annotation.ViewModelScope
 
 
 enum class InboxFeed {
-    Inbox,
+    All,
     Unread,
     Sent,
     Mentions
 }
 
-abstract class InboxRepository : ListingRepository<InboxFeed, MessageData>() {
-
+abstract class InboxRepository : ListingRepository<InboxFeed, Message>() {
+    abstract fun get(name: Fullname): Flow<Message?>
     abstract suspend fun readAll(): Result<Unit>
 
     abstract suspend fun read(name: Fullname): Result<Unit>
@@ -25,12 +31,19 @@ abstract class InboxRepository : ListingRepository<InboxFeed, MessageData>() {
 }
 
 @ViewModelScope
-class InboxRepositoryImpl(private val inbox: RedditAPIService) :
+class InboxRepositoryImpl(private val inbox: RedditAPIService, private val inboxDao: InboxDao) :
     InboxRepository() {
-    override fun thingToData(thing: Thing): MessageData? {
+
+    override suspend fun onResponseSuccess(things: List<Thing>) {
+        super.onResponseSuccess(things)
+        val data = things.mapNotNull { thing -> thingToData(thing) }
+        inboxDao.insert(data)
+    }
+
+    override fun thingToData(thing: Thing): Message? {
         return when (thing) {
-            is Thing.Message -> MessageData.Message(thing.data)
-            is Thing.Comment -> MessageData.Comment(thing.data)
+            is Thing.Message -> MessageDTOMapper.map(thing.data)
+            is Thing.Comment -> CommentMessageMapper.map(thing.data)
             else -> null
         }
     }
@@ -41,7 +54,7 @@ class InboxRepositoryImpl(private val inbox: RedditAPIService) :
     ): PagingSource.LoadResult<Fullname, Fullname> {
         return makeRequest {
             when (params) {
-                InboxFeed.Inbox -> inbox.inbox(after = after)
+                InboxFeed.All -> inbox.inbox(after = after)
                 InboxFeed.Unread -> inbox.unread(after = after)
                 InboxFeed.Sent -> inbox.sent(after = after)
                 InboxFeed.Mentions -> inbox.mentions(after = after)
@@ -49,14 +62,15 @@ class InboxRepositoryImpl(private val inbox: RedditAPIService) :
         }
     }
 
+    override fun get(name: Fullname): Flow<Message?> {
+        return inboxDao.get(name)
+    }
+
     override suspend fun readAll(): Result<Unit> {
         try {
             inbox.readAll()
-            cache.replaceAll { _, value ->
-                when (value) {
-                    is MessageData.Comment -> MessageData.Comment(value.comment.copy(new = false))
-                    is MessageData.Message -> MessageData.Message(value.message.copy(new = false))
-                }
+            withContext(Dispatchers.IO) {
+                inboxDao.markAllRead()
             }
             return Result.success(Unit)
         } catch (e: Exception) {
@@ -67,13 +81,10 @@ class InboxRepositoryImpl(private val inbox: RedditAPIService) :
     override suspend fun read(name: Fullname): Result<Unit> {
         try {
             inbox.markRead(name.name)
-            val newMessage = when (val message = cache[name]) {
-                is MessageData.Comment -> MessageData.Comment(message.comment.copy(new = true))
-                is MessageData.Message -> MessageData.Message(message.message.copy(new = true))
-                null -> null
-            }
-            if (newMessage != null) {
-                cache[name] = newMessage
+            val message =
+                inboxDao.getValue(name) ?: return Result.failure(Exception("Message not found"))
+            withContext(Dispatchers.IO) {
+                inboxDao.insert(message.copy(new = false))
             }
             return Result.success(Unit)
         } catch (e: Exception) {
@@ -84,13 +95,10 @@ class InboxRepositoryImpl(private val inbox: RedditAPIService) :
     override suspend fun unread(name: Fullname): Result<Unit> {
         try {
             inbox.markUnread(name.name)
-            val newMessage = when (val message = cache[name]) {
-                is MessageData.Comment -> MessageData.Comment(message.comment.copy(new = false))
-                is MessageData.Message -> MessageData.Message(message.message.copy(new = false))
-                null -> null
-            }
-            if (newMessage != null) {
-                cache[name] = newMessage
+            val message =
+                inboxDao.getValue(name) ?: return Result.failure(Exception("Message not found"))
+            withContext(Dispatchers.IO) {
+                inboxDao.update(message.copy(new = true))
             }
             return Result.success(Unit)
         } catch (e: Exception) {

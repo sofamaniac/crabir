@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class AuthorInfo(
     val username: String,
     val flair: Flair,
-    val authorFullname: String = "",
+    val authorFullname: Fullname = Fullname(""),
     val isAuthorBlocked: Boolean = false,
     val hasPatreonFlair: Boolean = false,
     val isAuthorPremium: Boolean = false,
@@ -15,7 +15,7 @@ data class AuthorInfo(
         val DUMMY = AuthorInfo(
             username = "user123",
             flair = EMPTY_FLAIR,
-            authorFullname = "t2_dummy",
+            authorFullname = Fullname("t2_dummy"),
             isAuthorBlocked = false,
             hasPatreonFlair = false,
             isAuthorPremium = false,

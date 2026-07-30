@@ -2,8 +2,11 @@ package com.sofamaniac.crabir.data.remote.dto
 
 import com.sofamaniac.crabir.data.remote.utils.InstantAsFloatSerializer
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.Message
+import com.sofamaniac.crabir.domain.model.MessageType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import tech.mappie.api.ObjectMappie
 import kotlin.time.Instant
 
 @Serializable
@@ -45,3 +48,15 @@ data class MessageDTO(
     @SerialName("was_comment")
     val wasComment: Boolean,
 )
+
+object MessageDTOMapper : ObjectMappie<MessageDTO, Message>() {
+    override fun map(from: MessageDTO) = mapping {
+        Message::linkTitle fromValue null
+        Message::type fromValue from.getType()
+    }
+}
+
+fun MessageDTO.getType(): MessageType {
+    return MessageType.fromString(type)
+}
+
