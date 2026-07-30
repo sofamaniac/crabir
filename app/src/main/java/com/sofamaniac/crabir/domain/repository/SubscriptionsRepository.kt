@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -27,9 +28,13 @@ class SubscriptionsRepository(
     val accountsRepository: AccountsRepository,
     val subredditCache: SubredditCache,
 ) {
+    val activeAccount = accountsRepository.activeAccount.distinctUntilChanged { old, new ->
+        old.id == new.id
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val subscriptions: StateFlow<List<Subreddit>> =
-        accountsRepository.activeAccount
+        activeAccount
             .flatMapLatest { account ->
                 Log.d("SubscriptionsRepository", "activeAccount: $account")
                 if (!account.isAnonymous()) {
@@ -45,7 +50,7 @@ class SubscriptionsRepository(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val multis: StateFlow<List<Thing.Multi>> =
-        accountsRepository.activeAccount
+        activeAccount
             .flatMapLatest { account ->
                 Log.d("SubscriptionsRepository", "activeAccount: $account")
                 if (!account.isAnonymous()) {

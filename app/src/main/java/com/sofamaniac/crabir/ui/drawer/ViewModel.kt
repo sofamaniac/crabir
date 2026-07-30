@@ -133,6 +133,10 @@ class DrawerViewModelImpl(
             accountManager.initialize { err ->
                 _loginState.update { LoginState.Error(err) }
             }
+            val account = activeAccount.first()
+            if (!account.isAnonymous() && !account.isUninitialized()) {
+                fetchUserInfo()
+            }
         }
     }
 
