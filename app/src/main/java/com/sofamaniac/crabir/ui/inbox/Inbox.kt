@@ -14,6 +14,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.automirrored.filled.Reply
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.MarkEmailRead
 import androidx.compose.material.icons.filled.MarkEmailUnread
@@ -57,6 +58,8 @@ import com.sofamaniac.crabir.domain.model.Message
 import com.sofamaniac.crabir.domain.model.MessageType
 import com.sofamaniac.crabir.domain.model.RichtextDocument
 import com.sofamaniac.crabir.domain.repository.InboxFeed
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.MessageEditorRoute
 import com.sofamaniac.crabir.ui.RefreshIndicator
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
@@ -88,6 +91,7 @@ fun InboxView() {
     }
     val tabs = listOf(InboxFeed.All, InboxFeed.Unread, InboxFeed.Sent, InboxFeed.Mentions)
     val theme = LocalTheme.current
+    val navController = LocalNavController.current
     CompositionLocalProvider(LocalSnackBarHost provides snackbarHostState) {
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -98,6 +102,11 @@ fun InboxView() {
             Scaffold(topBar = {
                 TopAppBar(
                     title = { Text("Inbox") },
+                    actions = {
+                        IconButton(onClick = { navController?.navigate(MessageEditorRoute(null)) }) {
+                            Icon(Icons.AutoMirrored.Filled.Send, "Send Message")
+                        }
+                    },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(Icons.Default.Menu, contentDescription = "Open Drawer")
@@ -209,6 +218,7 @@ fun Message(
             else -> CommentHeader(message)
         }
     }
+    val navController = LocalNavController.current
     Column(modifier = modifier.fillMaxWidth()) {
         Row( //horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
@@ -221,14 +231,17 @@ fun Message(
                 IconButton(onClick = { viewModel.markRead() }) {
                     Icon(Icons.Default.MarkEmailRead, contentDescription = "Mark as read")
                 }
-            } else {
-                IconButton(onClick = { viewModel.markUnread() }) {
-                    Icon(Icons.Default.MarkEmailUnread, contentDescription = "Mark as unread")
-                }
+                //            } else {
+                //                IconButton(onClick = { viewModel.markUnread() }) {
+                //                    Icon(Icons.Default.MarkEmailUnread, contentDescription = "Mark as unread")
+                //                }
             }
-            IconButton(onClick = {}) {
-                Icon(Icons.Default.MoreVert, contentDescription = null)
+            IconButton(onClick = { navController?.navigate(MessageEditorRoute(message.name)) }) {
+                Icon(Icons.AutoMirrored.Filled.Reply, contentDescription = "Reply")
             }
+            //            IconButton(onClick = {}) {
+            //                Icon(Icons.Default.MoreVert, contentDescription = null)
+            //            }
         }
         val textStyle = MaterialTheme.typography.titleSmall
         val annotatedString = buildAnnotatedString {

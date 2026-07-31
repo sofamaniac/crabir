@@ -22,6 +22,7 @@ sealed class MessageData : DataInterface {
 }
 
 @Entity(tableName = "inboxTable")
+@Serializable
 data class Message(
     @PrimaryKey
     override val name: Fullname,

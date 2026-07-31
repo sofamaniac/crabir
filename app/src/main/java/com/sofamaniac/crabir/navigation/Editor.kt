@@ -8,6 +8,7 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.ui.editor.crosspostEditor.CrosspostCreator
 import com.sofamaniac.crabir.ui.editor.postEditor.PostCreator
+import com.sofamaniac.crabir.ui.inbox.MessageEditor
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
@@ -16,6 +17,9 @@ class PostCreatorRoute(val kind: Kind, val communitySlug: String?) : Route
 
 @Serializable
 class CrosspostCreatorRoute(val post: Fullname) : Route
+
+@Serializable
+class MessageEditorRoute(val parent: Fullname? = null) : Route
 
 fun NavGraphBuilder.editorGraph(navController: NavController) {
     composable<PostCreatorRoute>(
@@ -32,5 +36,12 @@ fun NavGraphBuilder.editorGraph(navController: NavController) {
     ) {
         val route = it.toRoute<CrosspostCreatorRoute>()
         CrosspostCreator(route.post)
+    }
+
+    composable<MessageEditorRoute>(
+        typeMap = mapOf(typeOf<Fullname?>() to NullableFullnameType)
+    ) {
+        val route = it.toRoute<MessageEditorRoute>()
+        MessageEditor(parent = route.parent)
     }
 }

@@ -6,6 +6,7 @@ import com.sofamaniac.crabir.data.remote.interceptors.CountInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.ForceJsonInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.RateLimitInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.loggingInterceptor
+import com.sofamaniac.crabir.data.remote.reddit.InboxAPI
 import com.sofamaniac.crabir.data.remote.reddit.MediaUploadInterface
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.SubredditAPI
@@ -95,10 +96,10 @@ class NetworkModule {
         }
     }
 
-    @Single
+    @Single(binds = [RedditAPIService::class, InboxAPI::class])
     fun provideRedditApiService(
         okHttpClient: OkHttpClient,
-        json: Json
+        json: Json,
     ): RedditAPIService {
         val contentType = "application/json".toMediaType()
         return Retrofit.Builder()
@@ -112,7 +113,7 @@ class NetworkModule {
     @Single
     fun provideSubredditAPIService(
         okHttpClient: OkHttpClient,
-        json: Json
+        json: Json,
     ): SubredditAPI {
         return provideRedditApiService(okHttpClient, json)
     }
@@ -137,7 +138,7 @@ class NetworkModule {
 
     @Single
     fun provideStreamableAPI(
-        json: Json
+        json: Json,
     ): StreamableAPI {
         val contentType = "application/json".toMediaType()
         val loggingInterceptor = HttpLoggingInterceptor().apply {
