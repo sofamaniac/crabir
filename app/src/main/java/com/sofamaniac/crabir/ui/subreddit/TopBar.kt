@@ -44,7 +44,6 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
-import com.sofamaniac.crabir.data.remote.reddit.HOME
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SettingsRoute
@@ -90,7 +89,7 @@ fun TopBar(
         scope.launch {
             viewSettingsStore.updateData {
                 it.copy(
-                    rememberedViews = it.rememberedViews + (HOME to entity.copy(
+                    rememberedViews = it.rememberedViews + (slug to entity.copy(
                         sort = sort,
                         timeframe = timeframe
                     ))

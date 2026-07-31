@@ -76,6 +76,7 @@ abstract class PostFeedViewModel<T : CommunityData>(
     private val repository: PostFeedRepository<FeedParams>,
     private val visitedPostsDao: VisitedPostsDao,
     private val communityRepository: CommunityRepository<T>,
+    viewEntity: CommunityViewEntity,
 ) : ViewModel(), FeedViewModelInterface<PostData> {
 
 
@@ -83,8 +84,8 @@ abstract class PostFeedViewModel<T : CommunityData>(
     override var needScrollToTop = false
     private val _params = MutableStateFlow(
         FeedParams(
-            sort = Sort.Best,
-            timeframe = null,
+            sort = viewEntity?.sort ?: Sort.Best,
+            timeframe = viewEntity?.timeframe,
         )
     )
 

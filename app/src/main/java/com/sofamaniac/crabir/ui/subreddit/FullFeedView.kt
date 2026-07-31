@@ -37,7 +37,7 @@ fun FullFeedView(
     viewModel: FeedViewModelInterface<PostData>,
     modifier: Modifier = Modifier,
     drawerState: DrawerState,
-    communityEntity: CommunityViewEntity? = null,
+    viewEntity: CommunityViewEntity? = null,
     filter: (PostData) -> Boolean = rememberPostsFilter(),
     feedInfo: (@Composable () -> Unit)? = null,
 ) {
@@ -75,6 +75,7 @@ fun FullFeedView(
             ) { innerPadding ->
                 PostFeedViewer(
                     viewModel,
+                    viewEntity = viewEntity,
                     feedInfo = feedInfo,
                     filter = filter,
                     modifier = Modifier.padding(innerPadding)
@@ -83,7 +84,7 @@ fun FullFeedView(
                         post,
                         isMostVisible = isMosVisible,
                         showHidden = false,
-                        view = communityEntity?.view,
+                        view = viewEntity?.view,
                     )
                 }
 
@@ -97,7 +98,7 @@ fun FullFeedView(
                             navController?.navigate(
                                 PostCreatorRoute(
                                     kind,
-                                    communityEntity?.name
+                                    viewEntity?.name
                                 )
                             )
                         },

@@ -224,7 +224,7 @@ class SearchCommonViewModel(@InjectedParam query: String) : ViewModel() {
 private fun InnerTab(
     viewModel: PostSearchViewModel,
 ) {
-    PostFeedViewer(viewModel) { post, isMosVisible ->
+    PostFeedViewer(viewModel, viewEntity = null) { post, isMosVisible ->
         PostView(
             post,
             isMostVisible = isMosVisible,

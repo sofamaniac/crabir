@@ -30,21 +30,25 @@ import com.sofamaniac.crabir.ui.TabBar
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 import org.koin.core.annotation.Singleton
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryViewer(
     modifier: Modifier = Modifier,
-    viewModel: HistoryViewModel = koinViewModel(),
 ) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    val scope = rememberCoroutineScope()
     val title = stringResource(R.string.History)
-    val params by viewModel.params.collectAsState()
     val entity =
         LocalViewSettings.current.rememberedViews[HISTORY] ?: defaultCommunityEntity(HISTORY, title)
+    val viewModel: HistoryViewModel = koinViewModel() {
+        parametersOf(entity)
+    }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val scope = rememberCoroutineScope()
+    val params by viewModel.params.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
     val topBar = @Composable {
@@ -73,7 +77,7 @@ fun HistoryViewer(
         viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         drawerState = drawerState,
-        communityEntity = entity
+        viewEntity = entity
     )
 }
 
@@ -83,15 +87,13 @@ class HistoryViewModel(
     repository: HistoryRepository,
     visitedPostsDao: VisitedPostsDao,
     communityDao: SubredditRepository,
+    @InjectedParam viewEntity: CommunityViewEntity,
 ) : PostFeedViewModel<SubredditData>(
     repository,
     visitedPostsDao,
     communityDao,
-) {
-    override suspend fun createViewEntity(name: String): CommunityViewEntity {
-        return CommunityViewEntity(name = name, displayName = "History")
-    }
-}
+    viewEntity,
+)
 
 @Singleton
 class HistoryRepository(

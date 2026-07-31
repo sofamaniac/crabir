@@ -28,8 +28,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.Menu
+import kotlinx.coroutines.launch
 
 @Composable
 fun ViewManagerPage() {
@@ -42,6 +44,26 @@ fun ViewManagerPage() {
 
     val views = viewSettings.rememberedViews
     Log.d("ViewManagerPage", "views: $views")
+
+    fun updateView(slug: String, view: CommunityViewEntity) {
+        scope.launch {
+            settingsDataStore.updateData {
+                it.copy(
+                    rememberedViews = it.rememberedViews + (slug to view)
+                )
+            }
+        }
+    }
+
+    fun deleteView(slug: String) {
+        scope.launch {
+            settingsDataStore.updateData {
+                it.copy(
+                    rememberedViews = it.rememberedViews - slug
+                )
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -56,31 +78,43 @@ fun ViewManagerPage() {
         }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(items = views.values.toList(), key = { it.name }) {
-                ViewTile(it.displayName, it.view, it.columns)
+            items(items = views.toList(), key = { it.first }) { it ->
+                val slug = it.first
+                val entity = it.second
+                ViewTile(
+                    entity.displayName, entity, updateView = {
+                        updateView(slug, it)
+                    },
+                    deleteView = { deleteView(slug) }
+                )
             }
         }
     }
 }
 
 @Composable
-fun ViewTile(community: String, view: Views?, columns: Int?) {
+internal fun ViewTile(
+    community: String,
+    entity: CommunityViewEntity,
+    updateView: (CommunityViewEntity) -> Unit,
+    deleteView: () -> Unit,
+) {
     var showEditDialog by remember { mutableStateOf(false) }
     ListItem(
         onClick = { showEditDialog = true },
         trailingContent = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { deleteView() }) {
                 Icon(Icons.Default.Delete, contentDescription = null)
             }
         },
         supportingContent = {
             Row() {
-                if (view != null) {
-                    Text(stringResource(view.toStringResource()))
+                if (entity.view != null) {
+                    Text(stringResource(entity.view.toStringResource()))
                 }
                 VerticalDivider()
-                if (columns != null) {
-                    Text("$columns columns")
+                if (entity.columns != null) {
+                    Text("${entity.columns} columns")
                 }
             }
         }
@@ -88,23 +122,31 @@ fun ViewTile(community: String, view: Views?, columns: Int?) {
         Text(community)
     }
     if (showEditDialog) {
-        EditViewDialog(community, view, columns, onDismissRequest = { showEditDialog = false })
+        EditViewDialog(
+            community,
+            entity,
+            onConfirm = updateView,
+            onDismissRequest = { showEditDialog = false }
+        )
     }
 }
 
 @Composable
-fun EditViewDialog(
+internal fun EditViewDialog(
     community: String,
-    view: Views? = null,
-    columns: Int? = null,
+    entity: CommunityViewEntity,
+    onConfirm: (CommunityViewEntity) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    var view: Views? by remember { mutableStateOf(view) }
-    var columns: Int? by remember { mutableStateOf(columns) }
+    var view: Views? by remember { mutableStateOf(entity.view) }
+    var columns: Int? by remember { mutableStateOf(entity.columns) }
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(onClick = {}) { Text("Confirm") }
+            TextButton(onClick = {
+                onConfirm(entity.copy(columns = columns, view = view))
+                onDismissRequest()
+            }) { Text("Confirm") }
         },
         dismissButton = {
             TextButton(onClick = onDismissRequest) { Text("Cancel") }
