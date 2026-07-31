@@ -43,7 +43,7 @@ fun HistoryViewer(
     val title = stringResource(R.string.History)
     val entity =
         LocalViewSettings.current.rememberedViews[HISTORY] ?: defaultCommunityEntity(HISTORY, title)
-    val viewModel: HistoryViewModel = koinViewModel() {
+    val viewModel: HistoryViewModel = koinViewModel(key = HISTORY) {
         parametersOf(entity)
     }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())

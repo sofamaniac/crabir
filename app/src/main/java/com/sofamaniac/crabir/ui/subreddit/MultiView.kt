@@ -41,7 +41,7 @@ fun MultiView(
         slug,
         slug
     )
-    val viewModel: MultiViewModel = koinViewModel<MultiViewModel> {
+    val viewModel: MultiViewModel = koinViewModel<MultiViewModel>(key = slug) {
         parametersOf(slug, entity)
     }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())

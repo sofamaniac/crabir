@@ -73,7 +73,8 @@ fun SubredditViewer(
         subreddit,
         subreddit
     )
-    val viewModel: SubredditViewModel = koinViewModel { parametersOf(subreddit, entity) }
+    val viewModel: SubredditViewModel =
+        koinViewModel(key = subreddit) { parametersOf(subreddit, entity) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val params by viewModel.params.collectAsState()
     val feedInfo by viewModel.info.collectAsState()

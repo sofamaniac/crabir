@@ -84,8 +84,8 @@ abstract class PostFeedViewModel<T : CommunityData>(
     override var needScrollToTop = false
     private val _params = MutableStateFlow(
         FeedParams(
-            sort = viewEntity?.sort ?: Sort.Best,
-            timeframe = viewEntity?.timeframe,
+            sort = viewEntity.sort ?: Sort.Best,
+            timeframe = viewEntity.timeframe,
         )
     )
 

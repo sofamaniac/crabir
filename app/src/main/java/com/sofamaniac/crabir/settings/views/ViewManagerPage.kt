@@ -56,10 +56,14 @@ fun ViewManagerPage() {
     }
 
     fun deleteView(slug: String) {
+        val oldValue = viewSettings.rememberedViews[slug]!!
         scope.launch {
             settingsDataStore.updateData {
                 it.copy(
-                    rememberedViews = it.rememberedViews - slug
+                    rememberedViews = it.rememberedViews + (slug to oldValue.copy(
+                        view = null,
+                        columns = null
+                    ))
                 )
             }
         }
@@ -78,7 +82,8 @@ fun ViewManagerPage() {
         }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(items = views.toList(), key = { it.first }) { it ->
+            items(items = views.filter { entry -> entry.value.view != null || entry.value.columns != null }
+                .toList(), key = { it.first }) { it ->
                 val slug = it.first
                 val entity = it.second
                 ViewTile(

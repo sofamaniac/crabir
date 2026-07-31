@@ -43,7 +43,7 @@ fun HomeViewer(
             HOME,
             title,
         )
-    val viewModel: HomeViewModel = koinViewModel() {
+    val viewModel: HomeViewModel = koinViewModel(key = HOME) {
         parametersOf(viewEntity)
     }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
