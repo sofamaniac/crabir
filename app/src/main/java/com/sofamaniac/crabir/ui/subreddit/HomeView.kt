@@ -27,21 +27,28 @@ import com.sofamaniac.crabir.domain.repository.feed.HomeRepository
 import com.sofamaniac.crabir.ui.TabBar
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
+import org.koin.core.parameter.parametersOf
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeViewer(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = koinViewModel(),
 ) {
+    val title = stringResource(R.string.Home)
+    val viewEntity: CommunityViewEntity =
+        LocalViewSettings.current.rememberedViews[HOME] ?: defaultCommunityEntity(
+            HOME,
+            title,
+        )
+    val viewModel: HomeViewModel = koinViewModel() {
+        parametersOf(viewEntity)
+    }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
-    val title = stringResource(R.string.Home)
     val params by viewModel.params.collectAsState()
-    val entity =
-        LocalViewSettings.current.rememberedViews[HOME] ?: defaultCommunityEntity(HOME, title)
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
     val topBar = @Composable {
@@ -54,7 +61,7 @@ fun HomeViewer(
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
             openDrawer = { scope.launch { drawerState.open() } },
-            entity = entity
+            entity = viewEntity
         )
     }
     val bottomBar = @Composable {
@@ -71,7 +78,7 @@ fun HomeViewer(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         feedInfo = null,
         drawerState = drawerState,
-        communityEntity = entity,
+        viewEntity = viewEntity,
     )
 
 }
@@ -81,10 +88,12 @@ class HomeViewModel(
     repository: HomeRepository,
     visitedPostsDao: VisitedPostsDao,
     communityDao: SubredditRepository,
+    @InjectedParam viewEntity: CommunityViewEntity,
 ) : PostFeedViewModel<SubredditData>(
     repository,
     visitedPostsDao,
     communityDao,
+    viewEntity,
 ) {
     override suspend fun createViewEntity(name: String): CommunityViewEntity {
         return CommunityViewEntity(name = name, displayName = "Home")

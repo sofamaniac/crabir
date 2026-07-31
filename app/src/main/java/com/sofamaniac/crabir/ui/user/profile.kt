@@ -149,6 +149,7 @@ fun ProfileView(
                         if (viewModel != null) {
                             PostFeedViewer(
                                 viewModel = viewModel,
+                                viewEntity = null,
                                 filter = { true }
                             ) { thing, isMostVisible ->
                                 when (thing) {

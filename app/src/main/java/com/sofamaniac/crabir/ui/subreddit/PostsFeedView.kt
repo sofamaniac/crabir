@@ -38,6 +38,7 @@ import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.PreviewLocalComposition
+import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.settings.views.Views
@@ -67,6 +68,7 @@ import kotlin.math.max
 @Composable
 fun <T : VotableData> PostFeedViewer(
     viewModel: FeedViewModelInterface<T>,
+    viewEntity: CommunityViewEntity?,
     modifier: Modifier = Modifier,
     filter: (T) -> Boolean = { true },
     // If set to {}, breaks pull to refresh
@@ -110,7 +112,7 @@ fun <T : VotableData> PostFeedViewer(
         }.distinctUntilChanged()
     }.collectAsState(null)
 
-    val viewSettings = LocalViewSettings.current
+    val columns = viewEntity?.columns ?: LocalViewSettings.current.defaultColumns
     val state = rememberPullToRefreshState()
     val theme = LocalTheme.current
 
@@ -127,7 +129,7 @@ fun <T : VotableData> PostFeedViewer(
         }
     ) {
         LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(viewSettings.defaultColumns),
+            columns = StaggeredGridCells.Fixed(columns),
             verticalItemSpacing = 8.dp,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
@@ -231,7 +233,8 @@ private fun PostFeedPreview() {
             })
         }) {
             PostFeedViewer(
-                viewModel = FeedViewModelInterfacePreview
+                viewModel = FeedViewModelInterfacePreview,
+                viewEntity = null,
             ) { post, mostVisible ->
                 PostView(
                     thing = post,

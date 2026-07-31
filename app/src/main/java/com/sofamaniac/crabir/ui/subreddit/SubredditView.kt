@@ -29,6 +29,7 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
@@ -44,10 +46,12 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
+import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import com.sofamaniac.crabir.domain.repository.feed.SubredditPostsRepository
 import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
+import com.sofamaniac.crabir.settings.views.viewSettingDataStore
 import com.sofamaniac.crabir.ui.TabBar
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,17 +68,31 @@ import org.koin.core.parameter.parametersOf
 fun SubredditViewer(
     subreddit: String,
     modifier: Modifier = Modifier,
-    viewModel: SubredditViewModel = koinViewModel { parametersOf(subreddit) },
 ) {
+    val entity = LocalViewSettings.current.rememberedViews[subreddit] ?: defaultCommunityEntity(
+        subreddit,
+        subreddit
+    )
+    val viewModel: SubredditViewModel = koinViewModel { parametersOf(subreddit, entity) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val params by viewModel.params.collectAsState()
     val feedInfo by viewModel.info.collectAsState()
-    val entity = LocalViewSettings.current.rememberedViews[subreddit] ?: defaultCommunityEntity(
-        subreddit,
-        feedInfo?.displayName ?: subreddit
-    )
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    val viewDataStore = LocalContext.current.viewSettingDataStore
+    LaunchedEffect(feedInfo) {
+        if (feedInfo == null) return@LaunchedEffect
+        scope.launch {
+            viewDataStore.updateData {
+                it.copy(
+                    rememberedViews = it.rememberedViews + (subreddit to entity.copy(
+                        displayName = feedInfo!!.displayNamePrefixed
+                    ))
+                )
+            }
+        }
+    }
 
     val topBar = @Composable {
         TopBar(
@@ -103,7 +121,7 @@ fun SubredditViewer(
         filter = rememberPostsFilter(whitelistSubreddit = listOf(subreddit)),
         drawerState = drawerState,
         feedInfo = feedInfoView,
-        communityEntity = entity,
+        viewEntity = entity,
     )
 }
 
@@ -177,10 +195,12 @@ class SubredditViewModel(
     private val subredditCache: SubredditCache,
     /** Subreddit's prefixed display name */
     @InjectedParam slug: String,
+    @InjectedParam viewEntity: CommunityViewEntity,
 ) : PostFeedViewModel<SubredditData>(
     repository,
     visitedPostsDao,
     communityDao,
+    viewEntity,
 ) {
 
     private val _info = MutableStateFlow<SubredditData?>(null)
