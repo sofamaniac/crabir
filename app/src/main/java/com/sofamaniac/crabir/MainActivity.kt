@@ -184,8 +184,9 @@ fun setImageLoader() {
                 .build()
         }.diskCache {
             // 2go
+            val size: Long = 2L * 1024L * 1024L * 1024L
             DiskCache.Builder()
-                .maxSizeBytes(2 * 1024 * 1024)
+                .maxSizeBytes(size)
                 .directory(context.cacheDir.resolve("image_cache")).build()
         }
             .memoryCacheMaxSizePercentWhileInBackground(0.10) // 10% when backgrounded
