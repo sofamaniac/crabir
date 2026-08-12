@@ -29,11 +29,11 @@ class MessageViewModel(
         .stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = initialMessage)
 
     val richtext: StateFlow<RichtextDocument> =
-        message.map { RichtextDocument.fromHtml(it.bodyHtml ?: "") }
+        message.map { RichtextDocument.fromHtml(it.bodyHtml) }
             .stateIn(
                 viewModelScope,
                 started = SharingStarted.Eagerly,
-                initialValue = RichtextDocument.fromHtml(initialMessage.bodyHtml ?: "")
+                initialValue = RichtextDocument.fromHtml(initialMessage.bodyHtml)
             )
 
     fun markRead() {

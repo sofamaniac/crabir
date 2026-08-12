@@ -79,7 +79,7 @@ fun MessageEditor(
             }
             subjectState.edit {
                 delete(0, subjectState.selection.start)
-                insert(0, message!!.subject ?: "")
+                insert(0, message!!.subject)
             }
         }
     }

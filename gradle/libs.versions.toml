@@ -5,7 +5,7 @@ appauth = "0.11.1"
 coilVersion = "3.5.0"
 coreSplashscreen = "1.2.0"
 datastore = "1.2.1"
-kotlin = "2.3.20"
+kotlin = "2.4.10"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
@@ -13,18 +13,18 @@ kotlinxCoroutinesCore = "1.11.0"
 ksoup = "0.2.6"
 landscapistVersion = "2.11.0"
 lifecycleRuntimeKtx = "2.11.0"
-markdownVersion = "0.7.5"
-material3Version = "1.5.0-alpha24"
+markdownVersion = "0.7.8"
+material3Version = "1.5.0-alpha25"
 multiplatformMarkdownRenderer = "0.43.0"
 navigationCompose = "2.9.8"
 okhttpVersion = "5.4.0"
 retrofit2KotlinxSerializationConverter = "1.0.0"
 room = "2.8.4"
-serialization = "1.0.0"
+serialization = "1.0.2"
 coreKtx = "1.19.0"
-exoplayer = "1.10.1"
+exoplayer = "1.11.0"
 koin-bom = "4.2.2"
-koin-plugin = "1.0.1"
+koin-plugin = "1.1.0"
 
 [libraries]
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
@@ -41,7 +41,6 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version = "3.5.0" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
-#noinspection LoginCredentials
 appauth = { module = "net.openid:appauth", version.ref = "appauth" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilVersion" }
 coil3-coil-gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coilVersion" }
@@ -51,7 +50,7 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.13.0" }
-androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version = "2026.06.00" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version = "2026.06.01" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
@@ -64,7 +63,7 @@ landscapist-coil = { module = "com.github.skydoves:landscapist-coil3", version.r
 landscapist-image-gallery = { module = "com.github.skydoves:landscapist-image-gallery", version.ref = "landscapistVersion" }
 landscapist-zoomable = { module = "com.github.skydoves:landscapist-zoomable", version.ref = "landscapistVersion" }
 landscapist-transformation = { module = "com.github.skydoves:landscapist-transformation", version.ref = "landscapistVersion" }
-mappie-api = { module = "tech.mappie:mappie-api", version = "2.3.20-2.4.1" }
+mappie-api = { module = "tech.mappie:mappie-api", version = "2.4.10-2.4.3" }
 markdown = { module = "org.jetbrains:markdown", version.ref = "markdownVersion" }
 multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }
 multiplatform-markdown-renderer-coil3 = { module = "com.mikepenz:multiplatform-markdown-renderer-coil3", version.ref = "multiplatformMarkdownRenderer" }
