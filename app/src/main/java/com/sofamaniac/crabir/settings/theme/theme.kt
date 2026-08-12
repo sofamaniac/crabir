@@ -389,7 +389,9 @@ fun setSystemBarsColor(): (ThemeMode, Color) -> Unit {
                 windowInsetsController.isAppearanceLightNavigationBars = true
             }
 
-            else -> {}
+            else -> {
+                Log.e("setSystemBarsColor", "Call with invalid mode: $mode")
+            }
         }
     }
 }
