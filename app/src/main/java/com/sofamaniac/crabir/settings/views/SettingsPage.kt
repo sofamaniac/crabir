@@ -41,7 +41,7 @@ import kotlinx.coroutines.launch
 fun ViewsSettingsPage() {
     val context = LocalContext.current
     val settingsDataStore = remember(context) { context.viewSettingDataStore }
-    val viewSettings by settingsDataStore.data.collectAsState(initial = ViewSettings())
+    val viewSettingsOpt by settingsDataStore.data.collectAsState(initial = null)
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
 
@@ -57,6 +57,8 @@ fun ViewsSettingsPage() {
             })
         }
     ) { innerPadding ->
+        if (viewSettingsOpt == null) return@Scaffold
+        val viewSettings = viewSettingsOpt!!
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
             item {
                 ListSelector(

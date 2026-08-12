@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FileDownloadOff
@@ -25,12 +26,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalDataSettings
+import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
@@ -38,16 +39,13 @@ import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.FullscreenImageRoute
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.onWifiConnection
+import com.sofamaniac.crabir.settings.views.ImageHeight
 import com.sofamaniac.crabir.ui.SaveToHistory
-import com.sofamaniac.crabir.ui.crabirBlurStyle
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.image.DownloadButton
 import com.sofamaniac.crabir.ui.media.image.ImageView
-import dev.chrisbanes.haze.HazeInputScale
-import dev.chrisbanes.haze.blur.blurEffect
-import dev.chrisbanes.haze.hazeEffect
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -63,6 +61,10 @@ internal fun PostData.getObfuscated(): MediaResource? {
     val image = preview?.images[0] ?: return null
     val variant = image.variants?.obfuscated // ?: image.variants?.nsfw
     return variant?.resolutions?.minByOrNull { it.width }?.toMediaResource()
+}
+
+internal fun PostData.aspectRatio(): Float {
+    return preview?.images[0]?.source?.toMediaResource()?.aspectRatio ?: 1f
 }
 
 @Composable
@@ -87,46 +89,37 @@ fun PostImage(
     val goFullscreen = {
         goFullscreen(FullscreenImageRoute(post.name))
     }
-    val mediaResource = post.getImage()
-    val blurStyle = crabirBlurStyle()
+    val viewSettings = LocalViewSettings.current
     val blurredImage = post.getObfuscated()
-    val innerModifier = modifier
-        .let { modifier ->
-            if (blur && blurredImage == null) { // Blur only if not obfuscated preview is available
-                modifier.hazeEffect {
-                    inputScale = HazeInputScale.Fixed(0.5f)
-                    blurEffect {
-                        style = blurStyle
-                    }
-                }
-            } else {
-                modifier
-            }
+    val imageModifier = modifier.let {
+        when (viewSettings.cardSettings.imageHeight) {
+            ImageHeight.Full -> modifier.aspectRatio(post.aspectRatio())
+            ImageHeight.Fixed -> modifier.height(200.dp)
+            ImageHeight.Screen -> modifier
+                .aspectRatio(post.aspectRatio())
+                .heightIn(max = LocalWindowInfo.current.containerDpSize.height.times(0.8f))
         }
-        .let { modifier ->
-            if (mediaResource.hasValidAspectRatio) {
-                modifier.aspectRatio(mediaResource.aspectRatio, matchHeightConstraintsFirst = true)
-            } else {
-                modifier
-            }
-        }
+    }
     Box(modifier = modifier.clickable(enabled = enabled, onClick = goFullscreen)) {
         if (!loadImage) {
             UnloadedPlaceHolder(
-                innerModifier
+                modifier
                     .height(150.dp)
                     .clickable(enabled = enabled, onClick = goFullscreen)
             )
         } else if (blurredImage == null || !blur) {
             ImageView(
-                post, quality = quality, modifier = innerModifier, allowTransformation = false
+                post,
+                quality = quality,
+                modifier = imageModifier,
+                allowTransformation = false,
+                blur = blur && blurredImage == null
             )
         } else {
-            AsyncImage(
-                blurredImage.url,
-                modifier = innerModifier,
-                contentDescription = null,
-                contentScale = ContentScale.FillBounds
+            ImageView(
+                media = blurredImage,
+                modifier = imageModifier,
+                allowTransformation = false,
             )
         }
     }

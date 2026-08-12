@@ -20,19 +20,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.AccountManager
 import com.sofamaniac.crabir.LocalRedditAccount
-import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import dev.chrisbanes.haze.blur.HazeBlurStyle
-import dev.chrisbanes.haze.blur.HazeColorEffect
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
@@ -60,19 +56,6 @@ fun formatElapsedTimeLocalized(
         duration.toMinutes() > 0 -> String.format(locale, "%dm", duration.toMinutes())
         else -> String.format(locale, "%ds", duration.seconds)
     }
-}
-
-@Composable
-fun crabirBlurStyle(): HazeBlurStyle {
-    val theme = LocalTheme.current
-    return HazeBlurStyle(
-        blurRadius = 40.dp,
-        colorEffects = null,
-        noiseFactor = 0f,
-        fallbackColorEffect = HazeColorEffect.tint(
-            color = theme.cardBackground.copy(alpha = 0.2f)
-        )
-    )
 }
 
 @Composable

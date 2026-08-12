@@ -13,7 +13,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.core.net.toUri
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.media.image.DownloadButton
-import me.saket.telephoto.zoomable.coil3.ZoomableAsyncImage
+import com.sofamaniac.crabir.ui.media.image.TransformableImage
 
 @Composable
 fun SimpleFullscreenImage(url: String) {
@@ -33,8 +33,8 @@ fun SimpleFullscreenImage(url: String) {
             .fillMaxSize()
             .background(color = Color.Black)
     ) {
-        ZoomableAsyncImage(
-            model = url,
+        TransformableImage(
+            source = url,
             contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier = Modifier.fillMaxSize()

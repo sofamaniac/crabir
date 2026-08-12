@@ -72,13 +72,13 @@ import com.sofamaniac.crabir.settings.ConfigureSettings
 import com.sofamaniac.crabir.settings.theme.ConfigureCrabirTheme
 import com.sofamaniac.crabir.ui.inbox.InboxView
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
+import com.sofamaniac.crabir.ui.media.image.TransformableImage
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 import com.sofamaniac.crabir.ui.rememberCurrentAccount
 import com.sofamaniac.crabir.ui.search.SearchTab
 import com.sofamaniac.crabir.ui.subreddit.HistoryViewer
 import com.sofamaniac.crabir.ui.subreddit.HomeViewer
 import com.sofamaniac.crabir.ui.subredditList.SubredditListViewer
-import me.saket.telephoto.zoomable.coil3.ZoomableAsyncImage
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.annotation.KoinApplication
 import org.koin.core.annotation.KoinViewModelScopeApi
@@ -315,11 +315,12 @@ fun NavigationGraph(
                         .fillMaxSize()
                         .background(color = Color.Black)
                 ) {
-                    ZoomableAsyncImage(
-                        model = "https://v.redd.it/$url",
+                    TransformableImage(
+                        source = "https://v.redd.it/$url",
                         contentDescription = null,
                         contentScale = ContentScale.Fit,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        blur = false
                     )
                 }
             }

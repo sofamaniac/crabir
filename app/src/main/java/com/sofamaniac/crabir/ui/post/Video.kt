@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.media3.common.util.UnstableApi
-import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.domain.model.MediaResource
@@ -39,12 +38,9 @@ import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.VIDEO_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.YOUTUBE_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.ui.cartouche
-import com.sofamaniac.crabir.ui.crabirBlurStyle
 import com.sofamaniac.crabir.ui.media.image.ImageView
+import com.sofamaniac.crabir.ui.media.image.TransformableImage
 import com.sofamaniac.crabir.ui.media.videoPlayer.DecoratedVideoPlayer
-import dev.chrisbanes.haze.HazeInputScale
-import dev.chrisbanes.haze.blur.blurEffect
-import dev.chrisbanes.haze.hazeEffect
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -60,24 +56,18 @@ fun PostVideo(
         @Composable {
             val image = post.getObfuscated()
             if (image != null && blur) {
-                AsyncImage(
+                TransformableImage(
                     image.url,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.FillBounds
+                    contentScale = ContentScale.FillBounds,
+                    allowZoom = false,
                 )
             } else {
-                val blurStyle = crabirBlurStyle()
-                val placeholderModifier = Modifier.hazeEffect {
-                    inputScale = HazeInputScale.Fixed(0.5f)
-                    blurEffect {
-                        style = blurStyle
-                        blurEnabled = blur
-                    }
-                }
                 ImageView(
                     post = post,
-                    modifier = placeholderModifier.fillMaxSize(),
+                    blur = true,
+                    modifier = Modifier.fillMaxSize(),
                     allowTransformation = false,
                     contentScale = ContentScale.FillBounds,
                     quality = Quality.Medium,

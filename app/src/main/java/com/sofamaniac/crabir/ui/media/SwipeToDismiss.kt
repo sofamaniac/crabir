@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.media
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -79,6 +80,11 @@ fun VerticalSwipeToDismiss(
         }
     }
 
+    BackHandler() {
+        updateBars(theme.mode, toolbarBackground)
+        onDismiss()
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -93,6 +99,7 @@ fun VerticalSwipeToDismiss(
                         isDismissing = true
                         scope.launch {
                             offsetY.animateTo(offsetY.value.sign * screenHeight)
+                            updateBars(theme.mode, toolbarBackground)
                             onDismiss()
                         }
                     } else if (!isDismissing) {

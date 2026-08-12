@@ -168,13 +168,9 @@ dependencies {
     // Json serialization
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
-    //implementation(libs.kotlinx.datetime)
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.paging.compose)
-
-    // Parse HTML-encoded urls
-    //implementation(libs.commons.text)
 
     // More material icons
     implementation(libs.androidx.material.icons.extended)
@@ -182,17 +178,11 @@ dependencies {
     // Images
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
-    implementation(libs.zoomable)
     runtimeOnly(libs.coil3.coil.gif)
-    // TODO: switch to landscapist once zoomable can transmit single tap event to its parent
-    //    implementation(libs.landscapist.coil)
-    //    implementation(libs.landscapist.zoomable)
-    //    implementation(libs.landscapist.image.gallery)
-
-    // Blur effect
-    implementation(libs.haze)
-    implementation(libs.haze.blur)
-    implementation(libs.haze.blur.materials)
+    implementation(libs.landscapist.coil)
+    implementation(libs.landscapist.zoomable)
+    implementation(libs.landscapist.transformation)
+    implementation(libs.landscapist.image.gallery)
 
     // Video player
     implementation(libs.androidx.media3.exoplayer)

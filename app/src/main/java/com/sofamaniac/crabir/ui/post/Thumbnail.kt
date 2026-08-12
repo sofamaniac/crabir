@@ -16,17 +16,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.FullscreenGalleryRoute
 import com.sofamaniac.crabir.navigation.FullscreenImageRoute
 import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.ui.crabirBlurStyle
-import dev.chrisbanes.haze.HazeInputScale
-import dev.chrisbanes.haze.blur.blurEffect
-import dev.chrisbanes.haze.hazeEffect
+import com.sofamaniac.crabir.ui.media.image.TransformableImage
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 @Composable
@@ -47,25 +43,19 @@ fun Thumbnail(
         }
         Unit
     }
-    val blurStyle = crabirBlurStyle()
     val modifier = Modifier
-        .hazeEffect {
-            inputScale = HazeInputScale.Fixed(0.5f)
-            blurEffect {
-                style = blurStyle
-                blurEnabled = blur && thumbnailURL != null
-            }
-        }
         .fillMaxWidth(fraction = 0.2f)
         .aspectRatio(1f)
         .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
         .clickable(onClick = goFullscreen)
     if (thumbnailURL != null) {
-        AsyncImage(
-            model = thumbnailURL,
+        TransformableImage(
+            source = thumbnailURL,
             contentDescription = post.title,
             contentScale = ContentScale.Crop,
             modifier = modifier,
+            blur = blur,
+            allowZoom = false,
         )
     } else {
         Icon(

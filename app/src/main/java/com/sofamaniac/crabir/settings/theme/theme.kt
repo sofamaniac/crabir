@@ -325,7 +325,7 @@ fun rememberAppTheme(): CrabirTheme {
     val dynamicTheme = CrabirTheme.fromColorScheme(colorScheme)
     val mode = rememberThemeMode()
     val crabirTheme = theme.currentTheme()
-    setSystemBarsColor()(theme.mode, crabirTheme.toolbarBackground)
+    setSystemBarsColor()(mode, crabirTheme.toolbarBackground)
     if (theme.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         return dynamicTheme
     }
@@ -374,6 +374,7 @@ fun setSystemBarsColor(): (ThemeMode, Color) -> Unit {
     val windowInsetsController =
         WindowCompat.getInsetsController(window!!, window.decorView)
     return { mode, color ->
+        Log.d("setSystemBarsColor", "setSystemBarsColor: $mode")
         if (Build.VERSION.SDK_INT < 35) {
             window.navigationBarColor = color.toArgb()
         }

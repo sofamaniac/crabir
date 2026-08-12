@@ -47,18 +47,15 @@ import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.settings.data.NetworkPolicy
 import com.sofamaniac.crabir.ui.SaveToHistory
 import com.sofamaniac.crabir.ui.cartouche
-import com.sofamaniac.crabir.ui.crabirBlurStyle
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.gallery.Gallery
 import com.sofamaniac.crabir.ui.media.image.ImageView
+import com.sofamaniac.crabir.ui.media.image.TransformableImage
 import com.sofamaniac.crabir.ui.media.videoPlayer.DecoratedVideoPlayer
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayer
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
-import dev.chrisbanes.haze.HazeInputScale
-import dev.chrisbanes.haze.blur.blurEffect
-import dev.chrisbanes.haze.hazeEffect
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -178,19 +175,12 @@ fun EmbeddedGallery(
                     )
                 } else if (backgroundUrl != null) {
                     // If available, blur background
-                    val blurStyle = crabirBlurStyle()
-                    AsyncImage(
-                        backgroundUrl,
-                        modifier = innerModifier
-                            .hazeEffect {
-                                inputScale = HazeInputScale.Fixed(0.5f)
-                                blurEffect {
-                                    style = blurStyle
-                                }
-                            }
-                            .fillMaxSize(),
-                        contentScale = ContentScale.FillBounds,
-                        contentDescription = null,
+                    TransformableImage(
+                        source = backgroundUrl,
+                        modifier = modifier.fillMaxSize(),
+                        blur = true,
+                        allowZoom = false,
+                        contentScale = ContentScale.FillBounds
                     )
                 }
                 if (!blur) {

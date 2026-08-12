@@ -75,6 +75,7 @@ class DrawerViewModelImpl(
 ) : DrawerViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     override val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
+    private var initialized = false
 
     private val flowManager =
         AuthFlowManager(
@@ -129,6 +130,7 @@ class DrawerViewModelImpl(
 
 
     override fun initialize() {
+        if (initialized) return
         viewModelScope.launch(Dispatchers.IO) {
             accountManager.initialize { err ->
                 _loginState.update { LoginState.Error(err) }
@@ -137,6 +139,7 @@ class DrawerViewModelImpl(
             if (!account.isAnonymous() && !account.isUninitialized()) {
                 fetchUserInfo()
             }
+            initialized = true
         }
     }
 

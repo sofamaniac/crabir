@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,8 +46,8 @@ fun DecoratedVideoPlayer(
     key: String,
     modifier: Modifier = Modifier,
     placeholder: @Composable () -> Unit = {
-        Surface(color = Color.Gray, modifier = Modifier.fillMaxSize()) {
-            Text("LOADING")
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator()
         }
     },
     cartouche: @Composable (() -> Unit)? = {

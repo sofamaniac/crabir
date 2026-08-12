@@ -8,8 +8,6 @@ import com.sofamaniac.crabir.data.remote.dto.post.Preview
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Quality
-import me.saket.telephoto.zoomable.ZoomableState
-import me.saket.telephoto.zoomable.rememberZoomableState
 
 @Composable
 fun ImageView(
@@ -17,9 +15,9 @@ fun ImageView(
     contentDescription: String,
     modifier: Modifier = Modifier,
     allowTransformation: Boolean = true,
+    blur: Boolean = false,
     contentScale: ContentScale = ContentScale.Fit,
     quality: Quality,
-    zoomableState: ZoomableState,
     onZoomChange: (Float) -> Unit = {},
     onClick: () -> Unit = {},
 ) {
@@ -31,15 +29,17 @@ fun ImageView(
         Quality.Medium -> resolutions[preview.resolutions.size / 2]
         Quality.Low -> resolutions.first()
     }.toMediaResource()
+
     TransformableImage(
-        image,
-        contentDescription = contentDescription,
-        contentScale = contentScale,
-        onZoomChange = onZoomChange,
+        image.url,
         modifier = modifier,
-        enabled = allowTransformation,
-        zoomableState = zoomableState,
-        onClick = onClick
+        contentDescription = contentDescription,
+        placeholderAspectRatio = image.aspectRatio,
+        contentScale = contentScale,
+        onClick = onClick,
+        onZoomChange = onZoomChange,
+        allowZoom = allowTransformation,
+        blur = blur
     )
 }
 
@@ -48,19 +48,17 @@ fun ImageView(
     media: MediaResource,
     modifier: Modifier = Modifier,
     allowTransformation: Boolean = true,
-    zoomableState: ZoomableState = rememberZoomableState(),
     onZoomChange: (Float) -> Unit = {},
     onClick: () -> Unit = {},
 ) {
     TransformableImage(
-        media,
+        media.url,
         onZoomChange = onZoomChange,
         contentDescription = "Image",
         contentScale = ContentScale.Fit,
         modifier = modifier,
-        enabled = allowTransformation,
+        allowZoom = allowTransformation,
         onClick = onClick,
-        zoomableState = zoomableState,
     )
 }
 
@@ -69,23 +67,23 @@ fun ImageView(
     post: PostData,
     modifier: Modifier = Modifier,
     allowTransformation: Boolean = true,
+    blur: Boolean = false,
     contentScale: ContentScale = ContentScale.Fit,
     quality: Quality,
-    zoomableState: ZoomableState = rememberZoomableState(),
     onZoomChange: (Float) -> Unit = {},
     onClick: () -> Unit = {},
 ) {
     if (post.preview != null) {
         ImageView(
             post.preview,
-            post.title,
+            contentDescription = post.title,
             onZoomChange = onZoomChange,
             modifier = modifier
                 .fillMaxWidth(),
             allowTransformation = allowTransformation,
+            blur = blur,
             contentScale = contentScale,
             quality = quality,
-            zoomableState = zoomableState,
             onClick = onClick
         )
     } else {
@@ -95,7 +93,6 @@ fun ImageView(
             modifier = modifier
                 .fillMaxWidth(),
             contentScale = ContentScale.Fit,
-            zoomableState = zoomableState,
             onClick = onClick,
         )
     }
