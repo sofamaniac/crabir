@@ -91,7 +91,8 @@ internal fun PostCardContent(
         NetworkPolicy.Always -> isMostVisible
         NetworkPolicy.OnWifi -> connectionState && isMostVisible
         else -> false
-    } // We do not apply the padding on the column, but on each of its children except
+    }
+    // We do not apply the padding on the column, but on each of its children except
     // the body to have images that take the full width
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)

@@ -30,6 +30,7 @@ import com.sofamaniac.crabir.ui.post.LinkViewModel
 import com.sofamaniac.crabir.ui.post.PostHeader
 import com.sofamaniac.crabir.ui.post.PostInfo
 import com.sofamaniac.crabir.ui.post.card.PostBody
+import com.sofamaniac.crabir.ui.richtext.Richtext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -72,6 +73,9 @@ internal fun PostView(
                     .padding(8.dp)
             ) {
                 CrossPostView(parent)
+                if (post.selftext.richtext.document.isNotEmpty()) {
+                    Richtext(post.selftext.richtext, mediaMetadata = post.mediaMetadata)
+                }
             }
         }
     }

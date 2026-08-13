@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.post.card
 
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -146,6 +147,7 @@ internal fun PostBody(
     if (forceShowSelftext) {
         val selftext = post.selftext.markdown
         if (selftext.markdown.isNotBlank() && enableTextPreview) {
+            Spacer(modifier = Modifier.height(8.dp))
             selftextView()
         }
     }
