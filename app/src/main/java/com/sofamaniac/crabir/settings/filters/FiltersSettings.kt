@@ -23,7 +23,17 @@ data class FiltersSettings(
     val domainFilters: List<String> = emptyList(),
     val subredditFilters: List<String> = emptyList(),
     val flairFilters: List<String> = emptyList(),
-)
+) {
+    fun addSubreddit(subreddit: String): FiltersSettings {
+        assert(!subreddit.contains("r/"))
+        return copy(subredditFilters = subredditFilters + subreddit)
+    }
+
+    fun addAuthor(author: String): FiltersSettings {
+        assert(!author.contains("u/"))
+        return copy(authorFilters = authorFilters + author)
+    }
+}
 
 val Context.filtersDataStore by dataStore(
     fileName = "reboost_filters.json",
@@ -49,18 +59,24 @@ fun rememberPostsFilter(
     whitelistAuthor: List<String> = emptyList(),
 ): (PostData) -> Boolean {
     val settings = LocalFiltersSettings.current
+    assert(whitelistSubreddit.none { it.contains("r/") })
+    assert(whitelistAuthor.none { it.contains("u/") })
     return { post ->
         val title = post.title
         val author = post.author.username
         val domain = post.url.toUri().host ?: ""
         val subreddit = post.subreddit.name
         val flair = post.linkFlair.text
-        !(settings.titleFilters.any { Regex(it).matches(title) }
-                || settings.domainFilters.any { Regex(it).matches(domain) }
-                || settings.subredditFilters.any { Regex(it).matches(subreddit) }
+
+        val filteredOnTitle = settings.titleFilters.any { Regex(it).matches(title) }
+        val filteredOnDomain = settings.domainFilters.any { Regex(it).matches(domain) }
+        val filteredOnSubreddit = settings.subredditFilters.any { Regex(it).matches(subreddit) }
             .and(whitelistSubreddit.none { Regex(it).matches(subreddit) })
-                || settings.authorFilters.any { Regex(it).matches(author) }
-            .and(whitelistAuthor.none { Regex(it).matches(author) })
-                || settings.flairFilters.any { Regex(it).matches(flair) })
+        val filteredOnAuthor = settings.authorFilters.any { Regex(it).matches(author) }.and(
+            whitelistAuthor.none { Regex(it).matches(author) }
+        )
+        val filteredOnFlair = settings.flairFilters.any { Regex(it).matches(flair) }
+
+        !(filteredOnTitle || filteredOnDomain || filteredOnSubreddit || filteredOnAuthor || filteredOnFlair)
     }
 }

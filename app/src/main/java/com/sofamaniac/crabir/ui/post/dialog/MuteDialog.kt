@@ -43,7 +43,7 @@ fun MuteDialog(post: PostData, onDismissRequest: () -> Unit, onClick: () -> Unit
                 leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
                 modifier = Modifier.clickable {
                     scope.launch {
-                        settingsDataStore.updateData { it.copy(authorFilters = it.authorFilters + username) }
+                        settingsDataStore.updateData { it.addAuthor(username) }
                         onClick()
                     }
                 }
@@ -60,7 +60,7 @@ fun MuteDialog(post: PostData, onDismissRequest: () -> Unit, onClick: () -> Unit
                 leadingContent = { Icon(Icons.Default.Groups, contentDescription = null) },
                 modifier = Modifier.clickable {
                     scope.launch {
-                        settingsDataStore.updateData { it.copy(subredditFilters = it.subredditFilters + subreddit) }
+                        settingsDataStore.updateData { it.addSubreddit(subreddit) }
                         onClick()
                     }
                 }

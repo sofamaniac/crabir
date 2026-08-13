@@ -73,6 +73,7 @@ fun SubredditViewer(
         subreddit,
         subreddit
     )
+    val subredditName = subreddit.split("/").last()
     val viewModel: SubredditViewModel =
         koinViewModel(key = subreddit) { parametersOf(subreddit, entity) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -119,7 +120,7 @@ fun SubredditViewer(
     FullFeedView(
         topBar, bottomBar, viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        filter = rememberPostsFilter(whitelistSubreddit = listOf(subreddit)),
+        filter = rememberPostsFilter(whitelistSubreddit = listOf(subredditName)),
         drawerState = drawerState,
         feedInfo = feedInfoView,
         viewEntity = entity,
