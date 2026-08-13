@@ -4,6 +4,7 @@
 
 package com.sofamaniac.crabir.ui
 
+import android.util.Log
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -79,12 +80,21 @@ class CurrentAccountViewModel(accountManager: AccountManager) : ViewModel() {
 @Single
 class HistoryManager(val history: VisitedPostsDao) {
     suspend fun addPost(name: Fullname, account: Int) {
-        val entity = VisitedPostEntity(
+        val entity = history.getPost(name) ?: VisitedPostEntity(
             id = name,
-            visitedAt = Clock.systemUTC().millis(),
+            visitedAt = 0,
             visitedBy = account
         )
-        history.insert(entity)
+        history.insert(entity.copy(visitedAt = Clock.systemUTC().millis(), visitedBy = account))
+    }
+
+    suspend fun updateComments(name: Fullname, comments: List<String>, focusedComment: String) {
+        val entity = history.getPost(name)
+        if (entity == null) {
+            Log.e("HistoryManager", "updateComments: Post not found in database ($name)")
+            return
+        }
+        history.insert(entity.copy(comments = comments, focusedComment = focusedComment))
     }
 }
 

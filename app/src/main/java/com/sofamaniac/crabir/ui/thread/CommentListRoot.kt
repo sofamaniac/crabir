@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,7 +41,7 @@ fun CommentListRoot(
     comment: String? = null,
     context: Int? = null,
 ) {
-    val listState = rememberLazyListState()
+    val listState = viewModel.listState
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val theme = LocalTheme.current
     val navController = LocalNavController.current!!

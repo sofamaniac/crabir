@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.ui.thread
 
 import android.util.Log
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.remote.dto.Thing
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.core.annotation.InjectedParam
@@ -48,6 +50,9 @@ class ThreadViewModel(
 
     val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
 
+    var initialLoad: Boolean = false
+    var commentsLoaded: MutableStateFlow<Boolean> = MutableStateFlow(false)
+
     override val read = MutableStateFlow(false)
     override val linksSettings = postSettingsRepository.postSettings.map { it.linksSettings }
     override val likes: StateFlow<Boolean?> = post.map {
@@ -64,6 +69,7 @@ class ThreadViewModel(
 
     private var _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+    val listState = LazyListState()
 
     val comments = repository.comments
 
@@ -173,6 +179,7 @@ class ThreadViewModel(
     fun fetchComments() {
         viewModelScope.launch(Dispatchers.IO) {
             fetchAsync()
+            commentsLoaded.update { true }
         }
     }
 

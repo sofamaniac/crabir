@@ -4,6 +4,8 @@
 
 package com.sofamaniac.crabir.ui.thread
 
+import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -25,10 +27,12 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -39,10 +43,14 @@ import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
+import com.sofamaniac.crabir.ui.HistoryManager
 import com.sofamaniac.crabir.ui.SaveToHistory
 import com.sofamaniac.crabir.ui.editor.AccountSelector
 import com.sofamaniac.crabir.ui.editor.EditorActions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
 /**
@@ -69,6 +77,39 @@ fun ThreadView(
     val showReplySheet by viewModel.reply.collectAsState()
 
     SaveToHistory(viewModel.name)
+    val historyManager: HistoryManager = koinInject()
+    val navController = LocalNavController.current
+    val scope = rememberCoroutineScope()
+    BackHandler() {
+        val comments = viewModel.comments.value.toList().map { it.id }
+        val focusedIndex = viewModel.listState.firstVisibleItemIndex
+        val focusedComment = comments.getOrNull(focusedIndex)
+        if (focusedComment != null) {
+            scope.launch(Dispatchers.IO) {
+                historyManager.updateComments(viewModel.name, comments, focusedComment)
+                val entity = historyManager.history.getPost(viewModel.name)
+                Log.d("ThreadView", "Disposed: $entity")
+            }
+        }
+        navController?.popBackStack()
+    }
+
+    val comments by viewModel.comments.collectAsState()
+
+    LaunchedEffect(comments) {
+        if (viewModel.initialLoad || comments.count() == 0) return@LaunchedEffect
+        val comments = viewModel.comments.value.toList().map { it.id }
+        val entity = historyManager.history.getPost(viewModel.name)
+        Log.d("ThreadView", "LaunchedEffect: $entity")
+        if (entity?.focusedComment != null) {
+            val index = comments.indexOf(entity.focusedComment)
+            Log.d("ThreadView", "Scrolling to: $index")
+            if (index > 0) {
+                viewModel.listState.scrollToItem(index)
+            }
+        }
+        viewModel.initialLoad = true
+    }
 
     Scaffold(
         topBar = { TopBar(viewModel, scrollBehavior, dismiss) },

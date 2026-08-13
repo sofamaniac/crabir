@@ -24,7 +24,7 @@ abstract class AccountDatabase : RoomDatabase() {
     abstract fun accountsDao(): AccountsDao
 }
 
-@Database(entities = [VisitedPostEntity::class, VotableEntity::class], version = 1)
+@Database(entities = [VisitedPostEntity::class, VotableEntity::class], version = 2)
 @TypeConverters(RoomConverters::class)
 abstract class VisitedPostsDatabase : RoomDatabase() {
     abstract fun visitedPostsDao(): VisitedPostsDao

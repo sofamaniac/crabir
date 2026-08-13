@@ -10,4 +10,6 @@ data class VisitedPostEntity(
     val id: Fullname,
     val visitedAt: Long,
     val visitedBy: Int,
+    val focusedComment: String? = null,
+    val comments: List<String> = emptyList(),
 )
