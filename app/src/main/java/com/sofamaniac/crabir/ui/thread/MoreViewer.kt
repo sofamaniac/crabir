@@ -57,7 +57,7 @@ fun MoreViewer(
             text,
             style = MaterialTheme.typography.titleSmall,
             color = theme.highlight,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
     }
 }
