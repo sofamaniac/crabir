@@ -1,5 +1,7 @@
 package com.sofamaniac.crabir.ui.thread
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.MaterialTheme
@@ -7,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
@@ -19,19 +22,22 @@ import com.sofamaniac.crabir.ui.ThemedCard
 fun MoreViewer(
     more: CommentType.More,
     viewModel: ThreadViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val theme = LocalTheme.current
     val resources = LocalResources.current
-    val text = resources.getQuantityString(
-        R.plurals.MoreComments,
-        more.data.count,
-        more.data.count
-    )
+    val text = if (more.data.count == 0) stringResource(R.string.see_more_comments) else
+        resources.getQuantityString(
+            R.plurals.MoreComments,
+            more.data.count,
+            more.data.count
+        )
     val navController = LocalNavController.current!!
     ThemedCard(
         modifier = modifier
-            .depthIndent(more.depth.coerceAtLeast(0)),
+            .background(theme.cardBackground)
+            .depthIndent(more.depth.coerceAtLeast(0))
+            .fillMaxWidth(),
         roundedCorners = false,
         onClick = {
             if (more.data.count > 0) {
@@ -56,10 +62,10 @@ fun MoreViewer(
     }
 }
 
-fun LazyListScope.MoreNode(
+fun LazyListScope.moreNode(
     more: CommentType.More,
     viewModel: ThreadViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     item {
         MoreViewer(more, viewModel, modifier)

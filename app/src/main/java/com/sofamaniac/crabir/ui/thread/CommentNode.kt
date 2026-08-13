@@ -76,12 +76,14 @@ fun CommentContent(
 
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
+    val theme = LocalTheme.current
     Column(modifier = modifier) {
         if (comment.depth == 0) HorizontalDivider()
         ThemedCard(
             roundedCorners = false,
             modifier = Modifier
                 .fillMaxWidth()
+                .background(theme.cardBackground)
                 .depthIndent(comment.depth.coerceAtLeast(0))
                 .combinedClickable(
                     onClick = { if (!comment.collapsed) viewModel.toggleComment(comment.name) },

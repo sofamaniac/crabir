@@ -152,7 +152,7 @@ fun CommentListRoot(
                     }
 
 
-                    is CommentType.More -> MoreNode(comment, viewModel)
+                    is CommentType.More -> moreNode(comment, viewModel)
                 }
             }
             item {

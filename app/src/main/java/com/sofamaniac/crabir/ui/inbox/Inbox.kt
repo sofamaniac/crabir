@@ -61,6 +61,7 @@ import com.sofamaniac.crabir.domain.repository.InboxFeed
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.MessageEditorRoute
 import com.sofamaniac.crabir.ui.RefreshIndicator
+import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.richtext.Richtext
@@ -219,7 +220,7 @@ fun Message(
         }
     }
     val navController = LocalNavController.current
-    Column(modifier = modifier.fillMaxWidth()) {
+    ThemedCard(modifier = Modifier.fillMaxWidth()) {
         Row( //horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
         ) {
