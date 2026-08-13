@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Grid
 import androidx.compose.foundation.layout.GridTrackSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -118,8 +120,10 @@ internal fun InnerImage(media: MediaMetadata, caption: String? = null) {
         AsyncImage(
             model = url,
             contentDescription = caption,
+            contentScale = ContentScale.Fit,
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .aspectRatio(media.ratio)
                 .clickable {
                     navController?.navigate(SimpleImageRoute(url))
                 }
@@ -133,6 +137,8 @@ fun Image(image: Richtext.Image, context: Context) {
     val media = context.mediaMetadata[image.id]
     if (media != null) {
         InnerImage(media, image.caption)
+    } else {
+        Text(image.id)
     }
 }
 
@@ -166,6 +172,13 @@ fun Gif(image: Richtext.Gif, context: Context) {
             contentDescription = image.caption,
             modifier = Modifier
                 .fillMaxSize()
+                .let {
+                    if (media != null) {
+                        it.aspectRatio(media.ratio)
+                    } else {
+                        it
+                    }
+                }
                 .clickable {
                     navController?.navigate(SimpleImageRoute(gifUrl))
                 }
