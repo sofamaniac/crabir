@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,8 +40,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.CloseButton
+import com.sofamaniac.crabir.ui.ThemedCard
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -178,39 +180,42 @@ fun ThemeEditor() {
 @Composable
 fun ThemePreviewer(setActiveField: (ColorFields) -> Unit) {
     val theme = rememberAppTheme()
-    Card(
-        modifier = Modifier.padding(16.dp),
-        colors = CardDefaults.cardColors(containerColor = theme.cardBackground)
-    ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Post title", modifier = Modifier.clickable {
-                setActiveField(ColorFields.PostTitle)
-            }, color = theme.postTitle)
-            Text("Read", modifier = Modifier.clickable {
-                setActiveField(ColorFields.ReadPost)
-            }, color = theme.readPost)
-            Text("Announcement", modifier = Modifier.clickable {
-                setActiveField(ColorFields.Announcement)
-            }, color = theme.announcement)
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Community", modifier = Modifier.clickable {
-                setActiveField(ColorFields.Highlight)
-            }, color = theme.highlight)
-            Text("Secondary text", modifier = Modifier.clickable {
-                setActiveField(ColorFields.SecondaryText)
-            }, color = theme.secondaryText)
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Content text", modifier = Modifier.clickable {
-                setActiveField(ColorFields.ContentColor)
-            }, color = theme.contentColor)
-            Text("Link", modifier = Modifier.clickable {
-                setActiveField(ColorFields.LinkColor)
-            }, color = theme.linkColor)
-            Text("Downvote", modifier = Modifier.clickable {
-                setActiveField(ColorFields.Downvote)
-            }, color = theme.downvote)
+    CompositionLocalProvider(LocalTheme provides theme) {
+        ThemedCard(
+            modifier = Modifier.padding(16.dp),
+        ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Post title", modifier = Modifier.clickable {
+                        setActiveField(ColorFields.PostTitle)
+                    }, color = theme.postTitle)
+                    Text("Read", modifier = Modifier.clickable {
+                        setActiveField(ColorFields.ReadPost)
+                    }, color = theme.readPost)
+                    Text("Announcement", modifier = Modifier.clickable {
+                        setActiveField(ColorFields.Announcement)
+                    }, color = theme.announcement)
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Community", modifier = Modifier.clickable {
+                        setActiveField(ColorFields.Highlight)
+                    }, color = theme.highlight)
+                    Text("Secondary text", modifier = Modifier.clickable {
+                        setActiveField(ColorFields.SecondaryText)
+                    }, color = theme.secondaryText)
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Content text", modifier = Modifier.clickable {
+                        setActiveField(ColorFields.ContentColor)
+                    }, color = theme.contentColor)
+                    Text("Link", modifier = Modifier.clickable {
+                        setActiveField(ColorFields.LinkColor)
+                    }, color = theme.linkColor)
+                    Text("Downvote", modifier = Modifier.clickable {
+                        setActiveField(ColorFields.Downvote)
+                    }, color = theme.downvote)
+                }
+            }
         }
     }
 }
