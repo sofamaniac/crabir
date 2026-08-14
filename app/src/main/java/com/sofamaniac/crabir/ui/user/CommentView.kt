@@ -64,6 +64,9 @@ class CommentViewModel(
 
     }
 
+    override fun collapseComment(name: Fullname, collapsed: Boolean) {
+    }
+
     override fun submitComment(
         parent: Fullname,
         body: String,
@@ -107,8 +110,10 @@ class CommentViewModel(
         TODO("Not yet implemented")
     }
 
-    override fun report(reason: String) {
-        TODO("Not yet implemented")
+    override fun report(name: Fullname, reason: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            commentsRepository.report(name, reason)
+        }
     }
 
 }

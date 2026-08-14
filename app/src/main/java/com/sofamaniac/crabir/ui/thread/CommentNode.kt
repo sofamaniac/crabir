@@ -64,6 +64,8 @@ interface CommentViewModelInterface : VotableInteraction {
     fun replyTo(name: Fullname?)
     fun submitComment(parent: Fullname, body: String, account: RedditAccount?)
 
+    fun collapseComment(name: Fullname, collapsed: Boolean)
+
 }
 
 @Composable
@@ -197,6 +199,7 @@ fun BottomRow(
         DownButton(likes, onClick = { viewModel.downvote(comment.name) })
         SavedButton(saved, onClick = { viewModel.save(comment.name, !saved, false) })
         ReplyButton(comment.name, viewModel)
+        MoreOptionButton(comment, viewModel)
         if (BuildConfig.DEBUG) {
             IconButton(onClick = {
                 Log.d("CommentNode", "$comment")

@@ -64,14 +64,12 @@ interface RedditAPIService :
     ): Response<Listing<Post>>
 
 
-
-
     @GET("{subreddit}/api/link_flair_v2.json")
     suspend fun getPostFlair(
         @Path(
             "subreddit",
             encoded = true
-        ) subreddit: String
+        ) subreddit: String,
     ): Response<List<FlairInfo>>
 
     @FormUrlEncoded
@@ -79,7 +77,7 @@ interface RedditAPIService :
     suspend fun report(
         @Field("thing_id") id: Fullname,
         @Field("reason") reason: String,
-        @Field("api_type") apiType: String = "json"
+        @Field("api_type") apiType: String = "json",
     ): Response<Unit>
 
 }
@@ -97,16 +95,34 @@ enum class SubscribeAction {
 }
 
 
-
 @Serializable
 data class Rules(
     val rules: List<Rule> = emptyList(),
-    @SerialName("site_rules") val siteRules: List<String> = emptyList()
-)
+    @SerialName("site_rules") val siteRules: List<String> = emptyList(),
+) {
+    fun filter(kind: Kind): Rules {
+        return Rules(
+            rules.filter { kind == Kind.All || it.kind == kind || it.kind == Kind.All },
+            siteRules
+        )
+    }
+}
+
+@Serializable
+enum class Kind {
+    @SerialName("link")
+    Link,
+
+    @SerialName("comment")
+    Comment,
+
+    @SerialName("all")
+    All,
+}
 
 @Serializable
 data class Rule(
-    val kind: String,
+    val kind: Kind,
     val description: String,
     @SerialName("short_name") val shortName: String,
     @SerialName("violation_reason") val violationReason: String,

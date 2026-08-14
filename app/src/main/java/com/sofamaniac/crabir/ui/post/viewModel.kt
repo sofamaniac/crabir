@@ -247,6 +247,6 @@ class DummyInteraction(post: PostData = DUMMY_POST) : PostViewModelInterface, Vi
     override fun fetchRules() {
     }
 
-    override fun report(reason: String) {
+    override fun report(name: Fullname, reason: String) {
     }
 }

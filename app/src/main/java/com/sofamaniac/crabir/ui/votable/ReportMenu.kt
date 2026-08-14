@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui.post.dialog
+package com.sofamaniac.crabir.ui.votable
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
@@ -23,15 +22,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.ui.post.LinkInteraction
+import com.sofamaniac.crabir.data.remote.reddit.Kind
+import com.sofamaniac.crabir.domain.model.Fullname
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportMenu(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
-    val rules by viewModel.rules.collectAsState()
+fun ReportMenu(
+    name: Fullname,
+    viewModel: VotableInteraction,
+    kind: Kind = Kind.All,
+    onDismissRequest: () -> Unit,
+) {
+    val rulesFull by viewModel.rules.collectAsState()
+    val rules = rulesFull.filter(kind)
     val (selectedOption, setSelectedOption) = remember { mutableStateOf(rules.siteRules.firstOrNull()) }
-    BasicAlertDialog(onDismissRequest) {
+    Dialog(onDismissRequest) {
         Card(modifier = Modifier.padding(16.dp)) {
             LazyColumn(
                 modifier = Modifier
@@ -79,7 +86,7 @@ fun ReportMenu(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
                 Spacer(modifier = Modifier.weight(1f))
                 TextButton(onClick = {
                     if (selectedOption == null) return@TextButton
-                    viewModel.report(selectedOption)
+                    viewModel.report(name, selectedOption)
                     onDismissRequest()
                 }) {
                     Text(stringResource(R.string.report))

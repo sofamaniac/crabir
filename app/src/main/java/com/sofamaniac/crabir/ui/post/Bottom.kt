@@ -57,10 +57,10 @@ import com.sofamaniac.crabir.ui.post.buttons.ShareButton
 import com.sofamaniac.crabir.ui.post.buttons.ShareButtonLong
 import com.sofamaniac.crabir.ui.post.dialog.EditDialogue
 import com.sofamaniac.crabir.ui.post.dialog.PostDialog
-import com.sofamaniac.crabir.ui.post.dialog.ReportMenu
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.votable.DownButton
+import com.sofamaniac.crabir.ui.votable.ReportMenu
 import com.sofamaniac.crabir.ui.votable.SavedButton
 import com.sofamaniac.crabir.ui.votable.UpButton
 import kotlinx.coroutines.launch
@@ -146,7 +146,7 @@ private fun PostOptions(
             if (!buttonsSettings.hide) {
                 HideButtonLong(post, interaction, onClick = { showOptions = false })
             }
-            ReportButton(interaction)
+            ReportButton(post, interaction)
             MuteButton(post, onDismissRequest = { showOptions = false })
             if (!buttonsSettings.share) {
                 ShareButtonLong(post) { showOptions = false }
@@ -236,16 +236,17 @@ private fun GoToUserButton(post: PostData, onClick: () -> Unit) {
 }
 
 @Composable
-private fun ReportButton(interaction: LinkInteraction) {
+private fun ReportButton(post: PostData, interaction: LinkInteraction) {
     var showMenu by remember { mutableStateOf(false) }
     ListItem(
         content = { Text(stringResource(R.string.report)) },
         modifier = Modifier.clickable {
             interaction.fetchRules()
+            showMenu = true
         }
     )
     if (showMenu) {
-        ReportMenu(interaction) {
+        ReportMenu(post.name, interaction) {
             showMenu = false
         }
     }

@@ -23,7 +23,7 @@ interface VotableInteraction {
     fun downvote(name: Fullname)
     fun save(name: Fullname, target: Boolean, upvote: Boolean)
     fun fetchRules()
-    fun report(reason: String)
+    fun report(name: Fullname, reason: String)
 }
 
 open class VotableViewModel<T : VotableData>(
@@ -58,7 +58,7 @@ open class VotableViewModel<T : VotableData>(
         }
     }
 
-    override fun report(reason: String) {
+    override fun report(name: Fullname, reason: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.report(fullname, reason)
         }

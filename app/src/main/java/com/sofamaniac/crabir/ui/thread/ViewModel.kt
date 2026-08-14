@@ -61,8 +61,9 @@ class ThreadViewModel(
     override val saved: StateFlow<Boolean> = post.map {
         it?.relationship?.liked ?: false
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
-    override val rules: StateFlow<Rules>
-        get() = TODO("Not yet implemented")
+
+    private val rulesState = MutableStateFlow(Rules())
+    override val rules: StateFlow<Rules> = rulesState
 
     private val replyState = MutableStateFlow<Fullname?>(null)
     val reply: StateFlow<Fullname?> = replyState.asStateFlow()
@@ -149,7 +150,7 @@ class ThreadViewModel(
         return post
     }
 
-    fun collapseComment(name: Fullname, collapsed: Boolean) {
+    override fun collapseComment(name: Fullname, collapsed: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
 
             val comment =
@@ -295,10 +296,15 @@ class ThreadViewModel(
     }
 
     override fun fetchRules() {
-        TODO("Not yet implemented")
+        if (rulesState.value.rules.isNotEmpty()) return
+        viewModelScope.launch(Dispatchers.IO) {
+            rulesState.value = repository.fetchRules() ?: Rules()
+        }
     }
 
-    override fun report(reason: String) {
-        TODO("Not yet implemented")
+    override fun report(name: Fullname, reason: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.report(name, reason)
+        }
     }
 }

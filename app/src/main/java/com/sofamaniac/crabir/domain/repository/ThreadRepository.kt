@@ -9,6 +9,7 @@ import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.crabir.data.remote.reddit.MoreResponseOuter
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.data.remote.reddit.commentSubmissionBody
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -58,6 +59,9 @@ interface ThreadRepository {
     suspend fun downvote(fullname: Fullname)
     suspend fun save(fullname: Fullname)
     suspend fun unsave(fullname: Fullname)
+
+    suspend fun fetchRules(): Rules?
+    suspend fun report(fullname: Fullname, reason: String)
 
     /** Insert a comment into the thread
      * @param parent The name of the parent comment
@@ -297,4 +301,26 @@ class ThreadRepositoryImpl(
         commentsRepository.unsave(fullname)
     }
 
+    override suspend fun fetchRules(): Rules? {
+        if (post == null) return null
+        try {
+            val response = api.getRules(post!!.subreddit.subredditPrefixed)
+            if (response.isSuccessful) {
+                val body = response.body()
+                return body
+            } else {
+                return null
+            }
+        } catch (e: Exception) {
+            Log.e("ThreadRepositoryImpl", "fetchRules: ", e)
+            return null
+        }
+    }
+
+    override suspend fun report(
+        fullname: Fullname,
+        reason: String,
+    ) {
+        commentsRepository.report(fullname, reason)
+    }
 }

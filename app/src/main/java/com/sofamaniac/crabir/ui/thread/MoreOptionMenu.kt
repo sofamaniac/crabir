@@ -1,0 +1,131 @@
+package com.sofamaniac.crabir.ui.thread
+
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowUp
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Report
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.data.remote.reddit.Kind
+import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.ui.votable.ReportMenu
+
+@Composable
+fun MoreOptionButton(comment: CommentData, viewModel: CommentViewModelInterface) {
+    var showMenu by remember { mutableStateOf(false) }
+
+    IconButton(onClick = { showMenu = !showMenu }) {
+        Icon(Icons.Default.MoreVert, contentDescription = null)
+    }
+
+    if (showMenu) {
+        MoreOptionMenu(comment, viewModel) {
+            showMenu = false
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MoreOptionMenu(
+    comment: CommentData,
+    viewModel: CommentViewModelInterface,
+    onDismissRequest: () -> Unit,
+) {
+    val theme = LocalTheme.current
+    val colors = ListItemDefaults.colors().copy(containerColor = theme.cardBackground)
+    var showReportMenu by remember { mutableStateOf(false) }
+    ModalBottomSheet(onDismissRequest = onDismissRequest) {
+        ListItem(
+            colors = colors,
+            modifier = Modifier.clickable {},
+            leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
+            content = { Text("About ${comment.author.username}") },
+            trailingContent = {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowRight,
+                    contentDescription = null
+                )
+            }
+        )
+
+        ListItem(
+            colors = colors,
+            modifier = Modifier.clickable {
+                viewModel.collapseComment(comment.name, true)
+            },
+            leadingContent = {
+                Icon(
+                    Icons.Default.KeyboardDoubleArrowUp,
+                    contentDescription = null
+                )
+            },
+            content = { Text("Collapse thread") },
+        )
+
+        ListItem(
+            colors = colors,
+            modifier = Modifier.clickable {
+                viewModel.fetchRules()
+                showReportMenu = true
+            },
+            leadingContent = { Icon(Icons.Default.Report, contentDescription = null) },
+            content = { Text("Report") },
+            trailingContent = {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowRight,
+                    contentDescription = null
+                )
+            }
+        )
+
+        ListItem(
+            colors = colors,
+            modifier = Modifier.clickable {},
+            leadingContent = { Icon(Icons.Default.Share, contentDescription = null) },
+            content = { Text("Share") },
+            trailingContent = {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowRight,
+                    contentDescription = null
+                )
+            }
+        )
+
+        ListItem(
+            colors = colors,
+            modifier = Modifier.clickable {},
+            leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
+            content = { Text("Copy") },
+            trailingContent = {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowRight,
+                    contentDescription = null
+                )
+            }
+        )
+    }
+
+    if (showReportMenu) {
+        ReportMenu(comment.name, viewModel, kind = Kind.Comment) {
+            showReportMenu = false
+        }
+    }
+}

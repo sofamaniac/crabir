@@ -53,6 +53,7 @@ interface VotableRepository<T : VotableData> {
 
     suspend fun getRules(subreddit: String): Rules {
         try {
+            val subreddit = if (subreddit.startsWith("r/")) subreddit else "r/$subreddit"
             val res = api.getRules(subreddit)
             return if (res.isSuccessful) {
                 res.body()!!
@@ -61,7 +62,7 @@ interface VotableRepository<T : VotableData> {
             }
         } catch (e: Exception) {
             Log.e("VotableRepository", "Failed to get rules: $e")
-//            return Result.failure(e)
+            //            return Result.failure(e)
             return Rules()
         }
     }

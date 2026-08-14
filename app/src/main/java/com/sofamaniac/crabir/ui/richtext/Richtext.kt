@@ -123,7 +123,13 @@ internal fun InnerImage(media: MediaMetadata, caption: String? = null) {
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(media.ratio)
+                .let {
+                    if (media.ratio > 0) {
+                        it.aspectRatio(media.ratio)
+                    } else {
+                        it
+                    }
+                }
                 .clickable {
                     navController?.navigate(SimpleImageRoute(url))
                 }
@@ -173,7 +179,7 @@ fun Gif(image: Richtext.Gif, context: Context) {
             modifier = Modifier
                 .fillMaxSize()
                 .let {
-                    if (media != null) {
+                    if (media != null && media.ratio > 0) {
                         it.aspectRatio(media.ratio)
                     } else {
                         it
