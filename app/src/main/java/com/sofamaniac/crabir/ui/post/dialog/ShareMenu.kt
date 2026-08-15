@@ -10,7 +10,6 @@ import androidx.compose.material.icons.automirrored.filled.CallSplit
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.TextFields
-import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -26,6 +25,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.CrosspostCreatorRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.ui.ThemedCard
 
 @Composable
 fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
@@ -37,7 +37,7 @@ fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {
     //val fullscreenManager = LocalFullscreenHandler.current!!
     val navController = LocalNavController.current!!
     Dialog(onDismissRequest) {
-        Card(modifier = Modifier.padding(16.dp)) {
+        ThemedCard(modifier = Modifier.padding(16.dp)) {
             ListItem(
                 leadingContent = { Icon(Icons.Default.Link, contentDescription = null) },
                 content = { Text(stringResource(R.string.share_link)) },

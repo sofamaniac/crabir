@@ -12,6 +12,7 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.repository.profile.ProfileSort
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -90,5 +91,8 @@ interface UserAPI {
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
     ): Response<Listing<Thing>>
+
+    @POST("api/block")
+    suspend fun block(username: String): Response<Unit>
 }
 

@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalRedditAccount
+import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -119,11 +120,15 @@ private fun PostOptions(
     val navController = LocalNavController.current
     val currentAccount = LocalRedditAccount.current
     var currentDialog: PostDialog? by remember { mutableStateOf(null) }
+    val theme = LocalTheme.current
     IconButton(onClick = { showOptions = true }) {
         Icon(Icons.Default.MoreVert, "more", tint = Color.Gray)
     }
     if (showOptions) {
-        ModalBottomSheet(onDismissRequest = { showOptions = false }) {
+        ModalBottomSheet(
+            containerColor = theme.cardBackground,
+            onDismissRequest = { showOptions = false },
+        ) {
             if (post.canModPost) {
                 ModerationButton(post)
             }
@@ -138,7 +143,7 @@ private fun PostOptions(
                 showOptions = false
                 navController?.navigate(
                     ProfileRoute(
-                        author = post.author.username,
+                        username = post.author.username,
                         tab = ProfileTabs.Overview
                     )
                 )

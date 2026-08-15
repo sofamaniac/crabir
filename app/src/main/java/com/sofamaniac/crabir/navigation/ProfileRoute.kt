@@ -13,7 +13,7 @@ import com.sofamaniac.crabir.ui.user.ProfileView
 import kotlinx.serialization.Serializable
 
 @Serializable
-class ProfileRoute(val author: String, val tab: ProfileTabs = ProfileTabs.Overview) : Route
+class ProfileRoute(val username: String, val tab: ProfileTabs = ProfileTabs.Overview) : Route
 
 @Serializable
 object SavedRoute : Route
@@ -31,7 +31,7 @@ fun NavGraphBuilder.profileGraph(navController: NavController) {
         ) {
             val params = it.toRoute<ProfileRoute>()
             ProfileView(
-                params.author
+                params.username
             )
         }
         composable(
@@ -69,7 +69,7 @@ fun NavGraphBuilder.profileGraph(navController: NavController) {
     composable<ProfileRoute> {
         val params = it.toRoute<ProfileRoute>()
         ProfileView(
-            params.author,
+            params.username,
             initialTab = params.tab
         )
     }

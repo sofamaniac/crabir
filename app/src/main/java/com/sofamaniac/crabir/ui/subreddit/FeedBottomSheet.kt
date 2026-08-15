@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Kind
 
@@ -29,7 +30,9 @@ fun FeedBottomSheet(
     cancel: () -> Unit,
 ) {
 
+    val theme = LocalTheme.current
     ModalBottomSheet(
+        containerColor = theme.cardBackground,
         onDismissRequest = onDismiss,
         sheetState = sheetState,
     ) {

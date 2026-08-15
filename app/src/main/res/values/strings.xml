@@ -125,4 +125,6 @@
     <string name="all_shortcut_long_label">Go to r/all</string>
     <string name="close">Close</string>
     <string name="see_more_comments">More replies</string>
+    <string name="share_comment_text">Share comment\'s text</string>
+    <string name="done">Done</string>
 </resources>

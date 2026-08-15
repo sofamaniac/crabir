@@ -40,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.LocalRedditAccount
+import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
@@ -143,7 +144,9 @@ fun ReplyBottomSheet(viewModel: ThreadViewModel) {
     val initialAccount = LocalRedditAccount.current
     var selectedAccount by remember { mutableStateOf(initialAccount) }
     val accounts by viewModel.accounts.collectAsState(emptyList())
+    val theme = LocalTheme.current
     ModalBottomSheet(
+        containerColor = theme.cardBackground,
         modifier = Modifier
             .imePadding()
             .imeNestedScroll()

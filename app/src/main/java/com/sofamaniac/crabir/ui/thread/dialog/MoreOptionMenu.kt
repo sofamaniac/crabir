@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui.thread
+package com.sofamaniac.crabir.ui.thread.dialog
 
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.reddit.Kind
 import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.ui.thread.CommentViewModelInterface
 import com.sofamaniac.crabir.ui.votable.ReportMenu
 
 @Composable
@@ -52,10 +53,18 @@ fun MoreOptionMenu(
     val theme = LocalTheme.current
     val colors = ListItemDefaults.colors().copy(containerColor = theme.cardBackground)
     var showReportMenu by remember { mutableStateOf(false) }
-    ModalBottomSheet(onDismissRequest = onDismissRequest) {
+    var showUserMenu by remember { mutableStateOf(false) }
+    var showShareMenu by remember { mutableStateOf(false) }
+    var showCopyMenu by remember { mutableStateOf(false) }
+    ModalBottomSheet(
+        containerColor = theme.cardBackground,
+        onDismissRequest = onDismissRequest
+    ) {
         ListItem(
             colors = colors,
-            modifier = Modifier.clickable {},
+            modifier = Modifier.clickable {
+                showUserMenu = true
+            },
             leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
             content = { Text("About ${comment.author.username}") },
             trailingContent = {
@@ -98,7 +107,9 @@ fun MoreOptionMenu(
 
         ListItem(
             colors = colors,
-            modifier = Modifier.clickable {},
+            modifier = Modifier.clickable {
+                showShareMenu = true
+            },
             leadingContent = { Icon(Icons.Default.Share, contentDescription = null) },
             content = { Text("Share") },
             trailingContent = {
@@ -111,7 +122,9 @@ fun MoreOptionMenu(
 
         ListItem(
             colors = colors,
-            modifier = Modifier.clickable {},
+            modifier = Modifier.clickable {
+                showCopyMenu = true
+            },
             leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
             content = { Text("Copy") },
             trailingContent = {
@@ -128,4 +141,23 @@ fun MoreOptionMenu(
             showReportMenu = false
         }
     }
+
+    if (showUserMenu) {
+        UserMenu(comment.author.username) {
+            showUserMenu = false
+        }
+    }
+
+    if (showShareMenu) {
+        ShareMenu(comment) {
+            showShareMenu = false
+        }
+    }
+
+    if (showCopyMenu) {
+        CopyDialog(comment) {
+            showCopyMenu = false
+        }
+    }
 }
+
