@@ -1,16 +1,14 @@
 package com.sofamaniac.crabir.ui.post.dialog
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -20,10 +18,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
-import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.ui.ThemedDialog
 import com.sofamaniac.crabir.ui.editor.postEditor.FlairDialog
 import com.sofamaniac.crabir.ui.editor.postEditor.FlairEditBox
 import com.sofamaniac.crabir.ui.post.LinkInteraction
@@ -38,63 +35,65 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
     val post = postOpt!!
 
     var showFlairDialog by remember { mutableStateOf(false) }
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
 
-    BasicAlertDialog(onDismissRequest) {
-        Card(modifier = Modifier.padding(16.dp)) {
-            ListItem(
-                modifier = Modifier.clickable { showFlairDialog = true },
-                content = { Text(stringResource(R.string.change_flair)) },
-                trailingContent = {
-                    Icon(Icons.Default.Edit, contentDescription = null)
-                }
-            )
-            if (post.kind == Kind.Self) {
-                ListItem(content = { Text(stringResource(R.string.edit_text)) })
+    ThemedDialog(onDismissRequest) {
+        ListItem(
+            modifier = Modifier.clickable { showFlairDialog = true },
+            content = { Text(stringResource(R.string.change_flair)) },
+            trailingContent = {
+                Icon(Icons.Default.Edit, contentDescription = null)
             }
-            ListItem(
-                content = { Text(stringResource(R.string.nsfw)) },
-                trailingContent = {
-                    Switch(
-                        checked = post.over18,
-                        onCheckedChange = {
-                            if (it) {
-                                viewModel.markNSFW()
-                            } else {
-                                viewModel.unmarkNSFW()
-                            }
+        )
+        // TODO
+        //        if (post.kind == Kind.Self) {
+        //            ListItem(content = { Text(stringResource(R.string.edit_text)) })
+        //        }
+        ListItem(
+            content = { Text(stringResource(R.string.nsfw)) },
+            trailingContent = {
+                Switch(
+                    checked = post.over18,
+                    onCheckedChange = {
+                        if (it) {
+                            viewModel.markNSFW()
+                        } else {
+                            viewModel.unmarkNSFW()
                         }
-                    )
+                    }
+                )
 
-                }
-            )
-            ListItem(
-                content = { Text(stringResource(R.string.spoiler)) },
-                trailingContent = {
-                    Switch(
-                        checked = post.spoiler,
-                        onCheckedChange = {
-                            if (it) {
-                                viewModel.markSpoiler()
-                            } else {
-                                viewModel.unmarkSpoiler()
-                            }
+            }
+        )
+        ListItem(
+            content = { Text(stringResource(R.string.spoiler)) },
+            trailingContent = {
+                Switch(
+                    checked = post.spoiler,
+                    onCheckedChange = {
+                        if (it) {
+                            viewModel.markSpoiler()
+                        } else {
+                            viewModel.unmarkSpoiler()
                         }
-                    )
+                    }
+                )
 
-                }
-            )
-            ListItem(
-                content = { Text(stringResource(R.string.inbox_replies)) },
-                trailingContent = {
-                    Switch(
-                        checked = post.sendReplies,
-                        onCheckedChange = {
-                            viewModel.setInboxReplies(it)
-                        }
-                    )
-                })
-            ListItem(content = { Text(stringResource(R.string.delete)) })
-        }
+            }
+        )
+        ListItem(
+            content = { Text(stringResource(R.string.inbox_replies)) },
+            trailingContent = {
+                Switch(
+                    checked = post.sendReplies,
+                    onCheckedChange = {
+                        viewModel.setInboxReplies(it)
+                    }
+                )
+            })
+        ListItem(
+            modifier = Modifier.clickable { showDeleteConfirmDialog = true },
+            content = { Text(stringResource(R.string.delete)) })
     }
 
     var flair by remember { mutableStateOf<FlairInfo?>(null) }
@@ -127,5 +126,27 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
             },
             onDismiss = { showFlairEditDialog = false }
         )
+    }
+    if (showDeleteConfirmDialog) {
+        ThemedDialog(
+            confirm = {
+                TextButton(onClick = {
+                    viewModel.delete()
+                    onDismissRequest()
+                }) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            cancel = {
+                TextButton(onClick = {
+                    showDeleteConfirmDialog = false
+                }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+            onDismissRequest = { showDeleteConfirmDialog = false }) {
+            Text("Are you sure you want to delete this post?")
+        }
+
     }
 }

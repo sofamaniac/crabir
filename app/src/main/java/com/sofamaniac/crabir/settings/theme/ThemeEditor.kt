@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,11 +38,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.CloseButton
 import com.sofamaniac.crabir.ui.ThemedCard
+import com.sofamaniac.crabir.ui.ThemedDialog
+import com.sofamaniac.crabir.ui.protectedTouch
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,6 +65,8 @@ fun ThemeEditor() {
     var activeColorField by remember { mutableStateOf<ColorFields?>(null) }
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
+
+    var showSavedThemesDialog by remember { mutableStateOf(false) }
 
     fun updateColor(field: ColorFields, color: Color) {
         val newTheme = theme.updateFieldValue(field, color)
@@ -124,7 +126,7 @@ fun ThemeEditor() {
                 item {
                     ListItem(
                         content = {
-                            TextButton(onClick = {}) {
+                            TextButton(onClick = { showSavedThemesDialog = true }) {
                                 Text("Saved themes")
                             }
                         },
@@ -175,11 +177,54 @@ fun ThemeEditor() {
             }
         }
     }
+    if (showSavedThemesDialog) {
+        SavedThemesDialog { showSavedThemesDialog = false }
+    }
 }
 
 @Composable
-fun ThemePreviewer(setActiveField: (ColorFields) -> Unit) {
-    val theme = rememberAppTheme()
+fun SavedThemesDialog(onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    val themeDataStore = remember(context) { context.themeDataStore }
+    val themeSettings by themeDataStore.data.collectAsState(
+        initial = ThemeSettings.DEFAULT,
+    )
+    val mode = themeSettings.currentMode()
+    val collection = when (mode) {
+        ThemeMode.Dark -> themeSettings.collections.dark
+        ThemeMode.Light -> themeSettings.collections.light
+        else -> {
+            throw Exception("Unreachable code")
+        }
+    }
+    val scope = rememberCoroutineScope()
+    ThemedDialog(onDismissRequest) {
+        for (theme in collection) {
+            ListItem(
+                content = {
+                    Row {
+                        ThemePreviewer(theme.value) { }
+                        Text(theme.key)
+                    }
+                },
+                modifier = Modifier.protectedTouch {
+                    scope.launch {
+                        themeDataStore.updateData {
+                            if (mode == ThemeMode.Dark) {
+                                themeSettings.copy(darkParentTheme = theme.key)
+                            } else {
+                                themeSettings.copy(lightParentTheme = theme.key)
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun ThemePreviewer(theme: CrabirTheme = rememberAppTheme(), setActiveField: (ColorFields) -> Unit) {
     CompositionLocalProvider(LocalTheme provides theme) {
         ThemedCard(
             modifier = Modifier.padding(16.dp),
@@ -229,28 +274,28 @@ fun ColorPickerDialogue(
     applyChanges: () -> Unit,
 ) {
     var advancedMode by remember { mutableStateOf(true) }
-    Dialog(onDismissRequest) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp), shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-        ) {
-            ColorPicker(color, onColorChange, advancedMode)
-            Row {
-                TextButton(onClick = { advancedMode = !advancedMode }) {
-                    if (advancedMode) {
-                        Text("Presets")
-                    } else {
-                        Text("Custom")
-                    }
+    ThemedDialog(
+        onDismissRequest = onDismissRequest,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        roundedCorners = true,
+    ) {
+        ColorPicker(color, onColorChange, advancedMode)
+        Row {
+            TextButton(onClick = { advancedMode = !advancedMode }) {
+                if (advancedMode) {
+                    Text("Presets")
+                } else {
+                    Text("Custom")
                 }
-                Spacer(modifier = Modifier.weight(1f))
-                TextButton(onClick = onDismissRequest) {
-                    Text("Cancel")
-                }
-                TextButton(onClick = applyChanges) {
-                    Text("Confirm")
-                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            TextButton(onClick = onDismissRequest) {
+                Text("Cancel")
+            }
+            TextButton(onClick = applyChanges) {
+                Text("Confirm")
             }
         }
     }

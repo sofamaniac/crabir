@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,9 +39,9 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.ui.ThemedDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -135,43 +134,40 @@ fun MediaPicker(viewModel: PostCreatorViewModel) {
     }
     if (editIndex != null) {
         val uri = viewModel.media[editIndex!!]
-        Dialog(
+        ThemedDialog(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(16.dp),
             onDismissRequest = { editIndex = null }
         ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .padding(16.dp)
-            ) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    val caption =
-                        rememberTextFieldState(initialText = viewModel.captions[uri] ?: "")
-                    TextField(state = caption, label = { Text("Caption") })
+            Column(modifier = Modifier.fillMaxSize()) {
+                val caption =
+                    rememberTextFieldState(initialText = viewModel.captions[uri] ?: "")
+                TextField(state = caption, label = { Text("Caption") })
 
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.align(Alignment.End)
-                    ) {
-                        TextButton(onClick = {
-                            viewModel.media = viewModel.media.toMutableList().apply {
-                                removeAt(editIndex!!)
-                            }
-                            editIndex = null
-                        }) {
-                            Text("Remove", color = MaterialTheme.colorScheme.error)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    TextButton(onClick = {
+                        viewModel.media = viewModel.media.toMutableList().apply {
+                            removeAt(editIndex!!)
                         }
-                        Spacer(modifier = Modifier.weight(1f))
-                        TextButton(onClick = { editIndex = null }) {
-                            Text("Cancel")
-                        }
-                        TextButton(onClick = {
-                            viewModel.captions[uri] = caption.text as String
-                            editIndex = null
-                        }) {
-                            Text("Save")
-                        }
+                        editIndex = null
+                    }) {
+                        Text("Remove", color = MaterialTheme.colorScheme.error)
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    TextButton(onClick = { editIndex = null }) {
+                        Text("Cancel")
+                    }
+                    TextButton(onClick = {
+                        viewModel.captions[uri] = caption.text as String
+                        editIndex = null
+                    }) {
+                        Text("Save")
                     }
                 }
             }

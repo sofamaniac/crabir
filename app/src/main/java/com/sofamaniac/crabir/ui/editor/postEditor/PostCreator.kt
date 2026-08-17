@@ -22,7 +22,6 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Link
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -59,7 +58,7 @@ import com.sofamaniac.crabir.data.remote.reddit.PostSubmissionBuilder
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import com.sofamaniac.crabir.ui.CloseButton
-import com.sofamaniac.crabir.ui.ThemedCard
+import com.sofamaniac.crabir.ui.ThemedDialog
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.editor.AccountSelector
 import com.sofamaniac.crabir.ui.editor.EditorBottomBar
@@ -299,42 +298,40 @@ fun FlairDialog(
     onClickEdit: (FlairInfo) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    BasicAlertDialog(onDismissRequest = onDismiss) {
-        ThemedCard {
-            for (flair in flairs) {
-                val text = if (flair.id == flairId && flairText != null) {
-                    flairText
-                } else {
-                    flair.text
-                }
-                ListItem(
-                    modifier = Modifier.clickable {
-                        onSelect(flair)
-                        onDismiss()
-                    },
-                    content = {
-                        Text(
-                            text,
-                            color = mapColor(flair.textColor ?: "", Color.Unspecified),
-                            modifier = Modifier.cartouche(
-                                mapColor(flair.backgroundColor)
-                            )
+    ThemedDialog(onDismissRequest = onDismiss) {
+        for (flair in flairs) {
+            val text = if (flair.id == flairId && flairText != null) {
+                flairText
+            } else {
+                flair.text
+            }
+            ListItem(
+                modifier = Modifier.clickable {
+                    onSelect(flair)
+                    onDismiss()
+                },
+                content = {
+                    Text(
+                        text,
+                        color = mapColor(flair.textColor ?: "", Color.Unspecified),
+                        modifier = Modifier.cartouche(
+                            mapColor(flair.backgroundColor)
                         )
-                    },
-                    trailingContent = {
-                        if (flair.textEditable) {
-                            IconButton(onClick = {
-                                onClickEdit(flair)
-                            }) {
-                                Icon(Icons.Default.Edit, contentDescription = null)
-                            }
+                    )
+                },
+                trailingContent = {
+                    if (flair.textEditable) {
+                        IconButton(onClick = {
+                            onClickEdit(flair)
+                        }) {
+                            Icon(Icons.Default.Edit, contentDescription = null)
                         }
                     }
-                )
-            }
-            if (flairs.isEmpty()) {
-                Text("Community has no flair")
-            }
+                }
+            )
+        }
+        if (flairs.isEmpty()) {
+            Text("Community has no flair")
         }
     }
 }
@@ -350,34 +347,34 @@ fun FlairEditBox(
     val initialText = if (initialText.isNullOrBlank()) flair.text else initialText
     val textFieldState =
         rememberTextFieldState(initialText = initialText)
-    BasicAlertDialog(onDismissRequest = onDismiss) {
-        ThemedCard {
-            ListItem(content = {
-                Text(
-                    "Edit flair text",
-                    style = MaterialTheme.typography.titleMedium
-                )
-            })
-            ListItem(
-                content = {
-                    TextField(
-                        state = textFieldState
-                    )
-                }
-            )
-            Row {
-                TextButton(onClick = onDismiss) {
-                    Text("Cancel")
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                TextButton(onClick = {
-                    onConfirm(textFieldState.text as String)
-                    onDismiss()
-                }) {
-                    Text("Confirm")
-                }
+    ThemedDialog(
+        onDismissRequest = onDismiss,
+        cancel = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
             }
-        }
+        },
+        confirm = {
+            TextButton(onClick = {
+                onConfirm(textFieldState.text as String)
+                onDismiss()
+            }) {
+                Text("Confirm")
+            }
+        }) {
+        ListItem(content = {
+            Text(
+                "Edit flair text",
+                style = MaterialTheme.typography.titleMedium
+            )
+        })
+        ListItem(
+            content = {
+                TextField(
+                    state = textFieldState
+                )
+            }
+        )
     }
 }
 

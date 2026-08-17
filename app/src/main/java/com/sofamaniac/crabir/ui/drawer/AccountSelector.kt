@@ -16,7 +16,6 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -37,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.ui.ThemedCard
+import com.sofamaniac.crabir.ui.ThemedDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -128,30 +127,33 @@ fun AccountSelector(
         }
     }
     if (showWarningDialog) {
-        BasicAlertDialog(onDismissRequest = { showWarningDialog = false }) {
-            ThemedCard {
-                ListItem(
-                    content = { Text("Warning") }
-                )
-                ListItem(
-                    content = {
-                        Text(stringResource(R.string.login_warning))
-                    },
-                    modifier = Modifier.padding(16.dp)
-                )
-                Row {
-                    TextButton(onClick = { showWarningDialog = false }) {
-                        Text(stringResource(R.string.cancel))
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    TextButton(onClick = {
-                        showWarningDialog = false
-                        val authIntent = viewModel.createAuthIntent()
-                        authLauncher.launch(authIntent)
-                    }) {
-                        Text(stringResource(R.string._continue))
-                    }
+        ThemedDialog(
+            onDismissRequest = { showWarningDialog = false },
+            cancel = {
+                TextButton(onClick = { showWarningDialog = false }) {
+                    Text(stringResource(R.string.cancel))
                 }
+            },
+            confirm = {
+                TextButton(onClick = {
+                    showWarningDialog = false
+                    val authIntent = viewModel.createAuthIntent()
+                    authLauncher.launch(authIntent)
+                }) {
+                    Text(stringResource(R.string._continue))
+                }
+            }) {
+            ListItem(
+                content = { Text("Warning") }
+            )
+            ListItem(
+                content = {
+                    Text(stringResource(R.string.login_warning))
+                },
+                modifier = Modifier.padding(16.dp)
+            )
+            Row {
+                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }

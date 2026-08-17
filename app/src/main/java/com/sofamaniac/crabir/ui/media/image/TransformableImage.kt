@@ -1,13 +1,22 @@
 package com.sofamaniac.crabir.ui.media.image
 
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import coil3.SingletonImageLoader
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil3.CoilImage
@@ -36,11 +45,6 @@ fun TransformableImage(
     }
     Log.d("TransformableImage", "aspect ratio: $placeholderAspectRatio")
 
-    //    val modifier = when (placeholderAspectRatio) {
-    //        null -> modifier
-    //        else -> modifier.aspectRatio(placeholderAspectRatio)
-    //    }
-
     CoilImage(
         modifier = modifier,
         imageLoader = {
@@ -55,8 +59,24 @@ fun TransformableImage(
             contentDescription = contentDescription,
             placeholderAspectRatio = placeholderAspectRatio
         ),
+        failure = {
+            Log.e("TransformableImage", "", it.reason)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Gray)
+            ) {
+                Icon(Icons.Default.Error, contentDescription = null)
+            }
+        },
         loading = {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .align(Alignment.Center)
+                )
+            }
         },
         component = rememberImageComponent {
             +ZoomablePlugin(

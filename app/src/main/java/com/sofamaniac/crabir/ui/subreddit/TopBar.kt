@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,7 +51,7 @@ import com.sofamaniac.crabir.settings.views.ViewSettings
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.viewSettingDataStore
 import com.sofamaniac.crabir.ui.SortMenu
-import com.sofamaniac.crabir.ui.ThemedCard
+import com.sofamaniac.crabir.ui.ThemedDialog
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -201,30 +200,28 @@ private fun SelectViewDialog(
     }
 
     val selectedView = if (useDefault) viewSettings.defaultView else selectedView
-    BasicAlertDialog(onDismiss) {
-        ThemedCard {
-            Column(Modifier.selectableGroup()) {
-                for (view in Views.entries) {
-                    ListItem(
-                        selected = view == selectedView,
-                        onClick = { selectOption(view) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .selectable(
-                                selected = view == selectedView,
-                                onClick = { selectOption(view) },
-                                role = Role.RadioButton,
-                            ),
-                        content = { Text(stringResource(view.toStringResource())) },
-                        trailingContent = {
-                            RadioButton(
-                                selected = view == selectedView,
-                                onClick = null
-                            )
-                        }
-                    )
-                }
+    ThemedDialog(onDismiss) {
+        Column(Modifier.selectableGroup()) {
+            for (view in Views.entries) {
+                ListItem(
+                    selected = view == selectedView,
+                    onClick = { selectOption(view) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .selectable(
+                            selected = view == selectedView,
+                            onClick = { selectOption(view) },
+                            role = Role.RadioButton,
+                        ),
+                    content = { Text(stringResource(view.toStringResource())) },
+                    trailingContent = {
+                        RadioButton(
+                            selected = view == selectedView,
+                            onClick = null
+                        )
+                    }
+                )
             }
         }
     }

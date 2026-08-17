@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
@@ -31,6 +30,7 @@ import com.sofamaniac.crabir.navigation.ThemeEditorRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.ThemedDialog
 import kotlinx.coroutines.launch
 
 @Composable
@@ -179,18 +179,18 @@ fun TimePickerDialog(
     onConfirm: () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    AlertDialog(
+    ThemedDialog(
         onDismissRequest = onDismiss,
-        dismissButton = {
+        cancel = {
             TextButton(onClick = { onDismiss() }) {
                 Text("Dismiss")
             }
         },
-        confirmButton = {
+        confirm = {
             TextButton(onClick = { onConfirm() }) {
                 Text("OK")
             }
         },
-        text = { content() }
+        content = { content() }
     )
 }

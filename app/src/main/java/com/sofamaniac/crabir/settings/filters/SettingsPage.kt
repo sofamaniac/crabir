@@ -11,8 +11,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled._18UpRating
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,6 +38,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
+import com.sofamaniac.crabir.ui.ThemedDialog
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -176,7 +175,7 @@ fun FiltersSettingsPage() {
 private fun FilterEditor(
     onDismissRequest: () -> Unit,
     filters: List<String>,
-    onChange: (List<String>) -> Unit
+    onChange: (List<String>) -> Unit,
 ) {
     var filters by remember { mutableStateOf(filters) }
     val colors = ListItemDefaults.colors()
@@ -184,64 +183,62 @@ private fun FilterEditor(
             containerColor = CardDefaults.cardColors().containerColor,
             selectedContainerColor = CardDefaults.cardColors().containerColor
         )
-    BasicAlertDialog(onDismissRequest) {
-        Card {
-            LazyColumn {
-                items(filters.size) { index ->
-                    ListItem(
-                        content = {
-                            TextField(
-                                //enabled = editingIndex == index,
-                                singleLine = true,
-                                value = filters[index],
-                                onValueChange = { newVal ->
-                                    filters = filters.mapIndexed { i, string ->
-                                        if (i == index) {
-                                            newVal
-                                        } else {
-                                            string
-                                        }
+    ThemedDialog(onDismissRequest) {
+        LazyColumn {
+            items(filters.size) { index ->
+                ListItem(
+                    content = {
+                        TextField(
+                            //enabled = editingIndex == index,
+                            singleLine = true,
+                            value = filters[index],
+                            onValueChange = { newVal ->
+                                filters = filters.mapIndexed { i, string ->
+                                    if (i == index) {
+                                        newVal
+                                    } else {
+                                        string
                                     }
                                 }
-                            )
-                        },
-                        colors = colors,
-                        trailingContent = {
-                            IconButton(onClick = {
-                                filters = filters.filterIndexed { i, _ -> i != index }
-                            }) {
-                                Icon(Icons.Default.Delete, contentDescription = null)
                             }
+                        )
+                    },
+                    colors = colors,
+                    trailingContent = {
+                        IconButton(onClick = {
+                            filters = filters.filterIndexed { i, _ -> i != index }
+                        }) {
+                            Icon(Icons.Default.Delete, contentDescription = null)
                         }
-                    )
-                }
-                item {
-                    ListItem(
-                        colors = colors,
-                        content = {
-                            IconButton(onClick = {
-                                filters = filters + ""
-                            }) {
-                                Icon(Icons.Default.Add, contentDescription = null)
-                            }
-                        }
-                    )
-                }
+                    }
+                )
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                TextButton(onClick = onDismissRequest) {
-                    Text(stringResource(R.string.cancel))
-                }
-                TextButton(onClick = {
-                    onChange(filters)
-                    onDismissRequest()
-                }) {
-                    Text(stringResource(R.string.save))
-                }
+            item {
+                ListItem(
+                    colors = colors,
+                    content = {
+                        IconButton(onClick = {
+                            filters = filters + ""
+                        }) {
+                            Icon(Icons.Default.Add, contentDescription = null)
+                        }
+                    }
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(R.string.cancel))
+            }
+            TextButton(onClick = {
+                onChange(filters)
+                onDismissRequest()
+            }) {
+                Text(stringResource(R.string.save))
             }
         }
     }

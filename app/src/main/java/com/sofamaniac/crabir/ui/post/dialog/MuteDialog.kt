@@ -7,8 +7,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -24,6 +22,7 @@ import androidx.core.net.toUri
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.settings.filters.filtersDataStore
+import com.sofamaniac.crabir.ui.ThemedDialog
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,66 +35,64 @@ fun MuteDialog(post: PostData, onDismissRequest: () -> Unit, onClick: () -> Unit
     val subreddit = post.subreddit.name
     val flair = post.linkFlair.text
     val domain = post.url.toUri().host
-    BasicAlertDialog(onDismissRequest = onDismissRequest) {
-        Card {
-            ListItem(
-                content = { Text(stringResource(R.string.mute_posts_from_user, username)) },
-                leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
-                modifier = Modifier.clickable {
-                    scope.launch {
-                        settingsDataStore.updateData { it.addAuthor(username) }
-                        onClick()
-                    }
+    ThemedDialog(onDismissRequest = onDismissRequest) {
+        ListItem(
+            content = { Text(stringResource(R.string.mute_posts_from_user, username)) },
+            leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
+            modifier = Modifier.clickable {
+                scope.launch {
+                    settingsDataStore.updateData { it.addAuthor(username) }
+                    onClick()
                 }
-            )
+            }
+        )
+        ListItem(
+            content = {
+                Text(
+                    stringResource(
+                        R.string.mute_posts_from_community,
+                        subreddit
+                    )
+                )
+            },
+            leadingContent = { Icon(Icons.Default.Groups, contentDescription = null) },
+            modifier = Modifier.clickable {
+                scope.launch {
+                    settingsDataStore.updateData { it.addSubreddit(subreddit) }
+                    onClick()
+                }
+            }
+        )
+        domain?.isNotBlank()?.let {
             ListItem(
                 content = {
                     Text(
                         stringResource(
-                            R.string.mute_posts_from_community,
-                            subreddit
+                            R.string.mute_posts_from_domain,
+                            domain
                         )
                     )
                 },
-                leadingContent = { Icon(Icons.Default.Groups, contentDescription = null) },
+                leadingContent = { Icon(Icons.Default.Link, contentDescription = null) },
                 modifier = Modifier.clickable {
                     scope.launch {
-                        settingsDataStore.updateData { it.addSubreddit(subreddit) }
+                        settingsDataStore.updateData { it.copy(domainFilters = it.domainFilters + domain) }
                         onClick()
                     }
                 }
             )
-            domain?.isNotBlank()?.let {
-                ListItem(
-                    content = {
-                        Text(
-                            stringResource(
-                                R.string.mute_posts_from_domain,
-                                domain
-                            )
-                        )
-                    },
-                    leadingContent = { Icon(Icons.Default.Link, contentDescription = null) },
-                    modifier = Modifier.clickable {
-                        scope.launch {
-                            settingsDataStore.updateData { it.copy(domainFilters = it.domainFilters + domain) }
-                            onClick()
-                        }
+        }
+        if (flair.isNotBlank()) {
+            ListItem(
+                content = { Text(stringResource(R.string.mute_flair)) },
+                leadingContent = { Spacer(modifier = Modifier.size(16.dp)) },
+                modifier = Modifier.clickable {
+                    scope.launch {
+                        settingsDataStore.updateData { it.copy(flairFilters = it.flairFilters + flair) }
+                        onClick()
                     }
-                )
-            }
-            if (flair.isNotBlank()) {
-                ListItem(
-                    content = { Text(stringResource(R.string.mute_flair)) },
-                    leadingContent = { Spacer(modifier = Modifier.size(16.dp)) },
-                    modifier = Modifier.clickable {
-                        scope.launch {
-                            settingsDataStore.updateData { it.copy(flairFilters = it.flairFilters + flair) }
-                            onClick()
-                        }
-                    }
-                )
-            }
+                }
+            )
         }
     }
 }
