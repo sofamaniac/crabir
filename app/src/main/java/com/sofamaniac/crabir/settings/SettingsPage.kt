@@ -8,11 +8,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Article
+import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ViewComfy
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,6 +43,7 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.navigation.ThemeRoute
 import com.sofamaniac.crabir.navigation.ViewsSettingRoute
+import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
 import com.sofamaniac.crabir.settings.data.DataSettingsRoute
 import com.sofamaniac.crabir.settings.post.PostSettingsRoute
 import com.sofamaniac.crabir.ui.BackButton
@@ -74,6 +79,7 @@ fun SettingsPage() {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             ListItem(
+                leadingContent = { Icon(Icons.Default.Settings, contentDescription = null) },
                 content = { Text("General") },
                 modifier = Modifier.clickable {
                     navController?.navigate(GeneralSettingsRoute)
@@ -145,6 +151,12 @@ fun GeneralSettingsPage() {
         LazyColumn(modifier = Modifier.padding(padding)) {
             item {
                 ListItem(
+                    leadingContent = {
+                        Icon(
+                            Icons.AutoMirrored.Filled.Article,
+                            contentDescription = null
+                        )
+                    },
                     content = { Text("Posts") },
                     modifier = Modifier.clickable {
                         navController?.navigate(PostSettingsRoute)
@@ -153,13 +165,21 @@ fun GeneralSettingsPage() {
             }
             item {
                 ListItem(
+                    leadingContent = {
+                        Icon(
+                            Icons.AutoMirrored.Filled.Comment,
+                            contentDescription = null
+                        )
+                    },
                     content = { Text("Comments") },
                     modifier = Modifier.clickable {
+                        navController?.navigate(CommentsSettingsRoute)
                     }
                 )
             }
             item {
                 ListItem(
+                    leadingContent = { Icon(Icons.Default.ViewComfy, contentDescription = null) },
                     content = { Text("Views") },
                     modifier = Modifier.clickable {
                         navController?.navigate(ViewsSettingRoute)

@@ -16,6 +16,7 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
+import com.sofamaniac.crabir.settings.comments.CommentsSettings
 import com.sofamaniac.crabir.settings.post.PostSettingsRepository
 import com.sofamaniac.crabir.ui.post.PostViewModelInterface
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +42,7 @@ class ThreadViewModel(
     @InjectedParam val permalink: String,
     @InjectedParam val comment: String?,
     @InjectedParam val context: Int?,
-    @InjectedParam val initialSort: Sort?,
+    @InjectedParam val commentsSettings: CommentsSettings,
 ) : ViewModel(), CommentViewModelInterface, PostViewModelInterface {
 
     var name: Fullname = repository.getPostId(permalink)
@@ -131,11 +132,18 @@ class ThreadViewModel(
         }
     }
 
+    override fun closeComment(name: Fullname) {
+        if (_openComment.value == name) {
+            _openComment.value = null
+        }
+    }
+
     private val _sort = MutableStateFlow<Sort?>(null)
     val sort: StateFlow<Sort?> = _sort.asStateFlow()
 
     init {
-        _sort.value = initialSort
+        _sort.value =
+            if (commentsSettings.useRecommendedSort) null else commentsSettings.preferredSort
         fetchComments()
     }
 
@@ -180,6 +188,15 @@ class ThreadViewModel(
     fun fetchComments() {
         viewModelScope.launch(Dispatchers.IO) {
             fetchAsync()
+            if (commentsSettings.collapseAutoMod) {
+                for (comment in comments.value.filter { it is CommentType.Comment && it.comment.author.username == "AutoModerator" }) {
+                    val comment = comment as CommentType.Comment
+                    repository.updateComment(
+                        name,
+                        CommentType.Comment(comment = comment.comment.copy(collapsed = true))
+                    )
+                }
+            }
             commentsLoaded.update { true }
         }
     }

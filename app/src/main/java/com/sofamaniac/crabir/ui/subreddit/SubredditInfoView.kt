@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
@@ -37,6 +36,7 @@ import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SearchRoute
+import com.sofamaniac.crabir.ui.BackButton
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -188,8 +188,8 @@ internal fun TopBar(subreddit: String) {
     val navController = LocalNavController.current
     TopAppBar(
         navigationIcon = {
-            IconButton(onClick = { navController?.popBackStack() }) {
-                Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
+            BackButton {
+                navController?.popBackStack()
             }
         },
         title = {},

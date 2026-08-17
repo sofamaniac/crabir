@@ -68,7 +68,6 @@ interface ThreadRepository {
      * @param comment The data of the comment
      */
     fun insertReply(parent: Fullname, comment: CommentType)
-
 }
 
 class Forest private constructor(

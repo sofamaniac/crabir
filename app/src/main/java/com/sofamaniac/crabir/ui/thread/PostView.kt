@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
@@ -47,6 +48,7 @@ internal fun PostView(
         NetworkPolicy.OnWifi -> connectionState
         else -> false
     }
+    val imageHeight = LocalCommentsSettings.current.postMediaPreview
     PostCard(
         post,
         threadViewModel = threadViewModel
@@ -57,6 +59,7 @@ internal fun PostView(
                 canPlayVideo = canPlayVideo,
                 maxLines = null,
                 enableLinkFullSizePreview = false,
+                imageHeight = imageHeight,
                 forceShowSelftext = true,
                 markAsRead = {},
             )

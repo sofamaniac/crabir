@@ -2,10 +2,12 @@ package com.sofamaniac.crabir.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.LocalFiltersSettings
 import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalViewSettings
+import com.sofamaniac.crabir.settings.comments.rememberCommentsSettings
 import com.sofamaniac.crabir.settings.data.rememberDataSettings
 import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
 import com.sofamaniac.crabir.settings.post.rememberPostsSettings
@@ -17,12 +19,14 @@ fun ConfigureSettings(content: @Composable () -> Unit) {
     val filtersSettings = rememberFiltersSettings() ?: return
     val viewSettings = rememberViewSettings() ?: return
     val dataSettings = rememberDataSettings() ?: return
+    val commentsSettings = rememberCommentsSettings() ?: return
 
     CompositionLocalProvider(
         LocalPostSettings provides postSettings,
         LocalFiltersSettings provides filtersSettings,
         LocalViewSettings provides viewSettings,
         LocalDataSettings provides dataSettings,
+        LocalCommentsSettings provides commentsSettings,
     ) {
         content()
     }

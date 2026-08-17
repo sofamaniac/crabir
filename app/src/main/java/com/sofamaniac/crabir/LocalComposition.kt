@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.settings.comments.CommentsSettingsDefault
 import com.sofamaniac.crabir.settings.data.DataSettingsDefault
 import com.sofamaniac.crabir.settings.filters.FiltersSettings
 import com.sofamaniac.crabir.settings.post.PostSettingsDefaults
@@ -21,6 +22,7 @@ val LocalViewSettings = compositionLocalOf { ViewSettings() }
 val LocalFiltersSettings = compositionLocalOf { FiltersSettings() }
 val LocalPostSettings = compositionLocalOf { PostSettingsDefaults.defaultPostSettings }
 val LocalDataSettings = compositionLocalOf { DataSettingsDefault.defaultDataSettings }
+val LocalCommentsSettings = compositionLocalOf { CommentsSettingsDefault.default }
 
 /**Setup local providers for previews*/
 @Composable

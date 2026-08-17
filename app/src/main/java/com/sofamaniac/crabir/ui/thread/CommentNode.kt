@@ -35,6 +35,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.BuildConfig
+import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -66,6 +67,8 @@ interface CommentViewModelInterface : VotableInteraction {
     fun submitComment(parent: Fullname, body: String, account: RedditAccount?)
 
     fun collapseComment(name: Fullname, collapsed: Boolean)
+
+    fun closeComment(name: Fullname)
 
 }
 
@@ -169,6 +172,7 @@ fun ColumnScope.OpenedComment(
     val showBottomBar by remember(comment.name, context) {
         viewModel.openComment.map { it == comment.name || !enableAnimation }
     }.collectAsState(initial = !enableAnimation)
+    val commentsSettings = LocalCommentsSettings.current
 
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
@@ -178,7 +182,11 @@ fun ColumnScope.OpenedComment(
     Richtext(comment.richtext, modifier = innerModifier, mediaMetadata = comment.mediaMetadata)
     Spacer(modifier = Modifier.height(8.dp))
     AnimatedVisibility(showBottomBar) {
-        BottomRow(comment, viewModel)
+        BottomRow(comment, viewModel) {
+            if (commentsSettings.hideButtonsAfterVote) {
+                viewModel.closeComment(comment.name)
+            }
+        }
     }
 }
 
@@ -187,6 +195,7 @@ fun BottomRow(
     comment: CommentData,
     viewModel: CommentViewModelInterface,
     modifier: Modifier = Modifier,
+    onAction: () -> Unit,
 ) {
     val likes = comment.relationship.liked
     val saved = comment.relationship.saved
@@ -196,9 +205,18 @@ fun BottomRow(
             .background(color = Color.Gray.copy(alpha = 0.2f)),
         horizontalArrangement = Arrangement.End
     ) {
-        UpButton(likes, onClick = { viewModel.upvote(comment.name) })
-        DownButton(likes, onClick = { viewModel.downvote(comment.name) })
-        SavedButton(saved, onClick = { viewModel.save(comment.name, !saved, false) })
+        UpButton(likes, onClick = {
+            viewModel.upvote(comment.name)
+            onAction()
+        })
+        DownButton(likes, onClick = {
+            viewModel.downvote(comment.name)
+            onAction()
+        })
+        SavedButton(saved, onClick = {
+            viewModel.save(comment.name, !saved, false)
+            onAction()
+        })
         ReplyButton(comment.name, viewModel)
         MoreOptionButton(comment, viewModel)
         if (BuildConfig.DEBUG) {

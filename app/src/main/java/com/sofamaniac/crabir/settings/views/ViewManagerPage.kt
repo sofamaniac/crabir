@@ -200,7 +200,8 @@ internal fun <T> ListSelector(
             Menu(
                 options,
                 selectedOption,
-                onOptionSelected,
+                enabled = true,
+                onOptionSelected = onOptionSelected,
                 label = label,
                 optionLabel = {
                     if (it == null) {

@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.CommentType
@@ -46,6 +47,7 @@ fun CommentListRoot(
     val theme = LocalTheme.current
     val navController = LocalNavController.current!!
     val refreshBoxState = rememberPullToRefreshState()
+    val commentsSettings = LocalCommentsSettings.current
 
     PullToRefreshBox(
         state = refreshBoxState,
@@ -147,7 +149,7 @@ fun CommentListRoot(
                         commentNode(
                             comment.comment,
                             viewModel,
-                            enableAnimation = true,
+                            enableAnimation = !commentsSettings.buttonsAlwaysVisible,
                         )
                     }
 

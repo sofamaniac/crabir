@@ -127,4 +127,11 @@
     <string name="see_more_comments">More replies</string>
     <string name="share_comment_text">Share comment\'s text</string>
     <string name="done">Done</string>
+    <string name="comments_settings_page_title">Comments settings</string>
+    <string name="use_recommended_sort">Use recommended sort</string>
+    <string name="preferred_sort">Preferred sort</string>
+    <string name="media_preview">Media preview</string>
+    <string name="buttons_always_visible">Buttons always visible</string>
+    <string name="hide_buttons_after_vote">Hide buttons after vote</string>
+    <string name="collapse_automod">Collapse automod</string>
 </resources>

@@ -39,6 +39,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.toRoute
+import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
@@ -71,9 +72,9 @@ fun ThreadView(
         ?: LocalNavController.current?.currentBackStackEntry?.toRoute<PostRoute>()?.postPermalink
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val commentsSettings = LocalCommentsSettings.current
     val viewModel: ThreadViewModel = koinViewModel(key = permalink) {
-        // TODO user setting initial sort
-        parametersOf(link!!, comment, context, null)
+        parametersOf(link!!, comment, context, commentsSettings)
     }
     val showReplySheet by viewModel.reply.collectAsState()
 

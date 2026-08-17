@@ -67,6 +67,9 @@ class CommentViewModel(
     override fun collapseComment(name: Fullname, collapsed: Boolean) {
     }
 
+    override fun closeComment(name: Fullname) {
+    }
+
     override fun submitComment(
         parent: Fullname,
         body: String,

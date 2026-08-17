@@ -46,9 +46,11 @@ fun <T> ListSelector(
         Spacer(modifier = Modifier.size(24.dp))
     },
     headlineContent: @Composable () -> Unit = {},
+    enabled: Boolean = true,
     optionLabel: @Composable (T) -> String = { it.toString() },
 ) {
     ListItem(
+        enabled = enabled,
         modifier = modifier,
         leadingContent = leadingContent,
         shapes = ListItemDefaults.shapes(shape = ShapeDefaults.Medium.copy(all = ZeroCornerSize)),
@@ -57,7 +59,7 @@ fun <T> ListSelector(
             Menu(
                 options,
                 selectedOption,
-                onOptionSelected,
+                onOptionSelected = onOptionSelected,
                 label = headlineContent,
                 optionLabel = optionLabel
             )
@@ -70,6 +72,7 @@ fun <T> ListSelector(
 internal fun <T> Menu(
     options: List<T>,
     selected: T,
+    enabled: Boolean = true,
     onOptionSelected: (T) -> Unit,
     label: @Composable () -> Unit = {},
     optionLabel: @Composable (T) -> String = { it.toString() },
@@ -81,19 +84,20 @@ internal fun <T> Menu(
         textFieldState.setTextAndPlaceCursorAtEnd(text)
     }
 
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
+    ExposedDropdownMenuBox(expanded = expanded && enabled, onExpandedChange = { expanded = it }) {
         TextField(
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
             state = textFieldState,
+            enabled = enabled,
             readOnly = true,
             lineLimits = TextFieldLineLimits.SingleLine,
             label = { label() },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded && enabled) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
         )
         ExposedDropdownMenu(
-            expanded = expanded,
+            expanded = expanded && enabled,
             onDismissRequest = { expanded = false },
             containerColor = MenuDefaults.groupStandardContainerColor,
             shape = MenuDefaults.standaloneGroupShape,
