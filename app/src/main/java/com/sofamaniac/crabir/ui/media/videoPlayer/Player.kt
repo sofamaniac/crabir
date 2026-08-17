@@ -208,6 +208,7 @@ fun VideoPlayer(
             .clipToBounds()
     ) {
 
+        placeholder()
         if (isActive) {
             ContentFrame(
                 player = player,
@@ -216,8 +217,6 @@ fun VideoPlayer(
                     .align(Alignment.Center),
                 shutter = { placeholder() }
             )
-        } else {
-            placeholder()
         }
     }
 }

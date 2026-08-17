@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.media3.common.util.UnstableApi
+import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.domain.model.MediaResource
@@ -39,7 +40,6 @@ import com.sofamaniac.crabir.settings.theme.VIDEO_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.YOUTUBE_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.media.image.ImageView
-import com.sofamaniac.crabir.ui.media.image.TransformableImage
 import com.sofamaniac.crabir.ui.media.videoPlayer.DecoratedVideoPlayer
 
 @OptIn(UnstableApi::class)
@@ -56,17 +56,16 @@ fun PostVideo(
         @Composable {
             val image = post.getObfuscated()
             if (image != null && blur) {
-                TransformableImage(
-                    image.url,
+                AsyncImage(
+                    model = image.url,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.FillBounds,
-                    allowZoom = false,
                 )
             } else {
                 ImageView(
                     post = post,
-                    blur = true,
+                    blur = blur,
                     modifier = Modifier.fillMaxSize(),
                     allowTransformation = false,
                     contentScale = ContentScale.FillBounds,
