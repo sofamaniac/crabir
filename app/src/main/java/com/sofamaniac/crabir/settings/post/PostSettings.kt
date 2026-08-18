@@ -82,7 +82,7 @@ object PostSettingsDefaults {
     )
 
     val defaultPostSettings = PostSettings(
-        awardSettings = defaultAwardSettings,
+        //awardSettings = defaultAwardSettings,
         flairSettings = defaultFlairSettings,
         infoSettings = defaultInfoSettings,
         buttonsSettings = defaultButtonsSettings,

@@ -214,4 +214,7 @@
     <string name="posts_settings_name">Posts</string>
     <string name="comments_settings_title">Comments</string>
     <string name="views_settings_title">Views</string>
+    <string name="navigation_header">Navigation</string>
+    <string name="show_navigation_bar">Show navigation bar</string>
+    <string name="use_volume_keys_to_navigate">Use volume keys to navigate</string>
 </resources>

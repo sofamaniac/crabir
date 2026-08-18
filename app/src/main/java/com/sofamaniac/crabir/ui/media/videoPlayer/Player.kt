@@ -220,3 +220,60 @@ fun VideoPlayer(
         }
     }
 }
+
+@OptIn(UnstableApi::class)
+@Composable
+fun VideoPlayer(
+    url: String,
+    key: String,
+    modifier: Modifier = Modifier,
+    placeholder: @Composable () -> Unit = {},
+    startPlaying: Boolean = false,
+    mute: Boolean = true,
+) {
+    val player = remember { VideoPlayerManager.getInstance() }
+    val currentKey by VideoPlayerManager.currentKey.collectAsState()
+    val isActive = currentKey == key
+
+    val dataSettings = LocalDataSettings.current
+    val context = LocalContext.current
+    val currentQuality = if (context.onWifiConnection) {
+        dataSettings.videoQuality.onWifi
+    } else {
+        dataSettings.videoQuality.onMobile
+    }
+
+    LaunchedEffect(startPlaying) {
+        if (startPlaying) {
+            Log.d(
+                "VideoPlayer",
+                "key: $key, startPlaying: $startPlaying, startMuted: $mute"
+            )
+            VideoPlayerManager.setMediaItem(
+                url,
+                key,
+                playWhenReady = true,
+                volume = if (mute) 0f else 1f,
+                quality = currentQuality
+            )
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .clipToBounds()
+    ) {
+
+        placeholder()
+        if (isActive) {
+            ContentFrame(
+                player = player,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center),
+                shutter = { placeholder() }
+            )
+        }
+    }
+}

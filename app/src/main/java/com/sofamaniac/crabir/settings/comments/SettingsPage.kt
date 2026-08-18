@@ -143,6 +143,36 @@ fun CommentsSettingsPage() {
                     checked = commentsSettings.collapseAutoMod
                 )
             }
+
+            item {
+                SettingHeader(stringResource(R.string.navigation_header))
+            }
+            item {
+                SwitchTile(
+                    headlineContent = { Text(stringResource(R.string.show_navigation_bar)) },
+                    onCheckedChange = { target ->
+                        scope.launch {
+                            settingsDataStore.updateData {
+                                it.copy(showNavigationBar = target)
+                            }
+                        }
+                    },
+                    checked = commentsSettings.showNavigationBar
+                )
+            }
+            item {
+                SwitchTile(
+                    headlineContent = { Text(stringResource(R.string.use_volume_keys_to_navigate)) },
+                    onCheckedChange = { target ->
+                        scope.launch {
+                            settingsDataStore.updateData {
+                                it.copy(useVolumeKeyNavigation = target)
+                            }
+                        }
+                    },
+                    checked = commentsSettings.useVolumeKeyNavigation
+                )
+            }
         }
     }
 }

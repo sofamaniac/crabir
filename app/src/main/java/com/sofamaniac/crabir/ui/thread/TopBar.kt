@@ -23,6 +23,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
 import com.sofamaniac.crabir.ui.BackButton
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +37,7 @@ fun TopBar(
     val sort: Sort? by viewModel.sort.collectAsState()
     val theme = LocalTheme.current
     var showMenu by remember { mutableStateOf(false) }
+    val navController = LocalNavController.current
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = theme.toolbarBackground,
@@ -62,7 +65,12 @@ fun TopBar(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false }
                 ) {
-                    DropdownMenuItem(text = { Text("refresh") }, onClick = { viewModel.refresh() })
+                    DropdownMenuItem(text = { Text("Refresh") }, onClick = { viewModel.refresh() })
+                    DropdownMenuItem(text = { Text("Settings") }, onClick = {
+                        navController?.navigate(
+                            CommentsSettingsRoute
+                        )
+                    })
                 }
             }
         }
