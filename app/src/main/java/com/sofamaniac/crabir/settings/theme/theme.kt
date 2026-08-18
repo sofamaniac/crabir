@@ -208,10 +208,10 @@ enum class ThemeMode {
 @Serializable
 data class ThemeCollections(
     val light: Map<String, CrabirTheme> = buildMap {
-        put("default", DefaultLightTheme)
+        put("default light", DefaultLightTheme)
     },
     val dark: Map<String, CrabirTheme> = buildMap {
-        put("default", DefaultDarkTheme)
+        put("default dark", DefaultDarkTheme)
     },
 )
 

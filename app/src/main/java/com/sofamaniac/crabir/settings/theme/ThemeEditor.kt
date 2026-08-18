@@ -3,7 +3,6 @@ package com.sofamaniac.crabir.settings.theme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -56,10 +56,7 @@ fun ThemeEditor() {
     val themeSettings by themeDataStore.data.collectAsState(
         initial = ThemeSettings.DEFAULT,
     )
-    val mode = when (themeSettings.mode) {
-        ThemeMode.System, ThemeMode.Scheduled -> if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
-        else -> themeSettings.mode
-    }
+    val mode = themeSettings.currentMode()
 
     val theme =
         if (mode == ThemeMode.Dark) themeSettings.dark else themeSettings.light
@@ -106,7 +103,7 @@ fun ThemeEditor() {
             )
         }
         Column(modifier = Modifier.padding(paddingValues)) {
-            ThemePreviewer { activeColorField = it }
+            ThemePreviewer(modifier = Modifier.padding(8.dp)) { activeColorField = it }
             LazyColumn {
                 item {
                     ListItem(content = {
@@ -192,21 +189,16 @@ fun SavedThemesDialog(onDismissRequest: () -> Unit) {
         initial = ThemeSettings.DEFAULT,
     )
     val mode = themeSettings.currentMode()
-    val collection = when (mode) {
-        ThemeMode.Dark -> themeSettings.collections.dark
-        ThemeMode.Light -> themeSettings.collections.light
-        else -> {
-            throw Exception("Unreachable code")
-        }
-    }
+    val collection = themeSettings.collections.dark + themeSettings.collections.light
     val scope = rememberCoroutineScope()
     ThemedDialog(onDismissRequest) {
         for (theme in collection) {
             ListItem(
                 content = {
-                    Row {
-                        ThemePreviewer(theme.value) { }
+                    Column {
                         Text(theme.key)
+                        ThemePreviewer(theme = theme.value) { }
+                        HorizontalDivider()
                     }
                 },
                 modifier = Modifier.protectedTouch {
@@ -226,11 +218,13 @@ fun SavedThemesDialog(onDismissRequest: () -> Unit) {
 }
 
 @Composable
-fun ThemePreviewer(theme: CrabirTheme = rememberAppTheme(), setActiveField: (ColorFields) -> Unit) {
+fun ThemePreviewer(
+    modifier: Modifier = Modifier,
+    theme: CrabirTheme = rememberAppTheme(),
+    setActiveField: (ColorFields) -> Unit,
+) {
     CompositionLocalProvider(LocalTheme provides theme) {
-        ThemedCard(
-            modifier = Modifier.padding(16.dp),
-        ) {
+        ThemedCard(modifier = modifier) {
             Column(modifier = Modifier.padding(8.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(stringResource(R.string.theme_post_title), modifier = Modifier.clickable {
