@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,16 +22,18 @@ fun ThemedDialog(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Dialog(onDismissRequest) {
-        ThemedCard(modifier = modifier.padding(8.dp), roundedCorners) {
-            title?.invoke()
-            if (title != null) Spacer(modifier = Modifier.height(8.dp))
-            content()
-            if (cancel != null || confirm != null) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Row() {
-                    cancel?.invoke()
-                    Spacer(modifier = Modifier.weight(1f))
-                    confirm?.invoke()
+        ThemedCard(modifier = modifier, roundedCorners) {
+            Column(modifier = Modifier.padding(8.dp)) {
+                title?.invoke()
+                if (title != null) Spacer(modifier = Modifier.height(8.dp))
+                content()
+                if (cancel != null || confirm != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row() {
+                        cancel?.invoke()
+                        Spacer(modifier = Modifier.weight(1f))
+                        confirm?.invoke()
+                    }
                 }
             }
         }

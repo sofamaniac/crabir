@@ -51,7 +51,7 @@ data class LinksSettings(
 
 @Serializable
 data class PostSettings(
-    val awardSettings: AwardSettings,
+    //val awardSettings: AwardSettings,
     val flairSettings: FlairSettings,
     val infoSettings: InfoSettings,
     val buttonsSettings: ButtonsSettings,

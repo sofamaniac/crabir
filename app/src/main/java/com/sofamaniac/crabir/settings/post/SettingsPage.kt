@@ -36,9 +36,9 @@ fun PostSettingsPage() {
         }
     }
 
-    fun updateAwardsSettings(transform: (AwardSettings) -> AwardSettings) {
-        update { it.copy(awardSettings = transform(it.awardSettings)) }
-    }
+    //    fun updateAwardsSettings(transform: (AwardSettings) -> AwardSettings) {
+    //        update { it.copy(awardSettings = transform(it.awardSettings)) }
+    //    }
 
     fun updateFlairSettings(transform: (FlairSettings) -> FlairSettings) {
         update { it.copy(flairSettings = transform(it.flairSettings)) }
@@ -58,7 +58,7 @@ fun PostSettingsPage() {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Post Settings") }, navigationIcon = {
+            TopAppBar(title = { Text(stringResource(R.string.post_settings)) }, navigationIcon = {
                 BackButton { navController?.popBackStack() }
             })
         }
@@ -73,49 +73,49 @@ fun PostSettingsPage() {
     }
 }
 
-fun LazyListScope.awardsSettings(
-    postSettings: PostSettings,
-    updateAwardsSettings: (transform: (AwardSettings) -> AwardSettings) -> Unit,
-) {
-    item {
-        SettingHeader(stringResource(R.string.awards_settings_header))
-    }
-    item {
-        SwitchTile(
-            headlineContent = { Text("Show awards") },
-            checked = postSettings.awardSettings.showAwards,
-            onCheckedChange = { target ->
-                updateAwardsSettings { it.copy(showAwards = target) }
-            }
-        )
-    }
-    item {
-        val enabled = postSettings.awardSettings.showAwards
-        SwitchTile(
-            headlineContent = {
-                Text(
-                    "Clickable awards",
-                )
-            },
-            enabled = enabled,
-            checked = postSettings.awardSettings.clickableAwards,
-            onCheckedChange = { target ->
-                updateAwardsSettings { it.copy(clickableAwards = target) }
-            }
-        )
-    }
-}
+//fun LazyListScope.awardsSettings(
+//    postSettings: PostSettings,
+//    updateAwardsSettings: (transform: (AwardSettings) -> AwardSettings) -> Unit,
+//) {
+//    item {
+//        SettingHeader(stringResource(R.string.awards_settings_header))
+//    }
+//    item {
+//        SwitchTile(
+//            headlineContent = { Text("Show awards") },
+//            checked = postSettings.awardSettings.showAwards,
+//            onCheckedChange = { target ->
+//                updateAwardsSettings { it.copy(showAwards = target) }
+//            }
+//        )
+//    }
+//    item {
+//        val enabled = postSettings.awardSettings.showAwards
+//        SwitchTile(
+//            headlineContent = {
+//                Text(
+//                    "Clickable awards",
+//                )
+//            },
+//            enabled = enabled,
+//            checked = postSettings.awardSettings.clickableAwards,
+//            onCheckedChange = { target ->
+//                updateAwardsSettings { it.copy(clickableAwards = target) }
+//            }
+//        )
+//    }
+//}
 
 fun LazyListScope.linksSettings(
     linksSettings: LinksSettings,
     updateLinksSettings: (transform: (LinksSettings) -> LinksSettings) -> Unit,
 ) {
     item {
-        SettingHeader("Links settings")
+        SettingHeader(stringResource(R.string.links_settings))
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Upvote on save") },
+            headlineContent = { Text(stringResource(R.string.upvote_on_save)) },
             checked = linksSettings.upvoteOnSave,
             onCheckedChange = { target ->
                 updateLinksSettings { it.copy(upvoteOnSave = target) }
@@ -124,7 +124,7 @@ fun LazyListScope.linksSettings(
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Start videos muted") },
+            headlineContent = { Text(stringResource(R.string.start_videos_muted)) },
             checked = linksSettings.startMuted,
             onCheckedChange = { target ->
                 updateLinksSettings { it.copy(startMuted = target) }
@@ -138,11 +138,11 @@ fun LazyListScope.infoSettings(
     updateInfoSettings: (transform: (InfoSettings) -> InfoSettings) -> Unit,
 ) {
     item {
-        SettingHeader("Info settings")
+        SettingHeader(stringResource(R.string.post_info_settings))
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Show author") },
+            headlineContent = { Text(stringResource(R.string.post_info_show_author)) },
             checked = infoSettings.showAuthor,
             onCheckedChange = { target ->
                 updateInfoSettings { it.copy(showAuthor = target) }
@@ -151,7 +151,7 @@ fun LazyListScope.infoSettings(
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Tap on author to go to profile") },
+            headlineContent = { Text(stringResource(R.string.post_info_tap_author)) },
             enabled = infoSettings.showAuthor,
             checked = infoSettings.clickableAuthor,
             onCheckedChange = { target ->
@@ -161,7 +161,7 @@ fun LazyListScope.infoSettings(
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Show community") },
+            headlineContent = { Text(stringResource(R.string.post_info_show_community)) },
             checked = infoSettings.clickableCommunity,
             onCheckedChange = { target ->
                 updateInfoSettings { it.copy(clickableCommunity = target) }
@@ -175,11 +175,11 @@ fun LazyListScope.flairSettings(
     updateFlairSettings: (transform: (FlairSettings) -> FlairSettings) -> Unit,
 ) {
     item {
-        SettingHeader("Flair settings")
+        SettingHeader(stringResource(R.string.flair_settings))
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Show flair") },
+            headlineContent = { Text(stringResource(R.string.show_flair)) },
             checked = flairSettings.showFlair,
             onCheckedChange = { target ->
                 updateFlairSettings { it.copy(showFlair = target) }
@@ -188,7 +188,7 @@ fun LazyListScope.flairSettings(
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Show flair color") },
+            headlineContent = { Text(stringResource(R.string.show_flair_color)) },
             enabled = flairSettings.showFlair,
             checked = flairSettings.showFlairColor,
             onCheckedChange = { target ->
@@ -198,7 +198,7 @@ fun LazyListScope.flairSettings(
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Show flair emoji") },
+            headlineContent = { Text(stringResource(R.string.show_flair_emoji)) },
             enabled = flairSettings.showFlair,
             checked = flairSettings.showFlairEmoji,
             onCheckedChange = { target ->
@@ -208,7 +208,7 @@ fun LazyListScope.flairSettings(
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Click on flair to search") },
+            headlineContent = { Text(stringResource(R.string.click_on_flair_to_search)) },
             enabled = flairSettings.showFlair,
             checked = flairSettings.clickable,
             onCheckedChange = { target ->
@@ -223,11 +223,11 @@ fun LazyListScope.buttonsSettings(
     updateButtonsSettings: (transform: (ButtonsSettings) -> ButtonsSettings) -> Unit,
 ) {
     item {
-        SettingHeader("Buttons settings")
+        SettingHeader(stringResource(R.string.buttons_settings))
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Show comments") },
+            headlineContent = { Text(stringResource(R.string.show_comments_button)) },
             checked = buttonsSettings.comments,
             onCheckedChange = { target ->
                 updateButtonsSettings { it.copy(comments = target) }
@@ -236,7 +236,7 @@ fun LazyListScope.buttonsSettings(
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Hide post") },
+            headlineContent = { Text(stringResource(R.string.show_hide_post_button)) },
             checked = buttonsSettings.hide,
             onCheckedChange = { target ->
                 updateButtonsSettings { it.copy(hide = target) }
@@ -245,7 +245,7 @@ fun LazyListScope.buttonsSettings(
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Share post") },
+            headlineContent = { Text(stringResource(R.string.show_share_post_button)) },
             checked = buttonsSettings.share,
             onCheckedChange = { target ->
                 updateButtonsSettings { it.copy(share = target) }
@@ -254,7 +254,7 @@ fun LazyListScope.buttonsSettings(
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Open in app") },
+            headlineContent = { Text(stringResource(R.string.show_open_in_app_button)) },
             checked = buttonsSettings.openInApp,
             onCheckedChange = { target ->
                 updateButtonsSettings { it.copy(openInApp = target) }
@@ -263,7 +263,7 @@ fun LazyListScope.buttonsSettings(
     }
     item {
         SwitchTile(
-            headlineContent = { Text("Mark as read") },
+            headlineContent = { Text(stringResource(R.string.show_mark_read_button)) },
             checked = buttonsSettings.markAsRead,
             onCheckedChange = { target ->
                 updateButtonsSettings { it.copy(markAsRead = target) }

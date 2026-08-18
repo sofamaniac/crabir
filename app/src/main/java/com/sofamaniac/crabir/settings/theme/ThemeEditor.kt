@@ -37,8 +37,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.CloseButton
 import com.sofamaniac.crabir.ui.ThemedCard
@@ -83,7 +85,7 @@ fun ThemeEditor() {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Theme editor") }, navigationIcon = {
+            TopAppBar(title = { Text(stringResource(R.string.theme_editor)) }, navigationIcon = {
                 CloseButton { navController?.popBackStack() }
             })
         },
@@ -119,7 +121,7 @@ fun ThemeEditor() {
                                 }
                             }
                         }) {
-                            Text("Reset to default")
+                            Text(stringResource(R.string.reset_theme))
                         }
                     })
                 }
@@ -127,13 +129,13 @@ fun ThemeEditor() {
                     ListItem(
                         content = {
                             TextButton(onClick = { showSavedThemesDialog = true }) {
-                                Text("Saved themes")
+                                Text(stringResource(R.string.saved_themes))
                             }
                         },
                         trailingContent = {
                             val totalThemes =
                                 themeSettings.collections.dark.size + themeSettings.collections.light.size
-                            Text("$totalThemes themes")
+                            Text(stringResource(R.string.total_themes, totalThemes))
                         })
                 }
                 items(ColorFields.entries.size, key = { ColorFields.entries[it] }) { field ->
@@ -164,7 +166,7 @@ fun ThemeEditor() {
                                 }) {
                                     Icon(
                                         Icons.AutoMirrored.Default.Undo,
-                                        contentDescription = "Reset color"
+                                        contentDescription = stringResource(R.string.reset_color)
                                     )
                                 }
                             }
@@ -231,32 +233,44 @@ fun ThemePreviewer(theme: CrabirTheme = rememberAppTheme(), setActiveField: (Col
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Post title", modifier = Modifier.clickable {
+                    Text(stringResource(R.string.theme_post_title), modifier = Modifier.clickable {
                         setActiveField(ColorFields.PostTitle)
                     }, color = theme.postTitle)
-                    Text("Read", modifier = Modifier.clickable {
+                    Text(stringResource(R.string.theme_read), modifier = Modifier.clickable {
                         setActiveField(ColorFields.ReadPost)
                     }, color = theme.readPost)
-                    Text("Announcement", modifier = Modifier.clickable {
-                        setActiveField(ColorFields.Announcement)
-                    }, color = theme.announcement)
+                    Text(
+                        stringResource(R.string.theme_announcement),
+                        modifier = Modifier.clickable {
+                            setActiveField(ColorFields.Announcement)
+                        },
+                        color = theme.announcement
+                    )
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Community", modifier = Modifier.clickable {
+                    Text(stringResource(R.string.theme_community), modifier = Modifier.clickable {
                         setActiveField(ColorFields.Highlight)
                     }, color = theme.highlight)
-                    Text("Secondary text", modifier = Modifier.clickable {
-                        setActiveField(ColorFields.SecondaryText)
-                    }, color = theme.secondaryText)
+                    Text(
+                        stringResource(R.string.theme_secondary_text),
+                        modifier = Modifier.clickable {
+                            setActiveField(ColorFields.SecondaryText)
+                        },
+                        color = theme.secondaryText
+                    )
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Content text", modifier = Modifier.clickable {
-                        setActiveField(ColorFields.ContentColor)
-                    }, color = theme.contentColor)
-                    Text("Link", modifier = Modifier.clickable {
+                    Text(
+                        stringResource(R.string.theme_content_text),
+                        modifier = Modifier.clickable {
+                            setActiveField(ColorFields.ContentColor)
+                        },
+                        color = theme.contentColor
+                    )
+                    Text(stringResource(R.string.theme_link), modifier = Modifier.clickable {
                         setActiveField(ColorFields.LinkColor)
                     }, color = theme.linkColor)
-                    Text("Downvote", modifier = Modifier.clickable {
+                    Text(stringResource(R.string.theme_downvote), modifier = Modifier.clickable {
                         setActiveField(ColorFields.Downvote)
                     }, color = theme.downvote)
                 }
@@ -285,17 +299,17 @@ fun ColorPickerDialogue(
         Row {
             TextButton(onClick = { advancedMode = !advancedMode }) {
                 if (advancedMode) {
-                    Text("Presets")
+                    Text(stringResource(R.string.color_picker_presets))
                 } else {
-                    Text("Custom")
+                    Text(stringResource(R.string.color_picker_custom))
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
             TextButton(onClick = onDismissRequest) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
             TextButton(onClick = applyChanges) {
-                Text("Confirm")
+                Text(stringResource(R.string.confirm))
             }
         }
     }

@@ -14,12 +14,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -30,6 +34,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -38,6 +44,7 @@ import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.PreviewLocalComposition
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
@@ -158,15 +165,43 @@ fun <T : VotableData> PostFeedViewer(
             item {
                 val appendState = posts.loadState.append
                 if (appendState is LoadState.NotLoading && appendState.endOfPaginationReached) {
-                    ThemedCard {
-                        Text("End of Feed reached")
-                    }
+                    EndOfFeed()
                 } else if (appendState is LoadState.Error) {
-                    ThemedCard(modifier = Modifier.clickable { posts.retry() }) {
-                        Text("Error while loading: ${appendState.error.localizedMessage}")
+                    FeedError(appendState.error) {
+                        posts.retry()
                     }
                 }
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun EndOfFeed() {
+    ThemedCard() {
+        Column(
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(stringResource(R.string.end_of_feed_reached), textAlign = TextAlign.Center)
+        }
+    }
+}
+
+@Preview
+@Composable
+fun FeedError(error: Throwable = RuntimeException("Test"), retry: () -> Unit = {}) {
+    ThemedCard(modifier = Modifier.clickable { retry() }) {
+        Column(
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                stringResource(R.string.feed_error, error.localizedMessage),
+                textAlign = TextAlign.Center
+            )
+            Icon(Icons.Default.Refresh, contentDescription = null)
         }
     }
 }

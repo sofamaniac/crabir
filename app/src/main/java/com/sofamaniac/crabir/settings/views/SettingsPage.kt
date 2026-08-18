@@ -47,7 +47,7 @@ fun ViewsSettingsPage() {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("View settings") }, navigationIcon = {
+            TopAppBar(title = { Text(stringResource(R.string.view_settings)) }, navigationIcon = {
                 IconButton(onClick = { navController?.popBackStack() }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
@@ -64,7 +64,7 @@ fun ViewsSettingsPage() {
                 ListSelector(
                     options = Views.entries.toList(),
                     selectedOption = viewSettings.defaultView,
-                    headlineContent = { Text("Default view") },
+                    headlineContent = { Text(stringResource(R.string.default_view)) },
                     leadingContent = { Icon(Icons.Default.ViewComfy, contentDescription = null) },
                     onOptionSelected = { target ->
                         scope.launch {
@@ -80,7 +80,7 @@ fun ViewsSettingsPage() {
                 ListItem(
                     enabled = true,
                     leadingContent = { Spacer(modifier = Modifier.size(24.dp)) },
-                    content = { Text("Default number of columns") },
+                    content = { Text(stringResource(R.string.default_number_of_columns)) },
                     trailingContent = { Text(viewSettings.defaultColumns.toString()) },
                     supportingContent = {
                         Slider(
@@ -109,8 +109,8 @@ fun ViewsSettingsPage() {
                             }
                         }
                     },
-                    headlineContent = { Text("Remember view") },
-                    supportingContent = { Text("Each community will remember the last view selected for that community") }
+                    headlineContent = { Text(stringResource(R.string.remember_view_main)) },
+                    supportingContent = { Text(stringResource(R.string.remember_view_supporting)) }
                 )
             }
             item {
@@ -119,7 +119,7 @@ fun ViewsSettingsPage() {
                     onClick = { navController?.navigate(ViewManagerRoute) },
                     enabled = viewSettings.rememberView
                 ) {
-                    Text("Managed views")
+                    Text(stringResource(R.string.manage_views))
                 }
             }
             item {
@@ -132,7 +132,7 @@ fun ViewsSettingsPage() {
                             }
                         }
                     },
-                    headlineContent = { Text("Communities start with r/") },
+                    headlineContent = { Text(stringResource(R.string.communities_start_with_r)) },
                 )
             }
             item { SettingHeader(stringResource(Views.Card.toStringResource())) }
@@ -146,14 +146,14 @@ fun ViewsSettingsPage() {
                             }
                         }
                     },
-                    headlineContent = { Text("Rounded corners") },
+                    headlineContent = { Text(stringResource(R.string.rounded_corners)) },
                 )
             }
             item {
                 ListSelector(
                     options = ImageHeight.entries.toList(),
                     selectedOption = viewSettings.cardSettings.imageHeight,
-                    headlineContent = { Text("Image height") },
+                    headlineContent = { Text(stringResource(R.string.image_height)) },
                     onOptionSelected = { target ->
                         scope.launch {
                             settingsDataStore.updateData {
@@ -163,9 +163,9 @@ fun ViewsSettingsPage() {
                     },
                     optionLabel = {
                         when (it) {
-                            ImageHeight.Full -> "Full"
-                            ImageHeight.Fixed -> "Fixed"
-                            ImageHeight.Screen -> "Limit to 80% of screen height"
+                            ImageHeight.Full -> stringResource(R.string.image_height_full)
+                            ImageHeight.Fixed -> stringResource(R.string.image_height_fixed)
+                            ImageHeight.Screen -> stringResource(R.string.image_height_limit)
                         }
                     }
                 )
@@ -180,8 +180,8 @@ fun ViewsSettingsPage() {
                             }
                         }
                     },
-                    headlineContent = { Text("Show thumbnail for link preview") },
-                    supportingContent = { Text("Disable to user large image preview") }
+                    headlineContent = { Text(stringResource(R.string.show_thumbnail_for_link_preview)) },
+                    supportingContent = { Text(stringResource(R.string.show_thumbnail_for_link_preview_support)) }
                 )
             }
             item {
@@ -194,7 +194,7 @@ fun ViewsSettingsPage() {
                             }
                         }
                     },
-                    headlineContent = { Text("Enable text preview") },
+                    headlineContent = { Text(stringResource(R.string.enable_text_preview)) },
                 )
             }
 
@@ -204,11 +204,11 @@ fun ViewsSettingsPage() {
                     content = {
                         TextField(
                             enabled = viewSettings.cardSettings.enableTextPreview,
-                            label = { Text("Number of lines") },
+                            label = { Text(stringResource(R.string.number_of_lines_main)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             value = viewSettings.cardSettings.maxLines.toString(),
-                            supportingText = { Text("Maximum number of lines to preview") },
-                            suffix = { Text("lines") },
+                            supportingText = { Text(stringResource(R.string.number_of_lines_support)) },
+                            suffix = { Text(stringResource(R.string.lines)) },
                             singleLine = true,
                             onValueChange = { target ->
                                 scope.launch {

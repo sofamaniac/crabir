@@ -54,7 +54,7 @@ fun CommentsSettingsPage() {
         val commentsSettings = commentsSettingsOpt!!
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
             item {
-                SettingHeader("Sort")
+                SettingHeader(stringResource(R.string.header_sort))
             }
             item {
                 SwitchTile(
@@ -85,7 +85,7 @@ fun CommentsSettingsPage() {
                 )
             }
             item {
-                SettingHeader("Appearance")
+                SettingHeader(stringResource(R.string.appearance))
             }
 
             item {

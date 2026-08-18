@@ -14,7 +14,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.LocalSnackBarHost
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.ListSelector
@@ -35,7 +37,7 @@ fun DataSettingsPage() {
             topBar = {
                 TopAppBar(
                     title = {
-                        Text("Data settings")
+                        Text(stringResource(R.string.data_settings))
                     },
                     navigationIcon = {
                         BackButton {
@@ -46,11 +48,11 @@ fun DataSettingsPage() {
             }
         ) { paddingValues ->
             Column(modifier = Modifier.padding(paddingValues)) {
-                SettingHeader("Image")
+                SettingHeader(stringResource(R.string.Image_header))
                 ListSelector(
                     options = Quality.entries,
                     selectedOption = dataSettings.imageQuality.onWifi,
-                    headlineContent = { Text("Preferred quality on wifi") },
+                    headlineContent = { Text(stringResource(R.string.preferred_quality_on_wifi)) },
                     onOptionSelected = { quality ->
                         scope.launch {
                             dataSettingsStore.updateData { settings ->
@@ -62,7 +64,7 @@ fun DataSettingsPage() {
                 ListSelector(
                     options = Quality.entries,
                     selectedOption = dataSettings.imageQuality.onMobile,
-                    headlineContent = { Text("Preferred quality on cellular") },
+                    headlineContent = { Text(stringResource(R.string.preferred_quality_on_cellular)) },
                     onOptionSelected = { quality ->
                         scope.launch {
                             dataSettingsStore.updateData { settings ->
@@ -74,7 +76,7 @@ fun DataSettingsPage() {
                 ListSelector(
                     options = NetworkPolicy.entries,
                     selectedOption = dataSettings.imageQuality.loadImage,
-                    headlineContent = { Text("Load image") },
+                    headlineContent = { Text(stringResource(R.string.enable_load_image)) },
                     onOptionSelected = { quality ->
                         scope.launch {
                             dataSettingsStore.updateData { settings ->
@@ -83,11 +85,11 @@ fun DataSettingsPage() {
                         }
                     }
                 )
-                SettingHeader("Video")
+                SettingHeader(stringResource(R.string.header_video))
                 ListSelector(
                     options = VideoQuality.entries,
                     selectedOption = dataSettings.videoQuality.onWifi,
-                    headlineContent = { Text("Preferred quality on wifi") },
+                    headlineContent = { Text(stringResource(R.string.preferred_quality_on_wifi)) },
                     onOptionSelected = { quality ->
                         scope.launch {
                             dataSettingsStore.updateData { settings ->
@@ -99,7 +101,7 @@ fun DataSettingsPage() {
                 ListSelector(
                     options = VideoQuality.entries,
                     selectedOption = dataSettings.videoQuality.onMobile,
-                    headlineContent = { Text("Preferred quality on cellular") },
+                    headlineContent = { Text(stringResource(R.string.preferred_quality_on_cellular)) },
                     onOptionSelected = { quality ->
                         scope.launch {
                             dataSettingsStore.updateData { settings ->
@@ -111,7 +113,7 @@ fun DataSettingsPage() {
                 ListSelector(
                     options = NetworkPolicy.entries,
                     selectedOption = dataSettings.videoQuality.autostart,
-                    headlineContent = { Text("Autostart video") },
+                    headlineContent = { Text(stringResource(R.string.autostart_video)) },
                     onOptionSelected = { quality ->
                         scope.launch {
                             dataSettingsStore.updateData { settings ->

@@ -60,7 +60,7 @@ fun SettingsPage() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController?.popBackStack() }) {
                         Icon(
@@ -80,13 +80,13 @@ fun SettingsPage() {
         ) {
             ListItem(
                 leadingContent = { Icon(Icons.Default.Settings, contentDescription = null) },
-                content = { Text("General") },
+                content = { Text(stringResource(R.string.general_settings_title)) },
                 modifier = Modifier.clickable {
                     navController?.navigate(GeneralSettingsRoute)
                 }
             )
             ListItem(
-                content = { Text("Theme") },
+                content = { Text(stringResource(R.string.theme_settings_title)) },
                 leadingContent = { Icon(Icons.Default.Palette, contentDescription = null) },
                 modifier = Modifier.clickable {
                     navController?.navigate(ThemeRoute)
@@ -94,21 +94,21 @@ fun SettingsPage() {
             )
 
             ListItem(
-                content = { Text("Filters") },
+                content = { Text(stringResource(R.string.filter_settings_name)) },
                 leadingContent = { Icon(Icons.Default.FilterList, contentDescription = null) },
                 modifier = Modifier.clickable {
                     navController?.navigate(FiltersSettingRoute)
                 }
             )
             ListItem(
-                content = { Text("Data") },
+                content = { Text(stringResource(R.string.data_settings_name)) },
                 leadingContent = { Icon(Icons.Default.DataUsage, contentDescription = null) },
                 modifier = Modifier.clickable {
                     navController?.navigate(DataSettingsRoute)
                 }
             )
             ListItem(
-                content = { Text("Licenses") },
+                content = { Text(stringResource(R.string.licenses)) },
                 leadingContent = { Icon(Icons.Default.Info, contentDescription = null) },
                 modifier = Modifier.clickable {
                     navController?.navigate(LicensesRoute)
@@ -134,7 +134,7 @@ fun GeneralSettingsPage() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController?.popBackStack() }) {
                         Icon(
@@ -157,7 +157,7 @@ fun GeneralSettingsPage() {
                             contentDescription = null
                         )
                     },
-                    content = { Text("Posts") },
+                    content = { Text(stringResource(R.string.posts_settings_name)) },
                     modifier = Modifier.clickable {
                         navController?.navigate(PostSettingsRoute)
                     }
@@ -171,7 +171,7 @@ fun GeneralSettingsPage() {
                             contentDescription = null
                         )
                     },
-                    content = { Text("Comments") },
+                    content = { Text(stringResource(R.string.comments_settings_title)) },
                     modifier = Modifier.clickable {
                         navController?.navigate(CommentsSettingsRoute)
                     }
@@ -180,7 +180,7 @@ fun GeneralSettingsPage() {
             item {
                 ListItem(
                     leadingContent = { Icon(Icons.Default.ViewComfy, contentDescription = null) },
-                    content = { Text("Views") },
+                    content = { Text(stringResource(R.string.views_settings_title)) },
                     modifier = Modifier.clickable {
                         navController?.navigate(ViewsSettingRoute)
                     }
@@ -229,7 +229,7 @@ fun LicensePage() {
     val navController = LocalNavController.current
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Licenses") }, navigationIcon = {
+            TopAppBar(title = { Text(stringResource(R.string.licenses)) }, navigationIcon = {
                 BackButton { navController?.popBackStack() }
             })
         }

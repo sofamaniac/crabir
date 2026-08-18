@@ -371,8 +371,9 @@ fun ConfigureCrabirTheme(content: @Composable () -> Unit) {
 fun setSystemBarsColor(): (ThemeMode, Color) -> Unit {
     val view = LocalView.current
     val window = (view.context as? Activity)?.window
+    if (window == null) return { _, _ -> }
     val windowInsetsController =
-        WindowCompat.getInsetsController(window!!, window.decorView)
+        WindowCompat.getInsetsController(window, window.decorView)
     return { mode, color ->
         Log.d("setSystemBarsColor", "setSystemBarsColor: $mode")
         if (Build.VERSION.SDK_INT < 35) {

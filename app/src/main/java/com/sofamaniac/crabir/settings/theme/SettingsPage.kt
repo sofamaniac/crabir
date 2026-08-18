@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ThemeEditorRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
@@ -86,7 +87,7 @@ fun ThemeSettingsPage() {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Theme settings") }, navigationIcon = {
+            TopAppBar(title = { Text(stringResource(R.string.theme_settings)) }, navigationIcon = {
                 BackButton {
                     navController.popBackStack()
                 }
@@ -101,7 +102,7 @@ fun ThemeSettingsPage() {
                         contentDescription = null,
                     )
                 },
-                headlineContent = { Text("Theme") },
+                headlineContent = { Text(stringResource(R.string.theme)) },
                 options = ThemeMode.entries.toList(),
                 selectedOption = settings.mode,
                 onOptionSelected = { target ->
@@ -116,7 +117,7 @@ fun ThemeSettingsPage() {
             )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 SwitchTile(
-                    headlineContent = { Text("Dynamic color") },
+                    headlineContent = { Text(stringResource(R.string.dynamic_color)) },
                     checked = settings.dynamicColor,
                     onCheckedChange = { target ->
                         scope.launch {
@@ -128,7 +129,7 @@ fun ThemeSettingsPage() {
                 )
             }
             ListItem(
-                content = { Text("Edit Colors") },
+                content = { Text(stringResource(R.string.edit_colors)) },
                 enabled = !settings.dynamicColor || Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
                 onClick = {
                     navController.navigate(ThemeEditorRoute)
@@ -140,7 +141,7 @@ fun ThemeSettingsPage() {
             if (settings.mode == ThemeMode.Scheduled) {
                 ListItem(
                     content = {
-                        Text("Light mode start time")
+                        Text(stringResource(R.string.light_mode_start_time))
                     },
                     trailingContent = {
                         val hour = "%02d".format(endTimeState.hour)
@@ -155,7 +156,7 @@ fun ThemeSettingsPage() {
                 )
                 ListItem(
                     content = {
-                        Text("Light mode end time")
+                        Text(stringResource(R.string.light_mode_end_time))
                     },
                     trailingContent = {
                         val hour = "%02d".format(endTimeState.hour)
@@ -183,12 +184,12 @@ fun TimePickerDialog(
         onDismissRequest = onDismiss,
         cancel = {
             TextButton(onClick = { onDismiss() }) {
-                Text("Dismiss")
+                Text(stringResource(R.string.cancel))
             }
         },
         confirm = {
             TextButton(onClick = { onConfirm() }) {
-                Text("OK")
+                Text(stringResource((R.string.confirm)))
             }
         },
         content = { content() }
