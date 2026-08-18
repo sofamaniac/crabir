@@ -119,9 +119,9 @@
     <string name="home_shortcut_long_label">Go to home feed</string>
     <string name="search_shortcut_short_label">Search</string>
     <string name="search_shortcut_long_label">Search on Reddit</string>
-    <string name="popular_shortcut_short_label">r/popular</string>
+    <string name="popular_shortcut_short_label" translatable="false">r/popular</string>
     <string name="popular_shortcut_long_label">Go to r/popular</string>
-    <string name="all_shortcut_short_label">r/all</string>
+    <string name="all_shortcut_short_label" translatable="false">r/all</string>
     <string name="all_shortcut_long_label">Go to r/all</string>
     <string name="close">Close</string>
     <string name="see_more_comments">More replies</string>
@@ -146,7 +146,7 @@
     <string name="theme_secondary_text">Secondary text</string>
     <string name="theme_content_text">Content text</string>
     <string name="theme_link">Link</string>
-    <string name="theme_downvote">Downvote</string>
+    <string name="theme_downvote" translatable="false">Downvote</string>
     <string name="reset_color">Reset color</string>
     <string name="reset_theme">Reset to default</string>
     <string name="saved_themes">Saved themes</string>
