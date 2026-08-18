@@ -34,7 +34,7 @@ internal fun PostBody(
     enableTextPreview: Boolean = true,
     maxLines: Int?,
     enableLinkFullSizePreview: Boolean = true,
-    forceShowSelftext: Boolean = false,
+    forceShowSelftext: Boolean = true,
     markAsRead: () -> Unit = {},
 ) {
     val navController = LocalNavController.current
