@@ -93,7 +93,7 @@ fun PostHeader(
                 post.subreddit.name,
                 post.subredditDetails?.icon,
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(24.dp)
                     .clip(CircleShape)
                     .clickable(
                         enabled = settings.clickableCommunity,
@@ -148,6 +148,9 @@ fun PostHeader(
             }
             if (post.kind != Kind.Self) {
                 withSeparator { append(post.domain) }
+            }
+            if (post.locked) {
+                withSeparator { append("\uD83D\uDD12") }
             }
             withSeparator { append(formatElapsedTimeLocalized(post.createdUtc)) }
             if (post.isCrosspost) appendInlineContent("crosspost", "crosspost")
