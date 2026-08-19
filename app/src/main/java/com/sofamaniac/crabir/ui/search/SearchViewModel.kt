@@ -10,6 +10,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
+import com.sofamaniac.crabir.data.remote.RandditAPI
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.data.remote.reddit.CommunitySearchSort
@@ -159,6 +160,7 @@ class PostSearchViewModel(
 class CommunitySearchViewModel(
     repository: CommunitySearchRepository,
     subscriptionsRepository: SubscriptionsRepository,
+    private val randdit: RandditAPI,
 ) : SearchViewModel<CommunitySearchParams, SubredditData>(
     repository, initialParams =
         CommunitySearchParams(
@@ -175,6 +177,27 @@ class CommunitySearchViewModel(
             it.copy(sort = sort)
         }
         refresh()
+    }
+
+    fun goToRandom(
+        includeOver18: Boolean,
+        onSuccess: (String) -> Unit,
+        onError: (Throwable) -> Unit,
+    ) {
+        viewModelScope.launch {
+            try {
+                val response = randdit.getRandomCommunity(includeOver18)
+                if (response.isSuccessful) {
+                    val url = response.body()!!.url
+                    onSuccess(url)
+                } else {
+                    onError(Exception(response.errorBody()?.string()))
+                }
+            } catch (e: Exception) {
+                onError(e)
+            }
+        }
+
     }
 
     fun setIncludeOver18(include: Boolean) {

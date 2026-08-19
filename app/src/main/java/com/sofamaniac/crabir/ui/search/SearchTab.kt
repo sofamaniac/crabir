@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.search
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -236,7 +237,7 @@ private fun InnerTab(
 @Composable
 private fun InnerTab(viewModel: CommunitySearchViewModel) {
     val things = viewModel.items.collectAsLazyPagingItems()
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val listState = viewModel.listState
     val theme = LocalTheme.current
     PullToRefreshBox(
@@ -257,6 +258,36 @@ private fun InnerTab(viewModel: CommunitySearchViewModel) {
             verticalItemSpacing = 2.dp,
             state = listState, modifier = Modifier.fillMaxSize()
         ) {
+            if (things.itemCount == 0) {
+                fun onSuccess(sub: String) {
+                    val url = sub.removePrefix("/")
+                    navController?.navigate(SubredditRoute(url))
+                }
+
+                fun onError(e: Throwable) {
+                    Log.e("SearchTab", "InnerTab: ", e)
+                }
+                item {
+                    ListItem(onClick = {
+                        viewModel.goToRandom(
+                            false,
+                            onSuccess = { onSuccess(it) },
+                            onError = { onError(it) })
+                    }) {
+                        Text("Random community")
+                    }
+                }
+                item {
+                    ListItem(onClick = {
+                        viewModel.goToRandom(
+                            true,
+                            onSuccess = { onSuccess(it) },
+                            onError = { onError(it) })
+                    }) {
+                        Text("Random NSFW community")
+                    }
+                }
+            }
             items(
                 count = things.itemCount,
                 key = things.itemKey { p -> p.id }) { index ->
@@ -266,7 +297,7 @@ private fun InnerTab(viewModel: CommunitySearchViewModel) {
                     modifier = Modifier
                         .background(color = theme.cardBackground)
                         .clickable {
-                            navController.navigate(
+                            navController?.navigate(
                                 SubredditRoute(
                                     subreddit.displayNamePrefixed
                                 )
@@ -283,7 +314,7 @@ private fun InnerTab(viewModel: CommunitySearchViewModel) {
 private fun InnerTab(viewModel: UserSearchViewModel) {
     val things = viewModel.items.collectAsLazyPagingItems()
     val listState = viewModel.listState
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     PullToRefreshBox(
         isRefreshing = things.loadState.refresh == LoadState.Loading,
         onRefresh = {
@@ -315,7 +346,7 @@ private fun InnerTab(viewModel: UserSearchViewModel) {
                 }
                 ListItem(
                     modifier = Modifier.clickable {
-                        navController.navigate(
+                        navController?.navigate(
                             ProfileRoute(
                                 user.username,
                                 ProfileTabs.Overview,

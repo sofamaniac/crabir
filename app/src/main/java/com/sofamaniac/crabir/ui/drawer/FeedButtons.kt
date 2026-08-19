@@ -19,16 +19,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.data.remote.RandditAPI
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.navigation.HistoryRoute
 import com.sofamaniac.crabir.navigation.HomeRoute
+import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.navigation.SavedRoute
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 enum class FeedButtons(val icon: ImageVector, val route: Route) {
     Home(Icons.Default.Home, HomeRoute),
@@ -83,4 +90,44 @@ internal fun SubredditTile(
         },
         onClick = onClick
     )
+}
+
+@Composable
+internal fun RandomCommunity(label: String, includeNsfw: Boolean) {
+    val navController = LocalNavController.current
+    val viewModel: RandditViewModel = koinViewModel()
+    NavigationDrawerItem(selected = false, label = { Text(label) }, onClick = {
+        viewModel.getRandom(
+            includeNsfw, {
+                val subreddit = it.removePrefix("/")
+                val route = SubredditRoute(subreddit)
+                navController?.navigate(route)
+            },
+            {
+                it.printStackTrace()
+            }
+        )
+    })
+}
+
+@KoinViewModel
+class RandditViewModel(private val api: RandditAPI) : ViewModel() {
+    fun getRandom(
+        includeNsfw: Boolean,
+        onSuccess: (String) -> Unit,
+        onError: (Throwable) -> Unit,
+    ) {
+        viewModelScope.launch {
+            try {
+                val response = api.getRandomCommunity(includeNsfw)
+                if (response.isSuccessful) {
+                    onSuccess(response.body()!!.url)
+                } else {
+                    onError(Exception(response.errorBody()?.string()))
+                }
+            } catch (e: Exception) {
+                onError(e)
+            }
+        }
+    }
 }

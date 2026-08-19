@@ -2,6 +2,7 @@ package com.sofamaniac.crabir.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.sofamaniac.crabir.BuildConfig
+import com.sofamaniac.crabir.data.remote.RandditAPI
 import com.sofamaniac.crabir.data.remote.interceptors.CountInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.ForceJsonInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.RateLimitInterceptor
@@ -108,6 +109,21 @@ class NetworkModule {
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
             .create(RedditAPIService::class.java)
+    }
+
+    @Single(binds = [RandditAPI::class])
+    fun provideRandditApiService(json: Json): RandditAPI {
+        val client = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+        return Retrofit.Builder()
+            .baseUrl("https://crabir.com")
+            .client(client)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+            .create(RandditAPI::class.java)
     }
 
     @Single

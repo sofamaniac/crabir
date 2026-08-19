@@ -18,16 +18,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.DrawerDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
@@ -175,6 +180,23 @@ internal fun DrawerContent(
                     }
                 )
             }
+            item { HorizontalDivider() }
+            item {
+                ListItem(
+                    colors = ListItemDefaults.colors()
+                        .copy(containerColor = DrawerDefaults.modalContainerColor),
+                    leadingContent = {
+                        Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
+                    }, content = {
+                        Text(
+                            "Go to ...",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                )
+            }
+            item { RandomCommunity("Random community", false) }
+            item { RandomCommunity("Random NSFW", true) }
             item { HorizontalDivider() }
             item { BlurTile() }
             item { SettingsTile(drawerState) }
