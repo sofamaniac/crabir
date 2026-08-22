@@ -28,6 +28,7 @@ abstract class InboxRepository : ListingRepository<InboxFeed, Message>() {
     abstract suspend fun read(name: Fullname): Result<Unit>
 
     abstract suspend fun unread(name: Fullname): Result<Unit>
+    abstract suspend fun delete(name: Fullname): Result<Unit>
 }
 
 @ViewModelScope
@@ -99,6 +100,18 @@ class InboxRepositoryImpl(private val inbox: RedditAPIService, private val inbox
                 inboxDao.getValue(name) ?: return Result.failure(Exception("Message not found"))
             withContext(Dispatchers.IO) {
                 inboxDao.update(message.copy(new = true))
+            }
+            return Result.success(Unit)
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+    }
+
+    override suspend fun delete(name: Fullname): Result<Unit> {
+        try {
+            inbox.delete(name.name)
+            withContext(Dispatchers.IO) {
+                inboxDao.delete(name)
             }
             return Result.success(Unit)
         } catch (e: Exception) {

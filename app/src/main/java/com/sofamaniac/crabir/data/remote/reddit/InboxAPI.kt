@@ -75,6 +75,9 @@ interface InboxAPI {
         @Tag account: RedditAccount? = null,
     ): Response<PostResponse>
 
+    @POST("/api/del_msg")
+    suspend fun delete(@Query("id") id: String): Response<Unit>
+
 }
 
 @Serializable

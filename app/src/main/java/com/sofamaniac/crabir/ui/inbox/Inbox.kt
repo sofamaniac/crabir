@@ -1,6 +1,8 @@
 package com.sofamaniac.crabir.ui.inbox
 
+import android.content.ClipData
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,20 +13,30 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.MarkEmailRead
 import androidx.compose.material.icons.filled.MarkEmailUnread
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -32,6 +44,7 @@ import androidx.compose.material3.SecondaryScrollableTabRow
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -41,10 +54,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -53,6 +71,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Message
 import com.sofamaniac.crabir.domain.model.MessageType
@@ -60,8 +79,12 @@ import com.sofamaniac.crabir.domain.model.RichtextDocument
 import com.sofamaniac.crabir.domain.repository.InboxFeed
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.MessageEditorRoute
+import com.sofamaniac.crabir.navigation.PostRoute
+import com.sofamaniac.crabir.navigation.ProfileRoute
+import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.ui.RefreshIndicator
 import com.sofamaniac.crabir.ui.ThemedCard
+import com.sofamaniac.crabir.ui.ThemedDialog
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.richtext.Richtext
@@ -229,7 +252,7 @@ fun Message(
                 Spacer(modifier = Modifier.weight(1f))
             }
             if (message.new) {
-                IconButton(onClick = { viewModel.markRead() }) {
+                IconButton(onClick = { viewModel.markRead(message.name) }) {
                     Icon(Icons.Default.MarkEmailRead, contentDescription = "Mark as read")
                 }
                 //            } else {
@@ -240,9 +263,9 @@ fun Message(
             IconButton(onClick = { navController?.navigate(MessageEditorRoute(message.name)) }) {
                 Icon(Icons.AutoMirrored.Filled.Reply, contentDescription = "Reply")
             }
-            //            IconButton(onClick = {}) {
-            //                Icon(Icons.Default.MoreVert, contentDescription = null)
-            //            }
+            IconButton(onClick = {}) {
+                Icon(Icons.Default.MoreVert, contentDescription = null)
+            }
         }
         val textStyle = MaterialTheme.typography.titleSmall
         val annotatedString = buildAnnotatedString {
@@ -288,7 +311,7 @@ fun Message(
                 Spacer(modifier = Modifier.weight(1f))
             }
             if (new) {
-                IconButton(onClick = { viewModel.read(name) }) {
+                IconButton(onClick = { viewModel.markRead(name) }) {
                     Icon(Icons.Default.MarkEmailRead, contentDescription = "Mark as read")
                 }
             } else {
@@ -319,6 +342,172 @@ fun Message(
         Richtext(
             body, mediaMetadata = emptyMap(), modifier = Modifier.padding(horizontal = 8.dp)
         )
+    }
+}
+
+@Composable
+fun MessageDropdownMenu(message: Message, viewModel: MessageViewModel) {
+    val navController = LocalNavController.current
+    var expanded by remember { mutableStateOf(false) }
+    var showCopyDialog by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.padding(16.dp)) {
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(Icons.Default.MoreVert, contentDescription = "More actions")
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = !expanded }) {
+            DropdownMenuItem(
+                leadingIcon = {
+                    Icon(Icons.AutoMirrored.Filled.Reply, contentDescription = null)
+                },
+                text = { Text("Reply") },
+                onClick = { navController?.navigate(MessageEditorRoute(message.name)) }
+            )
+            if (message.new) {
+                DropdownMenuItem(
+                    leadingIcon = {
+                        Icon(Icons.Default.MarkEmailRead, contentDescription = null)
+                    },
+                    text = { Text("Mark as read") },
+                    onClick = { viewModel.markRead(message.name) }
+                )
+            }
+
+            if (message.author != null) {
+                DropdownMenuItem(
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = null
+                        )
+                    },
+                    text = { Text("About ${message.author}") }, onClick = {
+                        navController?.navigate(ProfileRoute(message.author))
+                    }
+                )
+            }
+            if (message.author != null) {
+                DropdownMenuItem(
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Block,
+                            contentDescription = null
+                        )
+                    },
+                    text = { Text("Block ${message.author}") }, onClick = {
+                        viewModel.blockAuthor(message.author)
+                    }
+                )
+            }
+            if (message.subredditNamePrefixed != null) {
+                DropdownMenuItem(
+                    leadingIcon = {
+                        Icon(
+                            Icons.AutoMirrored.Filled.OpenInNew,
+                            contentDescription = null
+                        )
+                    },
+                    text = { Text("Go to ${message.subredditNamePrefixed}") }, onClick = {
+                        navController?.navigate(SubredditRoute(message.subredditNamePrefixed))
+                    }
+                )
+            }
+            if (message.linkTitle != null) {
+                DropdownMenuItem(
+                    leadingIcon = {
+                        Icon(
+                            Icons.AutoMirrored.Filled.OpenInNew,
+                            contentDescription = null
+                        )
+                    },
+                    text = { Text("Go to parent post") }, onClick = {
+                        navController?.navigate(PostRoute(message.linkTitle))
+                    }
+                )
+            }
+
+            DropdownMenuItem(
+                leadingIcon = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
+                text = { Text("Copy") },
+                onClick = {
+                    showCopyDialog = true
+                }
+            )
+        }
+    }
+    if (showCopyDialog) CopyDialog(message, onDismissRequest = { showCopyDialog = false })
+}
+
+@Composable
+fun CopyDialog(message: Message, onDismissRequest: () -> Unit) {
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
+    var showSelectionDialog by remember { mutableStateOf(false) }
+    ThemedDialog(onDismissRequest) {
+        ListItem(
+            onClick = {
+                scope.launch {
+                    clipboard.setClipEntry(
+                        ClipEntry(
+                            ClipData.newPlainText(
+                                "message's text",
+                                message.body
+                            )
+                        )
+                    )
+                }
+            },
+            leadingContent = {
+                Icon(
+                    Icons.AutoMirrored.Filled.Message,
+                    contentDescription = null
+                )
+            },
+            content = { Text("Copy text") }
+        )
+        ListItem(
+            onClick = {
+                showSelectionDialog = true
+            },
+            leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
+            content = { Text("Select text") }
+        )
+        ListItem(
+            onClick = {
+                scope.launch {
+                    clipboard.setClipEntry(
+                        ClipEntry(
+                            ClipData.newPlainText(
+                                "author's username",
+                                message.author
+                            )
+                        )
+                    )
+                }
+            },
+            leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
+            content = { Text("Copy username") }
+        )
+    }
+
+    if (showSelectionDialog) {
+        ThemedDialog(
+            onDismissRequest = { showSelectionDialog = false },
+            confirm = {
+                TextButton(onClick = { onDismissRequest() }) {
+                    Text(stringResource(R.string.done))
+                }
+            }) {
+            SelectionContainer(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .verticalScroll(
+                        rememberScrollState()
+                    )
+            ) {
+                Text(message.body)
+            }
+        }
     }
 }
 

@@ -217,4 +217,7 @@
     <string name="navigation_header">Navigation</string>
     <string name="show_navigation_bar">Show navigation bar</string>
     <string name="use_volume_keys_to_navigate">Use volume keys to navigate</string>
+    <string name="lateral_menu_items_header">Items to show</string>
+    <string name="subscriptions_list">Subscriptions list</string>
+    <string name="lateral_menu">Lateral Menu</string>
 </resources>

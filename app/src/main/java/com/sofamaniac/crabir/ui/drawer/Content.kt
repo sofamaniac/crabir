@@ -18,21 +18,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.BlurOn
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.DrawerDefaults
+import androidx.compose.material.icons.filled.GroupWork
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
@@ -41,14 +33,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sofamaniac.crabir.LocalFiltersSettings
+import com.sofamaniac.crabir.LocalLateralMenuSettings
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.PreviewLocalComposition
 import com.sofamaniac.crabir.data.remote.dto.Thing
@@ -57,13 +50,17 @@ import com.sofamaniac.crabir.data.remote.dto.subreddit.dummySubredditData
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.MultiRoute
-import com.sofamaniac.crabir.navigation.SettingsRoute
+import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
-import com.sofamaniac.crabir.settings.filters.filtersDataStore
-import com.sofamaniac.crabir.settings.theme.ThemeMode
-import com.sofamaniac.crabir.settings.theme.themeDataStore
-import com.sofamaniac.crabir.ui.ThemedSwitch
-import kotlinx.coroutines.flow.map
+import com.sofamaniac.crabir.ui.drawer.buttons.BlurTile
+import com.sofamaniac.crabir.ui.drawer.buttons.DarkModeTile
+import com.sofamaniac.crabir.ui.drawer.buttons.FeedButtons
+import com.sofamaniac.crabir.ui.drawer.buttons.MultiTile
+import com.sofamaniac.crabir.ui.drawer.buttons.NSFWTile
+import com.sofamaniac.crabir.ui.drawer.buttons.SettingsTile
+import com.sofamaniac.crabir.ui.drawer.buttons.SubredditTile
+import com.sofamaniac.crabir.ui.drawer.buttons.feeds
+import com.sofamaniac.crabir.ui.drawer.buttons.goToMenu
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -153,6 +150,11 @@ internal fun DrawerContent(
     modifier: Modifier = Modifier,
 ) {
     Log.d("DrawerContentStateless", "recompose ${drawerState.isClosed}")
+    var expandGoTo by remember { mutableStateOf(false) }
+    val settings = LocalLateralMenuSettings.current
+    val navController = LocalNavController.current
+    val sortedSubscriptions =
+        sortedSubscriptions.filter { !settings.showFavOnly || it.data.userHasFavorited }
     ModalDrawerSheet(drawerState = drawerState) {
         LazyColumn(
             modifier = modifier
@@ -164,132 +166,73 @@ internal fun DrawerContent(
                 accountSelector()
             }
             item { HorizontalDivider() }
-
-            items(FeedButtons.entries.toList()) { feed ->
-                NavigationDrawerItem(
-                    label = { Text(feed.name) }, icon = {
-                        Icon(
-                            feed.icon,
-                            contentDescription = feed.name,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-                        onFeedClick(feed)
-                    }
-                )
+            feeds(settings.items) { route ->
+                navController?.navigate(route)
             }
             item { HorizontalDivider() }
-            item {
-                ListItem(
-                    colors = ListItemDefaults.colors()
-                        .copy(containerColor = DrawerDefaults.modalContainerColor),
-                    leadingContent = {
-                        Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
-                    }, content = {
-                        Text(
-                            "Go to ...",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
-                )
+            goToMenu(expandGoTo, onClick = { expandGoTo = !expandGoTo })
+            if (settings.items.goToCommunity) {
+                item {
+                    NavigationDrawerItem(
+                        label = { Text("Go to community") },
+                        selected = false,
+                        icon = {
+                            Icon(
+                                Icons.Default.GroupWork,
+                                contentDescription = null,
+                            )
+                        },
+                        onClick = {
+                            SearchRoute()
+                        }
+                    )
+                }
             }
-            item { RandomCommunity("Random community", false) }
-            item { RandomCommunity("Random NSFW", true) }
-            item { HorizontalDivider() }
-            item { BlurTile() }
+            if (settings.items.goToUser) {
+                item {
+                    NavigationDrawerItem(
+                        label = { Text("Go to user") },
+                        selected = false,
+                        icon = {
+                            Icon(
+                                Icons.Default.Person,
+                                contentDescription = null,
+                            )
+                        },
+                        onClick = {
+                            navController?.navigate(SearchRoute(initialTab = 2))
+                        }
+                    )
+                }
+            }
+            if (settings.items.darkMode) {
+                item {
+                    DarkModeTile()
+                }
+            }
+            if (settings.items.showNSFW) {
+                item {
+                    NSFWTile()
+                }
+            }
+            if (settings.items.blurNSFW) {
+                item { BlurTile() }
+            }
             item { SettingsTile(drawerState) }
             item { HorizontalDivider() }
             items(multis) { multi ->
-                MultiTile(multi) {
+                MultiTile(multi, settings.showIcons) {
                     onMultiClick(multi)
                 }
             }
             items(sortedSubscriptions) { subreddit ->
-                SubredditTile(subreddit)
+                SubredditTile(subreddit, settings.showIcons)
                 {
                     onSubredditClick(subreddit)
                 }
             }
         }
     }
-}
-
-@Composable
-private fun SettingsTile(drawerState: DrawerState) {
-    val coroutineScope = rememberCoroutineScope()
-    val navController = LocalNavController.current
-    val context = LocalContext.current
-    val themeDataStore = remember { context.themeDataStore }
-    val themeMode by remember {
-        themeDataStore.data.map { it.mode }
-    }
-        .collectAsState(initial = ThemeMode.System)
-    NavigationDrawerItem(
-        label = {
-            Text("Settings")
-        },
-        badge = {
-            if (themeMode == ThemeMode.Dark || themeMode == ThemeMode.Light) {
-                IconButton(onClick = {
-                    coroutineScope.launch {
-                        themeDataStore.updateData {
-                            if (themeMode == ThemeMode.Dark) {
-                                it.copy(mode = ThemeMode.Light)
-                            } else {
-                                it.copy(mode = ThemeMode.Dark)
-                            }
-                        }
-                    }
-                }) {
-                    if (themeMode == ThemeMode.Dark) {
-                        Icon(Icons.Default.LightMode, contentDescription = "Light mode")
-                    } else {
-                        Icon(Icons.Default.DarkMode, contentDescription = "Dark mode")
-                    }
-                }
-            }
-        },
-        icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-        selected = false,
-        onClick = {
-            coroutineScope.launch {
-                drawerState.close()
-                navController?.navigate(SettingsRoute)
-            }
-        }
-    )
-}
-
-@Composable
-private fun BlurTile() {
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val filtersDataStore = remember { context.filtersDataStore }
-    val blur = LocalFiltersSettings.current.blurNSFW
-
-    fun toggle() {
-        coroutineScope.launch {
-            filtersDataStore.updateData {
-                it.copy(blurNSFW = !it.blurNSFW)
-            }
-        }
-    }
-    NavigationDrawerItem(
-        selected = false,
-        icon = { Icon(Icons.Default.BlurOn, contentDescription = "Blur NSFW") },
-        label = {
-            Text("Blur NSFW")
-        },
-        badge = {
-            ThemedSwitch(
-                checked = blur,
-                onCheckedChange = { toggle() },
-            )
-        },
-        onClick = { toggle() }
-    )
 }
 
 @Preview

@@ -13,6 +13,8 @@ import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
 import com.sofamaniac.crabir.settings.data.DataSettingsPage
 import com.sofamaniac.crabir.settings.data.DataSettingsRoute
 import com.sofamaniac.crabir.settings.filters.FiltersSettingsPage
+import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsPage
+import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsRoute
 import com.sofamaniac.crabir.settings.post.PostSettingsPage
 import com.sofamaniac.crabir.settings.post.PostSettingsRoute
 import com.sofamaniac.crabir.settings.theme.ThemeEditor
@@ -56,5 +58,8 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
     }
     composable<CommentsSettingsRoute> {
         CommentsSettingsPage()
+    }
+    composable<LateralMenuSettingsRoute> {
+        LateralMenuSettingsPage()
     }
 }

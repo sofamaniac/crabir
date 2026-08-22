@@ -12,6 +12,7 @@ import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.DataUsage
+import androidx.compose.material.icons.filled.DevicesFold
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
@@ -45,6 +46,7 @@ import com.sofamaniac.crabir.navigation.ThemeRoute
 import com.sofamaniac.crabir.navigation.ViewsSettingRoute
 import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
 import com.sofamaniac.crabir.settings.data.DataSettingsRoute
+import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsRoute
 import com.sofamaniac.crabir.settings.post.PostSettingsRoute
 import com.sofamaniac.crabir.ui.BackButton
 import kotlinx.coroutines.Dispatchers
@@ -158,7 +160,7 @@ fun GeneralSettingsPage() {
                         )
                     },
                     content = { Text(stringResource(R.string.posts_settings_name)) },
-                    modifier = Modifier.clickable {
+                    onClick = {
                         navController?.navigate(PostSettingsRoute)
                     }
                 )
@@ -172,7 +174,7 @@ fun GeneralSettingsPage() {
                         )
                     },
                     content = { Text(stringResource(R.string.comments_settings_title)) },
-                    modifier = Modifier.clickable {
+                    onClick = {
                         navController?.navigate(CommentsSettingsRoute)
                     }
                 )
@@ -181,8 +183,17 @@ fun GeneralSettingsPage() {
                 ListItem(
                     leadingContent = { Icon(Icons.Default.ViewComfy, contentDescription = null) },
                     content = { Text(stringResource(R.string.views_settings_title)) },
-                    modifier = Modifier.clickable {
+                    onClick = {
                         navController?.navigate(ViewsSettingRoute)
+                    }
+                )
+            }
+            item {
+                ListItem(
+                    leadingContent = { Icon(Icons.Default.DevicesFold, contentDescription = null) },
+                    content = { Text(stringResource(R.string.lateral_menu)) },
+                    onClick = {
+                        navController?.navigate(LateralMenuSettingsRoute)
                     }
                 )
             }
@@ -204,7 +215,7 @@ internal fun DebugOptionsView(viewModel: DebugOptionViewModel = koinViewModel())
             item {
                 ListItem(
                     content = { Text("Clear history") },
-                    modifier = Modifier.clickable {
+                    onClick = {
                         viewModel.clearHistory()
                     })
             }

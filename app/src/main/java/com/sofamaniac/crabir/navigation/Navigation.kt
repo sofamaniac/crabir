@@ -14,7 +14,8 @@ object HomeRoute : Route
 object SubscriptionsRoute : Route
 
 @Serializable
-class SearchRoute(val subreddit: String = "", val flair: String = "") : Route
+class SearchRoute(val subreddit: String = "", val flair: String = "", val initialTab: Int? = null) :
+    Route
 
 @Serializable
 object InboxRoute : Route

@@ -8,6 +8,7 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.settings.comments.CommentsSettingsDefault
 import com.sofamaniac.crabir.settings.data.DataSettingsDefault
 import com.sofamaniac.crabir.settings.filters.FiltersSettings
+import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsDefault
 import com.sofamaniac.crabir.settings.post.PostSettingsDefaults
 import com.sofamaniac.crabir.settings.theme.ConfigureCrabirTheme
 import com.sofamaniac.crabir.settings.theme.CrabirTheme
@@ -23,6 +24,7 @@ val LocalFiltersSettings = compositionLocalOf { FiltersSettings() }
 val LocalPostSettings = compositionLocalOf { PostSettingsDefaults.defaultPostSettings }
 val LocalDataSettings = compositionLocalOf { DataSettingsDefault.defaultDataSettings }
 val LocalCommentsSettings = compositionLocalOf { CommentsSettingsDefault.default }
+val LocalLateralMenuSettings = compositionLocalOf { LateralMenuSettingsDefault.default }
 
 /**Setup local providers for previews*/
 @Composable

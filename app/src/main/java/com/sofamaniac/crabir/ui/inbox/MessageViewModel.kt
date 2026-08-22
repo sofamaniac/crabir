@@ -3,6 +3,7 @@ package com.sofamaniac.crabir.ui.inbox
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.utils.fromHtml
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Message
@@ -19,9 +20,10 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 class MessageViewModel(
     private val messageRepository: InboxRepository,
+    private val api: RedditAPIService,
     @InjectedParam val name: Fullname,
     @InjectedParam initialMessage: Message,
-) : ViewModel() {
+) : ViewModel(), MessageInteraction {
     val message: StateFlow<Message> = messageRepository.get(name).map {
         Log.d("MessageViewModel", "message: $it")
         it ?: initialMessage
@@ -36,11 +38,17 @@ class MessageViewModel(
                 initialValue = RichtextDocument.fromHtml(initialMessage.bodyHtml)
             )
 
-    fun markRead() {
+    override fun markRead(name: Fullname) {
         viewModelScope.launch {
             messageRepository.read(name).onFailure {
                 Log.e("MessageViewModel", "markRead: $it")
             }
+        }
+    }
+
+    override fun blockAuthor(username: String) {
+        viewModelScope.launch {
+            api.block(username)
         }
     }
 

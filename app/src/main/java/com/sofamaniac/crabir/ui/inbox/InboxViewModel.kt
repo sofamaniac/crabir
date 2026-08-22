@@ -6,6 +6,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Message
 import com.sofamaniac.crabir.domain.repository.InboxFeed
@@ -17,8 +18,12 @@ import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
-class InboxViewModel(private val repo: InboxRepository, @InjectedParam val feed: InboxFeed) :
-    ViewModel() {
+class InboxViewModel(
+    private val repo: InboxRepository,
+    private val api: RedditAPIService,
+    @InjectedParam val feed: InboxFeed,
+) :
+    ViewModel(), MessageInteraction {
     private var feedSource =
         FeedSource(repo, feed)
     val data: Flow<PagingData<Message>> = Pager(
@@ -38,7 +43,7 @@ class InboxViewModel(private val repo: InboxRepository, @InjectedParam val feed:
         repo.refresh()
     }
 
-    fun read(name: Fullname) {
+    override fun markRead(name: Fullname) {
         viewModelScope.launch {
             repo.read(name)
         }
@@ -55,4 +60,15 @@ class InboxViewModel(private val repo: InboxRepository, @InjectedParam val feed:
             repo.readAll()
         }
     }
+
+    override fun blockAuthor(username: String) {
+        viewModelScope.launch {
+            api.block(username)
+        }
+    }
+}
+
+interface MessageInteraction {
+    fun markRead(name: Fullname)
+    fun blockAuthor(username: String)
 }
