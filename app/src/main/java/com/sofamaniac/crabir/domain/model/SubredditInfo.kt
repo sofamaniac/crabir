@@ -4,9 +4,11 @@
 
 package com.sofamaniac.crabir.domain.model
 
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditIcon
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditId
-import com.sofamaniac.crabir.domain.repository.DataInterface
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,20 +18,36 @@ data class SubredditInfo(
     val subredditPrefixed: String,
     val subredditSubscribers: Int,
     val subredditType: String
-)
+) {
+    companion object {
+        val DUMMY = SubredditInfo(
+            name = "DUMMY",
+            subredditId = SubredditId("t3_dummy"),
+            subredditPrefixed = "r/DUMMY",
+            subredditSubscribers = 1_000_000,
+            subredditType = "type"
+        )
+    }
+}
+
 
 @Serializable
+@Entity(tableName = "subreddits")
 data class SubredditData(
+    @PrimaryKey
+    override val id: String,
+    override val name: Fullname,
     val defaultSet: Boolean,
     val bannerImg: String,
+    val bannerBackgroundImage: String? = null,
     val allowedMediaInComments: List<String>,
     val userIsBanned: Boolean?,
     val freeFormReports: Boolean?,
     val communityIcon: String?,
     val showMedia: Boolean,
-    val description: String,
+    val description: ParsedMarkdown,
     val userIsMuted: Boolean?,
-    val displayName: String,
+    override val displayName: String,
     val headerImg: String?,
     val title: String,
     val previousNames: List<String>,
@@ -46,10 +64,8 @@ data class SubredditData(
     val subscribers: Int,
     val submitTextLabel: String,
     val linkFlairPosition: String,
-    val displayNamePrefixed: String,
+    override val displayNamePrefixed: String,
     val keyColor: String?,
-    override val name: Fullname,
-    override val id: String,
     val url: String,
     val quarantine: Boolean,
     val createdUtc: Double = 0.0,
@@ -57,12 +73,14 @@ data class SubredditData(
     val bannerSize: List<Int>?,
     val userIsContributor: Boolean?,
     val acceptFollowers: Boolean,
-    val publicDescription: String,
+    val publicDescription: ParsedMarkdown,
     val linkFlairEnabled: Boolean,
     val disableContributorRequests: Boolean,
     val subredditType: String,
-    val userIsSubscriber: Boolean = false
-) : DataInterface {
+    val userIsSubscriber: Boolean = false,
+    val userHasFavorited: Boolean = false,
+) : CommunityData {
+    @Ignore
     val icon: SubredditIcon =
         when {
             !communityIcon.isNullOrBlank() -> SubredditIcon.Icon(communityIcon)

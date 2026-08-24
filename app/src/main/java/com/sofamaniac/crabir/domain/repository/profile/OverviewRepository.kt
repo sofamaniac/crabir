@@ -1,0 +1,38 @@
+/*
+ * Copyright (c) 2025 Antoine Grimod
+ */
+
+package com.sofamaniac.crabir.domain.repository.profile
+
+import android.util.Log
+import androidx.paging.PagingSource
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
+import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.domain.repository.MixedRepository
+import com.sofamaniac.crabir.domain.repository.feed.MixedFeedRepository
+import org.koin.core.annotation.ViewModelScope
+import retrofit2.Response
+
+@ViewModelScope
+class OverviewRepository(
+    override val votableRepository: MixedRepository,
+    val api: RedditAPIService,
+) : MixedFeedRepository<ProfileFeedParams>() {
+    override suspend fun getThings(
+        after: Fullname,
+        params: ProfileFeedParams,
+    ): PagingSource.LoadResult<Fullname, Fullname> {
+        return makeRequest {
+            if (params.username == RedditAccount.ANONYMOUS) {
+                Log.w("OverviewRepository", "getPosts: User is anonymous")
+                return@makeRequest Response.success(null)
+            }
+            Log.d("OverviewRepository", "getPosts: ${params.username}")
+            api.getOverview(
+                user = params.username,
+                after = after,
+            )
+        }
+    }
+}

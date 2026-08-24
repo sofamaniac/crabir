@@ -12,8 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,11 +19,13 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.sofamaniac.crabir.LocalFiltersSettings
+import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SearchRoute
+import com.sofamaniac.crabir.settings.post.FlairSettings
 import com.sofamaniac.crabir.ui.Flair
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.votable.ScoreString
@@ -41,13 +41,12 @@ fun PostInfo(
     modifier: Modifier = Modifier,
     enableThumbnail: Boolean = true,
     read: Boolean = false,
-    viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(key = post.id) { factory ->
-        factory.create(post.name.name, post.subreddit.name)
-    },
+    likes: Boolean?,
+    flairSettings: FlairSettings = LocalPostSettings.current.flairSettings,
 ) {
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val theme = LocalTheme.current
-    val likes by viewModel.likes.collectAsState(initial = post.relationship.liked)
+    val blur = LocalFiltersSettings.current.blurNSFW && post.over18
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -58,7 +57,7 @@ fun PostInfo(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             val width = if (enableThumbnail) 0.8f else 1f
             val titleModifier = Modifier.fillMaxWidth(fraction = width)
@@ -76,7 +75,7 @@ fun PostInfo(
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 if (post.spoiler) {
                     Text(
@@ -91,14 +90,22 @@ fun PostInfo(
                             .cartouche(Color.Transparent)
                     )
                 }
-                Flair(post.linkFlair, modifier = Modifier.clickable {
-                    navController.navigate(
-                        SearchRoute(
-                            subreddit = post.subreddit.name,
-                            flair = post.linkFlair.text
-                        )
+                if (flairSettings.showFlair) {
+                    Flair(
+                        post.linkFlair,
+                        showColor = flairSettings.showFlairColor,
+                        showEmoji = flairSettings.showFlairEmoji,
+                        modifier = Modifier
+                            .clickable(enabled = flairSettings.clickable) {
+                                navController?.navigate(
+                                    SearchRoute(
+                                        subreddit = post.subreddit.name,
+                                        flair = post.linkFlair.text
+                                    )
+                                )
+                            }
                     )
-                })
+                }
             }
 
             Row(
@@ -124,7 +131,7 @@ fun PostInfo(
             }
         }
         if (enableThumbnail) {
-            Thumbnail(post)
+            Thumbnail(post, blur = blur)
         }
     }
 }

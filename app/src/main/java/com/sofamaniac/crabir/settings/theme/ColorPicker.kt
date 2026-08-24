@@ -23,9 +23,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import com.sofamaniac.crabir.R
 
 @Composable
 fun ColorPicker(color: Color, onValueChange: (Color) -> Unit, advancedMode: Boolean = false) {
@@ -39,9 +41,9 @@ fun ColorPicker(color: Color, onValueChange: (Color) -> Unit, advancedMode: Bool
 fun generateColorShades(
     hue: Float,
     saturation: Float = 0.5f,
-    lightnessRange: ClosedFloatingPointRange<Float> = 0.85f..0.25f,
+    lightnessRange: ClosedFloatingPointRange<Float> = 0.25f..0.85f,
     columns: Int = 4,
-    rows: Int = 3
+    rows: Int = 3,
 ): List<Color> {
     return (0 until rows * columns).map { i ->
         val t = i.toFloat() / (rows * columns - 1)
@@ -100,7 +102,7 @@ fun SimpleColorPicker(color: Color, onValueChange: (Color) -> Unit) {
 fun AdvancedColorPicker(color: Color, onValueChange: (Color) -> Unit) {
 
     Column(modifier = Modifier.padding(16.dp)) {
-        Text("Select a color")
+        Text(stringResource(R.string.select_a_color))
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -141,9 +143,8 @@ fun AdvancedColorPicker(color: Color, onValueChange: (Color) -> Unit) {
 }
 
 fun Color.toHexString(): String {
-    val alphaString = (alpha * 255f).toInt().toHexString().substring(6, 8)
     val redString = (red * 255f).toInt().toHexString().substring(6, 8)
     val greenString = (green * 255f).toInt().toHexString().substring(6, 8)
     val blueString = (blue * 255f).toInt().toHexString().substring(6, 8)
-    return "$alphaString$redString$greenString$blueString"
+    return "$redString$greenString$blueString"
 }

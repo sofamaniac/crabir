@@ -1,15 +1,16 @@
 package com.sofamaniac.crabir.domain.repository.feed
 
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import androidx.paging.PagingSource
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PagedResponse
-import com.sofamaniac.crabir.domain.repository.VotableRepository
-import jakarta.inject.Inject
+import com.sofamaniac.crabir.domain.repository.LinksRepository
+import org.koin.core.annotation.ViewModelScope
 
-class MultiPostsRepository @Inject constructor(
-    votableRepository: VotableRepository,
-    api: RedditAPIService,
-) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
+@ViewModelScope
+class MultiPostsRepository(
+    override val votableRepository: LinksRepository,
+    val api: RedditAPIService,
+) : PostFeedRepository<FeedParams>() {
     private var currentMulti: String? = null
 
     fun updateMulti(permalink: String) {
@@ -19,10 +20,10 @@ class MultiPostsRepository @Inject constructor(
     override suspend fun getThings(
         after: Fullname,
         params: FeedParams,
-    ): PagedResponse<Fullname> {
-        val subreddit = currentMulti ?: return PagedResponse()
+    ): PagingSource.LoadResult<Fullname, Fullname> {
+        val subreddit = currentMulti ?: return PagingSource.LoadResult.Page(emptyList(), null, null)
         return makeRequest {
-            api.getMultreddit(
+            api.getMultireddit(
                 path = subreddit,
                 after = after,
                 sort = params.sort,

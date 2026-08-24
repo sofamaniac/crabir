@@ -1,22 +1,35 @@
 package com.sofamaniac.crabir.navigation
 
+import android.util.Log
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.sofamaniac.crabir.FullscreenHandler
-import com.sofamaniac.crabir.stringLink
+import androidx.navigation.toRoute
 import com.sofamaniac.crabir.ui.thread.ThreadView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 @Serializable
-class PostRoute(val postPermalink: String) : Route {
-    companion object {
-    }
-}
+class PostRoute(val postPermalink: String, val comment: String? = null, val context: Int? = null) :
+    Route
 
-private const val ROUTE = "r/{subreddit}/comments/{id}/{title}"
+
+private const val ROUTE = "/r/{subreddit}/comments/{id}/{title}"
+private const val SHORT_ROUTE = "/r/{subreddit}/s/{id}"
+private const val LONG_ROUTE = "/r/{subreddit}/comments/{id}/{title}/{commentId}"
+private const val LONGER_ROUTE = "/r/{subreddit}/comments/{id}/{title}/comment/{commentId}"
 
 fun NavGraphBuilder.postGraph(navController: NavController) {
     composable(
@@ -26,7 +39,7 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
             navArgument("subreddit") { type = NavType.StringType },
             navArgument("id") { type = NavType.StringType },
             navArgument("title") { type = NavType.StringType },
-        )
+        ),
     )
     {
         val subreddit = it.arguments?.getString("subreddit")
@@ -37,8 +50,86 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
         } else {
             null
         }
-        FullscreenHandler {
-            ThreadView(permalink = permalink, dismiss = { navController.popBackStack() })
+        ThreadView(
+            permalink = permalink,
+            dismiss = { navController.popBackStack() }
+        )
+    }
+    composable(
+        route = LONG_ROUTE,
+        deepLinks = stringLink(url = LONG_ROUTE) + stringLink(LONGER_ROUTE),
+        arguments = listOf(
+            navArgument("subreddit") { type = NavType.StringType },
+            navArgument("id") { type = NavType.StringType },
+            navArgument("title") { type = NavType.StringType },
+            navArgument("commentId") { type = NavType.StringType },
+        )
+    )
+    {
+        val subreddit = it.arguments?.getString("subreddit")
+        val id = it.arguments?.getString("id")
+        val title = it.arguments?.getString("title")
+        val commentId = it.arguments?.getString("commentId")
+        val permalink = if (subreddit != null && id != null && title != null) {
+            "/r/$subreddit/comments/$id/$title"
+        } else {
+            null
+        }
+        ThreadView(
+            permalink = permalink,
+            dismiss = { navController.popBackStack() },
+            comment = commentId
+        )
+    }
+    composable(
+        route = SHORT_ROUTE,
+        deepLinks = stringLink(url = SHORT_ROUTE),
+        arguments = listOf(
+            navArgument("subreddit") { type = NavType.StringType },
+            navArgument("id") { type = NavType.StringType },
+        )
+    )
+    { navBackStackEntry ->
+        val id = navBackStackEntry.arguments?.getString("id")
+        val subreddit = navBackStackEntry.arguments?.getString("subreddit")
+        val client = remember { OkHttpClient() }
+
+        LaunchedEffect(id) {
+            val url =
+                "https://www.reddit.com" + (if (!subreddit.isNullOrBlank()) "/r/$subreddit" else "") + "/s/${id}"
+            Log.d("NavGraph", "Trying to resolve short link at $url")
+            val request = Request.Builder().url(url).build()
+            val finalUrl = withContext(Dispatchers.IO) {
+                client.newCall(request).execute().use { response ->
+                    response.request.url.toString()
+                }
+            }
+            navController.popBackStack()
+            Log.d("NavGraph", finalUrl)
+            navController.navigate(deepLink = finalUrl.toUri())
         }
     }
+    composable<PostRoute>(
+        enterTransition = {
+            slideIntoContainer(
+                animationSpec = tween(300, easing = EaseIn),
+                towards = AnimatedContentTransitionScope.SlideDirection.Start
+            )
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                animationSpec = tween(300, easing = EaseOut),
+                towards = AnimatedContentTransitionScope.SlideDirection.End
+            )
+        }
+    ) {
+        val route = it.toRoute<PostRoute>()
+        ThreadView(
+            permalink = route.postPermalink,
+            comment = route.comment,
+            context = route.context,
+            dismiss = { navController.popBackStack() }
+        )
+    }
+
 }

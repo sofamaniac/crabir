@@ -4,6 +4,7 @@ package com.sofamaniac.crabir.settings.theme
 
 import android.app.Activity
 import android.content.Context
+import android.icu.util.Calendar
 import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -14,14 +15,17 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.datastore.dataStore
+import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.settings.DataStoreJsonSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -66,6 +70,7 @@ data class CrabirTheme(
     val linkColor: Color,
     val secondaryText: Color,
     val downvote: Color,
+    val saved: Color,
 ) {
     fun getFieldValue(field: ColorFields): Color {
         return when (field) {
@@ -139,7 +144,8 @@ data class CrabirTheme(
                 announcement = Color(0xff00ff00),
                 linkColor = Color(0xff4b91e2),
                 downvote = Color(0xFF448AFF),
-                secondaryText = colorScheme.onPrimaryFixedVariant,
+                secondaryText = colorScheme.secondary,
+                saved = Color(0xFFFFD740)
             )
         }
     }
@@ -159,6 +165,7 @@ val DefaultDarkTheme = CrabirTheme(
     contentColor = Color(0xfff5f6f8),
     linkColor = Color(0xff4b91e2),
     downvote = Color(0xFF448AFF),
+    saved = Color(0xFFFFD740),
 )
 
 val DefaultLightTheme = CrabirTheme(
@@ -175,7 +182,15 @@ val DefaultLightTheme = CrabirTheme(
     contentColor = Color.Black,
     linkColor = Color(0xff4b91e2),
     downvote = Color(0xFF448AFF),
+    saved = Color(0xFFFFD740),
 )
+
+val AUTHOR_CARTOUCHE_COLOR = Color(0xFF448AFF)
+val MODERATOR_CARTOUCHE_COLOR = Color(0xFF388E3C)
+val GIF_CARTOUCHE_COLOR = Color(0xFF0097A7)
+val VIDEO_CARTOUCHE_COLOR = Color(0xFFE64A19)
+val ADMIN_CARTOUCHE_COLOR = Color(0xFFE64A19)
+val YOUTUBE_CARTOUCHE_COLOR = Color(0xFFC00000)
 
 enum class ThemeMode {
     Dark, Light, System, Scheduled;
@@ -190,19 +205,77 @@ enum class ThemeMode {
     }
 }
 
+@Serializable
+data class ThemeCollections(
+    val light: Map<String, CrabirTheme> = buildMap {
+        put("default light", DefaultLightTheme)
+    },
+    val dark: Map<String, CrabirTheme> = buildMap {
+        put("default dark", DefaultDarkTheme)
+    },
+)
+
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonIgnoreUnknownKeys
 data class ThemeSettings(
     val dark: CrabirTheme,
+    val darkParentTheme: String,
     val light: CrabirTheme,
+    val lightParentTheme: String,
     val mode: ThemeMode,
     val dynamicColor: Boolean,
+    val collections: ThemeCollections = ThemeCollections(),
     val lightModeStartTime: Int = 6,
     val lightModeEndTime: Int = 18,
 ) {
+
+    @Composable
+    fun currentMode(): ThemeMode {
+        return when (mode) {
+            ThemeMode.Dark, ThemeMode.Light -> mode
+            ThemeMode.System -> if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
+            ThemeMode.Scheduled -> {
+                val currentTime = Calendar.getInstance()
+                if (currentTime.get(Calendar.HOUR_OF_DAY) in lightModeStartTime..lightModeEndTime) {
+                    ThemeMode.Light
+                } else {
+                    ThemeMode.Dark
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun currentTheme(): CrabirTheme {
+        return when (currentMode()) {
+            ThemeMode.Dark -> dark
+            ThemeMode.Light -> light
+            else -> {
+                throw Exception("Unreachable code")
+            }
+        }
+    }
+
+    fun getParentTheme(mode: ThemeMode): CrabirTheme {
+        return when (mode) {
+            ThemeMode.Dark -> collections.dark[darkParentTheme] ?: DefaultDarkTheme
+            ThemeMode.Light -> collections.light[lightParentTheme] ?: DefaultLightTheme
+            else -> {
+                throw Exception("Unreachable code")
+            }
+        }
+    }
+
     companion object {
-        val DEFAULT = ThemeSettings(DefaultDarkTheme, DefaultLightTheme, ThemeMode.System, true)
+        val DEFAULT = ThemeSettings(
+            DefaultDarkTheme,
+            "default",
+            DefaultLightTheme,
+            "default",
+            ThemeMode.System,
+            true
+        )
     }
 }
 
@@ -227,58 +300,113 @@ object ColorSerializer : KSerializer<Color> {
 }
 
 @Composable
-fun rememberAppTheme(): CrabirTheme {
+fun rememberThemeSettings(): ThemeSettings {
     val context = LocalContext.current
     val themeDataStore = remember(context) { context.themeDataStore }
     val theme by themeDataStore.data.collectAsState(
         initial = ThemeSettings.DEFAULT,
     )
-    val colorScheme = MaterialTheme.colorScheme
-    val dynamicTheme = CrabirTheme.fromColorScheme(colorScheme)
-    val view = LocalView.current
-    val window = (view.context as? Activity)?.window
-    val windowInsetsController =
-        WindowCompat.getInsetsController(window!!, window.decorView)
-    if (theme.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        return dynamicTheme
-    }
-    Log.d("rememberAppTheme", "rememberAppTheme: ${theme.mode}")
-    when (theme.mode) {
-        ThemeMode.Dark -> {
-            windowInsetsController.isAppearanceLightStatusBars = false
-            windowInsetsController.isAppearanceLightNavigationBars = false
-        }
+    return theme
+}
 
-        ThemeMode.Light -> {
-            windowInsetsController.isAppearanceLightStatusBars = true
-            windowInsetsController.isAppearanceLightNavigationBars = true
-        }
-
-        else -> {}
-    }
-
+@Composable
+fun rememberThemeMode(): ThemeMode {
+    val theme = rememberThemeSettings()
     return when (theme.mode) {
-        ThemeMode.Dark -> theme.dark
-        ThemeMode.Light -> theme.light
-        ThemeMode.System -> if (isSystemInDarkTheme()) theme.dark else theme.light
-        else -> theme.dark
+        ThemeMode.System -> if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
+        else -> theme.mode
     }
 }
 
 @Composable
-fun ConfigureMaterialTheme(
-    content: @Composable () -> Unit
-) {
+fun rememberAppTheme(): CrabirTheme {
+    val theme = rememberThemeSettings()
+    val colorScheme = MaterialTheme.colorScheme
+    val dynamicTheme = CrabirTheme.fromColorScheme(colorScheme)
+    val mode = rememberThemeMode()
+    val crabirTheme = theme.currentTheme()
+    setSystemBarsColor()(mode, crabirTheme.toolbarBackground)
+    if (theme.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        return dynamicTheme
+    }
+    Log.d("rememberAppTheme", "rememberAppTheme: ${theme.mode}")
+    return crabirTheme
+}
+
+@Composable
+fun ConfigureCrabirTheme(content: @Composable () -> Unit) {
     val context = LocalContext.current
     val themeDataStore = remember(context) { context.themeDataStore }
     val themeSettings by themeDataStore.data.collectAsState(
-        initial = ThemeSettings.DEFAULT,
+        initial = null,
     )
+    val mode = if (themeSettings != null) {
+        themeSettings!!.currentMode()
+    } else if (isSystemInDarkTheme()) {
+        ThemeMode.Dark
+    } else {
+        ThemeMode.Light
+    }
 
-    val darkModeEnabled = when (themeSettings.mode) {
+    val crabirTheme = themeSettings?.currentTheme()
+        ?: if (mode == ThemeMode.Dark) DefaultDarkTheme else DefaultLightTheme
+    setSystemBarsColor()(mode, crabirTheme.toolbarBackground)
+    ConfigureMaterialTheme {
+        val theme =
+            if ((themeSettings?.dynamicColor
+                    ?: false) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+            ) {
+                val colorScheme = MaterialTheme.colorScheme
+                CrabirTheme.fromColorScheme(colorScheme)
+            } else {
+                crabirTheme
+            }
+        CompositionLocalProvider(LocalTheme provides theme) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun setSystemBarsColor(): (ThemeMode, Color) -> Unit {
+    val view = LocalView.current
+    val window = (view.context as? Activity)?.window
+    if (window == null) return { _, _ -> }
+    val windowInsetsController =
+        WindowCompat.getInsetsController(window, window.decorView)
+    return { mode, color ->
+        Log.d("setSystemBarsColor", "setSystemBarsColor: $mode")
+        if (Build.VERSION.SDK_INT < 35) {
+            window.navigationBarColor = color.toArgb()
+        }
+        when (mode) {
+            ThemeMode.Dark -> {
+                windowInsetsController.isAppearanceLightStatusBars = false
+                windowInsetsController.isAppearanceLightNavigationBars = false
+            }
+
+            ThemeMode.Light -> {
+                windowInsetsController.isAppearanceLightStatusBars = true
+                windowInsetsController.isAppearanceLightNavigationBars = true
+            }
+
+            else -> {
+                Log.e("setSystemBarsColor", "Call with invalid mode: $mode")
+            }
+        }
+    }
+}
+
+@Composable
+private fun ConfigureMaterialTheme(
+    content: @Composable () -> Unit,
+) {
+
+    val themeSettings = rememberThemeSettings()
+    val context = LocalContext.current
+    val darkModeEnabled = when (themeSettings.currentMode()) {
         ThemeMode.Dark -> true
         ThemeMode.Light -> false
-        ThemeMode.System -> isSystemInDarkTheme()
         else -> false
     }
 

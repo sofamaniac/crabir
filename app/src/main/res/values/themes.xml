@@ -1,9 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2025 Antoine Grimod
   -->
 
 <resources>
 
-    <style name="Theme.Reboost" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Crabir" parent="android:Theme.Material.NoActionBar" />
+
+    <style name="Theme.Crabir.Starting" parent="Theme.SplashScreen.IconBackground">
+        <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.Crabir</item>
+    </style>
 </resources>

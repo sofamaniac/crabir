@@ -1,0 +1,273 @@
+package com.sofamaniac.crabir.settings.post
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.sofamaniac.crabir.R
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.settings.helper.SettingHeader
+import com.sofamaniac.crabir.settings.helper.SwitchTile
+import com.sofamaniac.crabir.ui.BackButton
+import kotlinx.coroutines.launch
+
+@Composable
+fun PostSettingsPage() {
+    val context = LocalContext.current
+    val postSettingsDataStore = remember(context) { context.postSettingsDataStore }
+    val postSettings by postSettingsDataStore.data.collectAsState(
+        initial = PostSettingsDefaults.defaultPostSettings,
+    )
+    val scope = rememberCoroutineScope()
+    val navController = LocalNavController.current
+    fun update(transform: (PostSettings) -> PostSettings) {
+        scope.launch {
+            postSettingsDataStore.updateData(transform)
+        }
+    }
+
+    //    fun updateAwardsSettings(transform: (AwardSettings) -> AwardSettings) {
+    //        update { it.copy(awardSettings = transform(it.awardSettings)) }
+    //    }
+
+    fun updateFlairSettings(transform: (FlairSettings) -> FlairSettings) {
+        update { it.copy(flairSettings = transform(it.flairSettings)) }
+    }
+
+    fun updateInfoSettings(transform: (InfoSettings) -> InfoSettings) {
+        update { it.copy(infoSettings = transform(it.infoSettings)) }
+    }
+
+    fun updateButtonsSettings(transform: (ButtonsSettings) -> ButtonsSettings) {
+        update { it.copy(buttonsSettings = transform(it.buttonsSettings)) }
+    }
+
+    fun updateLinksSettings(transform: (LinksSettings) -> LinksSettings) {
+        update { it.copy(linksSettings = transform(it.linksSettings)) }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(stringResource(R.string.post_settings)) }, navigationIcon = {
+                BackButton { navController?.popBackStack() }
+            })
+        }
+    ) { innerPadding ->
+        LazyColumn(modifier = Modifier.padding(innerPadding)) {
+            //awardsSettings(postSettings, ::updateAwardsSettings)
+            flairSettings(postSettings.flairSettings, ::updateFlairSettings)
+            infoSettings(postSettings.infoSettings, ::updateInfoSettings)
+            linksSettings(postSettings.linksSettings, ::updateLinksSettings)
+            buttonsSettings(postSettings.buttonsSettings, ::updateButtonsSettings)
+        }
+    }
+}
+
+//fun LazyListScope.awardsSettings(
+//    postSettings: PostSettings,
+//    updateAwardsSettings: (transform: (AwardSettings) -> AwardSettings) -> Unit,
+//) {
+//    item {
+//        SettingHeader(stringResource(R.string.awards_settings_header))
+//    }
+//    item {
+//        SwitchTile(
+//            headlineContent = { Text("Show awards") },
+//            checked = postSettings.awardSettings.showAwards,
+//            onCheckedChange = { target ->
+//                updateAwardsSettings { it.copy(showAwards = target) }
+//            }
+//        )
+//    }
+//    item {
+//        val enabled = postSettings.awardSettings.showAwards
+//        SwitchTile(
+//            headlineContent = {
+//                Text(
+//                    "Clickable awards",
+//                )
+//            },
+//            enabled = enabled,
+//            checked = postSettings.awardSettings.clickableAwards,
+//            onCheckedChange = { target ->
+//                updateAwardsSettings { it.copy(clickableAwards = target) }
+//            }
+//        )
+//    }
+//}
+
+fun LazyListScope.linksSettings(
+    linksSettings: LinksSettings,
+    updateLinksSettings: (transform: (LinksSettings) -> LinksSettings) -> Unit,
+) {
+    item {
+        SettingHeader(stringResource(R.string.links_settings))
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.upvote_on_save)) },
+            checked = linksSettings.upvoteOnSave,
+            onCheckedChange = { target ->
+                updateLinksSettings { it.copy(upvoteOnSave = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.start_videos_muted)) },
+            checked = linksSettings.startMuted,
+            onCheckedChange = { target ->
+                updateLinksSettings { it.copy(startMuted = target) }
+            },
+        )
+    }
+}
+
+fun LazyListScope.infoSettings(
+    infoSettings: InfoSettings,
+    updateInfoSettings: (transform: (InfoSettings) -> InfoSettings) -> Unit,
+) {
+    item {
+        SettingHeader(stringResource(R.string.post_info_settings))
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.post_info_show_author)) },
+            checked = infoSettings.showAuthor,
+            onCheckedChange = { target ->
+                updateInfoSettings { it.copy(showAuthor = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.post_info_tap_author)) },
+            enabled = infoSettings.showAuthor,
+            checked = infoSettings.clickableAuthor,
+            onCheckedChange = { target ->
+                updateInfoSettings { it.copy(clickableAuthor = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.post_info_show_community)) },
+            checked = infoSettings.clickableCommunity,
+            onCheckedChange = { target ->
+                updateInfoSettings { it.copy(clickableCommunity = target) }
+            },
+        )
+    }
+}
+
+fun LazyListScope.flairSettings(
+    flairSettings: FlairSettings,
+    updateFlairSettings: (transform: (FlairSettings) -> FlairSettings) -> Unit,
+) {
+    item {
+        SettingHeader(stringResource(R.string.flair_settings))
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.show_flair)) },
+            checked = flairSettings.showFlair,
+            onCheckedChange = { target ->
+                updateFlairSettings { it.copy(showFlair = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.show_flair_color)) },
+            enabled = flairSettings.showFlair,
+            checked = flairSettings.showFlairColor,
+            onCheckedChange = { target ->
+                updateFlairSettings { it.copy(showFlairColor = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.show_flair_emoji)) },
+            enabled = flairSettings.showFlair,
+            checked = flairSettings.showFlairEmoji,
+            onCheckedChange = { target ->
+                updateFlairSettings { it.copy(showFlairEmoji = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.click_on_flair_to_search)) },
+            enabled = flairSettings.showFlair,
+            checked = flairSettings.clickable,
+            onCheckedChange = { target ->
+                updateFlairSettings { it.copy(clickable = target) }
+            },
+        )
+    }
+}
+
+fun LazyListScope.buttonsSettings(
+    buttonsSettings: ButtonsSettings,
+    updateButtonsSettings: (transform: (ButtonsSettings) -> ButtonsSettings) -> Unit,
+) {
+    item {
+        SettingHeader(stringResource(R.string.buttons_settings))
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.show_comments_button)) },
+            checked = buttonsSettings.comments,
+            onCheckedChange = { target ->
+                updateButtonsSettings { it.copy(comments = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.show_hide_post_button)) },
+            checked = buttonsSettings.hide,
+            onCheckedChange = { target ->
+                updateButtonsSettings { it.copy(hide = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.show_share_post_button)) },
+            checked = buttonsSettings.share,
+            onCheckedChange = { target ->
+                updateButtonsSettings { it.copy(share = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.show_open_in_app_button)) },
+            checked = buttonsSettings.openInApp,
+            onCheckedChange = { target ->
+                updateButtonsSettings { it.copy(openInApp = target) }
+            },
+        )
+    }
+    item {
+        SwitchTile(
+            headlineContent = { Text(stringResource(R.string.show_mark_read_button)) },
+            checked = buttonsSettings.markAsRead,
+            onCheckedChange = { target ->
+                updateButtonsSettings { it.copy(markAsRead = target) }
+            },
+        )
+    }
+}

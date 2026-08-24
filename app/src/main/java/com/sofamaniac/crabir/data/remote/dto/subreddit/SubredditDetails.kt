@@ -8,6 +8,7 @@
 
 package com.sofamaniac.crabir.data.remote.dto.subreddit
 
+import com.sofamaniac.crabir.domain.model.Fullname
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -66,7 +67,7 @@ data class SubredditDetails(
     val displayNamePrefixed: String,
     @SerialName("key_color")
     val keyColor: String?,
-    val name: String,
+    val name: Fullname,
     val url: String,
     val quarantine: Boolean,
     @SerialName("created_utc")
@@ -87,7 +88,7 @@ data class SubredditDetails(
     @SerialName("subreddit_type")
     val subredditType: String,
     @SerialName("user_is_subscriber")
-    val userIsSubscriber: Boolean?
+    val userIsSubscriber: Boolean = false,
 ) {
     val icon: SubredditIcon =
         when {

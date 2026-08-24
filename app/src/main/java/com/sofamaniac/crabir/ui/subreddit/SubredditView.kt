@@ -4,7 +4,6 @@
 
 package com.sofamaniac.crabir.ui.subreddit
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,84 +17,113 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
+import com.sofamaniac.crabir.LocalViewSettings
+import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
+import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import com.sofamaniac.crabir.domain.repository.feed.SubredditPostsRepository
+import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
+import com.sofamaniac.crabir.settings.views.viewSettingDataStore
 import com.sofamaniac.crabir.ui.TabBar
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
+import org.koin.core.parameter.parametersOf
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun SubredditViewer(
     subreddit: String,
     modifier: Modifier = Modifier,
-    viewModel: SubredditViewModel = hiltViewModel<SubredditViewModel, SubredditViewModel.Factory> { factory ->
-        factory.create(subreddit)
-    },
 ) {
-    Log.d("SubredditViewer", "subreddit: $subreddit")
+    val entity = LocalViewSettings.current.rememberedViews[subreddit] ?: defaultCommunityEntity(
+        subreddit,
+        subreddit
+    )
+    val subredditName = subreddit.split("/").last()
+    val viewModel: SubredditViewModel =
+        koinViewModel(key = subreddit) { parametersOf(subreddit, entity) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val params by viewModel.params.collectAsState()
+    val feedInfo by viewModel.info.collectAsState()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    val viewDataStore = LocalContext.current.viewSettingDataStore
+    LaunchedEffect(feedInfo) {
+        if (feedInfo == null) return@LaunchedEffect
+        scope.launch {
+            viewDataStore.updateData {
+                it.copy(
+                    rememberedViews = it.rememberedViews + (subreddit to entity.copy(
+                        displayName = feedInfo!!.displayNamePrefixed
+                    ))
+                )
+            }
+        }
+    }
+
     val topBar = @Composable {
         TopBar(
-            subreddit,
-            viewModel,
-            scrollBehavior,
+            feedInfo?.displayName ?: subreddit,
+            params,
+            slug = subreddit,
+            updateSort = viewModel::updateSort,
+            refresh = viewModel::refresh,
+            entity = entity,
+            scrollBehavior = scrollBehavior,
+            openDrawer = { scope.launch { drawerState.open() } }
         )
     }
     val bottomBar = @Composable {
         TabBar(2)
     }
+    val feedInfoView = feedInfo?.let { info ->
+        @Composable {
+            SubredditInfo(info, viewModel)
+        }
+    }
+
     FullFeedView(
         topBar, bottomBar, viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        feedInfo = {
-            val subreddit by viewModel.info.collectAsState()
-            val info = subreddit
-            if (info != null) {
-                SubredditInfo(info, viewModel)
-            } else {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("Loading...")
-                }
-            }
-        }
+        filter = rememberPostsFilter(whitelistSubreddit = listOf(subredditName)),
+        drawerState = drawerState,
+        feedInfo = feedInfoView,
+        viewEntity = entity,
     )
 }
 
@@ -109,7 +137,7 @@ fun SubredditInfo(info: SubredditData, viewModel: SubredditViewModel) {
     ) {
         Box {
             AsyncImage(
-                info.bannerImg,
+                info.bannerImg.ifBlank { info.bannerBackgroundImage ?: "" },
                 "Banner background image",
                 modifier = Modifier.fillMaxWidth(),
                 contentScale = ContentScale.FillWidth
@@ -143,20 +171,17 @@ fun SubredditInfo(info: SubredditData, viewModel: SubredditViewModel) {
                 IconButton(onClick = {}) {
                     Icon(Icons.Default.MoreVert, contentDescription = "More options")
                 }
-                val joined = info.userIsSubscriber
-                OutlinedButton(onClick = {
-                    if (joined) {
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                SubscribeButton(info.userIsSubscriber) {
+                    if (info.userIsSubscriber) {
                         viewModel.unsubscribe()
                     } else {
                         viewModel.subscribe()
                     }
-                }) {
-                    val icon = if (joined) Icons.Default.CheckCircle else null
-                    val text = if (joined) "Joined" else "Subscribe"
-                    if (icon != null) {
-                        Icon(Icons.Default.CheckCircle, contentDescription = null)
-                    }
-                    Text(text)
+                }
+                FavoriteButton(info.userHasFavorited) {
+                    viewModel.favorite(!info.userHasFavorited)
                 }
             }
             RedditMarkdown(info.publicDescription)
@@ -164,50 +189,59 @@ fun SubredditInfo(info: SubredditData, viewModel: SubredditViewModel) {
     }
 }
 
-@HiltViewModel(assistedFactory = SubredditViewModel.Factory::class)
-class SubredditViewModel @AssistedInject constructor(
+@KoinViewModel
+class SubredditViewModel(
     private val repository: SubredditPostsRepository,
     visitedPostsDao: VisitedPostsDao,
-    visitedCommunityDao: VisitedCommunityDao,
+    communityDao: SubredditRepository,
     private val subredditCache: SubredditCache,
-    /** Subreddit's display name */
-    @Assisted private val subredditName: String,
-) : PostFeedViewModel(id = subredditName, repository, visitedPostsDao, visitedCommunityDao) {
+    /** Subreddit's prefixed display name */
+    @InjectedParam slug: String,
+    @InjectedParam viewEntity: CommunityViewEntity,
+) : PostFeedViewModel<SubredditData>(
+    repository,
+    visitedPostsDao,
+    communityDao,
+    viewEntity,
+) {
 
     private val _info = MutableStateFlow<SubredditData?>(null)
     val info = _info.asStateFlow()
 
     init {
-        _info.value = subredditCache.get(subredditName)
-        repository.updateSubreddit(subredditName)
+        assert(slug.startsWith("r/"))
+        repository.updateSubreddit(slug)
         viewModelScope.launch {
+            _info.value = subredditCache.get(slug)
             if (_info.value == null) {
                 _info.value = repository.getInfo()
-                _info.value?.let { subredditCache.save(it) }
+                updateData(_info.value)
             }
-            updateData(_info.value)
         }
-    }
-
-    private suspend fun updateInfo(subscribed: Boolean) {
-
     }
 
     fun subscribe() {
         viewModelScope.launch {
             repository.subscribe()
+            _info.value = repository.getInfo()
+            updateData(_info.value)
         }
     }
 
     fun unsubscribe() {
         viewModelScope.launch {
             repository.unsubscribe()
+            _info.value = repository.getInfo()
+            updateData(_info.value)
         }
     }
 
-    @AssistedFactory
-    interface Factory {
-        fun create(subreddit: String): SubredditViewModel
+    fun favorite(favorite: Boolean) {
+        viewModelScope.launch {
+            repository.favorite(favorite)
+            _info.value = repository.getInfo()
+            updateData(_info.value)
+        }
     }
 
 }

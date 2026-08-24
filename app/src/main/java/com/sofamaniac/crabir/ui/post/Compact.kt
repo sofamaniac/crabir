@@ -4,47 +4,50 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.PostRoute
+import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.ScoreString
 import com.sofamaniac.crabir.ui.votable.UpButton
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun CompactView(
     post: PostData,
     modifier: Modifier = Modifier,
     clickable: Boolean = true,
-    onClick: (PostData) -> Unit = {},
-    canStartVideo: Boolean = false,
-    read: Boolean = false,
-    viewModel: VotableViewModel = hiltViewModel<VotableViewModel, VotableViewModel.Factory>(
-        key = post.id,
-        creationCallback = { factory ->
-            factory.create(post.name.name, post.subreddit.name)
-        }),
+    showHidden: Boolean = false,
+    viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = post.id) {
+        parametersOf(
+            post
+        )
+    },
 ) {
-    val theme = LocalTheme.current
-    val onClick = { post: PostData ->
+    val navController = LocalNavController.current
+    val onClick = {
         if (clickable) {
-            onClick(post)
+            navController?.navigate(PostRoute(post.permalink))
         }
     }
-    val likes by viewModel.likes.collectAsState(post.relationship.liked)
-    Card(
-        shape = RoundedCornerShape(0.dp),
-        colors = CardDefaults.cardColors().copy(containerColor = theme.cardBackground),
-        onClick = { onClick(post) },
+    val likes by viewModel.likes.collectAsState()
+    val postOpt by viewModel.post.collectAsState()
+    val read by viewModel.read.collectAsState()
+    if (postOpt == null) return
+    val post = postOpt!!
+    if (!showHidden && post.relationship.hidden) {
+        return
+    }
+    ThemedCard(
+        onClick = onClick,
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp),
@@ -52,17 +55,17 @@ fun CompactView(
             verticalAlignment = Alignment.Top,
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                UpButton(viewModel)
+                UpButton(likes, onClick = { viewModel.upvote(post.name) })
                 ScoreString(post.score.score, likes)
-                DownButton(viewModel)
+                DownButton(likes, onClick = { viewModel.downvote(post.name) })
             }
             Column {
                 PostInfo(
                     post,
                     modifier,
                     enableThumbnail = true,
-                    viewModel = viewModel,
                     read = read,
+                    likes = likes,
                 )
                 PostHeader(post, showSubredditIcon = false, modifier = modifier)
             }

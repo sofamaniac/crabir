@@ -3,82 +3,159 @@ package com.sofamaniac.crabir.ui.drawer
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.navigation.HomeRoute
-import com.sofamaniac.crabir.navigation.LocalNavController
-import java.util.Collections
+import com.sofamaniac.crabir.ui.ThemedDialog
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountSelector(viewModel: DrawerViewModel, onAccountSelection: () -> Unit) {
+fun AccountSelector(
+    viewModel: DrawerViewModel,
+    expanded: Boolean,
+    onAccountSelection: (Int) -> Unit,
+) {
     val iconModifier = Modifier
-        .size(32.dp)
+        .size(48.dp)
         .padding(4.dp)
         .clip(CircleShape)
-    val navController = LocalNavController.current!!
+    var showWarningDialog by remember { mutableStateOf(false) }
+    val authLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        Log.d("AccountSelector", "Result: $result")
+        viewModel.handleAuthResult(result.data)
+    }
+    val rotation =
+        animateFloatAsState(targetValue = if (expanded) 180f else 0f, label = "rotation")
+    val activeAccount by viewModel.activeAccount.collectAsState(RedditAccount.anonymous())
+    val otherAccounts by viewModel.otherAccounts.collectAsState(emptyList())
     Column {
-        for (account in viewModel.accountsList.collectAsState(initial = Collections.emptyList()).value) {
-            AccountTile(
-                account,
-                onClick = {
-                    viewModel.setActiveAccount(account.id)
-                    navController.navigate(HomeRoute) {
-                        restoreState = false
-                    }
-                    onAccountSelection()
-                },
-                iconModifier = iconModifier
-            )
-        }
-        val authLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            viewModel.handleAuthResult(result.data)
-        }
-        NavigationDrawerItem(
-            icon = {
+        AccountTile(
+            activeAccount,
+            onClick = viewModel::toggleSelectAccount,
+            iconModifier = iconModifier,
+            badge = {
                 Icon(
-                    Icons.Default.Add,
-                    contentDescription = "Add account",
-                    modifier = iconModifier
+                    Icons.Default.ArrowDropDown,
+                    contentDescription = "Select account",
+                    modifier = Modifier
+                        .size(32.dp)
+                        .rotate(rotation.value)
                 )
-            },
-            label = { Text("Add account") },
-            selected = false,
-            onClick = {
-                Log.d("DrawerContent", "Launching auth intent")
-                val authIntent = viewModel.createAuthIntent()
-                authLauncher.launch(authIntent)
             }
         )
-        NavigationDrawerItem(
-            icon = {
-                Icon(
-                    Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = "Logout",
-                    modifier = iconModifier
+        AnimatedVisibility(expanded) {
+            Column {
+                for (account in otherAccounts) {
+                    AccountTile(
+                        account,
+                        onClick = {
+                            onAccountSelection(account.id)
+                        },
+                        iconModifier = iconModifier
+                    )
+                }
+                if (!activeAccount.isAnonymous()) {
+                    AccountTile(
+                        RedditAccount.anonymous(),
+                        onClick = {
+                            onAccountSelection(RedditAccount.anonymous().id)
+                        },
+                        iconModifier = iconModifier
+                    )
+                }
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "Add account",
+                            modifier = iconModifier
+                        )
+                    },
+                    label = { Text("Add account") },
+                    selected = false,
+                    onClick = {
+                        showWarningDialog = true
+                    }
                 )
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = "Logout",
+                            modifier = iconModifier
+                        )
+                    },
+                    label = { Text("Logout") },
+                    selected = false,
+                    onClick = {
+                        viewModel.logout()
+                    }
+                )
+            }
+        }
+    }
+    if (showWarningDialog) {
+        ThemedDialog(
+            onDismissRequest = { showWarningDialog = false },
+            cancel = {
+                TextButton(onClick = { showWarningDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
             },
-            label = { Text("Logout") },
-            selected = false,
-            onClick = { viewModel.logout() }
-        )
+            confirm = {
+                TextButton(onClick = {
+                    showWarningDialog = false
+                    val authIntent = viewModel.createAuthIntent()
+                    authLauncher.launch(authIntent)
+                }) {
+                    Text(stringResource(R.string._continue))
+                }
+            }) {
+            ListItem(
+                content = { Text("Warning") }
+            )
+            ListItem(
+                content = {
+                    Text(stringResource(R.string.login_warning))
+                },
+                modifier = Modifier.padding(16.dp)
+            )
+            Row {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+        }
     }
 }
 
@@ -88,27 +165,27 @@ fun AccountTile(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     iconModifier: Modifier = Modifier,
-    badge: @Composable (() -> Unit)? = null
+    badge: @Composable (() -> Unit)? = null,
 ) {
-    val image = if (account.thumbnailUrl.isBlank()) {
+    val image = if (account.info == null) {
         @Composable {
             Icon(
                 Icons.Default.Person,
-                contentDescription = "${account.username} icon",
+                contentDescription = null,
                 modifier = iconModifier
             )
         }
     } else {
         @Composable {
             AsyncImage(
-                model = account.thumbnailUrl,
-                contentDescription = "${account.username} thumbnail",
+                model = account.info.iconImg,
+                contentDescription = null,
                 modifier = iconModifier
             )
         }
     }
     NavigationDrawerItem(
-        label = { Text(account.username) },
+        label = { Text(account.info?.username ?: "Anonymous") },
         selected = false,
         onClick = onClick,
         icon = image,

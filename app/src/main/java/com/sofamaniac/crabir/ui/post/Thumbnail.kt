@@ -16,31 +16,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.navigation.FullscreenGalleryRoute
+import com.sofamaniac.crabir.navigation.FullscreenImageRoute
+import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.ui.media.image.TransformableImage
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 @Composable
-fun Thumbnail(post: PostData) {
+fun Thumbnail(
+    post: PostData,
+    blur: Boolean = false,
+) {
     val thumbnailURL = post.getThumbnailUrl()
     val uriHandler = LocalUriHandler.current
-    val fullscreenManager = LocalFullscreenHandler.current!!
+    //val fullscreenManager = LocalFullscreenHandler.current!!
+    val navController = LocalNavController.current
     val goFullscreen = {
         when (post.kind) {
-            Kind.Image -> fullscreenManager.push { FullscreenImageView(post) }
-            Kind.Gallery -> fullscreenManager.push {
-                FullscreenGallery(
-                    post,
-                    gallery = post.gallery!!
-                )
-            }
-            // TODO: thumbnail video post
-            //Kind.Video -> fullscreenManager.push { FullscreenVideo(post) }
-
+            Kind.Image -> navController?.navigate(FullscreenImageRoute(post.name))
+            Kind.Gallery -> navController?.navigate(FullscreenGalleryRoute(post.name))
+            Kind.Video -> navController?.navigate(FullscreenVideoRoute(post.name))
             else -> uriHandler.openUri(post.url)
         }
+        Unit
     }
     val modifier = Modifier
         .fillMaxWidth(fraction = 0.2f)
@@ -48,11 +49,13 @@ fun Thumbnail(post: PostData) {
         .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
         .clickable(onClick = goFullscreen)
     if (thumbnailURL != null) {
-        AsyncImage(
-            model = thumbnailURL,
+        TransformableImage(
+            source = thumbnailURL,
             contentDescription = post.title,
             contentScale = ContentScale.Crop,
             modifier = modifier,
+            blur = blur,
+            allowZoom = false,
         )
     } else {
         Icon(

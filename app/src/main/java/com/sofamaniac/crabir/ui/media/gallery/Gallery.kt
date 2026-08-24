@@ -17,7 +17,11 @@ fun Gallery(
     enableScroll: Boolean = true,
     content: @Composable (MediaMetadata, page: Int) -> Unit,
 ) {
-    HorizontalPager(state = state, modifier = Modifier.fillMaxSize()) { page ->
+    HorizontalPager(
+        state = state,
+        modifier = Modifier.fillMaxSize(),
+        userScrollEnabled = enableScroll,
+    ) { page ->
         val metadata: MediaMetadata? = gallery.get(page)
         if (metadata != null) {
             content(metadata, page)

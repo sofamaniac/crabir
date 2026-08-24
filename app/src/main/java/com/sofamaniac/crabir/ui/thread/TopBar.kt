@@ -1,10 +1,11 @@
 package com.sofamaniac.crabir.ui.thread
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,18 +17,26 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
+import com.sofamaniac.crabir.ui.BackButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
     viewModel: ThreadViewModel,
     scrollBehavior: TopAppBarScrollBehavior?,
-    dismiss: () -> Unit
+    dismiss: () -> Unit,
 ) {
-    val sort: Sort by viewModel.sort.collectAsState()
+    val sort: Sort? by viewModel.sort.collectAsState()
     val theme = LocalTheme.current
+    var showMenu by remember { mutableStateOf(false) }
+    val navController = LocalNavController.current
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = theme.toolbarBackground,
@@ -36,22 +45,33 @@ fun TopBar(
         ),
         scrollBehavior = scrollBehavior,
         navigationIcon = {
-            IconButton(
-                onClick = dismiss,
-            ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
-            }
+            BackButton { dismiss() }
         },
         title = {
             Column {
                 Text("Comments", style = MaterialTheme.typography.titleMedium)
-                Text("${sort}", style = MaterialTheme.typography.labelSmall)
+                Text("${sort ?: Sort.Best}", style = MaterialTheme.typography.labelSmall)
             }
         },
         actions = {
-            Icon(Icons.Default.Search, "Search comments")
+            //Icon(Icons.Default.Search, "Search comments")
             SortMenu(viewModel)
-            Icon(Icons.Default.MoreVert, "More Options")
+            Box {
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(Icons.Default.MoreVert, "More Options")
+                }
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(text = { Text("Refresh") }, onClick = { viewModel.refresh() })
+                    DropdownMenuItem(text = { Text("Settings") }, onClick = {
+                        navController?.navigate(
+                            CommentsSettingsRoute
+                        )
+                    })
+                }
+            }
         }
     )
 }

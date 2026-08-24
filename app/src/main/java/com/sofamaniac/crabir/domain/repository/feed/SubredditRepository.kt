@@ -4,51 +4,67 @@
 
 package com.sofamaniac.crabir.domain.repository.feed
 
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
-import com.sofamaniac.crabir.data.remote.api.SubscribeAction
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
+import android.util.Log
+import androidx.paging.PagingSource
+import com.sofamaniac.crabir.data.local.dao.SubredditRepository
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.SubscribeAction
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.SubredditData
-import com.sofamaniac.crabir.domain.repository.VotableRepository
-import jakarta.inject.Inject
-import jakarta.inject.Singleton
+import com.sofamaniac.crabir.domain.repository.LinksRepository
+import org.koin.core.annotation.Singleton
+import org.koin.core.annotation.ViewModelScope
 
 
 @Singleton
-class SubredditCache @Inject constructor() {
-    private val cache = mutableMapOf<String, SubredditData>()
-    fun save(subreddit: SubredditData) {
-        cache[subreddit.displayName] = subreddit
+class SubredditCache(
+    private val dao: SubredditRepository
+) {
+    suspend fun save(subreddit: SubredditData) {
+        dao.upsert(subreddit)
     }
 
-    fun get(displayName: String): SubredditData? = cache[displayName]
+    suspend fun get(displayName: String): SubredditData? {
+        return dao.getBySlug(displayName)
+    }
 }
 
-class SubredditPostsRepository @Inject constructor(
-    votableRepository: VotableRepository,
-    api: RedditAPIService,
-) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
+@ViewModelScope
+class SubredditPostsRepository(
+    override val votableRepository: LinksRepository,
+    val api: RedditAPIService,
+) : PostFeedRepository<FeedParams>() {
     private var currentSubreddit: String? = null
+    private var info: SubredditData? = null
 
     suspend fun getInfo(): SubredditData? {
         if (currentSubreddit == null) {
             return null
         }
-        val res = api.getSubInfo(currentSubreddit!!)
-        if (!res.isSuccessful) {
+        try {
+            val res = api.getSubInfo(currentSubreddit!!)
+            if (!res.isSuccessful) {
+                return null
+            }
+            info = SubredditDTOMapper.map(res.body()!!.data)
+            return info
+        } catch (e: Exception) {
+            Log.e("SubredditPostsRepository", "Failed to get subreddit info", e)
             return null
         }
-        return res.body()?.data?.let { SubredditDetailsMapper.map(it) }
     }
 
+    /**
+     * @param subreddit the non prefixed display name of the subreddit
+     * */
     fun updateSubreddit(subreddit: String) {
         currentSubreddit = subreddit
     }
 
     suspend fun subscribe(): Result<Unit> {
-        val subreddit = currentSubreddit ?: return Result.failure(Exception("No subreddit set"))
-        val res = api.subscribe(SubscribeAction.SUBSCRIBE, subreddit)
+        val subreddit = info ?: return Result.failure(Exception("No info for subreddit"))
+        val res = api.subscribe(SubscribeAction.SUBSCRIBE, subreddit.name)
         return if (res.isSuccessful) {
             Result.success(Unit)
         } else {
@@ -57,8 +73,8 @@ class SubredditPostsRepository @Inject constructor(
     }
 
     suspend fun unsubscribe(): Result<Unit> {
-        val subreddit = currentSubreddit ?: return Result.failure(Exception("No subreddit set"))
-        val res = api.subscribe(SubscribeAction.UNSUBSCRIBE, subreddit)
+        val subreddit = info ?: return Result.failure(Exception("No info for subreddit"))
+        val res = api.subscribe(SubscribeAction.UNSUBSCRIBE, subreddit.name)
         return if (res.isSuccessful) {
             Result.success(Unit)
         } else {
@@ -66,11 +82,22 @@ class SubredditPostsRepository @Inject constructor(
         }
     }
 
+    suspend fun favorite(favorite: Boolean): Result<Unit> {
+        val subreddit = info ?: return Result.failure(Exception("No info for subreddit"))
+        val res = api.favorite(subreddit.displayName, favorite)
+        return if (res.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(Exception("Failed to favorite"))
+        }
+    }
+
     override suspend fun getThings(
         after: Fullname,
-        params: FeedParams
-    ): PagedResponse<Fullname> {
-        val subreddit = currentSubreddit ?: return PagedResponse()
+        params: FeedParams,
+    ): PagingSource.LoadResult<Fullname, Fullname> {
+        val subreddit =
+            currentSubreddit ?: return PagingSource.LoadResult.Page(emptyList(), null, null)
         return makeRequest {
             api.getSubreddit(
                 subreddit = subreddit,

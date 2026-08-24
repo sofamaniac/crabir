@@ -4,374 +4,234 @@
 
 package com.sofamaniac.crabir.ui.markdown
 
-import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.Drawable
-import android.text.Layout
-import android.text.Spanned
-import android.text.TextUtils
-import android.text.method.LinkMovementMethod
-import android.text.util.Linkify
-import android.view.ContextThemeWrapper
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
-import android.widget.TextView
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.ColorScheme
+import android.util.Log
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.graphics.drawable.toDrawable
-import androidx.core.net.toUri
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestBuilder
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.gif.GifDrawable
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.LinkInteractionListener
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
+import androidx.navigation.NavController
+import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
+import com.mikepenz.markdown.compose.components.markdownComponents
+import com.mikepenz.markdown.m3.Markdown
+import com.mikepenz.markdown.m3.markdownTypography
+import com.mikepenz.markdown.model.DefaultMarkdownAnnotatorConfig
+import com.mikepenz.markdown.model.MarkdownTypography
+import com.mikepenz.markdown.model.ReferenceLinkHandlerImpl
+import com.mikepenz.markdown.model.State
+import com.mikepenz.markdown.model.markdownAnimations
+import com.mikepenz.markdown.model.markdownAnnotator
+import com.mikepenz.markdown.model.rememberMarkdownState
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
-import com.sofamaniac.crabir.domain.model.MediaResource
-import com.sofamaniac.crabir.settings.theme.CrabirTheme
-import dagger.hilt.android.lifecycle.HiltViewModel
-import io.noties.markwon.AbstractMarkwonPlugin
-import io.noties.markwon.Markwon
-import io.noties.markwon.core.MarkwonTheme
-import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
-import io.noties.markwon.ext.tables.TablePlugin
-import io.noties.markwon.html.HtmlPlugin
-import io.noties.markwon.image.AsyncDrawable
-import io.noties.markwon.image.glide.GlideImagesPlugin
-import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
-import io.noties.markwon.linkify.LinkifyPlugin
-import jakarta.inject.Inject
+import com.sofamaniac.crabir.domain.model.ParsedMarkdown
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.toLocalUrl
+import com.sofamaniac.redditmarkdown.redditFlavour.RedditFlavourDescriptor
 
-
-/** Display Reddit style markdown.
- * @param markdown The markdown to display.
- * @param modifier The modifier to apply to the text.
- * @param maxLines The maximum number of lines to display.
- *
- * If [maxLines] is different from [Int.MAX_VALUE], the link in the text will not be clickable
- */
 @Composable
 fun RedditMarkdown(
-    markdown: String,
+    markdown: State,
     modifier: Modifier = Modifier,
-    maxLines: Int = Int.MAX_VALUE,
-    mediaMetadata: Map<String, MediaMetadata> = emptyMap(),
-    key: String? = markdown,
-    viewModel: MarkdownViewModel = hiltViewModel(key = key)
+    maxLines: Int? = null,
+    enableImages: Boolean = true,
+    key: Any,
+    spoilerState: SpoilerState = rememberSpoilerState(),
 ) {
-    val colorScheme = MaterialTheme.colorScheme
-
-
-    val context = LocalContext.current
-
-    val processedMarkdown = remember(context) {
-        markdown
-            .extractRedditLinks()
-            .convertRedditSpoilers()
-            .convertRedditPreviewLinks(mediaMetadata)
-            .convertRedditSuperscript()
-            .fuseQuote()
-    }
-
-    val theme = LocalTheme.current
-    val markwonReddit = remember(redditMarkwonBuilder(context, colorScheme, theme, mediaMetadata))
-    // Parse markdown once and remember it
-    val parsedMarkdown = remember(processedMarkdown, markwonReddit) {
-        markwonReddit.parse(processedMarkdown)
-    }
-
-    val spanned = remember(parsedMarkdown, markwonReddit, maxLines) {
-        markwonReddit.render(parsedMarkdown)
-    }
-    LaunchedEffect(maxLines) {
-        viewModel.reset()
-    }
-
-    key(maxLines) {
-        AndroidView(
-            factory = { ctx ->
-                initTextView(
-                    ctx,
-                    theme,
-                    maxLines,
-                    markdown,
-                    markwonReddit,
-                    spanned
-                )
-            },
-            modifier = modifier
-                .onSizeChanged { size ->
-                    if (size.height > (viewModel.height ?: 0)) {
-                        viewModel.setHeight(size.height)
-                    }
-                }
-                .let { mod ->
-                    viewModel.height?.let { size ->
-                        mod.then(Modifier.height(with(LocalDensity.current) { size.toDp() }))
-                    } ?: mod
-                }
-                .fillMaxWidth(),
-            update = { textView ->
-                markwonReddit.setParsedMarkdown(textView, spanned)
-                if (textView.maxLines != maxLines) {
-                    textView.maxLines = maxLines
-                    textView.invalidate()
-                }
-                // Disable link when truncating view and allow clicks to be passed to parent view.
-                if (maxLines != Int.MAX_VALUE) {
-                    textView.movementMethod = null
-                    textView.ellipsize = TextUtils.TruncateAt.END
-                } else {
-                    textView.ellipsize = null
-                    textView.movementMethod = LinkMovementMethod.getInstance()
-                }
-            }
-        )
-    }
+    HeightRestrictedMarkdown(markdown, modifier, maxLines, enableImages, key, spoilerState)
 }
 
+@Composable
+fun RedditMarkdown(
+    markdown: ParsedMarkdown,
+    modifier: Modifier = Modifier,
+    maxLines: Int? = null,
+    enableImages: Boolean = true,
+    key: Any? = null,
+    spoilerState: SpoilerState = rememberSpoilerState(),
+) {
+    val markdownState = rememberMarkdownState(
+        markdown.markdown,
+        flavour = RedditFlavourDescriptor(enableImages),
+        retainState = true
+    )
+    val state by markdownState.state.collectAsState()
+    HeightRestrictedMarkdown(
+        state,
+        modifier,
+        maxLines,
+        enableImages,
+        key = key,
+        spoilers = spoilerState
+    )
+}
 
-fun initTextView(
-    ctx: Context,
-    colorScheme: CrabirTheme,
-    maxLines: Int,
-    markdown: String,
-    markwonReddit: Markwon,
-    spanned: Spanned
-): TextView {
-    val contextWrapper =
-        ContextThemeWrapper(ctx, androidx.appcompat.R.style.Theme_AppCompat)
-    val textView = PassThroughTextView(contextWrapper)
-
-    return textView.apply {
-        layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
+@Composable
+private fun HeightRestrictedMarkdown(
+    markdown: State,
+    modifier: Modifier = Modifier,
+    maxLines: Int? = null,
+    enableImages: Boolean,
+    key: Any? = null,
+    spoilers: SpoilerState,
+) {
+    val onClick = if (maxLines == null) redditLinkHandler() else LinkInteractionListener { }
+    if (maxLines == null) {
+        InnerRedditMarkdown(
+            modifier = modifier,
+            markdown = markdown,
+            enableImages = enableImages,
+            linkInteractionListener = onClick,
+            key = key,
+            spoilers = spoilers,
         )
-        setTextColor(colorScheme.contentColor.toArgb())
-        this.maxLines = maxLines
-        movementMethod = if (maxLines == Int.MAX_VALUE)
-            LinkMovementMethod.getInstance() else null
-        if (maxLines != Int.MAX_VALUE)
-            ellipsize = TextUtils.TruncateAt.END
-        markwonReddit.setParsedMarkdown(this, spanned)
-        tag = markdown
-
-        viewTreeObserver.addOnGlobalLayoutListener(
-            object : ViewTreeObserver.OnGlobalLayoutListener {
-                override fun onGlobalLayout() {
-                    textView.getViewTreeObserver().removeOnGlobalLayoutListener(this)
-                    val max = textView.maxLines.coerceAtLeast(1)
-                    val layout: Layout? = textView.layout
-                    if ((layout?.lineCount ?: 0) > max) {
-                        val end = layout!!.getLineEnd(max - 1)
-                        val text = textView.text
-                        textView.setText(
-                            text.subSequence(
-                                0,
-                                (end - 3).coerceAtLeast(0)
-                            ),
-                            TextView.BufferType.SPANNABLE
-                        )
-                        textView.append("...")
-                    }
-                }
-            }
-        )
+    } else {
+        HeightRestrictedWithGradient(
+            modifier = modifier,
+            maxHeight = with(LocalDensity.current) { (MaterialTheme.typography.bodyMedium.lineHeight * maxLines).toDp() },
+        ) {
+            InnerRedditMarkdown(
+                markdown = markdown,
+                linkInteractionListener = onClick,
+                enableImages = enableImages,
+                key = key,
+                spoilers = spoilers,
+            )
+        }
     }
 }
 
 @Composable
-private fun redditMarkwonBuilder(
-    context: Context,
-    colorScheme: ColorScheme,
-    theme: CrabirTheme,
-    mediaMetadata: Map<String, MediaMetadata>
-): () -> Markwon = {
-
-    Markwon.builder(context)
-        .usePlugin(MarkwonInlineParserPlugin.create())
-        .usePlugin(StrikethroughPlugin.create())
-        .useRedditSpoilers()
-        .usePlugin(TablePlugin.create(context))
-        .usePlugin(MarkdownTheme(colorScheme, theme))
-        .usePlugin(HtmlPlugin.create())
-        .usePlugin(LinkifyPlugin.create(Linkify.WEB_URLS))
-        .usePlugin(
-            GlideImagesPlugin.create(
-                object : GlideImagesPlugin.GlideStore {
-
-                    private val requestManager = Glide.with(context).apply {
-                        addDefaultRequestListener(object : RequestListener<Any> {
-                            override fun onLoadFailed(
-                                e: GlideException?,
-                                model: Any,
-                                target: Target<Any>,
-                                isFirstResource: Boolean
-                            ): Boolean = false
-
-                            override fun onResourceReady(
-                                resource: Any,
-                                model: Any,
-                                target: Target<Any>,
-                                dataSource: DataSource,
-                                isFirstResource: Boolean
-                            ): Boolean {
-                                (resource as? GifDrawable)?.start()
-                                return false
+private fun InnerRedditMarkdown(
+    markdown: State,
+    modifier: Modifier = Modifier,
+    linkInteractionListener: LinkInteractionListener,
+    enableImages: Boolean,
+    key: Any? = null,
+    spoilers: SpoilerState,
+) {
+    val typography = redditMarkdownTypography()
+    val referenceLinkHandler = ReferenceLinkHandlerImpl()
+    CompositionLocalProvider(LocalUriHandler provides redditUriHandler()) {
+        Markdown(
+            markdown,
+            modifier = modifier,
+            typography = typography,
+            imageTransformer = Coil3ImageTransformerImpl,
+            // Disable animations
+            animations = markdownAnimations(animateTextSize = { this }),
+            //animations = markdownAnimations(animateTextSize = { Modifier.fillMaxSize() }),
+            components = markdownComponents(
+                inlineImage = { model ->
+                    if (enableImages) {
+                        ClickableMarkdownInlineImage(
+                            model.content,
+                            model.node,
+                            linkInteractionListener
+                        )
+                    } else {
+                        val string = buildAnnotatedString {
+                            withLink(
+                                LinkAnnotation.Url(
+                                    model.content,
+                                    linkInteractionListener = linkInteractionListener
+                                )
+                            ) {
+                                append(model.content)
                             }
-                        })
-                    }
-
-
-                    override fun load(drawable: AsyncDrawable): RequestBuilder<Drawable?> {
-                        val metadata = drawable.getMetadata(mediaMetadata)
-                        val placeholder =
-                            Color.GRAY.toDrawable()
-                        if (metadata != null) {
-                            placeholder.setBounds(
-                                0,
-                                0,
-                                metadata.width,
-                                metadata.height
-                            )
                         }
-
-                        return requestManager
-                            .load(metadata?.url ?: drawable.destination)
-                            .placeholder(
-                                placeholder
-                            )
+                        Text(string)
                     }
-
-                    override fun cancel(target: Target<*>) {
-                        requestManager.clear(target)
-                    }
-                }
-
-            ))
-        //.usePlugin(FullWidthImagePlugin(mediaMetadata))
-        .build()
+                },
+            ),
+            annotator = RedditAnnotator(
+                typography,
+                referenceLinkHandler,
+                spoilers,
+                config = DefaultMarkdownAnnotatorConfig(),
+                linkInteractionListener = linkInteractionListener,
+                defaultAnnotator = markdownAnnotator()
+            ),
+        )
+    }
 }
 
-private fun AsyncDrawable.getMetadata(mediaMetadata: Map<String, MediaMetadata>): MediaResource? {
-    // Handle destination of the form `giphy|xxxx`
-    if (destination.contains('|')) {
-        val metadata = mediaMetadata[destination]
-        if (metadata != null && metadata !is MediaMetadata.Invalid) {
-            return metadata.toMediaResource()
-        } else {
-            val filename = destination.split('|').last()
-            return MediaResource("https://media.giphy.com/media/$filename/giphy.gif", 1f, 100, 100)
+
+@Composable
+fun redditLinkHandler(): LinkInteractionListener {
+    val navController = LocalNavController.current
+    val uriHandler = LocalUriHandler.current
+    return LinkInteractionListener { link ->
+        Log.d("redditLinkHandler", "redditLinkHandler: $link")
+        if (link is LinkAnnotation.Url) {
+            openLink(navController, uriHandler, link.url)
         }
     }
-    // Otherwise assume destination is a link
-    val url = destination.toUri()
-    val filename = url.pathSegments.last().split('.').first()
-    return mediaMetadata[filename]?.toMediaResource()
 }
 
-private fun String.convertRedditSpoilers(): String {
-    return this.replace(">!", " \ue000 ").replace("!<", " \ue000 ")
+private fun openLink(navController: NavController?, uriHandler: UriHandler, link: String) {
+    try {
+        Log.d("redditLinkHandler", "navigating to : ${link.toLocalUrl()}")
+        navController?.navigate(link.toLocalUrl().replace("//", "/"))
+        //uriHandler.openUri(link.url)
+    } catch (e: IllegalArgumentException) {
+        Log.i("redditLinkHandler", "failed to open link in app: $e")
+        uriHandler.openUri(link)
+    }
 }
 
-
-/** Convert all markdown links that correspond to some media metadata to a markdown image */
-private fun String.convertRedditPreviewLinks(mediaMetadata: Map<String, MediaMetadata>): String {
-    val redditPreviewPatternAltText = Regex(
-        """\[(.*)]\((https://preview\.redd\.it/[^\s)]+)\)"""
-    )
-    val redditPreviewPattern = Regex("(?<!\\S)(https://preview\\.redd\\.it/[^\\s)]+)")
-
-    val s = redditPreviewPatternAltText.replace(this) { matchResult ->
-        val alttext = matchResult.groupValues[1]
-        val url = matchResult.groupValues[2]
-
-        val filename = url.toUri().lastPathSegment?.split('.')?.first()
-
-        val metadata = mediaMetadata[filename]
-        if (metadata != null) {
-            "![$alttext]($url)"
-        } else {
-            matchResult.value
+@Composable
+fun redditUriHandler(): UriHandler {
+    val navController = LocalNavController.current
+    val uriHandler = LocalUriHandler.current
+    return object : UriHandler {
+        override fun openUri(uri: String) {
+            openLink(navController, uriHandler, uri)
         }
     }
-    return redditPreviewPattern.replace(s) { matchResult ->
-        "![Preview](${matchResult.groupValues[1]})"
-    }
 }
 
-private fun String.convertRedditSuperscript(): String {
-    // Convert reddit superscript to tag based superscript
-    val redditSuperscriptPattern = Regex(
-        """\^\(([^)]+)\)|\^\^(\S+)"""
+
+@Composable
+fun redditMarkdownTypography(): MarkdownTypography {
+    val theme = LocalTheme.current
+    val text = MaterialTheme.typography.bodyLarge
+    val linkStyle = SpanStyle(
+        color = theme.linkColor,
+        textDecoration = TextDecoration.Underline
     )
-
-    return redditSuperscriptPattern.replace(this) { matchResult ->
-        "<sup>${
-            matchResult.groupValues[1].ifEmpty { matchResult.groupValues[2] }
-        }</sup > "
-    }
-}
-
-private fun String.extractRedditLinks(): String {
-    val redditLinksPattern = Regex("(?<!\\S)/?([ru]/[A-Za-z0-9_]+/?)")
-    val res = redditLinksPattern.replace(this) { matchResult ->
-        "[${matchResult.value}](https://www.reddit.com/${matchResult.value})"
-    }
-    return res
-}
-
-private fun String.fuseQuote(): String {
-    val quotePattern = Regex(">(.*)\n(\n+)>")
-    return quotePattern.replace(this) { matchResult ->
-        val newLines = ">\n".repeat(matchResult.groupValues[2].length)
-        ">${matchResult.groupValues[1]}\n$newLines>"
-    }
-}
-
-@HiltViewModel
-class MarkdownViewModel @Inject constructor() : ViewModel() {
-    private var _height by mutableStateOf<Int?>(null)
-    val height = _height
-    fun reset() {
-        _height = null
-    }
-
-    fun setHeight(height: Int) {
-        _height = height
-    }
-}
-
-class MarkdownTheme(val colorScheme: ColorScheme, val theme: CrabirTheme) :
-    AbstractMarkwonPlugin() {
-    override fun configureTheme(builder: MarkwonTheme.Builder) {
-        builder
-            .linkColor(theme.linkColor.toArgb())
-            .codeTextColor(colorScheme.onBackground.toArgb())
-            .codeBackgroundColor(colorScheme.background.toArgb())
-            .codeBlockBackgroundColor(colorScheme.background.toArgb())
-            .blockQuoteColor(theme.highlight.toArgb())
-            // Disable ruler under titles ?
-            .headingBreakColor(colorScheme.background.toArgb())
-    }
+    return markdownTypography(
+        h1 = MaterialTheme.typography.headlineLarge,
+        h2 = MaterialTheme.typography.headlineMedium,
+        h3 = MaterialTheme.typography.headlineSmall,
+        h4 = MaterialTheme.typography.titleLarge,
+        h5 = MaterialTheme.typography.titleMedium,
+        h6 = MaterialTheme.typography.titleSmall,
+        text = text,
+        code = text.copy(fontFamily = FontFamily.Monospace),
+        inlineCode = text.copy(fontFamily = FontFamily.Monospace),
+        quote = text.copy(color = theme.highlight)
+            .plus(SpanStyle(fontStyle = FontStyle.Italic)),
+        paragraph = text,
+        ordered = text,
+        bullet = text,
+        list = text,
+        textLink = TextLinkStyles(
+            style = linkStyle,
+        ),
+        table = text,
+    )
 }

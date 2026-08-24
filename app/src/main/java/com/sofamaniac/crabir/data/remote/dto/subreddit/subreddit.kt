@@ -9,6 +9,7 @@
 package com.sofamaniac.crabir.data.remote.dto.subreddit
 
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.DataInterface
 import kotlinx.serialization.SerialName
@@ -131,6 +132,8 @@ data class SubredditDTO(
     val submissionType: String = "",
     @SerialName("user_is_subscriber")
     val userIsSubscriber: Boolean = false,
+    @SerialName("user_has_favorited")
+    val userHasFavorited: Boolean = false,
     @SerialName("allowed_media_in_comments")
     val allowedMediaInComments: List<String> = emptyList(),
     @SerialName("allow_videogifs")
@@ -246,11 +249,26 @@ data class SubredditDTO(
 }
 
 
-object SubredditDetailsMapper : ObjectMappie<SubredditDTO, SubredditData>() {
+object SubredditDTOMapper : ObjectMappie<SubredditDTO, SubredditData>() {
     override fun map(from: SubredditDTO): SubredditData = mapping {
         SubredditData::defaultSet fromValue false
         SubredditData::previousNames fromValue emptyList()
         SubredditData::iconColor fromProperty from::keyColor
+        SubredditData::publicDescription fromValue ParsedMarkdown(from.publicDescription)
+        SubredditData::description fromValue ParsedMarkdown(from.description)
     }
 }
 
+object SubredditDetailsMapper : ObjectMappie<SubredditDetails, SubredditData>() {
+    override fun map(from: SubredditDetails): SubredditData = mapping {
+        SubredditData::id fromValue from.getId()
+        SubredditData::defaultSet fromValue false
+        SubredditData::previousNames fromValue emptyList()
+        SubredditData::publicDescription fromValue ParsedMarkdown(from.publicDescription)
+        SubredditData::description fromValue ParsedMarkdown(from.description)
+        //SubredditData::iconColor fromValue (from.keyColor ?: from.iconColor)
+    }
+}
+
+
+fun SubredditDetails.getId(): String = name.name.split("_").last()

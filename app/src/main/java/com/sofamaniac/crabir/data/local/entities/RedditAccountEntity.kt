@@ -3,15 +3,16 @@ package com.sofamaniac.crabir.data.local.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.sofamaniac.crabir.domain.model.AuthStateSerializer
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import net.openid.appauth.AuthState
+import kotlinx.serialization.json.Json
 
-@Entity(tableName = "accounts", indices = [Index(value = ["username"], unique = true)])
-data class RedditAccountEntity (
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0,
-    val username: String,
-    val thumbnailUrl: String,
+@Entity(tableName = "accounts", indices = [Index(value = ["name"], unique = true)])
+data class RedditAccountEntity(
+    @PrimaryKey()
+    val id: Int = 0,
+    val name: String,
+    val info: String,
     val authState: String,
     val isActive: Boolean = false,
 )
@@ -20,8 +21,21 @@ data class RedditAccountEntity (
 fun RedditAccountEntity.toDomainModel(): RedditAccount {
     return RedditAccount(
         id = id,
-        username = username,
-        thumbnailUrl = thumbnailUrl,
-        auth = AuthState.jsonDeserialize(authState),
+        info = Json.decodeFromString(info),
+        auth = Json.decodeFromString(AuthStateSerializer, authState),
     )
+}
+
+fun RedditAccount.toEntity(): RedditAccountEntity {
+    return RedditAccountEntity(
+        info = Json.encodeToString(info),
+        authState = Json.encodeToString(AuthStateSerializer, auth),
+        name = info?.name?.name ?: "Anonymous",
+    ).let {
+        if (!isUninitialized()) {
+            it.copy(id = id)
+        } else {
+            it
+        }
+    }
 }

@@ -9,18 +9,15 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.map
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
-import com.sofamaniac.crabir.data.local.entities.toEntity
-import com.sofamaniac.crabir.data.remote.api.CommunitySearchSort
-import com.sofamaniac.crabir.data.remote.api.PostSearchSort
+import com.sofamaniac.crabir.data.remote.RandditAPI
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
+import com.sofamaniac.crabir.data.remote.reddit.CommunitySearchSort
+import com.sofamaniac.crabir.data.remote.reddit.PostSearchSort
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
-import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.domain.repository.DataInterface
 import com.sofamaniac.crabir.domain.repository.ListingRepository
 import com.sofamaniac.crabir.domain.repository.ListingSource
@@ -31,24 +28,18 @@ import com.sofamaniac.crabir.domain.repository.search.PostSearchParams
 import com.sofamaniac.crabir.domain.repository.search.PostSearchRepository
 import com.sofamaniac.crabir.domain.repository.search.UserSearchRepository
 import com.sofamaniac.crabir.ui.subreddit.FeedViewModelInterface
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import javax.inject.Inject
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 interface SearchParams<This> {
     val query: String
@@ -60,10 +51,8 @@ abstract class SearchViewModel<Params : SearchParams<Params>, Data : DataInterfa
     val initialParams: Params,
 ) : ViewModel() {
     private val queryState = TextFieldState(initialText = initialParams.query)
-    var showSettings = MutableStateFlow(false)
 
     val listState = LazyStaggeredGridState()
-
 
 
     val query: String get() = queryState.text as String
@@ -97,7 +86,7 @@ abstract class SearchViewModel<Params : SearchParams<Params>, Data : DataInterfa
         if (q.length < 3) return
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
-            delay(500)
+            delay(500.milliseconds)
             search()
         }
     }
@@ -111,29 +100,34 @@ abstract class SearchViewModel<Params : SearchParams<Params>, Data : DataInterfa
         refresh()
     }
 
-    fun refresh() {
+    open fun refresh() {
         feedSource?.invalidate()
         repository.refresh()
     }
 
 }
 
-@HiltViewModel(assistedFactory = PostSearchViewModel.Factory::class)
-class PostSearchViewModel @AssistedInject constructor(
+@KoinViewModel
+class PostSearchViewModel(
     repository: PostSearchRepository,
     val visitedPostsDao: VisitedPostsDao,
-    @Assisted initialParams: PostSearchParams,
-) : SearchViewModel<PostSearchParams, PostData>(repository, initialParams), FeedViewModelInterface {
-    override val entity: Flow<VisitedCommunityEntity?> = flowOf(null)
-    override val data: StateFlow<PagingData<VotableData>> = items.map { pagingData ->
-        pagingData.map { it as VotableData }
-    }.stateIn(
+    @InjectedParam initialParams: PostSearchParams,
+) : SearchViewModel<PostSearchParams, PostData>(repository, initialParams),
+    FeedViewModelInterface<PostData> {
+    override val data: StateFlow<PagingData<PostData>> = items.stateIn(
         scope = viewModelScope,
-        started = kotlinx.coroutines.flow.SharingStarted.Lazily,
+        started = SharingStarted.Lazily,
         initialValue = PagingData.empty()
     )
 
     override var needScrollToTop = false
+    private val history = visitedPostsDao.getHistoryFlow()
+        .stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList())
+
+    override fun refresh() {
+        needScrollToTop = true
+        super.refresh()
+    }
 
     fun setSubreddit(subreddit: String) {
         _params.update {
@@ -156,37 +150,27 @@ class PostSearchViewModel @AssistedInject constructor(
         refresh()
     }
 
-    override fun visitPost(post: PostData) {
-        viewModelScope.launch {
-            visitedPostsDao.insert(post.toEntity())
-        }
-    }
-
     override fun isPostRead(post: PostData): Boolean {
-        return runBlocking(Dispatchers.IO) {
-            visitedPostsDao.getPost(post.name) != null
-        }
+        return history.value.contains(post.name)
     }
 
-    @AssistedFactory
-    interface Factory {
-        fun create(
-            params: PostSearchParams
-        ): PostSearchViewModel
-    }
 }
 
-@HiltViewModel
-class CommunitySearchViewModel @Inject constructor(
+@KoinViewModel
+class CommunitySearchViewModel(
     repository: CommunitySearchRepository,
-    private val subscriptionsRepository: SubscriptionsRepository,
+    subscriptionsRepository: SubscriptionsRepository,
+    private val randdit: RandditAPI,
 ) : SearchViewModel<CommunitySearchParams, SubredditData>(
     repository, initialParams =
         CommunitySearchParams(
             query = "",
-            sort = CommunitySearchSort.Relevance
+            sort = CommunitySearchSort.Relevance,
+            includeOver18 = true,
         )
 ) {
+
+
     val subscriptions = subscriptionsRepository.subscriptions
     fun setSort(sort: CommunitySearchSort) {
         _params.update {
@@ -194,10 +178,37 @@ class CommunitySearchViewModel @Inject constructor(
         }
         refresh()
     }
+
+    fun goToRandom(
+        includeOver18: Boolean,
+        onSuccess: (String) -> Unit,
+        onError: (Throwable) -> Unit,
+    ) {
+        viewModelScope.launch {
+            try {
+                val response = randdit.getRandomCommunity(includeOver18)
+                if (response.isSuccessful) {
+                    val url = response.body()!!.url
+                    onSuccess(url)
+                } else {
+                    onError(Exception(response.errorBody()?.string()))
+                }
+            } catch (e: Exception) {
+                onError(e)
+            }
+        }
+
+    }
+
+    fun setIncludeOver18(include: Boolean) {
+        _params.update {
+            it.copy(includeOver18 = include)
+        }
+    }
 }
 
-@HiltViewModel
-class UserSearchViewModel @Inject constructor(
+@KoinViewModel
+class UserSearchViewModel(
     repository: UserSearchRepository,
 ) : SearchViewModel<PostSearchParams, UserDTO>(
     repository, initialParams =
@@ -207,15 +218,3 @@ class UserSearchViewModel @Inject constructor(
             sort = PostSearchSort.Relevance
         )
 )
-
-//@HiltViewModel
-//class CommentSearchViewModel @Inject constructor(
-//    repository: CommentSearchRepository,
-//) : SearchViewModel<CommentData>(
-//    repository, initialParams =
-//        SearchParams(
-//            query = "",
-//            type = "comment",
-//            sort = CommunitySearchSort.Relevance
-//        )
-//)

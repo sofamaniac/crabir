@@ -15,7 +15,6 @@ import com.sofamaniac.crabir.data.remote.dto.subreddit.dummySubredditData
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.repository.DataInterface
-import com.sofamaniac.crabir.reddit.ListingData
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -52,6 +51,13 @@ sealed class Thing : DataInterface {
     }
 
     @Serializable
+    @SerialName("t4")
+    data class Message(val data: MessageDTO) : Thing() {
+        override val id: String = data.id
+        override val name: Fullname = data.name
+    }
+
+    @Serializable
     @SerialName("t5")
     data class Subreddit(val data: SubredditDTO = dummySubredditData()) :
         Thing() {
@@ -62,13 +68,17 @@ sealed class Thing : DataInterface {
     @Serializable
     @SerialName("Listing")
     data class Listing<T>(
-        val data: ListingData<T>
+        val data: ListingData<T>,
     ) : Thing(), Iterable<T> {
 
         override val id: String = "Listing"
         override val name: Fullname = Fullname("Listing")
 
         val size: Int get() = data.children.size
+
+        operator fun get(n: Int): T {
+            return data.children[n]
+        }
 
         override fun iterator(): Iterator<T> {
             return data.children.iterator()

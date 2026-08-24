@@ -12,25 +12,29 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    id("org.jetbrains.kotlin.plugin.serialization")
+    alias(libs.plugins.jetbrains.kotlin.serialization)
+    alias(libs.plugins.mikepenz.aboutlibraries)
+    alias(libs.plugins.mikepenz.aboutlibraries.android)
+    alias(libs.plugins.koin.compiler)
     id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android")
     id("tech.mappie.plugin")
     id("androidx.room")
-    id("com.mikepenz.aboutlibraries.plugin")
-    id("com.mikepenz.aboutlibraries.plugin.android")
     id("kotlin-parcelize")
 }
 
 android {
     namespace = "com.sofamaniac.crabir"
-    compileSdk = 36
+    androidResources {
+        generateLocaleConfig = true
+    }
+    compileSdk = 37
     defaultConfig {
         applicationId = "com.sofamaniac.crabir"
-        minSdk = 31
-        targetSdk = 36
-        versionCode = 12
-        versionName = "0.5"
+        // Cannot run on < 26 because of formatElapsedTimeLocalized
+        minSdk = 28
+        targetSdk = 37
+        versionCode = 13
+        versionName = "0.5.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -61,13 +65,13 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
-//    compileOptions {
-//        sourceCompatibility = JavaVersion.VERSION_21
-//        targetCompatibility = JavaVersion.VERSION_21
-//    }
-//    kotlinOptions {
-//        jvmTarget = "21"
-//    }
+    //    compileOptions {
+    //        sourceCompatibility = JavaVersion.VERSION_21
+    //        targetCompatibility = JavaVersion.VERSION_21
+    //    }
+    //    kotlinOptions {
+    //        jvmTarget = "21"
+    //    }
 
     buildFeatures {
         compose = true
@@ -83,8 +87,14 @@ android {
             )
         }
     }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+    //    kotlinOptions {
+    //        jvmTarget = "11"
+    //    }
 }
-
 
 room {
     schemaDirectory("$projectDir/schemas")
@@ -107,6 +117,7 @@ aboutLibraries {
 dependencies {
 
 
+    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -114,18 +125,28 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    //implementation(libs.androidx.material3)
-    implementation("androidx.compose.material3:material3:1.5.0-alpha15")
+    implementation(libs.androidx.core.splashscreen)
+    //noinspection LoginCredentials
     implementation(libs.appauth)
-    implementation(libs.material3)
+    debugImplementation(libs.androidx.compose.ui.tooling)
 
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.core)
+    implementation(libs.androidx.datastore)
     implementation(libs.kotlinx.coroutines.core)
 
-    implementation(libs.hilt.android)
-    implementation(libs.androidx.hilt.navigation.compose)
+    // DI
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.core)
+    implementation(libs.koin.annotations)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.androidx.compose.navigation)
+
+
     implementation(libs.androidx.compose.foundation.layout)
-    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.compose.adaptive.layout)
     ksp(libs.kotlin.metadata.jvm)
 
 
@@ -137,7 +158,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Retrofit
@@ -148,13 +168,9 @@ dependencies {
     // Json serialization
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
-    implementation(libs.kotlinx.datetime)
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.paging.compose)
-
-    // Parse HTML-encoded urls
-    implementation(libs.commons.text)
 
     // More material icons
     implementation(libs.androidx.material.icons.extended)
@@ -162,41 +178,36 @@ dependencies {
     // Images
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
-    implementation(libs.zoomable)
+    runtimeOnly(libs.coil3.coil.gif)
+    implementation(libs.landscapist.coil)
+    implementation(libs.landscapist.zoomable)
+    implementation(libs.landscapist.transformation)
+    implementation(libs.landscapist.image.gallery)
 
     // Video player
     implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.androidx.media3.exoplayer.dash)
-    implementation(libs.androidx.media3.ui)
+    runtimeOnly(libs.androidx.media3.exoplayer.dash)
     implementation(libs.androidx.media3.ui.compose.material3)
 
     // Rooms
     implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.room.paging)
     ksp(libs.androidx.room.compiler)
 
     // Render markdown
-    implementation(libs.markdown)
+    implementation(libs.multiplatform.markdown.renderer)
+    implementation(libs.multiplatform.markdown.renderer.m3)
+    implementation(libs.multiplatform.markdown.renderer.coil3)
 
-    implementation(libs.core)
-    implementation(libs.ext.tables)
-    implementation(libs.ext.strikethrough)
-    implementation(libs.image)
-    implementation(libs.html)
-    implementation(libs.image.coil)
-    implementation(libs.image.glide)
-    implementation(libs.coil)
-    implementation(libs.inline.parser)
-    implementation(libs.simple.ext)
-    implementation(libs.linkify)
+    // Parse html
+    implementation(libs.ksoup)
 
-    implementation(libs.glide)
-    annotationProcessor(libs.glide)
-
+    // License page
     implementation(libs.aboutlibraries.core)
     implementation(libs.aboutlibraries.compose.core)
     implementation(libs.aboutlibraries.compose.m3)
 
-    implementation("io.github.pdvrieze.xmlutil:serialization:1.0.0-rc2")
+    // Support for XML serialization / deserialization
+    implementation(libs.xml.serialization)
+
+    implementation(project(":redditMarkdown"))
 }

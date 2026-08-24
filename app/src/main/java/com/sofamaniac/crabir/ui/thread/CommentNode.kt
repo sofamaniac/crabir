@@ -14,9 +14,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,43 +30,67 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.BuildConfig
+import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentData
-import com.sofamaniac.crabir.domain.model.CommentType
+import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
+import com.sofamaniac.crabir.settings.theme.ADMIN_CARTOUCHE_COLOR
+import com.sofamaniac.crabir.settings.theme.AUTHOR_CARTOUCHE_COLOR
+import com.sofamaniac.crabir.settings.theme.MODERATOR_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.ui.Flair
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
-import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
-import com.sofamaniac.crabir.ui.post.VotableInteraction
+import com.sofamaniac.crabir.ui.richtext.Richtext
+import com.sofamaniac.crabir.ui.thread.dialog.MoreOptionButton
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.SavedButton
 import com.sofamaniac.crabir.ui.votable.ScoreString
 import com.sofamaniac.crabir.ui.votable.UpButton
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import com.sofamaniac.crabir.ui.votable.VotableInteraction
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 
+interface CommentViewModelInterface : VotableInteraction {
+    val openComment: StateFlow<Fullname?>
+
+    fun replyTo(name: Fullname?)
+    fun submitComment(parent: Fullname, body: String, account: RedditAccount?)
+
+    fun collapseComment(name: Fullname, collapsed: Boolean)
+
+    fun closeComment(name: Fullname)
+
+}
+
 @Composable
-fun CommentNode(
+fun CommentContent(
     comment: CommentData,
     viewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
-    enableAnimation: Boolean = true
+    enableAnimation: Boolean = true,
 ) {
+
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
-    Column {
+    val theme = LocalTheme.current
+    Column(modifier = modifier) {
+        if (comment.depth == 0) HorizontalDivider()
         ThemedCard(
-            shape = RoundedCornerShape(0),
-            modifier = modifier
+            roundedCorners = false,
+            modifier = Modifier
                 .fillMaxWidth()
+                .background(theme.cardBackground)
+                .depthIndent(comment.depth.coerceAtLeast(0))
                 .combinedClickable(
                     onClick = { if (!comment.collapsed) viewModel.toggleComment(comment.name) },
                     onLongClick = { viewModel.collapseComment(comment.name, !comment.collapsed) },
@@ -78,27 +103,18 @@ fun CommentNode(
                 OpenedComment(comment, viewModel, modifier = innerModifier, enableAnimation)
             }
         }
-        AnimatedVisibility(!comment.collapsed) {
-            Column {
-                for (reply in comment.replies) {
-                    when (reply) {
-                        is CommentType.Comment -> CommentNode(
-                            reply.comment,
-                            viewModel,
-                            modifier = modifier.depthIndent(1),
-                        )
-
-                        is CommentType.More -> MoreViewer(
-                            reply,
-                            viewModel,
-                            modifier = modifier.depthIndent(1)
-                        )
-                    }
-                }
-            }
-        }
     }
+}
 
+fun LazyListScope.commentNode(
+    comment: CommentData,
+    viewModel: ThreadViewModel,
+    modifier: Modifier = Modifier,
+    enableAnimation: Boolean = true,
+) {
+    item(key = comment.name) {
+        CommentContent(comment, viewModel, modifier.animateItem(), enableAnimation)
+    }
 }
 
 @Composable
@@ -112,99 +128,103 @@ private fun CollapsedComment(
         append("· ")
         append(timeString)
     }
+    val authorString = buildAnnotatedString {
+        append("[+] ")
+        if (comment.distinguished == "moderator") {
+            withStyle(SpanStyle(background = Color(0xFFB2FF59))) {
+                append(comment.author.username)
+            }
+        } else {
+            append(comment.author.username)
+        }
+    }
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text("[+] ${comment.author.username}", color = theme.secondaryText)
+        Text(authorString, color = theme.secondaryText)
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            "+${comment.replies.size}",
+            //"+${comment.replies.size}",
+            "+${comment.replies}",
             color = Color.White,
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.cartouche(backgroundColor = Color.Green)
         )
-        ScoreString(comment.score.score, comment.relationship.liked)
+        ScoreString(
+            comment.score.score,
+            comment.relationship.liked,
+            hidden = comment.score.hideScore
+        )
         Text(rightString)
     }
 }
 
 @Composable
-private fun ColumnScope.OpenedComment(
+fun ColumnScope.OpenedComment(
     comment: CommentData,
-    viewModel: ThreadViewModel,
+    viewModel: CommentViewModelInterface,
     modifier: Modifier = Modifier,
-    enableAnimation: Boolean = true
+    enableAnimation: Boolean = true,
 ) {
     val context = LocalContext.current
     val showBottomBar by remember(comment.name, context) {
         viewModel.openComment.map { it == comment.name || !enableAnimation }
-    }.collectAsState(initial = false)
+    }.collectAsState(initial = !enableAnimation)
+    val commentsSettings = LocalCommentsSettings.current
 
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
-    //.padding(bottom = 8.dp)
     Spacer(modifier = Modifier.height(8.dp))
     TopRow(comment, modifier = innerModifier)
     Spacer(modifier = Modifier.height(8.dp))
-    RedditMarkdown(
-        comment.bodyMd,
-        modifier = innerModifier,
-        mediaMetadata = comment.mediaMetadata,
-        key = comment.id
-    )
+    Richtext(comment.richtext, modifier = innerModifier, mediaMetadata = comment.mediaMetadata)
     Spacer(modifier = Modifier.height(8.dp))
     AnimatedVisibility(showBottomBar) {
-        BottomRow(comment, viewModel)
+        BottomRow(comment, viewModel) {
+            if (commentsSettings.hideButtonsAfterVote) {
+                viewModel.closeComment(comment.name)
+            }
+        }
     }
 }
 
 @Composable
-fun BottomRow(comment: CommentData, viewModel: ThreadViewModel, modifier: Modifier = Modifier) {
+fun BottomRow(
+    comment: CommentData,
+    viewModel: CommentViewModelInterface,
+    modifier: Modifier = Modifier,
+    onAction: () -> Unit,
+) {
     val likes = comment.relationship.liked
     val saved = comment.relationship.saved
-    val votable = remember(comment) {
-        object : VotableInteraction {
-            override val likes: Flow<Boolean?> = flowOf(likes)
-            override val saved: Flow<Boolean> = flowOf(saved)
-
-            override fun upvote() {
-                viewModel.upvote(comment.name, likes)
-            }
-
-            override fun downvote() {
-                viewModel.downvote(comment.name, likes)
-            }
-
-            override fun save(target: Boolean) {
-                viewModel.save(comment.name, saved)
-            }
-        }
-    }
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(color = Color.Gray.copy(alpha = 0.2f)),
         horizontalArrangement = Arrangement.End
     ) {
-        UpButton(votable)
-        DownButton(votable)
-        SavedButton(votable)
-        ReplyButton(parentId = comment.name, threadViewModel = viewModel) {
-            ThemedCard(modifier = Modifier.padding(all = 16.dp)) {
-                Text(comment.author.username, modifier = modifier)
-                RedditMarkdown(
-                    comment.bodyMd,
-                    maxLines = 5,
-                    modifier = modifier
-                )
-            }
-        }
+        UpButton(likes, onClick = {
+            viewModel.upvote(comment.name)
+            onAction()
+        })
+        DownButton(likes, onClick = {
+            viewModel.downvote(comment.name)
+            onAction()
+        })
+        SavedButton(saved, onClick = {
+            viewModel.save(comment.name, !saved, false)
+            onAction()
+        })
+        ReplyButton(comment.name, viewModel)
+        MoreOptionButton(comment, viewModel)
         if (BuildConfig.DEBUG) {
             IconButton(onClick = {
                 Log.d("CommentNode", "$comment")
-            }) { Icon(Icons.Default.BugReport, contentDescription = null) }
+            }) {
+                Icon(Icons.Default.BugReport, contentDescription = null)
+            }
         }
     }
 }
@@ -228,6 +248,7 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
             )
         )
     }
+    val authorString = comment.author.username
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -235,9 +256,21 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
     ) {
         if (comment.isSubmitter) {
             Text(
-                comment.author.username,
+                authorString,
                 color = Color.White,
-                modifier = authorModifier.cartouche(Color(0xFF2196F3))
+                modifier = authorModifier.cartouche(AUTHOR_CARTOUCHE_COLOR)
+            )
+        } else if (comment.distinguished == "moderator") {
+            Text(
+                authorString,
+                color = Color.White,
+                modifier = authorModifier.cartouche(MODERATOR_CARTOUCHE_COLOR)
+            )
+        } else if (comment.distinguished == "admin") {
+            Text(
+                authorString,
+                color = Color.White,
+                modifier = authorModifier.cartouche(ADMIN_CARTOUCHE_COLOR)
             )
         } else {
             Text(comment.author.username, color = theme.highlight, modifier = authorModifier)
@@ -246,7 +279,11 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
             Flair(comment.author.flair)
         }
         Spacer(modifier = Modifier.weight(1f))
-        ScoreString(comment.score.ups, comment.relationship.liked, hidden = comment.score.hideScore)
+        ScoreString(
+            comment.score.score,
+            comment.relationship.liked,
+            hidden = comment.score.hideScore
+        )
         Text(rightString, maxLines = 1)
     }
 }

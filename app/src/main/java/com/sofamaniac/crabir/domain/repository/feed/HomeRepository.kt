@@ -4,29 +4,32 @@
 
 package com.sofamaniac.crabir.domain.repository.feed
 
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import android.util.Log
+import androidx.paging.PagingSource
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PagedResponse
-import com.sofamaniac.crabir.domain.repository.VotableRepository
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.sofamaniac.crabir.domain.repository.LinksRepository
+import org.koin.core.annotation.Singleton
 
 @Singleton
-class HomeRepository @Inject constructor(
-    votableRepository: VotableRepository,
-    api: RedditAPIService
-) : FeedRepositoryCommon<FeedParams>(votableRepository, api) {
+class HomeRepository(
+    override val votableRepository: LinksRepository,
+    val api: RedditAPIService
+) : PostFeedRepository<FeedParams>() {
 
     override suspend fun getThings(
         after: Fullname,
-        params: FeedParams
-    ): PagedResponse<Fullname> {
+        params: FeedParams,
+    ): PagingSource.LoadResult<Fullname, Fullname> {
         return makeRequest {
-            api.getHome(
+            Log.d("HomeRepository", "getThings: $params")
+            val res = api.getHome(
                 sort = params.sort,
                 timeframe = params.timeframe,
                 after = after
             )
+            Log.d("HomeRepository", "getThings: ${res.body()}")
+            res
         }
     }
 }

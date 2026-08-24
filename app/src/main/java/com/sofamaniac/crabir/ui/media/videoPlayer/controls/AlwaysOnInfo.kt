@@ -1,11 +1,13 @@
 package com.sofamaniac.crabir.ui.media.videoPlayer.controls
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -13,17 +15,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.material3.buttons.MuteButton
 import com.sofamaniac.crabir.ui.cartouche
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 
+@OptIn(UnstableApi::class)
 @Composable
 fun AlwaysOnInfo(modifier: Modifier = Modifier) {
     val backgroundColor = Color.Black.copy(alpha = 0.66f)
-    val context = LocalContext.current
-    val player = VideoPlayerManager.getInstance(context)
+    val player = VideoPlayerManager.getInstance()
     val showMuteButton by VideoPlayerManager.hasAudio.collectAsState(false)
     Row(
         horizontalArrangement = if (showMuteButton) Arrangement.SpaceBetween else Arrangement.End,
@@ -34,6 +36,7 @@ fun AlwaysOnInfo(modifier: Modifier = Modifier) {
         if (showMuteButton) {
             MuteButton(
                 player,
+                colors = IconButtonDefaults.iconButtonColors().copy(contentColor = Color.White),
                 modifier = Modifier
                     .cartouche(backgroundColor)
                     .size(32.dp)
@@ -42,7 +45,7 @@ fun AlwaysOnInfo(modifier: Modifier = Modifier) {
         }
         RemainingTimeText(
             player,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelLarge.copy(color = Color.White),
             modifier = Modifier
                 .height(32.dp)
                 .cartouche(backgroundColor)

@@ -10,9 +10,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.ThumbDown
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.PlainTooltip
@@ -22,27 +21,26 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.ui.post.VotableInteraction
+import com.sofamaniac.crabir.R
 import kotlinx.coroutines.launch
 
 const val MAX_OFFSET = 10f
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UpButton(viewModel: VotableInteraction) {
+fun UpButton(likes: Boolean?, onClick: () -> Unit) {
     val theme = LocalTheme.current
 
     val offset = remember { Animatable(0f) }
-    val likes by viewModel.likes.collectAsState(initial = null)
-
     suspend fun animate(likes: Boolean?) {
         if (likes == true) return
         offset.animateTo(-MAX_OFFSET, animationSpec = tween(50, easing = EaseIn))
@@ -58,7 +56,10 @@ fun UpButton(viewModel: VotableInteraction) {
     )
 
     val scope = rememberCoroutineScope()
-    val description = if (likes == true) "Neutral vote" else "Upvote"
+    val neutral = stringResource(R.string.neutral_vote)
+    val upvote = stringResource(R.string.upvote)
+    val description = if (likes == true) neutral else upvote
+    val icon = if (likes == true) R.drawable.filled_arrow_up else R.drawable.arrow_shape_up
     TooltipBox(
         tooltip = { PlainTooltip { Text(description) } },
         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
@@ -69,24 +70,28 @@ fun UpButton(viewModel: VotableInteraction) {
         IconButton(
             onClick = {
                 scope.launch { animate(likes) }
-                viewModel.upvote()
+                onClick()
             },
             modifier = Modifier.offset { IntOffset(0, offset.value.toInt()) }
         ) {
-            Icon(Icons.Filled.ThumbUp, description, tint = buttonColor.value)
+            Icon(
+                painter = painterResource(icon),
+                description,
+                tint = buttonColor.value
+            )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DownButton(viewModel: VotableInteraction) {
+fun DownButton(likes: Boolean?, onClick: () -> Unit) {
     val theme = LocalTheme.current
     val offset = remember { Animatable(0f) }
-    val likes by viewModel.likes.collectAsState(initial = null)
 
     suspend fun animate(likes: Boolean?) {
         if (likes == false) return
-        offset.animateTo(-MAX_OFFSET, animationSpec = tween(50, easing = EaseIn))
+        offset.animateTo(MAX_OFFSET, animationSpec = tween(50, easing = EaseIn))
         offset.animateTo(
             0f,
             animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium)
@@ -99,7 +104,10 @@ fun DownButton(viewModel: VotableInteraction) {
         targetValue = if (likes == false) theme.downvote else Color.Gray,
         label = "button color"
     )
-    val description = if (likes == false) "Neutral vote" else "Downvote"
+    val neutral = stringResource(R.string.neutral_vote)
+    val downvote = stringResource(R.string.downvote)
+    val description = if (likes == false) neutral else downvote
+    val icon = if (likes == false) R.drawable.filled_arrow_up else R.drawable.arrow_shape_up
     TooltipBox(
         tooltip = { PlainTooltip { Text(description) } },
         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
@@ -110,21 +118,27 @@ fun DownButton(viewModel: VotableInteraction) {
         IconButton(
             onClick = {
                 scope.launch { animate(likes) }
-                viewModel.downvote()
+                onClick()
             },
             modifier = Modifier.offset { IntOffset(0, offset.value.toInt()) }
         ) {
-            Icon(Icons.Filled.ThumbDown, description, tint = buttonColor.value)
+            Icon(
+                painter = painterResource(icon),
+                description,
+                tint = buttonColor.value,
+                modifier = Modifier.scale(-1f)
+            )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SavedButton(viewModel: VotableInteraction) {
+fun SavedButton(saved: Boolean, onClick: () -> Unit) {
+    val theme = LocalTheme.current
     val scale = remember { Animatable(1f) }
-    val saved by viewModel.saved.collectAsState(initial = false)
     val buttonColor = animateColorAsState(
-        targetValue = if (saved) Color.Yellow else Color.Gray,
+        targetValue = if (saved) theme.saved else Color.Gray,
         label = "button color"
     )
 
@@ -136,7 +150,9 @@ fun SavedButton(viewModel: VotableInteraction) {
     }
 
     val scope = rememberCoroutineScope()
-    val description = if (saved) "Unsave" else "Save"
+    val save = stringResource(R.string.save)
+    val unsave = stringResource(R.string.unsave)
+    val description = if (saved) unsave else save
     TooltipBox(
         tooltip = { PlainTooltip { Text(description) } },
         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
@@ -146,7 +162,7 @@ fun SavedButton(viewModel: VotableInteraction) {
     ) {
         IconButton(onClick = {
             scope.launch { animate(!saved) }
-            viewModel.save(!saved)
+            onClick()
         }, modifier = Modifier.scale(scale.value)) {
             if (saved) {
                 Icon(Icons.Filled.Bookmark, description, tint = buttonColor.value)

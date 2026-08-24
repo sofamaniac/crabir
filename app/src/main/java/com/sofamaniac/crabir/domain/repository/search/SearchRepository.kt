@@ -1,28 +1,40 @@
 package com.sofamaniac.crabir.domain.repository.search
 
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
+import androidx.paging.PagingSource
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ListingRepository
+import org.koin.core.annotation.ViewModelScope
 
-class PostSearchRepository(private val api: RedditAPIService) :
+@ViewModelScope
+class PostSearchRepository(
+    private val api: RedditAPIService,
+    private val votableRepository: LinksRepository,
+) :
     ListingRepository<PostSearchParams, PostData>() {
     override fun thingToData(thing: Thing): PostData? {
         if (thing !is Thing.Post) return null
         return PostDataMapper.map(thing.data)
     }
 
+    override suspend fun onResponseSuccess(things: List<Thing>) {
+        super.onResponseSuccess(things)
+        val votableList = things.mapNotNull { thingToData(it) }
+        votableRepository.insert(votableList)
+    }
+
     override suspend fun getThings(
         after: Fullname,
-        params: PostSearchParams
-    ): PagedResponse<Fullname> {
-        if (params.query.length < 3) return PagedResponse()
+        params: PostSearchParams,
+    ): PagingSource.LoadResult<Fullname, Fullname> {
+        if (params.query.length < 3) return PagingSource.LoadResult.Page(emptyList(), null, null)
         return makeRequest {
             api.search(
                 subreddit = params.subreddit ?: "all",
@@ -37,30 +49,31 @@ class PostSearchRepository(private val api: RedditAPIService) :
     }
 }
 
+@ViewModelScope
 class CommunitySearchRepository(private val api: RedditAPIService) :
     ListingRepository<CommunitySearchParams, SubredditData>() {
     override fun thingToData(thing: Thing): SubredditData? {
         if (thing !is Thing.Subreddit) return null
-        return SubredditDetailsMapper.map(thing.data)
+        return SubredditDTOMapper.map(thing.data)
     }
 
     override suspend fun getThings(
         after: Fullname,
-        params: CommunitySearchParams
-    ): PagedResponse<Fullname> {
-        if (params.query.length < 3) return PagedResponse()
+        params: CommunitySearchParams,
+    ): PagingSource.LoadResult<Fullname, Fullname> {
+        if (params.query.length < 3) return PagingSource.LoadResult.Page(emptyList(), null, null)
         return makeRequest {
-            api.search(
-                after = after,
+            api.searchSubreddits(
                 query = params.query,
-                type = "sr",
-                sort = params.sort,
-                timeframe = params.timeframe,
+                includeOver18 = params.includeOver18,
+                exact = params.exact,
+                after = after.name,
             )
         }
     }
 }
 
+@ViewModelScope
 class UserSearchRepository(private val api: RedditAPIService) :
     ListingRepository<PostSearchParams, UserDTO>() {
     override fun thingToData(thing: Thing): UserDTO? {
@@ -71,9 +84,9 @@ class UserSearchRepository(private val api: RedditAPIService) :
 
     override suspend fun getThings(
         after: Fullname,
-        params: PostSearchParams
-    ): PagedResponse<Fullname> {
-        if (params.query.length < 3) return PagedResponse()
+        params: PostSearchParams,
+    ): PagingSource.LoadResult<Fullname, Fullname> {
+        if (params.query.length < 3) return PagingSource.LoadResult.Page(emptyList(), null, null)
         return makeRequest {
             api.search(
                 subreddit = params.subreddit ?: "all",

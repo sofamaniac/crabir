@@ -6,6 +6,7 @@ package com.sofamaniac.crabir.data.remote.dto.comment
 
 import com.sofamaniac.crabir.data.remote.dto.LinkFlairRichtext
 import com.sofamaniac.crabir.data.remote.dto.Thing
+import com.sofamaniac.crabir.data.remote.dto.emptyListing
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditId
 import com.sofamaniac.crabir.data.remote.utils.EmptyStringOrListingSerializer
@@ -16,12 +17,17 @@ import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Flair
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.Message
+import com.sofamaniac.crabir.domain.model.MessageType
+import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.domain.model.Relationship
+import com.sofamaniac.crabir.domain.model.RichtextDocument
 import com.sofamaniac.crabir.domain.model.Score
 import com.sofamaniac.crabir.domain.model.SubredditInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import tech.mappie.api.ObjectMappie
+import java.util.Collections
 import kotlin.time.Instant
 
 @Serializable
@@ -39,19 +45,20 @@ data class CommentDTO(
     val body: String,
     @SerialName("body_html")
     val bodyHtml: String,
+    @SerialName("rtjson") val richtext: RichtextDocument = RichtextDocument(Collections.emptyList()),
     val depth: Int = -1,
     @SerialName("parent_id")
-    val parentId: String,
-    val permalink: String,
+    val parentId: Fullname,
+    val permalink: String = "",
     @Serializable(with = EmptyStringOrListingSerializer::class)
-    val replies: Thing.Listing<Thing>,
+    val replies: Thing.Listing<Thing> = emptyListing(),
     val media_metadata: Map<String, MediaMetadata> = emptyMap(),
 
     // ================================================ //
     // AUTHOR INFORMATION
     // ================================================ //
     val author: String = "[deleted]",
-    val author_fullname: String = "[deleted]",
+    val author_fullname: Fullname = Fullname("[deleted]"),
     val author_is_blocked: Boolean = false,
     val author_patreon_flair: Boolean = false,
     val author_premium: Boolean = false,
@@ -64,37 +71,50 @@ data class CommentDTO(
     val author_flair_text_color: String? = null,
     val author_flair_type: String? = null,
 
-    val saved: Boolean,
+    val saved: Boolean = false,
     val likes: Boolean? = null,
-    val score: Int,
-    val downs: Int,
-    val ups: Int,
+    val score: Int = 0,
+    val downs: Int = 0,
+    val ups: Int = 0,
 
-    val subreddit: String,
-    val subreddit_id: String,
-    val subreddit_name_prefixed: String,
-    val subreddit_type: String,
+    val subreddit: String = "",
+    val subreddit_id: String = "",
+    val subreddit_name_prefixed: String = "",
+    val subreddit_type: String = "",
+
+    // FIELD WHEN MESSAGE
+    val subject: String = "",
+    @SerialName("link_title")
+    val linkTitle: String? = null,
+    val type: String? = null,
+    val context: String = "",
+    val new: Boolean = false,
+    val dest: String = "",
+    @SerialName("num_comments")
+    val numComments: Int = 0,
+    @SerialName("was_comment")
+    val wasComment: Boolean = false,
 
 
     @Serializable(with = InstantAsFloatSerializer::class)
     val approved_at_utc: Instant? = null,
     val approved_by: String? = null,
-    val archived: Boolean,
+    val archived: Boolean = false,
     val all_awardings: List<String> = emptyList(),
     val associated_award: String? = null,
     val awarders: List<String> = emptyList(),
     @Serializable(with = InstantAsFloatSerializer::class)
     val banned_at_utc: Instant? = null,
     val banned_by: String? = null,
-    val can_gild: Boolean,
-    val can_mod_post: Boolean,
-    val collapsed: Boolean,
+    val can_gild: Boolean = false,
+    val can_mod_post: Boolean = false,
+    val collapsed: Boolean = false,
     val collapsed_because_crowd_control: Boolean? = null,
     val collapsed_reason: String? = null,
     // TODO Replace with enum
     val collapsed_reason_code: String? = null,
     val comment_type: String? = null,
-    val controversiality: Int,
+    val controversiality: Int = 0,
     @Serializable(with = InstantAsFloatSerializer::class)
     val created: Instant,
     @Serializable(with = InstantAsFloatSerializer::class)
@@ -102,28 +122,28 @@ data class CommentDTO(
     val distinguished: String? = null,
     @Serializable(with = FalseOrTimestampSerializer::class)
     val edited: Instant? = null,
-    val gilded: Int,
+    val gilded: Int = 0,
     // FIXME
     //val gildings: List<String>,
-    val is_submitter: Boolean,
-    val link_id: String,
-    val locked: Boolean,
+    val is_submitter: Boolean = false,
+    val link_id: String = "",
+    val locked: Boolean = false,
     val mod_note: String? = null,
     val mod_reason_by: String? = null,
     val mod_reason_title: String? = null,
-    val mod_reports: List<String>,
-    val no_follow: Boolean,
+    val mod_reports: List<String> = emptyList(),
+    val no_follow: Boolean = false,
     val num_reports: Int? = null,
     val removal_reason: String? = null,
     // val report_reasons: String? = null,
-    val score_hidden: Boolean,
-    val send_replies: Boolean,
-    val stickied: Boolean,
+    val score_hidden: Boolean = false,
+    val send_replies: Boolean = false,
+    val stickied: Boolean = false,
     val top_awarded_type: String? = null,
-    val total_awards_received: Int,
-    val treatment_tags: List<String>,
-    val unrepliable_reason: String?,
-    val user_reports: List<String>
+    val total_awards_received: Int = 0,
+    val treatment_tags: List<String> = emptyList(),
+    val unrepliable_reason: String? = null,
+    val user_reports: List<String> = emptyList(),
 )
 
 object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
@@ -133,13 +153,14 @@ object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
         CommentData::parentId fromProperty from::parentId
         CommentData::depth fromProperty from::depth
         CommentData::author fromValue from.toAuthorInfo()
-        CommentData::bodyMd fromProperty from::body
+        CommentData::bodyMd fromValue from.markdown()
         CommentData::bodyHtml fromProperty from::bodyHtml
         CommentData::relationship fromValue from.toRelationship()
         CommentData::permalink fromProperty from::permalink
         CommentData::score fromValue from.toScore()
         CommentData::subredditInfo fromValue from.toSubredditInfo()
-        CommentData::replies fromValue from.mapReplies()
+        //CommentData::replies fromValue from.mapReplies()
+        CommentData::replies fromValue from.countReplies()
         CommentData::createdUtc fromProperty from::created_utc
         CommentData::mediaMetadata fromProperty from::media_metadata
         CommentData::isSubmitter fromProperty from::is_submitter
@@ -147,12 +168,32 @@ object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
 
 }
 
+object CommentMessageMapper : ObjectMappie<CommentDTO, Message>() {
+    override fun map(from: CommentDTO): Message = mapping {
+        Message::type fromValue from.getType()
+        Message::authorFullname fromProperty from::author_fullname
+        Message::createdUtc fromProperty from::created_utc
+        Message::replies fromValue ""
+    }
+}
+
+fun CommentDTO.getType(): MessageType {
+    return MessageType.fromString(type ?: "")
+}
+
+
+private fun CommentDTO.countReplies(): Int = replies.size
+
 private fun CommentDTO.mapReplies(): List<CommentType> = replies.data.children.map {
     when (it) {
         is Thing.Comment -> CommentType.Comment(CommentDataMapper.map(it.data))
         is Thing.More -> CommentType.More(it.data)
         else -> throw IllegalArgumentException("Unknown comment type: ${it.javaClass.name}")
     }
+}
+
+private fun CommentDTO.markdown(): ParsedMarkdown {
+    return ParsedMarkdown(body, media_metadata)
 }
 
 
@@ -187,7 +228,7 @@ private fun CommentDTO.toScore() = Score(
     downs = downs,
     score = score,
     hideScore = score_hidden,
-    upvoteRatio = ups.toDouble() / (ups + downs).toDouble()
+    upvoteRatio = ups.toDouble() / (ups + downs).toDouble().coerceAtLeast(1.0)
 )
 
 private fun CommentDTO.toSubredditInfo() = SubredditInfo(

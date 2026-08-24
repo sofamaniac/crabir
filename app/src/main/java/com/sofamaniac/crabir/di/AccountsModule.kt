@@ -3,53 +3,43 @@ package com.sofamaniac.crabir.di
 import android.content.Context
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.AccountsRepositoryImpl
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import jakarta.inject.Qualifier
-import jakarta.inject.Singleton
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Configuration
+import org.koin.core.annotation.Module
+import org.koin.core.annotation.Single
+
+//
+//import com.sofamaniac.crabir.domain.repository.AccountsRepository
+//import com.sofamaniac.crabir.domain.repository.AccountsRepositoryImpl
+//import dagger.Binds
+//import dagger.Module
+//import dagger.hilt.InstallIn
+//import dagger.hilt.components.SingletonComponent
+//import jakarta.inject.Singleton
+//
+//@Module
+//@InstallIn(SingletonComponent::class)
+//abstract class AccountsModuleAbstract {
+//
+////    @Binds
+////    @Singleton
+////    abstract fun bindsAccountsRepository(
+////        accountsRepository: AccountsRepositoryImplRoom
+////    ): AccountsRepository
+//
+//    @Binds
+//    @Singleton
+//    abstract fun bindsAccountsRepository(
+//        accountsRepository: AccountsRepositoryImpl
+//    ): AccountsRepository
+//}
 
 @Module
-@InstallIn(SingletonComponent::class)
-object AccountsModule {
-
-    @Provides
-    @Singleton
-    fun providesAccountsRepository(
-        @ApplicationContext context: Context,
-        @ApplicationScope coroutineScope: CoroutineScope,
-    ): AccountsRepositoryImpl {
-        return AccountsRepositoryImpl(
-            context, coroutineScope
-        )
-
-    }
-
-    @ApplicationScope
-    @Provides
-    @Singleton
-    fun provideApplicationScope(): CoroutineScope {
-        return CoroutineScope(SupervisorJob() + Dispatchers.Default)
+@ComponentScan
+@Configuration
+class AccountsModule {
+    @Single
+    fun provideAccountsRepository(context: Context): AccountsRepository {
+        return AccountsRepositoryImpl(context)
     }
 }
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class AccountsModuleAbstract {
-
-    @Binds
-    @Singleton
-    abstract fun bindsAccountsRepository(
-        accountsRepositoryImpl: AccountsRepositoryImpl
-    ): AccountsRepository
-}
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class ApplicationScope

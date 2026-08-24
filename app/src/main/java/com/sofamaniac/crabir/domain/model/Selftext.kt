@@ -8,9 +8,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Selftext(
-    private val selftext: String,
-    private val selftextHtml: String
+    val markdown: ParsedMarkdown,
+    val html: String,
+    val richtext: RichtextDocument = RichtextDocument(emptyList()),
 ) {
-    val markdown: String get() = selftext
-    val html: String get() = selftextHtml
+
+    companion object {
+        val DUMMY = Selftext(ParsedMarkdown("selftext"), "selftextHtml")
+    }
 }

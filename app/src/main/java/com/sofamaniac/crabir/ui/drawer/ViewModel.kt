@@ -12,185 +12,214 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.data.local.dao.VisitedCommunityDao
-import com.sofamaniac.crabir.data.local.entities.VisitedCommunityEntity
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
-import com.sofamaniac.crabir.data.remote.api.auth.AuthConfig
-import com.sofamaniac.crabir.data.remote.api.auth.BasicAuthClient
+import com.sofamaniac.crabir.AccountManager
+import com.sofamaniac.crabir.data.local.dao.MultiRepository
+import com.sofamaniac.crabir.data.local.dao.SubredditRepository
+import com.sofamaniac.crabir.data.remote.dto.MultiData
 import com.sofamaniac.crabir.data.remote.dto.Thing
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.SubscriptionsRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.openid.appauth.AuthState
-import net.openid.appauth.AuthorizationException
-import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
+import org.koin.core.annotation.KoinViewModel
 
 sealed class LoginState {
     object Idle : LoginState()
     object Loading : LoginState()
     object Success : LoginState()
-    data class Error(val message: String) : LoginState()
+    data class Error(val message: Throwable) : LoginState()
 }
 
-@HiltViewModel
-class DrawerViewModel @Inject constructor(
+abstract class DrawerViewModel : ViewModel() {
+    abstract val accountsList: Flow<List<RedditAccount>>
+    abstract val otherAccounts: Flow<List<RedditAccount>>
+    abstract val activeAccount: Flow<RedditAccount>
+    abstract val loginState: StateFlow<LoginState>
+    abstract val selectingAccount: StateFlow<Boolean>
+    abstract val subscriptions: StateFlow<List<Thing.Subreddit>>
+    abstract val sortedSubscriptions: StateFlow<List<Thing.Subreddit>>
+    abstract val multis: StateFlow<List<Thing.Multi>>
+    abstract fun initialize()
+    abstract fun setActiveAccount(accountId: Int)
+    abstract fun toggleSelectAccount()
+    abstract fun logout()
+    abstract fun createAuthIntent(): Intent
+    abstract fun visitCommunity(data: SubredditData)
+    abstract fun visitCommunity(data: MultiData)
+    abstract fun handleAuthResult(intent: Intent?)
+}
+
+@KoinViewModel(binds = [DrawerViewModel::class])
+class DrawerViewModelImpl(
     private val authService: AuthorizationService,
     private val accountsRepository: AccountsRepository,
     private val subsRepository: SubscriptionsRepository,
     private val redditApi: RedditAPIService,
-    private val visitedCommunityDao: VisitedCommunityDao,
-) : ViewModel() {
+    private val subredditDao: SubredditRepository,
+    private val multiDao: MultiRepository,
+    private val accountManager: AccountManager,
+) : DrawerViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
-    val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
+    override val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
+    private var initialized = false
 
+    private val flowManager =
+        AuthFlowManager(
+            authService,
+            accountsRepository,
+            redditApi,
+            updateState = { newVal -> _loginState.update { newVal } }
+        )
 
-    val accountsList = accountsRepository.accounts
-    val activeAccount = accountsRepository.activeAccount
+    override val accountsList = accountsRepository.accounts
+    override val activeAccount = accountsRepository.activeAccount
+    override val otherAccounts = combine(
+        accountsRepository.accounts,
+        accountsRepository.activeAccount
+    ) { accounts, active ->
+        accounts.filterNot { it.id == active.id || it.isAnonymous() }
+            .sortedByDescending { it.id }
+    }
 
     private val _selectingAccount = MutableStateFlow(false)
-    val selectingAccount = _selectingAccount.asStateFlow()
+    override val selectingAccount = _selectingAccount.asStateFlow()
 
-    fun toggleSelectAccount() {
+    override fun toggleSelectAccount() {
         _selectingAccount.value = !_selectingAccount.value
     }
 
-    val serviceConfig = AuthConfig()
 
-    val subscriptions: StateFlow<List<Thing.Subreddit>>
-        get() = subsRepository.subscriptions.stateIn(
+    override val subscriptions: StateFlow<List<Thing.Subreddit>> =
+        subsRepository.subscriptions.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.Eagerly,
             initialValue = emptyList<Thing.Subreddit>()
         )
-    val multis: StateFlow<List<Thing.Multi>>
-        get() = subsRepository.multis.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList<Thing.Multi>()
-        )
-
-    fun logout() {
-        viewModelScope.launch {
-            try {
-                redditApi.logout(activeAccount.first().auth.accessToken!!)
-                accountsRepository.deleteAccount(activeAccount.first().id)
-            } catch (e: Exception) {
-                Log.e("LoginViewModel", "Failed to logout: $e")
-            }
-        }
-    }
-
-    fun setActiveAccount(accountId: Int) {
-        viewModelScope.launch {
-            accountsRepository.setActiveAccount(accountId)
-        }
-    }
-
-    fun createAuthIntent(): Intent {
-        val authRequest = serviceConfig.createAuthorizationRequest()
-        return authService.getAuthorizationRequestIntent(authRequest)
-    }
-
-    fun handleAuthResult(intent: Intent?) {
-        Log.d("LoginViewModel", "Handling auth result ${intent?.data}")
-        if (intent == null) {
-            _loginState.value = LoginState.Error("Login cancelled")
-            return
-        }
-
-        val authResponse = AuthorizationResponse.fromIntent(intent)
-        val authException = AuthorizationException.fromIntent(intent)
-
-        Log.d("LoginViewModel", "Auth response: $authResponse")
-
-
-        when {
-            authException != null -> {
-                Log.e("LoginViewModel", "Authorization exception: $authException")
-                _loginState.value = LoginState.Error(
-                    authException.message ?: "Authorization exception: $authException"
+    override val sortedSubscriptions: StateFlow<List<Thing.Subreddit>> =
+        subsRepository.subscriptions
+            .map { subs ->
+                subs.sortedWith(
+                    compareByDescending<Thing.Subreddit> { it.data.userHasFavorited }
+                        .thenBy { it.data.displayName.lowercase() }
                 )
             }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = emptyList()
+            )
+    override val multis: StateFlow<List<Thing.Multi>> = subsRepository.multis.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList<Thing.Multi>()
+    )
 
-            authResponse != null -> {
-                _loginState.value = LoginState.Loading
-                exchangeAuthCodeForToken(authResponse)
-            }
-        }
-    }
 
-
-    private fun exchangeAuthCodeForToken(authResponse: AuthorizationResponse) {
-        val clientAuth = BasicAuthClient()
-        authService.performTokenRequest(
-            authResponse.createTokenExchangeRequest(),
-            clientAuth
-        ) { tokenResponse, ex ->
-            when {
-                ex != null -> {
-                    Log.e("LoginViewModel", "Token exchange failed: $ex")
-                    _loginState.value = LoginState.Error("Failed to get access token.")
-                }
-
-                tokenResponse != null -> {
-                    val authState = AuthState(authResponse, tokenResponse, null)
-                    save(authState)
-                }
-
-            }
-        }
-    }
-
-    fun visitCommunity(data: SubredditData) {
+    override fun initialize() {
+        if (initialized) return
         viewModelScope.launch(Dispatchers.IO) {
-            val entity = visitedCommunityDao.getCommunity(data.displayName)?.copy(data = data)
-                ?: VisitedCommunityEntity(id = data.displayName, data = null).copy(data = data)
-            visitedCommunityDao.upsert(entity)
+            accountManager.initialize { err ->
+                _loginState.update { LoginState.Error(err) }
+            }
+            val account = activeAccount.first()
+            if (!account.isAnonymous() && !account.isUninitialized()) {
+                fetchUserInfo()
+            }
+            initialized = true
         }
     }
 
-    private fun save(authState: AuthState) {
-        viewModelScope.launch {
+    override fun logout() {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                val accounts = accountsRepository.accounts.first()
-                val newAccount = RedditAccount.uninitialized(accounts.size, authState)
-                accountsRepository.addAccount(newAccount)
-                accountsRepository.setActiveAccount(accounts.size)
-                try {
-                    val user = redditApi.getIdentity()
-                    if (user.isSuccessful) {
-                        val identity = user.body()!!
-                        accountsRepository.updateAccount(
-                            accounts.size,
-                            newAccount.copy(
-                                username = identity.username,
-                                thumbnailUrl = identity.iconImg
-                            )
-                        )
-                    } else {
-                        Log.e("LoginViewModel", "Failed to get user info: ${user.message()}")
-                        accountsRepository.deleteAccount(accounts.size)
-                    }
-                } catch (e: Exception) {
-                    Log.e("LoginViewModel", "Failed to get user info: $e")
-                    accountsRepository.deleteAccount(accounts.size)
+                val res = redditApi.logout(activeAccount.first().auth.refreshToken!!)
+                if (res.isSuccessful) {
+                    accountsRepository.deleteAccount(activeAccount.first().id)
+                } else {
+                    throw Exception("Failed to logout: ${res.message()}")
                 }
             } catch (e: Exception) {
-                Log.e("LoginViewModel", "Failed to save account: $e")
-                _loginState.value = LoginState.Error("Failed to save account.")
+                Log.e("LoginViewModel", "Failed to logout: $e")
+                _loginState.update { LoginState.Error(e) }
             }
+        }
+    }
+
+
+    override fun setActiveAccount(accountId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (activeAccount.first().id == accountId) return@launch
+            accountsRepository.setActiveAccount(accountId)
+            val account = activeAccount.first()
+            Log.d(
+                "LoginViewModel",
+                "Setting active account to '${activeAccount.first().info?.username ?: "Anonymous"}'"
+            )
+            if (account.info?.username.isNullOrBlank() && !account.isAnonymous()) {
+                fetchUserInfo()
+            }
+        }
+    }
+
+    override fun createAuthIntent(): Intent {
+        return flowManager.createAuthIntent()
+    }
+
+    override fun handleAuthResult(intent: Intent?) {
+        flowManager.handleAuthResult(intent, viewModelScope)
+        if (_loginState.value !is LoginState.Error) {
+            viewModelScope.launch {
+                fetchUserInfo()
+            }
+        }
+    }
+
+    suspend fun fetchUserInfo() {
+        val currentAccount = accountsRepository.activeAccount.first()
+        try {
+            val user = redditApi.getIdentity()
+            if (user.isSuccessful) {
+                val identity = user.body()!!
+                Log.d("LoginViewModel", "Updating ${currentAccount.id}")
+                accountsRepository.updateAccount(
+                    currentAccount.id,
+                    currentAccount.copy(
+                        info = identity,
+                    )
+                )
+
+            } else {
+                Log.e("LoginViewModel", "Failed to get user info: ${user.message()}")
+                //accountsRepository.deleteAccount(accounts.size)
+            }
+        } catch (e: Exception) {
+            _loginState.update { LoginState.Error(e) }
+        }
+    }
+
+    override fun visitCommunity(data: SubredditData) {
+        viewModelScope.launch(Dispatchers.IO) {
+            subredditDao.upsert(data)
+        }
+    }
+
+    override fun visitCommunity(data: MultiData) {
+        viewModelScope.launch(Dispatchers.IO) {
+            multiDao.upsert(data)
         }
     }
 }

@@ -2,6 +2,7 @@ package com.sofamaniac.crabir.domain.model
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
+import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -32,8 +33,7 @@ object AuthStateSerializer : KSerializer<AuthState> {
 @Serializable
 data class RedditAccount(
     val id: Int,
-    val username: String,
-    val thumbnailUrl: String,
+    val info: UserDTO?,
     @Serializable(with = AuthStateSerializer::class)
     val auth: AuthState,
 ) {
@@ -41,16 +41,20 @@ data class RedditAccount(
 
         const val ANONYMOUS = "Anonymous"
         fun anonymous(): RedditAccount {
-            return RedditAccount(-1, ANONYMOUS, "", AuthState())
+            return RedditAccount(-1, null, AuthState())
         }
 
         fun uninitialized(id: Int, authState: AuthState): RedditAccount {
-            return RedditAccount(id, "", "", authState)
+            return RedditAccount(id, null, authState)
         }
     }
 
     fun isAnonymous(): Boolean {
         return id == -1
+    }
+
+    fun isUninitialized(): Boolean {
+        return id == -2
     }
 }
 

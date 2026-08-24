@@ -1,35 +1,45 @@
 package com.sofamaniac.crabir.ui.media.image
 
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.data.remote.dto.post.Preview
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.Quality
 
 @Composable
-fun FromPreview(
+fun ImageView(
     preview: Preview,
     contentDescription: String,
     modifier: Modifier = Modifier,
     allowTransformation: Boolean = true,
-    onClick: () -> Unit = {}
+    blur: Boolean = false,
+    contentScale: ContentScale = ContentScale.Fit,
+    quality: Quality,
+    onZoomChange: (Float) -> Unit = {},
+    onClick: () -> Unit = {},
 ) {
+    val preview = preview.images[0]
+    val resolutions = preview.resolutions.sortedBy { it.width }
+    val image = when (quality) {
+        Quality.Source -> preview.source
+        Quality.High -> resolutions.last()
+        Quality.Medium -> resolutions[preview.resolutions.size / 2]
+        Quality.Low -> resolutions.first()
+    }.toMediaResource()
 
-    val image = preview.images[0].source.toMediaResource()
-    val modifier = modifier
-        .fillMaxWidth()
-        .aspectRatio(image.aspectRatio)
     TransformableImage(
-        image,
-        contentDescription = contentDescription,
+        image.url,
         modifier = modifier,
-        enabled = allowTransformation,
-        onClick = onClick
+        contentDescription = contentDescription,
+        placeholderAspectRatio = image.aspectRatio,
+        contentScale = contentScale,
+        onClick = onClick,
+        onZoomChange = onZoomChange,
+        allowZoom = allowTransformation,
+        blur = blur
     )
 }
 
@@ -38,18 +48,17 @@ fun ImageView(
     media: MediaResource,
     modifier: Modifier = Modifier,
     allowTransformation: Boolean = true,
-    onClick: () -> Unit = {}
+    onZoomChange: (Float) -> Unit = {},
+    onClick: () -> Unit = {},
 ) {
-    val modifier = Modifier
-        .fillMaxWidth()
-        .aspectRatio(media.aspectRatio)
     TransformableImage(
-        media,
+        media.url,
+        onZoomChange = onZoomChange,
         contentDescription = "Image",
         contentScale = ContentScale.Fit,
         modifier = modifier,
-        enabled = allowTransformation,
-        onClick = onClick
+        allowZoom = allowTransformation,
+        onClick = onClick,
     )
 }
 
@@ -58,24 +67,33 @@ fun ImageView(
     post: PostData,
     modifier: Modifier = Modifier,
     allowTransformation: Boolean = true,
+    blur: Boolean = false,
+    contentScale: ContentScale = ContentScale.Fit,
+    quality: Quality,
+    onZoomChange: (Float) -> Unit = {},
     onClick: () -> Unit = {},
 ) {
     if (post.preview != null) {
-        FromPreview(
+        ImageView(
             post.preview,
-            post.title,
-            modifier = modifier,
+            contentDescription = post.title,
+            onZoomChange = onZoomChange,
+            modifier = modifier
+                .fillMaxWidth(),
             allowTransformation = allowTransformation,
+            blur = blur,
+            contentScale = contentScale,
+            quality = quality,
             onClick = onClick
         )
     } else {
-        AsyncImage(
-            model = post.url,
+        TransformableImage(
+            source = post.url,
             contentDescription = post.title,
             modifier = modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
+                .fillMaxWidth(),
             contentScale = ContentScale.Fit,
+            onClick = onClick,
         )
     }
 }

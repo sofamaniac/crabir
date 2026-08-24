@@ -6,27 +6,32 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ThemeEditorRoute
-import com.sofamaniac.crabir.settings.ui.ListSelector
-import com.sofamaniac.crabir.settings.ui.SwitchTile
+import com.sofamaniac.crabir.settings.helper.ListSelector
+import com.sofamaniac.crabir.settings.helper.SwitchTile
+import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.ThemedDialog
 import kotlinx.coroutines.launch
 
 @Composable
@@ -34,28 +39,72 @@ fun ThemeSettingsPage() {
     val context = LocalContext.current
     val themeDataStore = remember(context) { context.themeDataStore }
 
-    val settings by themeDataStore.data.collectAsState(initial = ThemeSettings.DEFAULT)
+    val settings = rememberThemeSettings()
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current!!
+    val startTimeState = rememberTimePickerState(
+        initialHour = settings.lightModeStartTime,
+        initialMinute = 0,
+    )
+    val endTimeState = rememberTimePickerState(
+        initialHour = settings.lightModeEndTime,
+        initialMinute = 0,
+    )
 
-    Scaffold { innerPadding ->
+    var showStartTimeDialog by remember { mutableStateOf(false) }
+    var showEndTimeDialog by remember { mutableStateOf(false) }
+
+    if (showStartTimeDialog) {
+        TimePickerDialog(
+            onDismiss = { showStartTimeDialog = false },
+            onConfirm = {
+                scope.launch {
+                    themeDataStore.updateData {
+                        it.copy(lightModeStartTime = startTimeState.hour)
+                    }
+                }
+                showStartTimeDialog = false
+            }
+        ) {
+            TimePicker(state = startTimeState)
+        }
+    }
+    if (showEndTimeDialog) {
+        TimePickerDialog(
+            onDismiss = { showEndTimeDialog = false },
+            onConfirm = {
+                scope.launch {
+                    themeDataStore.updateData {
+                        it.copy(lightModeEndTime = endTimeState.hour)
+                    }
+                }
+                showEndTimeDialog = false
+            }
+        ) {
+            TimePicker(state = endTimeState)
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(stringResource(R.string.theme_settings)) }, navigationIcon = {
+                BackButton {
+                    navController.popBackStack()
+                }
+            })
+        }
+    ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             ListSelector(
                 leadingContent = {
                     Icon(
                         Icons.Default.Brightness6,
-                        contentDescription = "Dark mode"
+                        contentDescription = null,
                     )
                 },
-                headlineContent = { Text("Theme") },
-                supportingContent = { Text("Choose your theme") },
+                headlineContent = { Text(stringResource(R.string.theme)) },
                 options = ThemeMode.entries.toList(),
-                selectedOption = {
-                    Text(
-                        stringResource(settings.mode.toStringResource()),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                },
+                selectedOption = settings.mode,
                 onOptionSelected = { target ->
                     scope.launch {
                         themeDataStore.updateData {
@@ -68,7 +117,7 @@ fun ThemeSettingsPage() {
             )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 SwitchTile(
-                    headlineContent = { Text("Dynamic color") },
+                    headlineContent = { Text(stringResource(R.string.dynamic_color)) },
                     checked = settings.dynamicColor,
                     onCheckedChange = { target ->
                         scope.launch {
@@ -79,48 +128,70 @@ fun ThemeSettingsPage() {
                     }
                 )
             }
-            ConditionalListItem(
-                text = "Edit Colors",
+            ListItem(
+                content = { Text(stringResource(R.string.edit_colors)) },
                 enabled = !settings.dynamicColor || Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
                 onClick = {
                     navController.navigate(ThemeEditorRoute)
                 },
-                icon = Icons.Default.Palette
+                leadingContent = {
+                    Icon(Icons.Default.Palette, contentDescription = null)
+                }
             )
+            if (settings.mode == ThemeMode.Scheduled) {
+                ListItem(
+                    content = {
+                        Text(stringResource(R.string.light_mode_start_time))
+                    },
+                    trailingContent = {
+                        val hour = "%02d".format(endTimeState.hour)
+                        val minute = "%02d".format(endTimeState.minute)
+                        Text(
+                            "${hour}:${minute}"
+                        )
+                    },
+                    modifier = Modifier.clickable {
+                        showStartTimeDialog = true
+                    }
+                )
+                ListItem(
+                    content = {
+                        Text(stringResource(R.string.light_mode_end_time))
+                    },
+                    trailingContent = {
+                        val hour = "%02d".format(endTimeState.hour)
+                        val minute = "%02d".format(endTimeState.minute)
+                        Text(
+                            "${hour}:${minute}"
+                        )
+                    },
+                    modifier = Modifier.clickable {
+                        showEndTimeDialog = true
+                    }
+                )
+            }
         }
     }
 }
 
 @Composable
-fun ConditionalListItem(
-    onClick: () -> Unit,
-    text: String,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    icon: ImageVector? = null,
+fun TimePickerDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    content: @Composable () -> Unit,
 ) {
-    val contentColor = if (enabled) {
-        MaterialTheme.colorScheme.onSurface
-    } else {
-        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f) // M3 disabled alpha
-    }
-
-    ListItem(
-        modifier = modifier.clickable(enabled = enabled, onClick = onClick),
-        headlineContent = {
-            Text(text, color = contentColor)
-        },
-        leadingContent = {
-            icon?.let {
-                Icon(imageVector = it, contentDescription = null, tint = contentColor)
+    ThemedDialog(
+        onDismissRequest = onDismiss,
+        cancel = {
+            TextButton(onClick = { onDismiss() }) {
+                Text(stringResource(R.string.cancel))
             }
         },
-        trailingContent = {
-            Icon(
-                imageVector = Icons.AutoMirrored.Default.ArrowForward,
-                contentDescription = null,
-                tint = contentColor
-            )
-        }
+        confirm = {
+            TextButton(onClick = { onConfirm() }) {
+                Text(stringResource((R.string.confirm)))
+            }
+        },
+        content = { content() }
     )
 }

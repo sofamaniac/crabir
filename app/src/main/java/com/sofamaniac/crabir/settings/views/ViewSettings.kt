@@ -8,24 +8,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.dataStore
 import com.sofamaniac.crabir.R
+import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import kotlinx.serialization.Serializable
 
 enum class Views {
     Card,
-    Compact,
-    SmallCard,
-    Dense,
-    Image,
-    Swipe;
+    Compact;
+    //    SmallCard,
+    //    Dense,
+    //    Image,
+    //    Swipe;
 
     fun toStringResource(): Int {
         return when (this) {
             Card -> R.string.ViewCard
             Compact -> R.string.ViewCompact
-            SmallCard -> R.string.ViewSmallCard
-            Dense -> R.string.ViewDense
-            Image -> R.string.ViewImage
-            Swipe -> R.string.ViewSwipe
+            //            SmallCard -> R.string.ViewSmallCard
+            //            Dense -> R.string.ViewDense
+            //            Image -> R.string.ViewImage
+            //            Swipe -> R.string.ViewSwipe
         }
     }
 }
@@ -35,19 +36,29 @@ data class ViewSettings(
     val defaultView: Views = Views.Card,
     val defaultColumns: Int = 1,
     val rememberView: Boolean = true,
-//    val postFontSettings: FontSettings = FontSettings(),
-//    val commentFontSettings: FontSettings = FontSettings(),
+    val rememberColumns: Boolean = true,
+    //    val postFontSettings: FontSettings = FontSettings(),
+    //    val commentFontSettings: FontSettings = FontSettings(),
     val prefixCommunity: Boolean = true,
     val cardSettings: CardSettings = CardSettings(),
+    val rememberedViews: Map<String, CommunityViewEntity> = emptyMap(),
 )
+
+@Serializable
+enum class ImageHeight {
+    Full,
+    Fixed,
+    Screen
+}
 
 @Serializable
 data class CardSettings(
     val showSubredditIcon: Boolean = true,
-    val enableFullHeightImage: Boolean = true,
+    val imageHeight: ImageHeight = ImageHeight.Full,
     val enableTextPreview: Boolean = true,
     val thumbnailForLinkPreview: Boolean = true,
     val maxLines: Int = 5,
+    val roundedCorners: Boolean = false,
 )
 
 @Serializable
@@ -64,11 +75,11 @@ val Context.viewSettingDataStore by dataStore(
 )
 
 @Composable
-fun rememberViewSettings(): ViewSettings {
+internal fun rememberViewSettings(): ViewSettings? {
     val context = LocalContext.current
     val viewSettingDataStore = remember(context) { context.viewSettingDataStore }
     val viewSettings by viewSettingDataStore.data.collectAsState(
-        initial = ViewSettings(),
+        initial = null,
     )
     return viewSettings
 }

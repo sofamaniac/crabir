@@ -1,14 +1,17 @@
 package com.sofamaniac.crabir.ui.search
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.pager.HorizontalPager
@@ -16,7 +19,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Settings
@@ -29,9 +31,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
-import androidx.compose.material3.Switch
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -41,6 +45,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,32 +58,39 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
-import com.sofamaniac.crabir.FullscreenHandler
+import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.data.remote.api.CommunitySearchSort
-import com.sofamaniac.crabir.data.remote.api.PostSearchSort
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.SortInterface
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
+import com.sofamaniac.crabir.data.remote.reddit.CommunitySearchSort
+import com.sofamaniac.crabir.data.remote.reddit.PostSearchSort
 import com.sofamaniac.crabir.domain.repository.search.PostSearchParams
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
+import com.sofamaniac.crabir.settings.helper.ListSelector
+import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.ThemedSwitch
 import com.sofamaniac.crabir.ui.TimeframeMenu
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
+import com.sofamaniac.crabir.ui.subreddit.PostView
 import com.sofamaniac.crabir.ui.subredditList.Tile
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
+import org.koin.core.parameter.parametersOf
 import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,33 +98,44 @@ import kotlin.uuid.ExperimentalUuidApi
 fun SearchTab(
     searchQuery: SearchRoute,
     modifier: Modifier = Modifier,
+    initialTab: Int = searchQuery.initialTab ?: if (searchQuery.flair.isNotBlank()) 0 else 1,
+    commonViewModel: SearchCommonViewModel = koinViewModel {
+        val initialQuery =
+            if (searchQuery.flair.isNotBlank()) "flair:\"${searchQuery.flair}\"" else ""
+        parametersOf(initialQuery)
+    },
 ) {
-    val context = LocalContext.current
-    val initialQuery = if (searchQuery.flair.isNotBlank()) "flair:\"${searchQuery.flair}\"" else ""
-    val commonViewModel = remember(context) { SearchCommonViewModel(initialQuery) }
     val viewModels = listOf(
-        hiltViewModel<PostSearchViewModel, PostSearchViewModel.Factory>(key = "PostSearch") { factory ->
+        koinViewModel<PostSearchViewModel>(key = "PostSearch") {
             val subreddit = searchQuery.subreddit.ifBlank { null }
             val params = PostSearchParams(
-                query = initialQuery,
+                query = commonViewModel.query,
                 subreddit = subreddit,
                 restrictSubreddit = subreddit != null,
                 type = "link",
                 sort = PostSearchSort.Relevance
             )
-            factory.create(params)
+            parametersOf(params)
         },
-        hiltViewModel<CommunitySearchViewModel>(key = "CommunitySearch"),
-        hiltViewModel<UserSearchViewModel>(key = "UserSearch"),
+        koinViewModel<CommunitySearchViewModel>(key = "CommunitySearch"),
+        koinViewModel<UserSearchViewModel>(key = "UserSearch"),
         //hiltViewModel<CommentSearchViewModel>(key = "CommentSearch"),
     )
-    val tabs = listOf("Posts", "Communities", "Users")//, "Comments")
+    val tabs = listOf(
+        stringResource(R.string.search_post_tab),
+        stringResource(R.string.search_communities_tab),
+        stringResource(R.string.search_users_tab)
+    ) //, "Comments")
     val scope = rememberCoroutineScope()
-    val currentTab = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
+    val currentTab = rememberPagerState(initialPage = initialTab, pageCount = { tabs.size })
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val showSettings by commonViewModel.showSettings.collectAsState()
-    FullscreenHandler {
+    val snackbarHostState = remember { SnackbarHostState() }
+    CompositionLocalProvider(LocalSnackBarHost provides snackbarHostState) {
         Scaffold(
+            snackbarHost = {
+                SnackbarHost(snackbarHostState)
+            },
             topBar = {
                 TopBar(
                     commonViewModel,
@@ -177,8 +200,8 @@ fun SearchTab(
                         is UserSearchViewModel ->
                             InnerTab(viewModel)
 
-//                        is CommentSearchViewModel ->
-//                            InnerTab(viewModel)
+                        //                        is CommentSearchViewModel ->
+                        //                            InnerTab(viewModel)
                     }
                 }
             }
@@ -186,7 +209,8 @@ fun SearchTab(
     }
 }
 
-class SearchCommonViewModel(query: String) : ViewModel() {
+@KoinViewModel
+class SearchCommonViewModel(@InjectedParam query: String) : ViewModel() {
     val queryState = TextFieldState(initialText = query)
     val query: String get() = queryState.text as String
     var showSettings = MutableStateFlow(false)
@@ -194,19 +218,26 @@ class SearchCommonViewModel(query: String) : ViewModel() {
     fun onQueryUpdate(q: String) {
         queryState.edit { replace(0, length, q) }
     }
-
 }
 
 
 @Composable
-private fun InnerTab(viewModel: PostSearchViewModel) {
-    PostFeedViewer(viewModel)
+private fun InnerTab(
+    viewModel: PostSearchViewModel,
+) {
+    PostFeedViewer(viewModel, viewEntity = null) { post, isMosVisible ->
+        PostView(
+            post,
+            isMostVisible = isMosVisible,
+            showHidden = false
+        )
+    }
 }
 
 @Composable
 private fun InnerTab(viewModel: CommunitySearchViewModel) {
     val things = viewModel.items.collectAsLazyPagingItems()
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val listState = viewModel.listState
     val theme = LocalTheme.current
     PullToRefreshBox(
@@ -227,6 +258,36 @@ private fun InnerTab(viewModel: CommunitySearchViewModel) {
             verticalItemSpacing = 2.dp,
             state = listState, modifier = Modifier.fillMaxSize()
         ) {
+            if (things.itemCount == 0) {
+                fun onSuccess(sub: String) {
+                    val url = sub.removePrefix("/")
+                    navController?.navigate(SubredditRoute(url))
+                }
+
+                fun onError(e: Throwable) {
+                    Log.e("SearchTab", "InnerTab: ", e)
+                }
+                item {
+                    ListItem(onClick = {
+                        viewModel.goToRandom(
+                            false,
+                            onSuccess = { onSuccess(it) },
+                            onError = { onError(it) })
+                    }) {
+                        Text("Random community")
+                    }
+                }
+                item {
+                    ListItem(onClick = {
+                        viewModel.goToRandom(
+                            true,
+                            onSuccess = { onSuccess(it) },
+                            onError = { onError(it) })
+                    }) {
+                        Text("Random NSFW community")
+                    }
+                }
+            }
             items(
                 count = things.itemCount,
                 key = things.itemKey { p -> p.id }) { index ->
@@ -236,9 +297,9 @@ private fun InnerTab(viewModel: CommunitySearchViewModel) {
                     modifier = Modifier
                         .background(color = theme.cardBackground)
                         .clickable {
-                            navController.navigate(
+                            navController?.navigate(
                                 SubredditRoute(
-                                    subreddit.displayName
+                                    subreddit.displayNamePrefixed
                                 )
                             )
                         }
@@ -253,7 +314,7 @@ private fun InnerTab(viewModel: CommunitySearchViewModel) {
 private fun InnerTab(viewModel: UserSearchViewModel) {
     val things = viewModel.items.collectAsLazyPagingItems()
     val listState = viewModel.listState
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     PullToRefreshBox(
         isRefreshing = things.loadState.refresh == LoadState.Loading,
         onRefresh = {
@@ -279,13 +340,13 @@ private fun InnerTab(viewModel: UserSearchViewModel) {
                 }) { index ->
                 val user = things[index]!!
                 val iconUrl = if (user.prefShowSnoovatar) {
-                    user.snoovatarImg.ifBlank { user.iconImg }
+                    user.snoovatarImg?.ifBlank { user.iconImg }
                 } else {
                     user.iconImg
                 }
                 ListItem(
                     modifier = Modifier.clickable {
-                        navController.navigate(
+                        navController?.navigate(
                             ProfileRoute(
                                 user.username,
                                 ProfileTabs.Overview,
@@ -300,31 +361,13 @@ private fun InnerTab(viewModel: UserSearchViewModel) {
                                 .size(40.dp)
                                 .clip(CircleShape)
                         )
-                    }, headlineContent = {
+                    }, content = {
                         Text(user.username)
                     })
             }
         }
     }
 }
-
-//@Composable
-//private fun InnerTab(viewModel: CommentSearchViewModel) {
-//    val things = viewModel.items.collectAsLazyPagingItems()
-//    val listState = viewModel.listState
-//    LazyVerticalStaggeredGrid(
-//        columns = StaggeredGridCells.Fixed(1),
-//        verticalItemSpacing = 8.dp,
-//        state = listState, modifier = Modifier.fillMaxSize()
-//    ) {
-//        items(
-//            count = things.itemCount,
-//            key = things.itemKey { p -> p.id }) { index ->
-//            val comment = things[index]!!
-//            RedditMarkdown(comment.bodyMd)
-//        }
-//    }
-//}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -334,11 +377,13 @@ fun TopBar(
     enableSettings: Boolean = true,
     onQueryUpdate: (String) -> Unit = {},
 ) {
-    val navController = LocalNavController.current!!
+    val navController = LocalNavController.current
     val showSettings by commonViewModel.showSettings.collectAsState()
     val focusRequest = remember { FocusRequester() }
     LaunchedEffect(Unit) {
-        focusRequest.requestFocus()
+        if (commonViewModel.query.isEmpty()) {
+            focusRequest.requestFocus()
+        }
     }
     TopAppBar(
         scrollBehavior = scrollBehavior,
@@ -351,17 +396,15 @@ fun TopBar(
             )
         },
         navigationIcon = {
-            IconButton(
-                enabled = enableSettings,
-                onClick = { navController.popBackStack() }) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
-                )
+            BackButton {
+                navController?.popBackStack()
             }
         },
         actions = {
-            IconButton(onClick = { commonViewModel.showSettings.value = !showSettings }) {
+            IconButton(
+                enabled = enableSettings,
+                onClick = { commonViewModel.showSettings.value = !showSettings }
+            ) {
                 Icon(Icons.Default.Settings, contentDescription = "Search Settings")
             }
         }
@@ -373,7 +416,7 @@ fun TopBar(
 inline fun <reified Sort> SortMenu(
     currentValue: Sort,
     currentTimeframe: Timeframe? = null,
-    crossinline onSelect: (Sort, Timeframe?) -> Unit
+    crossinline onSelect: (Sort, Timeframe?) -> Unit,
 ) where Sort : Enum<Sort>, Sort : SortInterface {
     val sortString = stringResource(currentValue.representation)
     val timeframeString = currentTimeframe?.let { stringResource(it.representation) }
@@ -387,13 +430,14 @@ inline fun <reified Sort> SortMenu(
         leadingContent = {
             Icon(Icons.AutoMirrored.Default.Sort, contentDescription = null)
         },
-        headlineContent = { Text("Sort") },
+        content = { Text("Sort") },
         trailingContent = {
             ExposedDropdownMenuBox(
                 expanded = showMenu,
-                onExpandedChange = { showMenu = true },
+                onExpandedChange = { showMenu = it },
+                modifier = Modifier.width(IntrinsicSize.Min)
             ) {
-                TextField(
+                OutlinedTextField(
                     value = currentValueString,
                     onValueChange = {},
                     readOnly = true,
@@ -402,11 +446,12 @@ inline fun <reified Sort> SortMenu(
                             expanded = showMenu
                         )
                     },
-                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                    modifier = Modifier.menuAnchor(
-                        ExposedDropdownMenuAnchorType.PrimaryNotEditable,
-                        showMenu
-                    )
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    modifier = Modifier
+                        .width(IntrinsicSize.Min)
+                        .menuAnchor(
+                            ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                        )
                 )
                 ExposedDropdownMenu(
                     expanded = showMenu,
@@ -451,23 +496,22 @@ inline fun <reified Sort> SortMenu(
 
 @Composable
 fun SearchSettings(viewModel: PostSearchViewModel) {
-
     val params by viewModel.params.collectAsState()
     Column {
-        SortMenu<PostSearchSort>(
-            params.sort as PostSearchSort,
-            params.timeframe
-        ) { sort, timeframe ->
-            viewModel.setSort(sort, timeframe)
-        }
+        ListSelector(
+            PostSearchSort.entries,
+            params.sort,
+            onOptionSelected = viewModel::setSort,
+            headlineContent = { Text("Sort") }
+        )
         if (params.subreddit != null) {
             ListItem(
                 modifier = Modifier.clickable {
                     viewModel.setRestrictSubreddit(!params.restrictSubreddit)
                 },
-                headlineContent = { Text("Restrict subreddit") },
+                content = { Text("Restrict subreddit") },
                 trailingContent = {
-                    Switch(
+                    ThemedSwitch(
                         checked = params.restrictSubreddit,
                         onCheckedChange = {
                             viewModel.setRestrictSubreddit(it)
@@ -482,12 +526,10 @@ fun SearchSettings(viewModel: PostSearchViewModel) {
 @Composable
 fun SearchSettings(viewModel: CommunitySearchViewModel) {
     val params by viewModel.params.collectAsState()
-    Column {
-        SortMenu<CommunitySearchSort>(
-            params.sort as CommunitySearchSort,
-            params.timeframe
-        ) { sort, _ ->
-            viewModel.setSort(sort)
-        }
-    }
+    ListSelector(
+        CommunitySearchSort.entries,
+        params.sort as CommunitySearchSort,
+        onOptionSelected = viewModel::setSort,
+        headlineContent = { Text("Sort") }
+    )
 }

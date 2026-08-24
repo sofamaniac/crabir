@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+            android:shortcutId="home_shortcut"
+            android:enabled="true"
+            android:icon="@drawable/ic_home"
+            android:shortcutShortLabel="@string/home_shortcut_short_label"
+            android:shortcutLongLabel="@string/home_shortcut_long_label">
+        <intent
+                android:action="android.intent.action.MAIN"
+                android:targetPackage="com.sofamaniac.crabir"
+                android:targetClass="com.sofamaniac.crabir.MainActivity" />
+    </shortcut>
+    <shortcut
+            android:shortcutId="search_shortcut"
+            android:enabled="true"
+            android:icon="@drawable/ic_search"
+            android:shortcutShortLabel="@string/search_shortcut_short_label"
+            android:shortcutLongLabel="@string/search_shortcut_long_label">
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:data="com.sofamaniac.crabir://search"
+                android:targetPackage="com.sofamaniac.crabir"
+                android:targetClass="com.sofamaniac.crabir.MainActivity" />
+    </shortcut>
+    <shortcut
+            android:shortcutId="popular_shortcut"
+            android:enabled="true"
+            android:icon="@drawable/ic_search"
+            android:shortcutShortLabel="@string/popular_shortcut_short_label"
+            android:shortcutLongLabel="@string/popular_shortcut_long_label">
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:data="com.sofamaniac.crabir://r/popular"
+                android:targetPackage="com.sofamaniac.crabir"
+                android:targetClass="com.sofamaniac.crabir.MainActivity" />
+    </shortcut>
+    <shortcut
+            android:shortcutId="all_shortcut"
+            android:enabled="true"
+            android:icon="@drawable/ic_search"
+            android:shortcutShortLabel="@string/all_shortcut_short_label"
+            android:shortcutLongLabel="@string/all_shortcut_long_label">
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:data="com.sofamaniac.crabir://r/all"
+                android:targetPackage="com.sofamaniac.crabir"
+                android:targetClass="com.sofamaniac.crabir.MainActivity" />
+    </shortcut>
+</shortcuts>

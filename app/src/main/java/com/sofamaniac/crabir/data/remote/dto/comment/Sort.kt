@@ -6,7 +6,9 @@ package com.sofamaniac.crabir.data.remote.dto.comment
 
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.SortInterface
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class Sort : SortInterface {
     Confidence {
         override val representation: Int = R.string.SortConfidence

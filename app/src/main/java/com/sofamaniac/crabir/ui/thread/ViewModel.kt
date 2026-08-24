@@ -1,52 +1,127 @@
 package com.sofamaniac.crabir.ui.thread
 
 import android.util.Log
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.toDomainModel
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
+import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
+import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.domain.repository.AccountsRepository
+import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.sofamaniac.crabir.settings.comments.CommentsSettings
+import com.sofamaniac.crabir.settings.post.PostSettingsRepository
+import com.sofamaniac.crabir.ui.post.PostViewModelInterface
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
 
-@HiltViewModel(assistedFactory = ThreadViewModel.Factory::class)
-class ThreadViewModel @AssistedInject constructor(
+@KoinViewModel
+class ThreadViewModel(
     private val repository: ThreadRepository,
-    private val visitedPostsDao: VisitedPostsDao,
-    @Assisted val permalink: String,
-) : ViewModel() {
+    private val linksRepository: LinksRepository,
+    accountsRepository: AccountsRepository,
+    postSettingsRepository: PostSettingsRepository,
+    @InjectedParam val permalink: String,
+    @InjectedParam val comment: String?,
+    @InjectedParam val context: Int?,
+    @InjectedParam val commentsSettings: CommentsSettings,
+) : ViewModel(), CommentViewModelInterface, PostViewModelInterface {
 
     var name: Fullname = repository.getPostId(permalink)
+    private var _post = MutableStateFlow<PostData?>(null)
+    override val post: StateFlow<PostData?> = _post.asStateFlow()
+
+    val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
+
+    var initialLoad: Boolean = false
+    var commentsLoaded: MutableStateFlow<Boolean> = MutableStateFlow(false)
+
+    override val read = MutableStateFlow(false)
+    override val linksSettings = postSettingsRepository.postSettings.map { it.linksSettings }
+    override val likes: StateFlow<Boolean?> = post.map {
+        it?.relationship?.liked ?: false
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+    override val saved: StateFlow<Boolean> = post.map {
+        it?.relationship?.liked ?: false
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    private val rulesState = MutableStateFlow(Rules())
+    override val rules: StateFlow<Rules> = rulesState
+
+    private val replyState = MutableStateFlow<Fullname?>(null)
+    val reply: StateFlow<Fullname?> = replyState.asStateFlow()
 
     private var _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean>
-        get() = _isRefreshing.asStateFlow()
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+    val listState = LazyListState()
 
-    private var _comments = MutableStateFlow<List<CommentType>>(emptyList())
-    val comments: StateFlow<List<CommentType>> = _comments.asStateFlow()
+    val comments = repository.comments
 
-    private var _post = MutableStateFlow<PostData?>(null)
-    val post: StateFlow<PostData?> = _post.asStateFlow()
+    override val flairs: StateFlow<List<FlairInfo>>
+        get() = TODO("Not yet implemented")
+
+    override fun hide() {
+        TODO("Not yet implemented")
+    }
+
+    override fun unhide() {
+        TODO("Not yet implemented")
+    }
+
+    override fun delete() {
+        TODO("Not yet implemented")
+    }
+
+    override fun editFlair(flairId: String, text: String?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getFlairs() {
+        TODO("Not yet implemented")
+    }
+
+    override fun markNSFW() {
+        TODO("Not yet implemented")
+    }
+
+    override fun unmarkNSFW() {
+        TODO("Not yet implemented")
+    }
+
+    override fun markSpoiler() {
+        TODO("Not yet implemented")
+    }
+
+    override fun unmarkSpoiler() {
+        TODO("Not yet implemented")
+    }
+
+    override fun setInboxReplies(enabled: Boolean) {
+        TODO("Not yet implemented")
+    }
 
     private var _openComment = MutableStateFlow<Fullname?>(null)
 
     /** Id of the comment of which the bottom bar is currently open */
-    val openComment: StateFlow<Fullname?> = _openComment.asStateFlow()
+    override val openComment: StateFlow<Fullname?> = _openComment.asStateFlow()
 
     /** If [openComment] is equal to [name], close it. Otherwise, open it. */
     fun toggleComment(name: Fullname) {
@@ -57,18 +132,24 @@ class ThreadViewModel @AssistedInject constructor(
         }
     }
 
-    private val _sort = MutableStateFlow(Sort.Best)
-    val sort: StateFlow<Sort> = _sort.asStateFlow()
+    override fun closeComment(name: Fullname) {
+        if (_openComment.value == name) {
+            _openComment.value = null
+        }
+    }
+
+    private val _sort = MutableStateFlow<Sort?>(null)
+    val sort: StateFlow<Sort?> = _sort.asStateFlow()
 
     init {
-        // try initializing post
-        _post.value = getPost()
+        _sort.value =
+            if (commentsSettings.useRecommendedSort) null else commentsSettings.preferredSort
         fetchComments()
     }
 
     private fun getPost(): PostData? {
         val post = runBlocking(Dispatchers.IO) {
-            val post = repository.getPost(name) ?: visitedPostsDao.getPost(name)?.toDomainModel()
+            val post = repository.getPost(name) ?: linksRepository.getValue(name)
             if (post == null) {
                 Log.e("ThreadViewModel", "getPost: Post not found in database ($name)")
             }
@@ -77,30 +158,52 @@ class ThreadViewModel @AssistedInject constructor(
         return post
     }
 
-    fun collapseComment(name: Fullname, collapsed: Boolean) {
-        viewModelScope.launch {
-            _comments.update { comments ->
-                comments.updateComment(name) {
-                    val comment = (it as CommentType.Comment).comment
-                    CommentType.Comment(comment.copy(collapsed = collapsed))
-                }
-            }
+    override fun collapseComment(name: Fullname, collapsed: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val comment =
+                (comments.value.find { it.name == name } as CommentType.Comment).comment
+            repository.updateComment(
+                name,
+                CommentType.Comment(comment.copy(collapsed = collapsed))
+            )
         }
     }
 
+    private suspend fun fetchAsync() {
+        _isRefreshing.value = true
+        repository.getComments(
+            permalink,
+            sort = _sort.value,
+            comment = comment,
+            context = context
+        )
+        Log.d("ThreadViewModel", "commentFlow: ${comments.value.count()}")
+        // If post was not found set it here.
+        _post.value = getPost() ?: _post.value
+        _sort.value = _sort.value ?: _post.value?.suggestedSort
+        _isRefreshing.value = false
+    }
+
     fun fetchComments() {
-        viewModelScope.launch {
-            _isRefreshing.value = true
-            _comments.value = repository.getComments(permalink, sort = _sort.value)
-            // If post was not found set it here.
-            _post.value = _post.value ?: getPost()
-            _isRefreshing.value = false
+        viewModelScope.launch(Dispatchers.IO) {
+            fetchAsync()
+            if (commentsSettings.collapseAutoMod) {
+                for (comment in comments.value.filter { it is CommentType.Comment && it.comment.author.username == "AutoModerator" }) {
+                    val comment = comment as CommentType.Comment
+                    repository.updateComment(
+                        name,
+                        CommentType.Comment(comment = comment.comment.copy(collapsed = true))
+                    )
+                }
+            }
+            commentsLoaded.update { true }
         }
     }
 
     fun fetchMoreComments(more: CommentType.More) {
-        viewModelScope.launch {
-            _comments.value = repository.getMoreComments(more)
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getMoreComments(more)
         }
     }
 
@@ -112,147 +215,113 @@ class ThreadViewModel @AssistedInject constructor(
 
     fun refresh() {
         repository.refresh()
+        fetchComments()
     }
 
-    fun postComment(parentId: Fullname, comment: String) {
-        viewModelScope.launch {
-            val response = repository.postComment(parentId, comment)
+    override fun replyTo(name: Fullname?) {
+        replyState.value = name
+    }
+
+    override fun submitComment(parent: Fullname, body: String, account: RedditAccount?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = repository.postComment(parent, body, account = account)
             if (!response.isSuccessful) {
                 return@launch
             }
-            val comment = response.body()?.json?.data?.things?.firstOrNull() ?: return@launch
+            val result = response.body()?.json ?: return@launch
+            // TODO display error if any
+            val comment = result.data?.things?.firstOrNull() ?: return@launch
             val commentDTO = comment as Thing.Comment
             var commentData = CommentDataMapper.map(commentDTO.data)
             commentData =
                 commentData.copy(relationship = commentData.relationship.copy(liked = true))
-            if (parentId == post.value?.name) {
-                _comments.update {
-                    it + CommentType.Comment(commentData.copy(depth = 0))
+            val p = comments.value.find { it.name == parent }
+            commentData = commentData.copy(depth = (p?.depth ?: -1) + 1)
+            repository.insertReply(parent, CommentType.Comment(commentData))
+            replyState.value = null
+        }
+    }
+
+    override fun upvote(name: Fullname) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val comment = repository.comments.value.find { it.name == name }
+            val likes = comment?.relationship?.liked
+            if (likes != true) {
+                repository.upvote(name)
+            } else {
+                repository.neutralVote(name)
+            }
+            val newLikes = if (likes != true) {
+                true
+            } else {
+                null
+            }
+            val newComment =
+                comment!!.copy(
+                    relationship = comment.relationship.copy(
+                        liked = newLikes
+                    )
+                ).updateScore(likes, newLikes)
+            repository.updateComment(comment.name, newComment as CommentType)
+
+        }
+    }
+
+    override fun downvote(name: Fullname) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val comment = repository.comments.value.find { it.name == name }
+            val likes = comment?.relationship?.liked
+            if (likes != false) {
+                repository.downvote(name)
+            } else {
+                repository.neutralVote(name)
+            }
+            val newLikes = if (likes != false) {
+                false
+            } else {
+                null
+            }
+            val newComment =
+                comment!!.copy(
+                    relationship = comment.relationship.copy(
+                        liked = newLikes
+                    )
+                ).updateScore(likes, newLikes)
+            repository.updateComment(comment.name, newComment as CommentType)
+        }
+    }
+
+    override fun save(name: Fullname, target: Boolean, upvote: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (target) {
+                repository.save(name)
+                if (upvote) {
+                    repository.upvote(name)
                 }
             } else {
-                _comments.update {
-                    it.updateComment(parentId) { c ->
-                        c as CommentType.Comment
-                        val replies =
-                            c.comment.replies + CommentType.Comment(commentData.copy(depth = c.depth + 1))
-                        c.copy(comment = c.comment.copy(replies = replies))
-                    }
-                }
+                repository.unsave(name)
             }
-        }
-    }
-
-    fun upvote(name: Fullname, likes: Boolean?) {
-        viewModelScope.launch {
-            try {
-                if (likes != true) {
-                    repository.upvote(name)
-                } else {
-                    repository.neutralVote(name)
-                }
-                _comments.update {
-                    it.updateComment(name) { c ->
-                        val comment = (c as CommentType.Comment).comment
-                        CommentType.Comment(
-                            comment.copy(
-                                relationship = comment.relationship.copy(
-                                    liked = if (likes != true) {
-                                        true
-                                    } else {
-                                        null
-                                    }
-                                )
-                            )
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("ThreadViewModel", "upvote: $e")
-            }
-        }
-    }
-
-    fun downvote(name: Fullname, likes: Boolean?) {
-        viewModelScope.launch {
-            try {
-                if (likes != false) {
-                    repository.downvote(name)
-                } else {
-                    repository.neutralVote(name)
-                }
-                _comments.update {
-                    it.updateComment(name) { c ->
-                        val comment = (c as CommentType.Comment).comment
-                        CommentType.Comment(
-                            comment.copy(
-                                relationship = comment.relationship.copy(
-                                    liked = if (likes != false) {
-                                        false
-                                    } else {
-                                        null
-                                    }
-                                )
-                            )
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("ThreadViewModel", "downvote: $e")
-            }
-        }
-    }
-
-    fun save(name: Fullname, saved: Boolean) {
-        try {
-            viewModelScope.launch {
-                if (saved) {
-                    repository.unsave(name)
-                } else {
-                    repository.save(name)
-                }
-            }
-            _comments.update {
-                it.updateComment(name) { c ->
-                    val comment = (c as CommentType.Comment).comment
-                    CommentType.Comment(
-                        comment.copy(
-                            relationship = comment.relationship.copy(
-                                saved = !saved
-                            )
-                        )
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("ThreadViewModel", "save: $e")
-        }
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(permalink: String): ThreadViewModel
-    }
-}
-
-fun List<CommentType>.updateComment(
-    name: Fullname,
-    update: (CommentType) -> CommentType
-): List<CommentType> {
-    return map { comment ->
-        when {
-            comment.name == name -> update(comment)
-            comment is CommentType.Comment ->
-                CommentType.Comment(
-                    comment.comment.updateReplies(
-                        replies = comment.comment.replies.updateComment(
-                            name,
-                            update
-                        )
-                    )
+            val comment = repository.comments.value.find { it.name == name }!!
+            val newComment = comment.copy(
+                relationship = comment.relationship.copy(
+                    saved = target,
+                    liked = if (target && upvote) true else null
                 )
-
-            else -> comment
+            )
+            repository.updateComment(name, newComment as CommentType)
         }
     }
 
+    override fun fetchRules() {
+        if (rulesState.value.rules.isNotEmpty()) return
+        viewModelScope.launch(Dispatchers.IO) {
+            rulesState.value = repository.fetchRules() ?: Rules()
+        }
+    }
+
+    override fun report(name: Fullname, reason: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.report(name, reason)
+        }
+    }
 }

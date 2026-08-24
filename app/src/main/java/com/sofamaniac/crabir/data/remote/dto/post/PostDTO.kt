@@ -9,8 +9,12 @@
 package com.sofamaniac.crabir.data.remote.dto.post
 
 import com.sofamaniac.crabir.data.remote.dto.LinkFlairRichtext
+import com.sofamaniac.crabir.data.remote.dto.Thumbnail
+import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetails
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditId
+import com.sofamaniac.crabir.data.remote.utils.CommentSortSerializer
 import com.sofamaniac.crabir.data.remote.utils.FalseOrTimestampSerializer
 import com.sofamaniac.crabir.data.remote.utils.InstantAsFloatSerializer
 import com.sofamaniac.crabir.data.remote.utils.MediaMetadataSerializer
@@ -21,13 +25,14 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Gallery
 import com.sofamaniac.crabir.domain.model.MediaInfo
 import com.sofamaniac.crabir.domain.model.MediaResource
+import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Relationship
+import com.sofamaniac.crabir.domain.model.RichtextDocument
 import com.sofamaniac.crabir.domain.model.Score
 import com.sofamaniac.crabir.domain.model.Selftext
 import com.sofamaniac.crabir.domain.model.SubredditInfo
 import com.sofamaniac.crabir.domain.model.getKind
-import com.sofamaniac.crabir.reddit.Thumbnail
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -57,7 +62,8 @@ data class PostDTO(
     @SerialName("name") val fullname: Fullname,
     @SerialName("url") val url: String = "",
     @SerialName("title") val title: String = "",
-    @SerialName("suggested_sort") val suggestedSort: String? = null,
+    @Serializable(with = CommentSortSerializer::class)
+    @SerialName("suggested_sort") val suggestedSort: Sort? = null,
     @SerialName("num_comments") val numComments: Int = 0,
     @SerialName("over_18") val over18: Boolean = false,
     @SerialName("permalink") val permalink: String,
@@ -71,7 +77,7 @@ data class PostDTO(
     // AUTHOR INFORMATION
     // ================================================ //
     @SerialName("author") val author: String? = "",
-    @SerialName("author_fullname") val authorFullname: String = "",
+    @SerialName("author_fullname") val authorFullname: Fullname = Fullname(""),
     @SerialName("author_is_blocked") val authorIsBlocked: Boolean = false,
     @SerialName("author_patreon_flair") val authorPatreonFlair: Boolean = false,
     @SerialName("author_premium") val authorPremium: Boolean = false,
@@ -91,7 +97,7 @@ data class PostDTO(
 
     // Ban Info
     @Serializable(with = InstantAsFloatSerializer::class)
-    @SerialName("banned_at_utc") val bannedAtUtc: Instant = Instant.DISTANT_FUTURE,
+    @SerialName("banned_at_utc") val bannedAtUtc: Instant? = null,
     @SerialName("banned_by") val bannedBy: String? = null,
 
     // ================================================ //
@@ -132,6 +138,7 @@ data class PostDTO(
     // Selftext
     @SerialName("selftext") val selftextRaw: String = "",
     @SerialName("selftext_html") val selftextHtml: String? = null,
+    @SerialName("rtjson") val richtext: RichtextDocument = RichtextDocument(emptyList()),
 
     // Creation Info
     @SerialName("created") val created: Double = 0.0,
@@ -260,8 +267,9 @@ private fun PostDTO.toScore() = Score(
 )
 
 private fun PostDTO.toSelftext() = Selftext(
-    selftext = selftextRaw,
-    selftextHtml = selftextHtml ?: ""
+    markdown = ParsedMarkdown(selftextRaw, mediaMetadata),
+    html = selftextHtml ?: "",
+    richtext = richtext
 )
 
 private fun PostDTO.toLinkFlair() = Flair(
@@ -309,12 +317,13 @@ object PostDataMapper : ObjectMappie<PostDTO, PostData>() {
         PostData::name fromProperty from::fullname
 
         PostData::url fromProperty from::url
-        PostData::suggestedSort fromValue (from.suggestedSort ?: "")
+        PostData::suggestedSort fromProperty from::suggestedSort
         PostData::preview fromValue from.getPreview()
         PostData::crosspostParentList fromProperty from::crosspostParentList
 
         PostData::author fromValue from.toAuthorInfo()
         PostData::subreddit fromValue from.toSubredditInfo()
+        PostData::subredditDetails fromProperty from::subredditDetails via SubredditDetailsMapper
         PostData::thumbnail fromValue from.toThumbnail()
         PostData::score fromValue from.toScore()
         PostData::selftext fromValue from.toSelftext()
@@ -339,6 +348,7 @@ data class Media(
     @SerialName("reddit_video")
     val redditVideo: RedditVideo? = null,
     val oembed: OEmbed? = null,
+    val type: String? = null,
 )
 
 @Serializable
@@ -379,7 +389,7 @@ data class RedditVideo(
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable(with = MediaMetadataSerializer::class)
 @JsonClassDiscriminator("e")
-sealed class MediaMetadata() {
+sealed class MediaMetadata {
 
     abstract val ratio: Float
     abstract val width: Int
@@ -394,9 +404,9 @@ sealed class MediaMetadata() {
         @SerialName("id") val id: String? = null,
         /** Something like "image/jpeg" */
         @SerialName("m") val mime: String? = null,
-        @SerialName("p") val preview: List<MediaPreview>? = emptyList(),
+        @SerialName("p") val preview: List<MediaPreview> = emptyList(),
         @SerialName("s") val source: MediaPreview? = null,
-        @SerialName("o") val obfuscated: List<MediaPreview>? = emptyList(),
+        @SerialName("o") val obfuscated: List<MediaPreview> = emptyList(),
     ) : MediaMetadata() {
         override val ratio: Float
             get() = source?.ratio ?: 1f
@@ -459,7 +469,7 @@ data class MediaPreview(
     /** Url of the preview */
     @SerialName("u") val url: String? = null,
     @SerialName("x") val width: Int = 0,
-    @SerialName("y") val height: Int = 0
+    @SerialName("y") val height: Int = 0,
 ) {
     val ratio: Float
         get() = width.toFloat() / height.toFloat()

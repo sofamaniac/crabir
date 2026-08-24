@@ -1,11 +1,11 @@
 package com.sofamaniac.crabir.domain.repository
 
 import android.util.Log
-import com.sofamaniac.crabir.data.remote.api.RedditAPIService
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDetailsMapper
+import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
+import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
@@ -14,23 +14,27 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import org.koin.core.annotation.Singleton
 import retrofit2.Response
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
-class SubscriptionsRepository @Inject constructor(
+class SubscriptionsRepository(
     val api: RedditAPIService,
     val accountsRepository: AccountsRepository,
     val subredditCache: SubredditCache,
 ) {
+    val activeAccount = accountsRepository.activeAccount.distinctUntilChanged { old, new ->
+        old.id == new.id
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val subscriptions: StateFlow<List<Subreddit>> =
-        accountsRepository.activeAccount
+        activeAccount
             .flatMapLatest { account ->
                 Log.d("SubscriptionsRepository", "activeAccount: $account")
                 if (!account.isAnonymous()) {
@@ -46,7 +50,7 @@ class SubscriptionsRepository @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val multis: StateFlow<List<Thing.Multi>> =
-        accountsRepository.activeAccount
+        activeAccount
             .flatMapLatest { account ->
                 Log.d("SubscriptionsRepository", "activeAccount: $account")
                 if (!account.isAnonymous()) {
@@ -62,7 +66,7 @@ class SubscriptionsRepository @Inject constructor(
 
 
     private suspend fun <T : Thing> makeRequest(
-        request: suspend () -> Response<Listing<T>>
+        request: suspend () -> Response<Listing<T>>,
     ): PagedResponse<T> {
         val response = request()
         if (response.isSuccessful) {
@@ -88,23 +92,28 @@ class SubscriptionsRepository @Inject constructor(
         var after: Fullname? = Fullname("")
         var subs: List<Subreddit> = emptyList()
         while (after != null) {
-            val response = getSubreddits(after)
-            after = response.data.lastOrNull()?.data?.name
-            subs = subs.plus(response.data)
+            val response = runCatching { getSubreddits(after) }.getOrNull()
+            after = response?.data?.lastOrNull()?.data?.name
+            subs = subs.plus(response?.data ?: emptyList())
         }
         Log.d(
             "SubscriptionsRepository",
             "loadSubscriptions: ${subs.size} subreddits loaded"
         )
         for (sub in subs) {
-            val mapped = SubredditDetailsMapper.map(sub.data)
+            val mapped = SubredditDTOMapper.map(sub.data)
             subredditCache.save(mapped)
         }
         return subs
     }
 
     suspend fun loadMultis(): List<Thing.Multi> {
-        val response = api.getMultireddits()
+        val result = runCatching { api.getMultireddits() }
+        if (result.isFailure) {
+            Log.e("SubscriptionsRepository", "Error loading multis: ${result.exceptionOrNull()}")
+            return emptyList()
+        }
+        val response = result.getOrThrow()
         if (response.isSuccessful) {
             return response.body() ?: emptyList()
         } else {

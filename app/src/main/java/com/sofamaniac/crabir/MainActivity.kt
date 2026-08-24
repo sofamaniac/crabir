@@ -8,106 +8,190 @@
 
 package com.sofamaniac.crabir
 
+import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavDeepLink
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
+import androidx.core.net.toUri
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavController
+import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
-import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
+import coil3.ImageLoader
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.disk.DiskCache
+import coil3.disk.directory
+import coil3.memory.MemoryCache
+import coil3.memoryCacheMaxSizePercentWhileInBackground
+import coil3.util.DebugLogger
 import com.sofamaniac.crabir.navigation.HistoryRoute
 import com.sofamaniac.crabir.navigation.HomeRoute
 import com.sofamaniac.crabir.navigation.InboxRoute
-import com.sofamaniac.crabir.navigation.LicensesRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SearchRoute
-import com.sofamaniac.crabir.navigation.SettingsRoute
+import com.sofamaniac.crabir.navigation.SimpleImageRoute
 import com.sofamaniac.crabir.navigation.SubscriptionsRoute
-import com.sofamaniac.crabir.navigation.ThemeEditorRoute
-import com.sofamaniac.crabir.navigation.ThemeRoute
-import com.sofamaniac.crabir.navigation.ViewsSettingRoute
+import com.sofamaniac.crabir.navigation.editorGraph
+import com.sofamaniac.crabir.navigation.imagesGraph
 import com.sofamaniac.crabir.navigation.postGraph
 import com.sofamaniac.crabir.navigation.profileGraph
+import com.sofamaniac.crabir.navigation.settingsGraph
 import com.sofamaniac.crabir.navigation.subredditGraph
-import com.sofamaniac.crabir.settings.SettingsPage
-import com.sofamaniac.crabir.settings.theme.ConfigureMaterialTheme
-import com.sofamaniac.crabir.settings.theme.CrabirTheme
-import com.sofamaniac.crabir.settings.theme.DefaultDarkTheme
-import com.sofamaniac.crabir.settings.theme.ThemeEditor
-import com.sofamaniac.crabir.settings.theme.ThemeSettingsPage
-import com.sofamaniac.crabir.settings.theme.rememberAppTheme
-import com.sofamaniac.crabir.settings.views.ViewsSettingsPage
-import com.sofamaniac.crabir.ui.InboxView
-import com.sofamaniac.crabir.ui.drawer.DrawerContent
+import com.sofamaniac.crabir.settings.ConfigureSettings
+import com.sofamaniac.crabir.settings.theme.ConfigureCrabirTheme
+import com.sofamaniac.crabir.ui.inbox.InboxView
+import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
+import com.sofamaniac.crabir.ui.media.image.TransformableImage
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
+import com.sofamaniac.crabir.ui.rememberCurrentAccount
 import com.sofamaniac.crabir.ui.search.SearchTab
 import com.sofamaniac.crabir.ui.subreddit.HistoryViewer
 import com.sofamaniac.crabir.ui.subreddit.HomeViewer
 import com.sofamaniac.crabir.ui.subredditList.SubredditListViewer
-import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.launch
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.annotation.KoinApplication
+import org.koin.core.annotation.KoinViewModelScopeApi
+import org.koin.core.option.viewModelScopeFactory
+import org.koin.plugin.module.dsl.startKoin
 
 
-@HiltAndroidApp
-class CrabirApp : Application()
+@KoinApplication
+class CrabirApp : Application() {
+    @OptIn(KoinViewModelScopeApi::class)
+    override fun onCreate() {
+        super.onCreate()
+        startKoin<CrabirApp> {
+            //androidLogger(Level.DEBUG)
+            androidContext(this@CrabirApp)
+            options(viewModelScopeFactory())
+        }
+    }
+}
 
-val LocalTheme = compositionLocalOf<CrabirTheme> { DefaultDarkTheme }
-val LocalDrawerState = compositionLocalOf<DrawerState> { error("No drawer state provided") }
 
-
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    lateinit var navController: NavHostController
+    lateinit var uriHandler: UriHandler
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        //window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-        setContent {
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
 
-            ConfigureMaterialTheme {
-                val navController = rememberNavController()
-                val drawerState = rememberDrawerState(DrawerValue.Closed)
-                // Setup nav controller
-                CompositionLocalProvider(LocalNavController provides navController) {
-                    val theme = rememberAppTheme()
-                    Log.d("MainActivity", "onCreate: $theme")
-                    CompositionLocalProvider(LocalTheme provides theme) {
-                        CompositionLocalProvider(LocalDrawerState provides drawerState) {
-                            MainScreen(
-                                navController = navController,
-                            )
-                        }
+    private fun handleIntent(intent: Intent) {
+        Log.d("MainActivity", "handleIntent: $intent")
+        intent.data?.let { uri ->
+            val request = NavDeepLinkRequest.Builder.fromUri(uri).build()
+            try {
+                Log.d("MainActivity", "handleIntent: request: $request")
+                val mediaUrl = listOf("i.redd.it", "preview.reddit.com", "preview.redd.it")
+                if (mediaUrl.contains(uri.host)) {
+                    navController.navigate(
+                        route = SimpleImageRoute(uri.toString()),
+                        navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
+                    )
+                } else {
+                    navController.navigate(
+                        request = request,
+                        navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
+                    )
+                }
+            } catch (e: IllegalArgumentException) {
+                try {
+                    if (uri.scheme == "http" || uri.scheme == "https") {
+                        uriHandler.openUri(uri.toString())
                     }
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "handleIntent: failed to open uri: $uri", e)
                 }
             }
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        var keepSplashOnScreen = true
+        super.onCreate(savedInstanceState)
+        splashScreen.setKeepOnScreenCondition { keepSplashOnScreen }
+        VideoPlayerManager.initialize(this)
+        enableEdgeToEdge()
+        setContent {
+
+            navController = rememberNavController()
+            uriHandler = LocalUriHandler.current
+            setImageLoader()
+            MainScreen(navController = navController) {
+                keepSplashOnScreen = false
+                handleIntent(intent)
+            }
+        }
+    }
+}
+
+@Immutable
+data class CrabirUriHandler(val navController: NavController?, val fallback: UriHandler) :
+    UriHandler {
+    override fun openUri(uri: String) {
+        try {
+            val request = NavDeepLinkRequest.Builder.fromUri(uri.toUri()).build()
+            navController?.navigate(request)
+        } catch (_: IllegalArgumentException) {
+            Log.i("CrabirUriHandler", "could not open: $uri")
+            fallback.openUri(uri)
+        }
+    }
+
+}
+
+@SuppressLint("ComposableNaming")
+@Composable
+fun setImageLoader() {
+    setSingletonImageLoaderFactory { context ->
+        ImageLoader.Builder(context).memoryCache {
+            MemoryCache.Builder().maxSizePercent(context, 0.25)
+                .build()
+        }.diskCache {
+            // 2go
+            val size: Long = 2L * 1024L * 1024L * 1024L
+            DiskCache.Builder()
+                .maxSizeBytes(size)
+                .directory(context.cacheDir.resolve("image_cache")).build()
+        }
+            .memoryCacheMaxSizePercentWhileInBackground(0.10) // 10% when backgrounded
+            .logger(DebugLogger())
+            .build()
     }
 }
 
@@ -116,98 +200,66 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    onLoad: () -> Unit,
 ) {
 
-    DisposableEffect(Unit) {
+    val lifecycleOwner by rememberUpdatedState(LocalLifecycleOwner.current)
+    DisposableEffect(lifecycleOwner) {
+        val player = VideoPlayerManager.getInstance()
+        val lifecycle = lifecycleOwner.lifecycle
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_PAUSE -> player.pause()
+                Lifecycle.Event.ON_RESUME -> player.play()
+                Lifecycle.Event.ON_DESTROY -> VideoPlayerManager.releasePlayer()
+                else -> {}
+            }
+        }
+        lifecycle.addObserver(observer)
         onDispose {
-            VideoPlayerManager.releasePlayer()
+            Log.d("MainScreen", "onDispose")
+            lifecycle.removeObserver(observer)
         }
     }
-
-    val scope = rememberCoroutineScope()
-    val activity = LocalActivity.current
-    val drawerState = LocalDrawerState.current
-    BackHandler {
-        if (drawerState.isOpen) {
-            scope.launch {
-                drawerState.close()
-            }
-        } else {
-            // TODO: ask for confirmation and exit the app
-            if (navController.previousBackStackEntry != null) {
-                navController.popBackStack()
-            } else {
-                activity?.finish()
+    val currentAccount = rememberCurrentAccount()
+    ConfigureCrabirTheme {
+        ConfigureSettings {
+            CompositionLocalProvider(
+                LocalNavController provides navController,
+                LocalRedditAccount provides currentAccount,
+            ) {
+                LaunchedEffect(currentAccount) {
+                    if (!currentAccount.isUninitialized()) {
+                        navController.navigate(HomeRoute) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                        onLoad()
+                    }
+                }
+                SetShortcuts()
+                NavigationGraph(
+                    navController,
+                )
             }
         }
     }
-
-    ModalNavigationDrawer(
-        drawerState = LocalDrawerState.current,
-        drawerContent = {
-            DrawerContent()
-        },
-    ) {
-        NavigationGraph(
-            navController,
-        )
-    }
-
-
 }
 
-val BASE_URL = listOf(
-    "reddit.com",
-    "www.reddit.com",
-    "old.reddit.com",
-    "new.reddit.com",
-)
-
-
-inline fun <reified T : Any> makeDeepLinks(url: String): List<NavDeepLink> {
-    val links = BASE_URL.map {
-        navDeepLink<T>(basePath = "$it/$url")
-    }
-    val linksTrailing = BASE_URL.map {
-        navDeepLink<T>(basePath = "$it/$url/")
-    }
-    Log.d("makeDeepLinks", "Generating links for $url")
-    for (link in links) {
-        Log.d("makeDeepLinks", link.uriPattern.toString())
-    }
-    return links + linksTrailing
-}
-
-fun stringLink(url: String): List<NavDeepLink> {
-    require(!url.startsWith("/"))
-    require(!url.endsWith("/"))
-    val links = BASE_URL.map {
-        navDeepLink { uriPattern = "$it/$url" }
-    }
-    val linksTrailing = BASE_URL.map { navDeepLink { uriPattern = "$it/$url/" } }
-    Log.d("makeDeepLinks", "Generating links for $url")
-    for (link in links) {
-        Log.d("makeDeepLinks", link.uriPattern.toString())
-    }
-    return links + linksTrailing
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-
     NavHost(
         navController = navController,
         startDestination = HomeRoute,
         modifier = modifier
             .fillMaxSize()
             .imePadding(),
-        enterTransition = { EnterTransition.None },
-        exitTransition = { ExitTransition.None }
+        //        enterTransition = { EnterTransition.None },
+        //        exitTransition = { ExitTransition.None },
     ) {
         composable<HomeRoute> {
             HomeViewer()
@@ -216,11 +268,18 @@ fun NavigationGraph(
         profileGraph(navController = navController)
         postGraph(navController = navController)
         subredditGraph(navController = navController)
+        imagesGraph(navController = navController)
+        settingsGraph(navController = navController)
+        editorGraph(navController = navController)
 
         composable<SubscriptionsRoute> {
-            SubredditListViewer(navController = navController)
+            SubredditListViewer()
         }
-        composable<SearchRoute> { navBackStackEntry ->
+        composable<SearchRoute>(
+            deepLinks = listOf(
+                navDeepLink { uriPattern = "com.sofamaniac.crabir://search" }
+            )
+        ) { navBackStackEntry ->
             val search = navBackStackEntry.toRoute<SearchRoute>()
             SearchTab(search)
         }
@@ -228,26 +287,43 @@ fun NavigationGraph(
             InboxView()
 
         }
-
-
-        composable<LicensesRoute> {
-            val libraries by produceLibraries(R.raw.aboutlibraries)
-            LibrariesContainer(libraries, modifier = Modifier.fillMaxSize())
-        }
-        composable<SettingsRoute> {
-            SettingsPage()
-        }
-        composable<ThemeRoute> {
-            ThemeSettingsPage()
-        }
-        composable<ThemeEditorRoute> {
-            ThemeEditor()
-        }
-        composable<ViewsSettingRoute> {
-            ViewsSettingsPage()
-        }
         composable<HistoryRoute> {
             HistoryViewer()
+        }
+        composable(
+            route = "videoPreview?url={url}",
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "v.redd.it/{url}"
+                }
+            ),
+            arguments = listOf(
+                navArgument("url") {
+                    type = NavType.StringType
+                },
+            )
+        ) { navBackStackEntry ->
+            val url = navBackStackEntry.arguments?.getString("url")
+            if (url != null) {
+                VerticalSwipeToDismiss(
+                    onDismiss = {
+                        // Why do we need to pop twice?
+                        navController.popBackStack()
+                        navController.popBackStack()
+                    },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = Color.Black)
+                ) {
+                    TransformableImage(
+                        source = "https://v.redd.it/$url",
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize(),
+                        blur = false
+                    )
+                }
+            }
         }
     }
 }

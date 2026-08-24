@@ -4,8 +4,13 @@
 
 package com.sofamaniac.crabir.domain.model
 
+import androidx.annotation.Keep
 import com.sofamaniac.crabir.data.remote.dto.post.PostDTO
 
+import kotlinx.serialization.Serializable
+
+@Keep
+@Serializable
 enum class Kind {
     Self,
     Image,
@@ -14,15 +19,18 @@ enum class Kind {
     Meta,
     Link,
     YoutubeVideo,
+    Streamable,
     Unknown,
 }
 
 fun isVideoPost(post: PostDTO): Boolean {
     return post.isVideo || (post.postHint == "image" && isVideoUrl(post.url)) ||
-            (post.preview?.images?.any { it.variants?.mp4 != null } ?: false)
+            (post.preview?.images?.any { it.variants?.mp4 != null } ?: false) ||
+            (post.preview?.redditVideoPreview != null)
 }
 
 fun getKind(post: PostDTO): Kind {
+    if (post.secureMedia?.type == "streamable.com") return Kind.Streamable
     if (isVideoPost(post)) return Kind.Video
 
     if (post.crosspostParentList.isNotEmpty()) return getKind(post.crosspostParentList.first())

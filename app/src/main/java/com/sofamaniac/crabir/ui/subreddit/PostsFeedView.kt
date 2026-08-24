@@ -10,210 +10,165 @@ package com.sofamaniac.crabir.ui.subreddit
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import com.sofamaniac.crabir.LocalDrawerState
-import com.sofamaniac.crabir.LocalFullscreenHandler
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.data.remote.dto.post.Sort
-import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.LocalViewSettings
+import com.sofamaniac.crabir.PreviewLocalComposition
+import com.sofamaniac.crabir.R
+import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.settings.views.Views
-import com.sofamaniac.crabir.settings.views.rememberViewSettings
-import com.sofamaniac.crabir.ui.HorizontalSwipeToDismiss
-import com.sofamaniac.crabir.ui.SortMenu
+import com.sofamaniac.crabir.ui.RefreshIndicator
+import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.post.CompactView
-import com.sofamaniac.crabir.ui.post.PostCard
-import com.sofamaniac.crabir.ui.thread.CommentNode
-import com.sofamaniac.crabir.ui.thread.ThreadView
-import com.sofamaniac.crabir.ui.thread.ThreadViewModel
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
+import com.sofamaniac.crabir.ui.post.DummyInteraction
+import com.sofamaniac.crabir.ui.post.LinkViewModel
+import com.sofamaniac.crabir.ui.post.PostViewModelInterface
+import com.sofamaniac.crabir.ui.post.card.PostCard
+import kotlinx.coroutines.flow.distinctUntilChanged
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.KoinApplicationPreview
+import org.koin.core.parameter.parametersOf
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import org.koin.plugin.module.dsl.viewModel
 import kotlin.math.max
-
-object PostFeedViewerDefaults {
-    fun hiddenFilter(votableData: VotableData?): Boolean {
-        return when (votableData) {
-            is PostData -> {
-                !votableData.relationship.hidden
-            }
-
-            else -> true
-        }
-    }
-}
 
 /**
  * Composable function to display a list of posts from a subreddit.
  *
  * @param viewModel The current state of the SubredditViewer, including subreddit, sort order, and timeframe.
+ * @param filter Renders only the elements for which filter returns true
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostFeedViewer(
-    viewModel: FeedViewModelInterface,
+fun <T : VotableData> PostFeedViewer(
+    viewModel: FeedViewModelInterface<T>,
+    viewEntity: CommunityViewEntity?,
     modifier: Modifier = Modifier,
+    filter: (T) -> Boolean = { true },
+    // If set to {}, breaks pull to refresh
     feedInfo: (@Composable () -> Unit)? = null,
-    filter: (VotableData?) -> Boolean = PostFeedViewerDefaults::hiddenFilter
+    itemView: @Composable (thing: T, isMostVisible: Boolean) -> Unit,
 ) {
 
     val posts = viewModel.data.collectAsLazyPagingItems()
-    val listState = viewModel.listState
+    // Use another list state when they are no items.
+    // See https://issuetracker.google.com/issues/177245496#comment24
+    // This is necessary because when going back from another page,
+    // posts is at first empty and causes the list to lose its scroll state.
+    val listState = when (posts.itemCount) {
+        0 -> rememberLazyStaggeredGridState()
+        else -> viewModel.listState
+    }
 
     LaunchedEffect(posts.loadState.refresh) {
         if (posts.loadState.refresh is LoadState.NotLoading && viewModel.needScrollToTop) {
             Log.d("PostFeedViewer", "Refreshing list")
             listState.scrollToItem(0)
+            viewModel.needScrollToTop = false
         }
     }
 
-    var mostVisibleItemIndex by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(listState) {
+    val mostVisibleItemKey by remember(listState) {
         snapshotFlow {
-            if (!listState.isScrollInProgress) {
-                listState.layoutInfo.visibleItemsInfo
-                    .maxByOrNull { item ->
-                        item.size
-                        val itemTop = maxOf(item.offset.y, 0)
-                        val itemBottom =
-                            minOf(
-                                item.offset.y + item.size.height,
-                                listState.layoutInfo.viewportEndOffset
-                            )
-                        (itemBottom - itemTop).toFloat() / max(item.size.height, 1).toFloat()
-                    }?.index ?: 0
-            } else {
-                null
-            }
-        }
-            .filterNotNull()
-            .collect { index ->
-                mostVisibleItemIndex = index
-            }
-    }
+            listState.layoutInfo.visibleItemsInfo
+                .maxByOrNull { item ->
+                    // Compute the visible fraction for each item
+                    val itemTop = maxOf(item.offset.y, 0)
+                    val itemBottom =
+                        minOf(
+                            item.offset.y + item.size.height,
+                            listState.layoutInfo.viewportEndOffset
+                        )
+                    val visibleHeight = (itemBottom - itemTop).toFloat()
+                    visibleHeight / max(item.size.height, 1).toFloat()
+                }?.key as? String?
+        }.distinctUntilChanged()
+    }.collectAsState(null)
 
-    val fullscreenManager = LocalFullscreenHandler.current!!
-    val viewSettings = rememberViewSettings()
-    val postItems = posts.itemSnapshotList.filter { post -> filter(post) }
+    val columns = viewEntity?.columns ?: LocalViewSettings.current.defaultColumns
+    val state = rememberPullToRefreshState()
+    val theme = LocalTheme.current
 
     PullToRefreshBox(
         isRefreshing = posts.loadState.refresh == LoadState.Loading,
+        state = state,
         onRefresh = {
             viewModel.refresh()
         },
         modifier = modifier.fillMaxSize(),
         indicator = {
-            if (posts.loadState.refresh == LoadState.Loading) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
+            val refreshing = posts.loadState.refresh == LoadState.Loading
+            RefreshIndicator(refreshing, state)
         }
     ) {
         LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(viewSettings.defaultColumns),
-            verticalItemSpacing = 2.dp,
+            columns = StaggeredGridCells.Fixed(columns),
+            verticalItemSpacing = 8.dp,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
+                .background(theme.background)
                 .fillMaxSize(),
-            //verticalArrangement = Arrangement.spacedBy(8.dp),
             state = listState,
         ) {
             if (feedInfo != null) {
-                item { feedInfo() }
+                item(
+                    key = "info",
+                    span = StaggeredGridItemSpan.FullLine
+                ) {
+                    feedInfo()
+                }
             }
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
-                val post = posts[index]!!
-                val threadView = @Composable { post: PostData ->
-                    HorizontalSwipeToDismiss {
-                        ThreadView(
-                            permalink = post.permalink,
-                            dismiss = {
-                                fullscreenManager.pop()
-                            })
+                val post = posts[index]
+                if (post != null && filter(post)) {
+                    val isMostVisible = mostVisibleItemKey == post.id
+                    Column {
+                        itemView(post, isMostVisible)
+                        HorizontalDivider()
                     }
                 }
-                when (post) {
-                    is PostData -> {
-                        val onClick = { post: PostData ->
-                            viewModel.visitPost(post)
-                            fullscreenManager.push { threadView(post) }
-                        }
-                        val canStartVideo =
-                            viewSettings.defaultColumns == 1 && index == mostVisibleItemIndex
-                        val wasRead = viewModel.isPostRead(post)
-                        when (viewSettings.defaultView) {
-                            Views.Card -> PostCard(
-                                post,
-                                onClick = onClick,
-                                canStartVideo = canStartVideo,
-                                read = wasRead,
-                            )
-
-                            Views.Compact -> CompactView(
-                                post,
-                                onClick = onClick,
-                                canStartVideo = canStartVideo,
-                                read = wasRead,
-                            )
-
-                            else ->
-                                PostCard(
-                                    post,
-                                    onClick = { post ->
-                                        fullscreenManager.push { threadView(post) }
-                                    },
-                                    canStartVideo = canStartVideo,
-                                )
-                        }
-                    }
-
-                    is CommentData -> {
-                        CommentNode(
-                            comment = post,
-                            viewModel = hiltViewModel<ThreadViewModel, ThreadViewModel.Factory> { factory ->
-                                factory.create(post.permalink)
-                            }
-                        )
+            }
+            item {
+                val appendState = posts.loadState.append
+                if (appendState is LoadState.NotLoading && appendState.endOfPaginationReached) {
+                    EndOfFeed()
+                } else if (appendState is LoadState.Error) {
+                    FeedError(appendState.error) {
+                        posts.retry()
                     }
                 }
             }
@@ -221,63 +176,108 @@ fun PostFeedViewer(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Composable
-fun TopBar(
-    title: String,
-    state: PostFeedViewModel,
-    scrollBehavior: TopAppBarScrollBehavior?,
+fun EndOfFeed() {
+    ThemedCard() {
+        Column(
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(stringResource(R.string.end_of_feed_reached), textAlign = TextAlign.Center)
+        }
+    }
+}
+
+@Preview
+@Composable
+fun FeedError(error: Throwable = RuntimeException("Test"), retry: () -> Unit = {}) {
+    ThemedCard(modifier = Modifier.clickable { retry() }) {
+        Column(
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                stringResource(R.string.feed_error, error.localizedMessage),
+                textAlign = TextAlign.Center
+            )
+            Icon(Icons.Default.Refresh, contentDescription = null)
+        }
+    }
+}
+
+@Composable
+fun PostView(
+    thing: PostData,
+    isMostVisible: Boolean,
+    showHidden: Boolean,
+    view: Views,
+    viewModel: PostViewModelInterface,
+    modifier: Modifier = Modifier,
 ) {
-    val scope = rememberCoroutineScope()
-    val params = state.params.collectAsState()
-    val theme = LocalTheme.current
-    val drawerState = LocalDrawerState.current
+    when (view) {
+        Views.Card -> PostCard(
+            thing,
+            modifier = modifier,
+            isMostVisible = isMostVisible,
+            showHidden = showHidden,
+            viewModel = viewModel,
+        )
 
-    TopAppBar(
-        scrollBehavior = scrollBehavior,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = theme.toolbarBackground,
-            scrolledContainerColor = theme.toolbarBackground,
-            titleContentColor = theme.toolbarText,
-        ),
-        title = {
-            Column {
-                Text(title)
-                Row(
-                    modifier = Modifier.padding(horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(params.value.sort.toString(), style = MaterialTheme.typography.labelSmall)
-                    if (params.value.timeframe != null) {
-                        Text(".", style = MaterialTheme.typography.labelSmall)
-                        Text(
-                            params.value.timeframe.toString(),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-                }
-            }
-        },
-        navigationIcon = {
-            IconButton(onClick = {
-                scope.launch { drawerState.open() }
-            }) { Icon(Icons.Default.Menu, "Open Drawer") }
-        },
-        actions = {
-            // Sort Dropdown
-            var showMenu by remember { mutableStateOf(false) }
-            IconButton(onClick = { showMenu = !showMenu }) {
-                Icon(Icons.Filled.MoreVert, "Options")
-            }
+        Views.Compact -> CompactView(
+            thing,
+            modifier = modifier,
+            showHidden = showHidden,
+            viewModel = viewModel,
+        )
+    }
+}
 
-            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                DropdownMenuItem(onClick = { }, text = { Text("Settings") })
-                DropdownMenuItem(onClick = { }, text = { Text("Info") })
-                DropdownMenuItem(onClick = { state.refresh() }, text = { Text("Refresh") })
-            }
-            SortMenu<Sort> { sort, timeframe ->
-                state.updateSort(sort, timeframe)
+@Composable
+fun PostView(
+    thing: PostData,
+    isMostVisible: Boolean,
+    showHidden: Boolean,
+    modifier: Modifier = Modifier,
+    view: Views? = null,
+    viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = thing.id) {
+        parametersOf(
+            thing
+        )
+    },
+) {
+    val viewSettings = LocalViewSettings.current
+    val view = if (!viewSettings.rememberView) viewSettings.defaultView else view
+    PostView(
+        thing,
+        isMostVisible,
+        showHidden,
+        view ?: viewSettings.defaultView,
+        viewModel = viewModel,
+        modifier = modifier,
+    )
+}
+
+@Preview
+@Composable
+private fun PostFeedPreview() {
+    PreviewLocalComposition {
+        KoinApplicationPreview(application = {
+            modules(module {
+                viewModel<DummyInteraction>() bind PostViewModelInterface::class
+            })
+        }) {
+            PostFeedViewer(
+                viewModel = FeedViewModelInterfacePreview,
+                viewEntity = null,
+            ) { post, mostVisible ->
+                PostView(
+                    thing = post,
+                    isMostVisible = mostVisible,
+                    showHidden = false,
+                    viewModel = koinViewModel<DummyInteraction>()
+                )
             }
         }
-    )
+    }
 }

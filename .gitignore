@@ -19,3 +19,8 @@ app/schemas
 local.properties
 apikeys.properties
 google-services.json
+/idea-flex.skeleton
+/jflex-1.10.17.jar
+/ksp_log.txt
+/.idea/
+/.bundle/

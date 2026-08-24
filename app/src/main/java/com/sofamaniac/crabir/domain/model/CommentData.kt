@@ -1,19 +1,69 @@
 package com.sofamaniac.crabir.domain.model
 
+import com.sofamaniac.crabir.data.local.entities.VotableEntity
 import com.sofamaniac.crabir.data.remote.dto.MoreData
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 
-sealed class CommentType() {
-    data class Comment(val comment: CommentData) : CommentType()
-    data class More(val data: MoreData) : CommentType()
+@Serializable
+sealed class CommentType : VotableData {
+    @Serializable
+    data class Comment(val comment: CommentData) : CommentType() {
+        override fun copy(
+            relationship: Relationship?,
+            score: Score?
+        ): VotableData {
+            return copy(comment = comment.copy(relationship = relationship, score = score))
+        }
+        override val author: AuthorInfo = comment.author
+        override val relationship: Relationship = comment.relationship
+        override val score: Score = comment.score
+        override val body: ParsedMarkdown = comment.body
 
-    val name: Fullname
+        override fun toEntity(): VotableEntity {
+            return VotableEntity(id = comment.name, data = Json.encodeToString(this))
+        }
+
+        override val id: String = comment.id
+    }
+
+    @Serializable
+    data class More(val data: MoreData) : CommentType() {
+        override fun copy(
+            relationship: Relationship?,
+            score: Score?
+        ): VotableData {
+            return this
+        }
+
+        override val author: AuthorInfo? = null
+        override val relationship: Relationship get() = throw Exception("More has no relationship")
+        override val score: Score get() = throw Exception("More has no score")
+        override val body: ParsedMarkdown get() = throw Exception("More has no body")
+
+        override fun toEntity(): VotableEntity {
+            return VotableEntity(id = data.name, data = Json.encodeToString(this))
+        }
+
+        override val id: String = name.name
+    }
+
+    override val name: Fullname
         get() =
             when (this) {
                 is Comment -> comment.name
                 is More -> data.name
             }
+
+    val parentId: Fullname
+        get() =
+            when (this) {
+                is Comment -> comment.parentId
+                is More -> data.parentId
+            }
+
 
     val depth: Int
         get() =
@@ -23,16 +73,19 @@ sealed class CommentType() {
             }
 }
 
+@Serializable
 data class CommentData(
     override val id: String,
     override val name: Fullname,
     val depth: Int,
-    val bodyMd: String,
+    val bodyMd: ParsedMarkdown,
     val bodyHtml: String,
-    val parentId: String,
+    val richtext: RichtextDocument = RichtextDocument(emptyList()),
+    val parentId: Fullname,
     val permalink: String,
-    val replies: List<CommentType>,
-    val author: AuthorInfo,
+    val replies: Int,
+    //val replies: List<CommentType>,
+    override val author: AuthorInfo,
     val isSubmitter: Boolean,
     override val relationship: Relationship,
     val subredditInfo: SubredditInfo,
@@ -40,10 +93,23 @@ data class CommentData(
     val collapsed: Boolean,
     val createdUtc: Instant,
     val edited: Instant?,
-    val mediaMetadata: Map<String, MediaMetadata>
+    val mediaMetadata: Map<String, MediaMetadata>,
+    val distinguished: String? = "",
 ) : VotableData {
+    override val body: ParsedMarkdown = bodyMd
     override fun copy(relationship: Relationship?, score: Score?): CommentData =
         copy(relationship = relationship ?: this.relationship, score = score ?: this.score)
 
-    fun updateReplies(replies: List<CommentType>): CommentData = copy(replies = replies)
+    override fun updateScore(oldLikes: Boolean?, newLikes: Boolean?): CommentData {
+        return super.updateScore(oldLikes, newLikes) as CommentData
+    }
+
+    //fun updateReplies(replies: List<CommentType>): CommentData = copy(replies = replies)
+
+    override fun toEntity(): VotableEntity {
+        return VotableEntity(
+            id = name,
+            data = Json.encodeToString(this)
+        )
+    }
 }

@@ -120,9 +120,13 @@ data class UserDTO(
     @SerialName("pref_video_autoplay")
     val prefVideoAutoplay: Boolean = false,
     @SerialName("snoovatar_img")
-    val snoovatarImg: String = "",
+    val snoovatarImg: String? = null,
     @SerialName("snoovatar_size")
     val snoovatarSize: List<Int>? = null,
+    @SerialName("banner_img")
+    val bannerImg: String? = null,
+    @SerialName("banner_size")
+    val bannerSize: List<Int>? = null,
     @SerialName("subreddit")
     val subreddit: Subreddit = Subreddit(),
     @SerialName("suspension_expiration_utc")
