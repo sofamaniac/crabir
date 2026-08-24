@@ -10,6 +10,7 @@ An open source replacement for Boost for Reddit.
 - Browse communities
 - Interact with posts
 - Theme customization
+- View customization
 - Go to a random community
 - View comments
 - Write comments
