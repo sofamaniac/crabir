@@ -1,4 +1,6 @@
-![Crabir logo](https://raw.githubusercontent.com/sofamaniac/Crabir/main/pictures/logo.png)
+<p align="center">
+  <img width="96px" src="https://raw.githubusercontent.com/sofamaniac/Crabir/master/pictures/logo.png" />
+</p>
 
 # Crabir
 
