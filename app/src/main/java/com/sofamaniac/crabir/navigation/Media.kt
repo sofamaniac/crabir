@@ -33,6 +33,7 @@ class FullscreenVideoRoute(val post: Fullname) : Route
 
 @Serializable
 class FullscreenGalleryRoute(val post: Fullname, val page: Int = 0) : Route
+
 fun NavGraphBuilder.imagesGraph(navController: NavController) {
     for (base in URLS) {
         Log.d("NavGraph", "registering $base/{url}")
@@ -66,6 +67,15 @@ fun NavGraphBuilder.imagesGraph(navController: NavController) {
             route.post,
             dismiss = { navController.popBackStack() }
         )
+    }
+    composable(
+        route = "i.imgur.com/{filename}", deepLinks = listOf(
+            navDeepLink { uriPattern = "i.imgur.com/{filename}" }
+        )) {
+        val filename = it.arguments?.getString("filename")
+        if (filename != null) {
+            SimpleFullscreenImage("https://i.imgur.com/$filename")
+        }
     }
     composable<FullscreenVideoRoute>(
         typeMap = mapOf(typeOf<Fullname>() to FullnameType)
