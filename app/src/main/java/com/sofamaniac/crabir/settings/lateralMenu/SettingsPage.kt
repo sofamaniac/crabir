@@ -16,7 +16,6 @@ import androidx.compose.material.icons.filled.GroupWork
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inbox
-import androidx.compose.material.icons.filled.NoAdultContent
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Shield
@@ -31,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -358,7 +358,7 @@ private fun LazyListScope.itemsToShow(
             headlineContent = { Text("Show NSFW") },
             leadingContent = {
                 Icon(
-                    Icons.Default.NoAdultContent,
+                    painter = painterResource(R.drawable.eighteen_rating),
                     contentDescription = null
                 )
             },
