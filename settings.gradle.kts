@@ -35,3 +35,4 @@ dependencyResolutionManagement {
 rootProject.name = "Crabir"
 include(":app")
 include(":redditMarkdown")
+include(":lint-rules")

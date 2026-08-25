@@ -13,6 +13,7 @@ kotlinxCoroutinesCore = "1.11.0"
 ksoup = "0.2.6"
 landscapistVersion = "2.11.0"
 lifecycleRuntimeKtx = "2.11.0"
+lintApi = "32.3.2"
 markdownVersion = "0.7.8"
 material3Version = "1.5.0-alpha25"
 multiplatformMarkdownRenderer = "0.43.0"
@@ -63,6 +64,7 @@ landscapist-coil = { module = "com.github.skydoves:landscapist-coil3", version.r
 landscapist-image-gallery = { module = "com.github.skydoves:landscapist-image-gallery", version.ref = "landscapistVersion" }
 landscapist-zoomable = { module = "com.github.skydoves:landscapist-zoomable", version.ref = "landscapistVersion" }
 landscapist-transformation = { module = "com.github.skydoves:landscapist-transformation", version.ref = "landscapistVersion" }
+lint-api = { module = "com.android.tools.lint:lint-api", version.ref = "lintApi" }
 mappie-api = { module = "tech.mappie:mappie-api", version = "2.4.10-2.4.3" }
 markdown = { module = "org.jetbrains:markdown", version.ref = "markdownVersion" }
 multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }

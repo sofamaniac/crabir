@@ -116,6 +116,7 @@ aboutLibraries {
 
 dependencies {
 
+    lintChecks(project(":lint-rules"))
 
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.core.ktx)
