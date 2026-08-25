@@ -146,11 +146,14 @@
     <string name="theme_secondary_text">Secondary text</string>
     <string name="theme_content_text">Content text</string>
     <string name="theme_link">Link</string>
-    <string name="theme_downvote" translatable="false">Downvote</string>
+    <string name="theme_downvote">Downvote</string>
     <string name="reset_color">Reset color</string>
     <string name="reset_theme">Reset to default</string>
     <string name="saved_themes">Saved themes</string>
-    <string name="total_themes">%1$d themes</string>
+    <plurals name="total_themes">
+        <item quantity="one">%1$d theme</item>
+        <item quantity="other">%1$d themes</item>
+    </plurals>
     <string name="theme_editor">Theme editor</string>
     <string name="light_mode_start_time">Light mode start time</string>
     <string name="light_mode_end_time">Light mode end time</string>

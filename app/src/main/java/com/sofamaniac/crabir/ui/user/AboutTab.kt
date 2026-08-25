@@ -26,7 +26,7 @@ import kotlin.time.Instant
 import kotlin.time.toJavaInstant
 
 @Composable
-fun AboutTab(user: UserDTO?, modifier: Modifier = Modifier.Companion) {
+fun AboutTab(user: UserDTO?, modifier: Modifier = Modifier) {
     if (user == null) return
 
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.Top) {

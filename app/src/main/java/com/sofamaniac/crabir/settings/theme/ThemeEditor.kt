@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
@@ -132,7 +133,7 @@ fun ThemeEditor() {
                         trailingContent = {
                             val totalThemes =
                                 themeSettings.collections.dark.size + themeSettings.collections.light.size
-                            Text(stringResource(R.string.total_themes, totalThemes))
+                            Text(pluralStringResource(R.plurals.total_themes, totalThemes))
                         })
                 }
                 items(ColorFields.entries.size, key = { ColorFields.entries[it] }) { field ->

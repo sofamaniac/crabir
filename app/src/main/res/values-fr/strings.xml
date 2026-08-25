@@ -56,9 +56,14 @@
     <string name="showNSFWMedia">Afficher les images NSFW</string>
     <string name="blurNSFW">Flouter les images NSFW</string>
     <string name="filtersPageTitle">Filtres</string>
+    <plurals name="members">
+        <item quantity="one">%d membre</item>
+        <item quantity="many">%d membres</item>
+        <item quantity="other">%d membres</item>
+    </plurals>
     <string name="unhide_post">Afficher la publication</string>
     <string name="hide_post">Cacher la publication</string>
-    <string name="go_to_profile">Aller au profile du %1$s</string>
+    <string name="go_to_profile">Aller au profil du %1$s</string>
     <string name="go_to_subreddit">Aller à %1$s</string>
     <string name="moderation">Modération</string>
     <string name="edit">Éditer</string>
@@ -124,6 +129,7 @@
     <string name="end_of_feed_reached">Fin du flux</string>
     <string name="feed_error">Erreur pendant le chargement: %1$s\\Appuyer pour réessayer.</string>
     <string name="confirm">Confirmer</string>
+    <string name="color_picker_custom">Personalisée</string>
     <string name="theme_post_title">Titre publication</string>
     <string name="theme_read">Lu</string>
     <string name="theme_announcement">Annonce</string>
@@ -131,10 +137,15 @@
     <string name="theme_secondary_text">Texte secondaire</string>
     <string name="theme_content_text">Texte</string>
     <string name="theme_link">Lien</string>
+    <string name="theme_downvote">Bas vote</string>
     <string name="reset_color">Réinitialiser la couleur</string>
     <string name="reset_theme">Réinitailiser à la valeur par défaut</string>
     <string name="saved_themes">Thèmes enregistrés</string>
-    <string name="total_themes">%1$s thèmes</string>
+    <plurals name="total_themes">
+        <item quantity="one">%1$d thème</item>
+        <item quantity="other">%1$d thèmes</item>
+        <item quantity="many">%1$d thèmes</item>
+    </plurals>
     <string name="theme_editor">Éditeur thème</string>
     <string name="light_mode_start_time">Début mode clair</string>
     <string name="light_mode_end_time">Fin mode clair</string>
@@ -145,6 +156,7 @@
     <string name="select_a_color">Choisir une couleur</string>
     <string name="post_settings">Paramètres des publications</string>
     <string name="links_settings">Paramètres des liens</string>
+    <string name="upvote_on_save">Voter lors de l\'enregistrement</string>
     <string name="start_videos_muted">Lancer les vidéos sans son</string>
     <string name="post_info_settings">Paramètres d\'information</string>
     <string name="post_info_show_author">Montrer l\'auteur</string>
@@ -197,4 +209,11 @@
     <string name="posts_settings_name">Publications</string>
     <string name="comments_settings_title">Commentaires</string>
     <string name="views_settings_title">Vues</string>
+    <string name="navigation_header">Navigation</string>
+    <string name="show_navigation_bar">Afficher la bar de navigation</string>
+    <string name="use_volume_keys_to_navigate">Utliser les touches de volumes pour naviguer</string>
+    <string name="lateral_menu_items_header">Items à afficher</string>
+    <string name="subscriptions_list">Liste d\'abonnements</string>
+    <string name="lateral_menu">Menu latéral</string>
+    <string name="color_picker_presets">Prédéfinies</string>
 </resources>

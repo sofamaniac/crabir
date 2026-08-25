@@ -17,16 +17,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import com.sofamaniac.crabir.LocalTheme
-import java.util.Locale
 
 @Composable
 fun ScoreString(score: Int, likes: Boolean?, hidden: Boolean = false) {
     val scoreStyle =
         MaterialTheme.typography.titleMedium.toSpanStyle()
-    val locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
+    val locale = LocalConfiguration.current.locales[0] ?: LocalLocale.current.platformLocale
     val formatter = remember(locale) {
         CompactDecimalFormat.getInstance(locale, CompactDecimalFormat.CompactStyle.SHORT)
     }
