@@ -1,7 +1,5 @@
 package com.sofamaniac.crabir.ui.drawer.buttons
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.NoAdultContent
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
@@ -9,7 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import com.sofamaniac.crabir.LocalFiltersSettings
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.settings.filters.filtersDataStore
 import com.sofamaniac.crabir.ui.ThemedSwitch
 import kotlinx.coroutines.launch
@@ -30,7 +30,12 @@ internal fun NSFWTile() {
     }
     NavigationDrawerItem(
         selected = false,
-        icon = { Icon(Icons.Default.NoAdultContent, contentDescription = null) },
+        icon = {
+            Icon(
+                painter = painterResource(R.drawable.eighteen_rating),
+                contentDescription = null
+            )
+        },
         label = {
             Text("Show NSFW")
         },
