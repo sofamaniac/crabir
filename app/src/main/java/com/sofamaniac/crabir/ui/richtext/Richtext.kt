@@ -64,12 +64,12 @@ fun Richtext(
     mediaMetadata: Map<String, MediaMetadata>,
     threadId: String? = null,
     style: RichtextStyle = defaultRichtextStyle(),
+    components: RichtextComponents = DefaultRichtextComponents(),
 ) {
-    val components = DefaultRichtextComponents()
     val configuration = Configuration(components, style)
     val context = Context(
         inSpoiler = false,
-        inList = ListState.None,
+        inList = ListState(ListType.None, -1),
         style = null,
         configuration = configuration,
         mediaMetadata = mediaMetadata,
@@ -200,7 +200,7 @@ fun Gif(image: Richtext.Gif, context: Context) {
     if (image.id.contains("|")) {
         val id = image.id.split("|")[1]
         val gifUrl = "https://media.giphy.com/media/${id}/giphy.gif"
-        val url = "https://giphy.com/gifs/${id}"
+        // val url = "https://giphy.com/gifs/${id}"
         val navController = LocalNavController.current
         AsyncImage(
             model = gifUrl,
@@ -225,21 +225,26 @@ fun Gif(image: Richtext.Gif, context: Context) {
 
 @Composable
 fun ListBlock(list: Richtext.ListBlock, context: Context) {
+    val render = @Composable { child: Richtext.ListItem, ctx: Context ->
+        context.configuration.components.render(
+            child,
+            ctx
+        )
+    }
     Column {
         for (child in list.children) {
             if (child !is Richtext.ListItem) continue
-            ListItem(
-                child,
-                context.copy(inList = if (list.ordered) ListState.Ordered else ListState.Unordered),
-                list.children.indexOf(child)
-            )
+            val listType = if (list.ordered) ListType.Ordered else ListType.Unordered
+            val context = context.copy(inList = ListState(listType, list.children.indexOf(child)))
+            render(child, context)
         }
     }
 }
 
 @Composable
-fun ListItem(item: Richtext.ListItem, context: Context, index: Int) {
-    if (context.inList == ListState.Ordered) {
+fun ListItem(item: Richtext.ListItem, context: Context) {
+    if (context.inList.type == ListType.Ordered) {
+        val index = context.inList.index
         Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             Text("${index + 1}.")
             Column {

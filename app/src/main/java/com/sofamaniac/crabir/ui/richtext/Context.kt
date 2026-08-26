@@ -17,11 +17,13 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.domain.model.Richtext
 
-enum class ListState {
+enum class ListType {
     Unordered,
     Ordered,
     None,
 }
+
+data class ListState(val type: ListType, val index: Int)
 
 data class Configuration(
     val components: RichtextComponents,
@@ -183,6 +185,7 @@ class DefaultRichtextComponents : RichtextComponents(
         ListBlock(listBlock, ctx)
     },
     listItem = { listItem, ctx ->
+        ListItem(listItem, ctx)
     },
     spoiler = { spoiler, ctx ->
         Spoiler(spoiler, ctx)
