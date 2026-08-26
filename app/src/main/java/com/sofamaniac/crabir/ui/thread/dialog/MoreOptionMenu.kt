@@ -22,7 +22,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.Kind
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.ui.thread.CommentViewModelInterface
@@ -86,7 +88,7 @@ fun MoreOptionMenu(
                     contentDescription = null
                 )
             },
-            content = { Text("Collapse thread") },
+            content = { Text(stringResource(R.string.collapse_thread)) },
         )
 
         ListItem(
@@ -96,7 +98,7 @@ fun MoreOptionMenu(
                 showReportMenu = true
             },
             leadingContent = { Icon(Icons.Default.Report, contentDescription = null) },
-            content = { Text("Report") },
+            content = { Text(stringResource(R.string.report)) },
             trailingContent = {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowRight,
@@ -111,7 +113,7 @@ fun MoreOptionMenu(
                 showShareMenu = true
             },
             leadingContent = { Icon(Icons.Default.Share, contentDescription = null) },
-            content = { Text("Share") },
+            content = { Text(stringResource(R.string.share)) },
             trailingContent = {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowRight,
@@ -126,7 +128,7 @@ fun MoreOptionMenu(
                 showCopyMenu = true
             },
             leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
-            content = { Text("Copy") },
+            content = { Text(stringResource(R.string.copy)) },
             trailingContent = {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowRight,

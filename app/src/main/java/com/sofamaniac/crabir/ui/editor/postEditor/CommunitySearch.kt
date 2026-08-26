@@ -20,11 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.ui.search.CommunitySearchViewModel
 import com.sofamaniac.crabir.ui.subredditList.Tile
@@ -35,7 +37,7 @@ import org.koin.androidx.compose.koinViewModel
 internal fun CommunitySearch(
     viewModel: CreatorViewModel,
     searchViewModel: CommunitySearchViewModel = koinViewModel(),
-    onDismiss: () -> Unit = {}
+    onDismiss: () -> Unit = {},
 ) {
     val searchState = rememberSearchBarState()
     val searchedCommunities = searchViewModel.items.collectAsLazyPagingItems()
@@ -65,7 +67,7 @@ internal fun CommunitySearch(
                                     onQueryChange = searchViewModel::onQueryUpdate,
                                     onSearch = {},
                                     expanded = false,
-                                    placeholder = { Text("Search") },
+                                    placeholder = { Text(stringResource(R.string.search_placeholder)) },
                                     onExpandedChange = {}
                                 )
                             }

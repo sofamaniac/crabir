@@ -31,11 +31,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.AccountManager
 import com.sofamaniac.crabir.LocalRedditAccount
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.InboxAPI
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
@@ -88,7 +90,7 @@ fun MessageEditor(
     Scaffold(
         bottomBar = { EditorBottomBar(bodyState) },
         topBar = {
-            TopAppBar(title = { Text("Send Message") }, navigationIcon = {
+            TopAppBar(title = { Text(stringResource(R.string.send_message)) }, navigationIcon = {
                 CloseButton {
                     navController?.popBackStack()
                 }
@@ -133,26 +135,26 @@ fun MessageEditor(
                 .padding(paddingValues)
                 .verticalScroll(state = rememberScrollState())
         ) {
-            ListItem(leadingContent = { Text("From") }) {
+            ListItem(leadingContent = { Text(stringResource(R.string.from)) }) {
                 AccountSelector(accounts, selectedAccount) { newId ->
                     selectedAccount = accounts.find { it.id == newId }!!
                 }
             }
             HorizontalDivider()
-            ListItem(leadingContent = { Text("To") }) {
+            ListItem(leadingContent = { Text(stringResource(R.string.to)) }) {
                 TextField(
                     readOnly = parent != null,
                     isError = errors.contains(MessageEditorError.MissingDestination),
                     state = destState,
-                    label = { Text("Destination") }
+                    label = { Text(stringResource(R.string.to_label)) }
                 )
             }
-            ListItem(leadingContent = { Text("Subject") }) {
+            ListItem(leadingContent = { Text(stringResource(R.string.subject)) }) {
                 TextField(
                     readOnly = parent != null,
                     isError = errors.contains(MessageEditorError.MissingSubject),
                     state = subjectState,
-                    label = { Text("Subject") }
+                    label = { Text(stringResource(R.string.subject_label)) }
                 )
             }
             TextField(
@@ -162,8 +164,8 @@ fun MessageEditor(
                     .fillMaxSize()
                     .heightIn(min = 100.dp),
                 state = bodyState,
-                placeholder = { Text("Type content") },
-                label = { Text("Content") }
+                placeholder = { Text(stringResource(R.string.body_placeholder)) },
+                label = { Text(stringResource(R.string.body_label)) }
             )
         }
     }

@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
@@ -31,6 +32,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.material3.buttons.PlayPauseButton
 import androidx.media3.ui.compose.material3.indicator.DurationText
 import androidx.media3.ui.compose.material3.indicator.PositionText
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 
 @OptIn(UnstableApi::class)
@@ -77,7 +79,7 @@ fun PlayerControls(
                 IconButton(onClick = { showQualityMenu = true }) {
                     Icon(
                         Icons.Default.Settings,
-                        contentDescription = "Change quality",
+                        contentDescription = stringResource(R.string.change_quality),
                         tint = Color.White
                     )
                 }
@@ -88,7 +90,7 @@ fun PlayerControls(
                     val isAuto = VideoPlayerManager.isAuto()
 
                     DropdownMenuItem(
-                        text = { Text(text = "Auto") },
+                        text = { Text(text = stringResource(R.string.quality_auto)) },
                         trailingIcon = {
                             if (isAuto) {
                                 Icon(Icons.Default.Check, contentDescription = null)

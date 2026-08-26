@@ -11,6 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.settings.theme.ThemeMode
 import com.sofamaniac.crabir.settings.theme.themeDataStore
 import com.sofamaniac.crabir.ui.ThemedSwitch
@@ -40,7 +42,7 @@ fun DarkModeTile() {
     }
     NavigationDrawerItem(
         icon = { Icon(Icons.Default.DarkMode, contentDescription = null) },
-        label = { Text("Dark mode") },
+        label = { Text(stringResource(R.string.DarkMode)) },
         badge = {
             ThemedSwitch(checked = themeMode == ThemeMode.Dark, onCheckedChange = {
                 onClick()

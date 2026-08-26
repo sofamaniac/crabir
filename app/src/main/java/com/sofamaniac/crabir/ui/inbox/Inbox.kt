@@ -125,15 +125,21 @@ fun InboxView() {
         ) {
             Scaffold(topBar = {
                 TopAppBar(
-                    title = { Text("Inbox") },
+                    title = { Text(stringResource(R.string.inbox)) },
                     actions = {
                         IconButton(onClick = { navController?.navigate(MessageEditorRoute(null)) }) {
-                            Icon(Icons.AutoMirrored.Filled.Send, "Send Message")
+                            Icon(
+                                Icons.AutoMirrored.Filled.Send,
+                                stringResource(R.string.send_message)
+                            )
                         }
                     },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Open Drawer")
+                            Icon(
+                                Icons.Default.Menu,
+                                contentDescription = stringResource(R.string.open_drawer)
+                            )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -253,7 +259,10 @@ fun Message(
             }
             if (message.new) {
                 IconButton(onClick = { viewModel.markRead(message.name) }) {
-                    Icon(Icons.Default.MarkEmailRead, contentDescription = "Mark as read")
+                    Icon(
+                        Icons.Default.MarkEmailRead,
+                        contentDescription = stringResource(R.string.mark_as_read)
+                    )
                 }
                 //            } else {
                 //                IconButton(onClick = { viewModel.markUnread() }) {
@@ -261,7 +270,10 @@ fun Message(
                 //                }
             }
             IconButton(onClick = { navController?.navigate(MessageEditorRoute(message.name)) }) {
-                Icon(Icons.AutoMirrored.Filled.Reply, contentDescription = "Reply")
+                Icon(
+                    Icons.AutoMirrored.Filled.Reply,
+                    contentDescription = stringResource(R.string.reply)
+                )
             }
             IconButton(onClick = {}) {
                 Icon(Icons.Default.MoreVert, contentDescription = null)
@@ -360,7 +372,7 @@ fun MessageDropdownMenu(message: Message, viewModel: MessageViewModel) {
                 leadingIcon = {
                     Icon(Icons.AutoMirrored.Filled.Reply, contentDescription = null)
                 },
-                text = { Text("Reply") },
+                text = { Text(stringResource(R.string.reply)) },
                 onClick = { navController?.navigate(MessageEditorRoute(message.name)) }
             )
             if (message.new) {
@@ -368,7 +380,7 @@ fun MessageDropdownMenu(message: Message, viewModel: MessageViewModel) {
                     leadingIcon = {
                         Icon(Icons.Default.MarkEmailRead, contentDescription = null)
                     },
-                    text = { Text("Mark as read") },
+                    text = { Text(stringResource(R.string.mark_as_read)) },
                     onClick = { viewModel.markRead(message.name) }
                 )
             }
@@ -381,7 +393,8 @@ fun MessageDropdownMenu(message: Message, viewModel: MessageViewModel) {
                             contentDescription = null
                         )
                     },
-                    text = { Text("About ${message.author}") }, onClick = {
+                    text = { Text(stringResource(R.string.about_user, message.author)) },
+                    onClick = {
                         navController?.navigate(ProfileRoute(message.author))
                     }
                 )
@@ -394,7 +407,8 @@ fun MessageDropdownMenu(message: Message, viewModel: MessageViewModel) {
                             contentDescription = null
                         )
                     },
-                    text = { Text("Block ${message.author}") }, onClick = {
+                    text = { Text(stringResource(R.string.block_user, message.author)) },
+                    onClick = {
                         viewModel.blockAuthor(message.author)
                     }
                 )
@@ -407,7 +421,14 @@ fun MessageDropdownMenu(message: Message, viewModel: MessageViewModel) {
                             contentDescription = null
                         )
                     },
-                    text = { Text("Go to ${message.subredditNamePrefixed}") }, onClick = {
+                    text = {
+                        Text(
+                            stringResource(
+                                R.string.go_to_parametrized,
+                                message.subredditNamePrefixed
+                            )
+                        )
+                    }, onClick = {
                         navController?.navigate(SubredditRoute(message.subredditNamePrefixed))
                     }
                 )
@@ -420,7 +441,7 @@ fun MessageDropdownMenu(message: Message, viewModel: MessageViewModel) {
                             contentDescription = null
                         )
                     },
-                    text = { Text("Go to parent post") }, onClick = {
+                    text = { Text(stringResource(R.string.go_to_parent_post)) }, onClick = {
                         navController?.navigate(PostRoute(message.linkTitle))
                     }
                 )
@@ -428,7 +449,7 @@ fun MessageDropdownMenu(message: Message, viewModel: MessageViewModel) {
 
             DropdownMenuItem(
                 leadingIcon = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
-                text = { Text("Copy") },
+                text = { Text(stringResource(R.string.copy)) },
                 onClick = {
                     showCopyDialog = true
                 }
@@ -463,14 +484,14 @@ fun CopyDialog(message: Message, onDismissRequest: () -> Unit) {
                     contentDescription = null
                 )
             },
-            content = { Text("Copy text") }
+            content = { Text(stringResource(R.string.copy_text)) }
         )
         ListItem(
             onClick = {
                 showSelectionDialog = true
             },
             leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
-            content = { Text("Select text") }
+            content = { Text(stringResource(R.string.select_text)) }
         )
         ListItem(
             onClick = {
@@ -486,7 +507,7 @@ fun CopyDialog(message: Message, onDismissRequest: () -> Unit) {
                 }
             },
             leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
-            content = { Text("Copy username") }
+            content = { Text(stringResource(R.string.copy_username)) }
         )
     }
 

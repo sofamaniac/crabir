@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Quality
+import com.sofamaniac.crabir.domain.model.stringResource
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SettingHeader
@@ -53,6 +54,7 @@ fun DataSettingsPage() {
                     options = Quality.entries,
                     selectedOption = dataSettings.imageQuality.onWifi,
                     headlineContent = { Text(stringResource(R.string.preferred_quality_on_wifi)) },
+                    optionLabel = { quality -> quality.stringResource() },
                     onOptionSelected = { quality ->
                         scope.launch {
                             dataSettingsStore.updateData { settings ->
@@ -65,6 +67,7 @@ fun DataSettingsPage() {
                     options = Quality.entries,
                     selectedOption = dataSettings.imageQuality.onMobile,
                     headlineContent = { Text(stringResource(R.string.preferred_quality_on_cellular)) },
+                    optionLabel = { quality -> quality.stringResource() },
                     onOptionSelected = { quality ->
                         scope.launch {
                             dataSettingsStore.updateData { settings ->
@@ -77,6 +80,7 @@ fun DataSettingsPage() {
                     options = NetworkPolicy.entries,
                     selectedOption = dataSettings.imageQuality.loadImage,
                     headlineContent = { Text(stringResource(R.string.enable_load_image)) },
+                    optionLabel = { policy -> policy.stringResource() },
                     onOptionSelected = { quality ->
                         scope.launch {
                             dataSettingsStore.updateData { settings ->
@@ -90,6 +94,7 @@ fun DataSettingsPage() {
                     options = VideoQuality.entries,
                     selectedOption = dataSettings.videoQuality.onWifi,
                     headlineContent = { Text(stringResource(R.string.preferred_quality_on_wifi)) },
+                    optionLabel = { policy -> policy.stringResource() },
                     onOptionSelected = { quality ->
                         scope.launch {
                             dataSettingsStore.updateData { settings ->
@@ -102,6 +107,7 @@ fun DataSettingsPage() {
                     options = VideoQuality.entries,
                     selectedOption = dataSettings.videoQuality.onMobile,
                     headlineContent = { Text(stringResource(R.string.preferred_quality_on_cellular)) },
+                    optionLabel = { quality -> quality.stringResource() },
                     onOptionSelected = { quality ->
                         scope.launch {
                             dataSettingsStore.updateData { settings ->
@@ -114,6 +120,7 @@ fun DataSettingsPage() {
                     options = NetworkPolicy.entries,
                     selectedOption = dataSettings.videoQuality.autostart,
                     headlineContent = { Text(stringResource(R.string.autostart_video)) },
+                    optionLabel = { policy -> policy.stringResource() },
                     onOptionSelected = { quality ->
                         scope.launch {
                             dataSettingsStore.updateData { settings ->

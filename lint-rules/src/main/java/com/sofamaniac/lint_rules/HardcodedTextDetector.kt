@@ -82,7 +82,7 @@ class HardcodedTextDetector : Detector(), SourceCodeScanner {
     """.trimIndent(),
             category = Category.I18N,
             priority = 6,
-            severity = Severity.WARNING,
+            severity = Severity.ERROR,
             implementation = Implementation(
                 HardcodedTextDetector::class.java,
                 Scope.JAVA_FILE_SCOPE

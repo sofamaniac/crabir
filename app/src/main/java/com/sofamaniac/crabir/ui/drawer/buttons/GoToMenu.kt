@@ -11,6 +11,8 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import com.sofamaniac.crabir.R
 
 fun LazyListScope.goToMenu(expanded: Boolean = false, onClick: () -> Unit) {
     item {
@@ -22,7 +24,7 @@ fun LazyListScope.goToMenu(expanded: Boolean = false, onClick: () -> Unit) {
                 Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
             }, content = {
                 Text(
-                    "Go to ...",
+                    stringResource(R.string.go_to),
                     style = MaterialTheme.typography.titleMedium
                 )
             },
@@ -36,7 +38,7 @@ fun LazyListScope.goToMenu(expanded: Boolean = false, onClick: () -> Unit) {
         )
     }
     if (expanded) {
-        item { RandomCommunity("Random community", false) }
-        item { RandomCommunity("Random NSFW", true) }
+        item { RandomCommunity(stringResource(R.string.random_community), false) }
+        item { RandomCommunity(stringResource(R.string.random_nsfw), true) }
     }
 }

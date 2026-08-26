@@ -145,7 +145,7 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
                 }
             },
             onDismissRequest = { showDeleteConfirmDialog = false }) {
-            Text("Are you sure you want to delete this post?")
+            Text(stringResource(R.string.delete_post_confirmation))
         }
 
     }

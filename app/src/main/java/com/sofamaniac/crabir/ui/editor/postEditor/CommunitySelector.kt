@@ -27,10 +27,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.MissingCommunity
 import com.sofamaniac.crabir.ui.subredditList.Tile
 import kotlinx.coroutines.launch
@@ -45,6 +47,7 @@ internal fun CommunitySelector(
     var showRules by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     var showSearch by remember { mutableStateOf(false) }
+    val missingCommunityErrorMessage = stringResource(R.string.missing_community_error)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -53,7 +56,7 @@ internal fun CommunitySelector(
             }
             .semantics {
                 if (viewModel.error is MissingCommunity) {
-                    error("Missing community")
+                    error(missingCommunityErrorMessage)
                 }
             }
             .let {
@@ -70,12 +73,12 @@ internal fun CommunitySelector(
             .padding(all = 8.dp)
     ) {
         if (viewModel.community == null) {
-            Text("Community")
+            Text(stringResource(R.string.community_placeholder))
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = {}) {
                 Icon(
                     Icons.Default.ArrowDropDown,
-                    contentDescription = "Search"
+                    contentDescription = stringResource(R.string.search_icon_label)
                 )
             }
         } else {
@@ -86,7 +89,7 @@ internal fun CommunitySelector(
                     viewModel.getRules()
                     showRules = true
                 }
-            }) { Text("RULES") }
+            }) { Text(stringResource(R.string.rules_button)) }
         }
     }
     if (showRules) {
@@ -108,12 +111,12 @@ internal fun CommunitySelector(
                     }
                 }
                 TextButton(onClick = { showRules = false }) {
-                    Text("Close")
+                    Text(stringResource(R.string.close))
                 }
             }
         }
     }
     if (showSearch) {
-        communitySearch({ showSearch = false })
+        communitySearch { showSearch = false }
     }
 }

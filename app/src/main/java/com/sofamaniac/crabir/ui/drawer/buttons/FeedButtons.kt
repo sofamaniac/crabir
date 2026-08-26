@@ -20,9 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.navigation.HistoryRoute
 import com.sofamaniac.crabir.navigation.HomeRoute
@@ -152,7 +154,7 @@ internal fun LazyListScope.feeds(settings: LateralMenuItems, onClick: (Route) ->
     if (settings.saved) {
         item {
             NavigationDrawerItem(
-                label = { Text("Saved") },
+                label = { Text(stringResource(R.string.saved)) },
                 selected = false,
                 icon = { Icon(Icons.Default.BookmarkBorder, contentDescription = null) },
                 onClick = {
@@ -164,7 +166,7 @@ internal fun LazyListScope.feeds(settings: LateralMenuItems, onClick: (Route) ->
     if (settings.history) {
         item {
             NavigationDrawerItem(
-                label = { Text("History") },
+                label = { Text(stringResource(R.string.history)) },
                 selected = false,
                 icon = { Icon(Icons.Default.History, contentDescription = null) },
                 onClick = {
@@ -177,7 +179,7 @@ internal fun LazyListScope.feeds(settings: LateralMenuItems, onClick: (Route) ->
     if (settings.search) {
         item {
             NavigationDrawerItem(
-                label = { Text("Search") },
+                label = { Text(stringResource(R.string.search)) },
                 selected = false,
                 icon = { Icon(Icons.Default.Search, contentDescription = null) },
                 onClick = {

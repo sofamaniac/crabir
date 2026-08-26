@@ -46,12 +46,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.MissingTitle
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
@@ -102,7 +104,7 @@ fun CrosspostCreator(
                     navigationIcon = {
                         CloseButton { navController?.popBackStack() }
                     },
-                    title = { Text("Create post") },
+                    title = { Text(stringResource(R.string.create_post)) },
                     actions = {
                         IconButton(onClick = {
                             scope.launch {
@@ -132,13 +134,16 @@ fun CrosspostCreator(
                 }
                 TextField(
                     state = viewModel.titleState,
-                    label = { Text("Title") },
+                    label = { Text(stringResource(R.string.title_field)) },
                     inputTransformation = InputTransformation.maxLength(300),
                     modifier = Modifier.fillMaxWidth(),
                     isError = viewModel.error is MissingTitle,
                     supportingText = {
                         if (viewModel.error is MissingTitle)
-                            Text("Missing title", color = MaterialTheme.colorScheme.error)
+                            Text(
+                                stringResource(R.string.missing_title_error),
+                                color = MaterialTheme.colorScheme.error
+                            )
                     },
                     trailingIcon = {
                         if (viewModel.error is MissingTitle)
@@ -155,7 +160,7 @@ fun CrosspostCreator(
                 )
                 if (viewModel.flairs.isNotEmpty()) {
                     TextButton(onClick = {}) {
-                        Text("Flair")
+                        Text(stringResource(R.string.flair_field))
                     }
                 }
                 AccountSelector(accounts, selectedAccount) { newId ->
@@ -189,7 +194,7 @@ fun CrosspostCreator(
                 }
                 SwitchTile(
                     leadingContent = {},
-                    headlineContent = { Text("Send reply notification") },
+                    headlineContent = { Text(stringResource(R.string.send_reply_notification)) },
                     checked = viewModel.state.sendReplies,
                     onCheckedChange = {
                         viewModel.state = viewModel.state.copy(sendReplies = it)
@@ -247,12 +252,12 @@ fun CrosspostCommunitySearch(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Select Community") },
+                    title = { Text(stringResource(R.string.select_community)) },
                     navigationIcon = {
                         IconButton(onClick = onDismiss) {
                             Icon(
                                 Icons.Default.Close,
-                                contentDescription = "Close search"
+                                contentDescription = stringResource(R.string.close)
                             )
                         }
                     },

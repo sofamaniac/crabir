@@ -73,6 +73,9 @@ fun CommentsSettingsPage() {
                 ListSelector(
                     enabled = !commentsSettings.useRecommendedSort,
                     options = Sort.entries.toList(),
+                    optionLabel = { sort ->
+                        stringResource(sort.representation)
+                    },
                     headlineContent = { Text(stringResource(R.string.preferred_sort)) },
                     selectedOption = commentsSettings.preferredSort,
                     onOptionSelected = { target ->

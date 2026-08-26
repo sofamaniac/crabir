@@ -48,8 +48,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalRedditAccount
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.InvalidUrl
 import com.sofamaniac.crabir.data.remote.reddit.MissingTitle
@@ -124,13 +126,16 @@ fun PostCreator(
                 Column {
                     TextField(
                         state = viewModel.titleState,
-                        label = { Text("Title") },
+                        label = { Text(stringResource(R.string.title_field)) },
                         inputTransformation = InputTransformation.maxLength(300),
                         modifier = Modifier.fillMaxWidth(),
                         isError = viewModel.error is MissingTitle,
                         supportingText = {
                             if (viewModel.error is MissingTitle)
-                                Text("Missing title", color = MaterialTheme.colorScheme.error)
+                                Text(
+                                    stringResource(R.string.missing_title_error),
+                                    color = MaterialTheme.colorScheme.error
+                                )
                         },
                         trailingIcon = {
                             if (viewModel.error is MissingTitle)
@@ -156,7 +161,7 @@ fun PostCreator(
                         if (flair?.textEditable == true) {
                             Spacer(modifier = Modifier.weight(1f))
                             TextButton(onClick = { showFlairEdit = true }) {
-                                Text("Edit flair")
+                                Text(stringResource(R.string.edit_flair))
                             }
                         }
                     }
@@ -164,7 +169,7 @@ fun PostCreator(
             }
             item {
                 TextButton(onClick = { showFlairDialog = true }) {
-                    Text("Change Flair")
+                    Text(stringResource(R.string.change_flair))
                 }
             }
             item {
@@ -200,7 +205,7 @@ fun PostCreator(
             }
             item {
                 SwitchTile(
-                    headlineContent = { Text("Send reply notification") },
+                    headlineContent = { Text(stringResource(R.string.send_reply_notification)) },
                     checked = viewModel.state.sendReplies,
                     onCheckedChange = {
                         viewModel.state = viewModel.state.copy(sendReplies = it)
@@ -223,8 +228,8 @@ fun PostCreator(
                                 .fillMaxWidth()
                                 .heightIn(min = 100.dp),
                             state = viewModel.textState,
-                            placeholder = { Text("Type content") },
-                            label = { Text("Content") }
+                            placeholder = { Text(stringResource(R.string.body_placeholder)) },
+                            label = { Text(stringResource(R.string.body_label)) }
                         )
                     }
 
@@ -277,12 +282,15 @@ private fun EditorTopBar(
         navigationIcon = {
             CloseButton { onDismissRequest() }
         },
-        title = { Text("Create post") },
+        title = { Text(stringResource(R.string.create_post)) },
         actions = {
             IconButton(onClick = {
                 submit()
             }) {
-                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+                Icon(
+                    Icons.AutoMirrored.Filled.Send,
+                    contentDescription = stringResource(R.string.submit)
+                )
             }
         }
     )
@@ -331,7 +339,7 @@ fun FlairDialog(
             )
         }
         if (flairs.isEmpty()) {
-            Text("Community has no flair")
+            Text(stringResource(R.string.community_has_no_flair))
         }
     }
 }
@@ -351,7 +359,7 @@ fun FlairEditBox(
         onDismissRequest = onDismiss,
         cancel = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         },
         confirm = {
@@ -359,12 +367,12 @@ fun FlairEditBox(
                 onConfirm(textFieldState.text as String)
                 onDismiss()
             }) {
-                Text("Confirm")
+                Text(stringResource(R.string.confirm))
             }
         }) {
         ListItem(content = {
             Text(
-                "Edit flair text",
+                stringResource(R.string.edit_flair_text),
                 style = MaterialTheme.typography.titleMedium
             )
         })
@@ -392,7 +400,10 @@ internal fun UrlField(viewModel: PostCreatorViewModel) {
         },
         supportingText = {
             if (isError) {
-                Text("Invalid URL", color = MaterialTheme.colorScheme.error)
+                Text(
+                    stringResource(R.string.invalid_url_error),
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         },
         trailingIcon = {

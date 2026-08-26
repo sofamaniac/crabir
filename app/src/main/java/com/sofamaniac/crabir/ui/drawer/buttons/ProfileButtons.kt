@@ -10,7 +10,9 @@ import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.LocalRedditAccount
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.InboxRoute
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.Route
@@ -21,7 +23,7 @@ internal fun LazyListScope.profileButtons(settings: LateralMenuItems, onClick: (
         item {
             val currentAccount = LocalRedditAccount.current
             NavigationDrawerItem(
-                label = { Text("Profile") },
+                label = { Text(stringResource(R.string.profile)) },
                 selected = false,
                 icon = { Icon(Icons.Default.Person, contentDescription = null) },
                 onClick = {
@@ -36,7 +38,7 @@ internal fun LazyListScope.profileButtons(settings: LateralMenuItems, onClick: (
     if (settings.inbox) {
         item {
             NavigationDrawerItem(
-                label = { Text("Inbox") },
+                label = { Text(stringResource(R.string.inbox)) },
                 selected = false,
                 icon = { Icon(Icons.Default.Inbox, contentDescription = null) },
                 onClick = {
@@ -48,7 +50,7 @@ internal fun LazyListScope.profileButtons(settings: LateralMenuItems, onClick: (
     if (settings.friends) {
         item {
             NavigationDrawerItem(
-                label = { Text("Friends") },
+                label = { Text(stringResource(R.string.friends)) },
                 selected = false,
                 icon = { Icon(Icons.Default.Group, contentDescription = null) },
                 onClick = {
@@ -59,7 +61,7 @@ internal fun LazyListScope.profileButtons(settings: LateralMenuItems, onClick: (
     if (settings.drafts) {
         item {
             NavigationDrawerItem(
-                label = { Text("Drafts") },
+                label = { Text(stringResource(R.string.drafts)) },
                 selected = false,
                 icon = { Icon(Icons.Default.Drafts, contentDescription = null) },
                 onClick = {
@@ -70,7 +72,7 @@ internal fun LazyListScope.profileButtons(settings: LateralMenuItems, onClick: (
     if (settings.moderation) {
         item {
             NavigationDrawerItem(
-                label = { Text("Moderation") },
+                label = { Text(stringResource(R.string.moderation)) },
                 selected = false,
                 icon = { Icon(Icons.Default.Shield, contentDescription = null) },
                 onClick = {

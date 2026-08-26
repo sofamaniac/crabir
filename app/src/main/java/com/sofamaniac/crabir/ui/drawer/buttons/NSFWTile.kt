@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.LocalFiltersSettings
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.settings.filters.filtersDataStore
@@ -37,7 +38,7 @@ internal fun NSFWTile() {
             )
         },
         label = {
-            Text("Show NSFW")
+            Text(stringResource(R.string.showNSFW))
         },
         badge = {
             ThemedSwitch(

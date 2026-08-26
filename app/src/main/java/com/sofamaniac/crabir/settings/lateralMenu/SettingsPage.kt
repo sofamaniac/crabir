@@ -57,11 +57,13 @@ fun LateralMenuSettingsPage() {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Lateral Menu Settings") }, navigationIcon = {
-                BackButton {
-                    navController?.popBackStack()
-                }
-            })
+            TopAppBar(
+                title = { Text(stringResource(R.string.lateral_menu_settings)) },
+                navigationIcon = {
+                    BackButton {
+                        navController?.popBackStack()
+                    }
+                })
         }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
@@ -76,7 +78,7 @@ fun LateralMenuSettingsPage() {
             }
             item {
                 SwitchTile(
-                    headlineContent = { Text("Show in menu") },
+                    headlineContent = { Text(stringResource(R.string.show_in_menu)) },
                     checked = lateralMenuSettings.showSubscriptions,
                     onCheckedChange = { target ->
                         update { it.copy(showSubscriptions = target) }
@@ -85,7 +87,7 @@ fun LateralMenuSettingsPage() {
             }
             item {
                 SwitchTile(
-                    headlineContent = { Text("Show icons") },
+                    headlineContent = { Text(stringResource(R.string.show_icons)) },
                     enabled = lateralMenuSettings.showSubscriptions,
                     checked = lateralMenuSettings.showIcons,
                     onCheckedChange = { target ->
@@ -95,7 +97,7 @@ fun LateralMenuSettingsPage() {
             }
             item {
                 SwitchTile(
-                    headlineContent = { Text("Show only favorites") },
+                    headlineContent = { Text(stringResource(R.string.show_only_favorites)) },
                     enabled = lateralMenuSettings.showSubscriptions,
                     checked = lateralMenuSettings.showFavOnly,
                     onCheckedChange = { target ->
@@ -114,8 +116,8 @@ private fun LazyListScope.itemsToShow(
 
     item {
         CheckboxTile(
-            headlineContent = { Text("Home Feed") },
-            supportingContent = { Text("Posts from subscriptions") },
+            headlineContent = { Text(stringResource(R.string.home_feed)) },
+            supportingContent = { Text(stringResource(R.string.home_feed_support)) },
             leadingContent = { Icon(Icons.Default.Home, contentDescription = null) },
             checked = settings.homeFeed,
             onCheckedChange = { target ->
@@ -156,7 +158,7 @@ private fun LazyListScope.itemsToShow(
     }
     item {
         CheckboxTile(
-            headlineContent = { Text("Saved") },
+            headlineContent = { Text(stringResource(R.string.saved)) },
             leadingContent = {
                 Icon(
                     Icons.Default.BookmarkBorder,
@@ -171,7 +173,7 @@ private fun LazyListScope.itemsToShow(
     }
     item {
         CheckboxTile(
-            headlineContent = { Text("History") },
+            headlineContent = { Text(stringResource(R.string.history)) },
             leadingContent = {
                 Icon(
                     Icons.Default.History,
@@ -186,7 +188,7 @@ private fun LazyListScope.itemsToShow(
     }
     item {
         CheckboxTile(
-            headlineContent = { Text("Profile") },
+            headlineContent = { Text(stringResource(R.string.profile)) },
             leadingContent = {
                 Icon(
                     Icons.Default.Person,
@@ -201,7 +203,7 @@ private fun LazyListScope.itemsToShow(
     }
     item {
         CheckboxTile(
-            headlineContent = { Text("Inbox") },
+            headlineContent = { Text(stringResource(R.string.inbox)) },
             leadingContent = {
                 Icon(
                     Icons.Default.Inbox,
@@ -217,7 +219,7 @@ private fun LazyListScope.itemsToShow(
     item {
         CheckboxTile(
             enabled = false,
-            headlineContent = { Text("Friends") },
+            headlineContent = { Text(stringResource(R.string.friends)) },
             leadingContent = {
                 Icon(
                     Icons.Default.Group,
@@ -233,7 +235,7 @@ private fun LazyListScope.itemsToShow(
     item {
         CheckboxTile(
             enabled = false,
-            headlineContent = { Text("Drafts") },
+            headlineContent = { Text(stringResource(R.string.drafts)) },
             leadingContent = {
                 Icon(
                     Icons.Default.Drafts,
@@ -249,7 +251,7 @@ private fun LazyListScope.itemsToShow(
     item {
         CheckboxTile(
             enabled = false,
-            headlineContent = { Text("Moderation") },
+            headlineContent = { Text(stringResource(R.string.moderation)) },
             leadingContent = {
                 Icon(
                     Icons.Default.Shield,
@@ -264,7 +266,7 @@ private fun LazyListScope.itemsToShow(
     }
     item {
         CheckboxTile(
-            headlineContent = { Text("Search") },
+            headlineContent = { Text(stringResource(R.string.search)) },
             leadingContent = {
                 Icon(
                     Icons.Default.Search,
@@ -279,7 +281,7 @@ private fun LazyListScope.itemsToShow(
     }
     item {
         CheckboxTile(
-            headlineContent = { Text("Go to menu") },
+            headlineContent = { Text(stringResource(R.string.go_to_menu)) },
             leadingContent = {
                 Icon(
                     Icons.AutoMirrored.Filled.OpenInNew,
@@ -295,7 +297,7 @@ private fun LazyListScope.itemsToShow(
 
     item {
         CheckboxTile(
-            headlineContent = { Text("Go to community") },
+            headlineContent = { Text(stringResource(R.string.go_to_community_setting)) },
             leadingContent = {
                 Icon(
                     Icons.Default.GroupWork,
@@ -310,7 +312,7 @@ private fun LazyListScope.itemsToShow(
     }
     item {
         CheckboxTile(
-            headlineContent = { Text("Go to user") },
+            headlineContent = { Text(stringResource(R.string.go_to_user_setting)) },
             leadingContent = {
                 Icon(
                     Icons.Default.Person,
@@ -325,7 +327,7 @@ private fun LazyListScope.itemsToShow(
     }
     item {
         CheckboxTile(
-            headlineContent = { Text("Dark mode") },
+            headlineContent = { Text(stringResource(R.string.dark_mode_setting)) },
             leadingContent = {
                 Icon(
                     Icons.Default.DarkMode,
@@ -340,7 +342,7 @@ private fun LazyListScope.itemsToShow(
     }
     item {
         CheckboxTile(
-            headlineContent = { Text("Blur NSFW") },
+            headlineContent = { Text(stringResource(R.string.blur_nsfw_setting)) },
             leadingContent = {
                 Icon(
                     Icons.Default.BlurOn,
@@ -355,7 +357,7 @@ private fun LazyListScope.itemsToShow(
     }
     item {
         CheckboxTile(
-            headlineContent = { Text("Show NSFW") },
+            headlineContent = { Text(stringResource(R.string.show_nsfw_setting)) },
             leadingContent = {
                 Icon(
                     painter = painterResource(R.drawable.eighteen_rating),

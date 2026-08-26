@@ -34,9 +34,11 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalDataSettings
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Gallery
@@ -116,7 +118,7 @@ fun EmbeddedGallery(
                 .clickable { goFullscreen() }) {
             UnloadedPlaceHolder(modifier.fillMaxSize())
             Text(
-                "Gallery",
+                stringResource(R.string.gallery),
                 modifier = Modifier
                     .cartouche(Color.Black.copy(0.6f))
                     .align(Alignment.TopEnd)

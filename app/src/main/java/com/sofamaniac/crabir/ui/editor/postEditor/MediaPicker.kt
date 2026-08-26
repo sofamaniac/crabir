@@ -38,8 +38,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.ui.ThemedDialog
 
@@ -125,7 +127,7 @@ fun MediaPicker(viewModel: PostCreatorViewModel) {
 
                     Icon(
                         Icons.Default.Add,
-                        contentDescription = "Add media",
+                        contentDescription = stringResource(R.string.add_media),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -144,7 +146,9 @@ fun MediaPicker(viewModel: PostCreatorViewModel) {
             Column(modifier = Modifier.fillMaxSize()) {
                 val caption =
                     rememberTextFieldState(initialText = viewModel.captions[uri] ?: "")
-                TextField(state = caption, label = { Text("Caption") })
+                TextField(
+                    state = caption,
+                    label = { Text(stringResource(R.string.caption_placeholder)) })
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -157,17 +161,20 @@ fun MediaPicker(viewModel: PostCreatorViewModel) {
                         }
                         editIndex = null
                     }) {
-                        Text("Remove", color = MaterialTheme.colorScheme.error)
+                        Text(
+                            stringResource(R.string.delete),
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     TextButton(onClick = { editIndex = null }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                     TextButton(onClick = {
                         viewModel.captions[uri] = caption.text as String
                         editIndex = null
                     }) {
-                        Text("Save")
+                        Text(stringResource(R.string.save))
                     }
                 }
             }

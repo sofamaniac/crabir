@@ -53,7 +53,7 @@ fun CopyDialog(comment: CommentData, onDismissRequest: () -> Unit) {
                 }
             },
             leadingContent = { Icon(Icons.Default.Link, contentDescription = null) },
-            content = { Text("Copy link") }
+            content = { Text(stringResource(R.string.copy_link)) }
         )
         ListItem(
             modifier = Modifier.clickable {
@@ -74,14 +74,14 @@ fun CopyDialog(comment: CommentData, onDismissRequest: () -> Unit) {
                     contentDescription = null
                 )
             },
-            content = { Text("Copy text") }
+            content = { Text(stringResource(R.string.copy_text)) }
         )
         ListItem(
             modifier = Modifier.clickable {
                 showSelectionDialog = true
             },
             leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
-            content = { Text("Select text") }
+            content = { Text(stringResource(R.string.select_text)) }
         )
         ListItem(
             modifier = Modifier.clickable {
@@ -97,7 +97,7 @@ fun CopyDialog(comment: CommentData, onDismissRequest: () -> Unit) {
                 }
             },
             leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
-            content = { Text("Copy username") }
+            content = { Text(stringResource(R.string.copy_username)) }
         )
     }
 

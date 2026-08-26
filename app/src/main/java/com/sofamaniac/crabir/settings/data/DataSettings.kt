@@ -6,7 +6,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.datastore.dataStore
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.DataStoreJsonSerializer
@@ -24,11 +26,33 @@ enum class NetworkPolicy {
     OnWifi,
 }
 
+@Composable
+fun NetworkPolicy.stringResource(): String {
+    return stringResource(
+        when (this) {
+            NetworkPolicy.Always -> R.string.network_policy_always
+            NetworkPolicy.Never -> R.string.network_policy_never
+            NetworkPolicy.OnWifi -> R.string.network_policy_on_wifi
+        }
+    )
+}
+
 @Serializable
 enum class VideoQuality {
     Low,
     High,
     Auto,
+}
+
+@Composable
+fun VideoQuality.stringResource(): String {
+    return stringResource(
+        when (this) {
+            VideoQuality.Low -> R.string.video_quality_low
+            VideoQuality.High -> R.string.video_quality_high
+            VideoQuality.Auto -> R.string.video_quality_auto
+        }
+    )
 }
 
 @Serializable

@@ -274,7 +274,7 @@ private fun InnerTab(viewModel: CommunitySearchViewModel) {
                             onSuccess = { onSuccess(it) },
                             onError = { onError(it) })
                     }) {
-                        Text("Random community")
+                        Text(stringResource(R.string.random_community))
                     }
                 }
                 item {
@@ -284,7 +284,7 @@ private fun InnerTab(viewModel: CommunitySearchViewModel) {
                             onSuccess = { onSuccess(it) },
                             onError = { onError(it) })
                     }) {
-                        Text("Random NSFW community")
+                        Text(stringResource(R.string.random_nsfw))
                     }
                 }
             }
@@ -430,7 +430,7 @@ inline fun <reified Sort> SortMenu(
         leadingContent = {
             Icon(Icons.AutoMirrored.Default.Sort, contentDescription = null)
         },
-        content = { Text("Sort") },
+        content = { Text(stringResource(R.string.sort)) },
         trailingContent = {
             ExposedDropdownMenuBox(
                 expanded = showMenu,
@@ -502,14 +502,14 @@ fun SearchSettings(viewModel: PostSearchViewModel) {
             PostSearchSort.entries,
             params.sort,
             onOptionSelected = viewModel::setSort,
-            headlineContent = { Text("Sort") }
+            headlineContent = { Text(stringResource(R.string.sort)) }
         )
         if (params.subreddit != null) {
             ListItem(
                 modifier = Modifier.clickable {
                     viewModel.setRestrictSubreddit(!params.restrictSubreddit)
                 },
-                content = { Text("Restrict subreddit") },
+                content = { Text(stringResource(R.string.restrict_subreddit)) },
                 trailingContent = {
                     ThemedSwitch(
                         checked = params.restrictSubreddit,
@@ -530,6 +530,6 @@ fun SearchSettings(viewModel: CommunitySearchViewModel) {
         CommunitySearchSort.entries,
         params.sort as CommunitySearchSort,
         onOptionSelected = viewModel::setSort,
-        headlineContent = { Text("Sort") }
+        headlineContent = { Text(stringResource(R.string.sort)) }
     )
 }

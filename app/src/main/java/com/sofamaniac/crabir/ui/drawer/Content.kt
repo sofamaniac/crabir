@@ -39,11 +39,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalLateralMenuSettings
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.PreviewLocalComposition
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.data.remote.dto.subreddit.dummySubredditData
@@ -174,7 +176,7 @@ internal fun DrawerContent(
             if (settings.items.goToCommunity) {
                 item {
                     NavigationDrawerItem(
-                        label = { Text("Go to community") },
+                        label = { Text(stringResource(R.string.go_to_community)) },
                         selected = false,
                         icon = {
                             Icon(
@@ -191,7 +193,7 @@ internal fun DrawerContent(
             if (settings.items.goToUser) {
                 item {
                     NavigationDrawerItem(
-                        label = { Text("Go to user") },
+                        label = { Text(stringResource(R.string.go_to_user)) },
                         selected = false,
                         icon = {
                             Icon(

@@ -9,7 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.LocalFiltersSettings
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.settings.filters.filtersDataStore
 import com.sofamaniac.crabir.ui.ThemedSwitch
 import kotlinx.coroutines.launch
@@ -30,9 +32,9 @@ internal fun BlurTile() {
     }
     NavigationDrawerItem(
         selected = false,
-        icon = { Icon(Icons.Default.BlurOn, contentDescription = "Blur NSFW") },
+        icon = { Icon(Icons.Default.BlurOn, contentDescription = null) },
         label = {
-            Text("Blur NSFW")
+            Text(stringResource(R.string.blurNSFW))
         },
         badge = {
             ThemedSwitch(

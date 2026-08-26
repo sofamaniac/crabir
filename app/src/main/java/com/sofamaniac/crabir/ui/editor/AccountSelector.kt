@@ -16,8 +16,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.RedditAccount
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,7 +56,9 @@ fun AccountSelector(
 
             }
             if (otherAccounts.isEmpty()) {
-                DropdownMenuItem(onClick = {}, text = { Text("No other accounts") })
+                DropdownMenuItem(
+                    onClick = {},
+                    text = { Text(stringResource(R.string.no_other_accounts)) })
             }
         }
     }

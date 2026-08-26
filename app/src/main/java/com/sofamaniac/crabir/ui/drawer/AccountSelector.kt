@@ -99,11 +99,11 @@ fun AccountSelector(
                     icon = {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = "Add account",
+                            contentDescription = null,
                             modifier = iconModifier
                         )
                     },
-                    label = { Text("Add account") },
+                    label = { Text(stringResource(R.string.add_account)) },
                     selected = false,
                     onClick = {
                         showWarningDialog = true
@@ -113,11 +113,11 @@ fun AccountSelector(
                     icon = {
                         Icon(
                             Icons.AutoMirrored.Filled.Logout,
-                            contentDescription = "Logout",
+                            contentDescription = null,
                             modifier = iconModifier
                         )
                     },
-                    label = { Text("Logout") },
+                    label = { Text(stringResource(R.string.logout)) },
                     selected = false,
                     onClick = {
                         viewModel.logout()
@@ -144,7 +144,7 @@ fun AccountSelector(
                 }
             }) {
             ListItem(
-                content = { Text("Warning") }
+                content = { Text(stringResource(R.string.login_dialog_warning_title)) }
             )
             ListItem(
                 content = {

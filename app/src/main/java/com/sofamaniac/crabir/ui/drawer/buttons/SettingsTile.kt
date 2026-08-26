@@ -15,6 +15,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SettingsRoute
 import com.sofamaniac.crabir.settings.theme.ThemeMode
@@ -34,7 +36,7 @@ internal fun SettingsTile(drawerState: DrawerState) {
         .collectAsState(initial = ThemeMode.System)
     NavigationDrawerItem(
         label = {
-            Text("Settings")
+            Text(stringResource(R.string.settings))
         },
         badge = {
             if (themeMode == ThemeMode.Dark || themeMode == ThemeMode.Light) {
