@@ -9,12 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.data.local.dao.MultiRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
@@ -37,13 +39,14 @@ fun MultiView(
     slug: String,
     modifier: Modifier = Modifier,
 ) {
-    val entity = LocalViewSettings.current.rememberedViews[slug] ?: defaultCommunityEntity(
-        slug,
-        slug
-    )
+    val defaultEntity = getCommunityViewEntity(slug, slug)
     val viewModel: MultiViewModel = koinViewModel<MultiViewModel>(key = slug) {
-        parametersOf(slug, entity)
+        parametersOf(
+            slug,
+            defaultEntity,
+        )
     }
+    var entity by remember(slug) { mutableStateOf(defaultEntity) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
     val params by viewModel.params.collectAsState()
@@ -72,6 +75,7 @@ fun MultiView(
             params,
             info?.displayNamePrefixed ?: slug,
             updateSort = viewModel::updateSort,
+            updateView = { entity = entity.copy(view = it) },
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
             entity = entity,

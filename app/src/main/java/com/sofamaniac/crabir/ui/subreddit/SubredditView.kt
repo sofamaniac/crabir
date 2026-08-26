@@ -32,7 +32,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
@@ -69,13 +71,16 @@ fun SubredditViewer(
     subreddit: String,
     modifier: Modifier = Modifier,
 ) {
-    val entity = LocalViewSettings.current.rememberedViews[subreddit] ?: defaultCommunityEntity(
-        subreddit,
-        subreddit
-    )
+    val defaultEntity = getCommunityViewEntity(subreddit, subreddit)
     val subredditName = subreddit.split("/").last()
     val viewModel: SubredditViewModel =
-        koinViewModel(key = subreddit) { parametersOf(subreddit, entity) }
+        koinViewModel(key = subreddit) {
+            parametersOf(
+                subreddit,
+                defaultEntity,
+            )
+        }
+    var entity by remember(subreddit) { mutableStateOf(defaultEntity) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val params by viewModel.params.collectAsState()
     val feedInfo by viewModel.info.collectAsState()
@@ -102,6 +107,7 @@ fun SubredditViewer(
             params,
             slug = subreddit,
             updateSort = viewModel::updateSort,
+            updateView = { entity = entity.copy(view = it) },
             refresh = viewModel::refresh,
             entity = entity,
             scrollBehavior = scrollBehavior,

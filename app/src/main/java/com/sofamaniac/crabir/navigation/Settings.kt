@@ -12,6 +12,10 @@ import com.sofamaniac.crabir.settings.comments.CommentsSettingsPage
 import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
 import com.sofamaniac.crabir.settings.data.DataSettingsPage
 import com.sofamaniac.crabir.settings.data.DataSettingsRoute
+import com.sofamaniac.crabir.settings.feedSettings.FeedSettingsPage
+import com.sofamaniac.crabir.settings.feedSettings.FeedSettingsRoute
+import com.sofamaniac.crabir.settings.feedSettings.SortManagerPage
+import com.sofamaniac.crabir.settings.feedSettings.SortManagerRoute
 import com.sofamaniac.crabir.settings.filters.FiltersSettingsPage
 import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsPage
 import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsRoute
@@ -61,5 +65,11 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
     }
     composable<LateralMenuSettingsRoute> {
         LateralMenuSettingsPage()
+    }
+    composable<FeedSettingsRoute> {
+        FeedSettingsPage()
+    }
+    composable<SortManagerRoute> {
+        SortManagerPage()
     }
 }

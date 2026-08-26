@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.automirrored.filled.Comment
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.DevicesFold
@@ -46,6 +47,7 @@ import com.sofamaniac.crabir.navigation.ThemeRoute
 import com.sofamaniac.crabir.navigation.ViewsSettingRoute
 import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
 import com.sofamaniac.crabir.settings.data.DataSettingsRoute
+import com.sofamaniac.crabir.settings.feedSettings.FeedSettingsRoute
 import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsRoute
 import com.sofamaniac.crabir.settings.post.PostSettingsRoute
 import com.sofamaniac.crabir.ui.BackButton
@@ -151,6 +153,20 @@ fun GeneralSettingsPage() {
         },
     ) { padding ->
         LazyColumn(modifier = Modifier.padding(padding)) {
+            item {
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            Icons.AutoMirrored.Filled.List,
+                            contentDescription = null
+                        )
+                    },
+                    content = { Text(stringResource(R.string.feeds_settings_tile_label)) },
+                    onClick = {
+                        navController?.navigate(FeedSettingsRoute)
+                    }
+                )
+            }
             item {
                 ListItem(
                     leadingContent = {

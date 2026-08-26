@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 fun <T> ListSelector(
     options: List<T>,
     selectedOption: T,
-    onOptionSelected: (T) -> Unit,
     modifier: Modifier = Modifier,
     leadingContent: @Composable () -> Unit = {
         Spacer(modifier = Modifier.size(24.dp))
@@ -48,6 +47,7 @@ fun <T> ListSelector(
     headlineContent: @Composable () -> Unit = {},
     enabled: Boolean = true,
     optionLabel: @Composable (T) -> String = { it.toString() },
+    onOptionSelected: (T) -> Unit,
 ) {
     ListItem(
         enabled = enabled,

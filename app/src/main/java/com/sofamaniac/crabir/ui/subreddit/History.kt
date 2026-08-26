@@ -8,12 +8,14 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.paging.PagingSource
-import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
@@ -41,11 +43,11 @@ fun HistoryViewer(
     modifier: Modifier = Modifier,
 ) {
     val title = stringResource(R.string.History)
-    val entity =
-        LocalViewSettings.current.rememberedViews[HISTORY] ?: defaultCommunityEntity(HISTORY, title)
+    val defaultEntity = getCommunityViewEntity(HISTORY, title)
     val viewModel: HistoryViewModel = koinViewModel(key = HISTORY) {
-        parametersOf(entity)
+        parametersOf(defaultEntity)
     }
+    var entity by remember(HISTORY) { mutableStateOf(defaultEntity) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
     val params by viewModel.params.collectAsState()
@@ -58,7 +60,8 @@ fun HistoryViewer(
             slug = HISTORY,
             openDrawer = { scope.launch { drawerState.open() } },
             disableInfo = true,
-            updateSort = viewModel::updateSort,
+            updateSort = { _, _ -> },
+            updateView = { entity = entity.copy(view = it) },
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
             entity = entity,

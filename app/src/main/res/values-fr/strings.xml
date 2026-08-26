@@ -297,4 +297,19 @@
     <string name="video_quality_low">Basse</string>
     <string name="video_quality_high">Haute</string>
     <string name="video_quality_auto">Auto</string>
+    <string name="feeds_settings_title">Paramètre de flux</string>
+    <string name="home_sort_label">Tri de l\'accueil</string>
+    <string name="home_sort_timeframe_label">Temps de l\'accueil</string>
+    <string name="feed_default_sort_label">Tri par défault</string>
+    <string name="default_sort_timeframe_label">Temps par défault</string>
+    <string name="remember_sort_per_community">Sauvergarder par communauté</string>
+    <string name="remember_sort_per_community_support">Si activé, chaque communauté sauvegarde le dernier tri utilisé</string>
+    <string name="manage_sorts">Gérer les tris</string>
+    <string name="timeframe">Temps</string>
+    <string name="default_option">Défaut</string>
+    <string name="sort_edit_title">Éditer le tri pour %1$s</string>
+    <string name="view">Vue</string>
+    <string name="columns">Colonnes</string>
+    <string name="managed_remembered_sorts">Gérer les tris enregistrés</string>
+    <string name="feeds_settings_tile_label">Flux</string>
 </resources>

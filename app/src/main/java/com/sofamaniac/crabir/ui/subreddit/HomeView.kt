@@ -12,11 +12,14 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import com.sofamaniac.crabir.LocalViewSettings
+import com.sofamaniac.crabir.LocalFeedSettings
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
@@ -38,14 +41,18 @@ fun HomeViewer(
     modifier: Modifier = Modifier,
 ) {
     val title = stringResource(R.string.Home)
-    val viewEntity: CommunityViewEntity =
-        LocalViewSettings.current.rememberedViews[HOME] ?: defaultCommunityEntity(
+    val feedSettings = LocalFeedSettings.current
+    val defaultEntity: CommunityViewEntity =
+        getCommunityViewEntity(
             HOME,
             title,
+            defaultSort = feedSettings.homeSort,
+            defaultTimeframe = feedSettings.homeTimeframe
         )
     val viewModel: HomeViewModel = koinViewModel(key = HOME) {
-        parametersOf(viewEntity)
+        parametersOf(defaultEntity)
     }
+    var viewEntity by remember(HOME) { mutableStateOf(defaultEntity) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
     val params by viewModel.params.collectAsState()
@@ -58,6 +65,7 @@ fun HomeViewer(
             slug = HOME,
             disableInfo = true,
             updateSort = viewModel::updateSort,
+            updateView = { viewEntity = viewEntity.copy(view = it) },
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
             openDrawer = { scope.launch { drawerState.open() } },

@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.settings.views
+package com.sofamaniac.crabir.settings.feedSettings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,12 +29,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
+import com.sofamaniac.crabir.data.remote.dto.Timeframe
+import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.Menu
+import com.sofamaniac.crabir.settings.views.ViewSettings
+import com.sofamaniac.crabir.settings.views.viewSettingDataStore
 import kotlinx.coroutines.launch
 
 @Composable
-fun ViewManagerPage() {
+fun SortManagerPage() {
 
     val context = LocalContext.current
     val settingsDataStore = remember(context) { context.viewSettingDataStore }
@@ -43,6 +47,7 @@ fun ViewManagerPage() {
     val navController = LocalNavController.current
 
     val views = viewSettings.rememberedViews
+
     fun updateView(slug: String, view: CommunityViewEntity) {
         scope.launch {
             settingsDataStore.updateData {
@@ -59,8 +64,8 @@ fun ViewManagerPage() {
             settingsDataStore.updateData {
                 it.copy(
                     rememberedViews = it.rememberedViews + (slug to oldValue.copy(
-                        view = null,
-                        columns = null
+                        sort = null,
+                        timeframe = null
                     ))
                 )
             }
@@ -69,7 +74,7 @@ fun ViewManagerPage() {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.manage_views)) }, navigationIcon = {
+            TopAppBar(title = { Text(stringResource(R.string.manage_sorts)) }, navigationIcon = {
                 IconButton(onClick = { navController?.popBackStack() }) {
                     Icon(
                         Icons.Default.Close,
@@ -80,7 +85,7 @@ fun ViewManagerPage() {
         }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(items = views.filter { entry -> entry.value.view != null || entry.value.columns != null }
+            items(items = views.filter { entry -> entry.value.sort != null }
                 .toList(), key = { it.first }) { it ->
                 val slug = it.first
                 val entity = it.second
@@ -96,7 +101,7 @@ fun ViewManagerPage() {
 }
 
 @Composable
-internal fun ViewTile(
+private fun ViewTile(
     community: String,
     entity: CommunityViewEntity,
     updateView: (CommunityViewEntity) -> Unit,
@@ -112,12 +117,12 @@ internal fun ViewTile(
         },
         supportingContent = {
             Row() {
-                if (entity.view != null) {
-                    Text(stringResource(entity.view.toStringResource()))
+                if (entity.sort != null) {
+                    Text(stringResource(entity.sort.representation))
                 }
                 VerticalDivider()
-                if (entity.columns != null) {
-                    Text("${entity.columns} columns")
+                if (entity.timeframe != null) {
+                    Text(stringResource(entity.timeframe.representation))
                 }
             }
         }
@@ -141,44 +146,46 @@ internal fun EditViewDialog(
     onConfirm: (CommunityViewEntity) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    var view: Views? by remember { mutableStateOf(entity.view) }
-    var columns: Int? by remember { mutableStateOf(entity.columns) }
+    var sort: Sort? by remember { mutableStateOf(entity.sort) }
+    var timeframe: Timeframe? by remember { mutableStateOf(entity.timeframe) }
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(onClick = {
-                onConfirm(entity.copy(columns = columns, view = view))
+                onConfirm(entity.copy(sort = sort, timeframe = timeframe))
                 onDismissRequest()
             }) { Text(stringResource(R.string.confirm)) }
         },
         dismissButton = {
             TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.cancel)) }
         },
-        title = { Text("Edit view for $community") },
+        title = { Text(stringResource(R.string.sort_edit_title, community)) },
         text = {
             Column() {
                 ListSelector(
-                    options = Views.entries.toList(),
-                    selectedOption = view,
+                    options = Sort.entries.toList(),
+                    selectedOption = sort,
                     optionLabel = {
-                        stringResource(it.toStringResource())
+                        stringResource(it.representation)
                     },
                     onOptionSelected = {
-                        view = it
+                        sort = it
                     },
-                    label = { Text(stringResource(R.string.view)) }
+                    label = { Text(stringResource(R.string.sort)) }
                 )
-                ListSelector(
-                    options = (1..3).toList(),
-                    selectedOption = columns,
-                    optionLabel = {
-                        it.toString()
-                    },
-                    onOptionSelected = {
-                        columns = it
-                    },
-                    label = { Text(stringResource(R.string.columns)) }
-                )
+                if (sort?.isTimeframe == true) {
+                    ListSelector(
+                        options = Timeframe.entries.toList(),
+                        selectedOption = timeframe,
+                        optionLabel = {
+                            stringResource(it.representation)
+                        },
+                        onOptionSelected = {
+                            timeframe = it
+                        },
+                        label = { Text(stringResource(R.string.timeframe)) }
+                    )
+                }
             }
         }
     )
