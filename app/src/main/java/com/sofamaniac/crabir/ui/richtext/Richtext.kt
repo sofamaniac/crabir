@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.richtext
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
@@ -32,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.heading
@@ -59,6 +62,7 @@ fun Richtext(
     document: RichtextDocument,
     modifier: Modifier = Modifier,
     mediaMetadata: Map<String, MediaMetadata>,
+    threadId: String? = null,
     style: RichtextStyle = defaultRichtextStyle(),
 ) {
     val components = DefaultRichtextComponents()
@@ -69,6 +73,7 @@ fun Richtext(
         style = null,
         configuration = configuration,
         mediaMetadata = mediaMetadata,
+        threadId = threadId,
     )
     CompositionLocalProvider(
         LocalUriHandler provides CrabirUriHandler(
@@ -151,17 +156,41 @@ fun Image(image: Richtext.Image, context: Context) {
 @Composable
 fun Video(video: Richtext.Video, context: Context) {
     val media = context.mediaMetadata[video.id]
-    val navController = LocalNavController.current
     val uriHandler = LocalUriHandler.current
-    Box(modifier = Modifier.clickable {
-        uriHandler.openUri("https://v.redd.it/${video.id}")
-    }) {
-        AsyncImage("https://preview.redd.it/${video.id}.jpg", contentDescription = video.caption)
-        Icon(
-            Icons.Default.PlayArrow,
-            contentDescription = "Play video",
-            modifier = Modifier.align(Alignment.Center)
-        )
+    if (context.threadId != null && media == null) {
+        Box(
+            modifier = Modifier
+                .sizeIn(minWidth = 128.dp, minHeight = 128.dp)
+                .background(Color.Gray.copy(alpha = 0.3f))
+                .clickable {
+                    uriHandler.openUri("https://v.redd.it/link/${context.threadId}/asset/${video.id}/HLSPlaylist.m3u8")
+                }) {
+            AsyncImage(
+                "https://preview.redd.it/${video.id}.jpg?vthumb=1",
+                contentDescription = video.caption
+            )
+            Icon(
+                Icons.Default.PlayArrow,
+                contentDescription = "Play video",
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+    } else if (media != null) {
+        Box(modifier = Modifier.clickable {
+            uriHandler.openUri("https://v.redd.it/${video.id}")
+        }) {
+            AsyncImage(
+                "https://preview.redd.it/${video.id}.jpg?vthumb=1",
+                contentDescription = video.caption
+            )
+            Icon(
+                Icons.Default.PlayArrow,
+                contentDescription = "Play video",
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+    } else {
+        Text("Video")
     }
 }
 
@@ -221,7 +250,8 @@ fun ListItem(item: Richtext.ListItem, context: Context, index: Int) {
         }
     } else {
         Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("-")
+            @SuppressLint("HardcodedComposeText")
+            Text("•")
             Column {
                 for (child in item.children) {
                     context.configuration.components.render(child, context)

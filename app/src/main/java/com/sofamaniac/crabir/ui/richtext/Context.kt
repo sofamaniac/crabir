@@ -34,6 +34,7 @@ data class Context(
     val style: SpanStyle?,
     val mediaMetadata: Map<String, MediaMetadata>,
     val configuration: Configuration,
+    val threadId: String?,
 )
 
 @Immutable

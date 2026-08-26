@@ -16,6 +16,7 @@ lifecycleRuntimeKtx = "2.11.0"
 lintApi = "32.3.2"
 markdownVersion = "0.7.8"
 material3Version = "1.5.0-alpha25"
+media3ExoplayerHls = "1.11.0"
 multiplatformMarkdownRenderer = "0.43.0"
 navigationCompose = "2.9.8"
 okhttpVersion = "5.4.0"
@@ -37,6 +38,7 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-media3-exoplayer-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = "exoplayer" }
 androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "exoplayer" }
+androidx-media3-exoplayer-hls = { module = "androidx.media3:media3-exoplayer-hls", version.ref = "exoplayer" }
 androidx-media3-ui-compose-material3 = { module = "androidx.media3:media3-ui-compose-material3", version.ref = "exoplayer" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version = "3.5.0" }

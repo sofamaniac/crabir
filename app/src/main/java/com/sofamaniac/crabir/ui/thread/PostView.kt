@@ -77,7 +77,11 @@ internal fun PostView(
             ) {
                 CrossPostView(parent)
                 if (post.selftext.richtext.document.isNotEmpty()) {
-                    Richtext(post.selftext.richtext, mediaMetadata = post.mediaMetadata)
+                    Richtext(
+                        post.selftext.richtext,
+                        mediaMetadata = post.mediaMetadata,
+                        threadId = post.id
+                    )
                 }
             }
         }

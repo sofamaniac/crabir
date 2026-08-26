@@ -179,7 +179,12 @@ fun ColumnScope.OpenedComment(
     Spacer(modifier = Modifier.height(8.dp))
     TopRow(comment, modifier = innerModifier)
     Spacer(modifier = Modifier.height(8.dp))
-    Richtext(comment.richtext, modifier = innerModifier, mediaMetadata = comment.mediaMetadata)
+    Richtext(
+        comment.richtext,
+        modifier = innerModifier,
+        mediaMetadata = comment.mediaMetadata,
+        threadId = comment.parentId.name.split("_").last()
+    )
     Spacer(modifier = Modifier.height(8.dp))
     AnimatedVisibility(showBottomBar) {
         BottomRow(comment, viewModel) {

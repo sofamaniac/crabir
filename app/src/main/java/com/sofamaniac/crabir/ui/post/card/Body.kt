@@ -59,7 +59,8 @@ internal fun PostBody(
             Richtext(
                 post.selftext.richtext,
                 mediaMetadata = post.mediaMetadata,
-                modifier = modifier.padding(horizontal = 16.dp)
+                modifier = modifier.padding(horizontal = 16.dp),
+                threadId = post.id,
             )
         }
     }

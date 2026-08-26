@@ -95,6 +95,19 @@ fun NavGraphBuilder.imagesGraph(navController: NavController) {
             FullscreenVideo("https://v.redd.it/${url}") { navController.popBackStack() }
         }
     }
+    composable(
+        route = "v.redd.it/link/{parent}/asset/{id}/HLSPlaylist.m3u8",
+        deepLinks = listOf(
+            navDeepLink { uriPattern = "v.redd.it/link/{parent}/asset/{id}/HLSPlaylist.m3u8" }
+        ),
+    ) {
+        val id = it.arguments?.getString("id")
+        val parent = it.arguments?.getString("parent")
+        Log.d("NavGraph", "Opening video: ${id}")
+        if (id != null) {
+            FullscreenVideo("https://v.redd.it/link/${parent}/asset/${id}/HLSPlaylist.m3u8") { navController.popBackStack() }
+        }
+    }
     composable<FullscreenGalleryRoute>(
         typeMap = mapOf(typeOf<Fullname>() to FullnameType)
     ) {
