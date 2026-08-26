@@ -15,13 +15,15 @@ class MultiPostsRepository(
 
     fun updateMulti(permalink: String) {
         currentMulti = permalink
+        refresh()
     }
 
     override suspend fun getThings(
         after: Fullname,
         params: FeedParams,
     ): PagingSource.LoadResult<Fullname, Fullname> {
-        val subreddit = currentMulti ?: return PagingSource.LoadResult.Page(emptyList(), null, null)
+        val subreddit =
+            currentMulti ?: return PagingSource.LoadResult.Page(emptyList(), null, Fullname(""))
         return makeRequest {
             api.getMultireddit(
                 path = subreddit,

@@ -117,6 +117,7 @@ class MultiViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             _info.value = communityDao.getBySlug(slug) ?: return@launch
             repository.updateMulti(_info.value!!.permalink)
+            refresh()
         }
     }
 }
