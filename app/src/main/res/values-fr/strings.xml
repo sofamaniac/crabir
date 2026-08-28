@@ -119,9 +119,6 @@
     <string name="login_warning">Si, sur la prochaine page, vous ne pouvez pas vous connecter, essayez de mettre l\'appareil en mode paysage et de fermer la bannière de cookies.</string>
     <string name="awards_settings_header">Récompenses</string>
     <string name="back">Revenir</string>
-    <string name="autoplay_always">Toujours</string>
-    <string name="autoplay_wifi">Si connecté au Wifi</string>
-    <string name="autoplay_never">Jamais</string>
     <string name="drafts">Brouillons</string>
     <string name="see_full_thread">Voir le fil complet</string>
     <string name="show_full_context">Voir le contexte complet</string>
@@ -274,7 +271,7 @@
     <string name="subject">Sujet</string>
     <string name="go_to_parent_post">Aller à la publication mère</string>
     <string name="search_placeholder">Recherche</string>
-    <string name="go_to">Visiter ...</string>
+    <string name="go_to">Visiter …</string>
     <string name="random_community">Communauté aléatoire</string>
     <string name="random_nsfw">Communauté NSFW aléatoire</string>
     <string name="go_to_user">Visiter l\'utlisateur</string>

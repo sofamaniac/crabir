@@ -123,9 +123,6 @@
     <string name="enable_load_image">Load image</string>
     <string name="header_video">Video</string>
     <string name="autostart_video">Autostart video</string>
-    <string name="autoplay_always">Always</string>
-    <string name="autoplay_wifi">When on Wifi</string>
-    <string name="autoplay_never">Never</string>
 
     <!-- Settings - Filters -->
     <string name="filter_settings_name">Filters</string>
@@ -269,7 +266,7 @@
     <string name="go_to_subreddit">Go to %1$s</string>
     <string name="go_to_parametrized">Go to %1$s</string>
     <string name="go_to_top">Go to top</string>
-    <string name="go_to">Go to ...</string>
+    <string name="go_to">Go to …</string>
     <string name="random_community">Random community</string>
     <string name="random_nsfw">Random NSFW</string>
     <string name="restrict_subreddit">Restrict subreddit</string>
