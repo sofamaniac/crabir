@@ -225,10 +225,10 @@ class ThreadViewModel(
     override fun submitComment(parent: Fullname, body: String, account: RedditAccount?) {
         viewModelScope.launch(Dispatchers.IO) {
             val response = repository.postComment(parent, body, account = account)
-            if (!response.isSuccessful) {
+            if (!response.isSuccess) {
                 return@launch
             }
-            val result = response.body()?.json ?: return@launch
+            val result = response.getOrNull()?.json ?: return@launch
             // TODO display error if any
             val comment = result.data?.things?.firstOrNull() ?: return@launch
             val commentDTO = comment as Thing.Comment

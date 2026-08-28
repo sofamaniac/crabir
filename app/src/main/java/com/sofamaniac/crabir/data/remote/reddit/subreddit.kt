@@ -7,7 +7,6 @@ import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -25,7 +24,7 @@ interface SubredditAPI {
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
-    ): Response<Listing<Post>>
+    ): Result<Listing<Post>>
 
     @GET("{subreddit}/about.json")
     suspend fun getSubInfo(
@@ -33,7 +32,7 @@ interface SubredditAPI {
             "subreddit",
             encoded = true
         ) subreddit: String,
-    ): Response<Subreddit>
+    ): Result<Subreddit>
 
     /** Get the list of subreddits the user is subscribed to. */
     @GET("/subreddits/mine/subscriber.json")
@@ -42,7 +41,7 @@ interface SubredditAPI {
         @Query("before") before: String? = null,
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
-    ): Response<Listing<Subreddit>>
+    ): Result<Listing<Subreddit>>
 
     /** Get the post of a given subreddit.
      *
@@ -58,31 +57,31 @@ interface SubredditAPI {
         @Query("limit") limit: Int = API_LIMIT,
         @Query("t") timeframe: Timeframe? = null,
         @Query("sr_detail") srDetail: Boolean = true,
-    ): Response<Listing<Post>>
+    ): Result<Listing<Post>>
 
     @FormUrlEncoded
     @POST("api/subscribe")
     suspend fun subscribe(
         @Field("action") action: SubscribeAction,
         @Field("sr") subreddit: Fullname,
-    ): Response<Unit>
+    ): Result<Unit>
 
     @FormUrlEncoded
     @POST("api/subscribe")
     suspend fun subscribe(
         @Field("action") action: SubscribeAction,
         @Field("sr_name") subreddit: String,
-    ): Response<Unit>
+    ): Result<Unit>
 
     @GET("{subreddit}/about/rules.json")
-    suspend fun getRules(@Path("subreddit", encoded = true) subreddit: String): Response<Rules>
+    suspend fun getRules(@Path("subreddit", encoded = true) subreddit: String): Result<Rules>
 
     @FormUrlEncoded
     @POST("api/favorite")
     suspend fun favorite(
         @Field("sr_name") name: String,
         @Field("make_favorite") favorite: Boolean,
-    ): Response<Unit>
+    ): Result<Unit>
 
     @GET("api/crosspostable_subreddits.json")
     suspend fun getCrosspostableSubreddits(
@@ -92,5 +91,5 @@ interface SubredditAPI {
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Tag account: RedditAccount? = null,
-    ): Response<Listing<Subreddit>>
+    ): Result<Listing<Subreddit>>
 }

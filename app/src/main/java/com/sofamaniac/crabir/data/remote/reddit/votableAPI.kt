@@ -5,7 +5,6 @@
 package com.sofamaniac.crabir.data.remote.reddit
 
 import com.sofamaniac.crabir.domain.model.Fullname
-import retrofit2.Response
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -26,13 +25,13 @@ interface VotableAPI {
      * See [POST /api/vote](https://www.reddit.com/dev/api#POST_api_vote) for more information.
      */
     @POST("/api/vote")
-    suspend fun vote(@Query("id") fullname: Fullname, @Query("dir") dir: Int): Response<Unit>
+    suspend fun vote(@Query("id") fullname: Fullname, @Query("dir") dir: Int): Result<Unit>
 
     @POST("/api/save")
-    suspend fun save(@Query("id") fullname: Fullname): Response<Unit>
+    suspend fun save(@Query("id") fullname: Fullname): Result<Unit>
 
     @POST("/api/unsave")
-    suspend fun unsave(@Query("id") fullname: Fullname): Response<Unit>
+    suspend fun unsave(@Query("id") fullname: Fullname): Result<Unit>
 }
 
 const val UPVOTED = 1

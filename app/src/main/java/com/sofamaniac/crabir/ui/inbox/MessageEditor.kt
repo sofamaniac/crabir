@@ -198,7 +198,7 @@ class MessageEditorViewModel(
         body: String,
         subject: String,
         account: RedditAccount,
-        onError: (Exception) -> Unit,
+        onError: (Throwable) -> Unit,
         onSuccess: () -> Unit,
     ) {
         errorsFlow.value = emptySet()
@@ -222,19 +222,16 @@ class MessageEditorViewModel(
             return
         }
         viewModelScope.launch {
-            try {
-                val res = api.compose(dest, subject, body, account = account)
-                if (res.isSuccessful) {
-                    val errs = res.body()?.json?.errors
-                    if (!errs.isNullOrEmpty()) {
-                        throw Exception(errs.toString())
-                    }
+            val res = api.compose(dest, subject, body, account = account)
+            if (res.isSuccess) {
+                val errs = res.getOrNull()?.json?.errors
+                if (!errs.isNullOrEmpty()) {
+                    onError(Exception(errs.toString()))
                 } else {
-                    throw Exception(res.errorBody()?.string())
+                    onSuccess()
                 }
-                onSuccess()
-            } catch (e: Exception) {
-                onError(e)
+            } else {
+                onError(res.exceptionOrNull()!!)
             }
         }
     }
@@ -243,7 +240,7 @@ class MessageEditorViewModel(
         parent: Fullname,
         body: String,
         account: RedditAccount,
-        onError: (Exception) -> Unit,
+        onError: (Throwable) -> Unit,
         onSuccess: () -> Unit,
     ) {
         if (account.isAnonymous()) {
@@ -259,19 +256,16 @@ class MessageEditorViewModel(
             return
         }
         viewModelScope.launch {
-            try {
-                val res = api.reply(body, parent, account = account)
-                if (res.isSuccessful) {
-                    val errs = res.body()?.json?.errors
-                    if (!errs.isNullOrEmpty()) {
-                        throw Exception(errs.toString())
-                    }
+            val res = api.reply(body, parent, account = account)
+            if (res.isSuccess) {
+                val errs = res.getOrNull()?.json?.errors
+                if (!errs.isNullOrEmpty()) {
+                    onError(Exception(errs.toString()))
                 } else {
-                    throw Exception(res.errorBody()?.string())
+                    onSuccess()
                 }
-                onSuccess()
-            } catch (e: Exception) {
-                onError(e)
+            } else {
+                onError(res.exceptionOrNull()!!)
             }
         }
     }

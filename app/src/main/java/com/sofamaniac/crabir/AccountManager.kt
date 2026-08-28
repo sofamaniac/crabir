@@ -25,18 +25,13 @@ class AccountManager(val accountsRepository: AccountsRepository, val redditApi: 
     @OptIn(ExperimentalUuidApi::class)
     private suspend fun setupAnonymous(onError: (Throwable) -> Unit) {
         Log.d("AccountManager", "Setting up anonymous")
-        val response = try {
-            redditApi.getAnonymousAccessToken(
-                deviceId = Uuid.random().toHexDashString()
-            )
-        } catch (e: Exception) {
-            onError(e)
-            return
-        }
-        if (response.isSuccessful) {
+        val response = redditApi.getAnonymousAccessToken(
+            deviceId = Uuid.random().toHexDashString()
+        )
+        if (response.isSuccess) {
             Log.d("AccountManager", "Obtained access token for anonymous")
             val serviceConfig = AuthConfig()
-            val accessToken = response.body()!!
+            val accessToken = response.getOrNull()!!
             val authResponse =
                 AuthorizationResponse.Builder(serviceConfig.createAuthorizationRequest())
                     .setAccessToken(accessToken.access_token)
@@ -57,12 +52,10 @@ class AccountManager(val accountsRepository: AccountsRepository, val redditApi: 
             val account = RedditAccount.anonymous().copy(auth = state)
             accountsRepository.addAccount(account)
         } else {
-            val error = response.errorBody()
+            val error = response.exceptionOrNull()
             Log.e("AccountManager", "failed to setup anonymous: ${error}")
             onError(
-                Exception(
-                    error?.string() ?: "Something went wrong"
-                )
+                error ?: Exception("Something went wrong")
             )
         }
     }

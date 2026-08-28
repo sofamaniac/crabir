@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.skydoves.retrofit.adapters.result.ResultCallAdapterFactory
 import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.data.remote.RandditAPI
 import com.sofamaniac.crabir.data.remote.interceptors.CountInterceptor
@@ -97,7 +98,7 @@ class NetworkModule {
         }
     }
 
-    @Single(binds = [RedditAPIService::class, InboxAPI::class])
+    @Single(binds = [RedditAPIService::class, InboxAPI::class, SubredditAPI::class])
     fun provideRedditApiService(
         okHttpClient: OkHttpClient,
         json: Json,
@@ -107,6 +108,7 @@ class NetworkModule {
             .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory(contentType))
+            .addCallAdapterFactory(ResultCallAdapterFactory.create())
             .build()
             .create(RedditAPIService::class.java)
     }
@@ -122,16 +124,9 @@ class NetworkModule {
             .baseUrl("https://crabir.com")
             .client(client)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addCallAdapterFactory(ResultCallAdapterFactory.create())
             .build()
             .create(RandditAPI::class.java)
-    }
-
-    @Single
-    fun provideSubredditAPIService(
-        okHttpClient: OkHttpClient,
-        json: Json,
-    ): SubredditAPI {
-        return provideRedditApiService(okHttpClient, json)
     }
 
     @Single
@@ -149,6 +144,7 @@ class NetworkModule {
             .addConverterFactory(
                 XML.v1.asConverterFactory("application/xml".toMediaType())
             )
+            .addCallAdapterFactory(ResultCallAdapterFactory.create())
             .client(client).build().create(MediaUploadInterface::class.java)
     }
 
@@ -169,6 +165,7 @@ class NetworkModule {
             .baseUrl("https://api.streamable.com")
             .client(client)
             .addConverterFactory(json.asConverterFactory(contentType))
+            .addCallAdapterFactory(ResultCallAdapterFactory.create())
             .build()
             .create(StreamableAPI::class.java)
     }

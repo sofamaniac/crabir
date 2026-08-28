@@ -119,7 +119,7 @@ open class LinkViewModel(
 
     override fun getFlairs() {
         viewModelScope.launch(Dispatchers.IO) {
-            _flairs.value = posts.getFlairs(fullname)
+            _flairs.value = posts.getFlairs(fullname).getOrDefault(emptyList())
         }
     }
 

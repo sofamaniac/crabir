@@ -48,8 +48,8 @@ class StreamableViewModel(
         if (id != null) {
             viewModelScope.launch {
                 val response = api.getVideo(id)
-                if (response.isSuccessful) {
-                    val body = response.body() ?: return@launch
+                if (response.isSuccess) {
+                    val body = response.getOrNull() ?: return@launch
                     _video.value = body.files.mp4
                     _thumbnailUrl.value = body.thumbnailUrl
                 }

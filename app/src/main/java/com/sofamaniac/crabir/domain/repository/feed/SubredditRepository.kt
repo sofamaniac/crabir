@@ -4,7 +4,6 @@
 
 package com.sofamaniac.crabir.domain.repository.feed
 
-import android.util.Log
 import androidx.paging.PagingSource
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
@@ -19,7 +18,7 @@ import org.koin.core.annotation.ViewModelScope
 
 @Singleton
 class SubredditCache(
-    private val dao: SubredditRepository
+    private val dao: SubredditRepository,
 ) {
     suspend fun save(subreddit: SubredditData) {
         dao.upsert(subreddit)
@@ -42,17 +41,12 @@ class SubredditPostsRepository(
         if (currentSubreddit == null) {
             return null
         }
-        try {
-            val res = api.getSubInfo(currentSubreddit!!)
-            if (!res.isSuccessful) {
-                return null
-            }
-            info = SubredditDTOMapper.map(res.body()!!.data)
-            return info
-        } catch (e: Exception) {
-            Log.e("SubredditPostsRepository", "Failed to get subreddit info", e)
+        val res = api.getSubInfo(currentSubreddit!!)
+        if (!res.isSuccess) {
             return null
         }
+        info = SubredditDTOMapper.map(res.getOrNull()!!.data)
+        return info
     }
 
     /**
@@ -65,31 +59,19 @@ class SubredditPostsRepository(
     suspend fun subscribe(): Result<Unit> {
         val subreddit = info ?: return Result.failure(Exception("No info for subreddit"))
         val res = api.subscribe(SubscribeAction.SUBSCRIBE, subreddit.name)
-        return if (res.isSuccessful) {
-            Result.success(Unit)
-        } else {
-            Result.failure(Exception("Failed to subscribe"))
-        }
+        return res
     }
 
     suspend fun unsubscribe(): Result<Unit> {
         val subreddit = info ?: return Result.failure(Exception("No info for subreddit"))
         val res = api.subscribe(SubscribeAction.UNSUBSCRIBE, subreddit.name)
-        return if (res.isSuccessful) {
-            Result.success(Unit)
-        } else {
-            Result.failure(Exception("Failed to subscribe"))
-        }
+        return res
     }
 
     suspend fun favorite(favorite: Boolean): Result<Unit> {
         val subreddit = info ?: return Result.failure(Exception("No info for subreddit"))
         val res = api.favorite(subreddit.displayName, favorite)
-        return if (res.isSuccessful) {
-            Result.success(Unit)
-        } else {
-            Result.failure(Exception("Failed to favorite"))
-        }
+        return res
     }
 
     override suspend fun getThings(

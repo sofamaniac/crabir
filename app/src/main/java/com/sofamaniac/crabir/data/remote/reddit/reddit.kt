@@ -16,7 +16,6 @@ import com.sofamaniac.crabir.data.remote.reddit.auth.RedditAuthApi
 import com.sofamaniac.crabir.domain.model.Fullname
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -45,7 +44,7 @@ interface RedditAPIService :
     @GET("/api/multi/mine.json?raw_json=1")
     suspend fun getMultireddits(
         @Query("expand_srs") expandSrs: Boolean = true,
-    ): Response<List<Thing.Multi>>
+    ): Result<List<Thing.Multi>>
 
     /** Get the post of a given multi.
      *
@@ -61,7 +60,7 @@ interface RedditAPIService :
         @Query("limit") limit: Int = API_LIMIT,
         @Query("t") timeframe: PostTimeframe? = null,
         @Query("sr_detail") srDetail: Boolean = true,
-    ): Response<Listing<Post>>
+    ): Result<Listing<Post>>
 
 
     @GET("{subreddit}/api/link_flair_v2.json")
@@ -70,7 +69,7 @@ interface RedditAPIService :
             "subreddit",
             encoded = true
         ) subreddit: String,
-    ): Response<List<FlairInfo>>
+    ): Result<List<FlairInfo>>
 
     @FormUrlEncoded
     @POST("api/report")
@@ -78,7 +77,7 @@ interface RedditAPIService :
         @Field("thing_id") id: Fullname,
         @Field("reason") reason: String,
         @Field("api_type") apiType: String = "json",
-    ): Response<Unit>
+    ): Result<Unit>
 
 }
 

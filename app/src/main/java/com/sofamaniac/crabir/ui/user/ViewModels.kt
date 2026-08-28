@@ -54,8 +54,8 @@ class ProfileViewModel(
     init {
         viewModelScope.launch {
             val res = api.getUser(username)
-            if (res.isSuccessful) {
-                userProfile.value = res.body()?.data
+            if (res.isSuccess) {
+                userProfile.value = res.getOrNull()?.data
             }
         }
     }

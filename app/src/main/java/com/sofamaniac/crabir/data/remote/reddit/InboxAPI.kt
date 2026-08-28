@@ -5,7 +5,6 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -20,7 +19,7 @@ interface InboxAPI {
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
-    ): Response<Thing.Listing<Thing>>
+    ): Result<Thing.Listing<Thing>>
 
     @GET("/message/unread.json")
     suspend fun unread(
@@ -28,7 +27,7 @@ interface InboxAPI {
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
-    ): Response<Thing.Listing<Thing>>
+    ): Result<Thing.Listing<Thing>>
 
     @GET("/message/sent.json")
     suspend fun sent(
@@ -36,7 +35,7 @@ interface InboxAPI {
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
-    ): Response<Thing.Listing<Thing>>
+    ): Result<Thing.Listing<Thing>>
 
     @GET("/message/mentions.json")
     suspend fun mentions(
@@ -44,16 +43,16 @@ interface InboxAPI {
         @Query("count") count: Int = 0,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
-    ): Response<Thing.Listing<Thing>>
+    ): Result<Thing.Listing<Thing>>
 
     @POST("/api/read_all_messages")
-    suspend fun readAll(): Response<Unit>
+    suspend fun readAll(): Result<Unit>
 
     @POST("/api/read_message")
-    suspend fun markRead(@Query("id") id: String)
+    suspend fun markRead(@Query("id") id: String): Result<Unit>
 
     @POST("/api/unread_message")
-    suspend fun markUnread(@Query("id") id: String)
+    suspend fun markUnread(@Query("id") id: String): Result<Unit>
 
     @FormUrlEncoded
     @POST("/api/compose")
@@ -63,7 +62,7 @@ interface InboxAPI {
         @Field("text") body: String,
         @Field("api_type") apiType: String = "json",
         @Tag account: RedditAccount? = null,
-    ): Response<PostResponse>
+    ): Result<PostResponse>
 
     @FormUrlEncoded
     @POST("/api/comment")
@@ -73,10 +72,10 @@ interface InboxAPI {
         @Field("return_rtjson") returnRtjson: Boolean = true,
         @Field("api_type") apiType: String = "json",
         @Tag account: RedditAccount? = null,
-    ): Response<PostResponse>
+    ): Result<PostResponse>
 
     @POST("/api/del_msg")
-    suspend fun delete(@Query("id") id: String): Response<Unit>
+    suspend fun delete(@Query("id") id: String): Result<Unit>
 
 }
 

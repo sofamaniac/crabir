@@ -12,7 +12,6 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import kotlinx.serialization.Serializable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -45,7 +44,7 @@ interface ThreadAPI {
         @Query("depth") depth: Int? = null,
         @Query("limit") limit: Int? = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
-    ): Response<CommentsResponse>
+    ): Result<CommentsResponse>
 
     /**
      * Gets the post and comments for a post.
@@ -70,7 +69,7 @@ interface ThreadAPI {
         @Query("depth") depth: Int? = null,
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
-    ): Response<CommentsResponse>
+    ): Result<CommentsResponse>
 
     /** Get comments for a [Thing.More]
      *
@@ -83,13 +82,13 @@ interface ThreadAPI {
         @Query("children") children: String,
         @Query("api_type") apiType: String = "json",
         @Query("sort") sort: Sort? = null,
-    ): Response<MoreResponseOuter>
+    ): Result<MoreResponseOuter>
 
     @POST("api/comment")
     suspend fun submitComment(
         @Body body: RequestBody,
         @Tag account: RedditAccount?,
-    ): Response<MoreResponseOuter>
+    ): Result<MoreResponseOuter>
 }
 
 fun commentSubmissionBody(parentId: Fullname, text: String): RequestBody {
@@ -100,6 +99,7 @@ fun commentSubmissionBody(parentId: Fullname, text: String): RequestBody {
         .addFormDataPart("raw_json", "1")
         .build()
 }
+
 @Serializable(with = CommentsResponseSerializer::class)
 data class CommentsResponse(
     /** Contains only 1 (one) [Post] */
@@ -110,7 +110,7 @@ data class CommentsResponse(
 
 @Serializable
 data class MoreResponseOuter(
-    val json: MoreResult
+    val json: MoreResult,
 )
 
 @Serializable
@@ -118,5 +118,5 @@ data class MoreResult(val data: MoreResponseData? = null, val errors: List<List<
 
 @Serializable
 data class MoreResponseData(
-    val things: List<Thing>
+    val things: List<Thing>,
 )

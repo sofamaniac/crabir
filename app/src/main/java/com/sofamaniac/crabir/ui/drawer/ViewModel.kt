@@ -145,16 +145,13 @@ class DrawerViewModelImpl(
 
     override fun logout() {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val res = redditApi.logout(activeAccount.first().auth.refreshToken!!)
-                if (res.isSuccessful) {
-                    accountsRepository.deleteAccount(activeAccount.first().id)
-                } else {
-                    throw Exception("Failed to logout: ${res.message()}")
-                }
-            } catch (e: Exception) {
-                Log.e("LoginViewModel", "Failed to logout: $e")
-                _loginState.update { LoginState.Error(e) }
+            val res = redditApi.logout(activeAccount.first().auth.refreshToken!!)
+            if (res.isSuccess) {
+                accountsRepository.deleteAccount(activeAccount.first().id)
+            } else {
+                val error = res.exceptionOrNull()!!
+                Log.e("LoginViewModel", "Failed to logout: $error")
+                _loginState.update { LoginState.Error(error) }
             }
         }
     }
@@ -190,24 +187,22 @@ class DrawerViewModelImpl(
 
     suspend fun fetchUserInfo() {
         val currentAccount = accountsRepository.activeAccount.first()
-        try {
-            val user = redditApi.getIdentity()
-            if (user.isSuccessful) {
-                val identity = user.body()!!
-                Log.d("LoginViewModel", "Updating ${currentAccount.id}")
-                accountsRepository.updateAccount(
-                    currentAccount.id,
-                    currentAccount.copy(
-                        info = identity,
-                    )
+        val user = redditApi.getIdentity()
+        if (user.isSuccess) {
+            val identity = user.getOrNull()!!
+            Log.d("LoginViewModel", "Updating ${currentAccount.id}")
+            accountsRepository.updateAccount(
+                currentAccount.id,
+                currentAccount.copy(
+                    info = identity,
                 )
+            )
 
-            } else {
-                Log.e("LoginViewModel", "Failed to get user info: ${user.message()}")
-                //accountsRepository.deleteAccount(accounts.size)
-            }
-        } catch (e: Exception) {
-            _loginState.update { LoginState.Error(e) }
+        } else {
+            val err = user.exceptionOrNull()!!
+            Log.e("LoginViewModel", "Failed to get user info: $err")
+            //accountsRepository.deleteAccount(accounts.size)
+            _loginState.update { LoginState.Error(err) }
         }
     }
 

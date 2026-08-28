@@ -4,7 +4,6 @@
 
 package com.sofamaniac.crabir.domain.repository.feed
 
-import android.util.Log
 import androidx.paging.PagingSource
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -14,7 +13,7 @@ import org.koin.core.annotation.Singleton
 @Singleton
 class HomeRepository(
     override val votableRepository: LinksRepository,
-    val api: RedditAPIService
+    val api: RedditAPIService,
 ) : PostFeedRepository<FeedParams>() {
 
     override suspend fun getThings(
@@ -22,13 +21,11 @@ class HomeRepository(
         params: FeedParams,
     ): PagingSource.LoadResult<Fullname, Fullname> {
         return makeRequest {
-            Log.d("HomeRepository", "getThings: $params")
             val res = api.getHome(
                 sort = params.sort,
                 timeframe = params.timeframe,
                 after = after
             )
-            Log.d("HomeRepository", "getThings: ${res.body()}")
             res
         }
     }

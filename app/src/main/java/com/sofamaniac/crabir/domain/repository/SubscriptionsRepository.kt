@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.annotation.Singleton
-import retrofit2.Response
 
 @Singleton
 class SubscriptionsRepository(
@@ -66,11 +65,11 @@ class SubscriptionsRepository(
 
 
     private suspend fun <T : Thing> makeRequest(
-        request: suspend () -> Response<Listing<T>>,
+        request: suspend () -> Result<Listing<T>>,
     ): PagedResponse<T> {
         val response = request()
-        if (response.isSuccessful) {
-            val listing = response.body()
+        if (response.isSuccess) {
+            val listing = response.getOrNull()
             listing?.let {
                 return PagedResponse(
                     data = it.data.children,
@@ -80,7 +79,7 @@ class SubscriptionsRepository(
             }
             return PagedResponse()
         }
-        Log.e("makeRequest", "Error making request : ${response.errorBody()}")
+        Log.e("makeRequest", "Error making request : ${response.exceptionOrNull()}")
         return PagedResponse()
     }
 
@@ -114,10 +113,10 @@ class SubscriptionsRepository(
             return emptyList()
         }
         val response = result.getOrThrow()
-        if (response.isSuccessful) {
-            return response.body() ?: emptyList()
+        if (response.isSuccess) {
+            return response.getOrNull() ?: emptyList()
         } else {
-            Log.e("SubscriptionsRepository", "Error loading multis: ${response.errorBody()}")
+            Log.e("SubscriptionsRepository", "Error loading multis: ${response.exceptionOrNull()}")
             return emptyList()
         }
 

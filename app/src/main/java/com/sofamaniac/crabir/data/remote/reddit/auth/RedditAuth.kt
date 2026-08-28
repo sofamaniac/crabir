@@ -37,7 +37,6 @@ class RedditAuthenticator(
         val request = chain.request()
         val overrideAccount = request.tag(RedditAccount::class.java)
         val activeAccount = overrideAccount ?: runBlocking { activeAccount.first() }
-        Log.d("RedditAuthenticator", "Authenticating with ${activeAccount.auth.accessToken}")
 
         if (request.isUnauthenticated()) {
             // Disable auth on non oauth endpoints

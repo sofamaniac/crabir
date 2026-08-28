@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import org.koin.core.annotation.ViewModelScope
-import retrofit2.Response
 
 interface ThreadRepository {
 
@@ -44,7 +43,7 @@ interface ThreadRepository {
         parentId: Fullname,
         comment: String,
         account: RedditAccount?,
-    ): Response<MoreResponseOuter>
+    ): Result<MoreResponseOuter>
 
     suspend fun updateComment(name: Fullname, value: CommentType)
 
@@ -187,8 +186,8 @@ class ThreadRepositoryImpl(
             return
         }
         val response = api.getThread(permalink, sort = sort, comment = comment, context = context)
-        if (response.isSuccessful) {
-            val body = response.body()
+        if (response.isSuccess) {
+            val body = response.getOrNull()
             if (body != null) {
                 val data = body.post.data.children.first()
                 post = PostDataMapper.map(data.data)
@@ -236,8 +235,8 @@ class ThreadRepositoryImpl(
             post!!.name,
             more.data.children.take(100).joinToString(",")
         )
-        if (response.isSuccessful) {
-            val body = response.body()
+        if (response.isSuccess) {
+            val body = response.getOrNull()
             if (body != null) {
                 // TODO display error
                 val things = body.json.data?.things ?: return
@@ -252,7 +251,7 @@ class ThreadRepositoryImpl(
         parentId: Fullname,
         comment: String,
         account: RedditAccount?,
-    ): Response<MoreResponseOuter> {
+    ): Result<MoreResponseOuter> {
         val body = commentSubmissionBody(parentId, comment)
         return api.submitComment(body, account)
     }
@@ -304,8 +303,8 @@ class ThreadRepositoryImpl(
         if (post == null) return null
         try {
             val response = api.getRules(post!!.subreddit.subredditPrefixed)
-            if (response.isSuccessful) {
-                val body = response.body()
+            if (response.isSuccess) {
+                val body = response.getOrThrow()
                 return body
             } else {
                 return null

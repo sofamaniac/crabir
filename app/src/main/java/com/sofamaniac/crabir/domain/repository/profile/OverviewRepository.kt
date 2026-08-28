@@ -12,7 +12,6 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.MixedRepository
 import com.sofamaniac.crabir.domain.repository.feed.MixedFeedRepository
 import org.koin.core.annotation.ViewModelScope
-import retrofit2.Response
 
 @ViewModelScope
 class OverviewRepository(
@@ -26,7 +25,7 @@ class OverviewRepository(
         return makeRequest {
             if (params.username == RedditAccount.ANONYMOUS) {
                 Log.w("OverviewRepository", "getPosts: User is anonymous")
-                return@makeRequest Response.success(null)
+                return@makeRequest Result.failure(Exception("User is anonymous"))
             }
             Log.d("OverviewRepository", "getPosts: ${params.username}")
             api.getOverview(

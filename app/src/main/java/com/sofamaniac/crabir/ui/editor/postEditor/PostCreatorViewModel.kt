@@ -47,8 +47,8 @@ abstract class CreatorViewModel(
     suspend fun getRules() {
         if (rules.siteRules.isNotEmpty()) return
         val res = api.getRules(community!!.displayNamePrefixed)
-        if (res.isSuccessful) {
-            rules = res.body()!!
+        if (res.isSuccess) {
+            rules = res.getOrNull()!!
         }
     }
 
@@ -68,8 +68,8 @@ abstract class CreatorViewModel(
     suspend fun getFlairs() {
         if (flairs.isNotEmpty() || community == null) return
         val res = api.getPostFlair(community!!.displayName)
-        if (res.isSuccessful) {
-            flairs = res.body()!!
+        if (res.isSuccess) {
+            flairs = res.getOrNull()!!
         }
     }
 }
@@ -127,8 +127,8 @@ class PostCreatorViewModel(
                 Log.d("PostCreatorViewModel", "submit: uploading $it")
                 val mimetype = getMimeType(it, context)
                 val result = api.uploadMedia(it.toString(), mimetype, account)
-                if (result.isSuccessful) {
-                    result.body()!!
+                if (result.isSuccess) {
+                    result.getOrNull()!!
                 } else {
                     throw Exception("Failed to upload media")
                 }
@@ -137,9 +137,9 @@ class PostCreatorViewModel(
                 val request = makeMediaUploadBody(context, media[index], args.args.fields)
                 val uploadUrl = "https:${args.args.action}"
                 val response = mediaUploader.pushMedia(uploadUrl, request)
-                if (response.isSuccessful) {
+                if (response.isSuccess) {
                     if (kind == "link") {
-                        response.body()?.location!!
+                        response.getOrNull()?.location!!
                     } else {
                         args.asset.assetId
                     }
@@ -188,8 +188,8 @@ class PostCreatorViewModel(
                 api.submitPost(submission.getOrThrow(), account)
             }
             loading = false
-            return if (res.isSuccessful) {
-                val response = res.body()
+            return if (res.isSuccess) {
+                val response = res.getOrNull()
                 Log.d("PostCreatorViewModel", "submit: $response")
                 if (response?.json?.errors?.isNotEmpty() == true) {
                     Result.failure(Exception(response.json.errors.toString()))
@@ -197,7 +197,7 @@ class PostCreatorViewModel(
                     Result.success(Unit)
                 }
             } else {
-                Result.failure(Exception("Failed to submit post: ${res.errorBody()}"))
+                Result.failure(Exception("Failed to submit post: ${res.exceptionOrNull()}"))
             }
         }
     }

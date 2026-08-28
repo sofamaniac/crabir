@@ -79,8 +79,8 @@ class CrosspostCreatorViewModel(
         } else {
             val res = api.submitPost(submission.getOrThrow(), account = account)
             loading = false
-            return if (res.isSuccessful) {
-                val response = res.body()
+            return if (res.isSuccess) {
+                val response = res.getOrNull()
                 Log.d("PostCreatorViewModel", "submit: $response")
                 if (response?.json?.errors?.isNotEmpty() == true) {
                     Result.failure(Exception(response.json.errors.toString()))
@@ -88,7 +88,7 @@ class CrosspostCreatorViewModel(
                     Result.success(Unit)
                 }
             } else {
-                Result.failure(Exception("Failed to submit post: ${res.errorBody()}"))
+                Result.failure(Exception("Failed to submit post: ${res.exceptionOrNull()}"))
             }
         }
     }

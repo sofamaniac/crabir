@@ -6,7 +6,6 @@ import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.domain.model.Fullname
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -25,7 +24,7 @@ interface SearchAPI {
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
         @Query("type") type: String,
-    ): Response<Listing<Thing>>
+    ): Result<Listing<Thing>>
 
     @GET("search.json")
     suspend fun search(
@@ -38,7 +37,7 @@ interface SearchAPI {
         @Query("limit") limit: Int = API_LIMIT,
         @Query("sr_detail") srDetail: Boolean = true,
         @Query("type") type: String,
-    ): Response<Listing<Thing>>
+    ): Result<Listing<Thing>>
 
     @GET("subreddits/search.json")
     suspend fun searchSubreddits(
@@ -50,7 +49,7 @@ interface SearchAPI {
         @Query("before") before: String? = null,
         @Query("sr_detail") srDetail: Boolean = true,
         @Query("show_users") showUsers: Boolean = false,
-    ): Response<Listing<Thing>>
+    ): Result<Listing<Thing>>
 }
 
 interface SearchSort : SortInterface

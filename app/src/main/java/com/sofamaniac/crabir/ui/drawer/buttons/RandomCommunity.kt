@@ -38,15 +38,11 @@ class RandditViewModel(private val api: RandditAPI) : ViewModel() {
         onError: (Throwable) -> Unit,
     ) {
         viewModelScope.launch {
-            try {
-                val response = api.getRandomCommunity(includeNsfw)
-                if (response.isSuccessful) {
-                    onSuccess(response.body()!!.url)
-                } else {
-                    onError(Exception(response.errorBody()?.string()))
-                }
-            } catch (e: Exception) {
-                onError(e)
+            val response = api.getRandomCommunity(includeNsfw)
+            if (response.isSuccess) {
+                onSuccess(response.getOrNull()!!.url)
+            } else {
+                onError(response.exceptionOrNull()!!)
             }
         }
     }

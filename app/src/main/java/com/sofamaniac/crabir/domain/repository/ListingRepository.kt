@@ -1,13 +1,11 @@
 package com.sofamaniac.crabir.domain.repository
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.domain.model.Fullname
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.Response
 
 interface DataInterface {
     val id: String
@@ -37,16 +35,13 @@ abstract class ListingRepository<Params, Data : DataInterface> {
 
 
     protected suspend fun <T : Thing> makeRequest(
-        request: suspend () -> Response<Thing.Listing<T>>,
+        request: suspend () -> Result<Thing.Listing<T>>,
     ): PagingSource.LoadResult<Fullname, Fullname> {
-        val response = try {
-            request()
-        } catch (e: Exception) {
-            Log.e("makeRequest", "Error making request", e)
-            return PagingSource.LoadResult.Error(e)
-        }
-        if (response.isSuccessful) {
-            val listing = response.body()
+        val response = request()
+        if (response.isFailure) {
+            return PagingSource.LoadResult.Error(response.exceptionOrNull()!!)
+        } else {
+            val listing = response.getOrNull()
             if (listing != null) {
                 val things = listing.data.children
                     .filter { thing -> !_seenThings.contains(thing.name) }
@@ -71,9 +66,6 @@ abstract class ListingRepository<Params, Data : DataInterface> {
                     prevKey = null
                 )
             }
-        } else {
-            Log.e("makeRequest", "Error making request : ${response.errorBody()}")
-            return PagingSource.LoadResult.Error(Exception("Error making request ${response.errorBody()}"))
         }
     }
 }

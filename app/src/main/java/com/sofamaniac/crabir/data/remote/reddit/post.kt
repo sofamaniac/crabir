@@ -17,7 +17,6 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FieldMap
@@ -31,23 +30,23 @@ import retrofit2.http.Url
 interface PostAPI {
 
     @POST("/api/hide")
-    suspend fun hide(@Query("id") postFullname: Fullname): Response<Unit>
+    suspend fun hide(@Query("id") postFullname: Fullname): Result<Unit>
 
     @POST("/api/unhide")
-    suspend fun unhide(@Query("id") postFullname: Fullname): Response<Unit>
+    suspend fun unhide(@Query("id") postFullname: Fullname): Result<Unit>
 
     @FormUrlEncoded
     @POST("api/submit")
     suspend fun submitPost(
         @FieldMap post: Map<String, String>,
         @Tag account: RedditAccount?,
-    ): Response<PostResponse>
+    ): Result<PostResponse>
 
     @POST("api/submit_gallery_post.json")
     suspend fun submitGalleryPost(
         @Body body: GallerySubmission,
         @Tag account: RedditAccount?,
-    ): Response<PostResponse>
+    ): Result<PostResponse>
 
     @FormUrlEncoded
     @POST("api/media/asset.json")
@@ -55,25 +54,25 @@ interface PostAPI {
         @Field("filepath") filepath: String,
         @Field("mimetype") mimetype: String,
         @Tag account: RedditAccount?,
-    ): Response<MediaUploadResponse>
+    ): Result<MediaUploadResponse>
 
     @FormUrlEncoded
     @POST("api/spoiler")
     /** Mark post as spoiler */
-    suspend fun spoiler(@Field("id") postFullname: Fullname): Response<Unit>
+    suspend fun spoiler(@Field("id") postFullname: Fullname): Result<Unit>
 
     @FormUrlEncoded
     @POST("api/unspoiler")
     /** Unmark post as spoiler */
-    suspend fun unspoiler(@Field("id") postFullname: Fullname): Response<Unit>
+    suspend fun unspoiler(@Field("id") postFullname: Fullname): Result<Unit>
 
     @FormUrlEncoded
     @POST("api/marknsfw")
-    suspend fun markNSFW(@Field("id") postFullname: Fullname): Response<Unit>
+    suspend fun markNSFW(@Field("id") postFullname: Fullname): Result<Unit>
 
     @FormUrlEncoded
     @POST("api/unmarknsfw")
-    suspend fun unmarkNSFW(@Field("id") postFullname: Fullname): Response<Unit>
+    suspend fun unmarkNSFW(@Field("id") postFullname: Fullname): Result<Unit>
 
     @FormUrlEncoded
     @POST("api/editusertext")
@@ -83,18 +82,18 @@ interface PostAPI {
         @Field("text") text: String,
         @Field("api_type") apiType: String = "json",
         @Field("video_poster_url") videoPosterUrl: String? = null,
-    ): Response<Unit>
+    ): Result<Unit>
 
     @FormUrlEncoded
     @POST("api/sendreplies")
     suspend fun setSendReplies(
         @Field("id") postFullname: Fullname,
         @Field("state") sendReplies: Boolean,
-    ): Response<Unit>
+    ): Result<Unit>
 
     @FormUrlEncoded
     @POST("api/del")
-    suspend fun delete(@Field("id") name: Fullname): Response<Unit>
+    suspend fun delete(@Field("id") name: Fullname): Result<Unit>
 
     @FormUrlEncoded
     @POST("{subreddit}/api/selectflair")
@@ -103,14 +102,14 @@ interface PostAPI {
         @Field("link") postFullname: Fullname,
         @Field("flair_template_id") flairId: String,
         @Field("text") text: String?,
-    ): Response<Unit>
+    ): Result<Unit>
 
     @FormUrlEncoded
     @POST("{subreddit}/api/selectflair")
     suspend fun getFlairs(
         @Path("subreddit", encoded = true) subreddit: String,
         @Field("link") postFullname: Fullname,
-    ): Response<List<FlairInfo>>
+    ): Result<List<FlairInfo>>
 
 
 }
@@ -128,7 +127,7 @@ data class PostResponseInner(
 
 interface MediaUploadInterface {
     @POST
-    suspend fun pushMedia(@Url url: String, @Body body: RequestBody): Response<MediaPushResponse>
+    suspend fun pushMedia(@Url url: String, @Body body: RequestBody): Result<MediaPushResponse>
 }
 
 

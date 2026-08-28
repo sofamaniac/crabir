@@ -14,7 +14,10 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
+
+# required for the retrofit result call adapter (see https://github.com/skydoves/retrofit-adapters/issues/24)
+-keep public class kotlin.Result { *; }
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.

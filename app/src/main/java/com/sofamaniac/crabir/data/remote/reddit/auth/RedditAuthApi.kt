@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 import net.openid.appauth.TokenResponse
 import okhttp3.Request
 import retrofit2.Invocation
-import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Header
@@ -20,12 +19,12 @@ interface RedditAuthApi {
         @Field("refresh_token") refreshToken: String,
         @Field("grant_type") grantType: String = "refresh_token",
         @Header("Authorization") basicAuth: String = authorizationHeader,
-    ): Response<TokenResponse>
+    ): Result<TokenResponse>
 
     @FormUrlEncoded
     @POST("https://www.reddit.com/api/v1/access_token")
     @NoAuth
-    suspend fun getAccessToken(@Field("grant_type") grantType: String = "client_credentials"): Response<AccessTokenResponse>
+    suspend fun getAccessToken(@Field("grant_type") grantType: String = "client_credentials"): Result<AccessTokenResponse>
 
     @FormUrlEncoded
     @POST("https://www.reddit.com/api/v1/access_token")
@@ -33,15 +32,15 @@ interface RedditAuthApi {
     suspend fun getAnonymousAccessToken(
         @Field("grant_type") grantType: String = "https://oauth.reddit.com/grants/installed_client",
         @Field("device_id") deviceId: String,
-        @Field("duration") duration: String = "permanent"
-    ): Response<AccessTokenResponse>
+        @Field("duration") duration: String = "permanent",
+    ): Result<AccessTokenResponse>
 
     @FormUrlEncoded
     @POST("https://www.reddit.com/api/v1/revoke_token")
     suspend fun logout(
         @Field("token") token: String,
         @Header("Authorization") basicAuth: String = authorizationHeader,
-    ): Response<Unit>
+    ): Result<Unit>
 }
 
 @Retention(AnnotationRetention.RUNTIME)
@@ -57,7 +56,7 @@ data class AccessTokenResponse(
     val device_id: String?,
     val expires_in: Long?,
     val scope: String,
-    val token_type: String
+    val token_type: String,
 )
 
 val authorizationHeader =
