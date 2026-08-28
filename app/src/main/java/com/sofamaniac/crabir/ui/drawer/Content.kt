@@ -63,6 +63,7 @@ import com.sofamaniac.crabir.ui.drawer.buttons.SettingsTile
 import com.sofamaniac.crabir.ui.drawer.buttons.SubredditTile
 import com.sofamaniac.crabir.ui.drawer.buttons.feeds
 import com.sofamaniac.crabir.ui.drawer.buttons.goToMenu
+import com.sofamaniac.crabir.ui.drawer.buttons.profileButtons
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -171,6 +172,8 @@ internal fun DrawerContent(
             feeds(settings.items) { route ->
                 navController?.navigate(route)
             }
+            item { HorizontalDivider() }
+            profileButtons(settings.items) { route -> navController?.navigate(route) }
             item { HorizontalDivider() }
             goToMenu(expandGoTo, onClick = { expandGoTo = !expandGoTo })
             if (settings.items.goToCommunity) {
