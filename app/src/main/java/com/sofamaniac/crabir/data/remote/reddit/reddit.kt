@@ -63,6 +63,9 @@ interface RedditAPIService :
     ): Result<Listing<Post>>
 
 
+    /** Get the list of flair for a given subreddit.
+     * @param subreddit The subreddit to get the flair for. Must be prefixed with 'r/'
+     */
     @GET("{subreddit}/api/link_flair_v2.json")
     suspend fun getPostFlair(
         @Path(

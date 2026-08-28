@@ -39,7 +39,7 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
 
     ThemedDialog(onDismissRequest) {
         ListItem(
-            modifier = Modifier.clickable { showFlairDialog = true },
+            onClick = { showFlairDialog = true },
             content = { Text(stringResource(R.string.change_flair)) },
             trailingContent = {
                 Icon(Icons.Default.Edit, contentDescription = null)

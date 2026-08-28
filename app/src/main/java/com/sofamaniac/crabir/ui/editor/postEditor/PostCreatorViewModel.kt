@@ -67,7 +67,7 @@ abstract class CreatorViewModel(
 
     suspend fun getFlairs() {
         if (flairs.isNotEmpty() || community == null) return
-        val res = api.getPostFlair(community!!.displayName)
+        val res = api.getPostFlair(community!!.displayNamePrefixed)
         if (res.isSuccess) {
             flairs = res.getOrNull()!!
         }

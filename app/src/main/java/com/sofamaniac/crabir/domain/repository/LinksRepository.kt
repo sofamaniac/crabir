@@ -81,7 +81,7 @@ class LinksRepositoryImpl(
         val post = get(name).first()
         if (post == null) return Result.failure(PostNotFoundException(name))
         val subreddit = post.subreddit.name
-        val res = api.selectFlair(subreddit, name, flairId, text ?: "")
+        val res = api.selectFlair("r/$subreddit", name, flairId, text ?: "")
         if (res.isSuccess) {
             val oldFlair = post.linkFlair
             update(name, post.copy(linkFlair = oldFlair.copy(text = text ?: oldFlair.text)))
@@ -93,7 +93,7 @@ class LinksRepositoryImpl(
         val post = get(name).first()
         if (post == null) return Result.failure(PostNotFoundException(name))
         val subreddit = post.subreddit.name
-        val res = api.getPostFlair(subreddit)
+        val res = api.getPostFlair("r/$subreddit")
         return res
     }
 
