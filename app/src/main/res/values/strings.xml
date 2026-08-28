@@ -358,4 +358,12 @@
     <string name="columns">Columns</string>
     <string name="managed_remembered_sorts">Managed remembered sorts</string>
     <string name="feeds_settings_tile_label">Feeds</string>
+    <string name="profile_tab_overview">Overview</string>
+    <string name="profile_tab_about">About</string>
+    <string name="profile_tab_submitted">Posts</string>
+    <string name="profile_tab_comments">Comments</string>
+    <string name="profile_tab_saved">Saved</string>
+    <string name="profile_tab_upvoted">Upvoted</string>
+    <string name="profile_tab_downvoted">Downvoted</string>
+    <string name="profile_tab_hidden">Hidden</string>
 </resources>

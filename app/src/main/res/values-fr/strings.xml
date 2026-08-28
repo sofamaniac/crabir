@@ -51,8 +51,8 @@
     <string name="open_comments">Ouvrir les commentaires</string>
     <string name="show_nsfw_setting">Afficher NSFW</string>
     <string name="neutral_vote">Vote Neutre</string>
-    <string name="upvote">Haut Voter</string>
-    <string name="downvote">Bas Voter</string>
+    <string name="upvote">Upvoter</string>
+    <string name="downvote">Downvoter</string>
     <string name="save">Sauvegarder</string>
     <string name="unsave">Retirer des sauvegardés</string>
     <string name="showNSFW">Afficher NSFW</string>
@@ -151,7 +151,7 @@
     <string name="theme_secondary_text">Texte secondaire</string>
     <string name="theme_content_text">Texte</string>
     <string name="theme_link">Lien</string>
-    <string name="theme_downvote">Bas vote</string>
+    <string name="theme_downvote">Downvote</string>
     <string name="reset_color">Réinitialiser la couleur</string>
     <string name="reset_theme">Réinitailiser à la valeur par défaut</string>
     <string name="saved_themes">Thèmes enregistrés</string>
@@ -258,7 +258,7 @@
     <string name="missing_title_error">Titre manquant</string>
     <string name="body_placeholder">Taper le contenu</string>
     <string name="body_label">Contenu</string>
-    <string name="caption_placeholder">Titre</string>
+    <string name="caption_placeholder">Légende</string>
     <string name="add_media">Ajouter un media</string>
     <string name="select_community">Sélectionner une communauté</string>
     <string name="community_placeholder">Communauté</string>
@@ -312,4 +312,12 @@
     <string name="columns">Colonnes</string>
     <string name="managed_remembered_sorts">Gérer les tris enregistrés</string>
     <string name="feeds_settings_tile_label">Flux</string>
+    <string name="profile_tab_overview">Vue d\'ensemble</string>
+    <string name="profile_tab_about">À propos</string>
+    <string name="profile_tab_submitted">Publications</string>
+    <string name="profile_tab_comments">Commentaires</string>
+    <string name="profile_tab_saved">Sauvegardées</string>
+    <string name="profile_tab_upvoted">Upvotées</string>
+    <string name="profile_tab_downvoted">Downvotées</string>
+    <string name="profile_tab_hidden">Masquées</string>
 </resources>
