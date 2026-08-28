@@ -37,7 +37,9 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalTheme
@@ -151,6 +153,16 @@ fun PostHeader(
             }
             if (post.locked) {
                 withSeparator { append("\uD83D\uDD12") }
+            }
+            if (post.archived) {
+                withSeparator { append("\uD83D\uDDC4\uFE0F") }
+            }
+            if (post.isDistinguished) {
+                withSeparator {
+                    withStyle(SpanStyle(color = theme.highlight, fontWeight = FontWeight.Bold)) {
+                        append("A")
+                    }
+                }
             }
             withSeparator { append(formatElapsedTimeLocalized(post.createdUtc)) }
             if (post.isCrosspost) appendInlineContent("crosspost", "crosspost")

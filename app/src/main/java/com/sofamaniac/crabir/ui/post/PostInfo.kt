@@ -62,7 +62,7 @@ fun PostInfo(
             val width = if (enableThumbnail) 0.8f else 1f
             val titleModifier = Modifier.fillMaxWidth(fraction = width)
             val titleColor = when {
-                post.isDistinguished -> theme.announcement
+                post.stickied -> theme.announcement
                 read -> theme.readPost
                 else -> theme.postTitle
             }

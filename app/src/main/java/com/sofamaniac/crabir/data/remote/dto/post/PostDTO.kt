@@ -308,7 +308,8 @@ private fun PostDTO.getGalleryData(): Gallery? {
     return crosspostParentList.firstOrNull()?.getGalleryData()
 }
 
-private fun PostDTO.isDistinguished() = pinned || stickied || distinguished == "moderator"
+private fun PostDTO.isDistinguished() = distinguished == "admin"
+private fun PostDTO.isStickied() = stickied || pinned
 
 object PostDataMapper : ObjectMappie<PostDTO, PostData>() {
 
@@ -337,6 +338,7 @@ object PostDataMapper : ObjectMappie<PostDTO, PostData>() {
 
         PostData::gallery fromValue from.getGalleryData()
         PostData::isDistinguished fromValue from.isDistinguished()
+        PostData::stickied fromValue from.isStickied()
     }
 }
 

@@ -38,6 +38,8 @@ data class PostData(
     val mediaMetadata: Map<String, MediaMetadata> = emptyMap(),
     val kind: Kind,
     val isDistinguished: Boolean = false,
+    val stickied: Boolean = false,
+    val archived: Boolean = false,
     val linkFlair: Flair,
     val media: MediaInfo,
     val gallery: Gallery?,
