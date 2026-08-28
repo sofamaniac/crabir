@@ -66,16 +66,18 @@ internal fun PostView(
         } else {
             val parent = post.crosspostParentList.first()
             val navController = LocalNavController.current!!
-            Box(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .border(BorderStroke(1.dp, Color.Gray), shape = ShapeDefaults.Medium)
-                    .clickable(onClick = {
-                        navController.navigate(PostRoute(parent.permalink, null))
-                    })
-                    .padding(8.dp)
-            ) {
-                CrossPostView(parent)
+            Column {
+                Box(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .border(BorderStroke(1.dp, Color.Gray), shape = ShapeDefaults.Medium)
+                        .clickable(onClick = {
+                            navController.navigate(PostRoute(parent.permalink, null))
+                        })
+                        .padding(8.dp)
+                ) {
+                    CrossPostView(parent)
+                }
                 if (post.selftext.richtext.document.isNotEmpty()) {
                     Richtext(
                         post.selftext.richtext,

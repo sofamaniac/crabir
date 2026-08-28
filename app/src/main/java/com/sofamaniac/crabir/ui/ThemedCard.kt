@@ -69,24 +69,3 @@ fun ThemedCard(
         )
     }
 }
-
-//@Composable
-//fun ThemedCard(
-//    modifier: Modifier = Modifier,
-//    shape: Shape = CardDefaults.shape,
-//    elevation: CardElevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-//    border: BorderStroke? = null,
-//    onClick: () -> Unit,
-//    content: @Composable ColumnScope.() -> Unit,
-//) {
-//    val theme = LocalTheme.current
-//    Card(
-//        modifier = modifier,
-//        shape = shape,
-//        elevation = elevation,
-//        border = border,
-//        colors = CardDefaults.cardColors().copy(containerColor = theme.cardBackground),
-//        onClick = onClick,
-//        content = content,
-//    )
-//}
