@@ -164,7 +164,8 @@ fun PostHeader(
                     }
                 }
             }
-            withSeparator { append(formatElapsedTimeLocalized(post.createdUtc)) }
+            val timeString = formatElapsedTimeLocalized(post.createdUtc)
+            withSeparator { append(timeString) }
             if (post.isCrosspost) appendInlineContent("crosspost", "crosspost")
         }
         Text(

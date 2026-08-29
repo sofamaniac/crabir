@@ -58,8 +58,8 @@
     <string name="reset_theme">Reset to default</string>
     <string name="saved_themes">Saved themes</string>
     <plurals name="total_themes">
-        <item quantity="one">%1$d theme</item>
-        <item quantity="other">%1$d themes</item>
+        <item quantity="one">%d theme</item>
+        <item quantity="other">%d themes</item>
     </plurals>
     <string name="light_mode_start_time">Light mode start time</string>
     <string name="light_mode_end_time">Light mode end time</string>
@@ -363,4 +363,15 @@
     <string name="profile_tab_upvoted">Upvoted</string>
     <string name="profile_tab_downvoted">Downvoted</string>
     <string name="profile_tab_hidden">Hidden</string>
+    <string name="thread_top_bar_title">Comments</string>
+    <string name="refresh">Refresh</string>
+    <string name="go_to_sub_info">Info</string>
+    <string name="change_post_view">Post view</string>
+    <string name="more_option_desc">Options</string>
+    <string name="elapsed_year">%dy</string>
+    <string name="elapsed_month">%dmo</string>
+    <string name="elapsed_day">%dd</string>
+    <string name="elapsed_hour">%dh</string>
+    <string name="elapsed_minute">%dm</string>
+    <string name="elapsed_second">%ds</string>
 </resources>

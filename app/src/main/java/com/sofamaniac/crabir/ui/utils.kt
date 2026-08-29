@@ -42,6 +42,7 @@ import java.time.Clock
 import java.time.Duration
 import java.util.Locale
 
+@Composable
 fun formatElapsedTimeLocalized(
     creationDate: kotlin.time.Instant,
     locale: Locale = Locale.getDefault(),
@@ -50,12 +51,12 @@ fun formatElapsedTimeLocalized(
     val duration = Duration.ofMillis(kotlin.math.abs(end - creationDate.toEpochMilliseconds()))
 
     return when {
-        duration.toDays() >= 365 -> String.format(locale, "%dy", duration.toDays() / 365)
-        duration.toDays() >= 30 -> String.format(locale, "%dmo", duration.toDays() / 30)
-        duration.toDays() > 0 -> String.format(locale, "%dd", duration.toDays())
-        duration.toHours() > 0 -> String.format(locale, "%dh", duration.toHours())
-        duration.toMinutes() > 0 -> String.format(locale, "%dm", duration.toMinutes())
-        else -> String.format(locale, "%ds", duration.seconds)
+        duration.toDays() >= 365 -> stringResource(R.string.elapsed_year, duration.toDays() / 365)
+        duration.toDays() >= 30 -> stringResource(R.string.elapsed_month, duration.toDays() / 30)
+        duration.toDays() > 0 -> stringResource(R.string.elapsed_day, duration.toDays())
+        duration.toHours() > 0 -> stringResource(R.string.elapsed_hour, duration.toHours())
+        duration.toMinutes() > 0 -> stringResource(R.string.elapsed_minute, duration.toMinutes())
+        else -> stringResource(R.string.elapsed_second, duration.seconds)
     }
 }
 

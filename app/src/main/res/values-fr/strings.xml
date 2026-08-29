@@ -153,11 +153,11 @@
     <string name="reset_theme">Réinitailiser à la valeur par défaut</string>
     <string name="saved_themes">Thèmes enregistrés</string>
     <plurals name="total_themes">
-        <item quantity="one">%1$d thème</item>
-        <item quantity="other">%1$d thèmes</item>
-        <item quantity="many">%1$d thèmes</item>
+        <item quantity="one">%d thème</item>
+        <item quantity="other">%d thèmes</item>
+        <item quantity="many">%d thèmes</item>
     </plurals>
-    <string name="theme_editor">Éditeur thème</string>
+    <string name="theme_editor">Éditeur de thème</string>
     <string name="light_mode_start_time">Début mode clair</string>
     <string name="light_mode_end_time">Fin mode clair</string>
     <string name="edit_colors">Modifier les couleurs</string>
@@ -317,4 +317,15 @@
     <string name="profile_tab_upvoted">Upvotées</string>
     <string name="profile_tab_downvoted">Downvotées</string>
     <string name="profile_tab_hidden">Masquées</string>
+    <string name="thread_top_bar_title">Commentaires</string>
+    <string name="refresh">Raffraîchir</string>
+    <string name="go_to_sub_info">Info</string>
+    <string name="change_post_view">Vue</string>
+    <string name="more_option_desc">Options</string>
+    <string name="elapsed_year">%da</string>
+    <string name="elapsed_month">%dmo</string>
+    <string name="elapsed_day">%dj</string>
+    <string name="elapsed_hour">%dh</string>
+    <string name="elapsed_minute">%dm</string>
+    <string name="elapsed_second">%ds</string>
 </resources>

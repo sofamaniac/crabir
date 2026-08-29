@@ -17,13 +17,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.TwoRowsTopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.domain.repository.profile.ProfileSort
 import com.sofamaniac.crabir.ui.SortMenu
@@ -38,7 +39,6 @@ fun TopBar(
     viewModel: ProfileFeedViewModel<*>?,
     openDrawer: () -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
     TwoRowsTopAppBar(
         scrollBehavior = scrollBehavior,
         modifier = modifier.background(Color.Transparent),
@@ -81,7 +81,7 @@ fun TopBar(
         }, navigationIcon = {
             IconButton(onClick = openDrawer) {
                 Icon(
-                    Icons.Default.Menu, "Open Drawer"
+                    Icons.Default.Menu, stringResource(R.string.open_drawer)
                 )
             }
         }, actions = {

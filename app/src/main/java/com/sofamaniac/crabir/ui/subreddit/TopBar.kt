@@ -134,13 +134,18 @@ fun TopBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = openDrawer) { Icon(Icons.Default.Menu, "Open Drawer") }
+            IconButton(onClick = openDrawer) {
+                Icon(
+                    Icons.Default.Menu,
+                    stringResource(R.string.open_drawer)
+                )
+            }
         },
         actions = {
             // Sort Dropdown
             var showMenu by remember { mutableStateOf(false) }
             IconButton(onClick = { showMenu = !showMenu }) {
-                Icon(Icons.Filled.MoreVert, "Options")
+                Icon(Icons.Filled.MoreVert, stringResource(R.string.more_option_desc))
             }
 
             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
@@ -148,7 +153,7 @@ fun TopBar(
                     onClick = {
                         showViewSelect = true
                     },
-                    text = { Text("Post view") }
+                    text = { Text(stringResource(R.string.change_post_view)) }
                 )
                 DropdownMenuItem(
                     onClick = {
@@ -161,10 +166,12 @@ fun TopBar(
                         onClick = {
                             navController?.navigate(SubredditInfoRoute(slug))
                         },
-                        text = { Text("Info") }
+                        text = { Text(stringResource(R.string.go_to_sub_info)) }
                     )
                 }
-                DropdownMenuItem(onClick = { refresh() }, text = { Text("Refresh") })
+                DropdownMenuItem(
+                    onClick = { refresh() },
+                    text = { Text(stringResource(R.string.refresh)) })
             }
             if (!disableInfo) {
                 IconButton(onClick = {

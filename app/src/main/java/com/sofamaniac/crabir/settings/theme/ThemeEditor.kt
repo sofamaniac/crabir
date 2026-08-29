@@ -133,7 +133,13 @@ fun ThemeEditor() {
                         trailingContent = {
                             val totalThemes =
                                 themeSettings.collections.dark.size + themeSettings.collections.light.size
-                            Text(pluralStringResource(R.plurals.total_themes, totalThemes))
+                            Text(
+                                pluralStringResource(
+                                    R.plurals.total_themes,
+                                    totalThemes,
+                                    totalThemes
+                                )
+                            )
                         })
                 }
                 items(ColorFields.entries.size, key = { ColorFields.entries[it] }) { field ->

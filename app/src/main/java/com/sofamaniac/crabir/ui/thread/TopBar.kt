@@ -20,7 +20,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
@@ -49,8 +51,14 @@ fun TopBar(
         },
         title = {
             Column {
-                Text("Comments", style = MaterialTheme.typography.titleMedium)
-                Text("${sort ?: Sort.Best}", style = MaterialTheme.typography.labelSmall)
+                Text(
+                    stringResource(R.string.thread_top_bar_title),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    stringResource((sort ?: Sort.Best).representation),
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         },
         actions = {
@@ -58,14 +66,16 @@ fun TopBar(
             SortMenu(viewModel)
             Box {
                 IconButton(onClick = { showMenu = true }) {
-                    Icon(Icons.Default.MoreVert, "More Options")
+                    Icon(Icons.Default.MoreVert, stringResource(R.string.more_option_desc))
                 }
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false }
                 ) {
-                    DropdownMenuItem(text = { Text("Refresh") }, onClick = { viewModel.refresh() })
-                    DropdownMenuItem(text = { Text("Settings") }, onClick = {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.refresh)) },
+                        onClick = { viewModel.refresh() })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.settings)) }, onClick = {
                         navController?.navigate(
                             CommentsSettingsRoute
                         )
