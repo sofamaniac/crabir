@@ -288,7 +288,7 @@ fun ColorPickerDialogue(
     onDismissRequest: () -> Unit,
     applyChanges: () -> Unit,
 ) {
-    var advancedMode by remember { mutableStateOf(true) }
+    var advancedMode by remember { mutableStateOf(false) }
     ThemedDialog(
         onDismissRequest = onDismissRequest,
         modifier = Modifier

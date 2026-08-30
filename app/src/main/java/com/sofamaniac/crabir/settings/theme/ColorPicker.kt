@@ -40,7 +40,7 @@ fun ColorPicker(color: Color, onValueChange: (Color) -> Unit, advancedMode: Bool
 
 fun generateColorShades(
     hue: Float,
-    saturation: Float = 0.5f,
+    saturation: Float = 1f,
     lightnessRange: ClosedFloatingPointRange<Float> = 0.25f..0.85f,
     columns: Int = 4,
     rows: Int = 3,
@@ -70,9 +70,9 @@ fun SimpleColorPicker(color: Color, onValueChange: (Color) -> Unit) {
                 Box(
                     modifier = Modifier
                         .padding(4.dp)
-                        .clip(CircleShape)
-                        .background(Color.hsl(bases[it], 0.5f, 0.7f))
                         .size(64.dp)
+                        .background(Color.hsl(bases[it], 1f, 0.6f))
+                        .clip(CircleShape)
                         .clickable {
                             presets = generateColorShades(bases[it])
                         }
@@ -84,9 +84,9 @@ fun SimpleColorPicker(color: Color, onValueChange: (Color) -> Unit) {
                 Box(
                     modifier = Modifier
                         .padding(4.dp)
-                        .clip(CircleShape)
-                        .background(presets[it])
                         .size(64.dp)
+                        .background(presets[it])
+                        .clip(CircleShape)
                         .clickable {
                             onValueChange(presets[it])
                             presets = listOf()
