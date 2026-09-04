@@ -1,6 +1,7 @@
 package com.sofamaniac.crabir.domain.repository
 
 import android.util.Log
+import com.sofamaniac.crabir.data.local.dao.MultiRepository
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
@@ -26,6 +27,7 @@ class SubscriptionsRepository(
     val api: RedditAPIService,
     val accountsRepository: AccountsRepository,
     val subredditCache: SubredditCache,
+    val multiCache: MultiRepository,
 ) {
     val activeAccount = accountsRepository.activeAccount.distinctUntilChanged { old, new ->
         old.id == new.id
@@ -114,7 +116,11 @@ class SubscriptionsRepository(
         }
         val response = result.getOrThrow()
         if (response.isSuccess) {
-            return response.getOrNull() ?: emptyList()
+            val multis = response.getOrNull() ?: emptyList()
+            for (multi in multis) {
+                multiCache.upsert(multi.data)
+            }
+            return multis
         } else {
             Log.e("SubscriptionsRepository", "Error loading multis: ${response.exceptionOrNull()}")
             return emptyList()

@@ -254,7 +254,7 @@ fun NavigationGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val startRoute = if (LocalApiSettings.current.redditClientId.isNullOrBlank()) {
+    val startRoute = if (!LocalApiSettings.current.isConfigured) {
         ApiSettingsRoute
     } else {
         HomeRoute

@@ -14,7 +14,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ApiSettings(
     val redditClientId: String? = null,
-)
+    val redditRedirectUri: String? = null,
+) {
+    val isConfigured: Boolean get() = !redditClientId.isNullOrBlank() && !redditRedirectUri.isNullOrBlank()
+}
 
 @Serializable
 object ApiSettingsRoute : Route

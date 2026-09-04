@@ -48,7 +48,6 @@ import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.PreviewLocalComposition
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.Thing
-import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.data.remote.dto.subreddit.dummySubredditData
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -67,20 +66,17 @@ import com.sofamaniac.crabir.ui.drawer.buttons.goToMenu
 import com.sofamaniac.crabir.ui.drawer.buttons.profileButtons
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 @Composable
 fun DrawerContent(
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
+    viewModel: DrawerViewModel = koinViewModel(),
 ) {
     val apiSettings = LocalApiSettings.current
     if (apiSettings.redditClientId.isNullOrBlank()) {
         return
     }
-    val viewModel = koinViewModel<DrawerViewModelImpl>(parameters = {
-        parametersOf(apiSettings.redditClientId)
-    })
     val navController = LocalNavController.current
     val sortedSubscriptions by viewModel.sortedSubscriptions.collectAsState()
     val multis by viewModel.multis.collectAsState()
@@ -110,7 +106,6 @@ fun DrawerContent(
         onMultiClick = { multi ->
             coroutineScope.launch {
                 drawerState.close()
-                viewModel.visitCommunity(multi.data)
                 navController?.navigate(
                     MultiRoute(
                         multi.data.displayNamePrefixed
@@ -121,11 +116,6 @@ fun DrawerContent(
         onSubredditClick = { subreddit ->
             coroutineScope.launch {
                 drawerState.close()
-                viewModel.visitCommunity(
-                    SubredditDTOMapper.map(
-                        subreddit.data
-                    )
-                )
                 navController?.navigate(
                     SubredditRoute(
                         subreddit.data.displayNamePrefixed

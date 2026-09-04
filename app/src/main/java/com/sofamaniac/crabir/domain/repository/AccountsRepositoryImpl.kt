@@ -213,10 +213,10 @@ class AccountsRepositoryImpl(
             if (duplicateIndex != -1 && duplicateIndex != accountId) {
                 Log.e("AccountsRepositoryImpl", "Account already exists: $account")
                 val accountsList = accounts.accounts.toMutableList()
-                accountsList[duplicateIndex] = account
-
+                accountsList.removeAt(duplicateIndex)
+                accountsList.add(duplicateIndex, account)
                 return@updateData accounts.copy(
-                    accounts = accountsList.filter { it.id != accountId }
+                    accounts = accountsList.filterIndexed { index, account -> index == duplicateIndex || account.id != accountId }
                 )
             }
             val accountIndex = accounts.accounts.indexOfFirst { it.id == accountId }

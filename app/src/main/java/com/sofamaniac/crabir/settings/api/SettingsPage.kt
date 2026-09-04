@@ -31,8 +31,8 @@ import kotlinx.coroutines.launch
 fun ApiSettingsPage() {
     val context = LocalContext.current
     val datastore = remember(context) { context.apiSettingsDataStore }
-    val apiSettings by datastore.data.collectAsState(
-        initial = ApiSettings(),
+    val apiSettingsOpt by datastore.data.collectAsState(
+        initial = null,
     )
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
@@ -41,6 +41,10 @@ fun ApiSettingsPage() {
             datastore.updateData(transform)
         }
     }
+    if (apiSettingsOpt == null) {
+        return
+    }
+    val apiSettings = apiSettingsOpt!!
 
     Scaffold(
         topBar = {
@@ -55,8 +59,10 @@ fun ApiSettingsPage() {
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
             item {
-                val fieldState =
+                val clientIdState =
                     rememberTextFieldState(initialText = apiSettings.redditClientId ?: "")
+                val redirectUriState =
+                    rememberTextFieldState(initialText = apiSettings.redditRedirectUri ?: "")
                 ThemedCard(modifier = Modifier.fillMaxWidth()) {
                     Column(
                         modifier = Modifier.padding(8.dp),
@@ -70,13 +76,42 @@ fun ApiSettingsPage() {
                             stringResource(R.string.client_id_support),
                             style = MaterialTheme.typography.bodyMedium
                         )
-                        TextField(state = fieldState)
+                        TextField(state = clientIdState)
                         val enabled =
-                            fieldState.text != apiSettings.redditClientId && fieldState.text.isNotBlank()
+                            clientIdState.text != apiSettings.redditClientId && clientIdState.text.isNotBlank()
                         TextButton(
                             enabled = enabled,
                             onClick = {
-                                update { it.copy(redditClientId = fieldState.text.toString()) }
+                                update {
+                                    it.copy(
+                                        redditClientId = clientIdState.text.toString().trim()
+                                    )
+                                }
+                            }) {
+                            Text(stringResource(R.string.save))
+                        }
+                    }
+                }
+                ThemedCard(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier.padding(8.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(
+                            "Redirect URI",
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                        TextField(state = redirectUriState)
+                        val enabled =
+                            redirectUriState.text != apiSettings.redditRedirectUri && redirectUriState.text.isNotBlank()
+                        TextButton(
+                            enabled = enabled,
+                            onClick = {
+                                update {
+                                    it.copy(
+                                        redditRedirectUri = redirectUriState.text.toString().trim()
+                                    )
+                                }
                             }) {
                             Text(stringResource(R.string.save))
                         }

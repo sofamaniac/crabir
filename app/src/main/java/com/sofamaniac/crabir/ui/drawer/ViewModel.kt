@@ -13,13 +13,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.AccountManager
-import com.sofamaniac.crabir.data.local.dao.MultiRepository
-import com.sofamaniac.crabir.data.local.dao.SubredditRepository
-import com.sofamaniac.crabir.data.remote.dto.MultiData
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.SubscriptionsRepository
 import kotlinx.coroutines.Dispatchers
@@ -34,8 +30,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.openid.appauth.AuthorizationService
-import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 sealed class LoginState {
@@ -59,34 +53,19 @@ abstract class DrawerViewModel : ViewModel() {
     abstract fun toggleSelectAccount()
     abstract fun logout()
     abstract fun createAuthIntent(): Intent
-    abstract fun visitCommunity(data: SubredditData)
-    abstract fun visitCommunity(data: MultiData)
     abstract fun handleAuthResult(intent: Intent?)
 }
 
 @KoinViewModel(binds = [DrawerViewModel::class])
 class DrawerViewModelImpl(
-    private val authService: AuthorizationService,
     private val accountsRepository: AccountsRepository,
-    private val subsRepository: SubscriptionsRepository,
+    subsRepository: SubscriptionsRepository,
     private val redditApi: RedditAPIService,
-    private val subredditDao: SubredditRepository,
-    private val multiDao: MultiRepository,
     private val accountManager: AccountManager,
-    @InjectedParam private val clientId: String,
 ) : DrawerViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     override val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
     private var initialized = false
-
-    private val flowManager =
-        AuthFlowManager(
-            authService,
-            accountsRepository,
-            redditApi,
-            updateState = { newVal -> _loginState.update { newVal } },
-            clientId = clientId,
-        )
 
     override val accountsList = accountsRepository.accounts
     override val activeAccount = accountsRepository.activeAccount
@@ -176,11 +155,14 @@ class DrawerViewModelImpl(
     }
 
     override fun createAuthIntent(): Intent {
-        return flowManager.createAuthIntent()
+        return accountManager.createAuthIntent()
     }
 
     override fun handleAuthResult(intent: Intent?) {
-        flowManager.handleAuthResult(intent, viewModelScope)
+        accountManager.handleAuthResult(
+            intent,
+            viewModelScope,
+            updateState = { target -> _loginState.update { target } })
         if (_loginState.value !is LoginState.Error) {
             viewModelScope.launch {
                 fetchUserInfo()
@@ -206,18 +188,6 @@ class DrawerViewModelImpl(
             Log.e("LoginViewModel", "Failed to get user info: $err")
             //accountsRepository.deleteAccount(accounts.size)
             _loginState.update { LoginState.Error(err) }
-        }
-    }
-
-    override fun visitCommunity(data: SubredditData) {
-        viewModelScope.launch(Dispatchers.IO) {
-            subredditDao.upsert(data)
-        }
-    }
-
-    override fun visitCommunity(data: MultiData) {
-        viewModelScope.launch(Dispatchers.IO) {
-            multiDao.upsert(data)
         }
     }
 }
