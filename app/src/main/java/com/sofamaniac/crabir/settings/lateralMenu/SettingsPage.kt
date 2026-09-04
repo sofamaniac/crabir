@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Drafts
 import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.filled.GroupWork
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inbox
@@ -300,7 +299,7 @@ private fun LazyListScope.itemsToShow(
             headlineContent = { Text(stringResource(R.string.go_to_community_setting)) },
             leadingContent = {
                 Icon(
-                    Icons.Default.GroupWork,
+                    painter = painterResource(R.drawable.ic_community),
                     contentDescription = null
                 )
             },

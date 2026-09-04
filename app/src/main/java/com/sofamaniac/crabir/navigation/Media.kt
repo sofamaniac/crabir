@@ -1,6 +1,11 @@
 package com.sofamaniac.crabir.navigation
 
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -10,6 +15,8 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.ui.media.SimpleFullscreenImage
+import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
+import com.sofamaniac.crabir.ui.media.image.TransformableImage
 import com.sofamaniac.crabir.ui.media.videoPlayer.FullscreenVideo
 import com.sofamaniac.crabir.ui.post.FullscreenGallery
 import com.sofamaniac.crabir.ui.post.FullscreenImageView
@@ -116,5 +123,40 @@ fun NavGraphBuilder.imagesGraph(navController: NavController) {
             route.post,
             initialPage = route.page,
             dismiss = { navController.popBackStack() })
+    }
+    composable(
+        route = "videoPreview?url={url}",
+        deepLinks = listOf(
+            navDeepLink {
+                uriPattern = "v.redd.it/{url}"
+            }
+        ),
+        arguments = listOf(
+            navArgument("url") {
+                type = NavType.StringType
+            },
+        )
+    ) { navBackStackEntry ->
+        val url = navBackStackEntry.arguments?.getString("url")
+        if (url != null) {
+            VerticalSwipeToDismiss(
+                onDismiss = {
+                    // Why do we need to pop twice?
+                    navController.popBackStack()
+                    navController.popBackStack()
+                },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Black)
+            ) {
+                TransformableImage(
+                    source = "https://v.redd.it/$url",
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize(),
+                    blur = false
+                )
+            }
+        }
     }
 }

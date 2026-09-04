@@ -16,7 +16,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,8 +27,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.core.net.toUri
@@ -41,11 +38,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import coil3.ImageLoader
@@ -72,8 +67,6 @@ import com.sofamaniac.crabir.settings.ConfigureSettings
 import com.sofamaniac.crabir.settings.api.ApiSettingsRoute
 import com.sofamaniac.crabir.settings.theme.ConfigureCrabirTheme
 import com.sofamaniac.crabir.ui.inbox.InboxView
-import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
-import com.sofamaniac.crabir.ui.media.image.TransformableImage
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 import com.sofamaniac.crabir.ui.rememberCurrentAccount
 import com.sofamaniac.crabir.ui.search.SearchTab
@@ -259,10 +252,6 @@ fun NavigationGraph(
     } else {
         HomeRoute
     }
-    Log.d(
-        "NavigationGraph",
-        "startRoute: $startRoute, clientId: ${LocalApiSettings.current.redditClientId}"
-    )
     NavHost(
         navController = navController,
         startDestination = startRoute,
@@ -288,7 +277,9 @@ fun NavigationGraph(
         }
         composable<SearchRoute>(
             deepLinks = listOf(
-                navDeepLink { uriPattern = "com.sofamaniac.crabir://search" }
+                navDeepLink {
+                    uriPattern = SearchRoute.URL
+                }
             )
         ) { navBackStackEntry ->
             val search = navBackStackEntry.toRoute<SearchRoute>()
@@ -300,41 +291,6 @@ fun NavigationGraph(
         }
         composable<HistoryRoute> {
             HistoryViewer()
-        }
-        composable(
-            route = "videoPreview?url={url}",
-            deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = "v.redd.it/{url}"
-                }
-            ),
-            arguments = listOf(
-                navArgument("url") {
-                    type = NavType.StringType
-                },
-            )
-        ) { navBackStackEntry ->
-            val url = navBackStackEntry.arguments?.getString("url")
-            if (url != null) {
-                VerticalSwipeToDismiss(
-                    onDismiss = {
-                        // Why do we need to pop twice?
-                        navController.popBackStack()
-                        navController.popBackStack()
-                    },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(color = Color.Black)
-                ) {
-                    TransformableImage(
-                        source = "https://v.redd.it/$url",
-                        contentDescription = null,
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.fillMaxSize(),
-                        blur = false
-                    )
-                }
-            }
         }
     }
 }

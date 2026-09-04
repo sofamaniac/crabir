@@ -15,7 +15,11 @@ object SubscriptionsRoute : Route
 
 @Serializable
 class SearchRoute(val subreddit: String = "", val flair: String = "", val initialTab: Int? = null) :
-    Route
+    Route {
+    companion object {
+        const val URL = "crabir://search"
+    }
+}
 
 @Serializable
 object InboxRoute : Route

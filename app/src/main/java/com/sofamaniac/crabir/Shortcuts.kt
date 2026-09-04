@@ -7,6 +7,7 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
+import com.sofamaniac.crabir.navigation.SavedRoute
 
 @Composable
 fun SetShortcuts() {
@@ -16,7 +17,7 @@ fun SetShortcuts() {
         ShortcutManagerCompat.removeAllDynamicShortcuts(context)
     } else {
 
-        val intent = Intent(Intent.ACTION_VIEW, "com.sofamaniac.crabir://saved".toUri())
+        val intent = Intent(Intent.ACTION_VIEW, SavedRoute.URL.toUri())
         intent.setPackage(context.packageName)
 
         val shortcut = ShortcutInfoCompat.Builder(context, "saved")

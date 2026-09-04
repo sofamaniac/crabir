@@ -51,7 +51,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="com.sofamaniac.crabir" />
+                <data android:scheme="crabir" />
             </intent-filter>
 
             <meta-data
@@ -69,8 +69,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                        android:host="callback"
-                        android:scheme="com.sofamaniac.crabir" />
+                        android:host="oauth_redir"
+                        android:scheme="crabir" />
             </intent-filter>
 
             <intent-filter>

@@ -6,8 +6,6 @@
  *
  */
 
-import java.util.Properties
-
 
 plugins {
     alias(libs.plugins.android.application)
@@ -38,20 +36,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        manifestPlaceholders["appAuthRedirectScheme"] = "com.sofamaniac.crabir"
-
-        val keystoreFile = project.rootProject.file("apikeys.properties")
-        val properties = Properties()
-        properties.load(keystoreFile.inputStream())
-
-        val apiKey = properties.getProperty("REDDIT_CLIENT_ID")!!
-
-        buildConfigField(
-            type = "String",
-            name = "REDDIT_CLIENT_ID",
-            value = apiKey
-        )
-
+        manifestPlaceholders["appAuthRedirectScheme"] = "crabir"
     }
 
     buildTypes {

@@ -16,7 +16,9 @@ import kotlinx.serialization.Serializable
 class ProfileRoute(val username: String, val tab: ProfileTabs = ProfileTabs.Overview) : Route
 
 @Serializable
-object SavedRoute : Route
+object SavedRoute : Route {
+    const val URL = "crabir://saved"
+}
 
 val baseUrls = listOf("user/{author}", "u/{author}")
 
@@ -53,7 +55,7 @@ fun NavGraphBuilder.profileGraph(navController: NavController) {
     }
     composable<SavedRoute>(
         deepLinks = listOf(
-            navDeepLink { uriPattern = "com.sofamaniac.crabir://saved" }
+            navDeepLink { uriPattern = SavedRoute.URL }
         )) {
         val currentAccount = LocalRedditAccount.current
         if (currentAccount.isAnonymous()) {

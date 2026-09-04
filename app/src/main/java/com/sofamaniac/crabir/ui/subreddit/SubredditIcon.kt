@@ -10,27 +10,23 @@ package com.sofamaniac.crabir.ui.subreddit
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.painterResource
 import androidx.core.graphics.toColorInt
 import coil3.compose.AsyncImage
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditIcon
 
 @Composable
 fun SubredditIcon(
     subreddit: String,
     icon: SubredditIcon?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     when (icon) {
         is SubredditIcon.Icon ->
@@ -47,40 +43,20 @@ fun SubredditIcon(
                 Log.e("SubredditIcon", "SubredditIcon: $e")
                 Color.Black
             }
-            val textColor = if (color.luminance() > 0.5) Color.Black else Color.White
-            Box(
+            val tintColor = if (color.luminance() > 0.5) Color.Black else Color.White
+            Icon(
+                painter = painterResource(id = R.drawable.ic_community),
+                contentDescription = null,
+                tint = tintColor,
                 modifier = modifier
-                    .background(
-                        color,
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "r",
-                    textAlign = TextAlign.Center,
-                    color = textColor,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
+                    .background(color, shape = CircleShape)
+            )
         }
 
         null ->
-            Box(
-                modifier = modifier
-                    .background(
-                        Color.Black,
-                        shape = CircleShape
-                    )
-                    .border(width = 1.dp, color = Color.White, shape = CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "r",
-                    textAlign = TextAlign.Center,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            Icon(
+                painter = painterResource(id = R.drawable.ic_community),
+                contentDescription = null,
+            )
     }
 }
