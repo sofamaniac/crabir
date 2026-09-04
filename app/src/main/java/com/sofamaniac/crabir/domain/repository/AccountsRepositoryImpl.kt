@@ -22,6 +22,7 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -139,23 +140,33 @@ class AccountsRepositoryImpl(
     context: Context,
 ) : AccountsRepository {
     private val dataStore: DataStore<Accounts> = context.accountsDataStore
-    private val accountsData: Flow<Accounts> = dataStore.data
+    private val accountsData: Flow<Accounts> = dataStore.data.distinctUntilChanged()
 
-    override val accounts: Flow<List<RedditAccount>> = accountsData.map {
-        Log.d("AccountsRepositoryImpl", "accounts: ${it.accounts}")
-        it.accounts
-    }
+    override val accounts: Flow<List<RedditAccount>> =
+        accountsData.distinctUntilChanged { old, new ->
+            if (old.accounts.size != new.accounts.size) return@distinctUntilChanged false
+            var acc = true
+            for (i in old.accounts.indices) {
+                acc = acc && old.accounts[i].equalsShallow(new.accounts[i])
+            }
+            acc
+        }.map {
+            it.accounts
+        }.distinctUntilChanged()
 
-    override val activeAccountId: Flow<Int> = accountsData.map { accounts ->
-        Log.d("AccountsRepositoryImpl", "activeId: ${accounts.activeId}")
-        accounts.activeId
-    }
+    override val activeAccountId: Flow<Int> =
+        accountsData.distinctUntilChanged { old, new -> old.activeId == new.activeId }
+            .map { accounts ->
+                accounts.activeId
+            }.distinctUntilChanged()
 
 
     override val activeAccount: Flow<RedditAccount> =
         accounts.combine(activeAccountId) { accounts, activeId ->
             accounts.firstOrNull { account -> account.id == activeId }
                 ?: RedditAccount.anonymous()
+        }.distinctUntilChanged { old, new ->
+            old.equalsShallow(new)
         }
 
     override suspend fun addAccount(account: RedditAccount) {

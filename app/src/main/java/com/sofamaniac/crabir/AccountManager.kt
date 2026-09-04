@@ -48,7 +48,7 @@ class AccountManager(
                     .build()
             val tokenRequest = TokenRequest.Builder(
                 serviceConfig.authorizationServiceConfiguration(),
-                BuildConfig.REDDIT_CLIENT_ID
+                clientId,
             ).setGrantType(
                 TokenRequest.GRANT_TYPE_CLIENT_CREDENTIALS
             ).build()

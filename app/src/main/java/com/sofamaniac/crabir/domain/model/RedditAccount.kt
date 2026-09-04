@@ -56,6 +56,10 @@ data class RedditAccount(
     fun isUninitialized(): Boolean {
         return id == -2
     }
+
+    fun equalsShallow(other: RedditAccount): Boolean {
+        return id == other.id && info == other.info && (auth.accessToken == other.auth.accessToken && auth.refreshToken == other.auth.refreshToken)
+    }
 }
 
 object AccountSerializer : Serializer<RedditAccount> {
