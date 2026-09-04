@@ -8,6 +8,8 @@ import com.sofamaniac.crabir.settings.GeneralSettingsPage
 import com.sofamaniac.crabir.settings.GeneralSettingsRoute
 import com.sofamaniac.crabir.settings.LicensePage
 import com.sofamaniac.crabir.settings.SettingsPage
+import com.sofamaniac.crabir.settings.api.ApiSettingsPage
+import com.sofamaniac.crabir.settings.api.ApiSettingsRoute
 import com.sofamaniac.crabir.settings.comments.CommentsSettingsPage
 import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
 import com.sofamaniac.crabir.settings.data.DataSettingsPage
@@ -71,5 +73,8 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
     }
     composable<SortManagerRoute> {
         SortManagerPage()
+    }
+    composable<ApiSettingsRoute> {
+        ApiSettingsPage()
     }
 }

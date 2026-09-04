@@ -2,6 +2,7 @@ package com.sofamaniac.crabir.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import com.sofamaniac.crabir.LocalApiSettings
 import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.LocalFeedSettings
@@ -9,6 +10,7 @@ import com.sofamaniac.crabir.LocalFiltersSettings
 import com.sofamaniac.crabir.LocalLateralMenuSettings
 import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalViewSettings
+import com.sofamaniac.crabir.settings.api.rememberApiSettings
 import com.sofamaniac.crabir.settings.comments.rememberCommentsSettings
 import com.sofamaniac.crabir.settings.data.rememberDataSettings
 import com.sofamaniac.crabir.settings.feedSettings.rememberFeedSettings
@@ -26,6 +28,7 @@ fun ConfigureSettings(content: @Composable () -> Unit) {
     val commentsSettings = rememberCommentsSettings() ?: return
     val lateralMenuSettings = rememberLateralMenuSettings() ?: return
     val feedSettings = rememberFeedSettings() ?: return
+    val apiSettings = rememberApiSettings() ?: return
 
     CompositionLocalProvider(
         LocalPostSettings provides postSettings,
@@ -35,6 +38,7 @@ fun ConfigureSettings(content: @Composable () -> Unit) {
         LocalCommentsSettings provides commentsSettings,
         LocalLateralMenuSettings provides lateralMenuSettings,
         LocalFeedSettings provides feedSettings,
+        LocalApiSettings provides apiSettings
     ) {
         content()
     }

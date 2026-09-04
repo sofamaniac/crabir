@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Api
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.DevicesFold
@@ -45,6 +46,7 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.navigation.ThemeRoute
 import com.sofamaniac.crabir.navigation.ViewsSettingRoute
+import com.sofamaniac.crabir.settings.api.ApiSettingsRoute
 import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
 import com.sofamaniac.crabir.settings.data.DataSettingsRoute
 import com.sofamaniac.crabir.settings.feedSettings.FeedSettingsRoute
@@ -116,6 +118,13 @@ fun SettingsPage() {
                 leadingContent = { Icon(Icons.Default.Info, contentDescription = null) },
                 modifier = Modifier.clickable {
                     navController?.navigate(LicensesRoute)
+                }
+            )
+            ListItem(
+                content = { Text(stringResource(R.string.api_settings_tile)) },
+                leadingContent = { Icon(Icons.Default.Api, contentDescription = null) },
+                modifier = Modifier.clickable {
+                    navController?.navigate(ApiSettingsRoute)
                 }
             )
             ListItem(

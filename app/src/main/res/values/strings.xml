@@ -374,4 +374,8 @@
     <string name="elapsed_hour">%dh</string>
     <string name="elapsed_minute">%dm</string>
     <string name="elapsed_second">%ds</string>
+    <string name="api_settings_tile">API settings</string>
+    <string name="client_id_support">To work this app requires a client ID.</string>
+    <string name="client_id">Client ID</string>
+    <string name="api_settings_title">API settings</string>
 </resources>

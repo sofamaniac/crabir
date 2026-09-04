@@ -1,10 +1,13 @@
 package com.sofamaniac.crabir
 
+import android.content.Context
 import android.util.Log
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.auth.AuthConfig
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
+import com.sofamaniac.crabir.settings.api.apiSettingsDataStore
+import kotlinx.coroutines.flow.first
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.TokenRequest
@@ -14,23 +17,29 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @Single
-class AccountManager(val accountsRepository: AccountsRepository, val redditApi: RedditAPIService) {
+class AccountManager(
+    val accountsRepository: AccountsRepository,
+    val redditApi: RedditAPIService,
+    private val context: Context,
+) {
     private var initialized = false
     suspend fun initialize(onError: (Throwable) -> Unit) {
         if (initialized) return
-        setupAnonymous(onError)
+        val apiSettings = context.apiSettingsDataStore.data.first()
+        if (apiSettings.redditClientId == null) return
+        setupAnonymous(apiSettings.redditClientId, onError)
         initialized = true
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    private suspend fun setupAnonymous(onError: (Throwable) -> Unit) {
+    private suspend fun setupAnonymous(clientId: String, onError: (Throwable) -> Unit) {
         Log.d("AccountManager", "Setting up anonymous")
         val response = redditApi.getAnonymousAccessToken(
             deviceId = Uuid.random().toHexDashString()
         )
         if (response.isSuccess) {
             Log.d("AccountManager", "Obtained access token for anonymous")
-            val serviceConfig = AuthConfig()
+            val serviceConfig = AuthConfig(clientId)
             val accessToken = response.getOrNull()!!
             val authResponse =
                 AuthorizationResponse.Builder(serviceConfig.createAuthorizationRequest())

@@ -1,7 +1,10 @@
 package com.sofamaniac.crabir.data.remote.reddit.auth
 
+import android.content.Context
 import android.util.Base64
-import com.sofamaniac.crabir.BuildConfig
+import com.sofamaniac.crabir.settings.api.apiSettingsDataStore
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import net.openid.appauth.TokenResponse
 import okhttp3.Request
@@ -18,7 +21,7 @@ interface RedditAuthApi {
     suspend fun refreshToken(
         @Field("refresh_token") refreshToken: String,
         @Field("grant_type") grantType: String = "refresh_token",
-        @Header("Authorization") basicAuth: String = authorizationHeader,
+        @Header("Authorization") basicAuth: String,
     ): Result<TokenResponse>
 
     @FormUrlEncoded
@@ -37,12 +40,13 @@ interface RedditAuthApi {
 
     @FormUrlEncoded
     @POST("https://www.reddit.com/api/v1/revoke_token")
+    @NoAuth
     suspend fun logout(
         @Field("token") token: String,
-        @Header("Authorization") basicAuth: String = authorizationHeader,
     ): Result<Unit>
 }
 
+/** Use on endpoint that should be authenticated using the basic authorization header */
 @Retention(AnnotationRetention.RUNTIME)
 annotation class NoAuth
 
@@ -59,8 +63,12 @@ data class AccessTokenResponse(
     val token_type: String,
 )
 
-val authorizationHeader =
-    "Basic " + Base64.encodeToString(
-        "${BuildConfig.REDDIT_CLIENT_ID}:".toByteArray(),
-        Base64.NO_WRAP
-    )
+fun getAuthorizationHeader(context: Context): String {
+    return runBlocking {
+        val clientId = context.apiSettingsDataStore.data.first()
+        "Basic " + Base64.encodeToString(
+            "${clientId}:".toByteArray(),
+            Base64.NO_WRAP
+        )
+    }
+}

@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationService
+import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 sealed class LoginState {
@@ -72,6 +73,7 @@ class DrawerViewModelImpl(
     private val subredditDao: SubredditRepository,
     private val multiDao: MultiRepository,
     private val accountManager: AccountManager,
+    @InjectedParam private val clientId: String,
 ) : DrawerViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     override val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
@@ -82,7 +84,8 @@ class DrawerViewModelImpl(
             authService,
             accountsRepository,
             redditApi,
-            updateState = { newVal -> _loginState.update { newVal } }
+            updateState = { newVal -> _loginState.update { newVal } },
+            clientId = clientId,
         )
 
     override val accountsList = accountsRepository.accounts

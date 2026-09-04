@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.settings.api.ApiSettings
 import com.sofamaniac.crabir.settings.comments.CommentsSettingsDefault
 import com.sofamaniac.crabir.settings.data.DataSettingsDefault
 import com.sofamaniac.crabir.settings.feedSettings.FeedSettings
@@ -28,6 +29,7 @@ val LocalCommentsSettings = compositionLocalOf { CommentsSettingsDefault.default
 val LocalLateralMenuSettings = compositionLocalOf { LateralMenuSettingsDefault.default }
 
 val LocalFeedSettings = compositionLocalOf { FeedSettings() }
+val LocalApiSettings = compositionLocalOf { ApiSettings() }
 
 /**Setup local providers for previews*/
 @Composable

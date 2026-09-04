@@ -8,6 +8,7 @@
 
 package com.sofamaniac.crabir.data.remote.reddit.auth
 
+import android.app.Application
 import android.util.Log
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
@@ -29,6 +30,7 @@ class RedditAuthenticator(
     private val accountsRepository: AccountsRepository,
     private val authService: AuthorizationService,
     private val clientAuth: ClientAuthentication,
+    private val context: Application,
 ) : Interceptor {
 
     private val activeAccount: Flow<RedditAccount> = accountsRepository.activeAccount
@@ -41,6 +43,7 @@ class RedditAuthenticator(
         if (request.isUnauthenticated()) {
             // Disable auth on non oauth endpoints
             Log.w("RedditAuthenticator", "Non oauth endpoint (${request.url})")
+            val authorizationHeader = getAuthorizationHeader(context)
             val request =
                 chain.request().newBuilder().header("Authorization", authorizationHeader).build()
             return chain.proceed(request)

@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.di
 
+import android.app.Application
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.skydoves.retrofit.adapters.result.ResultCallAdapterFactory
 import com.sofamaniac.crabir.BuildConfig
@@ -49,9 +50,10 @@ class NetworkModule {
         accountsRepository: AccountsRepository,
         authService: AuthorizationService,
         clientAuth: ClientAuthentication,
+        context: Application,
     ): RedditAuthenticator {
         return RedditAuthenticator(
-            accountsRepository, authService, clientAuth
+            accountsRepository, authService, clientAuth, context
         )
     }
 

@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.LocalApiSettings
 import com.sofamaniac.crabir.LocalLateralMenuSettings
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.PreviewLocalComposition
@@ -66,13 +67,20 @@ import com.sofamaniac.crabir.ui.drawer.buttons.goToMenu
 import com.sofamaniac.crabir.ui.drawer.buttons.profileButtons
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun DrawerContent(
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
-    viewModel: DrawerViewModel = koinViewModel(),
 ) {
+    val apiSettings = LocalApiSettings.current
+    if (apiSettings.redditClientId.isNullOrBlank()) {
+        return
+    }
+    val viewModel = koinViewModel<DrawerViewModelImpl>(parameters = {
+        parametersOf(apiSettings.redditClientId)
+    })
     val navController = LocalNavController.current
     val sortedSubscriptions by viewModel.sortedSubscriptions.collectAsState()
     val multis by viewModel.multis.collectAsState()

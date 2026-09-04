@@ -21,8 +21,9 @@ class AuthFlowManager(
     private val accountsRepository: AccountsRepository,
     private val redditApi: RedditAPIService,
     private val updateState: (LoginState) -> Unit,
+    private val clientId: String,
 ) {
-    val serviceConfig = AuthConfig()
+    val serviceConfig = AuthConfig(clientId)
     fun createAuthIntent(): Intent {
         val authRequest = serviceConfig.createAuthorizationRequest()
         val intent = authService.getAuthorizationRequestIntent(authRequest)

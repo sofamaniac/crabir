@@ -6,18 +6,16 @@ package com.sofamaniac.crabir.data.remote.reddit.auth
 
 import android.util.Base64
 import androidx.core.net.toUri
-import com.sofamaniac.crabir.BuildConfig
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ClientAuthentication
 import net.openid.appauth.ResponseTypeValues
 import kotlin.enums.enumEntries
 
-class AuthConfig {
+class AuthConfig(private val clientId: String) {
     val authorizationEndpoint = "https://sh.reddit.com/api/v1/authorize.compact"
     private val tokenEndpoint = "https://www.reddit.com/api/v1/access_token"
     private val redirectUri = "com.sofamaniac.crabir://callback"
-    private val clientId = BuildConfig.REDDIT_CLIENT_ID
 
     /** Add all available scopes */
     private val scopes = enumEntries<Scopes>().map { it.name.lowercase() }

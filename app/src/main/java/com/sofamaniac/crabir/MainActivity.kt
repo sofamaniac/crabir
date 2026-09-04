@@ -69,6 +69,7 @@ import com.sofamaniac.crabir.navigation.profileGraph
 import com.sofamaniac.crabir.navigation.settingsGraph
 import com.sofamaniac.crabir.navigation.subredditGraph
 import com.sofamaniac.crabir.settings.ConfigureSettings
+import com.sofamaniac.crabir.settings.api.ApiSettingsRoute
 import com.sofamaniac.crabir.settings.theme.ConfigureCrabirTheme
 import com.sofamaniac.crabir.ui.inbox.InboxView
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
@@ -228,13 +229,14 @@ fun MainScreen(
                 LocalNavController provides navController,
                 LocalRedditAccount provides currentAccount,
             ) {
+                val clientId = LocalApiSettings.current.redditClientId
                 LaunchedEffect(currentAccount) {
-                    if (!currentAccount.isUninitialized()) {
+                    if (!currentAccount.isUninitialized() && !clientId.isNullOrBlank()) {
                         navController.navigate(HomeRoute) {
                             popUpTo(0) { inclusive = true }
                         }
-                        onLoad()
                     }
+                    onLoad()
                 }
                 SetShortcuts()
                 NavigationGraph(
@@ -252,9 +254,18 @@ fun NavigationGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
+    val startRoute = if (LocalApiSettings.current.redditClientId.isNullOrBlank()) {
+        ApiSettingsRoute
+    } else {
+        HomeRoute
+    }
+    Log.d(
+        "NavigationGraph",
+        "startRoute: $startRoute, clientId: ${LocalApiSettings.current.redditClientId}"
+    )
     NavHost(
         navController = navController,
-        startDestination = HomeRoute,
+        startDestination = startRoute,
         modifier = modifier
             .fillMaxSize()
             .imePadding(),
