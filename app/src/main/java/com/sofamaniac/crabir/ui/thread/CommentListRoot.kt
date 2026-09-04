@@ -147,7 +147,7 @@ fun CommentListRoot(
                             skipping = comment.depth
                         }
                         commentNode(
-                            comment.comment,
+                            comment,
                             viewModel,
                             enableAnimation = !commentsSettings.buttonsAlwaysVisible,
                         )

@@ -9,7 +9,6 @@ import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.crabir.data.remote.reddit.MoreResponseOuter
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
-import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.data.remote.reddit.commentSubmissionBody
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -52,15 +51,6 @@ interface ThreadRepository {
 
 
     fun refresh()
-
-    suspend fun upvote(fullname: Fullname)
-    suspend fun neutralVote(fullname: Fullname)
-    suspend fun downvote(fullname: Fullname)
-    suspend fun save(fullname: Fullname)
-    suspend fun unsave(fullname: Fullname)
-
-    suspend fun fetchRules(): Rules?
-    suspend fun report(fullname: Fullname, reason: String)
 
     /** Insert a comment into the thread
      * @param parent The name of the parent comment
@@ -279,46 +269,4 @@ class ThreadRepositoryImpl(
         forest.value = Forest.empty()
     }
 
-    override suspend fun upvote(fullname: Fullname) {
-        commentsRepository.upvote(fullname)
-    }
-
-    override suspend fun neutralVote(fullname: Fullname) {
-        commentsRepository.vote(fullname, null)
-    }
-
-    override suspend fun downvote(fullname: Fullname) {
-        commentsRepository.downvote(fullname)
-    }
-
-    override suspend fun save(fullname: Fullname) {
-        commentsRepository.save(fullname)
-    }
-
-    override suspend fun unsave(fullname: Fullname) {
-        commentsRepository.unsave(fullname)
-    }
-
-    override suspend fun fetchRules(): Rules? {
-        if (post == null) return null
-        try {
-            val response = api.getRules(post!!.subreddit.subredditPrefixed)
-            if (response.isSuccess) {
-                val body = response.getOrThrow()
-                return body
-            } else {
-                return null
-            }
-        } catch (e: Exception) {
-            Log.e("ThreadRepositoryImpl", "fetchRules: ", e)
-            return null
-        }
-    }
-
-    override suspend fun report(
-        fullname: Fullname,
-        reason: String,
-    ) {
-        commentsRepository.report(fullname, reason)
-    }
 }

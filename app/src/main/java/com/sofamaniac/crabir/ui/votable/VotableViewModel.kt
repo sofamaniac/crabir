@@ -27,25 +27,22 @@ interface VotableInteraction {
 }
 
 open class VotableViewModel<T : VotableData>(
-    val name: String,
+    val fullname: Fullname,
     val subreddit: String,
-    private val repository: VotableRepository<T>,
+    protected val repository: VotableRepository<T>,
     initialData: T? = null,
 ) : ViewModel(), VotableInteraction {
 
-    val fullname =
-        Fullname(name)
-
-    private var postFlow = repository.get(fullname)
+    open val votable = repository.get(fullname)
         .stateIn(
             viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = initialData
         )
 
-    override val likes = postFlow.map { it?.relationship?.liked }
+    override val likes = votable.map { it?.relationship?.liked }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialData?.relationship?.liked)
-    override val saved = postFlow.map { it?.relationship?.saved ?: false }
+    override val saved = votable.map { it?.relationship?.saved ?: false }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialData?.relationship?.saved ?: false)
 
     var rulesState = MutableStateFlow(Rules())

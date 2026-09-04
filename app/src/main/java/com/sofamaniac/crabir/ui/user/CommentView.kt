@@ -6,32 +6,21 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.data.remote.reddit.Rules
-import com.sofamaniac.crabir.domain.model.CommentData
-import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.domain.repository.CommentsRepository
+import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.ui.ThemedCard
-import com.sofamaniac.crabir.ui.thread.CommentViewModelInterface
+import com.sofamaniac.crabir.ui.thread.CommentViewModel
 import com.sofamaniac.crabir.ui.thread.OpenedComment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.annotation.InjectedParam
-import org.koin.core.annotation.KoinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
 fun CommentView(
-    thing: CommentData,
+    thing: CommentType.Comment,
 ) {
     val navController = LocalNavController.current
+    val comment = thing.comment
     Log.d("CommentView", "comment ${thing.body}")
     ThemedCard(
         roundedCorners = false,
@@ -39,84 +28,18 @@ fun CommentView(
         modifier = Modifier.clickable {
             navController?.navigate(
                 PostRoute(
-                    thing.permalink,
+                    comment.permalink,
                     comment = thing.id,
                 )
             )
         }
     ) {
         OpenedComment(
-            thing,
             viewModel = koinViewModel<CommentViewModel> { parametersOf(thing) },
             enableAnimation = false,
+            opened = true,
+            toggleComment = {},
+            startReply = {},
         )
     }
-}
-
-@KoinViewModel
-class CommentViewModel(
-    @InjectedParam val comment: CommentData,
-    private val commentsRepository: CommentsRepository,
-) : CommentViewModelInterface, ViewModel() {
-    override val openComment: StateFlow<Fullname?> = MutableStateFlow(comment.name)
-
-    override fun replyTo(name: Fullname?) {
-
-    }
-
-    override fun collapseComment(name: Fullname, collapsed: Boolean) {
-    }
-
-    override fun closeComment(name: Fullname) {
-    }
-
-    override fun submitComment(
-        parent: Fullname,
-        body: String,
-        account: RedditAccount?,
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override val likes: StateFlow<Boolean?> = MutableStateFlow(comment.relationship.liked)
-    override val saved: StateFlow<Boolean> = MutableStateFlow(comment.relationship.saved)
-    override val rules: StateFlow<Rules>
-        get() = TODO("Not yet implemented")
-
-
-    override fun upvote(name: Fullname) {
-        viewModelScope.launch(Dispatchers.IO) {
-            commentsRepository.upvote(name)
-        }
-    }
-
-    override fun downvote(name: Fullname) {
-        viewModelScope.launch(Dispatchers.IO) {
-            commentsRepository.downvote(name)
-        }
-    }
-
-    override fun save(name: Fullname, target: Boolean, upvote: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (target) {
-                commentsRepository.save(name)
-                if (upvote) {
-                    commentsRepository.upvote(name)
-                }
-            } else {
-                commentsRepository.unsave(name)
-            }
-        }
-    }
-
-    override fun fetchRules() {
-        TODO("Not yet implemented")
-    }
-
-    override fun report(name: Fullname, reason: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            commentsRepository.report(name, reason)
-        }
-    }
-
 }

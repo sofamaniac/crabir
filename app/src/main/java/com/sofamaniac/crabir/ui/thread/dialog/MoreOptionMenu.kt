@@ -27,11 +27,11 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.Kind
 import com.sofamaniac.crabir.domain.model.CommentData
-import com.sofamaniac.crabir.ui.thread.CommentViewModelInterface
+import com.sofamaniac.crabir.ui.thread.CommentViewModel
 import com.sofamaniac.crabir.ui.votable.ReportMenu
 
 @Composable
-fun MoreOptionButton(comment: CommentData, viewModel: CommentViewModelInterface) {
+fun MoreOptionButton(comment: CommentData, viewModel: CommentViewModel) {
     var showMenu by remember { mutableStateOf(false) }
 
     IconButton(onClick = { showMenu = !showMenu }) {
@@ -49,7 +49,7 @@ fun MoreOptionButton(comment: CommentData, viewModel: CommentViewModelInterface)
 @Composable
 fun MoreOptionMenu(
     comment: CommentData,
-    viewModel: CommentViewModelInterface,
+    viewModel: CommentViewModel,
     onDismissRequest: () -> Unit,
 ) {
     val theme = LocalTheme.current
@@ -80,7 +80,7 @@ fun MoreOptionMenu(
         ListItem(
             colors = colors,
             modifier = Modifier.clickable {
-                viewModel.collapseComment(comment.name, true)
+                viewModel.collapse(true)
             },
             leadingContent = {
                 Icon(

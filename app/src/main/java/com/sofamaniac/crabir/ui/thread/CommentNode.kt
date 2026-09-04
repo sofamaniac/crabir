@@ -25,21 +25,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.settings.theme.ADMIN_CARTOUCHE_COLOR
@@ -57,8 +58,18 @@ import com.sofamaniac.crabir.ui.votable.SavedButton
 import com.sofamaniac.crabir.ui.votable.ScoreString
 import com.sofamaniac.crabir.ui.votable.UpButton
 import com.sofamaniac.crabir.ui.votable.VotableInteraction
+import com.sofamaniac.crabir.ui.votable.VotableViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.KoinViewModel
+import org.koin.core.parameter.parametersOf
 
 interface CommentViewModelInterface : VotableInteraction {
     val openComment: StateFlow<Fullname?>
@@ -72,17 +83,53 @@ interface CommentViewModelInterface : VotableInteraction {
 
 }
 
+@KoinViewModel
+open class CommentViewModel(
+    @InjectedParam comment: CommentType.Comment,
+    repository: CommentsRepository,
+) :
+    VotableViewModel<CommentType>(
+        subreddit = comment.comment.subredditInfo.subredditPrefixed,
+        fullname = comment.name,
+        initialData = comment,
+        repository = repository
+    ) {
+
+    override val votable: StateFlow<CommentType.Comment?> =
+        super.votable.map { it as? CommentType.Comment }.stateIn(
+            viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = comment
+        )
+
+    open fun collapse(collapsed: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val comment = repository.get(fullname).first()
+            if (comment is CommentType.Comment) {
+                val updated = comment.copy(comment = comment.comment.copy(collapsed = collapsed))
+                repository.update(comment.name, updated)
+            }
+        }
+    }
+}
+
 @Composable
 fun CommentContent(
-    comment: CommentData,
-    viewModel: ThreadViewModel,
+    comment: CommentType.Comment,
+    viewModel: CommentViewModel,
+    opened: Boolean,
+    toggleComment: (Boolean) -> Unit,
+    startReply: () -> Unit,
     modifier: Modifier = Modifier,
     enableAnimation: Boolean = true,
 ) {
-
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
     val theme = LocalTheme.current
+    val commentOpt by viewModel.votable.collectAsState()
+    if (commentOpt == null) return
+    val comment = commentOpt!!.comment
+
     Column(modifier = modifier) {
         if (comment.depth == 0) HorizontalDivider()
         ThemedCard(
@@ -92,28 +139,48 @@ fun CommentContent(
                 .background(theme.cardBackground)
                 .depthIndent(comment.depth.coerceAtLeast(0))
                 .combinedClickable(
-                    onClick = { if (!comment.collapsed) viewModel.toggleComment(comment.name) },
-                    onLongClick = { viewModel.collapseComment(comment.name, !comment.collapsed) },
+                    onClick = { if (!comment.collapsed) toggleComment(!opened) },
+                    onLongClick = { viewModel.collapse(!comment.collapsed) },
                     onLongClickLabel = "Collapse comment"
                 ),
         ) {
             if (comment.collapsed) {
                 CollapsedComment(comment, modifier = innerModifier.padding(vertical = 8.dp))
             } else {
-                OpenedComment(comment, viewModel, modifier = innerModifier, enableAnimation)
+                OpenedComment(
+                    viewModel,
+                    opened = opened,
+                    toggleComment = toggleComment,
+                    modifier = innerModifier,
+                    enableAnimation = enableAnimation,
+                    startReply = startReply
+                )
             }
         }
     }
 }
 
 fun LazyListScope.commentNode(
-    comment: CommentData,
+    comment: CommentType.Comment,
     viewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
     enableAnimation: Boolean = true,
 ) {
     item(key = comment.name) {
-        CommentContent(comment, viewModel, modifier.animateItem(), enableAnimation)
+        val commentViewModel = koinViewModel<CommentViewModel>(key = comment.name.name) {
+            parametersOf(comment)
+        }
+        val opened by viewModel.openComment.collectAsState()
+        CommentContent(
+            comment,
+            commentViewModel,
+            opened == comment.name,
+            toggleComment = { target ->
+                viewModel.toggleComment(comment.name, target)
+            },
+            enableAnimation = enableAnimation,
+            startReply = { viewModel.replyTo(comment.name) }
+        )
     }
 }
 
@@ -163,16 +230,17 @@ private fun CollapsedComment(
 
 @Composable
 fun ColumnScope.OpenedComment(
-    comment: CommentData,
-    viewModel: CommentViewModelInterface,
+    viewModel: CommentViewModel,
+    opened: Boolean,
+    toggleComment: (Boolean) -> Unit,
+    startReply: () -> Unit,
     modifier: Modifier = Modifier,
     enableAnimation: Boolean = true,
 ) {
-    val context = LocalContext.current
-    val showBottomBar by remember(comment.name, context) {
-        viewModel.openComment.map { it == comment.name || !enableAnimation }
-    }.collectAsState(initial = !enableAnimation)
+    val showBottomBar = opened || !enableAnimation
     val commentsSettings = LocalCommentsSettings.current
+    val commentOuter by viewModel.votable.collectAsState()
+    val comment = (commentOuter)?.comment ?: return
 
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
@@ -187,9 +255,9 @@ fun ColumnScope.OpenedComment(
     )
     Spacer(modifier = Modifier.height(8.dp))
     AnimatedVisibility(showBottomBar) {
-        BottomRow(comment, viewModel) {
+        BottomRow(comment, viewModel, startReply = startReply) {
             if (commentsSettings.hideButtonsAfterVote) {
-                viewModel.closeComment(comment.name)
+                toggleComment(false)
             }
         }
     }
@@ -198,7 +266,8 @@ fun ColumnScope.OpenedComment(
 @Composable
 fun BottomRow(
     comment: CommentData,
-    viewModel: CommentViewModelInterface,
+    viewModel: CommentViewModel,
+    startReply: () -> Unit,
     modifier: Modifier = Modifier,
     onAction: () -> Unit,
 ) {
@@ -222,7 +291,7 @@ fun BottomRow(
             viewModel.save(comment.name, !saved, false)
             onAction()
         })
-        ReplyButton(comment.name, viewModel)
+        ReplyButton(startReply = startReply)
         MoreOptionButton(comment, viewModel)
         if (BuildConfig.DEBUG) {
             IconButton(onClick = {

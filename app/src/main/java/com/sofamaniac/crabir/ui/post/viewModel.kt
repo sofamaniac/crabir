@@ -62,7 +62,7 @@ open class LinkViewModel(
     private val history: VisitedPostsDao,
     private val settings: PostSettingsRepository,
 ) : VotableViewModel<PostData>(
-    initialPost.name.name,
+    initialPost.name,
     initialPost.subreddit.name,
     posts,
     initialPost

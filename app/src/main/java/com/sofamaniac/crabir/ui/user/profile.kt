@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
@@ -177,11 +176,7 @@ fun ProfileView(
                                         showHidden = page == ProfileTabs.Hidden,
                                     )
 
-                                    is CommentData -> CommentView(
-                                        thing,
-                                    )
-
-                                    is CommentType.Comment -> CommentView(thing.comment)
+                                    is CommentType.Comment -> CommentView(thing)
 
                                     else -> Text("Unknown type ${thing::class}")
                                 }
