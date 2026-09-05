@@ -93,17 +93,16 @@ fun FlairRichtext(
  * @param default The default color to use if string is empty.
  * @return The parsed color.*/
 fun mapColor(color: String, default: Color = Color.Transparent): Color {
-    return try {
-        Color(color.toColorInt())
-    } catch (e: IllegalArgumentException) {
-        when (color) {
-            "light" -> Color.White
-            "dark" -> Color.Black
-            "" -> default
-            else -> {
-                Log.e("Flair.mapColor", "Could not parse color: $color")
-                default
-            }
+    val colorInt = runCatching { color.toColorInt() }
+    return if (colorInt.isSuccess) {
+        Color(colorInt.getOrThrow())
+    } else when (color) {
+        "light" -> Color.White
+        "dark" -> Color.Black
+        "" -> default
+        else -> {
+            Log.e("Flair.mapColor", "Could not parse color: $color")
+            default
         }
     }
 }

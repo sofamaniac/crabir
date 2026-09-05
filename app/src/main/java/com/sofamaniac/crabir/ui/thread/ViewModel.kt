@@ -12,13 +12,20 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
+import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
 import com.sofamaniac.crabir.settings.comments.CommentsSettings
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
@@ -27,6 +34,7 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 class ThreadViewModel(
     private val repository: ThreadRepository,
+    private val commentsRepository: CommentsRepository,
     accountsRepository: AccountsRepository,
     @InjectedParam val permalink: String,
     @InjectedParam val comment: String?,
@@ -50,8 +58,29 @@ class ThreadViewModel(
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
     val listState = LazyListState()
 
-    val comments = repository.comments
 
+    private val commentsNames = repository.comments
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val comments = commentsNames.flatMapMerge { names ->
+        commentsRepository.getMany(names).map { comments ->
+            val table = comments.associateBy { it.name }
+            val orderedList = commentsNames.value.mapNotNull { table[it] }
+            buildList {
+                var collapsedDepthThreshold: Int? = null
+                for (comment in orderedList) {
+                    if (collapsedDepthThreshold != null) {
+                        if (comment.depth > collapsedDepthThreshold) continue
+                        collapsedDepthThreshold = null
+                    }
+                    add(comment)
+                    if (comment is CommentType.Comment && comment.comment.collapsed) {
+                        collapsedDepthThreshold = comment.depth
+                    }
+                }
+            }
+        }.dropWhile { it.isEmpty() }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     private var _openComment = MutableStateFlow<Fullname?>(null)
 
@@ -102,7 +131,6 @@ class ThreadViewModel(
             comment = comment,
             context = context
         )
-        Log.d("ThreadViewModel", "commentFlow: ${comments.value.count()}")
         // If post was not found set it here.
         _post.value = getPost() ?: _post.value
         _sort.value = _sort.value ?: _post.value?.suggestedSort

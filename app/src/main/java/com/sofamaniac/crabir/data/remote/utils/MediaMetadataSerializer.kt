@@ -65,7 +65,7 @@ object MediaMetadataSerializer : KSerializer<MediaMetadata> {
         val filtered = JsonObject(element.filterKeys { it != "e" })
 
 
-        val res = try {
+        return runCatching {
             when (obj["e"]?.jsonPrimitive?.content) {
                 "Image" ->
                     input.json.decodeFromJsonElement(
@@ -81,11 +81,11 @@ object MediaMetadataSerializer : KSerializer<MediaMetadata> {
 
                 else -> MediaMetadata.Invalid
             }
-        } catch (e: SerializationException) {
+        }.getOrElse { e ->
+
             Log.e("MediaMetadataSerializer", "Error deserializing media metadata", e)
             MediaMetadata.Invalid
         }
-        return res
     }
 }
 

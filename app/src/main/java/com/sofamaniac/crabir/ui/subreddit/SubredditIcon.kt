@@ -8,7 +8,6 @@
 
 package com.sofamaniac.crabir.ui.subreddit
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -17,10 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
-import androidx.core.graphics.toColorInt
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditIcon
+import com.sofamaniac.crabir.ui.mapColor
 
 @Composable
 fun SubredditIcon(
@@ -37,12 +36,7 @@ fun SubredditIcon(
             )
 
         is SubredditIcon.Color -> {
-            val color = try {
-                Color(icon.color.toColorInt())
-            } catch (e: IllegalArgumentException) {
-                Log.e("SubredditIcon", "SubredditIcon: $e")
-                Color.Black
-            }
+            val color = mapColor(icon.color, Color.Black)
             val tintColor = if (color.luminance() > 0.5) Color.Black else Color.White
             Icon(
                 painter = painterResource(id = R.drawable.ic_community),

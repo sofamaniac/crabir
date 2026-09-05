@@ -2,7 +2,7 @@ package com.sofamaniac.crabir.domain.repository
 
 import com.sofamaniac.crabir.data.local.dao.VotableDao
 import com.sofamaniac.crabir.data.local.entities.VotableEntity
-import com.sofamaniac.crabir.data.local.entities.asVotableData
+import com.sofamaniac.crabir.data.local.entities.into
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -12,9 +12,8 @@ import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Singleton
 
 interface LinksRepository : VotableRepository<PostData> {
-
-    override fun VotableEntity?.into(): PostData? {
-        return this?.asVotableData() as? PostData
+    override fun VotableEntity?.transform(): PostData? {
+        return this?.into()
     }
 
     suspend fun markNSFW(name: Fullname): Result<Unit>

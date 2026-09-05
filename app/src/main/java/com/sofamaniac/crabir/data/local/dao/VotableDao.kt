@@ -24,6 +24,9 @@ interface VotableDao {
     @Query("SELECT * FROM votableTable WHERE id = :id LIMIT 1")
     fun get(id: Fullname): Flow<VotableEntity?>
 
+    @Query("SELECT * FROM votableTable WHERE id IN (:ids)")
+    fun getMany(ids: List<Fullname>): Flow<List<VotableEntity>>
+
     @Query("SELECT * FROM votableTable WHERE id = :id LIMIT 1")
     fun getValue(id: Fullname): VotableEntity?
 

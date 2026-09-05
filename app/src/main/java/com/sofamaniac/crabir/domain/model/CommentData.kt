@@ -9,6 +9,10 @@ import kotlin.time.Instant
 
 @Serializable
 sealed class CommentType : VotableData {
+    override fun toEntity(): VotableEntity {
+        return VotableEntity(id = name, data = Json.encodeToString(this))
+    }
+
     @Serializable
     data class Comment(val comment: CommentData) : CommentType() {
         override fun copy(
@@ -22,10 +26,6 @@ sealed class CommentType : VotableData {
         override val relationship: Relationship = comment.relationship
         override val score: Score = comment.score
         override val body: ParsedMarkdown = comment.body
-
-        override fun toEntity(): VotableEntity {
-            return VotableEntity(id = comment.name, data = Json.encodeToString(this))
-        }
 
         override val id: String = comment.id
     }
@@ -43,10 +43,6 @@ sealed class CommentType : VotableData {
         override val relationship: Relationship get() = throw IllegalAccessError("More has no relationship")
         override val score: Score get() = throw IllegalAccessError("More has no score")
         override val body: ParsedMarkdown get() = throw IllegalAccessError("More has no body")
-
-        override fun toEntity(): VotableEntity {
-            return VotableEntity(id = data.name, data = Json.encodeToString(this))
-        }
 
         override val id: String = name.name
     }

@@ -13,10 +13,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 interface VotableRepository<T : VotableData> {
-
     val api: RedditAPIService
     val votableDao: VotableDao
-    fun VotableEntity?.into(): T?
+
+    fun VotableEntity?.transform(): T?
+
     fun insert(things: Iterable<T>) {
         votableDao.insert(things.map { it.toEntity() })
     }
@@ -25,12 +26,11 @@ interface VotableRepository<T : VotableData> {
         votableDao.insert(thing.toEntity())
     }
 
-    fun get(name: Fullname): Flow<T?> =
-        votableDao.get(name).map { it?.into() }
-            .distinctUntilChanged()
+    operator fun get(name: Fullname): Flow<T?> =
+        votableDao.get(name).map { it.transform() }.distinctUntilChanged()
 
     fun getValue(name: Fullname): T? =
-        votableDao.getValue(name)?.into()
+        votableDao.getValue(name)?.transform()
 
     fun update(name: Fullname, data: VotableData) {
         votableDao.update(name, data.toEntity().data)

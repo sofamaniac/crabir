@@ -173,10 +173,10 @@ fun redditLinkHandler(): LinkInteractionListener {
 }
 
 private fun openLink(navController: NavController?, uriHandler: UriHandler, link: String) {
-    try {
-        Log.d("redditLinkHandler", "navigating to : ${link.toLocalUrl()}")
+    Log.d("redditLinkHandler", "navigating to : ${link.toLocalUrl()}")
+    runCatching {
         navController?.navigate(link.toLocalUrl().replace("//", "/"))
-    } catch (e: IllegalArgumentException) {
+    }.onFailure { e ->
         Log.i("redditLinkHandler", "failed to open link in app: $e")
         uriHandler.openUri(link)
     }

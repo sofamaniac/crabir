@@ -8,10 +8,9 @@ import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
-import kotlinx.serialization.ExperimentalSerializationApi
+import com.sofamaniac.crabir.toOption
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonDecodingException
 
 @Entity(tableName = "votableTable")
 data class VotableEntity(
@@ -20,7 +19,6 @@ data class VotableEntity(
     val data: String,
 )
 
-@OptIn(ExperimentalSerializationApi::class)
 fun VotableEntity.asVotableData(): VotableData {
     return Json.safeDecodeFromString<PostData>(data)
         ?: Json.safeDecodeFromString<CommentData>(data)
@@ -29,13 +27,16 @@ fun VotableEntity.asVotableData(): VotableData {
         ?: throw SerializationException("VotableEntity: Missing decode from type $this")
 }
 
+inline fun <reified T> VotableEntity.into(): T? {
+    return Json.safeDecodeFromString<T>(data)
+}
 
-@OptIn(ExperimentalSerializationApi::class)
+
 inline fun <reified T> Json.safeDecodeFromString(s: String): T? {
-    return try {
+    return runCatching {
         Json.decodeFromString<T>(s)
-    } catch (e: JsonDecodingException) {
+    }.onFailure { e ->
         Log.e("safeDecodeFromString", e.stackTraceToString())
-        null
     }
+        .toOption()
 }

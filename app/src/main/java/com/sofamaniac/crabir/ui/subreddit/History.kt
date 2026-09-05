@@ -20,7 +20,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.SubredditRepository
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
-import com.sofamaniac.crabir.data.local.entities.asVotableData
+import com.sofamaniac.crabir.data.local.entities.into
 import com.sofamaniac.crabir.data.remote.reddit.HISTORY
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
@@ -110,19 +110,19 @@ class HistoryRepository(
         after: Fullname,
         params: FeedParams,
     ): PagingSource.LoadResult<Fullname, Fullname> {
-        val timestamp = try {
+        val timestamp = runCatching {
             if (after.name.isBlank()) {
                 System.currentTimeMillis()
             } else {
                 after.name.toLong()
             }
-        } catch (e: NumberFormatException) {
+        }.getOrElse { e ->
             return PagingSource.LoadResult.Error(e)
         }
         val entities =
             visitedPostsDao.getHistory(before = timestamp)
-        cache.putAll(entities.map {
-            it.asVotableData() as PostData
+        cache.putAll(entities.mapNotNull {
+            it.into<PostData>()
         }.associateBy { it.name })
         val nextPage = entities.lastOrNull()?.let {
             visitedPostsDao.getPost(it.id)

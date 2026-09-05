@@ -1,7 +1,5 @@
 package com.sofamaniac.crabir.domain.repository
 
-import android.util.Log
-import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
@@ -21,7 +19,7 @@ import org.koin.core.annotation.ViewModelScope
 
 interface ThreadRepository {
 
-    val comments: StateFlow<Iterable<CommentType>>
+    val comments: StateFlow<Iterable<Fullname>>
     suspend fun getComments(
         permalink: String,
         sort: Sort? = null,
@@ -57,6 +55,128 @@ interface ThreadRepository {
      * @param comment The data of the comment
      */
     fun insertReply(parent: Fullname, comment: CommentType)
+}
+
+@ViewModelScope
+class ThreadRepositoryNew(
+    private val repository: CommentsRepository,
+    private val postsRepository: LinksRepository,
+    private val api: RedditAPIService,
+) :
+    ThreadRepository {
+
+    private var post: PostData? = null
+    private val forest: MutableStateFlow<List<Fullname>> = MutableStateFlow(emptyList())
+    override val comments: StateFlow<Iterable<Fullname>> = forest
+
+
+    suspend fun fetchThread(
+        permalink: String,
+        sort: Sort? = null,
+        comment: String? = null,
+        context: Int? = null,
+    ) {
+        if (post != null && forest.value.isNotEmpty()) {
+            return
+        }
+        val response = api.getThread(permalink, sort = sort, comment = comment, context = context)
+        if (response.isSuccess) {
+            val body = response.getOrNull()
+            if (body != null) {
+                val data = body.post.data.children.first()
+                post = PostDataMapper.map(data.data)
+                val forest =
+                    Forest.create(
+                        body.comments.data.children,
+                        post!!.name,
+                        post!!.numComments
+                    )
+                repository.insert(forest)
+                this.forest.update {
+                    forest.iterator().asSequence().map { it.name }.toList()
+                }
+                postsRepository.insert(listOf(post!!))
+            }
+        }
+    }
+
+    override suspend fun getPost(name: Fullname): PostData? {
+        if (post != null) {
+            return post
+        } else {
+            post = postsRepository.getValue(name)
+        }
+        return post
+    }
+
+    override suspend fun getComments(
+        permalink: String,
+        sort: Sort?,
+        timeframe: Timeframe?,
+        comment: String?,
+        context: Int?,
+    ) {
+        fetchThread(permalink, sort, comment = comment, context = context)
+    }
+
+    override fun getPostId(permalink: String): Fullname {
+        val segments = permalink.split("/")
+        val index = segments.indexOf("comments")
+        return Fullname("t3_${segments[index + 1]}")
+    }
+
+    override suspend fun getMoreComments(more: CommentType.More) {
+        val response = api.getMoreComments(
+            post!!.name,
+            more.data.children.take(100).joinToString(",")
+        )
+        if (response.isSuccess) {
+            val body = response.getOrNull()
+            if (body != null) {
+                // TODO display error
+                val things = body.json.data?.things ?: return
+                val temp = Forest.create(things, Fullname(""), things.size)
+                repository.insert(temp)
+                forest.update { list ->
+                    val startIndex = list.indexOfFirst { it == more.data.name }
+                    val head = runCatching { list.subList(0, startIndex) }.getOrDefault(emptyList())
+                    val tail = runCatching { list.subList(startIndex + 1, list.size) }.getOrDefault(
+                        emptyList()
+                    )
+                    head + temp.asSequence().map { it.name } + tail
+                }
+            }
+        }
+    }
+
+    override suspend fun postComment(
+        parentId: Fullname,
+        comment: String,
+        account: RedditAccount?,
+    ): Result<MoreResponseOuter> {
+        val body = commentSubmissionBody(parentId, comment)
+        return api.submitComment(body, account)
+    }
+
+    override suspend fun updateComment(
+        name: Fullname,
+        value: CommentType,
+    ) {
+        repository.update(name, value)
+    }
+
+    override fun insertReply(parent: Fullname, comment: CommentType) {
+        forest.update { list ->
+            val index = list.indexOfFirst { it == parent }
+            list.subList(0, index + 1) + comment.name + list.subList(index + 1, list.size)
+        }
+        repository.insert(comment)
+    }
+
+    override fun refresh() {
+        //comments = emptyList()
+        forest.value = emptyList()
+    }
 }
 
 class Forest private constructor(
@@ -137,7 +257,8 @@ class Forest private constructor(
     }
 
     override fun iterator(): Iterator<CommentType> {
-        return object : Iterator<CommentType> {
+        val iterator = object : Iterator<CommentType> {
+
             var current = this@Forest.root
             override fun next(): CommentType {
                 val next = this@Forest.next[current]
@@ -150,123 +271,7 @@ class Forest private constructor(
                 return this@Forest.next[current] != null
             }
         }
+
+        return iterator
     }
-}
-
-@ViewModelScope
-class ThreadRepositoryImpl(
-    val api: RedditAPIService,
-    val visitedPostsDao: VisitedPostsDao,
-    val commentsRepository: CommentsRepository,
-    val postsRepository: LinksRepository,
-) :
-    ThreadRepository {
-    private var post: PostData? = null
-    private val forest: MutableStateFlow<Forest> = MutableStateFlow(Forest.empty())
-    override val comments: StateFlow<Iterable<CommentType>> = forest
-
-
-    suspend fun fetchThread(
-        permalink: String,
-        sort: Sort? = null,
-        comment: String? = null,
-        context: Int? = null,
-    ) {
-        if (post != null && forest.value.comments.isNotEmpty()) {
-            return
-        }
-        val response = api.getThread(permalink, sort = sort, comment = comment, context = context)
-        if (response.isSuccess) {
-            val body = response.getOrNull()
-            if (body != null) {
-                val data = body.post.data.children.first()
-                post = PostDataMapper.map(data.data)
-                forest.update {
-                    Forest.create(
-                        body.comments.data.children,
-                        post!!.name,
-                        post!!.numComments
-                    )
-                }
-                commentsRepository.insert(forest.value)
-                postsRepository.insert(listOf(post!!))
-            }
-        }
-    }
-
-    override suspend fun getPost(name: Fullname): PostData? {
-        if (post != null) {
-            return post
-        } else {
-            post = postsRepository.getValue(name)
-        }
-        return post
-    }
-
-    override suspend fun getComments(
-        permalink: String,
-        sort: Sort?,
-        timeframe: Timeframe?,
-        comment: String?,
-        context: Int?,
-    ) {
-        fetchThread(permalink, sort, comment = comment, context = context)
-        Log.d("ThreadRepositoryImpl", "forest: ${forest.value.next}")
-    }
-
-    override fun getPostId(permalink: String): Fullname {
-        val segments = permalink.split("/")
-        val index = segments.indexOf("comments")
-        return Fullname("t3_${segments[index + 1]}")
-    }
-
-    override suspend fun getMoreComments(more: CommentType.More) {
-        val response = api.getMoreComments(
-            post!!.name,
-            more.data.children.take(100).joinToString(",")
-        )
-        if (response.isSuccess) {
-            val body = response.getOrNull()
-            if (body != null) {
-                // TODO display error
-                val things = body.json.data?.things ?: return
-                forest.update {
-                    it.insert(more.data.name, things, things.size, removeRoot = true)
-                }
-            }
-        }
-    }
-
-    override suspend fun postComment(
-        parentId: Fullname,
-        comment: String,
-        account: RedditAccount?,
-    ): Result<MoreResponseOuter> {
-        val body = commentSubmissionBody(parentId, comment)
-        return api.submitComment(body, account)
-    }
-
-    override suspend fun updateComment(
-        name: Fullname,
-        value: CommentType,
-    ) {
-        forest.update {
-            it.updateComment(name, value)
-        }
-        commentsRepository.update(name, value)
-    }
-
-    override fun insertReply(parent: Fullname, comment: CommentType) {
-        forest.update {
-            Log.d("ThreadRepositoryImpl", "insertReply: $comment")
-            it.insertReply(parent, comment)
-        }
-        commentsRepository.insert(comment)
-    }
-
-    override fun refresh() {
-        //comments = emptyList()
-        forest.value = Forest.empty()
-    }
-
 }

@@ -159,26 +159,35 @@ fun CommentContent(
     }
 }
 
+@Composable
+fun CommentNode(
+    comment: CommentType.Comment,
+    viewModel: ThreadViewModel,
+    enableAnimation: Boolean = true,
+) {
+    val commentViewModel = koinViewModel<CommentViewModel>(key = comment.name.name) {
+        parametersOf(comment)
+    }
+    val opened by viewModel.openComment.collectAsState()
+    CommentContent(
+        comment,
+        commentViewModel,
+        opened == comment.name,
+        toggleComment = { target ->
+            viewModel.toggleComment(comment.name, target)
+        },
+        enableAnimation = enableAnimation,
+        startReply = { viewModel.replyTo(comment.name) }
+    )
+}
+
 fun LazyListScope.commentNode(
     comment: CommentType.Comment,
     viewModel: ThreadViewModel,
     enableAnimation: Boolean = true,
 ) {
     item(key = comment.name) {
-        val commentViewModel = koinViewModel<CommentViewModel>(key = comment.name.name) {
-            parametersOf(comment)
-        }
-        val opened by viewModel.openComment.collectAsState()
-        CommentContent(
-            comment,
-            commentViewModel,
-            opened == comment.name,
-            toggleComment = { target ->
-                viewModel.toggleComment(comment.name, target)
-            },
-            enableAnimation = enableAnimation,
-            startReply = { viewModel.replyTo(comment.name) }
-        )
+        CommentNode(comment, viewModel, enableAnimation)
     }
 }
 
@@ -240,15 +249,12 @@ fun OpenedComment(
     val commentOuter by viewModel.votable.collectAsState()
     val comment = (commentOuter)?.comment ?: return
 
-    val innerModifier = Modifier
-        .padding(horizontal = 16.dp)
     Column(modifier) {
         Spacer(modifier = Modifier.height(8.dp))
-        TopRow(comment, modifier = innerModifier)
+        TopRow(comment)
         Spacer(modifier = Modifier.height(8.dp))
         Richtext(
             comment.richtext,
-            modifier = innerModifier,
             mediaMetadata = comment.mediaMetadata,
             threadId = comment.parentId.name.split("_").last()
         )

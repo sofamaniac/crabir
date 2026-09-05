@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import net.openid.appauth.AuthState
 import org.koin.core.annotation.Singleton
@@ -62,13 +61,13 @@ object AccountsSerializer : Serializer<Accounts> {
     private val json = Json { ignoreUnknownKeys = true }
 
     override suspend fun readFrom(input: InputStream): Accounts {
-        try {
-            return json.decodeFromString<Accounts>(
+        return runCatching {
+            json.decodeFromString<Accounts>(
                 input.readBytes().decodeToString()
             )
-        } catch (serialization: SerializationException) {
-            Log.e("AccountsSerializer", "Error reading Settings", serialization)
-            return defaultValue
+        }.getOrElse { err ->
+            Log.e("AccountsSerializer", "Error reading Settings", err)
+            defaultValue
         }
     }
 
