@@ -25,8 +25,6 @@ data class UserDTO(
     val created: Double = 0.0,
     @SerialName("created_utc")
     val createdUtc: Double = 0.0,
-    @SerialName("features")
-    val features: Features = Features(),
     @SerialName("force_password_reset")
     val forcePasswordReset: Boolean = false,
     @SerialName("gold_creddits")
@@ -136,5 +134,5 @@ data class UserDTO(
     @SerialName("verified")
     val verified: Boolean = false,
     @SerialName("fullname")
-    override val name: Fullname = Fullname("t2_$id")
+    override val name: Fullname = Fullname("t2_$id"),
 ) : DataInterface

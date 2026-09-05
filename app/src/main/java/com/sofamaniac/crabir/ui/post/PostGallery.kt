@@ -202,8 +202,8 @@ fun EmbeddedGallery(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .align(Alignment.Center),
-                                autostart = canPlayVideo && state.currentPage == page && !blur,
-                                clickable = !blur,
+                                autostart = canPlayVideo && state.currentPage == page,
+                                clickable = true,
                                 placeholder = {
                                     val resource = metadata.preview.lastOrNull()?.toMediaResource()
                                     if (resource != null) {

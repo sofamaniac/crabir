@@ -18,6 +18,7 @@ plugins {
     id("tech.mappie.plugin")
     id("androidx.room")
     id("kotlin-parcelize")
+    alias(libs.plugins.detekt)
 }
 
 android {
@@ -97,6 +98,15 @@ aboutLibraries {
     library {
         duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
     }
+}
+
+detekt {
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
+}
+// Remove this block if you don't want to run detekt on every build
+tasks.preBuild {
+    dependsOn(tasks.detekt)
 }
 
 dependencies {

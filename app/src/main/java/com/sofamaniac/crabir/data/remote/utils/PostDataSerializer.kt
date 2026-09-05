@@ -27,7 +27,7 @@ object PostDataSerializer : KSerializer<PostData> {
 
     override fun serialize(
         encoder: Encoder,
-        value: PostData
+        value: PostData,
     ) {
         PostData.serializer().serialize(encoder, value)
     }

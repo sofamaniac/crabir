@@ -88,5 +88,5 @@ data class Subreddit(
     @SerialName("user_is_muted")
     val userIsMuted: Boolean? = null,
     @SerialName("user_is_subscriber")
-    val userIsSubscriber: Boolean = false
+    val userIsSubscriber: Boolean = false,
 )

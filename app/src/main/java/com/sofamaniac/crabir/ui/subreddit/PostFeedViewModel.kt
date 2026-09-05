@@ -74,7 +74,7 @@ object FeedViewModelInterfacePreview : FeedViewModelInterface<PostData> {
 
 abstract class PostFeedViewModel<T : CommunityData>(
     private val repository: PostFeedRepository<FeedParams>,
-    private val visitedPostsDao: VisitedPostsDao,
+    visitedPostsDao: VisitedPostsDao,
     private val communityRepository: CommunityRepository<T>,
     viewEntity: CommunityViewEntity,
 ) : ViewModel(), FeedViewModelInterface<PostData> {

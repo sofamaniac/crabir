@@ -20,7 +20,7 @@ object CommentSortSerializer : KSerializer<Sort?> {
     @OptIn(ExperimentalSerializationApi::class)
     override fun serialize(
         encoder: Encoder,
-        value: Sort?
+        value: Sort?,
     ) {
         if (value != null) {
             Sort.serializer().serialize(encoder, value)

@@ -48,8 +48,8 @@ interface SubredditRepository : CommunityRepository<SubredditData> {
     @Query("SELECT * FROM subreddits WHERE userIsSubscriber = 1")
     suspend fun getSubscribed(): List<SubredditData>
 
-//    @Query("SELECT * FROM subreddits WHERE displayName = :displayName")
-//    suspend fun getBySlug(displayName: String): SubredditData?
+    //    @Query("SELECT * FROM subreddits WHERE displayName = :displayName")
+    //    suspend fun getBySlug(displayName: String): SubredditData?
 
     @Query("DELETE FROM subreddits")
     override suspend fun deleteAll()

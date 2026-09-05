@@ -29,7 +29,7 @@ fun RemainingTimeText(player: Player, modifier: Modifier = Modifier, style: Text
 fun PositionDurationTimeText(
     player: Player,
     modifier: Modifier = Modifier,
-    style: TextStyle? = null
+    style: TextStyle? = null,
 ) {
     TimeText(player) {
         val remainingTime = this.currentPositionMs

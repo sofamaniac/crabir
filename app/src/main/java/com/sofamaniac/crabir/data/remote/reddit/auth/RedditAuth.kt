@@ -67,7 +67,7 @@ class RedditAuthenticator(
     private fun refreshToken(account: RedditAccount): String? {
         Log.d("RedditAuthenticator", "Refreshing token for ${account.id}")
         return try {
-            runBlocking<String?> {
+            runBlocking {
                 suspendCancellableCoroutine { continuation ->
                     account.auth.performActionWithFreshTokens(
                         authService,

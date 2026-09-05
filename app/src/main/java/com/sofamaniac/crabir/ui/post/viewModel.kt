@@ -60,7 +60,7 @@ open class LinkViewModel(
     @InjectedParam initialPost: PostData,
     private val posts: LinksRepository,
     private val history: VisitedPostsDao,
-    private val settings: PostSettingsRepository,
+    settings: PostSettingsRepository,
 ) : VotableViewModel<PostData>(
     initialPost.name,
     initialPost.subreddit.name,

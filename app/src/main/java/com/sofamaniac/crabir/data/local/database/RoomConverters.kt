@@ -60,12 +60,12 @@ class RoomConverters {
     }
 
     @TypeConverter
-    fun fromInstant(value: kotlin.time.Instant): Long {
+    fun fromInstant(value: Instant): Long {
         return value.toEpochMilliseconds()
     }
 
     @TypeConverter
-    fun toInstant(value: Long): kotlin.time.Instant {
+    fun toInstant(value: Long): Instant {
         return Instant.fromEpochMilliseconds(value)
     }
 

@@ -9,14 +9,14 @@ import kotlinx.serialization.Serializable
 value class ParsedMarkdown private constructor(val markdown: String) {
     constructor(rawMarkdown: String, mediaMetadata: Map<String, MediaMetadata> = emptyMap()) : this(
         rawMarkdown
-//.extractRedditLinks()
+            //.extractRedditLinks()
             //.convertRedditVideoLink()
             .convertGiphy()
             .convertRedditPreviewLinks(mediaMetadata)
     )
 }
 
-/** Convert links of the form `https://reddit.com/link/[POSTID]/video/[VIDEOID]/player to a direct to the video. */
+/** Convert links of the form `https://reddit.com/link/{POSTID}/video/{VIDEOID}/player to a direct to the video. */
 private fun String.convertRedditVideoLink(): String {
     val redditLinkPattern = Regex("https://reddit\\.com/link/\\w+/video/(\\w+)/player")
     return redditLinkPattern.replace(this) { matchResult ->

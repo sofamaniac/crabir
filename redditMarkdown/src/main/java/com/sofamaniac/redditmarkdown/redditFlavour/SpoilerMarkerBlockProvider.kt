@@ -18,7 +18,7 @@ class SpoilerMarkerBlock(myConstraints: MarkdownConstraints, marker: ProductionH
 
     override fun doProcessToken(
         pos: LookaheadText.Position,
-        currentConstraints: MarkdownConstraints
+        currentConstraints: MarkdownConstraints,
     ): MarkerBlock.ProcessingResult {
 
         return MarkerBlock.ProcessingResult.DEFAULT

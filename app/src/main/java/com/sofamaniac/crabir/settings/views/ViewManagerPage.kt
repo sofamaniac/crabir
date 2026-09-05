@@ -111,7 +111,7 @@ internal fun ViewTile(
             }
         },
         supportingContent = {
-            Row() {
+            Row {
                 if (entity.view != null) {
                     Text(stringResource(entity.view.toStringResource()))
                 }
@@ -156,7 +156,7 @@ internal fun EditViewDialog(
         },
         title = { Text("Edit view for $community") },
         text = {
-            Column() {
+            Column {
                 ListSelector(
                     options = Views.entries.toList(),
                     selectedOption = view,

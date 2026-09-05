@@ -162,12 +162,14 @@ fun FullscreenImageView(
             if (postData == null) return@VerticalSwipeToDismiss
             FullscreenTopBar(showDecorations, actions = {
                 DownloadButton(postData!!.getSourceUrl().toUri())
-                if (quality != Quality.Source) IconButton(onClick = { quality = Quality.Source }) {
-                    Icon(
-                        Icons.Default.Hd,
-                        contentDescription = "Load highest quality available",
-                        tint = Color.White
-                    )
+                if (quality != Quality.Source) {
+                    IconButton(onClick = { quality = Quality.Source }) {
+                        Icon(
+                            Icons.Default.Hd,
+                            contentDescription = "Load highest quality available",
+                            tint = Color.White
+                        )
+                    }
                 }
             })
         },
@@ -185,7 +187,7 @@ fun FullscreenImageView(
         Box(modifier = Modifier.fillMaxSize()) {
             ImageView(
                 postData!!,
-                allowTransformation = true, //zoomableState = zoomableState,
+                allowTransformation = true, // zoomableState = zoomableState,
                 modifier = Modifier
                     .fillMaxSize()
                     .align(Alignment.Center),

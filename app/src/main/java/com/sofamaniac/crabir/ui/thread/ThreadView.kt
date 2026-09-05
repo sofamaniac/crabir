@@ -99,7 +99,7 @@ fun ThreadView(
     val historyManager: HistoryManager = koinInject()
     val navController = LocalNavController.current
     val scope = rememberCoroutineScope()
-    BackHandler() {
+    BackHandler {
         val comments = viewModel.comments.value.toList().map { it.id }
         val focusedIndex = viewModel.listState.firstVisibleItemIndex
         val focusedComment = comments.getOrNull(focusedIndex)

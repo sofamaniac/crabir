@@ -20,7 +20,7 @@ interface VisitedPostsDao {
     @Query("SELECT votableTable.* FROM votableTable INNER JOIN visitedPosts ON votableTable.id = visitedPosts.id  WHERE visitedPosts.visitedAt < :before AND visitedBy = :visitedBy ORDER BY visitedPosts.visitedAt DESC LIMIT 100")
     suspend fun getHistory(
         before: Long = System.currentTimeMillis(),
-        visitedBy: Int
+        visitedBy: Int,
     ): List<VotableEntity>
 
     @Query("SELECT EXISTS(SELECT 1 FROM visitedPosts WHERE id = :id)")

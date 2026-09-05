@@ -76,7 +76,7 @@ class SubredditInfoViewModel(
         }
     }
 
-    private fun _subscribe(action: SubscribeAction) {
+    private fun subscribeInner(action: SubscribeAction) {
         val infoLoc = info.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -92,11 +92,11 @@ class SubredditInfoViewModel(
 
 
     fun subscribe() {
-        _subscribe(SubscribeAction.SUBSCRIBE)
+        subscribeInner(SubscribeAction.SUBSCRIBE)
     }
 
     fun unsubscribe() {
-        _subscribe(SubscribeAction.UNSUBSCRIBE)
+        subscribeInner(SubscribeAction.UNSUBSCRIBE)
     }
 
 }

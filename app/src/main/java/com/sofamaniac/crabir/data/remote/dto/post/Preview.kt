@@ -10,5 +10,5 @@ data class Preview(
     @SerialName("reddit_video_preview")
     @Serializable(with = RedditVideoSerializer::class)
     val redditVideoPreview: RedditVideo? = null,
-    val enabled: Boolean? = false
+    val enabled: Boolean? = false,
 )

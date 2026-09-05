@@ -89,7 +89,7 @@ class DrawerViewModelImpl(
         subsRepository.subscriptions.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = emptyList<Thing.Subreddit>()
+            initialValue = emptyList()
         )
     override val sortedSubscriptions: StateFlow<List<Thing.Subreddit>> =
         subsRepository.subscriptions
@@ -107,7 +107,7 @@ class DrawerViewModelImpl(
     override val multis: StateFlow<List<Thing.Multi>> = subsRepository.multis.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
-        initialValue = emptyList<Thing.Multi>()
+        initialValue = emptyList()
     )
 
 

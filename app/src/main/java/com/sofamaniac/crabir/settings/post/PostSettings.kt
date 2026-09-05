@@ -119,7 +119,7 @@ interface PostSettingsRepository {
 
 @Singleton(binds = [PostSettingsRepository::class])
 class PostSettingsRepositoryImpl(
-    private val context: Context,
+    context: Context,
 ) : PostSettingsRepository {
     override val postSettings: Flow<PostSettings> = context.postSettingsDataStore.data
 }

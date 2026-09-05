@@ -13,6 +13,7 @@ plugins {
     id("tech.mappie.plugin") version "2.4.10-2.4.3" apply true
     id("androidx.room") version "2.8.4" apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
+    alias(libs.plugins.detekt)
 }
 
 dependencyAnalysis {
@@ -23,4 +24,11 @@ dependencyAnalysis {
             }
         }
     }
+}
+
+
+detekt {
+    toolVersion = "2.0.0-alpha.6"
+    config.setFrom(rootProject.file("config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
 }

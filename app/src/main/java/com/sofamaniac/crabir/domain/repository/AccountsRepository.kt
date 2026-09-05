@@ -28,27 +28,21 @@ class AccountsRepositoryPreview : AccountsRepository {
     override val activeAccount: Flow<RedditAccount> = flowOf(RedditAccount.anonymous())
     override val activeAccountId: Flow<Int> = flowOf(-1)
 
-    override suspend fun addAccount(account: RedditAccount) {
-    }
+    override suspend fun addAccount(account: RedditAccount) = Unit
 
-    override suspend fun setActiveAccount(accountId: Int) {
-    }
+    override suspend fun setActiveAccount(accountId: Int) = Unit
 
-    override suspend fun deleteAccount(accountId: Int) {
-    }
+    override suspend fun deleteAccount(accountId: Int) = Unit
 
     override suspend fun updateAccount(
         accountId: Int,
         account: RedditAccount,
-    ) {
-    }
+    ) = Unit
 
     override suspend fun updateAuthState(
         accountId: Int,
         authState: AuthState,
-    ) {
-    }
+    ) = Unit
 
-    override suspend fun clearAll() {
-    }
+    override suspend fun clearAll() = Unit
 }

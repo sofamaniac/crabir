@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.CommentData
-import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.ThemedCard
 
 @Composable
@@ -29,8 +28,6 @@ fun ShareMenu(comment: CommentData, onDismissRequest: () -> Unit) {
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             onDismissRequest()
         }
-    //val fullscreenManager = LocalFullscreenHandler.current!!
-    val navController = LocalNavController.current!!
     Dialog(onDismissRequest) {
         ThemedCard(modifier = Modifier.padding(16.dp)) {
             ListItem(

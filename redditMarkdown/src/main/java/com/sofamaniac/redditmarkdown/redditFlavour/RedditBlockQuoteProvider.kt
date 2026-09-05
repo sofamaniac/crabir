@@ -13,7 +13,7 @@ class RedditBlockQuoteProvider : MarkerBlockProvider<MarkerProcessor.StateInfo> 
     override fun createMarkerBlocks(
         pos: LookaheadText.Position,
         productionHolder: ProductionHolder,
-        stateInfo: MarkerProcessor.StateInfo
+        stateInfo: MarkerProcessor.StateInfo,
     ): List<MarkerBlock> {
         val currentConstraints = stateInfo.currentConstraints
         val nextConstraints = stateInfo.nextConstraints
@@ -52,7 +52,7 @@ class RedditBlockQuoteProvider : MarkerBlockProvider<MarkerProcessor.StateInfo> 
 
     override fun interruptsParagraph(
         pos: LookaheadText.Position,
-        constraints: MarkdownConstraints
+        constraints: MarkdownConstraints,
     ): Boolean {
         return false
     }

@@ -10,7 +10,7 @@ class SpoilerParser : SequentialParser {
     val lastOpenedPos = mutableListOf<Int>()
     override fun parse(
         tokens: TokensCache,
-        rangesToGlue: List<IntRange>
+        rangesToGlue: List<IntRange>,
     ): SequentialParser.ParsingResult {
         val result = SequentialParser.ParsingResultBuilder()
         val delegateIndices = RangesListBuilder()
@@ -58,7 +58,7 @@ class SpoilerParser : SequentialParser {
                     RedditFlavourElementType.SPOILER
                 )
             )
-            for (i in 0 until lastOpenedPos.size) {
+            for (i in lastOpenedPos.indices) {
                 lastOpenedPos[i] = 0
             }
         }

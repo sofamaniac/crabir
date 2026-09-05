@@ -18,6 +18,7 @@ enum class Timeframe {
     override fun toString(): String {
         return super.toString().lowercase()
     }
+
     val representation
         get() = when (this) {
             Hour -> com.sofamaniac.crabir.R.string.hour

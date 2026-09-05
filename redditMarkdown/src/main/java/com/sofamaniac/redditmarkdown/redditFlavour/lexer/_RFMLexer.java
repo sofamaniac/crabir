@@ -1536,7 +1536,7 @@ public class _RFMLexer implements GeneratedLexer {
 
     private IElementType parseDelimited(IElementType contentsType, boolean allowInlines) {
         char first = yycharat(0);
-    char last = yycharat(yylength() - 1);
+        char last = yycharat(yylength() - 1);
 
         stateStack.add(yystate());
 
@@ -1551,7 +1551,9 @@ public class _RFMLexer implements GeneratedLexer {
         return getDelimiterTokenType(first);
     }
 
-    /** Returns the maximum size of the scanner buffer, which limits the size of tokens. */
+    /**
+     * Returns the maximum size of the scanner buffer, which limits the size of tokens.
+     */
     private int zzMaxBufferLen() {
         return Integer.MAX_VALUE;
     }
@@ -1559,9 +1561,8 @@ public class _RFMLexer implements GeneratedLexer {
     /**
      * Refills the input buffer.
      *
-     * @return      {@code false}, iff there was new input.
-     *
-     * @exception java.io.IOException  if any I/O-Error occurs
+     * @return {@code false}, iff there was new input.
+     * @throws java.io.IOException if any I/O-Error occurs
      */
     private boolean zzRefill() {
         return true;
@@ -1593,12 +1594,11 @@ public class _RFMLexer implements GeneratedLexer {
     /**
      * Returns the character at position {@code pos} from the
      * matched text.
-     *
+     * <p>
      * It is equivalent to yytext().charAt(pos), but faster
      *
      * @param pos the position of the character to fetch.
      *            A value from 0 to yylength()-1.
-     *
      * @return the character at position pos
      */
     public final char yycharat(int pos) {
@@ -1727,17 +1727,17 @@ public class _RFMLexer implements GeneratedLexer {
 
     /**
      * Reports an error that occurred while scanning.
-     *
+     * <p>
      * In a wellformed scanner (no or only correct usage of
      * yypushback(int) and a match-all fallback rule) this method
      * will only be called with things that "Can't Possibly Happen".
      * If this method is called, something is seriously wrong
      * (e.g. a JFlex bug producing a faulty scanner etc.).
-     *
+     * <p>
      * Usual syntax/scanner level error handling should be done
      * in error fallback rules.
      *
-     * @param   errorCode  the code of the errormessage to display
+     * @param errorCode the code of the errormessage to display
      */
     private void zzScanError(int errorCode) {
         String message;
@@ -1759,11 +1759,11 @@ public class _RFMLexer implements GeneratedLexer {
 
     /**
      * Pushes the specified amount of characters back into the input stream.
-     *
+     * <p>
      * They will be read again by then next call of the scanning method
      *
-     * @param number  the number of characters to be read again.
-     *                This number must not be greater than yylength()!
+     * @param number the number of characters to be read again.
+     *               This number must not be greater than yylength()!
      */
     public void yypushback(int number) {
         if (number > yylength())
@@ -1793,8 +1793,8 @@ public class _RFMLexer implements GeneratedLexer {
      * Resumes scanning until the next regular expression is matched,
      * the end of input is encountered or an I/O-Error occurs.
      *
-     * @return      the next token
-     * @exception java.io.IOException  if any I/O-Error occurs
+     * @return the next token
+     * @throws java.io.IOException if any I/O-Error occurs
      */
     public IElementType advance() {
         int zzInput;
@@ -1859,7 +1859,7 @@ public class _RFMLexer implements GeneratedLexer {
                     zzState = zzNext;
 
                     zzAttributes = zzAttrL[zzState];
-                    if ( (zzAttributes & 1) == 1) {
+                    if ((zzAttributes & 1) == 1) {
                         zzAction = zzState;
                         zzMarkedPosL = zzCurrentPosL;
                         if ((zzAttributes & 8) == 8) break zzForAction;
@@ -2083,16 +2083,18 @@ public class _RFMLexer implements GeneratedLexer {
                         }
                         zzMarkedPos = zzFPos;
                     }
-            { return MarkdownTokenTypes.TEXT;
+                    {
+                        return MarkdownTokenTypes.TEXT;
+                    }
+                    // fall through
+                    case 48:
+                        break;
+                    default:
+                        zzScanError(ZZ_NO_MATCH);
+                }
             }
-          // fall through
-          case 48: break;
-          default:
-            zzScanError(ZZ_NO_MATCH);
-          }
-      }
+        }
     }
-  }
 
 
     /**
@@ -2120,10 +2122,10 @@ public class _RFMLexer implements GeneratedLexer {
         return zzBuffer.subSequence(zzStartRead, zzMarkedPos);
     }
 
-  @Override
-  public int getState() {
-    return 0;
-  }
+    @Override
+    public int getState() {
+        return 0;
+    }
 
 
     /**

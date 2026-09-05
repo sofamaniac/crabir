@@ -29,7 +29,7 @@ fun ThemedDialog(
                 content()
                 if (cancel != null || confirm != null) {
                     Spacer(modifier = Modifier.height(8.dp))
-                    Row() {
+                    Row {
                         cancel?.invoke()
                         Spacer(modifier = Modifier.weight(1f))
                         confirm?.invoke()

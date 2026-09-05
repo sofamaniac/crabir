@@ -116,7 +116,7 @@ private fun ViewTile(
             }
         },
         supportingContent = {
-            Row() {
+            Row {
                 if (entity.sort != null) {
                     Text(stringResource(entity.sort.representation))
                 }
@@ -161,7 +161,7 @@ internal fun EditViewDialog(
         },
         title = { Text(stringResource(R.string.sort_edit_title, community)) },
         text = {
-            Column() {
+            Column {
                 ListSelector(
                     options = Sort.entries.toList(),
                     selectedOption = sort,

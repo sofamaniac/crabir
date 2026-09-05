@@ -20,7 +20,6 @@ fun ThemedSwitch(enabled: Boolean = true, checked: Boolean, onCheckedChange: (Bo
 
 @Composable
 fun ThemedCheckbox(enabled: Boolean = true, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    val theme = LocalTheme.current
     Checkbox(
         enabled = enabled,
         checked = checked,

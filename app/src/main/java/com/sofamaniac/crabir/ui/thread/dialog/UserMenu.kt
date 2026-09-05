@@ -35,7 +35,7 @@ fun UserMenu(
     val filtersSettingsStore = context.filtersDataStore
     val scope = rememberCoroutineScope()
     Dialog(onDismissRequest) {
-        ThemedCard() {
+        ThemedCard {
             ListItem(
                 modifier = Modifier.clickable {
                     val route = ProfileRoute(username = username)

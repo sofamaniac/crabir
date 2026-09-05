@@ -11,7 +11,7 @@ open class RedditMarkdownConstraints protected constructor(
     private val indents: IntArray,
     override val types: CharArray,
     override val isExplicit: BooleanArray,
-    override val charsEaten: Int
+    override val charsEaten: Int,
 ) : MarkdownConstraints {
 
     protected open val base: RedditMarkdownConstraints
@@ -21,7 +21,7 @@ open class RedditMarkdownConstraints protected constructor(
         indents: IntArray,
         types: CharArray,
         isExplicit: BooleanArray,
-        charsEaten: Int
+        charsEaten: Int,
     ): RedditMarkdownConstraints {
         return RedditMarkdownConstraints(indents, types, isExplicit, charsEaten)
     }
@@ -197,7 +197,7 @@ open class RedditMarkdownConstraints protected constructor(
     protected data class ListMarkerInfo(
         val markerLength: Int,
         val markerType: Char,
-        val markerIndent: Int
+        val markerIndent: Int,
     )
 
 
@@ -303,7 +303,7 @@ open class RedditMarkdownConstraints protected constructor(
             newIndentDelta: Int,
             newType: Char,
             newExplicit: Boolean,
-            newOffset: Int
+            newOffset: Int,
         ): RedditMarkdownConstraints {
             val n = parent.indents.size
             val indents = parent.indents.copyOf(n + 1)

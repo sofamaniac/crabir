@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 
 fun Modifier.cartouche(
     backgroundColor: Color,
-    shape: RoundedCornerShape = RoundedCornerShape(2.dp)
+    shape: RoundedCornerShape = RoundedCornerShape(2.dp),
 ) =
     this
         .background(color = backgroundColor, shape = shape)

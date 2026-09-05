@@ -13,7 +13,7 @@ import kotlinx.serialization.json.Json
 data class VotableEntity(
     @PrimaryKey
     val id: Fullname,
-    val data: String
+    val data: String,
 )
 
 fun VotableEntity.asVotableData(): VotableData {

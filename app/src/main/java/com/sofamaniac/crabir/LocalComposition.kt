@@ -13,12 +13,11 @@ import com.sofamaniac.crabir.settings.filters.FiltersSettings
 import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsDefault
 import com.sofamaniac.crabir.settings.post.PostSettingsDefaults
 import com.sofamaniac.crabir.settings.theme.ConfigureCrabirTheme
-import com.sofamaniac.crabir.settings.theme.CrabirTheme
 import com.sofamaniac.crabir.settings.theme.DefaultDarkTheme
 import com.sofamaniac.crabir.settings.views.ViewSettings
 
-val LocalTheme = compositionLocalOf<CrabirTheme> { DefaultDarkTheme }
-val LocalRedditAccount = compositionLocalOf<RedditAccount> { RedditAccount.anonymous() }
+val LocalTheme = compositionLocalOf { DefaultDarkTheme }
+val LocalRedditAccount = compositionLocalOf { RedditAccount.anonymous() }
 val LocalSnackBarHost = compositionLocalOf<SnackbarHostState?> { null }
 
 val LocalViewSettings = compositionLocalOf { ViewSettings() }

@@ -12,5 +12,5 @@ data class Score(
     val downs: Int,
     val score: Int,
     val upvoteRatio: Double,
-    val hideScore: Boolean
+    val hideScore: Boolean,
 )

@@ -34,7 +34,7 @@ fun NavGraphBuilder.subredditGraph(navController: NavController) {
     ) { navBackStackEntry ->
         val params = navBackStackEntry.arguments
         val subreddit = params!!.getString("subreddit")!!
-        SubredditViewer(subreddit = "$subreddit")
+        SubredditViewer(subreddit = subreddit)
     }
     composable<MultiRoute>(
         typeMap = mapOf(typeOf<Fullname>() to NullableFullnameType)

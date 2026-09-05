@@ -27,8 +27,8 @@ data class MultiData(
     @SerialName("created") val created: Double,
     @SerialName("visibility") val visibility: String,
     @SerialName("key_color") val keyColor: String? = null,
-    override val displayNamePrefixed: String = "m/$displayName"
-    ) : CommunityData {
+    override val displayNamePrefixed: String = "m/$displayName",
+) : CommunityData {
 
     @Ignore
     override val id: String = name.name
@@ -37,6 +37,6 @@ data class MultiData(
 @Serializable
 data class SubredditInfo(
     val name: String,
-    val data: SubredditDetails
+    val data: SubredditDetails,
 )
 

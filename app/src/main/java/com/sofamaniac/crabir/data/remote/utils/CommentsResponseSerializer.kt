@@ -24,7 +24,7 @@ object CommentsResponseSerializer : KSerializer<CommentsResponse> {
 
     override fun serialize(
         encoder: Encoder,
-        value: CommentsResponse
+        value: CommentsResponse,
     ) {
         TODO("Not yet implemented")
     }

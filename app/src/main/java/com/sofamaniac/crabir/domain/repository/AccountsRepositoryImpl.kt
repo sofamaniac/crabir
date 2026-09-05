@@ -50,7 +50,6 @@ data class Accounts(
     }
 }
 
-
 val Context.accountsDataStore: DataStore<Accounts> by dataStore(
     fileName = "accounts.json",
     AccountsSerializer
@@ -84,9 +83,7 @@ object AccountsSerializer : Serializer<Accounts> {
             )
         }
     }
-
 }
-
 
 @Singleton
 class AccountsRepositoryImplRoom(
@@ -132,7 +129,6 @@ class AccountsRepositoryImplRoom(
     override suspend fun clearAll() {
         TODO("Not yet implemented")
     }
-
 }
 
 @Singleton(binds = [AccountsRepository::class])
@@ -160,7 +156,6 @@ class AccountsRepositoryImpl(
                 accounts.activeId
             }.distinctUntilChanged()
 
-
     override val activeAccount: Flow<RedditAccount> =
         accounts.combine(activeAccountId) { accounts, activeId ->
             accounts.firstOrNull { account -> account.id == activeId }
@@ -174,7 +169,8 @@ class AccountsRepositoryImpl(
         dataStore.updateData { accounts ->
             if (accounts.accounts.any {
                     (it.info?.name ?: "") == account.info?.name || it.id == account.id
-                }) {
+                }
+            ) {
                 Log.w("AccountsRepositoryImpl", "Account already exists: $account")
                 val i = accounts.accounts.indexOfFirst {
                     (it.info?.name ?: "") == account.info?.name || it.id == account.id
@@ -216,7 +212,9 @@ class AccountsRepositoryImpl(
                 accountsList.removeAt(duplicateIndex)
                 accountsList.add(duplicateIndex, account)
                 return@updateData accounts.copy(
-                    accounts = accountsList.filterIndexed { index, account -> index == duplicateIndex || account.id != accountId }
+                    accounts = accountsList.filterIndexed { index, account ->
+                        index == duplicateIndex || account.id != accountId
+                    }
                 )
             }
             val accountIndex = accounts.accounts.indexOfFirst { it.id == accountId }
@@ -244,7 +242,6 @@ class AccountsRepositoryImpl(
                 accounts
             }
         }
-
     }
 
     override suspend fun clearAll() {
@@ -253,4 +250,3 @@ class AccountsRepositoryImpl(
         }
     }
 }
-

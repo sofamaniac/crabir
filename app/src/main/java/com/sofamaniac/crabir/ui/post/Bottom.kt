@@ -57,7 +57,6 @@ import com.sofamaniac.crabir.ui.post.buttons.OpenThreadButton
 import com.sofamaniac.crabir.ui.post.buttons.ShareButton
 import com.sofamaniac.crabir.ui.post.buttons.ShareButtonLong
 import com.sofamaniac.crabir.ui.post.dialog.EditDialogue
-import com.sofamaniac.crabir.ui.post.dialog.PostDialog
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.votable.DownButton
@@ -119,7 +118,6 @@ private fun PostOptions(
     var showOptions by remember { mutableStateOf(false) }
     val navController = LocalNavController.current
     val currentAccount = LocalRedditAccount.current
-    var currentDialog: PostDialog? by remember { mutableStateOf(null) }
     val theme = LocalTheme.current
     IconButton(onClick = { showOptions = true }) {
         Icon(Icons.Default.MoreVert, "more", tint = Color.Gray)

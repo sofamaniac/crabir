@@ -59,7 +59,7 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun MessageEditor(
     parent: Fullname? = null,
-    viewModel: MessageEditorViewModel = koinViewModel() {
+    viewModel: MessageEditorViewModel = koinViewModel {
         parametersOf(parent)
     },
 ) {
@@ -179,7 +179,7 @@ enum class MessageEditorError {
 
 @KoinViewModel
 class MessageEditorViewModel(
-    val accountManager: AccountManager,
+    accountManager: AccountManager,
     val messageRepository: InboxRepository,
     val api: InboxAPI,
     @InjectedParam val parent: Fullname?,

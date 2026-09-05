@@ -22,7 +22,7 @@ value class SubredditId(val id: String)
 
 @Serializable
 data class CommentContributionSettings(
-    @SerialName("allowed_media_types") val allowedMediaTypes: List<String>? = null
+    @SerialName("allowed_media_types") val allowedMediaTypes: List<String>? = null,
 )
 
 fun dummySubredditData(): SubredditDTO {

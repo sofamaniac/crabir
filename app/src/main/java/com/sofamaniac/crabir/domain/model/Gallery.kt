@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Gallery(
     val images: List<GalleryDataImage>,
-    val mediaMetadata: Map<String, MediaMetadata>
+    val mediaMetadata: Map<String, MediaMetadata>,
 ) {
 
     fun get(index: Int): MediaMetadata? {

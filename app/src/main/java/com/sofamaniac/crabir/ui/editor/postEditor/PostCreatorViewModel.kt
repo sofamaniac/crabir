@@ -79,7 +79,7 @@ class PostCreatorViewModel(
     api: RedditAPIService,
     private val communities: SubredditRepository,
     private val mediaUploader: MediaUploadInterface,
-    private val accountsRepository: AccountsRepository,
+    accountsRepository: AccountsRepository,
 ) : CreatorViewModel(api) {
     var state by mutableStateOf(PostSubmissionBuilder())
     val textState = TextFieldState()

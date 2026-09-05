@@ -12,7 +12,7 @@ import androidx.media3.ui.compose.material3.indicator.ProgressSlider
 @Composable
 fun SeekProgressBar(
     player: Player, modifier: Modifier = Modifier,
-    sliderColors: SliderColors = SliderDefaults.colors()
+    sliderColors: SliderColors = SliderDefaults.colors(),
 ) {
 
     ProgressSlider(player, modifier = modifier, colors = sliderColors)

@@ -84,7 +84,7 @@ class CommentsViewModel(
 
     override fun updateSort(sort: ProfileSort, timeframe: Timeframe?) {
         val needRefresh = params.value.sort != sort || params.value.timeframe != timeframe
-        _params.update {
+        paramsMut.update {
             if (!needRefresh) it
             else {
                 it.copy(sort = sort, timeframe = timeframe)
@@ -127,7 +127,7 @@ class SubmittedViewModel(
 
     override fun updateSort(sort: ProfileSort, timeframe: Timeframe?) {
         val needRefresh = params.value.sort != sort || params.value.timeframe != timeframe
-        _params.update {
+        paramsMut.update {
             if (!needRefresh) it
             else {
                 it.copy(sort = sort, timeframe = timeframe)
@@ -142,12 +142,12 @@ class SubmittedViewModel(
 abstract class ProfileFeedViewModel<T : VotableData>(
     val username: String,
     private val repository: FeedRepositoryCommon<ProfileFeedParams, T>,
-    private val visitedPostsDao: VisitedPostsDao,
+    visitedPostsDao: VisitedPostsDao,
 ) : ViewModel(), FeedViewModelInterface<T> {
 
     override val listState = LazyStaggeredGridState()
     override var needScrollToTop = false
-    protected val _params = MutableStateFlow(
+    protected val paramsMut = MutableStateFlow(
         ProfileFeedParams(
             username = username,
             sort = ProfileSort.New,
@@ -158,7 +158,7 @@ abstract class ProfileFeedViewModel<T : VotableData>(
     private val history = visitedPostsDao.getHistoryFlow()
         .stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList())
 
-    val params: StateFlow<ProfileFeedParams> = _params.asStateFlow()
+    val params: StateFlow<ProfileFeedParams> = paramsMut.asStateFlow()
 
     override fun refresh() {
         needScrollToTop = true

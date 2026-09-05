@@ -187,10 +187,6 @@ fun VideoPlayer(
 
     LaunchedEffect(startPlaying) {
         if (startPlaying) {
-            Log.d(
-                "VideoPlayer",
-                "key: $key, startPlaying: $startPlaying, startMuted: $mute"
-            )
             VideoPlayerManager.setMediaItem(
                 media.url,
                 key,
@@ -245,10 +241,6 @@ fun VideoPlayer(
 
     LaunchedEffect(startPlaying) {
         if (startPlaying) {
-            Log.d(
-                "VideoPlayer",
-                "key: $key, startPlaying: $startPlaying, startMuted: $mute"
-            )
             VideoPlayerManager.setMediaItem(
                 url,
                 key,

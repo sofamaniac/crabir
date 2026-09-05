@@ -179,7 +179,7 @@ fun <T : VotableData> PostFeedViewer(
 @Preview
 @Composable
 fun EndOfFeed() {
-    ThemedCard() {
+    ThemedCard {
         Column(
             modifier = Modifier.padding(8.dp),
             verticalArrangement = Arrangement.Center

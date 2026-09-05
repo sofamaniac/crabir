@@ -17,7 +17,7 @@ data class SubredditInfo(
     val subredditId: SubredditId,
     val subredditPrefixed: String,
     val subredditSubscribers: Int,
-    val subredditType: String
+    val subredditType: String,
 ) {
     companion object {
         val DUMMY = SubredditInfo(

@@ -159,7 +159,6 @@ class AccountManager(
             val newAccount = RedditAccount.uninitialized(id, authState)
             accountsRepository.addAccount(newAccount)
             accountsRepository.setActiveAccount(id)
-            Log.d("LoginViewModel", "save: fetching user info")
         } catch (e: Exception) {
             Log.e("LoginViewModel", "Failed to save account: $e")
             updateState(LoginState.Error(e))

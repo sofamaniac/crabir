@@ -10,13 +10,13 @@ import java.io.OutputStream
 
 class DataStoreJsonSerializer<T>(
     private val serializer: KSerializer<T>,
-    override val defaultValue: T
+    override val defaultValue: T,
 ) :
     Serializer<T> {
 
     override suspend fun readFrom(input: InputStream): T {
         return try {
-            Json.decodeFromString<T>(serializer, input.readBytes().decodeToString())
+            Json.decodeFromString(serializer, input.readBytes().decodeToString())
 
         } catch (e: SerializationException) {
             Log.e("DataStoreJsonSerializer", "readFrom: $e")

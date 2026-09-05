@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
@@ -87,13 +86,10 @@ class ThreadViewModel(
         fetchComments()
     }
 
-    private fun getPost(): PostData? {
-        val post = runBlocking(Dispatchers.IO) {
-            val post = repository.getPost(name)
-            if (post == null) {
-                Log.e("ThreadViewModel", "getPost: Post not found in database ($name)")
-            }
-            post
+    private suspend fun getPost(): PostData? {
+        val post = repository.getPost(name)
+        if (post == null) {
+            Log.e("ThreadViewModel", "getPost: Post not found in database ($name)")
         }
         return post
     }

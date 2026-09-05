@@ -11,7 +11,7 @@ data class StreamableAnswer(
     val url: String,
     val files: Files,
     @SerialName("thumbnail_url")
-    val thumbnailUrl: String
+    val thumbnailUrl: String,
 )
 
 @Serializable

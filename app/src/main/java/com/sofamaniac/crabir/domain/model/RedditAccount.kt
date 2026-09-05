@@ -68,7 +68,7 @@ object AccountSerializer : Serializer<RedditAccount> {
 
     override suspend fun readFrom(input: InputStream): RedditAccount {
         try {
-            return Json.decodeFromString<RedditAccount>(
+            return Json.decodeFromString(
                 RedditAccount.serializer(), input.readBytes().decodeToString()
             )
         } catch (serialization: SerializationException) {

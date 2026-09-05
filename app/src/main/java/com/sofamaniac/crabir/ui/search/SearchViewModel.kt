@@ -54,16 +54,14 @@ abstract class SearchViewModel<Params : SearchParams<Params>, Data : DataInterfa
 
     val listState = LazyStaggeredGridState()
 
-
     val query: String get() = queryState.text as String
 
     private var searchJob: Job? = null
 
-
-    internal var _params = MutableStateFlow(
+    internal var paramsState = MutableStateFlow(
         initialParams
     )
-    val params: StateFlow<Params> = _params.asStateFlow()
+    val params: StateFlow<Params> = paramsState.asStateFlow()
 
     private var feedSource: ListingSource<Params, Data>? = null
     val items = Pager(
@@ -91,10 +89,9 @@ abstract class SearchViewModel<Params : SearchParams<Params>, Data : DataInterfa
         }
     }
 
-
     private fun search() {
         Log.d("SearchViewModel", "search: ${queryState.text}")
-        _params.update {
+        paramsState.update {
             it.copy(query = queryState.text as String)
         }
         refresh()
@@ -104,7 +101,6 @@ abstract class SearchViewModel<Params : SearchParams<Params>, Data : DataInterfa
         feedSource?.invalidate()
         repository.refresh()
     }
-
 }
 
 @KoinViewModel
@@ -130,21 +126,21 @@ class PostSearchViewModel(
     }
 
     fun setSubreddit(subreddit: String) {
-        _params.update {
+        paramsState.update {
             it.copy(subreddit = subreddit, restrictSubreddit = true)
         }
         refresh()
     }
 
     fun setRestrictSubreddit(restrict: Boolean) {
-        _params.update {
+        paramsState.update {
             it.copy(restrictSubreddit = restrict)
         }
         refresh()
     }
 
     fun setSort(sort: PostSearchSort, timeframe: Timeframe? = null) {
-        _params.update {
+        paramsState.update {
             it.copy(sort = sort, timeframe = timeframe)
         }
         refresh()
@@ -153,7 +149,6 @@ class PostSearchViewModel(
     override fun isPostRead(post: PostData): Boolean {
         return history.value.contains(post.name)
     }
-
 }
 
 @KoinViewModel
@@ -162,7 +157,8 @@ class CommunitySearchViewModel(
     subscriptionsRepository: SubscriptionsRepository,
     private val randdit: RandditAPI,
 ) : SearchViewModel<CommunitySearchParams, SubredditData>(
-    repository, initialParams =
+    repository,
+    initialParams =
         CommunitySearchParams(
             query = "",
             sort = CommunitySearchSort.Relevance,
@@ -170,10 +166,9 @@ class CommunitySearchViewModel(
         )
 ) {
 
-
     val subscriptions = subscriptionsRepository.subscriptions
     fun setSort(sort: CommunitySearchSort) {
-        _params.update {
+        paramsState.update {
             it.copy(sort = sort)
         }
         refresh()
@@ -197,11 +192,10 @@ class CommunitySearchViewModel(
                 onError(e)
             }
         }
-
     }
 
     fun setIncludeOver18(include: Boolean) {
-        _params.update {
+        paramsState.update {
             it.copy(includeOver18 = include)
         }
     }
@@ -211,7 +205,8 @@ class CommunitySearchViewModel(
 class UserSearchViewModel(
     repository: UserSearchRepository,
 ) : SearchViewModel<PostSearchParams, UserDTO>(
-    repository, initialParams =
+    repository,
+    initialParams =
         PostSearchParams(
             query = "",
             type = "user",

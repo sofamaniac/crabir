@@ -70,7 +70,7 @@ inline fun <reified Sort> SortMenu(crossinline onSelect: (Sort, Timeframe?) -> U
 fun TimeframeMenu(
     expanded: Boolean,
     onDismiss: () -> Unit,
-    onSortChange: (Timeframe?) -> Unit
+    onSortChange: (Timeframe?) -> Unit,
 ) {
     DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
         Timeframe.entries.forEach {

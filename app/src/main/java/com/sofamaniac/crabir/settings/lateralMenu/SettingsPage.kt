@@ -62,7 +62,8 @@ fun LateralMenuSettingsPage() {
                     BackButton {
                         navController?.popBackStack()
                     }
-                })
+                }
+            )
         }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
@@ -112,7 +113,6 @@ private fun LazyListScope.itemsToShow(
     settings: LateralMenuItems,
     update: (LateralMenuItems) -> Unit,
 ) {
-
     item {
         CheckboxTile(
             headlineContent = { Text(stringResource(R.string.home_feed)) },

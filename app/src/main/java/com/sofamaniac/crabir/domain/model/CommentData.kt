@@ -13,10 +13,11 @@ sealed class CommentType : VotableData {
     data class Comment(val comment: CommentData) : CommentType() {
         override fun copy(
             relationship: Relationship?,
-            score: Score?
+            score: Score?,
         ): VotableData {
             return copy(comment = comment.copy(relationship = relationship, score = score))
         }
+
         override val author: AuthorInfo = comment.author
         override val relationship: Relationship = comment.relationship
         override val score: Score = comment.score
@@ -33,7 +34,7 @@ sealed class CommentType : VotableData {
     data class More(val data: MoreData) : CommentType() {
         override fun copy(
             relationship: Relationship?,
-            score: Score?
+            score: Score?,
         ): VotableData {
             return this
         }

@@ -28,6 +28,7 @@ coreKtx = "1.19.0"
 exoplayer = "1.11.0"
 koin-bom = "4.2.2"
 koin-plugin = "1.1.0"
+detekt = "2.0.0-alpha.6"
 
 [libraries]
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
@@ -102,3 +103,4 @@ mikepenz-aboutlibraries-android = { id = "com.mikepenz.aboutlibraries.plugin.and
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }

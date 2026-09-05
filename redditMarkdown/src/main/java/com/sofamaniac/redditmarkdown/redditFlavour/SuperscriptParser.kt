@@ -8,7 +8,7 @@ import org.intellij.markdown.parser.sequentialparsers.TokensCache
 class SuperscriptParser : SequentialParser {
     override fun parse(
         tokens: TokensCache,
-        rangesToGlue: List<IntRange>
+        rangesToGlue: List<IntRange>,
     ): SequentialParser.ParsingResult {
         val result = SequentialParser.ParsingResultBuilder()
         val delegateIndices = RangesListBuilder()
