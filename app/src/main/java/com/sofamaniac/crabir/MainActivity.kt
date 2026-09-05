@@ -16,8 +16,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -26,7 +24,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.core.net.toUri
@@ -38,11 +35,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navDeepLink
-import androidx.navigation.toRoute
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.disk.DiskCache
@@ -50,29 +43,13 @@ import coil3.disk.directory
 import coil3.memory.MemoryCache
 import coil3.memoryCacheMaxSizePercentWhileInBackground
 import coil3.util.DebugLogger
-import com.sofamaniac.crabir.navigation.HistoryRoute
 import com.sofamaniac.crabir.navigation.HomeRoute
-import com.sofamaniac.crabir.navigation.InboxRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.SearchRoute
-import com.sofamaniac.crabir.navigation.SimpleImageRoute
-import com.sofamaniac.crabir.navigation.SubscriptionsRoute
-import com.sofamaniac.crabir.navigation.editorGraph
-import com.sofamaniac.crabir.navigation.imagesGraph
-import com.sofamaniac.crabir.navigation.postGraph
-import com.sofamaniac.crabir.navigation.profileGraph
-import com.sofamaniac.crabir.navigation.settingsGraph
-import com.sofamaniac.crabir.navigation.subredditGraph
+import com.sofamaniac.crabir.navigation.NavigationGraph
 import com.sofamaniac.crabir.settings.ConfigureSettings
-import com.sofamaniac.crabir.settings.api.ApiSettingsRoute
 import com.sofamaniac.crabir.settings.theme.ConfigureCrabirTheme
-import com.sofamaniac.crabir.ui.inbox.InboxView
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 import com.sofamaniac.crabir.ui.rememberCurrentAccount
-import com.sofamaniac.crabir.ui.search.SearchTab
-import com.sofamaniac.crabir.ui.subreddit.HistoryViewer
-import com.sofamaniac.crabir.ui.subreddit.HomeViewer
-import com.sofamaniac.crabir.ui.subredditList.SubredditListViewer
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.annotation.KoinApplication
 import org.koin.core.annotation.KoinViewModelScopeApi
@@ -109,20 +86,11 @@ class MainActivity : ComponentActivity() {
         intent.data?.let { uri ->
             val request = NavDeepLinkRequest.Builder.fromUri(uri).build()
             try {
-                Log.d("MainActivity", "handleIntent: request: $request")
-                val mediaUrl = listOf("i.redd.it", "preview.reddit.com", "preview.redd.it")
-                if (mediaUrl.contains(uri.host)) {
-                    navController.navigate(
-                        route = SimpleImageRoute(uri.toString()),
-                        navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
-                    )
-                } else {
-                    navController.navigate(
-                        request = request,
-                        navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
-                    )
-                }
-            } catch (e: IllegalArgumentException) {
+                navController.navigate(
+                    request = request,
+                    navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
+                )
+            } catch (_: IllegalArgumentException) {
                 try {
                     if (uri.scheme == "http" || uri.scheme == "https") {
                         uriHandler.openUri(uri.toString())
@@ -183,8 +151,8 @@ fun setImageLoader() {
                 .maxSizeBytes(size)
                 .directory(context.cacheDir.resolve("image_cache")).build()
         }
-            .memoryCacheMaxSizePercentWhileInBackground(0.10) // 10% when backgrounded
-            .logger(DebugLogger())
+            .memoryCacheMaxSizePercentWhileInBackground(0.10)
+            .let { builder -> if (BuildConfig.DEBUG) builder.logger(DebugLogger()) else builder }
             .build()
     }
 }
@@ -241,56 +209,3 @@ fun MainScreen(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun NavigationGraph(
-    navController: NavHostController,
-    modifier: Modifier = Modifier,
-) {
-    val startRoute = if (!LocalApiSettings.current.isConfigured) {
-        ApiSettingsRoute
-    } else {
-        HomeRoute
-    }
-    NavHost(
-        navController = navController,
-        startDestination = startRoute,
-        modifier = modifier
-            .fillMaxSize()
-            .imePadding(),
-        //        enterTransition = { EnterTransition.None },
-        //        exitTransition = { ExitTransition.None },
-    ) {
-        composable<HomeRoute> {
-            HomeViewer()
-        }
-
-        profileGraph()
-        postGraph(navController = navController)
-        subredditGraph()
-        imagesGraph(navController = navController)
-        settingsGraph()
-        editorGraph(navController = navController)
-
-        composable<SubscriptionsRoute> {
-            SubredditListViewer()
-        }
-        composable<SearchRoute>(
-            deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = SearchRoute.URL
-                }
-            )
-        ) { navBackStackEntry ->
-            val search = navBackStackEntry.toRoute<SearchRoute>()
-            SearchTab(search)
-        }
-        composable<InboxRoute> {
-            InboxView()
-
-        }
-        composable<HistoryRoute> {
-            HistoryViewer()
-        }
-    }
-}
