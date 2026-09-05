@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.navigation
 
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -13,7 +12,7 @@ import com.sofamaniac.crabir.ui.subreddit.SubredditInfoView
 import com.sofamaniac.crabir.ui.subreddit.SubredditViewer
 import kotlin.reflect.typeOf
 
-fun NavGraphBuilder.subredditGraph(navController: NavController) {
+fun NavGraphBuilder.subredditGraph() {
     composable<SubredditRoute>
     { navBackStackEntry ->
         val subreddit = navBackStackEntry.toRoute<SubredditRoute>().subreddit

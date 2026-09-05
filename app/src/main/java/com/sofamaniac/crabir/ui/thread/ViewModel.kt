@@ -113,7 +113,12 @@ class ThreadViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             fetchAsync()
             if (commentsSettings.collapseAutoMod) {
-                for (comment in comments.value.filter { it is CommentType.Comment && it.comment.author.username == "AutoModerator" }) {
+                val automodComments =
+                    comments.value.filter {
+                        it is CommentType.Comment &&
+                                it.comment.author.username == "AutoModerator"
+                    }
+                for (comment in automodComments) {
                     val comment = comment as CommentType.Comment
                     repository.updateComment(
                         name,

@@ -64,7 +64,7 @@ fun MediaPicker(viewModel: PostCreatorViewModel) {
             ActivityResultContracts.PickVisualMedia.VideoOnly,
         )
 
-        else -> throw Exception("Invalid kind")
+        else -> throw IllegalArgumentException("Invalid kind")
     }
     val picker = when (viewModel.state.kind) {
         Kind.Image, Kind.Gallery -> rememberLauncherForActivityResult(

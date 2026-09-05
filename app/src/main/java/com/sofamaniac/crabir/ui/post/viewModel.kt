@@ -164,20 +164,15 @@ class DummyInteraction(post: PostData = DUMMY_POST) : PostViewModelInterface, Vi
         flowOf(PostSettingsDefaults.defaultLinksSettings)
     override val flairs: StateFlow<List<FlairInfo>> = MutableStateFlow(emptyList())
 
-    override fun hide() {
-    }
+    override fun hide() = Unit
 
-    override fun unhide() {
-    }
+    override fun unhide() = Unit
 
-    override fun delete() {
-    }
+    override fun delete() = Unit
 
-    override fun editFlair(flairId: String, text: String?) {
-    }
+    override fun editFlair(flairId: String, text: String?) = Unit
 
-    override fun getFlairs() {
-    }
+    override fun getFlairs() = Unit
 
     override fun markNSFW() {
         _post.value = _post.value.copy(over18 = true)
@@ -195,8 +190,7 @@ class DummyInteraction(post: PostData = DUMMY_POST) : PostViewModelInterface, Vi
         _post.value = _post.value.copy(spoiler = false)
     }
 
-    override fun setInboxReplies(enabled: Boolean) {
-    }
+    override fun setInboxReplies(enabled: Boolean) = Unit
 
     override val likes: StateFlow<Boolean?> =
         _post.map { it.relationship.liked }.stateIn(viewModelScope, SharingStarted.Lazily, null)
@@ -244,9 +238,7 @@ class DummyInteraction(post: PostData = DUMMY_POST) : PostViewModelInterface, Vi
         _post.value = _post.value.copy(relationship = _post.value.relationship.copy(saved = target))
     }
 
-    override fun fetchRules() {
-    }
+    override fun fetchRules() = Unit
 
-    override fun report(name: Fullname, reason: String) {
-    }
+    override fun report(name: Fullname, reason: String) = Unit
 }

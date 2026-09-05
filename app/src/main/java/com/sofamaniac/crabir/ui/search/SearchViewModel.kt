@@ -180,16 +180,12 @@ class CommunitySearchViewModel(
         onError: (Throwable) -> Unit,
     ) {
         viewModelScope.launch {
-            try {
-                val response = randdit.getRandomCommunity(includeOver18)
-                if (response.isSuccess) {
-                    val url = response.getOrNull()!!.url
-                    onSuccess(url)
-                } else {
-                    onError(Exception(response.exceptionOrNull()))
-                }
-            } catch (e: Exception) {
-                onError(e)
+            val response = randdit.getRandomCommunity(includeOver18)
+            if (response.isSuccess) {
+                val url = response.getOrNull()!!.url
+                onSuccess(url)
+            } else {
+                onError(Exception(response.exceptionOrNull()))
             }
         }
     }

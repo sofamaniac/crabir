@@ -40,12 +40,10 @@ import org.koin.core.annotation.KoinViewModel
 import org.koin.core.annotation.Single
 import java.time.Clock
 import java.time.Duration
-import java.util.Locale
 
 @Composable
 fun formatElapsedTimeLocalized(
     creationDate: kotlin.time.Instant,
-    locale: Locale = Locale.getDefault(),
 ): String {
     val end = Clock.systemUTC().millis()
     val duration = Duration.ofMillis(kotlin.math.abs(end - creationDate.toEpochMilliseconds()))

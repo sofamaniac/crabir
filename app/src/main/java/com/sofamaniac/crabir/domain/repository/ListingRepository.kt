@@ -84,26 +84,20 @@ class ListingSource<Params, Data : DataInterface>(
         if (params.key == null) {
             return LoadResult.Page(prevKey = null, nextKey = null, data = emptyList())
         }
-        try {
-            val page = getThings(params.key!!)
-            if (page is LoadResult.Error) {
-                return LoadResult.Error(page.throwable)
+        return when (val page = getThings(params.key!!)) {
+            is LoadResult.Error -> LoadResult.Error(page.throwable)
+            !is LoadResult.Page -> LoadResult.Error(Exception("Invalid load result"))
+            else -> {
+                val data = page.data.mapNotNull { id ->
+                    repository.cache[id]
+                }
+                LoadResult.Page(
+                    prevKey = null,
+                    nextKey = page.nextKey,
+                    data = data
+                )
             }
-            if (page !is LoadResult.Page) {
-                return LoadResult.Error(Exception("Invalid load result"))
-            }
-            val data = page.data.mapNotNull { id ->
-                repository.cache[id]
-            }
-            return LoadResult.Page(
-                prevKey = null,
-                nextKey = page.nextKey,
-                data = data
-            )
-        } catch (e: Exception) {
-            return LoadResult.Error(e)
         }
-
     }
 
     private suspend fun getThings(after: Fullname): LoadResult<Fullname, Fullname> {

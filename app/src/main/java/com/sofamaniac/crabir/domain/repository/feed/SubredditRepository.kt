@@ -38,15 +38,11 @@ class SubredditPostsRepository(
     private var info: SubredditData? = null
 
     suspend fun getInfo(): SubredditData? {
-        if (currentSubreddit == null) {
-            return null
+        return currentSubreddit?.let { sub ->
+            api.getSubInfo(sub).map { res ->
+                SubredditDTOMapper.map(res.data)
+            }.getOrNull()
         }
-        val res = api.getSubInfo(currentSubreddit!!)
-        if (!res.isSuccess) {
-            return null
-        }
-        info = SubredditDTOMapper.map(res.getOrNull()!!.data)
-        return info
     }
 
     /**

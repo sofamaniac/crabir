@@ -51,7 +51,8 @@ internal fun PostView(
     val imageHeight = LocalCommentsSettings.current.postMediaPreview
     PostCard(
         post,
-        threadViewModel = threadViewModel
+        threadViewModel = threadViewModel,
+        modifier = modifier,
     ) {
         if (!post.isCrosspost) {
             PostBody(

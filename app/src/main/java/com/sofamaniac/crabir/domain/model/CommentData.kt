@@ -40,9 +40,9 @@ sealed class CommentType : VotableData {
         }
 
         override val author: AuthorInfo? = null
-        override val relationship: Relationship get() = throw Exception("More has no relationship")
-        override val score: Score get() = throw Exception("More has no score")
-        override val body: ParsedMarkdown get() = throw Exception("More has no body")
+        override val relationship: Relationship get() = throw IllegalAccessError("More has no relationship")
+        override val score: Score get() = throw IllegalAccessError("More has no score")
+        override val body: ParsedMarkdown get() = throw IllegalAccessError("More has no body")
 
         override fun toEntity(): VotableEntity {
             return VotableEntity(id = data.name, data = Json.encodeToString(this))

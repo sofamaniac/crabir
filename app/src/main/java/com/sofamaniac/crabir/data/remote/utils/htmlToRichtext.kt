@@ -44,18 +44,22 @@ private fun Richtext.Companion.fromHtml(node: Node, style: Int = 0): List<Richte
         is TextNode if (node.text().isNotBlank()) -> listOf(
             Richtext.Text(
                 node.text(),
-                if (style == 0) emptyList() else listOf(
-                    TextModifier(
-                        style,
-                        0,
-                        node.text().length
+                if (style == 0) {
+                    emptyList()
+                } else {
+                    listOf(
+                        TextModifier(
+                            style,
+                            0,
+                            node.text().length
+                        )
                     )
-                )
+                }
             )
         )
 
         else -> {
-            Log.e("Richtext", "Unknown node: ${node}")
+            Log.e("Richtext", "Unknown node: $node")
             emptyList()
         }
     }
@@ -138,7 +142,6 @@ private fun Richtext.Companion.fromHtml(node: Element, style: Int = 0): List<Ric
             Log.d("Richtext", "Code: ${node.childNodes()}")
             if (node.text().contains("\n")) {
                 listOf(Richtext.Code(node.text().lines().map { Richtext.Raw(it) }))
-
             } else {
                 listOf(
                     Richtext.Text(
@@ -153,7 +156,6 @@ private fun Richtext.Companion.fromHtml(node: Element, style: Int = 0): List<Ric
             Log.d("Richtext", "Code: ${node.childNodes()}")
             if (node.text().contains("\n")) {
                 listOf(Richtext.Code(node.text().lines().map { Richtext.Raw(it) }))
-
             } else {
                 listOf(
                     Richtext.Text(

@@ -20,24 +20,21 @@ import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.mikepenz.markdown.compose.LocalImageTransformer
-import org.intellij.markdown.ast.ASTNode
 
 @Composable
 fun ClickableMarkdownInlineImage(
     link: String,
-    node: ASTNode,
     linkHandler: LinkInteractionListener?,
 ) {
     when (link.toUri().host) {
-        "v.redd.it" -> InlineVideo(link, node, linkHandler)
-        else -> InlineImage(link, node, linkHandler)
+        "v.redd.it" -> InlineVideo(link, linkHandler)
+        else -> InlineImage(link, linkHandler)
     }
 }
 
 @Composable
 private fun InlineVideo(
     link: String,
-    node: ASTNode,
     linkHandler: LinkInteractionListener?,
 ) {
     val transformer = LocalImageTransformer.current
@@ -74,7 +71,6 @@ private fun InlineVideo(
 @Composable
 private fun InlineImage(
     link: String,
-    node: ASTNode,
     linkHandler: LinkInteractionListener?,
 ) {
     val transformer = LocalImageTransformer.current

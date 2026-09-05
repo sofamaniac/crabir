@@ -18,7 +18,7 @@ import com.sofamaniac.crabir.data.remote.utils.CommentSortSerializer
 import com.sofamaniac.crabir.data.remote.utils.FalseOrTimestampSerializer
 import com.sofamaniac.crabir.data.remote.utils.InstantAsFloatSerializer
 import com.sofamaniac.crabir.data.remote.utils.MediaMetadataSerializer
-import com.sofamaniac.crabir.data.remote.utils.RedditVideoSerializer
+import com.sofamaniac.crabir.data.remote.utils.TranscodedMediaSerializer
 import com.sofamaniac.crabir.domain.model.AuthorInfo
 import com.sofamaniac.crabir.domain.model.Flair
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -346,7 +346,7 @@ object PostDataMapper : ObjectMappie<PostDTO, PostData>() {
 //FIXME
 @Serializable
 data class Media(
-    @Serializable(with = RedditVideoSerializer::class)
+    @Serializable(with = TranscodedMediaSerializer::class)
     @SerialName("reddit_video")
     val redditVideo: RedditVideo? = null,
     val oembed: OEmbed? = null,

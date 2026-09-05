@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
-import com.sofamaniac.crabir.data.remote.reddit.auth.AuthConfig
 import com.sofamaniac.crabir.data.remote.reddit.auth.BasicAuthClient
+import com.sofamaniac.crabir.data.remote.reddit.auth.Config
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.settings.api.apiSettingsDataStore
@@ -38,13 +38,13 @@ class AccountManager(
         val apiSettings = context.apiSettingsDataStore.data.first()
         if (apiSettings.redditClientId == null || apiSettings.redditRedirectUri == null) return
         clientId = apiSettings.redditClientId
-        serviceConfig = AuthConfig(clientId, apiSettings.redditRedirectUri)
+        serviceConfig = Config(clientId, apiSettings.redditRedirectUri)
         Log.d("AccountManager", "Initializing account manager: $clientId")
         setupAnonymous(apiSettings.redditClientId, onError)
         initialized = true
     }
 
-    private lateinit var serviceConfig: AuthConfig
+    private lateinit var serviceConfig: Config
     fun createAuthIntent(): Intent {
         if (!initialized) throw IllegalStateException("AccountManager not initialized")
         val authRequest = serviceConfig.createAuthorizationRequest()
@@ -141,7 +141,7 @@ class AccountManager(
                     Log.d("LoginViewModel", "Got authorization token")
                     val authState = AuthState(authResponse, tokenResponse, null)
                     scope.launch(Dispatchers.IO) {
-                        save(authState, updateState)
+                        save(authState)
                     }
                 }
 
@@ -153,16 +153,11 @@ class AccountManager(
     }
 
 
-    private suspend fun save(authState: AuthState, updateState: (LoginState) -> Unit) {
-        try {
-            val id = (accountsRepository.accounts.first().maxByOrNull { it.id }?.id ?: 0) + 1
-            val newAccount = RedditAccount.uninitialized(id, authState)
-            accountsRepository.addAccount(newAccount)
-            accountsRepository.setActiveAccount(id)
-        } catch (e: Exception) {
-            Log.e("LoginViewModel", "Failed to save account: $e")
-            updateState(LoginState.Error(e))
-        }
+    private suspend fun save(authState: AuthState) {
+        val id = (accountsRepository.accounts.first().maxByOrNull { it.id }?.id ?: 0) + 1
+        val newAccount = RedditAccount.uninitialized(id, authState)
+        accountsRepository.addAccount(newAccount)
+        accountsRepository.setActiveAccount(id)
     }
 
 }

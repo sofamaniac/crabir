@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.navigation
 
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -22,7 +21,7 @@ object SavedRoute : Route {
 
 val baseUrls = listOf("user/{author}", "u/{author}")
 
-fun NavGraphBuilder.profileGraph(navController: NavController) {
+fun NavGraphBuilder.profileGraph() {
     for (url in baseUrls) {
         composable(
             route = "/$url",

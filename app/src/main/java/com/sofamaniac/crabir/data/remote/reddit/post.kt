@@ -110,8 +110,6 @@ interface PostAPI {
         @Path("subreddit", encoded = true) subreddit: String,
         @Field("link") postFullname: Fullname,
     ): Result<List<FlairInfo>>
-
-
 }
 
 @Serializable
@@ -124,12 +122,10 @@ data class PostResponseInner(
     val errors: List<List<String>> = emptyList(),
 )
 
-
 interface MediaUploadInterface {
     @POST
     suspend fun pushMedia(@Url url: String, @Body body: RequestBody): Result<MediaPushResponse>
 }
-
 
 @Serializable
 @XmlSerialName("PostResponse")
@@ -150,7 +146,6 @@ data class MediaUploadResponse(
 data class Asset(
     @SerialName("asset_id") val assetId: String,
 )
-
 
 @Serializable
 data class Args(
@@ -198,7 +193,6 @@ data class GallerySubmission(
     @SerialName("validate_on_submit") val validateOnSubmit: Boolean = true,
 )
 
-
 @Serializable
 data class PostSubmissionBuilder(
     val title: String = "",
@@ -225,47 +219,56 @@ data class PostSubmissionBuilder(
         )
     }
 
-
-    fun build(): Result<Map<String, String>> {
-        when {
-            title.isBlank() -> return Result.failure(MissingTitle())
-            subreddit.isBlank() -> return Result.failure(MissingCommunity())
-            kind == Kind.Link && url.isNullOrBlank() -> return Result.failure(MissingUrl())
-            kind == Kind.Self && text.isNullOrBlank() -> return Result.failure(MissingText())
+    private fun check(): Result<Unit> {
+        return when {
+            title.isBlank() -> Result.failure(MissingTitle())
+            subreddit.isBlank() -> Result.failure(MissingCommunity())
+            kind == Kind.Link && url.isNullOrBlank() -> Result.failure(MissingUrl())
+            kind == Kind.Self && text.isNullOrBlank() -> Result.failure(MissingText())
             kind == Kind.Link && url?.runCatching { toHttpUrl() }?.isSuccess != true -> return Result.failure(
                 InvalidUrl()
             )
+
+            else -> Result.success(Unit)
         }
-        return Result.success(
-            buildMap {
-                put("api_type", "json")
-                kind.toApiString()?.let {
-                    put("kind", it)
-                }
-                put("title", title)
-                put("sr", subreddit)
-                put("sendreplies", sendReplies.toString())
-                put("nsfw", nsfw.toString())
-                put("spoiler", spoiler.toString())
-                put("show_error_list", true.toString())
-                put("validate_on_submit", true.toString())
-                if (!text.isNullOrBlank()) {
-                    put("text", text)
-                }
-                if (!url.isNullOrBlank()) {
-                    put("url", url)
-                    if (kind == Kind.Video) {
-                        put("video_poster_url", url)
+    }
+
+    fun build(): Result<Map<String, String>> {
+        val result = check()
+        return if (result.isFailure) {
+            Result.failure(result.exceptionOrNull()!!)
+        } else {
+            Result.success(
+                buildMap {
+                    put("api_type", "json")
+                    kind.toApiString()?.let {
+                        put("kind", it)
+                    }
+                    put("title", title)
+                    put("sr", subreddit)
+                    put("sendreplies", sendReplies.toString())
+                    put("nsfw", nsfw.toString())
+                    put("spoiler", spoiler.toString())
+                    put("show_error_list", true.toString())
+                    put("validate_on_submit", true.toString())
+                    if (!text.isNullOrBlank()) {
+                        put("text", text)
+                    }
+                    if (!url.isNullOrBlank()) {
+                        put("url", url)
+                        if (kind == Kind.Video) {
+                            put("video_poster_url", url)
+                        }
+                    }
+                    if (flairId != null) {
+                        put("flair_id", flairId)
+                    }
+                    if (flairText != null) {
+                        put("flair_text", flairText)
                     }
                 }
-                if (flairId != null) {
-                    put("flair_id", flairId)
-                }
-                if (flairText != null) {
-                    put("flair_text", flairText)
-                }
-            }
-        )
+            )
+        }
     }
 }
 
@@ -282,29 +285,32 @@ data class CrosspostSubmissionBuilder(
 ) {
 
     fun build(): Result<Map<String, String>> {
-        if (title.isBlank()) return Result.failure(MissingTitle())
-        else if (subreddit.isBlank()) return Result.failure(MissingCommunity())
-
-        return Result.success(
-            buildMap {
-                put("api_type", "json")
-                put("kind", "crosspost")
-                put("title", title)
-                put("sr", subreddit)
-                put("sendreplies", sendReplies.toString())
-                put("nsfw", nsfw.toString())
-                put("spoiler", spoiler.toString())
-                put("show_error_list", true.toString())
-                put("validate_on_submit", true.toString())
-                put("crosspost_fullname", crosspostFullname.name)
-                if (flairId != null) {
-                    put("flair_id", flairId)
+        return if (title.isBlank()) {
+            Result.failure(MissingTitle())
+        } else if (subreddit.isBlank()) {
+            Result.failure(MissingCommunity())
+        } else {
+            Result.success(
+                buildMap {
+                    put("api_type", "json")
+                    put("kind", "crosspost")
+                    put("title", title)
+                    put("sr", subreddit)
+                    put("sendreplies", sendReplies.toString())
+                    put("nsfw", nsfw.toString())
+                    put("spoiler", spoiler.toString())
+                    put("show_error_list", true.toString())
+                    put("validate_on_submit", true.toString())
+                    put("crosspost_fullname", crosspostFullname.name)
+                    if (flairId != null) {
+                        put("flair_id", flairId)
+                    }
+                    if (flairText != null) {
+                        put("flair_text", flairText)
+                    }
                 }
-                if (flairText != null) {
-                    put("flair_text", flairText)
-                }
-            }
-        )
+            )
+        }
     }
 }
 

@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.navigation
 
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.sofamaniac.crabir.settings.DebugOptionsView
@@ -28,7 +27,7 @@ import com.sofamaniac.crabir.settings.theme.ThemeSettingsPage
 import com.sofamaniac.crabir.settings.views.ViewManagerPage
 import com.sofamaniac.crabir.settings.views.ViewsSettingsPage
 
-fun NavGraphBuilder.settingsGraph(navController: NavController) {
+fun NavGraphBuilder.settingsGraph() {
     composable<LicensesRoute> {
         LicensePage()
     }

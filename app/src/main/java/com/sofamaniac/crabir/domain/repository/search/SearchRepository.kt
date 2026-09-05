@@ -77,9 +77,13 @@ class CommunitySearchRepository(private val api: RedditAPIService) :
 class UserSearchRepository(private val api: RedditAPIService) :
     ListingRepository<PostSearchParams, UserDTO>() {
     override fun thingToData(thing: Thing): UserDTO? {
-        if (thing !is Thing.User) return null
-        if (thing.data.id.isBlank()) return null
-        return thing.data
+        return if (thing !is Thing.User) {
+            null
+        } else if (thing.data.id.isBlank()) {
+            null
+        } else {
+            thing.data
+        }
     }
 
     override suspend fun getThings(
@@ -101,9 +105,9 @@ class UserSearchRepository(private val api: RedditAPIService) :
     }
 }
 
-//class CommentSearchRepository(api: RedditAPIService) : SearchRepositoryGeneric<CommentData>(api) {
+// class CommentSearchRepository(api: RedditAPIService) : SearchRepositoryGeneric<CommentData>(api) {
 //    override fun thingToData(thing: Thing): CommentData? {
 //        if (thing !is Thing.Comment) return null
 //        return CommentDataMapper.map(thing.data)
 //    }
-//}
+// }

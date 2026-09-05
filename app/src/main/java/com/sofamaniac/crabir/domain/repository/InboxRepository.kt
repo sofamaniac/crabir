@@ -21,6 +21,8 @@ enum class InboxFeed {
     Mentions
 }
 
+class MessageNotFoundException : Exception()
+
 abstract class InboxRepository : ListingRepository<InboxFeed, Message>() {
     abstract fun get(name: Fullname): Flow<Message?>
     abstract suspend fun readAll(): Result<Unit>
@@ -68,54 +70,40 @@ class InboxRepositoryImpl(private val inbox: RedditAPIService, private val inbox
     }
 
     override suspend fun readAll(): Result<Unit> {
-        try {
-            inbox.readAll()
+        return inbox.readAll().onSuccess {
             withContext(Dispatchers.IO) {
                 inboxDao.markAllRead()
             }
-            return Result.success(Unit)
-        } catch (e: Exception) {
-            return Result.failure(e)
         }
     }
 
     override suspend fun read(name: Fullname): Result<Unit> {
-        try {
-            inbox.markRead(name.name)
-            val message =
-                inboxDao.getValue(name) ?: return Result.failure(Exception("Message not found"))
-            withContext(Dispatchers.IO) {
-                inboxDao.insert(message.copy(new = false))
-            }
-            return Result.success(Unit)
-        } catch (e: Exception) {
-            return Result.failure(e)
+        val res = inbox.markRead(name.name)
+        if (res.isFailure) return res
+        val message =
+            inboxDao.getValue(name) ?: return Result.failure(MessageNotFoundException())
+        withContext(Dispatchers.IO) {
+            inboxDao.insert(message.copy(new = false))
         }
+        return Result.success(Unit)
     }
 
     override suspend fun unread(name: Fullname): Result<Unit> {
-        try {
-            inbox.markUnread(name.name)
-            val message =
-                inboxDao.getValue(name) ?: return Result.failure(Exception("Message not found"))
-            withContext(Dispatchers.IO) {
-                inboxDao.update(message.copy(new = true))
-            }
-            return Result.success(Unit)
-        } catch (e: Exception) {
-            return Result.failure(e)
+        val res = inbox.markUnread(name.name)
+        if (res.isFailure) return res
+        val message =
+            inboxDao.getValue(name) ?: return Result.failure(MessageNotFoundException())
+        withContext(Dispatchers.IO) {
+            inboxDao.update(message.copy(new = true))
         }
+        return Result.success(Unit)
     }
 
     override suspend fun delete(name: Fullname): Result<Unit> {
-        try {
-            inbox.delete(name.name)
+        return inbox.delete(name.name).onSuccess {
             withContext(Dispatchers.IO) {
                 inboxDao.delete(name)
             }
-            return Result.success(Unit)
-        } catch (e: Exception) {
-            return Result.failure(e)
         }
     }
 }

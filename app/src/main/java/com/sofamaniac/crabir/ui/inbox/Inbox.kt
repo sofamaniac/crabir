@@ -249,7 +249,7 @@ fun Message(
         }
     }
     val navController = LocalNavController.current
-    ThemedCard(modifier = Modifier.fillMaxWidth()) {
+    ThemedCard(modifier = modifier.fillMaxWidth()) {
         Row( //horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
         ) {

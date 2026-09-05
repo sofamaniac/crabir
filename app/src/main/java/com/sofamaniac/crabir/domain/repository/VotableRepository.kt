@@ -107,18 +107,18 @@ interface VotableRepository<T : VotableData> {
 
     suspend fun saveHelper(name: Fullname, target: Boolean): Result<Unit> {
         val post: VotableData? = get(name).first()
-        if (post == null) return Result.failure(Exception("Post not found"))
+        if (post == null) return Result.failure(PostNotFoundException(name))
         val relationship = post.relationship.copy(saved = target)
         val newPost = post.copy(relationship = relationship)
         votableDao.update(name, newPost.toEntity().data)
         val res = if (target) api.save(post.name) else api.unsave(post.name)
-        if (res.isSuccess) {
-            return Result.success(Unit)
+        return if (res.isSuccess) {
+            Result.success(Unit)
         } else {
             // restore old value on failure
             votableDao.update(name, post.toEntity().data)
             Log.e("PostRepository", "Error saving post: ${res.exceptionOrNull()}")
-            return Result.failure(Exception("Error saving post"))
+            Result.failure(Exception("Error saving post"))
         }
     }
 

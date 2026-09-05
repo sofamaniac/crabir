@@ -21,8 +21,8 @@ import com.sofamaniac.crabir.data.remote.dto.Timeframe
 
 @Preview
 @Composable
-inline fun <reified Sort> SortMenu(crossinline onSelect: (Sort, Timeframe?) -> Unit = { _, _ -> }) where Sort : Enum<Sort>, Sort : SortInterface {
-
+inline fun <reified Sort> SortMenu(crossinline onSelect: (Sort, Timeframe?) -> Unit = { _, _ -> })
+        where Sort : Enum<Sort>, Sort : SortInterface {
     var sortExpanded by remember { mutableStateOf(false) }
     var timeframeExpanded by remember { mutableStateOf(false) }
     var chosenSort by remember { mutableStateOf<Sort?>(null) }
@@ -33,7 +33,8 @@ inline fun <reified Sort> SortMenu(crossinline onSelect: (Sort, Timeframe?) -> U
         }
         DropdownMenu(
             expanded = sortExpanded,
-            onDismissRequest = { sortExpanded = false }) {
+            onDismissRequest = { sortExpanded = false }
+        ) {
             entries.forEach { sort ->
                 if (sort.isTimeframe) {
                     DropdownMenuItem(
@@ -47,14 +48,16 @@ inline fun <reified Sort> SortMenu(crossinline onSelect: (Sort, Timeframe?) -> U
                                 Icons.AutoMirrored.Filled.ArrowRight,
                                 contentDescription = "Select"
                             )
-                        })
+                        }
+                    )
                 } else {
                     DropdownMenuItem(
                         text = { Text(stringResource(sort.representation)) },
                         onClick = {
                             onSelect(sort, null)
                             sortExpanded = false
-                        })
+                        }
+                    )
                 }
             }
         }

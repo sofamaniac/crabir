@@ -40,7 +40,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-
 interface FeedViewModelInterface<T : VotableData> {
     val listState: LazyStaggeredGridState
     val data: Flow<PagingData<T>>
@@ -49,27 +48,28 @@ interface FeedViewModelInterface<T : VotableData> {
     fun refresh()
 
     fun isPostRead(post: PostData): Boolean
-
 }
 
 object FeedViewModelInterfacePreview : FeedViewModelInterface<PostData> {
     override val listState: LazyStaggeredGridState = LazyStaggeredGridState()
     override val data: Flow<PagingData<PostData>> =
-        flowOf(PagingData.from(List(100) {
-            DUMMY_POST.copy(
-                id = it.toString(),
-                name = Fullname(it.toString())
+        flowOf(
+            PagingData.from(
+                List(100) {
+                    DUMMY_POST.copy(
+                        id = it.toString(),
+                        name = Fullname(it.toString())
+                    )
+                }
             )
-        }))
+        )
     override var needScrollToTop: Boolean = false
 
-    override fun refresh() {
-    }
+    override fun refresh() = Unit
 
     override fun isPostRead(post: PostData): Boolean {
         return false
     }
-
 }
 
 abstract class PostFeedViewModel<T : CommunityData>(
@@ -78,7 +78,6 @@ abstract class PostFeedViewModel<T : CommunityData>(
     private val communityRepository: CommunityRepository<T>,
     viewEntity: CommunityViewEntity,
 ) : ViewModel(), FeedViewModelInterface<PostData> {
-
 
     override val listState = LazyStaggeredGridState()
     override var needScrollToTop = false
@@ -137,8 +136,9 @@ abstract class PostFeedViewModel<T : CommunityData>(
         val needRefresh = params.value.sort != sort || params.value.timeframe != timeframe
         Log.d("PostFeedViewModel", "_params: ${params.value}, sort: $sort, timeframe: $timeframe")
         _params.update {
-            if (!needRefresh) it
-            else {
+            if (!needRefresh) {
+                it
+            } else {
                 it.copy(sort = sort, timeframe = timeframe)
             }
         }
@@ -151,5 +151,4 @@ abstract class PostFeedViewModel<T : CommunityData>(
     override fun isPostRead(post: PostData): Boolean {
         return history.value.contains(post.name)
     }
-
 }

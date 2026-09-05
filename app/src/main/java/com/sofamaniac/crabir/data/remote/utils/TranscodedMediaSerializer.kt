@@ -23,7 +23,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 /** If `transcoding_status` is different from `completed` returns null*/
-object RedditVideoSerializer : KSerializer<RedditVideo?> {
+object TranscodedMediaSerializer : KSerializer<RedditVideo?> {
 
     private val delegateSerializer = RedditVideo.serializer().nullable
 

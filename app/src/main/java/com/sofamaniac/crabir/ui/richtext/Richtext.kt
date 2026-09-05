@@ -468,7 +468,7 @@ fun Richtext.TextNode.toAnnotatedString(context: Context): AnnotatedString {
         is Richtext.CommunityLink -> toAnnotatedString(context)
         is Richtext.UserLink -> toAnnotatedString(context)
         is Richtext.Raw -> toAnnotatedString(context)
-        else -> throw Exception("Unknown text node ${this::class.simpleName}")
+        else -> throw IllegalArgumentException("Unknown text node ${this::class.simpleName}")
     }
 }
 

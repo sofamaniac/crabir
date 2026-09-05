@@ -81,7 +81,7 @@ fun BottomRow(
     val upvoteOnSave =
         interactions.linksSettings.collectAsState(initial = null).value?.upvoteOnSave ?: false
     val navController = LocalNavController.current
-    Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+    Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = modifier.fillMaxWidth()) {
         UpButton(likes, onClick = { interactions.upvote(post.name) })
         DownButton(likes, onClick = { interactions.downvote(post.name) })
         SavedButton(saved, onClick = {
@@ -119,7 +119,7 @@ private fun PostOptions(
     val navController = LocalNavController.current
     val currentAccount = LocalRedditAccount.current
     val theme = LocalTheme.current
-    IconButton(onClick = { showOptions = true }) {
+    IconButton(modifier = modifier, onClick = { showOptions = true }) {
         Icon(Icons.Default.MoreVert, "more", tint = Color.Gray)
     }
     if (showOptions) {

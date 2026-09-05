@@ -8,7 +8,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -163,7 +162,6 @@ fun CommentContent(
 fun LazyListScope.commentNode(
     comment: CommentType.Comment,
     viewModel: ThreadViewModel,
-    modifier: Modifier = Modifier,
     enableAnimation: Boolean = true,
 ) {
     item(key = comment.name) {
@@ -229,7 +227,7 @@ private fun CollapsedComment(
 }
 
 @Composable
-fun ColumnScope.OpenedComment(
+fun OpenedComment(
     viewModel: CommentViewModel,
     opened: Boolean,
     toggleComment: (Boolean) -> Unit,
@@ -244,20 +242,22 @@ fun ColumnScope.OpenedComment(
 
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
-    Spacer(modifier = Modifier.height(8.dp))
-    TopRow(comment, modifier = innerModifier)
-    Spacer(modifier = Modifier.height(8.dp))
-    Richtext(
-        comment.richtext,
-        modifier = innerModifier,
-        mediaMetadata = comment.mediaMetadata,
-        threadId = comment.parentId.name.split("_").last()
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    AnimatedVisibility(showBottomBar) {
-        BottomRow(comment, viewModel, startReply = startReply) {
-            if (commentsSettings.hideButtonsAfterVote) {
-                toggleComment(false)
+    Column(modifier) {
+        Spacer(modifier = Modifier.height(8.dp))
+        TopRow(comment, modifier = innerModifier)
+        Spacer(modifier = Modifier.height(8.dp))
+        Richtext(
+            comment.richtext,
+            modifier = innerModifier,
+            mediaMetadata = comment.mediaMetadata,
+            threadId = comment.parentId.name.split("_").last()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        AnimatedVisibility(showBottomBar) {
+            BottomRow(comment, viewModel, startReply = startReply) {
+                if (commentsSettings.hideButtonsAfterVote) {
+                    toggleComment(false)
+                }
             }
         }
     }

@@ -81,7 +81,7 @@ object MediaMetadataSerializer : KSerializer<MediaMetadata> {
 
                 else -> MediaMetadata.Invalid
             }
-        } catch (e: Exception) {
+        } catch (e: SerializationException) {
             Log.e("MediaMetadataSerializer", "Error deserializing media metadata", e)
             MediaMetadata.Invalid
         }

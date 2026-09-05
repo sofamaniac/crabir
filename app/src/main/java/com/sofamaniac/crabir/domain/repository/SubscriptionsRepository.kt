@@ -72,14 +72,13 @@ class SubscriptionsRepository(
         val response = request()
         if (response.isSuccess) {
             val listing = response.getOrNull()
-            listing?.let {
-                return PagedResponse(
+            return listing?.let {
+                PagedResponse(
                     data = it.data.children,
                     after = it.data.after,
                     total = it.size
                 )
-            }
-            return PagedResponse()
+            } ?: PagedResponse()
         }
         Log.e("makeRequest", "Error making request : ${response.exceptionOrNull()}")
         return PagedResponse()
@@ -115,15 +114,15 @@ class SubscriptionsRepository(
             return emptyList()
         }
         val response = result.getOrThrow()
-        if (response.isSuccess) {
+        return if (response.isSuccess) {
             val multis = response.getOrNull() ?: emptyList()
             for (multi in multis) {
                 multiCache.upsert(multi.data)
             }
-            return multis
+            multis
         } else {
             Log.e("SubscriptionsRepository", "Error loading multis: ${response.exceptionOrNull()}")
-            return emptyList()
+            emptyList()
         }
 
     }

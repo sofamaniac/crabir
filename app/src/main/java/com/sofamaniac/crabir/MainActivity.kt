@@ -127,7 +127,7 @@ class MainActivity : ComponentActivity() {
                     if (uri.scheme == "http" || uri.scheme == "https") {
                         uriHandler.openUri(uri.toString())
                     }
-                } catch (e: Exception) {
+                } catch (e: IllegalArgumentException) {
                     Log.e("MainActivity", "handleIntent: failed to open uri: $uri", e)
                 }
             }
@@ -265,11 +265,11 @@ fun NavigationGraph(
             HomeViewer()
         }
 
-        profileGraph(navController = navController)
+        profileGraph()
         postGraph(navController = navController)
-        subredditGraph(navController = navController)
+        subredditGraph()
         imagesGraph(navController = navController)
-        settingsGraph(navController = navController)
+        settingsGraph()
         editorGraph(navController = navController)
 
         composable<SubscriptionsRoute> {

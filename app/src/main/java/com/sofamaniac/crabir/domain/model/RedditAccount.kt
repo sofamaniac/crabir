@@ -29,7 +29,6 @@ object AuthStateSerializer : KSerializer<AuthState> {
     }
 }
 
-
 @Serializable
 data class RedditAccount(
     val id: Int,
@@ -40,6 +39,8 @@ data class RedditAccount(
     companion object {
 
         const val ANONYMOUS = "Anonymous"
+        const val UNINITIALIZED_ID = -2
+        const val ANONYMOUS_ID = -1
         fun anonymous(): RedditAccount {
             return RedditAccount(-1, null, AuthState())
         }
@@ -50,15 +51,17 @@ data class RedditAccount(
     }
 
     fun isAnonymous(): Boolean {
-        return id == -1
+        return id == ANONYMOUS_ID
     }
 
     fun isUninitialized(): Boolean {
-        return id == -2
+        return id == UNINITIALIZED_ID
     }
 
     fun equalsShallow(other: RedditAccount): Boolean {
-        return id == other.id && info == other.info && (auth.accessToken == other.auth.accessToken && auth.refreshToken == other.auth.refreshToken)
+        val isAuthEqual = auth.accessToken == other.auth.accessToken &&
+                auth.refreshToken == other.auth.refreshToken
+        return id == other.id && info == other.info && isAuthEqual
     }
 }
 
@@ -69,7 +72,8 @@ object AccountSerializer : Serializer<RedditAccount> {
     override suspend fun readFrom(input: InputStream): RedditAccount {
         try {
             return Json.decodeFromString(
-                RedditAccount.serializer(), input.readBytes().decodeToString()
+                RedditAccount.serializer(),
+                input.readBytes().decodeToString()
             )
         } catch (serialization: SerializationException) {
             throw CorruptionException("Unable to read RedditAccount", serialization)

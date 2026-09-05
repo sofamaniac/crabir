@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -54,7 +57,6 @@ fun generateColorShades(
 
 @Composable
 fun SimpleColorPicker(color: Color, onValueChange: (Color) -> Unit) {
-    //val presets = listOf<Color>()
     val bases =
         listOf(4f, 340f, 290f, 230f, 207f, 200f, 187f, 174f, 123f, 88f, 66f, 54f, 45f, 36f, 15f)
 
@@ -67,17 +69,22 @@ fun SimpleColorPicker(color: Color, onValueChange: (Color) -> Unit) {
     ) {
         if (presets.isEmpty()) {
             items(bases.size) {
+                val currentColor = Color.hsl(bases[it], 1f, 0.6f)
                 Box(
                     modifier = Modifier
                         .padding(4.dp)
                         .size(64.dp)
-                        .background(Color.hsl(bases[it], 1f, 0.6f))
+                        .background(currentColor)
                         .clip(CircleShape)
                         .clickable {
                             presets = generateColorShades(bases[it])
                         }
 
-                )
+                ) {
+                    if (color == currentColor) {
+                        Icon(Icons.Default.Check, contentDescription = null)
+                    }
+                }
             }
         } else {
             items(presets.size) {

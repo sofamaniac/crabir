@@ -39,7 +39,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SortManagerPage() {
-
     val context = LocalContext.current
     val settingsDataStore = remember(context) { context.viewSettingDataStore }
     val viewSettings by settingsDataStore.data.collectAsState(initial = ViewSettings())
@@ -63,10 +62,12 @@ fun SortManagerPage() {
         scope.launch {
             settingsDataStore.updateData {
                 it.copy(
-                    rememberedViews = it.rememberedViews + (slug to oldValue.copy(
-                        sort = null,
-                        timeframe = null
-                    ))
+                    rememberedViews = it.rememberedViews + (
+                            slug to oldValue.copy(
+                                sort = null,
+                                timeframe = null
+                            )
+                            )
                 )
             }
         }
@@ -85,13 +86,18 @@ fun SortManagerPage() {
         }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(items = views.filter { entry -> entry.value.sort != null }
-                .toList(), key = { it.first }) { it ->
-                val slug = it.first
-                val entity = it.second
+            items(
+                items = views.filter { entry -> entry.value.sort != null }
+                    .toList(),
+                key = { it.first }
+            ) { view ->
+                val slug = view.first
+                val entity = view.second
                 ViewTile(
-                    entity.displayName, entity, updateView = {
-                        updateView(slug, it)
+                    entity.displayName,
+                    entity,
+                    updateView = { newView ->
+                        updateView(slug, newView)
                     },
                     deleteView = { deleteView(slug) }
                 )

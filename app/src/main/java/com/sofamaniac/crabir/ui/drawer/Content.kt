@@ -52,11 +52,11 @@ import com.sofamaniac.crabir.data.remote.dto.subreddit.dummySubredditData
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.MultiRoute
+import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.ui.drawer.buttons.BlurTile
 import com.sofamaniac.crabir.ui.drawer.buttons.DarkModeTile
-import com.sofamaniac.crabir.ui.drawer.buttons.FeedButtons
 import com.sofamaniac.crabir.ui.drawer.buttons.MultiTile
 import com.sofamaniac.crabir.ui.drawer.buttons.NSFWTile
 import com.sofamaniac.crabir.ui.drawer.buttons.SettingsTile
@@ -89,7 +89,9 @@ fun DrawerContent(
     val snackbarHostState = LocalSnackBarHost.current
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Error) {
-            snackbarHostState?.showSnackbar(message = "Something went wrong: ${(loginState as LoginState.Error).message}")
+            snackbarHostState?.showSnackbar(
+                message = "Something went wrong: ${(loginState as LoginState.Error).message}"
+            )
         }
     }
 
@@ -97,10 +99,10 @@ fun DrawerContent(
         drawerState = drawerState,
         sortedSubscriptions = sortedSubscriptions,
         multis = multis,
-        onFeedClick = { feed ->
+        onFeedClick = { route ->
             coroutineScope.launch {
                 drawerState.close()
-                navController?.navigate(feed.route)
+                navController?.navigate(route)
             }
         },
         onMultiClick = { multi ->
@@ -144,7 +146,7 @@ internal fun DrawerContent(
     sortedSubscriptions: List<Thing.Subreddit>,
     drawerState: DrawerState,
     multis: List<Thing.Multi>,
-    onFeedClick: (FeedButtons) -> Unit,
+    onFeedClick: (Route) -> Unit,
     onMultiClick: (Thing.Multi) -> Unit,
     onSubredditClick: (Thing.Subreddit) -> Unit,
     accountSelector: @Composable () -> Unit,
@@ -168,7 +170,7 @@ internal fun DrawerContent(
             }
             item { HorizontalDivider() }
             feeds(settings.items) { route ->
-                navController?.navigate(route)
+                onFeedClick(route)
             }
             item { HorizontalDivider() }
             profileButtons(settings.items) { route -> navController?.navigate(route) }
@@ -229,8 +231,7 @@ internal fun DrawerContent(
                 }
             }
             items(sortedSubscriptions) { subreddit ->
-                SubredditTile(subreddit, settings.showIcons)
-                {
+                SubredditTile(subreddit, settings.showIcons) {
                     onSubredditClick(subreddit)
                 }
             }
@@ -282,4 +283,3 @@ private fun DrawerContentPreview() {
         )
     }
 }
-

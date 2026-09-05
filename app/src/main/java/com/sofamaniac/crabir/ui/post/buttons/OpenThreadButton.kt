@@ -36,8 +36,3 @@ fun OpenThreadButton(onClick: () -> Unit) {
         }
     }
 }
-
-@Composable
-fun OpenThreadButtonLong(onClick: () -> Unit) {
-
-}

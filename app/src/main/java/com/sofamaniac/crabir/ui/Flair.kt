@@ -95,7 +95,7 @@ fun FlairRichtext(
 fun mapColor(color: String, default: Color = Color.Transparent): Color {
     return try {
         Color(color.toColorInt())
-    } catch (e: Exception) {
+    } catch (e: IllegalArgumentException) {
         when (color) {
             "light" -> Color.White
             "dark" -> Color.Black

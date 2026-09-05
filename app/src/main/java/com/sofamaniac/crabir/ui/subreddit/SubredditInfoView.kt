@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.subreddit
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -65,28 +64,21 @@ class SubredditInfoViewModel(
     fun favorite(favorite: Boolean) {
         val infoLoc = info.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                redditApi.favorite(info.value!!.displayName, !infoLoc.userHasFavorited)
-            } catch (e: Exception) {
-                Log.e("SubredditInfoViewModel", "Failed to favorite subreddit : ${e.message}")
-                return@launch
+            redditApi.favorite(info.value!!.displayName, !infoLoc.userHasFavorited).onSuccess {
+                info.value = infoLoc.copy(userHasFavorited = favorite)
+                info.value?.let { subredditCache.save(it) }
             }
-            info.value = infoLoc.copy(userHasFavorited = favorite)
-            info.value?.let { subredditCache.save(it) }
         }
     }
 
     private fun subscribeInner(action: SubscribeAction) {
         val infoLoc = info.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                redditApi.subscribe(action, info.value!!.displayName)
-            } catch (e: Exception) {
-                Log.e("SubredditInfoViewModel", "Failed to subscribe to subreddit : ${e.message}")
-                return@launch
+            redditApi.subscribe(action, info.value!!.displayName).onSuccess {
+                info.value =
+                    infoLoc.copy(userIsSubscriber = action == SubscribeAction.SUBSCRIBE)
+                info.value?.let { subredditCache.save(it) }
             }
-            info.value = infoLoc.copy(userIsSubscriber = action == SubscribeAction.SUBSCRIBE)
-            info.value?.let { subredditCache.save(it) }
         }
     }
 

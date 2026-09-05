@@ -39,7 +39,7 @@ fun SubredditIcon(
         is SubredditIcon.Color -> {
             val color = try {
                 Color(icon.color.toColorInt())
-            } catch (e: Exception) {
+            } catch (e: IllegalArgumentException) {
                 Log.e("SubredditIcon", "SubredditIcon: $e")
                 Color.Black
             }

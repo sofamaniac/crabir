@@ -252,7 +252,7 @@ data class ThemeSettings(
             ThemeMode.Dark -> dark
             ThemeMode.Light -> light
             else -> {
-                throw Exception("Unreachable code")
+                throw IllegalArgumentException("Invalid mode")
             }
         }
     }
@@ -262,7 +262,7 @@ data class ThemeSettings(
             ThemeMode.Dark -> collections.dark[darkParentTheme] ?: DefaultDarkTheme
             ThemeMode.Light -> collections.light[lightParentTheme] ?: DefaultLightTheme
             else -> {
-                throw Exception("Unreachable code")
+                throw IllegalArgumentException("Invalid mode")
             }
         }
     }

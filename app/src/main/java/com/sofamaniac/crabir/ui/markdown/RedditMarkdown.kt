@@ -48,10 +48,9 @@ fun RedditMarkdown(
     modifier: Modifier = Modifier,
     maxLines: Int? = null,
     enableImages: Boolean = true,
-    key: Any,
     spoilerState: SpoilerState = rememberSpoilerState(),
 ) {
-    HeightRestrictedMarkdown(markdown, modifier, maxLines, enableImages, key, spoilerState)
+    HeightRestrictedMarkdown(markdown, modifier, maxLines, enableImages, spoilerState)
 }
 
 @Composable
@@ -60,7 +59,6 @@ fun RedditMarkdown(
     modifier: Modifier = Modifier,
     maxLines: Int? = null,
     enableImages: Boolean = true,
-    key: Any? = null,
     spoilerState: SpoilerState = rememberSpoilerState(),
 ) {
     val markdownState = rememberMarkdownState(
@@ -74,7 +72,6 @@ fun RedditMarkdown(
         modifier,
         maxLines,
         enableImages,
-        key = key,
         spoilers = spoilerState
     )
 }
@@ -85,7 +82,6 @@ private fun HeightRestrictedMarkdown(
     modifier: Modifier = Modifier,
     maxLines: Int? = null,
     enableImages: Boolean,
-    key: Any? = null,
     spoilers: SpoilerState,
 ) {
     val onClick = if (maxLines == null) redditLinkHandler() else LinkInteractionListener { }
@@ -95,7 +91,6 @@ private fun HeightRestrictedMarkdown(
             markdown = markdown,
             enableImages = enableImages,
             linkInteractionListener = onClick,
-            key = key,
             spoilers = spoilers,
         )
     } else {
@@ -107,7 +102,6 @@ private fun HeightRestrictedMarkdown(
                 markdown = markdown,
                 linkInteractionListener = onClick,
                 enableImages = enableImages,
-                key = key,
                 spoilers = spoilers,
             )
         }
@@ -120,7 +114,6 @@ private fun InnerRedditMarkdown(
     modifier: Modifier = Modifier,
     linkInteractionListener: LinkInteractionListener,
     enableImages: Boolean,
-    key: Any? = null,
     spoilers: SpoilerState,
 ) {
     val typography = redditMarkdownTypography()
@@ -131,15 +124,12 @@ private fun InnerRedditMarkdown(
             modifier = modifier,
             typography = typography,
             imageTransformer = Coil3ImageTransformerImpl,
-            // Disable animations
             animations = markdownAnimations(animateTextSize = { this }),
-            //animations = markdownAnimations(animateTextSize = { Modifier.fillMaxSize() }),
             components = markdownComponents(
                 inlineImage = { model ->
                     if (enableImages) {
                         ClickableMarkdownInlineImage(
                             model.content,
-                            model.node,
                             linkInteractionListener
                         )
                     } else {
@@ -186,7 +176,6 @@ private fun openLink(navController: NavController?, uriHandler: UriHandler, link
     try {
         Log.d("redditLinkHandler", "navigating to : ${link.toLocalUrl()}")
         navController?.navigate(link.toLocalUrl().replace("//", "/"))
-        //uriHandler.openUri(link.url)
     } catch (e: IllegalArgumentException) {
         Log.i("redditLinkHandler", "failed to open link in app: $e")
         uriHandler.openUri(link)

@@ -19,7 +19,7 @@ fun Gallery(
 ) {
     HorizontalPager(
         state = state,
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         userScrollEnabled = enableScroll,
     ) { page ->
         val metadata: MediaMetadata? = gallery.get(page)

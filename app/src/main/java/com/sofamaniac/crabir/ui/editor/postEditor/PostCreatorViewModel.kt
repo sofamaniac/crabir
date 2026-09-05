@@ -117,6 +117,8 @@ class PostCreatorViewModel(
         }
     }
 
+    class MediaUploadError(message: String) : Exception(message)
+
     suspend fun uploadMedia(
         context: Context,
         kind: String = "link",
@@ -130,7 +132,7 @@ class PostCreatorViewModel(
                 if (result.isSuccess) {
                     result.getOrNull()!!
                 } else {
-                    throw Exception("Failed to upload media")
+                    throw MediaUploadError("Failed to upload media")
                 }
             }
             return uploadResponse.mapIndexed { index, args ->
@@ -144,7 +146,7 @@ class PostCreatorViewModel(
                         args.asset.assetId
                     }
                 } else {
-                    throw Exception("Failed to upload media")
+                    throw MediaUploadError("Failed to upload media")
                 }
             }
         } else {

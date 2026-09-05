@@ -109,7 +109,7 @@ class LinksRepositoryImpl(
 
     override suspend fun hide(name: Fullname): Result<Unit> {
         val res = api.hide(name)
-        if (!res.isSuccess) {
+        if (res.isFailure) {
             return res
         }
         val post: VotableData? = get(name).first()
@@ -121,7 +121,7 @@ class LinksRepositoryImpl(
 
     override suspend fun unhide(name: Fullname): Result<Unit> {
         val res = api.unhide(name)
-        if (!res.isSuccess) {
+        if (res.isFailure) {
             return res
         }
         val post: VotableData? = get(name).first()
