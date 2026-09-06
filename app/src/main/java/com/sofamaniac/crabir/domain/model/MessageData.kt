@@ -21,6 +21,15 @@ sealed class MessageData : DataInterface {
     }
 }
 
+@Serializable
+data class ParentInfo(
+    val name: Fullname,
+    val title: String? = null,
+    val subreddit: String? = null,
+    val subredditPrefixed: String? = null,
+)
+
+
 @Entity(tableName = "inboxTable")
 @Serializable
 data class Message(
@@ -40,13 +49,10 @@ data class Message(
     val likes: Boolean?,
     val new: Boolean,
     val numComments: Int?,
-    val parentId: Fullname?,
-    val linkTitle: String?,
     val replies: String,
     val score: Int,
     val subject: String,
-    val subreddit: String? = null,
-    val subredditNamePrefixed: String? = null,
+    val parent: ParentInfo? = null,
     val type: MessageType,
     val wasComment: Boolean,
 ) : DataInterface

@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import com.sofamaniac.crabir.data.remote.dto.SubredditInfo
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.MessageType
+import com.sofamaniac.crabir.domain.model.ParentInfo
 import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import kotlinx.serialization.json.Json
 import kotlin.time.Instant
@@ -76,6 +77,16 @@ class RoomConverters {
 
     @TypeConverter
     fun toMessageType(value: String): MessageType {
+        return Json.decodeFromString(value)
+    }
+
+    @TypeConverter
+    fun fromParentInfo(value: ParentInfo): String {
+        return Json.encodeToString(value)
+    }
+
+    @TypeConverter
+    fun toParentInfo(value: String): ParentInfo {
         return Json.decodeFromString(value)
     }
 }

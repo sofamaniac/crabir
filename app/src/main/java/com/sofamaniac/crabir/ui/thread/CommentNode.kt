@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
@@ -236,6 +235,18 @@ private fun CollapsedComment(
 }
 
 @Composable
+fun CommentInner(comment: CommentData, modifier: Modifier = Modifier) {
+    Column(modifier.padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        TopRow(comment)
+        Richtext(
+            comment.richtext,
+            mediaMetadata = comment.mediaMetadata,
+            threadId = comment.parentInfo.name.name.split("_").last()
+        )
+    }
+}
+
+@Composable
 fun OpenedComment(
     viewModel: CommentViewModel,
     opened: Boolean,
@@ -250,15 +261,7 @@ fun OpenedComment(
     val comment = (commentOuter)?.comment ?: return
 
     Column(modifier) {
-        Spacer(modifier = Modifier.height(8.dp))
-        TopRow(comment)
-        Spacer(modifier = Modifier.height(8.dp))
-        Richtext(
-            comment.richtext,
-            mediaMetadata = comment.mediaMetadata,
-            threadId = comment.parentId.name.split("_").last()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+        CommentInner(comment)
         AnimatedVisibility(showBottomBar) {
             BottomRow(comment, viewModel, startReply = startReply) {
                 if (commentsSettings.hideButtonsAfterVote) {

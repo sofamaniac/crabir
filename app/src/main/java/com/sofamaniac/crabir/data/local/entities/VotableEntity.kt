@@ -3,7 +3,6 @@ package com.sofamaniac.crabir.data.local.entities
 import android.util.Log
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
@@ -21,7 +20,6 @@ data class VotableEntity(
 
 fun VotableEntity.asVotableData(): VotableData {
     return Json.safeDecodeFromString<PostData>(data)
-        ?: Json.safeDecodeFromString<CommentData>(data)
         ?: Json.safeDecodeFromString<CommentType.Comment>(data)
         ?: Json.safeDecodeFromString<CommentType.More>(data)
         ?: throw SerializationException("VotableEntity: Missing decode from type $this")

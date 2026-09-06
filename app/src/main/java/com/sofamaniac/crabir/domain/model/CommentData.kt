@@ -57,7 +57,7 @@ sealed class CommentType : VotableData {
     val parentId: Fullname
         get() =
             when (this) {
-                is Comment -> comment.parentId
+                is Comment -> comment.parentInfo.name
                 is More -> data.parentId
             }
 
@@ -78,7 +78,7 @@ data class CommentData(
     val bodyMd: ParsedMarkdown,
     val bodyHtml: String,
     val richtext: RichtextDocument = RichtextDocument(emptyList()),
-    val parentId: Fullname,
+    val parentInfo: ParentInfo,
     val permalink: String,
     val replies: Int,
     //val replies: List<CommentType>,

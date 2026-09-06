@@ -4,6 +4,7 @@ import com.sofamaniac.crabir.data.remote.utils.InstantAsFloatSerializer
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Message
 import com.sofamaniac.crabir.domain.model.MessageType
+import com.sofamaniac.crabir.domain.model.ParentInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import tech.mappie.api.ObjectMappie
@@ -51,9 +52,19 @@ data class MessageDTO(
 
 object MessageDTOMapper : ObjectMappie<MessageDTO, Message>() {
     override fun map(from: MessageDTO) = mapping {
-        Message::linkTitle fromValue null
         Message::type fromValue from.getType()
+        Message::parent fromValue from.getParentInfo()
     }
+}
+
+fun MessageDTO.getParentInfo(): ParentInfo? {
+    if (parentId == null) return null
+    return ParentInfo(
+        name = parentId,
+        title = subject,
+        subreddit = subreddit,
+        subredditPrefixed = subredditNamePrefixed
+    )
 }
 
 fun MessageDTO.getType(): MessageType {

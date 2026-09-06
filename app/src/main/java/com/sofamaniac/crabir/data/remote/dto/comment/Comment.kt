@@ -19,6 +19,7 @@ import com.sofamaniac.crabir.domain.model.Flair
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Message
 import com.sofamaniac.crabir.domain.model.MessageType
+import com.sofamaniac.crabir.domain.model.ParentInfo
 import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.domain.model.Relationship
 import com.sofamaniac.crabir.domain.model.RichtextDocument
@@ -29,14 +30,6 @@ import kotlinx.serialization.Serializable
 import tech.mappie.api.ObjectMappie
 import java.util.Collections
 import kotlin.time.Instant
-
-@Serializable
-@JvmInline
-value class CommentId(val id: String)
-
-@Serializable
-@JvmInline
-value class CommentFullname(val id: String)
 
 @Serializable
 data class CommentDTO(
@@ -150,7 +143,7 @@ object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
     override fun map(from: CommentDTO) = mapping {
         CommentData::name fromProperty from::name
         CommentData::id fromProperty from::id
-        CommentData::parentId fromProperty from::parentId
+        CommentData::parentInfo fromValue from.getParentInfo()
         CommentData::depth fromProperty from::depth
         CommentData::author fromValue from.toAuthorInfo()
         CommentData::bodyMd fromValue from.markdown()
@@ -179,6 +172,16 @@ object CommentMessageMapper : ObjectMappie<CommentDTO, Message>() {
 
 fun CommentDTO.getType(): MessageType {
     return MessageType.fromString(type ?: "")
+}
+
+fun CommentDTO.getParentInfo(): ParentInfo {
+    val title = linkTitle ?: subject
+    return ParentInfo(
+        name = parentId,
+        title = title,
+        subreddit = subreddit,
+        subredditPrefixed = subreddit_name_prefixed
+    )
 }
 
 

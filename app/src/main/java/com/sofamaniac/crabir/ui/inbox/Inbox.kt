@@ -284,10 +284,10 @@ fun Message(
             withStyle(textStyle.copy(color = theme.highlight).toSpanStyle()) {
                 append(message.author)
             }
-            if (message.subreddit != null) {
+            if (message.parent?.subreddit != null) {
                 append(" via ")
                 withStyle(textStyle.copy(color = theme.highlight).toSpanStyle()) {
-                    append(message.subreddit)
+                    append(message.parent?.subreddit)
                 }
             }
             append(" · ")
@@ -413,7 +413,7 @@ fun MessageDropdownMenu(message: Message, viewModel: MessageViewModel) {
                     }
                 )
             }
-            if (message.subredditNamePrefixed != null) {
+            if (message.parent?.subredditPrefixed != null) {
                 DropdownMenuItem(
                     leadingIcon = {
                         Icon(
@@ -425,15 +425,15 @@ fun MessageDropdownMenu(message: Message, viewModel: MessageViewModel) {
                         Text(
                             stringResource(
                                 R.string.go_to_parametrized,
-                                message.subredditNamePrefixed
+                                message.parent.subredditPrefixed
                             )
                         )
                     }, onClick = {
-                        navController?.navigate(SubredditRoute(message.subredditNamePrefixed))
+                        navController?.navigate(SubredditRoute(message.parent.subredditPrefixed))
                     }
                 )
             }
-            if (message.linkTitle != null) {
+            if (message.parent?.title != null) {
                 DropdownMenuItem(
                     leadingIcon = {
                         Icon(
@@ -442,7 +442,7 @@ fun MessageDropdownMenu(message: Message, viewModel: MessageViewModel) {
                         )
                     },
                     text = { Text(stringResource(R.string.go_to_parent_post)) }, onClick = {
-                        navController?.navigate(PostRoute(message.linkTitle))
+                        navController?.navigate(PostRoute(message.parent.title))
                     }
                 )
             }

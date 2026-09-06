@@ -81,7 +81,8 @@ abstract class MixedFeedRepository<Params> : FeedRepositoryCommon<Params, Votabl
             }
 
             is Thing.Comment -> {
-                CommentDataMapper.map(thing.data)
+                val data = CommentDataMapper.map(thing.data)
+                CommentType.Comment(data)
             }
 
             else -> {
