@@ -67,6 +67,20 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
+@Composable
+fun BottomRow(
+    post: PostData,
+    modifier: Modifier = Modifier,
+    interactions: LinkInteraction,
+    buttonsSettings: ButtonsSettings = LocalPostSettings.current.buttonsSettings,
+) {
+    val navController = LocalNavController.current
+    BottomRow(post, modifier, interactions) {
+        if (buttonsSettings.comments) {
+            OpenThreadButton { navController?.navigate(PostRoute(post.permalink)) }
+        }
+    }
+}
 
 @Composable
 fun BottomRow(
@@ -87,9 +101,10 @@ fun BottomRow(
         SavedButton(saved, onClick = {
             interactions.save(post.name, !saved, upvoteOnSave)
         })
-        if (buttonsSettings.comments) {
+        if (buttonsSettings.comments && action == null) {
             OpenThreadButton { navController?.navigate(PostRoute(post.permalink)) }
         }
+        action?.invoke()
         if (buttonsSettings.openInApp) {
             OpenInAppButton(post)
         }

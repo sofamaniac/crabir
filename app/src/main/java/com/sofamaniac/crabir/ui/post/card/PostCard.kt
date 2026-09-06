@@ -29,7 +29,6 @@ import com.sofamaniac.crabir.ui.post.LinkViewModel
 import com.sofamaniac.crabir.ui.post.PostHeader
 import com.sofamaniac.crabir.ui.post.PostInfo
 import com.sofamaniac.crabir.ui.post.PostViewModelInterface
-import com.sofamaniac.crabir.ui.post.buttons.OpenThreadButton
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -137,11 +136,6 @@ internal fun PostCardContent(
             post,
             innerModifier,
             interactions = interactions,
-            action = if (!showOpenButton) null else {
-                {
-                    OpenThreadButton(openPost)
-                }
-            }
         )
     }
 }
