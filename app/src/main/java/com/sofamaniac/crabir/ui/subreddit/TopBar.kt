@@ -21,7 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -48,6 +47,7 @@ import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SettingsRoute
 import com.sofamaniac.crabir.navigation.SubredditInfoRoute
+import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
 import com.sofamaniac.crabir.settings.views.ViewSettings
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.viewSettingDataStore
@@ -110,11 +110,7 @@ fun TopBar(
 
     TopAppBar(
         scrollBehavior = scrollBehavior,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = theme.toolbarBackground,
-            scrolledContainerColor = theme.toolbarBackground,
-            titleContentColor = theme.toolbarText,
-        ),
+        colors = rememberTopAppBarColors(),
         title = {
             Column {
                 Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)

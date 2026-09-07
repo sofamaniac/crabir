@@ -46,7 +46,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDrawerState
@@ -82,6 +81,7 @@ import com.sofamaniac.crabir.navigation.MessageEditorRoute
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
+import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
 import com.sofamaniac.crabir.ui.RefreshIndicator
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.ThemedDialog
@@ -125,6 +125,7 @@ fun InboxView() {
         ) {
             Scaffold(topBar = {
                 TopAppBar(
+                    colors = rememberTopAppBarColors(),
                     title = { Text(stringResource(R.string.inbox)) },
                     actions = {
                         IconButton(onClick = { navController?.navigate(MessageEditorRoute(null)) }) {
@@ -142,11 +143,6 @@ fun InboxView() {
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = theme.toolbarBackground,
-                        scrolledContainerColor = theme.toolbarBackground,
-                        titleContentColor = theme.toolbarText,
-                    ),
                 )
             }) { innerPadding ->
                 val pagerState = rememberPagerState(0, pageCount = { tabs.size })

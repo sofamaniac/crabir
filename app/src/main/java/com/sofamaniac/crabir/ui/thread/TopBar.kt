@@ -12,7 +12,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -26,6 +25,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
+import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
 import com.sofamaniac.crabir.ui.BackButton
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,11 +40,7 @@ fun TopBar(
     var showMenu by remember { mutableStateOf(false) }
     val navController = LocalNavController.current
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = theme.toolbarBackground,
-            scrolledContainerColor = theme.toolbarBackground,
-            titleContentColor = theme.toolbarText,
-        ),
+        colors = rememberTopAppBarColors(),
         scrollBehavior = scrollBehavior,
         navigationIcon = {
             BackButton { dismiss() }

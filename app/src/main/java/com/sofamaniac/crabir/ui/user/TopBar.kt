@@ -1,7 +1,6 @@
 package com.sofamaniac.crabir.ui.user
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,13 +19,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.domain.repository.profile.ProfileSort
+import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
 import com.sofamaniac.crabir.ui.SortMenu
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -41,7 +40,7 @@ fun TopBar(
 ) {
     TwoRowsTopAppBar(
         scrollBehavior = scrollBehavior,
-        modifier = modifier.background(Color.Transparent),
+        colors = rememberTopAppBarColors(),
         title = { expanded ->
             if (expanded && userInfo != null) {
                 val iconUrl =

@@ -12,7 +12,6 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 
@@ -31,7 +30,6 @@ fun OpenThreadButton(onClick: () -> Unit) {
             Icon(
                 Icons.AutoMirrored.Filled.Comment,
                 contentDescription = description,
-                tint = Color.Gray
             )
         }
     }

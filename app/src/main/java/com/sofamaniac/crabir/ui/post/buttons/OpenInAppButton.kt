@@ -15,7 +15,6 @@ import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
@@ -39,7 +38,7 @@ internal fun OpenInAppButton(
         IconButton(onClick = {
             uriHandler.openUri(post.url)
         }) {
-            Icon(Icons.AutoMirrored.Outlined.ExitToApp, description, tint = Color.Gray)
+            Icon(Icons.AutoMirrored.Outlined.ExitToApp, description)
         }
     }
 }

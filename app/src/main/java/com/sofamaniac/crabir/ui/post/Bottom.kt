@@ -21,9 +21,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -95,26 +97,29 @@ fun BottomRow(
     val upvoteOnSave =
         interactions.linksSettings.collectAsState(initial = null).value?.upvoteOnSave ?: false
     val navController = LocalNavController.current
-    Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = modifier.fillMaxWidth()) {
-        UpButton(likes, onClick = { interactions.upvote(post.name) })
-        DownButton(likes, onClick = { interactions.downvote(post.name) })
-        SavedButton(saved, onClick = {
-            interactions.save(post.name, !saved, upvoteOnSave)
-        })
-        if (buttonsSettings.comments && action == null) {
-            OpenThreadButton { navController?.navigate(PostRoute(post.permalink)) }
+    val theme = LocalTheme.current
+    CompositionLocalProvider(LocalContentColor provides theme.secondaryText) {
+        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = modifier.fillMaxWidth()) {
+            UpButton(likes, onClick = { interactions.upvote(post.name) })
+            DownButton(likes, onClick = { interactions.downvote(post.name) })
+            SavedButton(saved, onClick = {
+                interactions.save(post.name, !saved, upvoteOnSave)
+            })
+            if (buttonsSettings.comments && action == null) {
+                OpenThreadButton { navController?.navigate(PostRoute(post.permalink)) }
+            }
+            action?.invoke()
+            if (buttonsSettings.openInApp) {
+                OpenInAppButton(post)
+            }
+            if (buttonsSettings.hide) {
+                HideButton(post, interactions)
+            }
+            if (buttonsSettings.share) {
+                ShareButton(post)
+            }
+            PostOptions(post, interactions, buttonsSettings)
         }
-        action?.invoke()
-        if (buttonsSettings.openInApp) {
-            OpenInAppButton(post)
-        }
-        if (buttonsSettings.hide) {
-            HideButton(post, interactions)
-        }
-        if (buttonsSettings.share) {
-            ShareButton(post)
-        }
-        PostOptions(post, interactions, buttonsSettings)
     }
 }
 
