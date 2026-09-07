@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,7 +44,6 @@ import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SettingsRoute
-import com.sofamaniac.crabir.navigation.SubredditInfoRoute
 import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
 import com.sofamaniac.crabir.settings.views.ViewSettings
 import com.sofamaniac.crabir.settings.views.Views
@@ -60,7 +59,7 @@ fun TopBar(
     title: String,
     params: FeedParams,
     slug: String,
-    disableInfo: Boolean = false,
+    onInfoClick: (() -> Unit)? = null,
     updateSort: (Sort, Timeframe?) -> Unit,
     updateView: (Views) -> Unit,
     refresh: () -> Unit,
@@ -140,14 +139,11 @@ fun TopBar(
                 onPostViewClick = { showViewSelect = true },
                 onSettingsClick = { navController?.navigate(SettingsRoute) },
                 refresh = refresh,
-                disableInfo = disableInfo,
-                onInfoClick = { navController?.navigate(SubredditInfoRoute(slug)) }
+                onInfoClick = onInfoClick,
             )
-            if (!disableInfo) {
-                IconButton(onClick = {
-                    navController?.navigate(SubredditInfoRoute(slug))
-                }) {
-                    Icon(Icons.Default.Info, contentDescription = null)
+            if (onInfoClick != null) {
+                IconButton(onClick = onInfoClick) {
+                    Icon(Icons.Outlined.Info, contentDescription = null)
                 }
             }
             SortMenu<Sort> { sort, timeframe ->
@@ -169,8 +165,7 @@ private fun OptionMenu(
     onPostViewClick: () -> Unit,
     onSettingsClick: () -> Unit,
     refresh: () -> Unit,
-    disableInfo: Boolean = false,
-    onInfoClick: () -> Unit,
+    onInfoClick: (() -> Unit)? = null,
 ) {
     var showMenu by remember { mutableStateOf(false) }
     IconButton(onClick = { showMenu = !showMenu }) {
@@ -186,7 +181,7 @@ private fun OptionMenu(
             onClick = onSettingsClick,
             text = { Text(stringResource(R.string.settings)) }
         )
-        if (!disableInfo) {
+        if (onInfoClick != null) {
             DropdownMenuItem(
                 onClick = onInfoClick,
                 text = { Text(stringResource(R.string.go_to_sub_info)) }

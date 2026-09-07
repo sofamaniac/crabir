@@ -16,10 +16,10 @@ import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.DevicesFold
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ViewComfy
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -115,7 +115,7 @@ fun SettingsPage() {
             )
             ListItem(
                 content = { Text(stringResource(R.string.licenses)) },
-                leadingContent = { Icon(Icons.Default.Info, contentDescription = null) },
+                leadingContent = { Icon(Icons.Outlined.Info, contentDescription = null) },
                 modifier = Modifier.clickable {
                     navController?.navigate(LicensesRoute)
                 }

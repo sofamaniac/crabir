@@ -7,6 +7,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.ui.feedInfo.multi.MultiInfo
 import com.sofamaniac.crabir.ui.feedInfo.subreddit.SubredditInfoView
 import com.sofamaniac.crabir.ui.postFeed.multi.MultiView
 import com.sofamaniac.crabir.ui.postFeed.subreddit.SubredditViewer
@@ -48,5 +49,10 @@ fun NavGraphBuilder.subredditGraph() {
     ) { navBackStackEntry ->
         val subreddit = navBackStackEntry.toRoute<SubredditInfoRoute>()
         SubredditInfoView(subreddit.subreddit)
+    }
+
+    composable<MultiInfoRoute> {
+        val multi = it.toRoute<MultiInfoRoute>()
+        MultiInfo(multi.name)
     }
 }

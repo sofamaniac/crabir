@@ -47,7 +47,6 @@ fun HistoryViewer(
             params,
             slug = HISTORY,
             openDrawer = { scope.launch { drawerState.open() } },
-            disableInfo = true,
             updateSort = { _, _ -> },
             updateView = { entity = entity.copy(view = it) },
             refresh = viewModel::refresh,

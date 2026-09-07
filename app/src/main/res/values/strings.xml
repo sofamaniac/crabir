@@ -216,6 +216,12 @@
         <item quantity="many">%d members</item>
         <item quantity="other">%d members</item>
     </plurals>
+    <plurals name="multi_subreddits">
+        <item quantity="zero">No subreddit</item>
+        <item quantity="one">%d subreddits</item>
+        <item quantity="many">%d subreddits</item>
+        <item quantity="other">%d subreddits</item>
+    </plurals>
 
     <!-- Post Creation & Editor -->
     <string name="create_post">Create post</string>

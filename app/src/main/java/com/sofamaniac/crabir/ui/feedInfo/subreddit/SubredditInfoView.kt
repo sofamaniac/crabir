@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.feedInfo.subreddit
 
+import android.icu.text.CompactDecimalFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
@@ -35,6 +37,7 @@ import com.sofamaniac.crabir.ui.components.SubredditIcon
 import com.sofamaniac.crabir.ui.richtext.Richtext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import java.util.Locale
 
 @Composable
 fun SubredditInfoView(
@@ -61,10 +64,16 @@ fun SubredditInfoView(
                     SubredditIcon(info.displayName, info.icon, modifier = Modifier.size(48.dp))
                     Column {
                         Text(info.displayNamePrefixed, style = MaterialTheme.typography.titleMedium)
+                        val num = remember {
+                            CompactDecimalFormat.getInstance(
+                                Locale.getDefault(),
+                                CompactDecimalFormat.CompactStyle.SHORT
+                            ).format(info.subscribers)
+                        }
                         val members = LocalResources.current.getQuantityString(
-                            R.plurals.members,
+                            R.plurals.subreddit_subscribers_count,
                             info.subscribers,
-                            info.subscribers
+                            num
                         )
                         Text(members, style = MaterialTheme.typography.labelSmall)
                         TextButton(onClick = {}) {

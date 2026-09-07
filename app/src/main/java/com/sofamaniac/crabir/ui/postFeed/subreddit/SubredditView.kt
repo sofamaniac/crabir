@@ -17,6 +17,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.SubredditInfoRoute
 import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
 import com.sofamaniac.crabir.settings.views.viewSettingDataStore
 import com.sofamaniac.crabir.ui.components.TabBar
@@ -31,7 +33,7 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun SubredditViewer(
     subreddit: String,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
 ) {
     val defaultEntity = getCommunityViewEntity(subreddit, subreddit)
     val subredditName = subreddit.split("/").last()
@@ -62,6 +64,7 @@ fun SubredditViewer(
             }
         }
     }
+    val navController = LocalNavController.current
 
     val topBar = @Composable {
         TopBar(
@@ -73,6 +76,13 @@ fun SubredditViewer(
             refresh = viewModel::refresh,
             entity = entity,
             scrollBehavior = scrollBehavior,
+            onInfoClick = {
+                navController?.navigate(
+                    SubredditInfoRoute(
+                        feedInfo?.displayNamePrefixed ?: subreddit
+                    )
+                )
+            },
             openDrawer = { scope.launch { drawerState.open() } }
         )
     }

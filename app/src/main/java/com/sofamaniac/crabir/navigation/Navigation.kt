@@ -57,6 +57,13 @@ class MultiRoute(val name: String) : Route {
 }
 
 @Serializable
+class MultiInfoRoute(val name: String) : Route {
+    init {
+        assert(name.startsWith("m/"))
+    }
+}
+
+@Serializable
 object LicensesRoute : Route
 
 @Serializable

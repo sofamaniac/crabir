@@ -16,11 +16,11 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.VideoFile
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -171,7 +171,7 @@ fun OptionsButton(subreddit: SubredditData) {
                 onClick = {
                     navController?.navigate(SubredditInfoRoute(subreddit.displayNamePrefixed))
                 },
-                leadingContent = { Icon(Icons.Default.Info, contentDescription = null) },
+                leadingContent = { Icon(Icons.Outlined.Info, contentDescription = null) },
                 content = { Text("Community info") }
             )
             CreatePostItem(subreddit)

@@ -16,6 +16,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.MultiInfoRoute
 import com.sofamaniac.crabir.settings.views.viewSettingDataStore
 import com.sofamaniac.crabir.ui.components.TabBar
 import com.sofamaniac.crabir.ui.postFeed.FullFeedView
@@ -61,6 +63,7 @@ fun MultiView(
     }
 
 
+    val navController = LocalNavController.current
     val topBar = @Composable {
         TopBar(
             info?.displayName ?: slug,
@@ -71,6 +74,13 @@ fun MultiView(
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
             entity = entity,
+            onInfoClick = {
+                navController?.navigate(
+                    MultiInfoRoute(
+                        info?.displayNamePrefixed ?: slug
+                    )
+                )
+            },
             openDrawer = { scope.launch { drawerState.open() } }
         )
     }

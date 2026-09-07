@@ -55,7 +55,6 @@ fun HomeViewer(
             title,
             params,
             slug = HOME,
-            disableInfo = true,
             updateSort = viewModel::updateSort,
             updateView = { viewEntity = viewEntity.copy(view = it) },
             refresh = viewModel::refresh,
