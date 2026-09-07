@@ -1,5 +1,7 @@
 package com.sofamaniac.crabir.settings.theme
 
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import com.sofamaniac.crabir.LocalTheme
@@ -15,4 +17,11 @@ fun rememberTopAppBarColors(): TopAppBarColors {
         actionIconContentColor = theme.toolbarText,
         subtitleContentColor = theme.toolbarText
     )
+}
+
+@Composable
+fun rememberListItemColors(): ListItemColors {
+    val theme = LocalTheme.current
+    val default = ListItemDefaults.colors()
+    return default.copy(containerColor = theme.cardBackground)
 }

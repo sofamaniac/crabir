@@ -176,7 +176,7 @@ fun PostHeader(
     }
 }
 
-fun <R : Any> AnnotatedString.Builder.withSeparator(
+inline fun <R : Any> AnnotatedString.Builder.withSeparator(
     separator: String = " · ",
     block: AnnotatedString.Builder.() -> R,
 ): R {

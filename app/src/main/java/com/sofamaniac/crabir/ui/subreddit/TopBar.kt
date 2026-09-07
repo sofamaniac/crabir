@@ -16,7 +16,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -51,6 +50,7 @@ import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
 import com.sofamaniac.crabir.settings.views.ViewSettings
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.viewSettingDataStore
+import com.sofamaniac.crabir.ui.ListItem
 import com.sofamaniac.crabir.ui.SortMenu
 import com.sofamaniac.crabir.ui.ThemedDialog
 import kotlinx.coroutines.launch

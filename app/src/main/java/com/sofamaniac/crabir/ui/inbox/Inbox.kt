@@ -36,7 +36,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -82,6 +81,7 @@ import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
+import com.sofamaniac.crabir.ui.ListItem
 import com.sofamaniac.crabir.ui.RefreshIndicator
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.ThemedDialog

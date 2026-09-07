@@ -9,7 +9,6 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -22,6 +21,7 @@ import androidx.core.net.toUri
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.settings.filters.filtersDataStore
+import com.sofamaniac.crabir.ui.ListItem
 import com.sofamaniac.crabir.ui.ThemedDialog
 import kotlinx.coroutines.launch
 

@@ -6,7 +6,6 @@ import androidx.compose.material.icons.automirrored.filled.VolumeMute
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -19,6 +18,7 @@ import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.settings.filters.filtersDataStore
+import com.sofamaniac.crabir.ui.ListItem
 import com.sofamaniac.crabir.ui.ThemedCard
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel

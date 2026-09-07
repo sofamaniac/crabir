@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -50,6 +49,7 @@ import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.post.ButtonsSettings
+import com.sofamaniac.crabir.ui.ListItem
 import com.sofamaniac.crabir.ui.post.buttons.HideButton
 import com.sofamaniac.crabir.ui.post.buttons.HideButtonLong
 import com.sofamaniac.crabir.ui.post.buttons.MuteButton

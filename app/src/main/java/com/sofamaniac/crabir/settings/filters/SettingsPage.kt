@@ -11,12 +11,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled._18UpRating
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -38,6 +35,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
+import com.sofamaniac.crabir.ui.ListItem
 import com.sofamaniac.crabir.ui.ThemedDialog
 import kotlinx.coroutines.launch
 
@@ -178,11 +176,6 @@ private fun FilterEditor(
     onChange: (List<String>) -> Unit,
 ) {
     var filters by remember { mutableStateOf(filters) }
-    val colors = ListItemDefaults.colors()
-        .copy(
-            containerColor = CardDefaults.cardColors().containerColor,
-            selectedContainerColor = CardDefaults.cardColors().containerColor
-        )
     ThemedDialog(onDismissRequest) {
         LazyColumn {
             items(filters.size) { index ->
@@ -203,7 +196,6 @@ private fun FilterEditor(
                             }
                         )
                     },
-                    colors = colors,
                     trailingContent = {
                         IconButton(onClick = {
                             filters = filters.filterIndexed { i, _ -> i != index }
@@ -215,7 +207,6 @@ private fun FilterEditor(
             }
             item {
                 ListItem(
-                    colors = colors,
                     content = {
                         IconButton(onClick = {
                             filters = filters + ""

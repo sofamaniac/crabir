@@ -1,22 +1,17 @@
 package com.sofamaniac.crabir.ui.post
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalFiltersSettings
@@ -27,7 +22,8 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.settings.post.FlairSettings
 import com.sofamaniac.crabir.ui.Flair
-import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.Over18Cartouche
+import com.sofamaniac.crabir.ui.SpoilerCartouche
 import com.sofamaniac.crabir.ui.votable.ScoreString
 
 /** Show a post title and thumbnail.
@@ -78,17 +74,7 @@ fun PostInfo(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 if (post.spoiler) {
-                    Text(
-                        "SPOILER",
-                        style = MaterialTheme.typography.labelSmall.copy(color = Color.Red),
-                        modifier = Modifier
-                            .border(
-                                width = 1.dp,
-                                color = Color.Red,
-                                shape = RoundedCornerShape(corner = CornerSize(2.dp)),
-                            )
-                            .cartouche(Color.Transparent)
-                    )
+                    SpoilerCartouche()
                 }
                 if (flairSettings.showFlair) {
                     Flair(
@@ -122,11 +108,7 @@ fun PostInfo(
                     color = theme.secondaryText
                 )
                 if (post.over18) {
-                    Text(
-                        "NSFW", fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.labelSmall.copy(color = Color.White),
-                        modifier = Modifier.cartouche(Color.Red)
-                    )
+                    Over18Cartouche()
                 }
             }
         }

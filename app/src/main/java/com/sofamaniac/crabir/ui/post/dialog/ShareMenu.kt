@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,6 +21,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.CrosspostCreatorRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.ui.ListItem
 import com.sofamaniac.crabir.ui.ThemedDialog
 
 @Composable

@@ -12,8 +12,6 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +25,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.Kind
 import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.ui.ListItem
 import com.sofamaniac.crabir.ui.thread.CommentViewModel
 import com.sofamaniac.crabir.ui.votable.ReportMenu
 
@@ -53,7 +52,6 @@ fun MoreOptionMenu(
     onDismissRequest: () -> Unit,
 ) {
     val theme = LocalTheme.current
-    val colors = ListItemDefaults.colors().copy(containerColor = theme.cardBackground)
     var showReportMenu by remember { mutableStateOf(false) }
     var showUserMenu by remember { mutableStateOf(false) }
     var showShareMenu by remember { mutableStateOf(false) }
@@ -63,7 +61,6 @@ fun MoreOptionMenu(
         onDismissRequest = onDismissRequest
     ) {
         ListItem(
-            colors = colors,
             modifier = Modifier.clickable {
                 showUserMenu = true
             },
@@ -78,7 +75,6 @@ fun MoreOptionMenu(
         )
 
         ListItem(
-            colors = colors,
             modifier = Modifier.clickable {
                 viewModel.collapse(true)
             },
@@ -92,7 +88,6 @@ fun MoreOptionMenu(
         )
 
         ListItem(
-            colors = colors,
             modifier = Modifier.clickable {
                 viewModel.fetchRules()
                 showReportMenu = true
@@ -108,7 +103,6 @@ fun MoreOptionMenu(
         )
 
         ListItem(
-            colors = colors,
             modifier = Modifier.clickable {
                 showShareMenu = true
             },
@@ -123,7 +117,6 @@ fun MoreOptionMenu(
         )
 
         ListItem(
-            colors = colors,
             modifier = Modifier.clickable {
                 showCopyMenu = true
             },
