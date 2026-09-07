@@ -12,6 +12,7 @@ import org.koin.core.annotation.ViewModelScope
 @ViewModelScope
 class CrosspostCommunitiesRepository(
     val api: RedditAPIService,
+    override val cache: CommunityCache<SubredditData>,
 ) : ListingRepository<RedditAccount?, SubredditData>() {
     override fun thingToData(thing: Thing): SubredditData? {
         return when (thing) {

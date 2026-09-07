@@ -154,7 +154,7 @@ class PostSearchViewModel(
 @KoinViewModel
 class CommunitySearchViewModel(
     repository: CommunitySearchRepository,
-    subscriptionsRepository: SubscriptionsRepository,
+    private val subscriptionsRepository: SubscriptionsRepository,
     private val randdit: RandditAPI,
 ) : SearchViewModel<CommunitySearchParams, SubredditData>(
     repository,
@@ -193,6 +193,16 @@ class CommunitySearchViewModel(
     fun setIncludeOver18(include: Boolean) {
         paramsState.update {
             it.copy(includeOver18 = include)
+        }
+    }
+
+    fun subscribe(subreddit: SubredditData) {
+        viewModelScope.launch {
+            if (subreddit.userIsSubscriber) {
+                subscriptionsRepository.subscribe(subreddit)
+            } else {
+                subscriptionsRepository.unsubscribe(subreddit)
+            }
         }
     }
 }

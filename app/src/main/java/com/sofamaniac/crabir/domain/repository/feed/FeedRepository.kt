@@ -13,6 +13,7 @@ import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
+import com.sofamaniac.crabir.domain.repository.Cache
 import com.sofamaniac.crabir.domain.repository.ListingRepository
 import com.sofamaniac.crabir.domain.repository.ListingSource
 import com.sofamaniac.crabir.domain.repository.VotableRepository
@@ -36,16 +37,13 @@ interface FeedRepository<Params, T : VotableData> {
     }
 }
 
-abstract class FeedRepositoryCommon<Params, T : VotableData>
-    : FeedRepository<Params, T>, ListingRepository<Params, T>() {
-    override suspend fun onResponseSuccess(things: List<Thing>) {
-        super.onResponseSuccess(things)
-        val votableList = things.mapNotNull { thingToData(it) }
-        votableRepository.insert(votableList)
-    }
+abstract class FeedRepositoryCommon<Params, T : VotableData> :
+    FeedRepository<Params, T>, ListingRepository<Params, T>() {
+    override val cache: Cache<T> get() = votableRepository
 }
 
-abstract class PostFeedRepository<Params> : FeedRepositoryCommon<Params, PostData>() {
+abstract class PostFeedRepository<Params> :
+    FeedRepositoryCommon<Params, PostData>() {
     override fun thingToData(thing: Thing): PostData? {
         return when (thing) {
             is Thing.Post -> {
@@ -59,7 +57,8 @@ abstract class PostFeedRepository<Params> : FeedRepositoryCommon<Params, PostDat
     }
 }
 
-abstract class CommentFeedRepository<Params> : FeedRepositoryCommon<Params, CommentType>() {
+abstract class CommentFeedRepository<Params> :
+    FeedRepositoryCommon<Params, CommentType>() {
     override fun thingToData(thing: Thing): CommentType? {
         return when (thing) {
             is Thing.Comment -> {
@@ -73,7 +72,8 @@ abstract class CommentFeedRepository<Params> : FeedRepositoryCommon<Params, Comm
     }
 }
 
-abstract class MixedFeedRepository<Params> : FeedRepositoryCommon<Params, VotableData>() {
+abstract class MixedFeedRepository<Params> :
+    FeedRepositoryCommon<Params, VotableData>() {
     override fun thingToData(thing: Thing): VotableData? {
         return when (thing) {
             is Thing.Post -> {

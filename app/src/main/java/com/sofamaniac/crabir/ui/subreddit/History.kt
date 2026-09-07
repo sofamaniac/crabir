@@ -17,13 +17,11 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.paging.PagingSource
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.data.local.dao.SubredditRepository
+import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
-import com.sofamaniac.crabir.data.local.entities.into
 import com.sofamaniac.crabir.data.remote.reddit.HISTORY
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
@@ -89,7 +87,7 @@ fun HistoryViewer(
 class HistoryViewModel(
     repository: HistoryRepository,
     visitedPostsDao: VisitedPostsDao,
-    communityDao: SubredditRepository,
+    communityDao: SubredditDao,
     @InjectedParam viewEntity: CommunityViewEntity,
 ) : PostFeedViewModel<SubredditData>(
     repository,
@@ -121,9 +119,6 @@ class HistoryRepository(
         }
         val entities =
             visitedPostsDao.getHistory(before = timestamp)
-        cache.putAll(entities.mapNotNull {
-            it.into<PostData>()
-        }.associateBy { it.name })
         val nextPage = entities.lastOrNull()?.let {
             visitedPostsDao.getPost(it.id)
         }

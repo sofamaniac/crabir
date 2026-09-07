@@ -91,9 +91,10 @@ class ThreadRepositoryNew(
                         post!!.name,
                         post!!.numComments
                     )
-                repository.insert(forest)
+                val list = forest.toList()
+                repository.insert(list)
                 this.forest.update {
-                    forest.iterator().asSequence().map { it.name }.toList()
+                    list.map { it.name }
                 }
                 postsRepository.insert(listOf(post!!))
             }
@@ -104,7 +105,7 @@ class ThreadRepositoryNew(
         if (post != null) {
             return post
         } else {
-            post = postsRepository.getValue(name)
+            post = postsRepository.getAsync(name)
         }
         return post
     }
@@ -136,7 +137,8 @@ class ThreadRepositoryNew(
                 // TODO display error
                 val things = body.json.data?.things ?: return
                 val temp = Forest.create(things, Fullname(""), things.size)
-                repository.insert(temp)
+                val list = temp.toList()
+                repository.insert(list)
                 forest.update { list ->
                     val startIndex = list.indexOfFirst { it == more.data.name }
                     val head = runCatching { list.subList(0, startIndex) }.getOrDefault(emptyList())
@@ -162,7 +164,7 @@ class ThreadRepositoryNew(
         name: Fullname,
         value: CommentType,
     ) {
-        repository.update(name, value)
+        repository.update(value)
     }
 
     override fun insertReply(parent: Fullname, comment: CommentType) {

@@ -57,7 +57,7 @@ class SubredditInfoViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            info.value = subredditCache.get(subredditName)
+            info.value = subredditCache.getBySlug(subredditName)
         }
     }
 
@@ -66,7 +66,7 @@ class SubredditInfoViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             redditApi.favorite(info.value!!.displayName, !infoLoc.userHasFavorited).onSuccess {
                 info.value = infoLoc.copy(userHasFavorited = favorite)
-                info.value?.let { subredditCache.save(it) }
+                info.value?.let { subredditCache.update(it) }
             }
         }
     }
@@ -77,7 +77,7 @@ class SubredditInfoViewModel(
             redditApi.subscribe(action, info.value!!.displayName).onSuccess {
                 info.value =
                     infoLoc.copy(userIsSubscriber = action == SubscribeAction.SUBSCRIBE)
-                info.value?.let { subredditCache.save(it) }
+                info.value?.let { subredditCache.update(it) }
             }
         }
     }

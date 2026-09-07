@@ -1,14 +1,16 @@
 package com.sofamaniac.crabir.domain.repository
 
 import android.util.Log
-import com.sofamaniac.crabir.data.local.dao.MultiRepository
+import com.sofamaniac.crabir.data.local.dao.MultiDao
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.SubscribeAction
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
+import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +29,7 @@ class SubscriptionsRepository(
     val api: RedditAPIService,
     val accountsRepository: AccountsRepository,
     val subredditCache: SubredditCache,
-    val multiCache: MultiRepository,
+    val multiCache: MultiDao,
 ) {
     val activeAccount = accountsRepository.activeAccount.distinctUntilChanged { old, new ->
         old.id == new.id
@@ -102,7 +104,7 @@ class SubscriptionsRepository(
         )
         for (sub in subs) {
             val mapped = SubredditDTOMapper.map(sub.data)
-            subredditCache.save(mapped)
+            subredditCache.insert(mapped)
         }
         return subs
     }
@@ -124,6 +126,17 @@ class SubscriptionsRepository(
             Log.e("SubscriptionsRepository", "Error loading multis: ${response.exceptionOrNull()}")
             emptyList()
         }
+    }
 
+    suspend fun subscribe(subreddit: SubredditData): Result<Unit> {
+        return api.subscribe(SubscribeAction.SUBSCRIBE, subreddit.displayName).onSuccess {
+            subredditCache.insert(subreddit.copy(userIsSubscriber = true))
+        }
+    }
+
+    suspend fun unsubscribe(subreddit: SubredditData): Result<Unit> {
+        return api.subscribe(SubscribeAction.UNSUBSCRIBE, subreddit.displayName).onSuccess {
+            subredditCache.insert(subreddit.copy(userIsSubscriber = false))
+        }
     }
 }

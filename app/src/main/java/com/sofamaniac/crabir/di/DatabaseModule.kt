@@ -3,10 +3,11 @@ package com.sofamaniac.crabir.di
 import android.content.Context
 import androidx.room.Room
 import com.sofamaniac.crabir.data.local.dao.AccountsDao
+import com.sofamaniac.crabir.data.local.dao.CommunityDao
 import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
 import com.sofamaniac.crabir.data.local.dao.InboxDao
-import com.sofamaniac.crabir.data.local.dao.MultiRepository
-import com.sofamaniac.crabir.data.local.dao.SubredditRepository
+import com.sofamaniac.crabir.data.local.dao.MultiDao
+import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.dao.VotableDao
 import com.sofamaniac.crabir.data.local.database.AccountDatabase
@@ -15,6 +16,8 @@ import com.sofamaniac.crabir.data.local.database.InboxDatabase
 import com.sofamaniac.crabir.data.local.database.MultiDatabase
 import com.sofamaniac.crabir.data.local.database.SubredditDatabase
 import com.sofamaniac.crabir.data.local.database.VisitedPostsDatabase
+import com.sofamaniac.crabir.data.remote.dto.MultiData
+import com.sofamaniac.crabir.domain.model.SubredditData
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Singleton
@@ -104,13 +107,13 @@ object DatabaseModule {
         return database.votableDao()
     }
 
-    @Singleton
-    fun subredditDao(database: SubredditDatabase): SubredditRepository {
+    @Singleton(binds = [SubredditDao::class])
+    fun subredditDao(database: SubredditDatabase): CommunityDao<SubredditData> {
         return database.subredditDao()
     }
 
-    @Singleton
-    fun multiDao(database: MultiDatabase): MultiRepository {
+    @Singleton(binds = [MultiDao::class])
+    fun multiDao(database: MultiDatabase): CommunityDao<MultiData> {
         return database.multiDao()
     }
 

@@ -11,7 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
-import com.sofamaniac.crabir.data.local.dao.SubredditRepository
+import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.GalleryItem
 import com.sofamaniac.crabir.data.remote.reddit.MediaUploadInterface
@@ -77,7 +77,7 @@ abstract class CreatorViewModel(
 @KoinViewModel
 class PostCreatorViewModel(
     api: RedditAPIService,
-    private val communities: SubredditRepository,
+    private val communities: SubredditDao,
     private val mediaUploader: MediaUploadInterface,
     accountsRepository: AccountsRepository,
 ) : CreatorViewModel(api) {

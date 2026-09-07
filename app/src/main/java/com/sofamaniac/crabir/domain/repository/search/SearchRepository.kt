@@ -9,25 +9,24 @@ import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.repository.Cache
+import com.sofamaniac.crabir.domain.repository.CommunityCache
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ListingRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import org.koin.core.annotation.Singleton
 import org.koin.core.annotation.ViewModelScope
 
 @ViewModelScope
 class PostSearchRepository(
     private val api: RedditAPIService,
-    private val votableRepository: LinksRepository,
+    override val cache: LinksRepository,
 ) :
     ListingRepository<PostSearchParams, PostData>() {
     override fun thingToData(thing: Thing): PostData? {
         if (thing !is Thing.Post) return null
         return PostDataMapper.map(thing.data)
-    }
-
-    override suspend fun onResponseSuccess(things: List<Thing>) {
-        super.onResponseSuccess(things)
-        val votableList = things.mapNotNull { thingToData(it) }
-        votableRepository.insert(votableList)
     }
 
     override suspend fun getThings(
@@ -50,7 +49,10 @@ class PostSearchRepository(
 }
 
 @ViewModelScope
-class CommunitySearchRepository(private val api: RedditAPIService) :
+class CommunitySearchRepository(
+    private val api: RedditAPIService,
+    override val cache: CommunityCache<SubredditData>,
+) :
     ListingRepository<CommunitySearchParams, SubredditData>() {
     override fun thingToData(thing: Thing): SubredditData? {
         if (thing !is Thing.Subreddit) return null
@@ -73,8 +75,40 @@ class CommunitySearchRepository(private val api: RedditAPIService) :
     }
 }
 
+@Singleton
+class UserCache : Cache<UserDTO> {
+    private val cache = mutableMapOf<Fullname, UserDTO>()
+    override fun insert(thing: UserDTO) {
+        cache[thing.name] = thing
+    }
+
+    override fun insert(things: List<UserDTO>) {
+        things.forEach { insert(it) }
+    }
+
+    override fun update(thing: UserDTO) {
+        cache[thing.name] = thing
+    }
+
+    override fun get(name: Fullname): Flow<UserDTO?> {
+        return flowOf(cache[name])
+    }
+
+    override suspend fun getAsync(name: Fullname): UserDTO? {
+        return cache[name]
+    }
+
+    override suspend fun delete(name: Fullname) {
+        cache.remove(name)
+    }
+
+    override fun clear() {
+        cache.clear()
+    }
+}
+
 @ViewModelScope
-class UserSearchRepository(private val api: RedditAPIService) :
+class UserSearchRepository(private val api: RedditAPIService, override val cache: UserCache) :
     ListingRepository<PostSearchParams, UserDTO>() {
     override fun thingToData(thing: Thing): UserDTO? {
         return if (thing !is Thing.User) {
@@ -104,10 +138,3 @@ class UserSearchRepository(private val api: RedditAPIService) :
         }
     }
 }
-
-// class CommentSearchRepository(api: RedditAPIService) : SearchRepositoryGeneric<CommentData>(api) {
-//    override fun thingToData(thing: Thing): CommentData? {
-//        if (thing !is Thing.Comment) return null
-//        return CommentDataMapper.map(thing.data)
-//    }
-// }

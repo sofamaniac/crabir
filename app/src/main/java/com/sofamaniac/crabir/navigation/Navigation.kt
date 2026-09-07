@@ -39,6 +39,9 @@ class SubredditRoute(val subreddit: String) : Route {
 
 
 @Serializable
+/**
+ * @param subreddit the prefixed display name of the subreddit
+ */
 class SubredditInfoRoute(val subreddit: String) : Route {
 
     init {

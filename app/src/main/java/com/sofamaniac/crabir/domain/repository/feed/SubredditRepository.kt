@@ -5,29 +5,25 @@
 package com.sofamaniac.crabir.domain.repository.feed
 
 import androidx.paging.PagingSource
-import com.sofamaniac.crabir.data.local.dao.SubredditRepository
+import com.sofamaniac.crabir.data.local.dao.MultiDao
+import com.sofamaniac.crabir.data.local.dao.SubredditDao
+import com.sofamaniac.crabir.data.remote.dto.MultiData
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.SubscribeAction
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.repository.CommunityCache
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import org.koin.core.annotation.Singleton
 import org.koin.core.annotation.ViewModelScope
 
 
 @Singleton
-class SubredditCache(
-    private val dao: SubredditRepository,
-) {
-    suspend fun save(subreddit: SubredditData) {
-        dao.upsert(subreddit)
-    }
+class SubredditCache(dao: SubredditDao) : CommunityCache<SubredditData>(dao)
 
-    suspend fun get(displayName: String): SubredditData? {
-        return dao.getBySlug(displayName)
-    }
-}
+@Singleton
+class MultiCache(dao: MultiDao) : CommunityCache<MultiData>(dao)
 
 @ViewModelScope
 class SubredditPostsRepository(

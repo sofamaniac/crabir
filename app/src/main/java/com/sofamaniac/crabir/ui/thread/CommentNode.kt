@@ -105,7 +105,7 @@ open class CommentViewModel(
             val comment = repository.get(fullname).first()
             if (comment is CommentType.Comment) {
                 val updated = comment.copy(comment = comment.comment.copy(collapsed = collapsed))
-                repository.update(comment.name, updated)
+                repository.update(updated)
             }
         }
     }

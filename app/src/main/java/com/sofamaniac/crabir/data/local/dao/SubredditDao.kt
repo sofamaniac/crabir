@@ -8,8 +8,8 @@ import androidx.room.Update
 import androidx.room.Upsert
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.MultiData
+import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.SubredditData
-import com.sofamaniac.crabir.domain.repository.CommunityRepository
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -31,15 +31,21 @@ interface CommunityViewDao {
 }
 
 @Dao
-interface SubredditRepository : CommunityRepository<SubredditData> {
+interface SubredditDao : CommunityDao<SubredditData> {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    override suspend fun insert(community: SubredditData)
+    override fun insert(community: SubredditData)
 
     @Upsert
-    override suspend fun upsert(entity: SubredditData)
+    override fun upsert(entity: SubredditData)
 
     @Query("SELECT * FROM subreddits WHERE id = :id")
     suspend fun getById(id: String): SubredditData?
+
+    @Query("SELECT * FROM subreddits WHERE name = :name LIMIT 1")
+    override fun get(name: Fullname): Flow<SubredditData?>
+
+    @Query("SELECT * FROM subreddits WHERE name = :name LIMIT 1")
+    override suspend fun getAsync(name: Fullname): SubredditData?
 
 
     @Query("SELECT * FROM subreddits WHERE displayNamePrefixed = :slug")
@@ -51,25 +57,38 @@ interface SubredditRepository : CommunityRepository<SubredditData> {
     //    @Query("SELECT * FROM subreddits WHERE displayName = :displayName")
     //    suspend fun getBySlug(displayName: String): SubredditData?
 
+    @Query("DELETE FROM subreddits WHERE name = :name")
+    override suspend fun delete(name: Fullname)
+
     @Query("DELETE FROM subreddits")
-    override suspend fun deleteAll()
+    override fun deleteAll()
 }
 
 @Dao
-interface MultiRepository : CommunityRepository<MultiData> {
+interface MultiDao : CommunityDao<MultiData> {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    override suspend fun insert(community: MultiData)
+    override fun insert(community: MultiData)
 
     @Upsert
-    override suspend fun upsert(entity: MultiData)
+    override fun upsert(entity: MultiData)
 
 
     @Query("SELECT * FROM multireddits WHERE displayNamePrefixed = :slug")
     override suspend fun getBySlug(slug: String): MultiData?
 
+    @Query("SELECT * FROM multireddits WHERE name = :name LIMIT 1")
+    override fun get(name: Fullname): Flow<MultiData?>
+
+    @Query("SELECT * FROM multireddits WHERE name = :name LIMIT 1")
+    override suspend fun getAsync(name: Fullname): MultiData?
+
+
     @Query("SELECT * FROM multireddits")
     suspend fun getAll(): List<MultiData>
 
+    @Query("DELETE FROM multireddits WHERE name = :name")
+    override suspend fun delete(name: Fullname)
+
     @Query("DELETE FROM multireddits")
-    override suspend fun deleteAll()
+    override fun deleteAll()
 }

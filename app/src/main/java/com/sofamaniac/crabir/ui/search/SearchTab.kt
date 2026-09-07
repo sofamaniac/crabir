@@ -1,8 +1,6 @@
 package com.sofamaniac.crabir.ui.search
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -30,7 +28,6 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
@@ -66,7 +63,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalSnackBarHost
-import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.SortInterface
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
@@ -76,14 +72,14 @@ import com.sofamaniac.crabir.domain.repository.search.PostSearchParams
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SearchRoute
-import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.ListItem
 import com.sofamaniac.crabir.ui.ThemedSwitch
 import com.sofamaniac.crabir.ui.TimeframeMenu
+import com.sofamaniac.crabir.ui.search.community.InnerTab
 import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
 import com.sofamaniac.crabir.ui.subreddit.PostView
-import com.sofamaniac.crabir.ui.subredditList.Tile
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -234,80 +230,6 @@ private fun InnerTab(
     }
 }
 
-@Composable
-private fun InnerTab(viewModel: CommunitySearchViewModel) {
-    val things = viewModel.items.collectAsLazyPagingItems()
-    val navController = LocalNavController.current
-    val listState = viewModel.listState
-    val theme = LocalTheme.current
-    PullToRefreshBox(
-        isRefreshing = things.loadState.refresh == LoadState.Loading,
-        onRefresh = {
-            viewModel.refresh()
-        },
-        modifier = Modifier
-            .fillMaxSize(),
-        indicator = {
-            if (things.loadState.refresh == LoadState.Loading) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
-        }
-    ) {
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(1),
-            verticalItemSpacing = 2.dp,
-            state = listState, modifier = Modifier.fillMaxSize()
-        ) {
-            if (things.itemCount == 0) {
-                fun onSuccess(sub: String) {
-                    val url = sub.removePrefix("/")
-                    navController?.navigate(SubredditRoute(url))
-                }
-
-                fun onError(e: Throwable) {
-                    Log.e("SearchTab", "InnerTab: ", e)
-                }
-                item {
-                    ListItem(onClick = {
-                        viewModel.goToRandom(
-                            false,
-                            onSuccess = { onSuccess(it) },
-                            onError = { onError(it) })
-                    }) {
-                        Text(stringResource(R.string.random_community))
-                    }
-                }
-                item {
-                    ListItem(onClick = {
-                        viewModel.goToRandom(
-                            true,
-                            onSuccess = { onSuccess(it) },
-                            onError = { onError(it) })
-                    }) {
-                        Text(stringResource(R.string.random_nsfw))
-                    }
-                }
-            }
-            items(
-                count = things.itemCount,
-                key = things.itemKey { p -> p.id }) { index ->
-                val subreddit = things[index]!!
-                Tile(
-                    subreddit,
-                    modifier = Modifier
-                        .background(color = theme.cardBackground)
-                        .clickable {
-                            navController?.navigate(
-                                SubredditRoute(
-                                    subreddit.displayNamePrefixed
-                                )
-                            )
-                        }
-                )
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalUuidApi::class)
 @Composable

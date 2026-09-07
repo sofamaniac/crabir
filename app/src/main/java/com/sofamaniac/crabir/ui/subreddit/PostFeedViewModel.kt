@@ -16,6 +16,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.sofamaniac.crabir.data.local.dao.CommunityDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
@@ -25,7 +26,6 @@ import com.sofamaniac.crabir.domain.model.DUMMY_POST
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
-import com.sofamaniac.crabir.domain.repository.CommunityRepository
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.domain.repository.feed.FeedSource
 import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository
@@ -75,7 +75,7 @@ object FeedViewModelInterfacePreview : FeedViewModelInterface<PostData> {
 abstract class PostFeedViewModel<T : CommunityData>(
     private val repository: PostFeedRepository<FeedParams>,
     visitedPostsDao: VisitedPostsDao,
-    private val communityRepository: CommunityRepository<T>,
+    private val communityRepository: CommunityDao<T>,
     viewEntity: CommunityViewEntity,
 ) : ViewModel(), FeedViewModelInterface<PostData> {
 

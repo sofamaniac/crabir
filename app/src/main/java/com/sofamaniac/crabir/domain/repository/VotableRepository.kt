@@ -12,35 +12,36 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-interface VotableRepository<T : VotableData> {
+interface VotableRepository<T : VotableData> : Cache<T> {
     val api: RedditAPIService
     val votableDao: VotableDao
 
     fun VotableEntity?.transform(): T?
 
-    fun insert(things: Iterable<T>) {
+    override fun insert(things: List<T>) {
         votableDao.insert(things.map { it.toEntity() })
     }
 
-    fun insert(thing: VotableData) {
+    override fun insert(thing: T) {
         votableDao.insert(thing.toEntity())
     }
 
-    operator fun get(name: Fullname): Flow<T?> =
+    override fun get(name: Fullname): Flow<T?> =
         votableDao.get(name).map { it.transform() }.distinctUntilChanged()
 
-    fun getValue(name: Fullname): T? =
-        votableDao.getValue(name)?.transform()
-
-    fun update(name: Fullname, data: VotableData) {
-        votableDao.update(name, data.toEntity().data)
+    override suspend fun getAsync(name: Fullname): T? {
+        return votableDao.getValue(name)?.transform()
     }
 
-    fun clear() {
+    override fun update(thing: T) {
+        votableDao.update(thing.name, thing.toEntity().data)
+    }
+
+    override fun clear() {
         votableDao.clear()
     }
 
-    suspend fun delete(name: Fullname) {
+    override suspend fun delete(name: Fullname) {
         val res = api.delete(name)
         if (res.isSuccess) {
             votableDao.delete(name)

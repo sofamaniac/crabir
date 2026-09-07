@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.data.local.dao.MultiRepository
+import com.sofamaniac.crabir.data.local.dao.MultiDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.MultiData
@@ -104,7 +104,7 @@ fun MultiView(
 class MultiViewModel(
     repository: MultiPostsRepository,
     visitedPostsDao: VisitedPostsDao,
-    communityDao: MultiRepository,
+    communityDao: MultiDao,
     @InjectedParam slug: String,
     @InjectedParam viewEntity: CommunityViewEntity,
 ) : PostFeedViewModel<MultiData>(

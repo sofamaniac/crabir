@@ -6,8 +6,8 @@ import androidx.room.TypeConverters
 import com.sofamaniac.crabir.data.local.dao.AccountsDao
 import com.sofamaniac.crabir.data.local.dao.CommunityViewDao
 import com.sofamaniac.crabir.data.local.dao.InboxDao
-import com.sofamaniac.crabir.data.local.dao.MultiRepository
-import com.sofamaniac.crabir.data.local.dao.SubredditRepository
+import com.sofamaniac.crabir.data.local.dao.MultiDao
+import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.dao.VotableDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
@@ -40,13 +40,13 @@ abstract class CommunityViewDatabase : RoomDatabase() {
 @Database(entities = [SubredditData::class], version = 1)
 @TypeConverters(RoomConverters::class)
 abstract class SubredditDatabase : RoomDatabase() {
-    abstract fun subredditDao(): SubredditRepository
+    abstract fun subredditDao(): SubredditDao
 }
 
 @Database(entities = [MultiData::class], version = 1)
 @TypeConverters(RoomConverters::class)
 abstract class MultiDatabase : RoomDatabase() {
-    abstract fun multiDao(): MultiRepository
+    abstract fun multiDao(): MultiDao
 }
 
 @Database(entities = [Message::class], version = 1)

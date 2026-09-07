@@ -10,6 +10,7 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Message
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.ViewModelScope
 
@@ -23,7 +24,39 @@ enum class InboxFeed {
 
 class MessageNotFoundException : Exception()
 
-abstract class InboxRepository : ListingRepository<InboxFeed, Message>() {
+class InboxCache : Cache<Message> {
+    private val cache = mutableMapOf<Fullname, Message>()
+    override fun insert(thing: Message) {
+        cache[thing.name] = thing
+    }
+
+    override fun insert(things: List<Message>) {
+        things.forEach { insert(it) }
+    }
+
+    override fun update(thing: Message) {
+        cache[thing.name] = thing
+    }
+
+    override fun get(name: Fullname): Flow<Message?> {
+        return flowOf(cache[name])
+    }
+
+    override suspend fun getAsync(name: Fullname): Message? {
+        return cache[name]
+    }
+
+    override suspend fun delete(name: Fullname) {
+        cache.remove(name)
+    }
+
+    override fun clear() {
+        cache.clear()
+    }
+}
+
+abstract class InboxRepository(override val cache: InboxCache = InboxCache()) :
+    ListingRepository<InboxFeed, Message>() {
     abstract fun get(name: Fullname): Flow<Message?>
     abstract suspend fun readAll(): Result<Unit>
 

@@ -14,8 +14,7 @@ interface DataInterface {
 
 abstract class ListingRepository<Params, Data : DataInterface> {
     private var _seenThings: Set<Fullname> = emptySet()
-    var cache = mutableMapOf<Fullname, Data>()
-        private set
+    abstract val cache: Cache<Data>
 
     open fun refresh() {
         _seenThings = emptySet()
@@ -23,7 +22,7 @@ abstract class ListingRepository<Params, Data : DataInterface> {
 
     open suspend fun onResponseSuccess(things: List<Thing>) {
         val data = things.mapNotNull { thing -> thingToData(thing) }
-        cache.putAll(data.associateBy { it.name })
+        cache.insert(data)
     }
 
     abstract fun thingToData(thing: Thing): Data?
@@ -89,7 +88,7 @@ class ListingSource<Params, Data : DataInterface>(
             !is LoadResult.Page -> LoadResult.Error(Exception("Invalid load result"))
             else -> {
                 val data = page.data.mapNotNull { id ->
-                    repository.cache[id]
+                    repository.cache.getAsync(id)
                 }
                 LoadResult.Page(
                     prevKey = null,

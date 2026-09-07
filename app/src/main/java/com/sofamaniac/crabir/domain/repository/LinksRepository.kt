@@ -41,7 +41,7 @@ class LinksRepositoryImpl(
         if (post == null) return Result.failure(PostNotFoundException(name))
         val res = api.markNSFW(name)
         if (res.isSuccess) {
-            update(name, post.copy(over18 = true))
+            update(post.copy(over18 = true))
         }
         return res
     }
@@ -51,7 +51,7 @@ class LinksRepositoryImpl(
         if (post == null) return Result.failure(PostNotFoundException(name))
         val res = api.unmarkNSFW(name)
         if (res.isSuccess) {
-            update(name, post.copy(over18 = false))
+            update(post.copy(over18 = false))
         }
         return res
     }
@@ -61,7 +61,7 @@ class LinksRepositoryImpl(
         if (post == null) return Result.failure(PostNotFoundException(name))
         val res = api.unspoiler(name)
         if (res.isSuccess) {
-            update(name, post.copy(spoiler = false))
+            update(post.copy(spoiler = false))
         }
         return res
     }
@@ -71,7 +71,7 @@ class LinksRepositoryImpl(
         if (post == null) return Result.failure(PostNotFoundException(name))
         val res = api.spoiler(name)
         if (res.isSuccess) {
-            update(name, post.copy(spoiler = true))
+            update(post.copy(spoiler = true))
         }
         return res
     }
@@ -83,7 +83,7 @@ class LinksRepositoryImpl(
         val res = api.selectFlair("r/$subreddit", name, flairId, text ?: "")
         if (res.isSuccess) {
             val oldFlair = post.linkFlair
-            update(name, post.copy(linkFlair = oldFlair.copy(text = text ?: oldFlair.text)))
+            update(post.copy(linkFlair = oldFlair.copy(text = text ?: oldFlair.text)))
         }
         return res
     }
@@ -101,7 +101,7 @@ class LinksRepositoryImpl(
         if (post == null) return Result.failure(PostNotFoundException(name))
         val res = api.setSendReplies(name, enabled)
         if (res.isSuccess) {
-            update(name, post.copy(sendReplies = enabled))
+            update(post.copy(sendReplies = enabled))
         }
         return res
     }

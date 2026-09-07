@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.data.local.dao.SubredditRepository
+import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.domain.model.SubredditData
@@ -199,7 +199,7 @@ fun SubredditInfo(info: SubredditData, viewModel: SubredditViewModel) {
 class SubredditViewModel(
     private val repository: SubredditPostsRepository,
     visitedPostsDao: VisitedPostsDao,
-    communityDao: SubredditRepository,
+    communityDao: SubredditDao,
     private val subredditCache: SubredditCache,
     /** Subreddit's prefixed display name */
     @InjectedParam slug: String,
@@ -218,7 +218,7 @@ class SubredditViewModel(
         val slug = if (slug.startsWith("r/") || slug.startsWith("/r/")) slug else "r/$slug"
         repository.updateSubreddit(slug)
         viewModelScope.launch {
-            _info.value = subredditCache.get(slug)
+            _info.value = subredditCache.getBySlug(slug)
             if (_info.value == null) {
                 _info.value = repository.getInfo()
                 updateData(_info.value)
