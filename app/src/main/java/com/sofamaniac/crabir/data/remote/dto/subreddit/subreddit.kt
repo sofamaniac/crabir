@@ -8,6 +8,7 @@
 
 package com.sofamaniac.crabir.data.remote.dto.subreddit
 
+import com.sofamaniac.crabir.data.remote.utils.InstantAsFloatSerializer
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.ParsedMarkdown
 import com.sofamaniac.crabir.domain.model.SubredditData
@@ -15,6 +16,7 @@ import com.sofamaniac.crabir.domain.repository.DataInterface
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import tech.mappie.api.ObjectMappie
+import kotlin.time.Instant
 
 @Serializable
 @JvmInline
@@ -124,8 +126,9 @@ data class SubredditDTO(
     val keyColor: String = "",
     @SerialName("can_assign_user_flair")
     val canAssignUserFlair: Boolean = false,
+    @Serializable(with = InstantAsFloatSerializer::class)
     @SerialName("created")
-    val created: Double = 0.0,
+    val created: Instant? = null,
     @SerialName("show_media_preview")
     val showMediaPreview: Boolean = false,
     @SerialName("submission_type")
@@ -225,8 +228,9 @@ data class SubredditDTO(
     val lang: String = "",
     @SerialName("url")
     val url: String = "",
+    @Serializable(with = InstantAsFloatSerializer::class)
     @SerialName("created_utc")
-    val createdUtc: Double = 0.0,
+    val createdUtc: Instant? = null,
     @SerialName("user_is_contributor")
     val userIsContributor: Boolean = false,
     @SerialName("allow_predictions_tournament")

@@ -10,6 +10,7 @@ import androidx.room.PrimaryKey
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditIcon
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditId
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class SubredditInfo(
@@ -68,8 +69,8 @@ data class SubredditData(
     val keyColor: String?,
     val url: String,
     val quarantine: Boolean,
-    val createdUtc: Double = 0.0,
-    val created: Double = 0.0,
+    val createdUtc: Instant? = null,
+    val created: Instant? = null,
     val bannerSize: List<Int>?,
     val userIsContributor: Boolean?,
     val acceptFollowers: Boolean,

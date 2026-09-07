@@ -53,7 +53,6 @@ import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import com.sofamaniac.crabir.ui.post.withSeparator
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import java.util.Locale
-import kotlin.time.Instant
 
 @Composable
 fun SubredditItem(
@@ -105,8 +104,10 @@ private fun SubredditItemContent(
                 num,
             )
         )
-        withSeparator {
-            append(formatElapsedTimeLocalized(Instant.fromEpochSeconds(subreddit.createdUtc.toLong())))
+        if (subreddit.createdUtc != null) {
+            withSeparator {
+                append(formatElapsedTimeLocalized(subreddit.createdUtc))
+            }
         }
     }
     Row(

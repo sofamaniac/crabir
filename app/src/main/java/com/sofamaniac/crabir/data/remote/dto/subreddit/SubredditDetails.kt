@@ -8,9 +8,11 @@
 
 package com.sofamaniac.crabir.data.remote.dto.subreddit
 
+import com.sofamaniac.crabir.data.remote.utils.InstantAsFloatSerializer
 import com.sofamaniac.crabir.domain.model.Fullname
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class SubredditDetails(
@@ -70,9 +72,11 @@ data class SubredditDetails(
     val name: Fullname,
     val url: String,
     val quarantine: Boolean,
+    @Serializable(with = InstantAsFloatSerializer::class)
     @SerialName("created_utc")
-    val createdUtc: Double = 0.0,
-    val created: Double = 0.0,
+    val createdUtc: Instant? = null,
+    @Serializable(with = InstantAsFloatSerializer::class)
+    val created: Instant? = null,
     @SerialName("banner_size")
     val bannerSize: List<Int>?,
     @SerialName("user_is_contributor")

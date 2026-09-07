@@ -37,7 +37,7 @@ abstract class CommunityViewDatabase : RoomDatabase() {
     abstract fun visitedCommunityDao(): CommunityViewDao
 }
 
-@Database(entities = [SubredditData::class], version = 1)
+@Database(entities = [SubredditData::class], version = 2)
 @TypeConverters(RoomConverters::class)
 abstract class SubredditDatabase : RoomDatabase() {
     abstract fun subredditDao(): SubredditDao
