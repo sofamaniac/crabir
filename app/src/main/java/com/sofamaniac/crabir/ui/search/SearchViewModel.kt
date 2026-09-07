@@ -28,12 +28,16 @@ import com.sofamaniac.crabir.domain.repository.search.PostSearchParams
 import com.sofamaniac.crabir.domain.repository.search.PostSearchRepository
 import com.sofamaniac.crabir.domain.repository.search.UserSearchRepository
 import com.sofamaniac.crabir.ui.subreddit.FeedViewModelInterface
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -167,6 +171,19 @@ class CommunitySearchViewModel(
 ) {
 
     val subscriptions = subscriptionsRepository.subscriptions
+
+    private val cache = mutableMapOf<Fullname, Flow<SubredditData>>()
+
+    fun get(name: Fullname): Flow<SubredditData> {
+        if (cache.containsKey(name)) {
+            return cache[name]!!
+        }
+        val flow = repository.cache.get(name).dropWhile { it == null }.map { it!! }
+        cache[name] = flow
+        return flow
+
+    }
+
     fun setSort(sort: CommunitySearchSort) {
         paramsState.update {
             it.copy(sort = sort)
@@ -197,8 +214,8 @@ class CommunitySearchViewModel(
     }
 
     fun subscribe(subreddit: SubredditData) {
-        viewModelScope.launch {
-            if (subreddit.userIsSubscriber) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (!subreddit.userIsSubscriber) {
                 subscriptionsRepository.subscribe(subreddit)
             } else {
                 subscriptionsRepository.unsubscribe(subreddit)

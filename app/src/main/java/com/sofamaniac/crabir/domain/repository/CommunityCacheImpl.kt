@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.domain.repository
 
+import android.util.Log
 import com.sofamaniac.crabir.data.local.dao.CommunityDao
 import com.sofamaniac.crabir.domain.model.CommunityData
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -13,6 +14,7 @@ abstract class CommunityCache<T : CommunityData>(val dao: CommunityDao<T>) : Cac
     }
 
     override fun insert(things: List<T>) {
+        Log.d("CommunityCache", "insert into ${this.javaClass}")
         for (thing in things) {
             dao.insert(thing)
         }

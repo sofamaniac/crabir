@@ -183,6 +183,7 @@ fun SearchTab(
                 }
                 HorizontalPager(
                     state = currentTab,
+                    userScrollEnabled = false,
                     modifier = Modifier
                         .fillMaxSize()
                 ) { index ->

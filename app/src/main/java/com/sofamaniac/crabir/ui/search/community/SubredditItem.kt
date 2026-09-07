@@ -2,10 +2,13 @@ package com.sofamaniac.crabir.ui.search.community
 
 import android.content.Intent
 import android.content.Intent.ACTION_SEND
+import android.icu.text.CompactDecimalFormat
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
@@ -25,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,11 +46,13 @@ import com.sofamaniac.crabir.navigation.SubredditInfoRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.ui.ListItem
 import com.sofamaniac.crabir.ui.Over18Cartouche
+import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.ThemedDialog
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import com.sofamaniac.crabir.ui.post.withSeparator
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
+import java.util.Locale
 import kotlin.time.Instant
 
 @Composable
@@ -56,29 +62,27 @@ fun SubredditItem(
     modifier: Modifier = Modifier,
 ) {
     val navController = LocalNavController.current
-    ListItem(
-        modifier = modifier,
-        onClick = {
-            navController?.navigate(
-                SubredditRoute(
-                    subreddit.displayNamePrefixed
+    ThemedCard(modifier = modifier.clickable {
+        navController?.navigate(SubredditRoute(subreddit.displayNamePrefixed))
+    }) {
+        Column(
+            modifier = Modifier.padding(all = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                SubredditIcon(
+                    subreddit = subreddit.displayName,
+                    icon = subreddit.icon,
+                    modifier = Modifier.size(48.dp)
                 )
-            )
-        },
-        leadingContent = {
-            SubredditIcon(
-                subreddit = subreddit.displayName,
-                icon = subreddit.icon,
-                modifier = Modifier.size(48.dp)
-            )
-        },
-        supportingContent = {
+                SubredditItemContent(subreddit, subscribe)
+            }
             RedditMarkdown(markdown = subreddit.publicDescription)
-        },
-        content = {
-            SubredditItemContent(subreddit, subscribe)
         }
-    )
+    }
 }
 
 @Composable
@@ -87,41 +91,47 @@ private fun SubredditItemContent(
     subscribe: (SubredditData) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val num = remember {
+        CompactDecimalFormat.getInstance(
+            Locale.getDefault(),
+            CompactDecimalFormat.CompactStyle.SHORT
+        ).format(subreddit.subscribers)
+    }
     val supportString = buildAnnotatedString {
         append(
             pluralStringResource(
                 R.plurals.subreddit_subscribers_count,
                 subreddit.subscribers,
-                subreddit.subscribers
+                num,
             )
         )
         withSeparator {
             append(formatElapsedTimeLocalized(Instant.fromEpochSeconds(subreddit.createdUtc.toLong())))
         }
     }
-    Column(modifier = modifier) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = modifier) {
             Text(subreddit.displayName, style = MaterialTheme.typography.labelMedium)
-            if (subreddit.over18) {
-                Over18Cartouche()
-            }
-            if (subreddit.subredditType == "private") {
-                PrivateCartouche()
-            }
-            if (subreddit.subredditType == "restricted") {
-                RestrictedCartouche()
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            ShortSubscribeButton(subreddit, subscribe)
-            OptionsButton(subreddit)
+            Text(
+                supportString,
+                style = MaterialTheme.typography.labelSmall
+            )
         }
-        Text(
-            supportString,
-            style = MaterialTheme.typography.labelSmall
-        )
+        if (subreddit.over18) {
+            Over18Cartouche()
+        }
+        if (subreddit.subredditType == "private") {
+            PrivateCartouche()
+        }
+        if (subreddit.subredditType == "restricted") {
+            RestrictedCartouche()
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        ShortSubscribeButton(subreddit, subscribe)
+        OptionsButton(subreddit)
     }
 }
 
@@ -143,7 +153,7 @@ private fun ShortSubscribeButton(subreddit: SubredditData, subscribe: (Subreddit
 @Composable
 fun OptionsButton(subreddit: SubredditData) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
-    IconButton(onClick = {}) {
+    IconButton(onClick = { showDialog = true }) {
         Icon(Icons.Default.MoreVert, contentDescription = "Options")
     }
 

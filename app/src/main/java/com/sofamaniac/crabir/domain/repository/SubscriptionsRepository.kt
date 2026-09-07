@@ -1,7 +1,6 @@
 package com.sofamaniac.crabir.domain.repository
 
 import android.util.Log
-import com.sofamaniac.crabir.data.local.dao.MultiDao
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Listing
 import com.sofamaniac.crabir.data.remote.dto.Thing.Subreddit
@@ -11,6 +10,7 @@ import com.sofamaniac.crabir.data.remote.reddit.SubscribeAction
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
 import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.repository.feed.MultiCache
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +29,7 @@ class SubscriptionsRepository(
     val api: RedditAPIService,
     val accountsRepository: AccountsRepository,
     val subredditCache: SubredditCache,
-    val multiCache: MultiDao,
+    val multiCache: MultiCache,
 ) {
     val activeAccount = accountsRepository.activeAccount.distinctUntilChanged { old, new ->
         old.id == new.id
@@ -119,7 +119,7 @@ class SubscriptionsRepository(
         return if (response.isSuccess) {
             val multis = response.getOrNull() ?: emptyList()
             for (multi in multis) {
-                multiCache.upsert(multi.data)
+                multiCache.insert(multi.data)
             }
             multis
         } else {

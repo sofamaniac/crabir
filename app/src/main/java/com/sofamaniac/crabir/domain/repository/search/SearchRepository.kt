@@ -10,9 +10,9 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.Cache
-import com.sofamaniac.crabir.domain.repository.CommunityCache
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ListingRepository
+import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import org.koin.core.annotation.Singleton
@@ -51,7 +51,7 @@ class PostSearchRepository(
 @ViewModelScope
 class CommunitySearchRepository(
     private val api: RedditAPIService,
-    override val cache: CommunityCache<SubredditData>,
+    override val cache: SubredditCache,
 ) :
     ListingRepository<CommunitySearchParams, SubredditData>() {
     override fun thingToData(thing: Thing): SubredditData? {

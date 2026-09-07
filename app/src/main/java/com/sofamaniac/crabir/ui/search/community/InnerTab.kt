@@ -9,6 +9,8 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -77,7 +79,7 @@ internal fun InnerTab(viewModel: CommunitySearchViewModel) {
             items(
                 count = things.itemCount,
                 key = things.itemKey { p -> p.id }) { index ->
-                val subreddit = things[index]!!
+                val subreddit by viewModel.get(things[index]!!.name).collectAsState(things[index]!!)
                 SubredditItem(
                     subreddit,
                     viewModel::subscribe

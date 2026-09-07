@@ -379,7 +379,7 @@
     <string name="client_id">Client ID</string>
     <string name="api_settings_title">API settings</string>
     <plurals name="subreddit_subscribers_count">"
-        <item quantity="one">%1$d subscriber</item>
-        <item quantity="other">%1$d subscribers</item>
+        <item quantity="one">%1$s subscriber</item>
+        <item quantity="other">%1$s subscribers</item>
     </plurals>
 </resources>
