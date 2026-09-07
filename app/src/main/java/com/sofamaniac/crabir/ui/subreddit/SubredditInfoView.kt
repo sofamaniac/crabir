@@ -31,12 +31,14 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.SubredditAPI
 import com.sofamaniac.crabir.data.remote.reddit.SubscribeAction
+import com.sofamaniac.crabir.data.remote.utils.fromHtml
+import com.sofamaniac.crabir.domain.model.RichtextDocument
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.ui.BackButton
-import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
+import com.sofamaniac.crabir.ui.richtext.Richtext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -165,8 +167,9 @@ fun SubredditInfoView(
                 }
             }
             item {
-                RedditMarkdown(
-                    info.description,
+                Richtext(
+                    document = RichtextDocument.fromHtml(info.descriptionHtml),
+                    mediaMetadata = emptyMap(),
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                 )

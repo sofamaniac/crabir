@@ -4,6 +4,7 @@
 
 package com.sofamaniac.crabir.domain.repository.feed
 
+import android.util.Log
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
@@ -51,7 +52,8 @@ abstract class PostFeedRepository<Params> :
             }
 
             else -> {
-                throw IllegalArgumentException("Unreachable code")
+                Log.e("PostFeedRepository", "Expect Post got: $thing")
+                null
             }
         }
     }

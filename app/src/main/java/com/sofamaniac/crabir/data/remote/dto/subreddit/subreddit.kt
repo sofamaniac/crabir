@@ -109,7 +109,7 @@ data class SubredditDTO(
     @SerialName("community_reviewed")
     val communityReviewed: Boolean = false,
     @SerialName("description_html")
-    val descriptionHtml: String? = null,
+    val descriptionHtml: String = "",
     @SerialName("spoilers_enabled")
     val spoilersEnabled: Boolean = false,
     @SerialName("comment_contribution_settings")
@@ -152,7 +152,7 @@ data class SubredditDTO(
     @SerialName("emojis_custom_size")
     val emojisCustomSize: List<Int>? = null,
     @SerialName("public_description_html")
-    val publicDescriptionHtml: String? = null,
+    val publicDescriptionHtml: String = "",
     @SerialName("allow_videos")
     val allowVideos: Boolean = false,
     @SerialName("notification_level")
@@ -270,6 +270,8 @@ object SubredditDetailsMapper : ObjectMappie<SubredditDetails, SubredditData>() 
         SubredditData::previousNames fromValue emptyList()
         SubredditData::publicDescription fromValue ParsedMarkdown(from.publicDescription)
         SubredditData::description fromValue ParsedMarkdown(from.description)
+        SubredditData::descriptionHtml fromValue ""
+        SubredditData::publicDescriptionHtml fromValue ""
         //SubredditData::iconColor fromValue (from.keyColor ?: from.iconColor)
     }
 }

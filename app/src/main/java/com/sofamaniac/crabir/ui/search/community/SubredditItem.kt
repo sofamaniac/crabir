@@ -38,7 +38,9 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
+import com.sofamaniac.crabir.data.remote.utils.fromHtml
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.domain.model.RichtextDocument
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostCreatorRoute
@@ -49,8 +51,8 @@ import com.sofamaniac.crabir.ui.Over18Cartouche
 import com.sofamaniac.crabir.ui.ThemedCard
 import com.sofamaniac.crabir.ui.ThemedDialog
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
-import com.sofamaniac.crabir.ui.markdown.RedditMarkdown
 import com.sofamaniac.crabir.ui.post.withSeparator
+import com.sofamaniac.crabir.ui.richtext.Richtext
 import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import java.util.Locale
 
@@ -79,7 +81,10 @@ fun SubredditItem(
                 )
                 SubredditItemContent(subreddit, subscribe)
             }
-            RedditMarkdown(markdown = subreddit.publicDescription)
+            Richtext(
+                document = RichtextDocument.fromHtml(subreddit.publicDescriptionHtml),
+                mediaMetadata = emptyMap()
+            )
         }
     }
 }

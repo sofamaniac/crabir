@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.domain.repository
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.sofamaniac.crabir.data.remote.dto.Thing
@@ -38,6 +39,7 @@ abstract class ListingRepository<Params, Data : DataInterface> {
     ): PagingSource.LoadResult<Fullname, Fullname> {
         val response = request()
         if (response.isFailure) {
+            Log.e("ListingRepository", "Error while making request", response.exceptionOrNull())
             return PagingSource.LoadResult.Error(response.exceptionOrNull()!!)
         } else {
             val listing = response.getOrNull()
