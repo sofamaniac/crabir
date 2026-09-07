@@ -142,37 +142,13 @@ fun TopBar(
             }
         },
         actions = {
-            // Sort Dropdown
-            var showMenu by remember { mutableStateOf(false) }
-            IconButton(onClick = { showMenu = !showMenu }) {
-                Icon(Icons.Filled.MoreVert, stringResource(R.string.more_option_desc))
-            }
-
-            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                DropdownMenuItem(
-                    onClick = {
-                        showViewSelect = true
-                    },
-                    text = { Text(stringResource(R.string.change_post_view)) }
-                )
-                DropdownMenuItem(
-                    onClick = {
-                        navController?.navigate(SettingsRoute)
-                    },
-                    text = { Text(stringResource(R.string.settings)) }
-                )
-                if (!disableInfo) {
-                    DropdownMenuItem(
-                        onClick = {
-                            navController?.navigate(SubredditInfoRoute(slug))
-                        },
-                        text = { Text(stringResource(R.string.go_to_sub_info)) }
-                    )
-                }
-                DropdownMenuItem(
-                    onClick = { refresh() },
-                    text = { Text(stringResource(R.string.refresh)) })
-            }
+            OptionMenu(
+                onPostViewClick = { showViewSelect = true },
+                onSettingsClick = { navController?.navigate(SettingsRoute) },
+                refresh = refresh,
+                disableInfo = disableInfo,
+                onInfoClick = { navController?.navigate(SubredditInfoRoute(slug)) }
+            )
             if (!disableInfo) {
                 IconButton(onClick = {
                     navController?.navigate(SubredditInfoRoute(slug))
@@ -191,6 +167,40 @@ fun TopBar(
             selectedView = entity.view ?: LocalViewSettings.current.defaultView,
             updateView = ::updateViewInner
         )
+    }
+}
+
+@Composable
+private fun OptionMenu(
+    onPostViewClick: () -> Unit,
+    onSettingsClick: () -> Unit,
+    refresh: () -> Unit,
+    disableInfo: Boolean = false,
+    onInfoClick: () -> Unit,
+) {
+    var showMenu by remember { mutableStateOf(false) }
+    IconButton(onClick = { showMenu = !showMenu }) {
+        Icon(Icons.Filled.MoreVert, stringResource(R.string.more_option_desc))
+    }
+
+    DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+        DropdownMenuItem(
+            onClick = onPostViewClick,
+            text = { Text(stringResource(R.string.change_post_view)) }
+        )
+        DropdownMenuItem(
+            onClick = onSettingsClick,
+            text = { Text(stringResource(R.string.settings)) }
+        )
+        if (!disableInfo) {
+            DropdownMenuItem(
+                onClick = onInfoClick,
+                text = { Text(stringResource(R.string.go_to_sub_info)) }
+            )
+        }
+        DropdownMenuItem(
+            onClick = { refresh() },
+            text = { Text(stringResource(R.string.refresh)) })
     }
 }
 
