@@ -77,7 +77,7 @@ fun TimeframeMenu(
 ) {
     DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
         Timeframe.entries.forEach {
-            DropdownMenuItem(text = { Text(it.toString()) }, onClick = {
+            DropdownMenuItem(text = { Text(stringResource(it.representation)) }, onClick = {
                 onSortChange(it)
             })
         }
