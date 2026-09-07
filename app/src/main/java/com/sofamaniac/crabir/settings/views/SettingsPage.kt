@@ -33,7 +33,7 @@ import com.sofamaniac.crabir.navigation.ViewManagerRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
-import com.sofamaniac.crabir.ui.ListItem
+import com.sofamaniac.crabir.ui.components.ListItem
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

@@ -19,8 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
-import com.sofamaniac.crabir.ui.ListItem
-import com.sofamaniac.crabir.ui.ThemedDialog
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ThemedDialog
 import com.sofamaniac.crabir.ui.editor.postEditor.FlairDialog
 import com.sofamaniac.crabir.ui.editor.postEditor.FlairEditBox
 import com.sofamaniac.crabir.ui.post.LinkInteraction

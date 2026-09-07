@@ -7,9 +7,9 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.ui.subreddit.MultiView
-import com.sofamaniac.crabir.ui.subreddit.SubredditInfoView
-import com.sofamaniac.crabir.ui.subreddit.SubredditViewer
+import com.sofamaniac.crabir.ui.feedInfo.subreddit.SubredditInfoView
+import com.sofamaniac.crabir.ui.postFeed.multi.MultiView
+import com.sofamaniac.crabir.ui.postFeed.subreddit.SubredditViewer
 import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.subredditGraph() {

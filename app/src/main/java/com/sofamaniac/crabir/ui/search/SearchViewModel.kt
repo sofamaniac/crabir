@@ -27,7 +27,7 @@ import com.sofamaniac.crabir.domain.repository.search.CommunitySearchRepository
 import com.sofamaniac.crabir.domain.repository.search.PostSearchParams
 import com.sofamaniac.crabir.domain.repository.search.PostSearchRepository
 import com.sofamaniac.crabir.domain.repository.search.UserSearchRepository
-import com.sofamaniac.crabir.ui.subreddit.FeedViewModelInterface
+import com.sofamaniac.crabir.ui.postFeed.FeedViewModelInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

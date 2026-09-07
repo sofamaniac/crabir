@@ -74,12 +74,12 @@ import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.ui.BackButton
-import com.sofamaniac.crabir.ui.ListItem
-import com.sofamaniac.crabir.ui.ThemedSwitch
-import com.sofamaniac.crabir.ui.TimeframeMenu
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ThemedSwitch
+import com.sofamaniac.crabir.ui.components.TimeframeMenu
+import com.sofamaniac.crabir.ui.postFeed.PostFeedViewer
+import com.sofamaniac.crabir.ui.postFeed.PostView
 import com.sofamaniac.crabir.ui.search.community.InnerTab
-import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
-import com.sofamaniac.crabir.ui.subreddit.PostView
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

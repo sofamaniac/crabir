@@ -34,10 +34,10 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
-import com.sofamaniac.crabir.ui.TabBar
+import com.sofamaniac.crabir.ui.components.TabBar
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
-import com.sofamaniac.crabir.ui.subreddit.PostFeedViewer
-import com.sofamaniac.crabir.ui.subreddit.PostView
+import com.sofamaniac.crabir.ui.postFeed.PostFeedViewer
+import com.sofamaniac.crabir.ui.postFeed.PostView
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel

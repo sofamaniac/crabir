@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui
+package com.sofamaniac.crabir.ui.components
 
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults

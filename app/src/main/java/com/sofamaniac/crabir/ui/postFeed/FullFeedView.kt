@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui.subreddit
+package com.sofamaniac.crabir.ui.postFeed
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerState
@@ -26,6 +26,8 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostCreatorRoute
 import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
+import com.sofamaniac.crabir.ui.postFeed.components.BottomSheet
+import com.sofamaniac.crabir.ui.postFeed.components.Fab
 import kotlinx.coroutines.launch
 
 
@@ -89,7 +91,7 @@ fun FullFeedView(
                 }
 
                 if (showBottomSheet) {
-                    FeedBottomSheet(
+                    BottomSheet(
                         bottomSheetState,
                         onDismiss = {
                             showBottomSheet = false

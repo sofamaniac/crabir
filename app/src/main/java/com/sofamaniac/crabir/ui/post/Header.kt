@@ -49,8 +49,8 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.post.InfoSettings
+import com.sofamaniac.crabir.ui.components.SubredditIcon
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
-import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 
 

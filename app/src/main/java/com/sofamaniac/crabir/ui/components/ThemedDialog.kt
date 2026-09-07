@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui
+package com.sofamaniac.crabir.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope

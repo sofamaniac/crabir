@@ -15,7 +15,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
-import com.sofamaniac.crabir.ui.ThemedCard
+import com.sofamaniac.crabir.ui.components.ThemedCard
 import com.sofamaniac.crabir.ui.thread.CommentInner
 
 @Composable

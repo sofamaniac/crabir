@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.ui.ListItem
+import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.post.dialog.MuteDialog
 
 @Composable

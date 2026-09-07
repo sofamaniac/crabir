@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui.subreddit
+package com.sofamaniac.crabir.ui.postFeed.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
@@ -19,11 +19,11 @@ import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Kind
-import com.sofamaniac.crabir.ui.ListItem
+import com.sofamaniac.crabir.ui.components.ListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FeedBottomSheet(
+fun BottomSheet(
     sheetState: SheetState,
     onDismiss: () -> Unit,
     createPost: (Kind) -> Unit,

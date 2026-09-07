@@ -43,9 +43,9 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.CloseButton
-import com.sofamaniac.crabir.ui.ListItem
-import com.sofamaniac.crabir.ui.ThemedCard
-import com.sofamaniac.crabir.ui.ThemedDialog
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ThemedCard
+import com.sofamaniac.crabir.ui.components.ThemedDialog
 import com.sofamaniac.crabir.ui.protectedTouch
 import kotlinx.coroutines.launch
 

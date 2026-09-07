@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui.subreddit
+package com.sofamaniac.crabir.ui.postFeed
 
 import android.util.Log
 import androidx.compose.runtime.Composable

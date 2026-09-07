@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui
+package com.sofamaniac.crabir.ui.components
 
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.icons.Icons
@@ -125,4 +125,3 @@ fun TabBar(
         )
     }
 }
-

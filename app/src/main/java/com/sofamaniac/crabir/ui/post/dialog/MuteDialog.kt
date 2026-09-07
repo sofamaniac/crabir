@@ -21,8 +21,8 @@ import androidx.core.net.toUri
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.settings.filters.filtersDataStore
-import com.sofamaniac.crabir.ui.ListItem
-import com.sofamaniac.crabir.ui.ThemedDialog
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ThemedDialog
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

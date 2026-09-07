@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Kind
-import com.sofamaniac.crabir.ui.ThemedDialog
+import com.sofamaniac.crabir.ui.components.ThemedDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

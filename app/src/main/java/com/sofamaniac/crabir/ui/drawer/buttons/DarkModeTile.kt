@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.settings.theme.ThemeMode
 import com.sofamaniac.crabir.settings.theme.themeDataStore
-import com.sofamaniac.crabir.ui.ThemedSwitch
+import com.sofamaniac.crabir.ui.components.ThemedSwitch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 

@@ -1,6 +1,7 @@
-package com.sofamaniac.crabir.ui
+package com.sofamaniac.crabir.ui.components
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemColors
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemElevation
@@ -9,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.sofamaniac.crabir.settings.theme.rememberListItemColors
-import androidx.compose.material3.ListItem as BaseListItem
 
 @Composable
 fun ListItem(
@@ -26,7 +26,7 @@ fun ListItem(
     contentPadding: PaddingValues = ListItemDefaults.ContentPadding,
     content: @Composable () -> Unit,
 ) {
-    BaseListItem(
+    ListItem(
         modifier = modifier,
         enabled = enabled,
         leadingContent = leadingContent,
@@ -58,7 +58,7 @@ fun ListItem(
     contentPadding: PaddingValues = ListItemDefaults.ContentPadding,
     content: @Composable () -> Unit,
 ) {
-    BaseListItem(
+    ListItem(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
@@ -92,8 +92,9 @@ fun ListItem(
     contentPadding: PaddingValues = ListItemDefaults.ContentPadding,
     content: @Composable () -> Unit,
 ) {
-    BaseListItem(
+    ListItem(
         selected = selected,
+        enabled = enabled,
         onClick = onClick,
         modifier = modifier,
         leadingContent = leadingContent,

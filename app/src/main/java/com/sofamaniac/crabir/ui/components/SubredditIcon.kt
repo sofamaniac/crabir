@@ -1,12 +1,4 @@
-/*
- * *
- *  * Created by sofamaniac
- *  * Copyright (c) 2026 . All rights reserved.
- *  * Last modified 1/12/26, 10:45 PM
- *
- */
-
-package com.sofamaniac.crabir.ui.subreddit
+package com.sofamaniac.crabir.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
@@ -20,7 +12,6 @@ import androidx.compose.ui.res.painterResource
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditIcon
-import com.sofamaniac.crabir.ui.mapColor
 
 @Composable
 fun SubredditIcon(

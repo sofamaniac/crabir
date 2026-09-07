@@ -22,7 +22,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.Thing
@@ -33,7 +32,8 @@ import com.sofamaniac.crabir.navigation.SavedRoute
 import com.sofamaniac.crabir.navigation.SearchRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuItems
-import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
+import com.sofamaniac.crabir.ui.components.MultiIcon
+import com.sofamaniac.crabir.ui.components.SubredditIcon
 
 enum class FeedButtons(val icon: ImageVector, val route: Route) {
     Home(Icons.Default.Home, HomeRoute),
@@ -52,13 +52,7 @@ internal fun MultiTile(multi: Thing.Multi, showIcon: Boolean, onClick: () -> Uni
         selected = false,
         icon = {
             if (showIcon) {
-                AsyncImage(
-                    multi.data.iconUrl,
-                    "${multi.data.displayName} icon",
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                )
+                MultiIcon(multi.data)
             } else {
                 Spacer(modifier = Modifier.size(32.dp))
             }

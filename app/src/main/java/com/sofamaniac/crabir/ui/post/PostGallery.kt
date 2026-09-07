@@ -48,7 +48,7 @@ import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.settings.data.NetworkPolicy
 import com.sofamaniac.crabir.ui.SaveToHistory
-import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.components.cartouche
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss

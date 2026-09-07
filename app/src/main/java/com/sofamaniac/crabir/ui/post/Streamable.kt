@@ -22,7 +22,7 @@ import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
-import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.components.cartouche
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

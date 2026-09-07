@@ -8,8 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.sofamaniac.crabir.ui.ListItem
-import com.sofamaniac.crabir.ui.ThemedCheckbox
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ThemedCheckbox
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

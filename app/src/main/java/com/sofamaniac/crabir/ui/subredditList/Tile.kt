@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.domain.model.SubredditData
-import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
+import com.sofamaniac.crabir.ui.components.SubredditIcon
 
 @Composable
 fun Tile(subreddit: SubredditData, modifier: Modifier = Modifier) {

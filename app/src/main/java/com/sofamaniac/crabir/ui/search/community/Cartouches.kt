@@ -5,7 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.components.cartouche
 
 val CartoucheColor = Color.Cyan
 

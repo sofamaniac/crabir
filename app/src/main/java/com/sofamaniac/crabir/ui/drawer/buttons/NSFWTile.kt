@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.LocalFiltersSettings
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.settings.filters.filtersDataStore
-import com.sofamaniac.crabir.ui.ThemedSwitch
+import com.sofamaniac.crabir.ui.components.ThemedSwitch
 import kotlinx.coroutines.launch
 
 @Composable

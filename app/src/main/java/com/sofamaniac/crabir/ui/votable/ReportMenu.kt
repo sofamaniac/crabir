@@ -19,8 +19,8 @@ import androidx.compose.ui.semantics.Role
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.Kind
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.ui.ListItem
-import com.sofamaniac.crabir.ui.ThemedDialog
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ThemedDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

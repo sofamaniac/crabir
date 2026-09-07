@@ -43,7 +43,7 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.InboxRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.CloseButton
-import com.sofamaniac.crabir.ui.ListItem
+import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.editor.AccountSelector
 import com.sofamaniac.crabir.ui.editor.EditorBottomBar
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -44,9 +44,9 @@ import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.settings.theme.ADMIN_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.AUTHOR_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.MODERATOR_CARTOUCHE_COLOR
-import com.sofamaniac.crabir.ui.Flair
-import com.sofamaniac.crabir.ui.ThemedCard
-import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.components.Flair
+import com.sofamaniac.crabir.ui.components.ThemedCard
+import com.sofamaniac.crabir.ui.components.cartouche
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.richtext.Richtext
 import com.sofamaniac.crabir.ui.thread.dialog.MoreOptionButton

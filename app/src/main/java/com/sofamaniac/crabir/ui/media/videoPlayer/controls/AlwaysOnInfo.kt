@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.material3.buttons.MuteButton
-import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.components.cartouche
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
 
 @OptIn(UnstableApi::class)

@@ -378,6 +378,10 @@
     <string name="client_id_support">To work this app requires a client ID.</string>
     <string name="client_id">Client ID</string>
     <string name="api_settings_title">API settings</string>
+    <string name="subreddit_info_view_title">Details</string>
+    <string name="edit_flair_button_title">Edit Flair</string>
+    <string name="unfavorite">Unfavorite</string>
+    <string name="favorite">Favorite</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>

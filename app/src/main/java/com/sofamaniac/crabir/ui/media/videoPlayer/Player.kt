@@ -34,7 +34,7 @@ import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.settings.data.VideoQuality
 import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
-import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.components.cartouche
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.AlwaysOnInfo
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
 

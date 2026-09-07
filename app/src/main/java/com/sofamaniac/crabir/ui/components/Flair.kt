@@ -1,8 +1,4 @@
-/*
- * Copyright (c) 2025 Antoine Grimod
- */
-
-package com.sofamaniac.crabir.ui
+package com.sofamaniac.crabir.ui.components
 
 import android.util.Log
 import androidx.compose.foundation.layout.height
@@ -30,12 +26,11 @@ import com.sofamaniac.crabir.domain.model.Flair
 import kotlin.math.max
 import kotlin.math.min
 
-
 @Composable
 fun FlairRichtext(
     richText: List<LinkFlairRichtext>,
     color: Color,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.Companion,
     showEmoji: Boolean = true,
 ) {
     val annotatedString = buildAnnotatedString {
@@ -86,7 +81,7 @@ fun FlairRichtext(
     )
 }
 
-/** Parse the color string to a Color object using [String.toColorInt]. If the string is empty or could not be parsed,
+/** Parse the color string to a Color object using [toColorInt]. If the string is empty or could not be parsed,
  * return the default color.
  *
  * @param color The color string to parse.
@@ -128,7 +123,7 @@ fun Color.invert(bw: Boolean = true): Color {
 @Composable
 fun Flair(
     flair: Flair,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.Companion,
     showColor: Boolean = true,
     showEmoji: Boolean = true,
 ) {

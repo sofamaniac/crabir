@@ -6,7 +6,7 @@
  *
  */
 
-package com.sofamaniac.crabir.ui.subreddit
+package com.sofamaniac.crabir.ui.postFeed
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -49,8 +49,8 @@ import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.settings.views.Views
-import com.sofamaniac.crabir.ui.RefreshIndicator
-import com.sofamaniac.crabir.ui.ThemedCard
+import com.sofamaniac.crabir.ui.components.RefreshIndicator
+import com.sofamaniac.crabir.ui.components.ThemedCard
 import com.sofamaniac.crabir.ui.post.CompactView
 import com.sofamaniac.crabir.ui.post.DummyInteraction
 import com.sofamaniac.crabir.ui.post.LinkViewModel

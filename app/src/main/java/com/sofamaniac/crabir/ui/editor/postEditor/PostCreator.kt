@@ -59,12 +59,12 @@ import com.sofamaniac.crabir.data.remote.reddit.PostSubmissionBuilder
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import com.sofamaniac.crabir.ui.CloseButton
-import com.sofamaniac.crabir.ui.ListItem
-import com.sofamaniac.crabir.ui.ThemedDialog
-import com.sofamaniac.crabir.ui.cartouche
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ThemedDialog
+import com.sofamaniac.crabir.ui.components.cartouche
+import com.sofamaniac.crabir.ui.components.mapColor
 import com.sofamaniac.crabir.ui.editor.AccountSelector
 import com.sofamaniac.crabir.ui.editor.EditorBottomBar
-import com.sofamaniac.crabir.ui.mapColor
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 

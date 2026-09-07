@@ -12,7 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.ui.ListItem
+import com.sofamaniac.crabir.ui.components.ListItem
 
 fun LazyListScope.goToMenu(expanded: Boolean = false, onClick: () -> Unit) {
     item {

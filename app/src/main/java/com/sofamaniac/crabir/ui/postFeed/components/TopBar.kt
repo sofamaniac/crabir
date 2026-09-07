@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui.subreddit
+package com.sofamaniac.crabir.ui.postFeed.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,7 +36,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalFeedSettings
-import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
@@ -50,9 +49,9 @@ import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
 import com.sofamaniac.crabir.settings.views.ViewSettings
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.viewSettingDataStore
-import com.sofamaniac.crabir.ui.ListItem
-import com.sofamaniac.crabir.ui.SortMenu
-import com.sofamaniac.crabir.ui.ThemedDialog
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.SortMenu
+import com.sofamaniac.crabir.ui.components.ThemedDialog
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,7 +68,6 @@ fun TopBar(
     scrollBehavior: TopAppBarScrollBehavior?,
     entity: CommunityViewEntity,
 ) {
-    val theme = LocalTheme.current
     val navController = LocalNavController.current
 
     var showViewSelect by remember { mutableStateOf(false) }

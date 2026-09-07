@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.ui.ListItem
-import com.sofamaniac.crabir.ui.ThemedDialog
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ThemedDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

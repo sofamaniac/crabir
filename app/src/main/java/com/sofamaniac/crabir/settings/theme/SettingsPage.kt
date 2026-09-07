@@ -30,8 +30,8 @@ import com.sofamaniac.crabir.navigation.ThemeEditorRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import com.sofamaniac.crabir.ui.BackButton
-import com.sofamaniac.crabir.ui.ListItem
-import com.sofamaniac.crabir.ui.ThemedDialog
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ThemedDialog
 import kotlinx.coroutines.launch
 
 @Composable

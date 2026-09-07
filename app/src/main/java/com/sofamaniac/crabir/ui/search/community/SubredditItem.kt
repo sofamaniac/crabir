@@ -46,14 +46,14 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostCreatorRoute
 import com.sofamaniac.crabir.navigation.SubredditInfoRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
-import com.sofamaniac.crabir.ui.ListItem
-import com.sofamaniac.crabir.ui.Over18Cartouche
-import com.sofamaniac.crabir.ui.ThemedCard
-import com.sofamaniac.crabir.ui.ThemedDialog
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.Over18Cartouche
+import com.sofamaniac.crabir.ui.components.SubredditIcon
+import com.sofamaniac.crabir.ui.components.ThemedCard
+import com.sofamaniac.crabir.ui.components.ThemedDialog
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.post.withSeparator
 import com.sofamaniac.crabir.ui.richtext.Richtext
-import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import java.util.Locale
 
 @Composable

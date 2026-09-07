@@ -32,7 +32,7 @@ import com.sofamaniac.crabir.domain.repository.profile.ProfileSort
 import com.sofamaniac.crabir.domain.repository.profile.SavedRepository
 import com.sofamaniac.crabir.domain.repository.profile.SubmittedRepository
 import com.sofamaniac.crabir.domain.repository.profile.UpvotedRepository
-import com.sofamaniac.crabir.ui.subreddit.FeedViewModelInterface
+import com.sofamaniac.crabir.ui.postFeed.FeedViewModelInterface
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

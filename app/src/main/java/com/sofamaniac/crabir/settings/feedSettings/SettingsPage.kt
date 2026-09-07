@@ -27,7 +27,7 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import com.sofamaniac.crabir.ui.BackButton
-import com.sofamaniac.crabir.ui.ListItem
+import com.sofamaniac.crabir.ui.components.ListItem
 import kotlinx.coroutines.launch
 
 @Composable

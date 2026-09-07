@@ -13,9 +13,9 @@ import androidx.navigation.toRoute
 import com.sofamaniac.crabir.LocalApiSettings
 import com.sofamaniac.crabir.settings.api.ApiSettingsRoute
 import com.sofamaniac.crabir.ui.inbox.InboxView
+import com.sofamaniac.crabir.ui.postFeed.history.HistoryViewer
+import com.sofamaniac.crabir.ui.postFeed.home.HomeViewer
 import com.sofamaniac.crabir.ui.search.SearchTab
-import com.sofamaniac.crabir.ui.subreddit.HistoryViewer
-import com.sofamaniac.crabir.ui.subreddit.HomeViewer
 import com.sofamaniac.crabir.ui.subredditList.SubredditListViewer
 
 @OptIn(ExperimentalMaterial3Api::class)

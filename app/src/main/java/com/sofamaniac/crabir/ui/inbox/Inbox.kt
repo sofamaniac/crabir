@@ -81,10 +81,10 @@ import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
-import com.sofamaniac.crabir.ui.ListItem
-import com.sofamaniac.crabir.ui.RefreshIndicator
-import com.sofamaniac.crabir.ui.ThemedCard
-import com.sofamaniac.crabir.ui.ThemedDialog
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.RefreshIndicator
+import com.sofamaniac.crabir.ui.components.ThemedCard
+import com.sofamaniac.crabir.ui.components.ThemedDialog
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.richtext.Richtext

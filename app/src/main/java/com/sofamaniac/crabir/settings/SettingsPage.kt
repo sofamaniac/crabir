@@ -52,7 +52,7 @@ import com.sofamaniac.crabir.settings.feedSettings.FeedSettingsRoute
 import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsRoute
 import com.sofamaniac.crabir.settings.post.PostSettingsRoute
 import com.sofamaniac.crabir.ui.BackButton
-import com.sofamaniac.crabir.ui.ListItem
+import com.sofamaniac.crabir.ui.components.ListItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable

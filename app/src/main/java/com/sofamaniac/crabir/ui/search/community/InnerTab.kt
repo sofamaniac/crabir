@@ -20,7 +20,7 @@ import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.SubredditRoute
-import com.sofamaniac.crabir.ui.ListItem
+import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.search.CommunitySearchViewModel
 
 @Composable

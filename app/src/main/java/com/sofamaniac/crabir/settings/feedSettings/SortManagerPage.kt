@@ -34,7 +34,7 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.Menu
 import com.sofamaniac.crabir.settings.views.ViewSettings
 import com.sofamaniac.crabir.settings.views.viewSettingDataStore
-import com.sofamaniac.crabir.ui.ListItem
+import com.sofamaniac.crabir.ui.components.ListItem
 import kotlinx.coroutines.launch
 
 @Composable

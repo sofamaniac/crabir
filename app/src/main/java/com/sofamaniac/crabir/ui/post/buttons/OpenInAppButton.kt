@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.settings.post.ButtonsSettings
-import com.sofamaniac.crabir.ui.ListItem
+import com.sofamaniac.crabir.ui.components.ListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

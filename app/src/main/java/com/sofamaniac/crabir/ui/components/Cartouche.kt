@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui
+package com.sofamaniac.crabir.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 
 fun Modifier.cartouche(
     backgroundColor: Color,
-    shape: RoundedCornerShape = RoundedCornerShape(2.dp),
+    shape: RoundedCornerShape = androidx.compose.foundation.shape.RoundedCornerShape(2.dp),
 ) =
     this
         .background(color = backgroundColor, shape = shape)

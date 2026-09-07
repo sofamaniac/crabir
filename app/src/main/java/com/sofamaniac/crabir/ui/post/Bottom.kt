@@ -49,7 +49,8 @@ import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.SubredditRoute
 import com.sofamaniac.crabir.settings.post.ButtonsSettings
-import com.sofamaniac.crabir.ui.ListItem
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.SubredditIcon
 import com.sofamaniac.crabir.ui.post.buttons.HideButton
 import com.sofamaniac.crabir.ui.post.buttons.HideButtonLong
 import com.sofamaniac.crabir.ui.post.buttons.MuteButton
@@ -59,7 +60,6 @@ import com.sofamaniac.crabir.ui.post.buttons.OpenThreadButton
 import com.sofamaniac.crabir.ui.post.buttons.ShareButton
 import com.sofamaniac.crabir.ui.post.buttons.ShareButtonLong
 import com.sofamaniac.crabir.ui.post.dialog.EditDialogue
-import com.sofamaniac.crabir.ui.subreddit.SubredditIcon
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.ReportMenu

@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.ui.subreddit
+package com.sofamaniac.crabir.ui.postFeed.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -30,6 +30,7 @@ import androidx.compose.ui.semantics.stateDescription
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.ui.postFeed.FeedViewModelInterface
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

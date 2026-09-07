@@ -21,8 +21,8 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.CrosspostCreatorRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.ui.ListItem
-import com.sofamaniac.crabir.ui.ThemedDialog
+import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ThemedDialog
 
 @Composable
 fun ShareMenu(post: PostData, onDismissRequest: () -> Unit) {

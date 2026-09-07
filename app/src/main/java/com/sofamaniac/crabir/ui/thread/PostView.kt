@@ -25,7 +25,7 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.PostRoute
 import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.settings.data.NetworkPolicy
-import com.sofamaniac.crabir.ui.ThemedCard
+import com.sofamaniac.crabir.ui.components.ThemedCard
 import com.sofamaniac.crabir.ui.post.BottomRow
 import com.sofamaniac.crabir.ui.post.LinkViewModel
 import com.sofamaniac.crabir.ui.post.PostHeader

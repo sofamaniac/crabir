@@ -26,7 +26,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
 import com.sofamaniac.crabir.domain.repository.profile.ProfileSort
 import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
-import com.sofamaniac.crabir.ui.SortMenu
+import com.sofamaniac.crabir.ui.components.SortMenu
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
