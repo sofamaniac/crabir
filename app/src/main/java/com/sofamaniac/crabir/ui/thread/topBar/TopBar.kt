@@ -1,14 +1,7 @@
-package com.sofamaniac.crabir.ui.thread
+package com.sofamaniac.crabir.ui.thread.topBar
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -20,13 +13,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
-import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
+import com.sofamaniac.crabir.navigation.SubredditInfoRoute
 import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
 import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.post.dialog.ShareMenu
+import com.sofamaniac.crabir.ui.thread.SortMenu
+import com.sofamaniac.crabir.ui.thread.ThreadViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,9 +31,9 @@ fun TopBar(
     dismiss: () -> Unit,
 ) {
     val sort: Sort? by viewModel.sort.collectAsState()
-    val theme = LocalTheme.current
-    var showMenu by remember { mutableStateOf(false) }
+    val post by viewModel.post.collectAsState()
     val navController = LocalNavController.current
+    var showShareMenu by remember { mutableStateOf(false) }
     TopAppBar(
         colors = rememberTopAppBarColors(),
         scrollBehavior = scrollBehavior,
@@ -60,24 +55,28 @@ fun TopBar(
         actions = {
             //Icon(Icons.Default.Search, "Search comments")
             SortMenu(viewModel)
-            Box {
-                IconButton(onClick = { showMenu = true }) {
-                    Icon(Icons.Default.MoreVert, stringResource(R.string.more_option_desc))
-                }
-                DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.refresh)) },
-                        onClick = { viewModel.refresh() })
-                    DropdownMenuItem(text = { Text(stringResource(R.string.settings)) }, onClick = {
-                        navController?.navigate(
-                            CommentsSettingsRoute
-                        )
-                    })
-                }
-            }
+            MoreOptionsMenu(
+                refresh = viewModel::refresh,
+                reply = {
+                    post?.let { post ->
+                        viewModel.replyTo(post.name)
+                    }
+                },
+                goToCommunityInfo = {
+                    post?.let { post ->
+                        navController?.navigate(SubredditInfoRoute(post.subreddit.subredditPrefixed))
+                    }
+                },
+                share = { showShareMenu = true },
+            )
         }
     )
+
+    if (showShareMenu) {
+        post?.let { post ->
+            ShareMenu(post) {
+                showShareMenu = false
+            }
+        }
+    }
 }

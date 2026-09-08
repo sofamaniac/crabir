@@ -388,6 +388,7 @@
     <string name="edit_flair_button_title">Edit Flair</string>
     <string name="unfavorite">Unfavorite</string>
     <string name="favorite">Favorite</string>
+    <string name="community_info">Community info</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>

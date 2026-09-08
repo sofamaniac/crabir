@@ -66,6 +66,7 @@ import com.sofamaniac.crabir.ui.HistoryManager
 import com.sofamaniac.crabir.ui.SaveToHistory
 import com.sofamaniac.crabir.ui.editor.AccountSelector
 import com.sofamaniac.crabir.ui.editor.EditorActions
+import com.sofamaniac.crabir.ui.thread.topBar.TopBar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
