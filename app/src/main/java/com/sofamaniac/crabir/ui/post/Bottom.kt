@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -262,6 +264,7 @@ private fun GoToUserButton(post: PostData, onClick: () -> Unit) {
 private fun ReportButton(post: PostData, interaction: LinkInteraction) {
     var showMenu by remember { mutableStateOf(false) }
     ListItem(
+        leadingContent = { Icon(Icons.Outlined.Flag, contentDescription = null) },
         content = { Text(stringResource(R.string.report)) },
         modifier = Modifier.clickable {
             interaction.fetchRules()
@@ -280,6 +283,7 @@ private fun CopyButton(post: PostData) {
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
     ListItem(
+        leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
         content = { Text(stringResource(R.string.copy)) },
         modifier = Modifier.clickable {
             scope.launch {

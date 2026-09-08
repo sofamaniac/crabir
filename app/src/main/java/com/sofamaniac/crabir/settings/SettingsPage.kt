@@ -14,7 +14,6 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Api
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.DataUsage
-import androidx.compose.material.icons.filled.DevicesFold
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Settings
@@ -29,12 +28,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
+import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.remote.interceptors.CountInterceptor
@@ -114,24 +115,26 @@ fun SettingsPage() {
                 }
             )
             ListItem(
-                content = { Text(stringResource(R.string.licenses)) },
-                leadingContent = { Icon(Icons.Outlined.Info, contentDescription = null) },
-                modifier = Modifier.clickable {
-                    navController?.navigate(LicensesRoute)
-                }
-            )
-            ListItem(
                 content = { Text(stringResource(R.string.api_settings_tile)) },
                 leadingContent = { Icon(Icons.Default.Api, contentDescription = null) },
                 modifier = Modifier.clickable {
                     navController?.navigate(ApiSettingsRoute)
                 }
             )
+            if (BuildConfig.DEBUG) {
+                ListItem(
+                    content = { Text("Dev Options") },
+                    leadingContent = { Icon(Icons.Default.BugReport, contentDescription = null) },
+                    modifier = Modifier.clickable {
+                        navController?.navigate(DebugOptionsRoute)
+                    }
+                )
+            }
             ListItem(
-                content = { Text("Dev Options") },
-                leadingContent = { Icon(Icons.Default.BugReport, contentDescription = null) },
+                content = { Text(stringResource(R.string.licenses)) },
+                leadingContent = { Icon(Icons.Outlined.Info, contentDescription = null) },
                 modifier = Modifier.clickable {
-                    navController?.navigate(DebugOptionsRoute)
+                    navController?.navigate(LicensesRoute)
                 }
             )
         }
@@ -215,7 +218,12 @@ fun GeneralSettingsPage() {
             }
             item {
                 ListItem(
-                    leadingContent = { Icon(Icons.Default.DevicesFold, contentDescription = null) },
+                    leadingContent = {
+                        Icon(
+                            painterResource(R.drawable.side_navigation),
+                            contentDescription = null
+                        )
+                    },
                     content = { Text(stringResource(R.string.lateral_menu)) },
                     onClick = {
                         navController?.navigate(LateralMenuSettingsRoute)

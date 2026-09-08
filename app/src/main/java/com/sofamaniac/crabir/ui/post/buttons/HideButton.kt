@@ -2,6 +2,7 @@ package com.sofamaniac.crabir.ui.post.buttons
 
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.HideSource
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,6 +18,7 @@ import com.sofamaniac.crabir.ui.post.LinkInteraction
 @Composable
 internal fun HideButtonLong(post: PostData, interaction: LinkInteraction, onClick: () -> Unit) {
     ListItem(
+        leadingContent = { Icon(Icons.Default.HideSource, contentDescription = null) },
         content = {
             val text =
                 if (post.relationship.hidden) R.string.unhide_post else R.string.hide_post

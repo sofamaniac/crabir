@@ -1,6 +1,9 @@
 package com.sofamaniac.crabir.ui.post.buttons
 
 import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeMute
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,6 +21,7 @@ import com.sofamaniac.crabir.ui.post.dialog.MuteDialog
 internal fun MuteButton(post: PostData, onDismissRequest: () -> Unit) {
     var showMenu by remember { mutableStateOf(false) }
     ListItem(
+        leadingContent = { Icon(Icons.AutoMirrored.Filled.VolumeMute, contentDescription = null) },
         content = { Text(stringResource(R.string.mute)) },
         modifier = Modifier.clickable(onClick = { showMenu = true })
     )
