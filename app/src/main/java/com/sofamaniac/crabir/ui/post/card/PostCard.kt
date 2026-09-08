@@ -13,7 +13,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sofamaniac.crabir.LocalDataSettings
-import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
@@ -97,10 +96,6 @@ internal fun PostCardContent(
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
     val navController = LocalNavController.current
-    val openPost = {
-        navController?.navigate(PostRoute(post.permalink)) ?: Unit
-    }
-    val showOpenButton = LocalPostSettings.current.buttonsSettings.comments
     ThemedCard(
         roundedCorners = viewSettings.cardSettings.roundedCorners,
         modifier = modifier.fillMaxWidth(),
@@ -134,7 +129,6 @@ internal fun PostCardContent(
         )
         BottomRow(
             post,
-            innerModifier,
             interactions = interactions,
         )
     }
