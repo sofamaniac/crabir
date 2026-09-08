@@ -127,7 +127,7 @@ private fun LazyListScope.itemsToShow(
 
     item {
         CheckboxTile(
-            headlineContent = { Text("Popular") },
+            headlineContent = { Text(stringResource(R.string.popular_feed)) },
             leadingContent = {
                 Icon(
                     Icons.AutoMirrored.Filled.TrendingUp,
@@ -142,7 +142,7 @@ private fun LazyListScope.itemsToShow(
     }
     item {
         CheckboxTile(
-            headlineContent = { Text("All") },
+            headlineContent = { Text(stringResource(R.string.all_feed)) },
             leadingContent = {
                 Icon(
                     Icons.Default.BarChart,

@@ -188,7 +188,7 @@ fun PostCreator(
                             selectedContainerColor = Color.Red,
                         ),
                         label = {
-                            Text("NSFW")
+                            Text(stringResource(R.string.nsfw))
                         },
                     )
                     FilterChip(
@@ -198,7 +198,7 @@ fun PostCreator(
                         },
                         selected = viewModel.state.spoiler,
                         label = {
-                            Text("SPOILER")
+                            Text(stringResource(R.string.spoiler))
                         }
                     )
                 }

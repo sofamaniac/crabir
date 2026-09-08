@@ -10,8 +10,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.R
 
 fun Modifier.cartouche(
     backgroundColor: Color,
@@ -25,7 +27,7 @@ fun Modifier.cartouche(
 @Composable
 fun Over18Cartouche() {
     Text(
-        "NSFW", fontWeight = FontWeight.Bold,
+        stringResource(R.string.nsfw), fontWeight = FontWeight.Bold,
         style = MaterialTheme.typography.labelSmall.copy(color = Color.White),
         modifier = Modifier.cartouche(Color.Red)
     )
@@ -34,7 +36,7 @@ fun Over18Cartouche() {
 @Composable
 fun SpoilerCartouche() {
     Text(
-        "SPOILER",
+        stringResource(R.string.spoiler),
         style = MaterialTheme.typography.labelSmall.copy(color = Color.Red),
         modifier = Modifier
             .border(

@@ -213,7 +213,7 @@ fun ReplyBottomSheet(viewModel: ThreadViewModel) {
                         account = selectedAccount
                     )
                 }) {
-                    Text("Submit")
+                    Text(stringResource(R.string.submit))
                 }
             }
             AccountSelector(accounts, selectedAccount) { newId ->
@@ -224,7 +224,14 @@ fun ReplyBottomSheet(viewModel: ThreadViewModel) {
                     .fillMaxWidth()
                     .fillMaxHeight(0.5f),
                 state = textFieldState,
-                label = { Text("Reply to ${parent.author?.username ?: "user"}") }
+                label = {
+                    Text(
+                        stringResource(
+                            R.string.reply_to,
+                            parent.author?.username ?: "user"
+                        )
+                    )
+                }
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),

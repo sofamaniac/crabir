@@ -36,7 +36,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.navigation.LocalNavController
 import org.koin.androidx.compose.koinViewModel
@@ -59,7 +61,7 @@ fun TopBar(scrollBehavior: TopAppBarScrollBehavior?) {
                         query = currentSearch,
                         onQueryChange = { currentSearch = it },
                         onSearch = { },
-                        placeholder = { Text("Go to ...") },
+                        placeholder = { Text(stringResource(R.string.go_to_placeholder)) },
                         expanded = expanded,
                         onExpandedChange = { expanded = it },
 

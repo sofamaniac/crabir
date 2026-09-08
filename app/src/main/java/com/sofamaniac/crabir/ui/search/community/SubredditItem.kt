@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
@@ -172,7 +173,7 @@ fun OptionsButton(subreddit: SubredditData) {
                     navController?.navigate(SubredditInfoRoute(subreddit.displayNamePrefixed))
                 },
                 leadingContent = { Icon(Icons.Outlined.Info, contentDescription = null) },
-                content = { Text("Community info") }
+                content = { Text(stringResource(R.string.community_info)) }
             )
             CreatePostItem(subreddit)
             ShareCommunityItem(subreddit)
@@ -197,7 +198,7 @@ fun CreatePostItem(subreddit: SubredditData) {
     ListItem(
         onClick = { showPostKindSelector = true },
         leadingContent = { Icon(Icons.Default.Create, contentDescription = null) },
-        content = { Text("Create post") }
+        content = { Text(stringResource(R.string.create_post)) }
     )
     if (showPostKindSelector) {
         ThemedDialog(onDismissRequest = { showPostKindSelector = false }) {
@@ -209,7 +210,7 @@ fun CreatePostItem(subreddit: SubredditData) {
                         contentDescription = null
                     )
                 },
-                content = { Text("Text") }
+                content = { Text(stringResource(R.string.create_kind_self)) }
             )
             ListItem(
                 onClick = { navigate(Kind.Image) },
@@ -219,7 +220,7 @@ fun CreatePostItem(subreddit: SubredditData) {
                         contentDescription = null
                     )
                 },
-                content = { Text("Image") }
+                content = { Text(stringResource(R.string.create_kind_image)) }
             )
             ListItem(
                 onClick = { navigate(Kind.Link) },
@@ -229,7 +230,7 @@ fun CreatePostItem(subreddit: SubredditData) {
                         contentDescription = null
                     )
                 },
-                content = { Text("Link") }
+                content = { Text(stringResource(R.string.create_kind_link)) }
             )
             ListItem(
                 onClick = { navigate(Kind.Video) },
@@ -239,7 +240,7 @@ fun CreatePostItem(subreddit: SubredditData) {
                         contentDescription = null
                     )
                 },
-                content = { Text("Video") }
+                content = { Text(stringResource(R.string.create_kind_video)) }
             )
         }
     }
@@ -260,6 +261,6 @@ fun ShareCommunityItem(subreddit: SubredditData) {
     ListItem(
         onClick = { shareLink() },
         leadingContent = { Icon(Icons.Default.Share, contentDescription = null) },
-        content = { Text("Share community") }
+        content = { Text(stringResource(R.string.share_community)) }
     )
 }

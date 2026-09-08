@@ -184,7 +184,8 @@ fun ProfileView(
                         } else {
                             AboutTab(
                                 profileViewModel.userProfile.value,
-                                modifier = Modifier.padding(horizontal = 8.dp)
+                                modifier = Modifier
+                                    .fillMaxSize()
                             )
                         }
                     }

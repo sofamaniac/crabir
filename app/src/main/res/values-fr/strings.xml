@@ -328,4 +328,37 @@
     <string name="elapsed_hour">%dh</string>
     <string name="elapsed_minute">%dm</string>
     <string name="elapsed_second">%ds</string>
+    <string name="api_settings_tile">Paramères d\'API</string>
+    <string name="client_id_support">Pour fonctionner cette application nécessite un client id</string>
+    <string name="client_id">Client ID</string>
+    <string name="api_settings_title">Paramètres d\'API</string>
+    <string name="subreddit_info_view_title">Détails</string>
+    <string name="edit_flair_button_title">Changer le flair</string>
+    <string name="unfavorite">Retirer des favoris</string>
+    <string name="favorite">Ajouter aux favors</string>
+    <string name="community_info">Informations de la communauté</string>
+    <string name="reddit_account_creation_format">dd MMM, yyyy</string>
+    <string name="karma">KARMA</string>
+    <string name="reddit_age">ÂGE REDDIT</string>
+    <plurals name="multi_subreddits">
+        <item quantity="one">%d communauté</item>
+        <item quantity="many">%d communautés</item>
+        <item quantity="other">%d communautés</item>
+    </plurals>
+    <plurals name="subreddit_subscribers_count">"
+        <item quantity="one">%1$s abonné</item>
+        <item quantity="other">%1$s abonné</item>
+        <item quantity="many">%1$s abonnés</item>
+    </plurals>
+    <string name="create_kind_self">Texte</string>
+    <string name="create_kind_image">Image</string>
+    <string name="create_kind_link">Lien</string>
+    <string name="create_kind_video">Video</string>
+    <string name="share_community">Partager la communauté</string>
+    <string name="reply_to">Répondre à %1$s</string>
+    <string name="popular_feed">Popular</string>
+    <string name="all_feed">All</string>
+    <string name="subreddit_private">PRIVÉ</string>
+    <string name="subreddit_restricted">RESTREINT</string>
+    <string name="go_to_placeholder">Aller à…</string>
 </resources>

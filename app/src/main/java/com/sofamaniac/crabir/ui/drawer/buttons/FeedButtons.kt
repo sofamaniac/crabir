@@ -98,7 +98,7 @@ internal fun LazyListScope.feeds(settings: LateralMenuItems, onClick: (Route) ->
     if (settings.defaultFeed) {
         item {
             NavigationDrawerItem(
-                label = { Text("Home") },
+                label = { Text(stringResource(R.string.Home)) },
                 selected = false,
                 icon = { Icon(Icons.Default.Home, contentDescription = null) },
                 onClick = {}
@@ -109,7 +109,7 @@ internal fun LazyListScope.feeds(settings: LateralMenuItems, onClick: (Route) ->
     if (settings.homeFeed) {
         item {
             NavigationDrawerItem(
-                label = { Text("Home Feed") },
+                label = { Text(stringResource(R.string.home_feed)) },
                 selected = false,
                 icon = { Icon(Icons.Default.Home, contentDescription = null) },
                 onClick = {
@@ -122,7 +122,7 @@ internal fun LazyListScope.feeds(settings: LateralMenuItems, onClick: (Route) ->
     if (settings.popular) {
         item {
             NavigationDrawerItem(
-                label = { Text("Popular") },
+                label = { Text(stringResource(R.string.popular_feed)) },
                 selected = false,
                 icon = { Icon(Icons.Default.Moving, contentDescription = null) },
                 onClick = {
@@ -135,7 +135,7 @@ internal fun LazyListScope.feeds(settings: LateralMenuItems, onClick: (Route) ->
     if (settings.all) {
         item {
             NavigationDrawerItem(
-                label = { Text("All") },
+                label = { Text(stringResource(R.string.all_feed)) },
                 selected = false,
                 icon = { Icon(Icons.Default.BarChart, contentDescription = null) },
                 onClick = {

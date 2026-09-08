@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.postFeed.components
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
@@ -39,7 +40,7 @@ fun BottomSheet(
         ListItem(content = { Text(stringResource(R.string.create_post)) })
         for (type in postTypes) {
             ListItem(
-                content = { Text(type.name) },
+                content = { Text(stringResource(type.name)) },
                 leadingContent = { Icon(type.icon, contentDescription = null) },
                 modifier = Modifier.clickable {
                     createPost(type.kind)
@@ -52,11 +53,11 @@ fun BottomSheet(
     }
 }
 
-data class PostType(val name: String, val kind: Kind, val icon: ImageVector)
+data class PostType(@StringRes val name: Int, val kind: Kind, val icon: ImageVector)
 
 val postTypes = listOf(
-    PostType("Text", Kind.Self, Icons.AutoMirrored.Filled.Article),
-    PostType("Link", Kind.Link, Icons.Default.Link),
-    PostType("Image", Kind.Image, Icons.Default.Image),
-    PostType("Video", Kind.Video, Icons.Default.VideoFile)
+    PostType(R.string.create_kind_self, Kind.Self, Icons.AutoMirrored.Filled.Article),
+    PostType(R.string.create_kind_link, Kind.Link, Icons.Default.Link),
+    PostType(R.string.create_kind_image, Kind.Image, Icons.Default.Image),
+    PostType(R.string.create_kind_video, Kind.Video, Icons.Default.VideoFile)
 )
