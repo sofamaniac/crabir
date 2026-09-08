@@ -3,8 +3,10 @@ package com.sofamaniac.crabir.settings.filters
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -31,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.SettingHeader
@@ -105,7 +108,7 @@ fun FiltersSettingsPage() {
                 SettingHeader(stringResource(R.string.filters))
             }
             item {
-                ListItem(
+                ListItemPadded(
                     content = { Text(stringResource(R.string.edit_title_filters)) },
                     modifier = Modifier.clickable {
                         filtersToEdit = settings.titleFilters
@@ -115,7 +118,7 @@ fun FiltersSettingsPage() {
                 )
             }
             item {
-                ListItem(
+                ListItemPadded(
                     content = { Text(stringResource(R.string.edit_author_filters)) },
                     modifier = Modifier.clickable {
                         filtersToEdit = settings.authorFilters
@@ -125,7 +128,7 @@ fun FiltersSettingsPage() {
                 )
             }
             item {
-                ListItem(
+                ListItemPadded(
                     content = { Text(stringResource(R.string.edit_subreddit_filters)) },
                     modifier = Modifier.clickable {
                         filtersToEdit = settings.subredditFilters
@@ -135,7 +138,7 @@ fun FiltersSettingsPage() {
                 )
             }
             item {
-                ListItem(
+                ListItemPadded(
                     content = { Text(stringResource(R.string.edit_domains_filters)) },
                     modifier = Modifier.clickable {
                         filtersToEdit = settings.domainFilters
@@ -145,7 +148,7 @@ fun FiltersSettingsPage() {
                 )
             }
             item {
-                ListItem(
+                ListItemPadded(
                     content = { Text(stringResource(R.string.edit_flair_filters)) },
                     modifier = Modifier.clickable {
                         filtersToEdit = settings.flairFilters
@@ -166,6 +169,14 @@ fun FiltersSettingsPage() {
             onChange = editFilters!!
         )
     }
+}
+
+@Composable
+private fun ListItemPadded(content: @Composable () -> Unit, modifier: Modifier = Modifier) {
+    ListItem(
+        content = content,
+        modifier = modifier,
+        leadingContent = { Spacer(modifier.size(24.dp)) })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
