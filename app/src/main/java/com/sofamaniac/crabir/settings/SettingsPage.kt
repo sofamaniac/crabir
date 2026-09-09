@@ -1,8 +1,6 @@
 package com.sofamaniac.crabir.settings
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
@@ -81,62 +78,80 @@ fun SettingsPage() {
             )
         },
     ) { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier.padding(padding),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            ListItem(
-                leadingContent = { Icon(Icons.Default.Settings, contentDescription = null) },
-                content = { Text(stringResource(R.string.general_settings_title)) },
-                modifier = Modifier.clickable {
-                    navController?.navigate(GeneralSettingsRoute)
-                }
-            )
-            ListItem(
-                content = { Text(stringResource(R.string.theme_settings_title)) },
-                leadingContent = { Icon(Icons.Default.Palette, contentDescription = null) },
-                modifier = Modifier.clickable {
-                    navController?.navigate(ThemeRoute)
-                }
-            )
-
-            ListItem(
-                content = { Text(stringResource(R.string.filter_settings_name)) },
-                leadingContent = { Icon(Icons.Default.FilterList, contentDescription = null) },
-                modifier = Modifier.clickable {
-                    navController?.navigate(FiltersSettingRoute)
-                }
-            )
-            ListItem(
-                content = { Text(stringResource(R.string.data_settings_name)) },
-                leadingContent = { Icon(Icons.Default.DataUsage, contentDescription = null) },
-                modifier = Modifier.clickable {
-                    navController?.navigate(DataSettingsRoute)
-                }
-            )
-            ListItem(
-                content = { Text(stringResource(R.string.api_settings_tile)) },
-                leadingContent = { Icon(Icons.Default.Api, contentDescription = null) },
-                modifier = Modifier.clickable {
-                    navController?.navigate(ApiSettingsRoute)
-                }
-            )
-            if (BuildConfig.DEBUG) {
+            item {
                 ListItem(
-                    content = { Text("Dev Options") },
-                    leadingContent = { Icon(Icons.Default.BugReport, contentDescription = null) },
+                    leadingContent = { Icon(Icons.Default.Settings, contentDescription = null) },
+                    content = { Text(stringResource(R.string.general_settings_title)) },
                     modifier = Modifier.clickable {
-                        navController?.navigate(DebugOptionsRoute)
+                        navController?.navigate(GeneralSettingsRoute)
                     }
                 )
             }
-            ListItem(
-                content = { Text(stringResource(R.string.licenses)) },
-                leadingContent = { Icon(Icons.Outlined.Info, contentDescription = null) },
-                modifier = Modifier.clickable {
-                    navController?.navigate(LicensesRoute)
+            item {
+                ListItem(
+                    content = { Text(stringResource(R.string.theme_settings_title)) },
+                    leadingContent = { Icon(Icons.Default.Palette, contentDescription = null) },
+                    modifier = Modifier.clickable {
+                        navController?.navigate(ThemeRoute)
+                    }
+                )
+            }
+
+            item {
+                ListItem(
+                    content = { Text(stringResource(R.string.filter_settings_name)) },
+                    leadingContent = { Icon(Icons.Default.FilterList, contentDescription = null) },
+                    modifier = Modifier.clickable {
+                        navController?.navigate(FiltersSettingRoute)
+                    }
+                )
+            }
+            item {
+                ListItem(
+                    content = { Text(stringResource(R.string.data_settings_name)) },
+                    leadingContent = { Icon(Icons.Default.DataUsage, contentDescription = null) },
+                    modifier = Modifier.clickable {
+                        navController?.navigate(DataSettingsRoute)
+                    }
+                )
+            }
+            item {
+                ListItem(
+                    content = { Text(stringResource(R.string.api_settings_tile)) },
+                    leadingContent = { Icon(Icons.Default.Api, contentDescription = null) },
+                    modifier = Modifier.clickable {
+                        navController?.navigate(ApiSettingsRoute)
+                    }
+                )
+            }
+            if (BuildConfig.DEBUG) {
+                item {
+                    ListItem(
+                        content = { Text("Dev Options") },
+                        leadingContent = {
+                            Icon(
+                                Icons.Default.BugReport,
+                                contentDescription = null
+                            )
+                        },
+                        modifier = Modifier.clickable {
+                            navController?.navigate(DebugOptionsRoute)
+                        }
+                    )
                 }
-            )
+            }
+            item {
+                ListItem(
+                    content = { Text(stringResource(R.string.licenses)) },
+                    leadingContent = { Icon(Icons.Outlined.Info, contentDescription = null) },
+                    modifier = Modifier.clickable {
+                        navController?.navigate(LicensesRoute)
+                    }
+                )
+            }
         }
     }
 }
