@@ -225,7 +225,7 @@ data class PostSubmissionBuilder(
             subreddit.isBlank() -> Result.failure(MissingCommunity())
             kind == Kind.Link && url.isNullOrBlank() -> Result.failure(MissingUrl())
             kind == Kind.Self && text.isNullOrBlank() -> Result.failure(MissingText())
-            kind == Kind.Link && url?.runCatching { toHttpUrl() }?.isSuccess != true -> return Result.failure(
+            kind == Kind.Link && url?.runCatching { toHttpUrl() }?.isSuccess != true -> Result.failure(
                 InvalidUrl()
             )
 

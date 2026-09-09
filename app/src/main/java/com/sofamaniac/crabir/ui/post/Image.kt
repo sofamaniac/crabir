@@ -113,7 +113,7 @@ fun PostImage(
                 quality = quality,
                 modifier = imageModifier,
                 allowTransformation = false,
-                blur = blur && blurredImage == null
+                blur = blur
             )
         } else {
             ImageView(

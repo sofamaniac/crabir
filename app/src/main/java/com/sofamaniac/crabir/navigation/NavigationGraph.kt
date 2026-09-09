@@ -22,7 +22,7 @@ import com.sofamaniac.crabir.ui.subredditList.SubredditListViewer
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
 ) {
     val startRoute = if (!LocalApiSettings.current.isConfigured) {
         ApiSettingsRoute

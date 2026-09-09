@@ -30,7 +30,7 @@ import kotlin.math.min
 fun FlairRichtext(
     richText: List<LinkFlairRichtext>,
     color: Color,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     showEmoji: Boolean = true,
 ) {
     val annotatedString = buildAnnotatedString {
@@ -123,7 +123,7 @@ fun Color.invert(bw: Boolean = true): Color {
 @Composable
 fun Flair(
     flair: Flair,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     showColor: Boolean = true,
     showEmoji: Boolean = true,
 ) {
