@@ -50,7 +50,7 @@ fun <T> ListSelector(
     onOptionSelected: (T) -> Unit,
 ) {
     ListItem(
-        enabled = enabled,
+        //enabled = enabled,
         modifier = modifier,
         leadingContent = leadingContent,
         shapes = ListItemDefaults.shapes(shape = ShapeDefaults.Medium.copy(all = ZeroCornerSize)),
@@ -59,6 +59,7 @@ fun <T> ListSelector(
             Menu(
                 options,
                 selectedOption,
+                enabled = enabled,
                 onOptionSelected = onOptionSelected,
                 label = headlineContent,
                 optionLabel = optionLabel
