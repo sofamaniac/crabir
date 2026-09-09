@@ -1,12 +1,21 @@
 package com.sofamaniac.crabir.ui.thread
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
@@ -33,6 +42,7 @@ fun MoreViewer(
             more.data.count
         )
     val navController = LocalNavController.current!!
+    var loading by remember { mutableStateOf(false) }
     ThemedCard(
         modifier = modifier
             .background(theme.cardBackground)
@@ -40,7 +50,9 @@ fun MoreViewer(
             .fillMaxWidth(),
         roundedCorners = false,
         onClick = {
+            if (loading) return@ThemedCard
             if (more.data.count > 0) {
+                loading = true
                 viewModel.fetchMoreComments(more)
             } else {
                 val parentId = more.parentId.name.split('_').last()
@@ -53,12 +65,20 @@ fun MoreViewer(
             }
         }
     ) {
-        Text(
-            text,
-            style = MaterialTheme.typography.titleSmall,
-            color = theme.highlight,
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
+        ) {
+            Text(
+                text,
+                style = MaterialTheme.typography.titleSmall,
+                color = theme.highlight,
+            )
+            if (loading) {
+                CircularProgressIndicator(modifier = Modifier.size(16.dp))
+            }
+        }
     }
 }
 

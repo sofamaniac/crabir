@@ -9,18 +9,18 @@ import org.koin.core.annotation.Singleton
 
 @Singleton
 abstract class CommunityCache<T : CommunityData>(val dao: CommunityDao<T>) : Cache<T> {
-    override fun insert(thing: T) {
+    override suspend fun insert(thing: T) {
         dao.insert(thing)
     }
 
-    override fun insert(things: List<T>) {
+    override suspend fun insert(things: List<T>) {
         Log.d("CommunityCache", "insert into ${this.javaClass}")
         for (thing in things) {
             dao.insert(thing)
         }
     }
 
-    override fun update(thing: T) {
+    override suspend fun update(thing: T) {
         dao.upsert(thing)
     }
 
@@ -40,7 +40,7 @@ abstract class CommunityCache<T : CommunityData>(val dao: CommunityDao<T>) : Cac
         return dao.get(name)
     }
 
-    override fun clear() {
+    override suspend fun clear() {
         dao.deleteAll()
     }
 }

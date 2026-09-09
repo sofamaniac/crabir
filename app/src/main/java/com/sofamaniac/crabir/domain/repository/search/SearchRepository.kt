@@ -78,15 +78,15 @@ class CommunitySearchRepository(
 @Singleton
 class UserCache : Cache<UserDTO> {
     private val cache = mutableMapOf<Fullname, UserDTO>()
-    override fun insert(thing: UserDTO) {
+    override suspend fun insert(thing: UserDTO) {
         cache[thing.name] = thing
     }
 
-    override fun insert(things: List<UserDTO>) {
+    override suspend fun insert(things: List<UserDTO>) {
         things.forEach { insert(it) }
     }
 
-    override fun update(thing: UserDTO) {
+    override suspend fun update(thing: UserDTO) {
         cache[thing.name] = thing
     }
 
@@ -102,7 +102,7 @@ class UserCache : Cache<UserDTO> {
         cache.remove(name)
     }
 
-    override fun clear() {
+    override suspend fun clear() {
         cache.clear()
     }
 }

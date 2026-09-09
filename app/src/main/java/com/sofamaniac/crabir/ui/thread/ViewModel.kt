@@ -23,13 +23,19 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.dropWhile
-import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
+
+sealed class UiState {
+    object Loading : UiState()
+    class Error(val e: Throwable) : UiState()
+    object Success : UiState()
+}
 
 @KoinViewModel
 class ThreadViewModel(
@@ -48,24 +54,25 @@ class ThreadViewModel(
 
     val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
 
+    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
     var initialLoad: Boolean = false
     var commentsLoaded: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     private val replyState = MutableStateFlow<Fullname?>(null)
     val reply: StateFlow<Fullname?> = replyState.asStateFlow()
 
-    private var _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
     val listState = LazyListState()
 
 
     private val commentsNames = repository.comments
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val comments = commentsNames.flatMapMerge { names ->
+    val comments = commentsNames.flatMapLatest { names ->
         commentsRepository.getMany(names).map { comments ->
             val table = comments.associateBy { it.name }
-            val orderedList = commentsNames.value.mapNotNull { table[it] }
+            val orderedList = names.mapNotNull { table[it] }
             buildList {
                 var collapsedDepthThreshold: Int? = null
                 for (comment in orderedList) {
@@ -124,7 +131,7 @@ class ThreadViewModel(
     }
 
     private suspend fun fetchAsync() {
-        _isRefreshing.value = true
+        _uiState.update { UiState.Loading }
         repository.getComments(
             permalink,
             sort = _sort.value,
@@ -134,7 +141,7 @@ class ThreadViewModel(
         // If post was not found set it here.
         _post.value = getPost() ?: _post.value
         _sort.value = _sort.value ?: _post.value?.suggestedSort
-        _isRefreshing.value = false
+        _uiState.update { UiState.Success }
     }
 
     fun fetchComments() {

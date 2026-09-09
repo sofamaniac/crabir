@@ -18,11 +18,11 @@ interface VotableRepository<T : VotableData> : Cache<T> {
 
     fun VotableEntity?.transform(): T?
 
-    override fun insert(things: List<T>) {
+    override suspend fun insert(things: List<T>) {
         votableDao.insert(things.map { it.toEntity() })
     }
 
-    override fun insert(thing: T) {
+    override suspend fun insert(thing: T) {
         votableDao.insert(thing.toEntity())
     }
 
@@ -33,11 +33,11 @@ interface VotableRepository<T : VotableData> : Cache<T> {
         return votableDao.getValue(name)?.transform()
     }
 
-    override fun update(thing: T) {
+    override suspend fun update(thing: T) {
         votableDao.update(thing.name, thing.toEntity().data)
     }
 
-    override fun clear() {
+    override suspend fun clear() {
         votableDao.clear()
     }
 

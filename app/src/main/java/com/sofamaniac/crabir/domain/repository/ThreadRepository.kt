@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.domain.repository
 
+import android.util.Log
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
@@ -29,7 +30,7 @@ interface ThreadRepository {
     )
 
     suspend fun getPost(name: Fullname): PostData?
-    suspend fun getMoreComments(more: CommentType.More)
+    suspend fun getMoreComments(more: CommentType.More): Result<Unit>
 
     /** Submit a reply
      * @param parentId The name of the parent to the reply
@@ -54,7 +55,7 @@ interface ThreadRepository {
      * @param parent The name of the parent comment
      * @param comment The data of the comment
      */
-    fun insertReply(parent: Fullname, comment: CommentType)
+    suspend fun insertReply(parent: Fullname, comment: CommentType)
 }
 
 @ViewModelScope
@@ -93,9 +94,7 @@ class ThreadRepositoryNew(
                     )
                 val list = forest.toList()
                 repository.insert(list)
-                this.forest.update {
-                    list.map { it.name }
-                }
+                this.forest.value = list.map { it.name }
                 postsRepository.insert(listOf(post!!))
             }
         }
@@ -126,7 +125,7 @@ class ThreadRepositoryNew(
         return Fullname("t3_${segments[index + 1]}")
     }
 
-    override suspend fun getMoreComments(more: CommentType.More) {
+    override suspend fun getMoreComments(more: CommentType.More): Result<Unit> {
         val response = api.getMoreComments(
             post!!.name,
             more.data.children.take(100).joinToString(",")
@@ -134,12 +133,18 @@ class ThreadRepositoryNew(
         if (response.isSuccess) {
             val body = response.getOrNull()
             if (body != null) {
-                // TODO display error
-                val things = body.json.data?.things ?: return
+                val things = body.json.data?.things ?: return Result.failure(
+                    Exception(
+                        body.json.errors?.fold(
+                            ""
+                        ) { acc, list -> acc + list.joinToString() }
+                    )
+                )
                 val temp = Forest.create(things, Fullname(""), things.size)
                 val list = temp.toList()
                 repository.insert(list)
                 forest.update { list ->
+                    Log.d("ThreadRepository", "getMoreComments update forest")
                     val startIndex = list.indexOfFirst { it == more.data.name }
                     val head = runCatching { list.subList(0, startIndex) }.getOrDefault(emptyList())
                     val tail = runCatching { list.subList(startIndex + 1, list.size) }.getOrDefault(
@@ -149,6 +154,7 @@ class ThreadRepositoryNew(
                 }
             }
         }
+        return Result.success(Unit)
     }
 
     override suspend fun postComment(
@@ -167,12 +173,12 @@ class ThreadRepositoryNew(
         repository.update(value)
     }
 
-    override fun insertReply(parent: Fullname, comment: CommentType) {
+    override suspend fun insertReply(parent: Fullname, comment: CommentType) {
+        repository.insert(comment)
         forest.update { list ->
             val index = list.indexOfFirst { it == parent }
             list.subList(0, index + 1) + comment.name + list.subList(index + 1, list.size)
         }
-        repository.insert(comment)
     }
 
     override fun refresh() {

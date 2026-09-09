@@ -41,15 +41,15 @@ interface VotableData : DataInterface {
 }
 
 class VotableCache(private val dao: VotableDao) : Cache<VotableData> {
-    override fun insert(thing: VotableData) {
+    override suspend fun insert(thing: VotableData) {
         dao.insert(thing.toEntity())
     }
 
-    override fun insert(things: List<VotableData>) {
+    override suspend fun insert(things: List<VotableData>) {
         dao.insert(things.map { it.toEntity() })
     }
 
-    override fun update(thing: VotableData) {
+    override suspend fun update(thing: VotableData) {
         dao.update(thing.name, thing.toEntity().data)
     }
 
@@ -65,7 +65,7 @@ class VotableCache(private val dao: VotableDao) : Cache<VotableData> {
         dao.delete(name)
     }
 
-    override fun clear() {
+    override suspend fun clear() {
         dao.clear()
     }
 }

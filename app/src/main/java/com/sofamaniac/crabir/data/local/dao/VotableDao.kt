@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface VotableDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(votable: VotableEntity)
+    suspend fun insert(votable: VotableEntity)
 
     @Transaction
-    fun insert(votable: List<VotableEntity>) {
+    suspend fun insert(votable: List<VotableEntity>) {
         for (v in votable) {
             insert(v)
         }
@@ -31,11 +31,11 @@ interface VotableDao {
     suspend fun getValue(id: Fullname): VotableEntity?
 
     @Query("UPDATE votableTable SET data = :data WHERE id = :id")
-    fun update(id: Fullname, data: String)
+    suspend fun update(id: Fullname, data: String)
 
     @Query("DELETE FROM votableTable WHERE id = :id")
-    fun delete(id: Fullname)
+    suspend fun delete(id: Fullname)
 
     @Query("DELETE FROM votableTable")
-    fun clear()
+    suspend fun clear()
 }

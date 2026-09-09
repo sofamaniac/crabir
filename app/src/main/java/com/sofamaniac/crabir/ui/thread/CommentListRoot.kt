@@ -44,25 +44,27 @@ fun CommentListRoot(
     context: Int? = null,
 ) {
     val listState = viewModel.listState
-    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     val theme = LocalTheme.current
     val navController = LocalNavController.current!!
     val refreshBoxState = rememberPullToRefreshState()
     val commentsSettings = LocalCommentsSettings.current
 
+    val isLoading = uiState == UiState.Loading
+
+    val comments by viewModel.comments.collectAsState()
+    val post by viewModel.post.collectAsState()
     PullToRefreshBox(
         state = refreshBoxState,
-        isRefreshing = isRefreshing,
+        isRefreshing = isLoading,
         onRefresh = {
             viewModel.refresh()
         },
         modifier = modifier.fillMaxSize(),
         indicator = {
-            RefreshIndicator(isRefreshing, state = refreshBoxState)
+            RefreshIndicator(isLoading, state = refreshBoxState)
         }
     ) {
-        val comments by viewModel.comments.collectAsState()
-        val post by viewModel.post.collectAsState()
 
         if (post == null) return@PullToRefreshBox
         LazyColumn(
@@ -122,7 +124,7 @@ fun CommentListRoot(
                     HorizontalDivider()
                 }
             }
-            if (!comments.any() && !isRefreshing) {
+            if (!comments.any() && !isLoading) {
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(

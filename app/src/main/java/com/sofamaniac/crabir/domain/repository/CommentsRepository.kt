@@ -21,6 +21,10 @@ class CommentsRepository(
         return this?.into<CommentType>()
     }
 
+    suspend fun insertAsync(things: List<CommentType>) {
+        votableDao.insert(things.map { it.toEntity() })
+    }
+
     fun getMany(commentsNames: Iterable<Fullname>): Flow<List<CommentType>> {
         return votableDao.getMany(commentsNames.toList()).map { list ->
             list.mapNotNull { it.transform() }

@@ -42,14 +42,11 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
         ),
     )
     {
-        val subreddit = it.arguments?.getString("subreddit")
-        val id = it.arguments?.getString("id")
-        val title = it.arguments?.getString("title")
-        val permalink = if (subreddit != null && id != null && title != null) {
-            "/r/$subreddit/comments/$id/$title"
-        } else {
-            null
-        }
+        val arguments = it.arguments ?: return@composable
+        val subreddit = arguments.getString("subreddit") ?: return@composable
+        val id = arguments.getString("id") ?: return@composable
+        val title = arguments.getString("title") ?: return@composable
+        val permalink = "/r/$subreddit/comments/$id/$title"
         ThreadView(
             permalink = permalink,
             dismiss = { navController.popBackStack() }
@@ -66,15 +63,12 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
         )
     )
     {
-        val subreddit = it.arguments?.getString("subreddit")
-        val id = it.arguments?.getString("id")
-        val title = it.arguments?.getString("title")
-        val commentId = it.arguments?.getString("commentId")
-        val permalink = if (subreddit != null && id != null && title != null) {
-            "/r/$subreddit/comments/$id/$title"
-        } else {
-            null
-        }
+        val arguments = it.arguments ?: return@composable
+        val subreddit = arguments.getString("subreddit") ?: return@composable
+        val id = arguments.getString("id") ?: return@composable
+        val title = arguments.getString("title") ?: return@composable
+        val permalink = "/r/$subreddit/comments/$id/$title"
+        val commentId = arguments.getString("commentId")
         ThreadView(
             permalink = permalink,
             dismiss = { navController.popBackStack() },

@@ -26,15 +26,15 @@ class MessageNotFoundException : Exception()
 
 class InboxCache : Cache<Message> {
     private val cache = mutableMapOf<Fullname, Message>()
-    override fun insert(thing: Message) {
+    override suspend fun insert(thing: Message) {
         cache[thing.name] = thing
     }
 
-    override fun insert(things: List<Message>) {
+    override suspend fun insert(things: List<Message>) {
         things.forEach { insert(it) }
     }
 
-    override fun update(thing: Message) {
+    override suspend fun update(thing: Message) {
         cache[thing.name] = thing
     }
 
@@ -50,7 +50,7 @@ class InboxCache : Cache<Message> {
         cache.remove(name)
     }
 
-    override fun clear() {
+    override suspend fun clear() {
         cache.clear()
     }
 }
