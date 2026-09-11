@@ -66,7 +66,7 @@ enum class ProfileTabs {
     }
 
     companion object {
-        val publicTabs get() = listOf(Overview, About, Posts, Comments)
+        val publicTabs = listOf(Overview, About, Posts, Comments)
         fun fromString(string: String): ProfileTabs {
             return when (string.lowercase()) {
                 "about" -> About

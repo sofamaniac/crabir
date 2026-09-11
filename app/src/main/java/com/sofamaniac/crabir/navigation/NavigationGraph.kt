@@ -44,7 +44,7 @@ fun NavigationGraph(
 
         profileGraph()
         postGraph(navController = navController)
-        subredditGraph()
+        subredditGraph(navController = navController)
         imagesGraph(navController = navController)
         settingsGraph()
         editorGraph(navController = navController)

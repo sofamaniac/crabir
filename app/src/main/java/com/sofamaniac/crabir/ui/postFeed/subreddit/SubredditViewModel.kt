@@ -34,7 +34,7 @@ class SubredditViewModel(
     val info = _info.asStateFlow()
 
     init {
-        val slug = if (slug.startsWith("r/") || slug.startsWith("/r/")) slug else "r/$slug"
+        val slug = if (slug.contains("/")) slug else "r/$slug"
         repository.updateSubreddit(slug)
         viewModelScope.launch {
             _info.value = subredditCache.getBySlug(slug)

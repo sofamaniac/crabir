@@ -33,7 +33,7 @@ object HistoryRoute : Route
  */
 class SubredditRoute(val subreddit: String) : Route {
     init {
-        assert(subreddit.startsWith("r/"))
+        assert(subreddit.contains("/"))
     }
 }
 

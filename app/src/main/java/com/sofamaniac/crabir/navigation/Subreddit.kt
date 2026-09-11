@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.navigation
 
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -11,15 +12,21 @@ import com.sofamaniac.crabir.ui.feedInfo.multi.MultiInfo
 import com.sofamaniac.crabir.ui.feedInfo.subreddit.SubredditInfoView
 import com.sofamaniac.crabir.ui.postFeed.multi.MultiView
 import com.sofamaniac.crabir.ui.postFeed.subreddit.SubredditViewer
+import com.sofamaniac.crabir.ui.user.ProfileTabs
 import kotlin.reflect.typeOf
 
-fun NavGraphBuilder.subredditGraph() {
+fun NavGraphBuilder.subredditGraph(navController: NavController) {
     composable<SubredditRoute>
     { navBackStackEntry ->
         val subreddit = navBackStackEntry.toRoute<SubredditRoute>().subreddit
-        SubredditViewer(
-            subreddit
-        )
+        if (subreddit.contains("u/")) {
+            navController.popBackStack()
+            navController.navigate(ProfileRoute(subreddit.split("/").last(), ProfileTabs.Posts))
+        } else {
+            SubredditViewer(
+                subreddit
+            )
+        }
     }
     composable(
         route = "/r/{subreddit}",
