@@ -1,9 +1,9 @@
 package com.sofamaniac.crabir.ui.thread.dialog
 
-import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardDoubleArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
@@ -19,12 +19,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.Kind
 import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.TextEditorRoute
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.thread.CommentViewModel
 import com.sofamaniac.crabir.ui.votable.ReportMenu
@@ -56,14 +58,24 @@ fun MoreOptionMenu(
     var showUserMenu by remember { mutableStateOf(false) }
     var showShareMenu by remember { mutableStateOf(false) }
     var showCopyMenu by remember { mutableStateOf(false) }
+    val currentAccount = LocalRedditAccount.current
+    val navController = LocalNavController.current
     ModalBottomSheet(
         containerColor = theme.cardBackground,
         onDismissRequest = onDismissRequest
     ) {
+
+        if (comment.author.authorFullname == currentAccount.info?.name) {
+            ListItem(
+                onClick = {
+                    navController?.navigate(TextEditorRoute(comment.name, comment.body.markdown))
+                },
+                leadingContent = { Icon(Icons.Default.Edit, contentDescription = null) },
+                content = { Text(stringResource(R.string.edit)) }
+            )
+        }
         ListItem(
-            modifier = Modifier.clickable {
-                showUserMenu = true
-            },
+            onClick = { showUserMenu = true },
             leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
             content = { Text("About ${comment.author.username}") },
             trailingContent = {
@@ -75,9 +87,7 @@ fun MoreOptionMenu(
         )
 
         ListItem(
-            modifier = Modifier.clickable {
-                viewModel.collapse(true)
-            },
+            onClick = { viewModel.collapse(true) },
             leadingContent = {
                 Icon(
                     Icons.Default.KeyboardDoubleArrowUp,
@@ -88,7 +98,7 @@ fun MoreOptionMenu(
         )
 
         ListItem(
-            modifier = Modifier.clickable {
+            onClick = {
                 viewModel.fetchRules()
                 showReportMenu = true
             },
@@ -103,7 +113,7 @@ fun MoreOptionMenu(
         )
 
         ListItem(
-            modifier = Modifier.clickable {
+            onClick = {
                 showShareMenu = true
             },
             leadingContent = { Icon(Icons.Default.Share, contentDescription = null) },
@@ -117,7 +127,7 @@ fun MoreOptionMenu(
         )
 
         ListItem(
-            modifier = Modifier.clickable {
+            onClick = {
                 showCopyMenu = true
             },
             leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
