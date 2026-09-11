@@ -18,9 +18,11 @@ import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -260,8 +262,8 @@ fun OpenedComment(
     val commentOuter by viewModel.votable.collectAsState()
     val comment = (commentOuter)?.comment ?: return
 
-    Column(modifier) {
-        CommentInner(comment)
+    Column {
+        CommentInner(comment, modifier = modifier)
         AnimatedVisibility(showBottomBar) {
             BottomRow(comment, viewModel, startReply = startReply) {
                 if (commentsSettings.hideButtonsAfterVote) {
@@ -282,31 +284,33 @@ fun BottomRow(
 ) {
     val likes = comment.relationship.liked
     val saved = comment.relationship.saved
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(color = Color.Gray.copy(alpha = 0.2f)),
-        horizontalArrangement = Arrangement.End
-    ) {
-        UpButton(likes, onClick = {
-            viewModel.upvote(comment.name)
-            onAction()
-        })
-        DownButton(likes, onClick = {
-            viewModel.downvote(comment.name)
-            onAction()
-        })
-        SavedButton(saved, onClick = {
-            viewModel.save(comment.name, !saved, false)
-            onAction()
-        })
-        ReplyButton(startReply = startReply)
-        MoreOptionButton(comment, viewModel)
-        if (BuildConfig.DEBUG) {
-            IconButton(onClick = {
-                Log.d("CommentNode", "$comment")
-            }) {
-                Icon(Icons.Default.BugReport, contentDescription = null)
+    CompositionLocalProvider(LocalContentColor provides LocalTheme.current.secondaryText) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(color = Color.Gray.copy(alpha = 0.2f)),
+            horizontalArrangement = Arrangement.End
+        ) {
+            UpButton(likes, onClick = {
+                viewModel.upvote(comment.name)
+                onAction()
+            })
+            DownButton(likes, onClick = {
+                viewModel.downvote(comment.name)
+                onAction()
+            })
+            SavedButton(saved, onClick = {
+                viewModel.save(comment.name, !saved, false)
+                onAction()
+            })
+            ReplyButton(startReply = startReply)
+            MoreOptionButton(comment, viewModel)
+            if (BuildConfig.DEBUG) {
+                IconButton(onClick = {
+                    Log.d("CommentNode", "$comment")
+                }) {
+                    Icon(Icons.Default.BugReport, contentDescription = null)
+                }
             }
         }
     }
