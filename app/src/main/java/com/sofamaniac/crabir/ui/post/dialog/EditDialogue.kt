@@ -19,6 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
+import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.TextEditorRoute
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.components.ThemedDialog
 import com.sofamaniac.crabir.ui.editor.postEditor.FlairDialog
@@ -36,6 +39,7 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
 
     var showFlairDialog by remember { mutableStateOf(false) }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
+    val navController = LocalNavController.current
 
     ThemedDialog(onDismissRequest) {
         ListItem(
@@ -45,10 +49,19 @@ fun EditDialogue(viewModel: LinkInteraction, onDismissRequest: () -> Unit) {
                 Icon(Icons.Default.Edit, contentDescription = null)
             }
         )
-        // TODO
-        //        if (post.kind == Kind.Self) {
-        //            ListItem(content = { Text(stringResource(R.string.edit_text)) })
-        //        }
+        if (post.kind == Kind.Self) {
+            ListItem(
+                onClick = {
+                    navController?.navigate(
+                        TextEditorRoute(
+                            post.name,
+                            post.selftext.markdown.markdown
+                        )
+                    )
+                },
+                content = { Text(stringResource(R.string.edit_text)) }
+            )
+        }
         ListItem(
             content = { Text(stringResource(R.string.nsfw)) },
             trailingContent = {

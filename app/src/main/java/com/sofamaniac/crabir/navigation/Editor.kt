@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.ui.editor.TextEditor
 import com.sofamaniac.crabir.ui.editor.crosspostEditor.CrosspostCreator
 import com.sofamaniac.crabir.ui.editor.postEditor.PostCreator
 import com.sofamaniac.crabir.ui.inbox.MessageEditor
@@ -20,6 +21,9 @@ class CrosspostCreatorRoute(val post: Fullname) : Route
 
 @Serializable
 class MessageEditorRoute(val parent: Fullname? = null) : Route
+
+@Serializable
+class TextEditorRoute(val name: Fullname, val initial: String) : Route
 
 fun NavGraphBuilder.editorGraph(navController: NavController) {
     composable<PostCreatorRoute>(
@@ -44,4 +48,12 @@ fun NavGraphBuilder.editorGraph(navController: NavController) {
         val route = it.toRoute<MessageEditorRoute>()
         MessageEditor(parent = route.parent)
     }
+
+    composable<TextEditorRoute>(
+        typeMap = mapOf(typeOf<Fullname>() to FullnameType)
+    ) {
+        val route = it.toRoute<TextEditorRoute>()
+        TextEditor(route.name, route.initial)
+    }
+
 }
