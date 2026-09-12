@@ -39,8 +39,8 @@ import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.navigation.FullscreenImageRoute
 import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.onWifiConnection
+import com.sofamaniac.crabir.settings.history.SaveToHistory
 import com.sofamaniac.crabir.settings.views.ImageHeight
-import com.sofamaniac.crabir.ui.SaveToHistory
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
@@ -73,6 +73,7 @@ fun PostImage(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     blur: Boolean = false,
+    dim: Boolean = false,
     goFullscreen: (Route) -> Unit,
 ) {
     val dataSettings = LocalDataSettings.current
@@ -122,6 +123,12 @@ fun PostImage(
                 allowTransformation = false,
             )
         }
+        if (dim) {
+            Box(
+                modifier = imageModifier
+                    .background(Color.Black.copy(alpha = 0.5f))
+            )
+        }
     }
 }
 
@@ -154,7 +161,7 @@ fun FullscreenImageView(
     var showDecorations by remember { mutableStateOf(true) }
     val postData by viewModel.post.collectAsState(initial = null)
     var enableDismiss by remember { mutableStateOf(true) }
-    SaveToHistory(post)
+    SaveToHistory(post, postData?.over18 ?: true)
     VerticalSwipeToDismiss(
         onDismiss = dismiss,
         enabled = true,

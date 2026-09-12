@@ -7,6 +7,7 @@ import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.LocalFeedSettings
 import com.sofamaniac.crabir.LocalFiltersSettings
+import com.sofamaniac.crabir.LocalHistorySettings
 import com.sofamaniac.crabir.LocalLateralMenuSettings
 import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalViewSettings
@@ -15,6 +16,7 @@ import com.sofamaniac.crabir.settings.comments.rememberCommentsSettings
 import com.sofamaniac.crabir.settings.data.rememberDataSettings
 import com.sofamaniac.crabir.settings.feedSettings.rememberFeedSettings
 import com.sofamaniac.crabir.settings.filters.rememberFiltersSettings
+import com.sofamaniac.crabir.settings.history.rememberHistorySettings
 import com.sofamaniac.crabir.settings.lateralMenu.rememberLateralMenuSettings
 import com.sofamaniac.crabir.settings.post.rememberPostsSettings
 import com.sofamaniac.crabir.settings.views.rememberViewSettings
@@ -29,6 +31,7 @@ fun ConfigureSettings(content: @Composable () -> Unit) {
     val lateralMenuSettings = rememberLateralMenuSettings() ?: return
     val feedSettings = rememberFeedSettings() ?: return
     val apiSettings = rememberApiSettings() ?: return
+    val historySettings = rememberHistorySettings() ?: return
 
     CompositionLocalProvider(
         LocalPostSettings provides postSettings,
@@ -38,7 +41,8 @@ fun ConfigureSettings(content: @Composable () -> Unit) {
         LocalCommentsSettings provides commentsSettings,
         LocalLateralMenuSettings provides lateralMenuSettings,
         LocalFeedSettings provides feedSettings,
-        LocalApiSettings provides apiSettings
+        LocalApiSettings provides apiSettings,
+        LocalHistorySettings provides historySettings,
     ) {
         content()
     }

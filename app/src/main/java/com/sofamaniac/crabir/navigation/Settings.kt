@@ -18,6 +18,8 @@ import com.sofamaniac.crabir.settings.feedSettings.FeedSettingsRoute
 import com.sofamaniac.crabir.settings.feedSettings.SortManagerPage
 import com.sofamaniac.crabir.settings.feedSettings.SortManagerRoute
 import com.sofamaniac.crabir.settings.filters.FiltersSettingsPage
+import com.sofamaniac.crabir.settings.history.HistorySettingsPage
+import com.sofamaniac.crabir.settings.history.HistorySettingsRoute
 import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsPage
 import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsRoute
 import com.sofamaniac.crabir.settings.post.PostSettingsPage
@@ -75,5 +77,8 @@ fun NavGraphBuilder.settingsGraph() {
     }
     composable<ApiSettingsRoute> {
         ApiSettingsPage()
+    }
+    composable<HistorySettingsRoute> {
+        HistorySettingsPage()
     }
 }

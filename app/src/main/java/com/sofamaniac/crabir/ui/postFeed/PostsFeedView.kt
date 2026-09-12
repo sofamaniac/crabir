@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.sofamaniac.crabir.LocalHistorySettings
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.PreviewLocalComposition
@@ -48,6 +49,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
+import com.sofamaniac.crabir.settings.history.SaveToHistory
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.ui.components.RefreshIndicator
 import com.sofamaniac.crabir.ui.components.ThemedCard
@@ -215,6 +217,11 @@ fun PostView(
     viewModel: PostViewModelInterface,
     modifier: Modifier = Modifier,
 ) {
+    val settings = LocalHistorySettings.current
+    val dim = settings.dimImages
+    if (settings.readOnScroll && isMostVisible) {
+        SaveToHistory(thing.name, thing.over18)
+    }
     when (view) {
         Views.Card -> PostCard(
             thing,
@@ -222,6 +229,7 @@ fun PostView(
             isMostVisible = isMostVisible,
             showHidden = showHidden,
             viewModel = viewModel,
+            dim = dim,
         )
 
         Views.Compact -> CompactView(

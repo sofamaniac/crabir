@@ -49,6 +49,7 @@ fun PostCard(
     modifier: Modifier = Modifier,
     clickable: Boolean = true,
     showHidden: Boolean = false,
+    dim: Boolean = false,
     isMostVisible: Boolean,
     viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = post.id) {
         parametersOf(
@@ -68,6 +69,7 @@ fun PostCard(
             post,
             modifier,
             interactions = viewModel,
+            dim = dim,
             isMostVisible = isMostVisible,
         )
     }
@@ -78,6 +80,7 @@ internal fun PostCardContent(
     post: PostData,
     modifier: Modifier = Modifier,
     isMostVisible: Boolean = false,
+    dim: Boolean = false,
     interactions: LinkInteraction,
 ) {
 
@@ -126,6 +129,7 @@ internal fun PostCardContent(
             enableTextPreview = viewSettings.cardSettings.enableTextPreview && !post.spoiler,
             maxLines = viewSettings.cardSettings.maxLines,
             enableLinkFullSizePreview = !viewSettings.cardSettings.thumbnailForLinkPreview,
+            dim = dim && read,
         )
         BottomRow(
             post,

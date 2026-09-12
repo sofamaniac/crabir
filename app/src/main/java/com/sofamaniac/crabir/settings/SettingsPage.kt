@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Api
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ViewComfy
@@ -48,6 +49,7 @@ import com.sofamaniac.crabir.settings.api.ApiSettingsRoute
 import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
 import com.sofamaniac.crabir.settings.data.DataSettingsRoute
 import com.sofamaniac.crabir.settings.feedSettings.FeedSettingsRoute
+import com.sofamaniac.crabir.settings.history.HistorySettingsRoute
 import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsRoute
 import com.sofamaniac.crabir.settings.post.PostSettingsRoute
 import com.sofamaniac.crabir.ui.BackButton
@@ -86,7 +88,7 @@ fun SettingsPage() {
                 ListItem(
                     leadingContent = { Icon(Icons.Default.Settings, contentDescription = null) },
                     content = { Text(stringResource(R.string.general_settings_title)) },
-                    modifier = Modifier.clickable {
+                    onClick = {
                         navController?.navigate(GeneralSettingsRoute)
                     }
                 )
@@ -95,7 +97,7 @@ fun SettingsPage() {
                 ListItem(
                     content = { Text(stringResource(R.string.theme_settings_title)) },
                     leadingContent = { Icon(Icons.Default.Palette, contentDescription = null) },
-                    modifier = Modifier.clickable {
+                    onClick = {
                         navController?.navigate(ThemeRoute)
                     }
                 )
@@ -105,7 +107,7 @@ fun SettingsPage() {
                 ListItem(
                     content = { Text(stringResource(R.string.filter_settings_name)) },
                     leadingContent = { Icon(Icons.Default.FilterList, contentDescription = null) },
-                    modifier = Modifier.clickable {
+                    onClick = {
                         navController?.navigate(FiltersSettingRoute)
                     }
                 )
@@ -114,16 +116,23 @@ fun SettingsPage() {
                 ListItem(
                     content = { Text(stringResource(R.string.data_settings_name)) },
                     leadingContent = { Icon(Icons.Default.DataUsage, contentDescription = null) },
-                    modifier = Modifier.clickable {
+                    onClick = {
                         navController?.navigate(DataSettingsRoute)
                     }
                 )
             }
             item {
                 ListItem(
+                    content = { Text(stringResource(R.string.history_settings_tile)) },
+                    leadingContent = { Icon(Icons.Default.History, contentDescription = null) },
+                    onClick = { navController?.navigate(HistorySettingsRoute) }
+                )
+            }
+            item {
+                ListItem(
                     content = { Text(stringResource(R.string.api_settings_tile)) },
                     leadingContent = { Icon(Icons.Default.Api, contentDescription = null) },
-                    modifier = Modifier.clickable {
+                    onClick = {
                         navController?.navigate(ApiSettingsRoute)
                     }
                 )
@@ -139,7 +148,7 @@ fun SettingsPage() {
                                 contentDescription = null
                             )
                         },
-                        modifier = Modifier.clickable {
+                        onClick = {
                             navController?.navigate(DebugOptionsRoute)
                         }
                     )

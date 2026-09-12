@@ -32,6 +32,7 @@ internal fun PostBody(
     canPlayVideo: Boolean = false,
     imageHeight: ImageHeight = ImageHeight.Full,
     enableTextPreview: Boolean = true,
+    dim: Boolean = false,
     maxLines: Int?,
     enableLinkFullSizePreview: Boolean = true,
     forceShowSelftext: Boolean = true,
@@ -86,6 +87,7 @@ internal fun PostBody(
                 modifier = mediaModifier,
                 goFullscreen = ::goFullscreen,
                 blur = blur,
+                dim = dim,
             )
         }
 
@@ -106,6 +108,7 @@ internal fun PostBody(
                     modifier.fillMaxWidth(),
                     enabled = false,
                     blur = blur,
+                    dim = dim,
                     goFullscreen = ::goFullscreen,
                 )
             }

@@ -12,6 +12,7 @@ import com.sofamaniac.crabir.settings.data.DataSettings
 import com.sofamaniac.crabir.settings.data.DataSettingsDefault
 import com.sofamaniac.crabir.settings.feedSettings.FeedSettings
 import com.sofamaniac.crabir.settings.filters.FiltersSettings
+import com.sofamaniac.crabir.settings.history.HistorySettings
 import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettings
 import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsDefault
 import com.sofamaniac.crabir.settings.post.PostSettings
@@ -35,6 +36,7 @@ val LocalLateralMenuSettings =
 
 val LocalFeedSettings = compositionLocalOf<FeedSettings> { FeedSettings() }
 val LocalApiSettings = compositionLocalOf<ApiSettings> { error("Api settings not provided") }
+val LocalHistorySettings = compositionLocalOf<HistorySettings> { HistorySettings() }
 
 /**Setup local providers for previews*/
 @Composable

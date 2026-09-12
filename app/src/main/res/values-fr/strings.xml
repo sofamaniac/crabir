@@ -361,4 +361,14 @@
     <string name="subreddit_private">PRIVÉ</string>
     <string name="subreddit_restricted">RESTREINT</string>
     <string name="go_to_placeholder">Aller à…</string>
+    <string name="history_settings_tile">Paramètre de l\'historique</string>
+    <string name="history_settings_title">Paramètre de l\'historique</string>
+    <string name="history_enabled">Activer</string>
+    <string name="history_save_nsfw">Sauvergarder les publications NSFW</string>
+    <string name="history_dim_images">Obscurcir les images des publications lues</string>
+    <string name="history_read_on_scroll">Marquer comme lu pendant le défilement</string>
+    <string name="clear_history">Effacer l\'historique</string>
+    <string name="clear_history_dialog">Effacer l\'historique</string>
+    <string name="clear">Effacer</string>
+    <string name="clear_history_dialog_content">Êtes-vous sûr de vouloir effacer l\'historique ?</string>
 </resources>

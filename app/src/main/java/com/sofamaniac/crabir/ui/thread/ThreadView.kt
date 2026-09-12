@@ -28,8 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.zIndex
 import com.sofamaniac.crabir.LocalCommentsSettings
-import com.sofamaniac.crabir.ui.HistoryManager
-import com.sofamaniac.crabir.ui.SaveToHistory
+import com.sofamaniac.crabir.settings.history.HistoryManager
+import com.sofamaniac.crabir.settings.history.SaveToHistory
 import com.sofamaniac.crabir.ui.thread.topBar.TopBar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -83,8 +83,9 @@ fun ThreadView(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val commentsSettings = LocalCommentsSettings.current
     val showReplySheet by viewModel.reply.collectAsState()
+    val post by viewModel.post.collectAsState()
 
-    SaveToHistory(viewModel.name)
+    SaveToHistory(viewModel.name, post?.over18 ?: true)
     val historyManager: HistoryManager = koinInject()
     val scope = rememberCoroutineScope()
     BackHandler {

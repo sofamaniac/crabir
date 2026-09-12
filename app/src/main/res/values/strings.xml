@@ -403,6 +403,16 @@
     <string name="subreddit_private">PRIVATE</string>
     <string name="subreddit_restricted">RESTRICTED</string>
     <string name="go_to_placeholder">Go to …</string>
+    <string name="history_settings_tile">History Settings</string>
+    <string name="history_settings_title">History Settings</string>
+    <string name="history_enabled">Enabled</string>
+    <string name="history_save_nsfw">Save NSFW</string>
+    <string name="history_dim_images">Dim images in read posts</string>
+    <string name="history_read_on_scroll">Mark read on scroll</string>
+    <string name="clear_history">Clear history</string>
+    <string name="clear_history_dialog">Clear history</string>
+    <string name="clear">Clear</string>
+    <string name="clear_history_dialog_content">Are you sure you want to clear the history ?</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>
