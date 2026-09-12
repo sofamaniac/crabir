@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material3.HorizontalDivider
@@ -38,8 +37,6 @@ import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.CommentType
-import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.ProfileRoute
@@ -57,7 +54,6 @@ import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.SavedButton
 import com.sofamaniac.crabir.ui.votable.ScoreString
 import com.sofamaniac.crabir.ui.votable.UpButton
-import com.sofamaniac.crabir.ui.votable.VotableInteraction
 import com.sofamaniac.crabir.ui.votable.VotableViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -70,18 +66,6 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 import org.koin.core.parameter.parametersOf
-
-interface CommentViewModelInterface : VotableInteraction {
-    val openComment: StateFlow<Fullname?>
-
-    fun replyTo(name: Fullname?)
-    fun submitComment(parent: Fullname, body: String, account: RedditAccount?)
-
-    fun collapseComment(name: Fullname, collapsed: Boolean)
-
-    fun closeComment(name: Fullname)
-
-}
 
 @KoinViewModel
 open class CommentViewModel(
@@ -115,7 +99,6 @@ open class CommentViewModel(
 
 @Composable
 fun CommentContent(
-    comment: CommentType.Comment,
     viewModel: CommentViewModel,
     opened: Boolean,
     toggleComment: (Boolean) -> Unit,
@@ -171,7 +154,6 @@ fun CommentNode(
     }
     val opened by viewModel.openComment.collectAsState()
     CommentContent(
-        comment,
         commentViewModel,
         opened == comment.name,
         toggleComment = { target ->
@@ -180,16 +162,6 @@ fun CommentNode(
         enableAnimation = enableAnimation,
         startReply = { viewModel.replyTo(comment.name) }
     )
-}
-
-fun LazyListScope.commentNode(
-    comment: CommentType.Comment,
-    viewModel: ThreadViewModel,
-    enableAnimation: Boolean = true,
-) {
-    item(key = comment.name) {
-        CommentNode(comment, viewModel, enableAnimation)
-    }
 }
 
 @Composable
