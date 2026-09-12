@@ -102,8 +102,12 @@ fun DrawerContent(
         multis = multis,
         onFeedClick = { route ->
             coroutineScope.launch {
+                Log.d("DrawerContent", "Clicked on feed: $route")
                 drawerState.close()
-                navController?.navigate(route)
+                navController?.navigate(route) {
+                    popUpTo(route)
+                    launchSingleTop = true
+                }
             }
         },
         onMultiClick = { multi ->

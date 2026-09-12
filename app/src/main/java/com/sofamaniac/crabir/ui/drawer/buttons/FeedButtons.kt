@@ -101,7 +101,9 @@ internal fun LazyListScope.feeds(settings: LateralMenuItems, onClick: (Route) ->
                 label = { Text(stringResource(R.string.Home)) },
                 selected = false,
                 icon = { Icon(Icons.Default.Home, contentDescription = null) },
-                onClick = {}
+                onClick = {
+                    onClick(HomeRoute)
+                }
             )
         }
     }
