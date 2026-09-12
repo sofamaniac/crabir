@@ -5,11 +5,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Flair(
+    val templateId: String? = null,
     val text: String,
     val backgroundColor: String,
     val textColor: String,
     val type: String,
-    val richText: List<LinkFlairRichtext>,
+    val richtext: List<LinkFlairRichtext>,
 )
 
 val EMPTY_FLAIR = Flair(
@@ -17,5 +18,5 @@ val EMPTY_FLAIR = Flair(
     backgroundColor = "transparent",
     textColor = "black",
     type = "text",
-    richText = emptyList(),
+    richtext = emptyList(),
 )

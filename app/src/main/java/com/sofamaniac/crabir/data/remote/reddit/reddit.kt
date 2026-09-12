@@ -37,7 +37,8 @@ interface RedditAPIService :
     RedditAuthApi,
     UserAPI, SearchAPI,
     ThreadAPI,
-    InboxAPI {
+    InboxAPI,
+    DraftAPI {
 
 
     /** Get the list of multis the user is subscribed to. */
@@ -81,6 +82,7 @@ interface RedditAPIService :
         @Field("reason") reason: String,
         @Field("api_type") apiType: String = "json",
     ): Result<Unit>
+
 
 }
 
@@ -142,3 +144,4 @@ data class FlairInfo(
     @SerialName("text_color") val textColor: String? = null,
     @SerialName("max_emojis") val maxEmojis: Int? = null,
 )
+

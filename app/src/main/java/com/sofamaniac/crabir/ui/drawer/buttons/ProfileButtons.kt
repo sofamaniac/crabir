@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.R
+import com.sofamaniac.crabir.navigation.DraftsRoute
 import com.sofamaniac.crabir.navigation.InboxRoute
 import com.sofamaniac.crabir.navigation.ProfileRoute
 import com.sofamaniac.crabir.navigation.Route
@@ -65,6 +66,7 @@ internal fun LazyListScope.profileButtons(settings: LateralMenuItems, onClick: (
                 selected = false,
                 icon = { Icon(Icons.Default.Drafts, contentDescription = null) },
                 onClick = {
+                    onClick(DraftsRoute)
                 }
             )
         }

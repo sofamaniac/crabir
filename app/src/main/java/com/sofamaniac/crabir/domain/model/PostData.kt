@@ -107,7 +107,7 @@ val DUMMY_POST = PostData(
         text = "Discussion",
         textColor = "Black",
         backgroundColor = "#ff4500",
-        richText = emptyList(),
+        richtext = emptyList(),
         type = "text",
     ),
     media = MediaInfo(media = null),

@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.ui.drafts.DraftsView
 import com.sofamaniac.crabir.ui.editor.TextEditor
 import com.sofamaniac.crabir.ui.editor.crosspostEditor.CrosspostCreator
 import com.sofamaniac.crabir.ui.editor.postEditor.PostCreator
@@ -14,7 +15,12 @@ import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
 @Serializable
-class PostCreatorRoute(val kind: Kind, val communitySlug: String?) : Route
+class PostCreatorRoute(
+    val kind: Kind,
+    val communityNamePrefixed: String?,
+    val draftId: String? = null,
+) :
+    Route
 
 @Serializable
 class CrosspostCreatorRoute(val post: Fullname) : Route
@@ -25,14 +31,22 @@ class MessageEditorRoute(val parent: Fullname? = null) : Route
 @Serializable
 class TextEditorRoute(val name: Fullname, val initial: String) : Route
 
+@Serializable
+object DraftsRoute : Route
+
 fun NavGraphBuilder.editorGraph(navController: NavController) {
     composable<PostCreatorRoute>(
         typeMap = mapOf(typeOf<Fullname?>() to NullableFullnameType)
     ) {
         val route = it.toRoute<PostCreatorRoute>()
-        PostCreator(kind = route.kind, communitySlug = route.communitySlug, onDismissRequest = {
-            navController.popBackStack()
-        })
+        PostCreator(
+            kind = route.kind,
+            communitySlug = route.communityNamePrefixed,
+            draftId = route.draftId,
+            onDismissRequest = {
+                navController.popBackStack()
+            }
+        )
     }
 
     composable<CrosspostCreatorRoute>(
@@ -56,4 +70,7 @@ fun NavGraphBuilder.editorGraph(navController: NavController) {
         TextEditor(route.name, route.initial)
     }
 
+    composable<DraftsRoute> {
+        DraftsView()
+    }
 }

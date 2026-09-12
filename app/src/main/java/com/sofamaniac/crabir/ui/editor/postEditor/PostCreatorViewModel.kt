@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.insert
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
 import com.sofamaniac.crabir.data.local.dao.SubredditDao
+import com.sofamaniac.crabir.data.remote.dto.DraftBody
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.GalleryItem
 import com.sofamaniac.crabir.data.remote.reddit.MediaUploadInterface
@@ -24,8 +26,10 @@ import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.AccountsRepository
+import com.sofamaniac.crabir.domain.repository.DraftsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 abstract class CreatorViewModel(
@@ -76,7 +80,9 @@ abstract class CreatorViewModel(
 
 @KoinViewModel
 class PostCreatorViewModel(
+    @InjectedParam draftId: String? = null,
     api: RedditAPIService,
+    private val draftsRepository: DraftsRepository,
     private val communities: SubredditDao,
     private val mediaUploader: MediaUploadInterface,
     accountsRepository: AccountsRepository,
@@ -90,6 +96,34 @@ class PostCreatorViewModel(
     var loading by mutableStateOf(false)
 
     val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
+
+    init {
+        viewModelScope.launch {
+            if (draftId != null) {
+                draftsRepository.getDrafts()
+            }
+        }.invokeOnCompletion {
+            val draft = draftsRepository.drafts.value.find { it.id == draftId }
+            if (draft != null) {
+                state = state.copy(
+                    title = draft.title,
+                    text = draft.body.toString(),
+                    subreddit = draft.subreddit.name,
+                    flairId = draft.flair?.templateId,
+                    flairText = draft.flair?.text,
+                )
+                titleState.edit { insert(0, draft.title) }
+                if (draft.kind == "link") {
+                    urlState.edit { insert(0, draft.body.toString()) }
+                    state = state.copy(kind = Kind.Link)
+                } else if (draft.body is DraftBody.Text) {
+                    textState.edit { insert(0, draft.body.text) }
+                } else {
+                    textState.edit { insert(0, draft.body.toString()) }
+                }
+            }
+        }
+    }
 
     fun setKind(context: Context) {
         if (media.size > 1) {

@@ -25,7 +25,6 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @Serializable
 @JsonClassDiscriminator("e")
 sealed class Richtext {
-
     interface ContainerBlock
     interface LeafBlock
     interface TextNode : LeafBlock
@@ -196,6 +195,16 @@ data class TextModifier(val style: Int, val start: Int, val length: Int) {
             fontFamily = fontFamily,
             textDecoration = if (decorations.isNotEmpty()) TextDecoration.combine(decorations) else null
         )
+    }
+
+    fun toMd(text: String): String {
+        return when (style) {
+            TextStyle.Bold.value -> "**$text**"
+            TextStyle.Italic.value -> "*$text*"
+            TextStyle.Underline.value -> text
+            TextStyle.Strikethrough.value -> "~~$text~~"
+            else -> text
+        }
     }
 }
 

@@ -9,6 +9,7 @@ import com.sofamaniac.crabir.data.remote.interceptors.CountInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.ForceJsonInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.RateLimitInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.loggingInterceptor
+import com.sofamaniac.crabir.data.remote.reddit.DraftAPI
 import com.sofamaniac.crabir.data.remote.reddit.InboxAPI
 import com.sofamaniac.crabir.data.remote.reddit.MediaUploadInterface
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
@@ -100,7 +101,7 @@ class NetworkModule {
         }
     }
 
-    @Single(binds = [RedditAPIService::class, InboxAPI::class, SubredditAPI::class])
+    @Single(binds = [RedditAPIService::class, InboxAPI::class, SubredditAPI::class, DraftAPI::class])
     fun provideRedditApiService(
         okHttpClient: OkHttpClient,
         json: Json,

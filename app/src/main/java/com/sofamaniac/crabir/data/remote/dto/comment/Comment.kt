@@ -213,7 +213,7 @@ private fun CommentDTO.toAuthorFlair() = Flair(
     text = author_flair_text ?: "",
     backgroundColor = author_flair_background_color ?: "",
     textColor = author_flair_text_color ?: "",
-    richText = author_flair_richtext,
+    richtext = author_flair_richtext,
     type = author_flair_type ?: ""
 )
 

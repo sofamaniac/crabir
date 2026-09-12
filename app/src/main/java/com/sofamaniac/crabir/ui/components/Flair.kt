@@ -127,7 +127,7 @@ fun Flair(
     showColor: Boolean = true,
     showEmoji: Boolean = true,
 ) {
-    if (flair.text.isEmpty() && flair.richText.isEmpty()) return
+    if (flair.text.isEmpty() && flair.richtext.isEmpty()) return
     val backgroundColor =
         if (showColor) mapColor(flair.backgroundColor, default = Color.DarkGray) else Color.DarkGray
     var textColor =
@@ -144,8 +144,8 @@ fun Flair(
     val modifier = modifier.cartouche(backgroundColor)
     when (flair.type) {
         "richtext" -> {
-            if (flair.richText.isNotEmpty()) {
-                FlairRichtext(flair.richText, textColor, modifier, showEmoji)
+            if (flair.richtext.isNotEmpty()) {
+                FlairRichtext(flair.richtext, textColor, modifier, showEmoji)
             } else {
                 Text(
                     text = flair.text,

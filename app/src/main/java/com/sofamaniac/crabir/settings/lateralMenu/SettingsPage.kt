@@ -233,7 +233,6 @@ private fun LazyListScope.itemsToShow(
     }
     item {
         CheckboxTile(
-            enabled = false,
             headlineContent = { Text(stringResource(R.string.drafts)) },
             leadingContent = {
                 Icon(

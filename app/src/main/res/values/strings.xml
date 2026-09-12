@@ -413,6 +413,7 @@
     <string name="clear_history_dialog">Clear history</string>
     <string name="clear">Clear</string>
     <string name="clear_history_dialog_content">Are you sure you want to clear the history ?</string>
+    <string name="drafts_page_title">Drafts</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>

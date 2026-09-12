@@ -25,3 +25,17 @@ object InstantAsFloatSerializer : KSerializer<Instant> {
         encoder.encodeDouble(value.toEpochMilliseconds().toDouble())
     }
 }
+
+object InstantAsLongSerializer : KSerializer<Instant> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("InstantAsFloat", PrimitiveKind.FLOAT)
+
+    override fun deserialize(decoder: Decoder): Instant {
+        val timestamp = decoder.decodeLong() // Use decodeDouble to handle both Float & Double
+        return Instant.fromEpochMilliseconds(timestamp)
+    }
+
+    override fun serialize(encoder: Encoder, value: Instant) {
+        encoder.encodeLong(value.toEpochMilliseconds())
+    }
+}

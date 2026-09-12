@@ -240,7 +240,7 @@ private fun PostDTO.toAuthorFlair() = Flair(
     text = authorFlairText ?: "",
     backgroundColor = authorFlairBackgroundColor ?: "",
     textColor = authorFlairTextColor ?: "",
-    richText = authorFlairRichtext,
+    richtext = authorFlairRichtext,
     type = authorFlairType ?: ""
 )
 
@@ -276,7 +276,7 @@ private fun PostDTO.toLinkFlair() = Flair(
     text = linkFlairText ?: "",
     backgroundColor = linkFlairBackgroundColor ?: "",
     textColor = linkFlairTextColor ?: "",
-    richText = linkFlairRichtext,
+    richtext = linkFlairRichtext,
     type = linkFlairType ?: ""
 )
 

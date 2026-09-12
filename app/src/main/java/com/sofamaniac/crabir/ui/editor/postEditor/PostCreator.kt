@@ -67,12 +67,14 @@ import com.sofamaniac.crabir.ui.editor.AccountSelector
 import com.sofamaniac.crabir.ui.editor.EditorBottomBar
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun PostCreator(
     communitySlug: String? = null,
+    draftId: String?,
     kind: Kind = Kind.Self,
-    viewModel: PostCreatorViewModel = koinViewModel(),
+    viewModel: PostCreatorViewModel = koinViewModel() { parametersOf(draftId) },
     onDismissRequest: () -> Unit,
 ) {
     LaunchedEffect(communitySlug, kind) {
