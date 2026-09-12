@@ -1,10 +1,8 @@
 package com.sofamaniac.crabir.ui.postFeed.components
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
@@ -109,21 +107,16 @@ fun TopBar(
         scrollBehavior = scrollBehavior,
         colors = rememberTopAppBarColors(),
         title = {
-            Column {
+            Column(horizontalAlignment = Alignment.Start) {
                 Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Row(
-                    modifier = Modifier.padding(horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val sortString = stringResource(params.sort.representation)
-                    val timeString = params.timeframe?.let { stringResource(it.representation) }
-                    val fullString = if (params.timeframe != null) {
-                        stringResource(R.string.sort_timeframe, sortString, timeString!!)
-                    } else {
-                        sortString
-                    }
-                    Text(fullString, style = MaterialTheme.typography.labelSmall)
+                val sortString = stringResource(params.sort.representation)
+                val timeString = params.timeframe?.let { stringResource(it.representation) }
+                val fullString = if (params.timeframe != null) {
+                    stringResource(R.string.sort_timeframe, sortString, timeString!!)
+                } else {
+                    sortString
                 }
+                Text(fullString, style = MaterialTheme.typography.labelSmall)
             }
         },
         navigationIcon = {
