@@ -39,7 +39,6 @@ fun TransformableImage(
     LaunchedEffect(state.transformation.scale) {
         onZoomChange(state.transformation.scale.scaleX)
     }
-    Log.d("TransformableImage", "aspect ratio: $placeholderAspectRatio")
 
     CoilImage(
         modifier = modifier,

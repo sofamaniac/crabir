@@ -189,7 +189,7 @@ fun MainScreen(
                     onLoad()
                 }
                 //                val apiSettings = LocalApiSettings.current
-                //                LaunchedEffect(apiSettings) {
+                //                LaunchedEffect(currentAccount) {
                 //                    if (!currentAccount.isUninitialized() && apiSettings.isConfigured) {
                 //                        navController.navigate(HomeRoute) {
                 //                            popUpTo(0) { inclusive = true }

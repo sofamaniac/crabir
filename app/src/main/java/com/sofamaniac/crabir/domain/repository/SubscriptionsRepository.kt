@@ -39,7 +39,6 @@ class SubscriptionsRepository(
     val subscriptions: StateFlow<List<Subreddit>> =
         activeAccount
             .flatMapLatest { account ->
-                Log.d("SubscriptionsRepository", "activeAccount: $account")
                 if (!account.isAnonymous()) {
                     flow { emit(loadSubscriptions()) }
                 } else {
@@ -55,7 +54,6 @@ class SubscriptionsRepository(
     val multis: StateFlow<List<Thing.Multi>> =
         activeAccount
             .flatMapLatest { account ->
-                Log.d("SubscriptionsRepository", "activeAccount: $account")
                 if (!account.isAnonymous()) {
                     flow { emit(loadMultis()) }
                 } else {
