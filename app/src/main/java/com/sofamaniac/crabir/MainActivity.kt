@@ -43,7 +43,6 @@ import coil3.disk.directory
 import coil3.memory.MemoryCache
 import coil3.memoryCacheMaxSizePercentWhileInBackground
 import coil3.util.DebugLogger
-import com.sofamaniac.crabir.navigation.HomeRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.NavigationGraph
 import com.sofamaniac.crabir.settings.ConfigureSettings
@@ -85,19 +84,15 @@ class MainActivity : ComponentActivity() {
         Log.d("MainActivity", "handleIntent: $intent")
         intent.data?.let { uri ->
             val request = NavDeepLinkRequest.Builder.fromUri(uri).build()
-            try {
+            runCatching {
                 navController.navigate(
                     request = request,
                     navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
                 )
-            } catch (_: IllegalArgumentException) {
-                try {
-                    if (uri.scheme == "http" || uri.scheme == "https") {
-                        uriHandler.openUri(uri.toString())
-                    }
-                } catch (e: IllegalArgumentException) {
-                    Log.e("MainActivity", "handleIntent: failed to open uri: $uri", e)
-                }
+            }.recoverCatching {
+                uriHandler.openUri(uri.toString())
+            }.onFailure { e ->
+                Log.e("MainActivity", "handleIntent: failed to open uri: $uri", e)
             }
         }
     }
@@ -126,10 +121,10 @@ class MainActivity : ComponentActivity() {
 data class CrabirUriHandler(val navController: NavController?, val fallback: UriHandler) :
     UriHandler {
     override fun openUri(uri: String) {
-        try {
+        runCatching {
             val request = NavDeepLinkRequest.Builder.fromUri(uri.toUri()).build()
             navController?.navigate(request)
-        } catch (_: IllegalArgumentException) {
+        }.recover {
             Log.i("CrabirUriHandler", "could not open: $uri")
             fallback.openUri(uri)
         }
@@ -164,7 +159,6 @@ fun MainScreen(
     navController: NavHostController,
     onLoad: () -> Unit,
 ) {
-
     val lifecycleOwner by rememberUpdatedState(LocalLifecycleOwner.current)
     DisposableEffect(lifecycleOwner) {
         val player = VideoPlayerManager.getInstance()
@@ -190,15 +184,18 @@ fun MainScreen(
                 LocalNavController provides navController,
                 LocalRedditAccount provides currentAccount,
             ) {
-                val clientId = LocalApiSettings.current.redditClientId
-                LaunchedEffect(currentAccount) {
-                    if (!currentAccount.isUninitialized() && !clientId.isNullOrBlank()) {
-                        navController.navigate(HomeRoute) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                LaunchedEffect(Unit) {
+                    // App is done loading
                     onLoad()
                 }
+                //                val apiSettings = LocalApiSettings.current
+                //                LaunchedEffect(apiSettings) {
+                //                    if (!currentAccount.isUninitialized() && apiSettings.isConfigured) {
+                //                        navController.navigate(HomeRoute) {
+                //                            popUpTo(0) { inclusive = true }
+                //                        }
+                //                    }
+                //                }
                 SetShortcuts()
                 NavigationGraph(
                     navController,

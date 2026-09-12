@@ -50,6 +50,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.subreddit.dummySubredditData
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.navigation.HomeRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.MultiRoute
 import com.sofamaniac.crabir.navigation.Route
@@ -131,9 +132,13 @@ fun DrawerContent(
                 expanded = selectingAccount
             ) { id ->
                 coroutineScope.launch {
+                    viewModel.setActiveAccount(id)
                     drawerState.close()
                     viewModel.toggleSelectAccount()
-                    viewModel.setActiveAccount(id)
+                }.invokeOnCompletion {
+                    navController?.navigate(HomeRoute) {
+                        popUpTo(HomeRoute)
+                    }
                 }
             }
         },
@@ -152,7 +157,6 @@ internal fun DrawerContent(
     accountSelector: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Log.d("DrawerContentStateless", "recompose ${drawerState.isClosed}")
     var expandGoTo by remember { mutableStateOf(false) }
     val settings = LocalLateralMenuSettings.current
     val navController = LocalNavController.current

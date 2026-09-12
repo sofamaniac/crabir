@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.settings
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -129,6 +130,7 @@ fun SettingsPage() {
             }
             if (BuildConfig.DEBUG) {
                 item {
+                    @SuppressLint("HardcodedComposeText")
                     ListItem(
                         content = { Text("Dev Options") },
                         leadingContent = {
@@ -250,6 +252,7 @@ fun GeneralSettingsPage() {
 }
 
 
+@SuppressLint("HardcodedComposeText")
 @Composable
 internal fun DebugOptionsView(viewModel: DebugOptionViewModel = koinViewModel()) {
     Scaffold { padding ->

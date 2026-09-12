@@ -49,7 +49,7 @@ abstract class DrawerViewModel : ViewModel() {
     abstract val sortedSubscriptions: StateFlow<List<Thing.Subreddit>>
     abstract val multis: StateFlow<List<Thing.Multi>>
     abstract fun initialize()
-    abstract fun setActiveAccount(accountId: Int)
+    abstract suspend fun setActiveAccount(accountId: Int)
     abstract fun toggleSelectAccount()
     abstract fun logout()
     abstract fun createAuthIntent(): Intent
@@ -139,18 +139,16 @@ class DrawerViewModelImpl(
     }
 
 
-    override fun setActiveAccount(accountId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (activeAccount.first().id == accountId) return@launch
-            accountsRepository.setActiveAccount(accountId)
-            val account = activeAccount.first()
-            Log.d(
-                "LoginViewModel",
-                "Setting active account to '${activeAccount.first().info?.username ?: "Anonymous"}'"
-            )
-            if (account.info?.username.isNullOrBlank() && !account.isAnonymous()) {
-                fetchUserInfo()
-            }
+    override suspend fun setActiveAccount(accountId: Int) {
+        if (activeAccount.first().id == accountId) return
+        accountsRepository.setActiveAccount(accountId)
+        val account = activeAccount.first()
+        Log.d(
+            "LoginViewModel",
+            "Setting active account to '${activeAccount.first().info?.username ?: "Anonymous"}'"
+        )
+        if (account.info?.username.isNullOrBlank() && !account.isAnonymous()) {
+            fetchUserInfo()
         }
     }
 
