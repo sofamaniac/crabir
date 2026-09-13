@@ -103,10 +103,13 @@ fun PostCreator(
             }
         }
     }
+
+    var showDraftDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         modifier = Modifier.imePadding(),
         topBar = {
-            EditorTopBar(onDismissRequest, ::submit)
+            EditorTopBar({ showDraftDialog = true }, ::submit)
         },
         bottomBar = {
             EditorBottomBar(viewModel.textState)
@@ -273,16 +276,46 @@ fun PostCreator(
             )
         }
     }
+
+    if (showDraftDialog) {
+        ThemedDialog(
+            onDismissRequest = { showDraftDialog = false },
+            title = {
+                Text(
+                    stringResource(R.string.create_draft_title),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            },
+            confirm = {
+                TextButton(onClick = {
+                    scope.launch {
+                        viewModel.saveDraft(selectedAccount)
+                    }.invokeOnCompletion {
+                        onDismissRequest()
+                    }
+                }) {
+                    Text(stringResource(R.string.save))
+                }
+            },
+            cancel = {
+                TextButton(onClick = onDismissRequest) {
+                    Text(stringResource(R.string.discard))
+                }
+            }
+        ) {
+            Text(stringResource(R.string.create_draft_content))
+        }
+    }
 }
 
 @Composable
 private fun EditorTopBar(
-    onDismissRequest: () -> Unit,
+    cancel: () -> Unit,
     submit: () -> Unit,
 ) {
     TopAppBar(
         navigationIcon = {
-            CloseButton { onDismissRequest() }
+            CloseButton { cancel() }
         },
         title = { Text(stringResource(R.string.create_post)) },
         actions = {

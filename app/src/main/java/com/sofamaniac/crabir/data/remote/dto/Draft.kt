@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 @Serializable
+/** @property optionalText Text when kind is a link */
 data class Draft(
     val subreddit: Fullname,
     val kind: String,
@@ -24,6 +25,12 @@ data class Draft(
     val body: DraftBody?,
     @Serializable(with = InstantAsLongSerializer::class)
     val created: Instant,
+    @Serializable(with = InstantAsLongSerializer::class)
+    val modified: Instant = Instant.fromEpochMilliseconds(0),
+    val nsfw: Boolean,
+    val spoiler: Boolean,
+    @SerialName("optional_text")
+    val optionalText: String? = null,
 )
 
 @Serializable

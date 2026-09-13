@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
 import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.remote.dto.DraftBody
+import com.sofamaniac.crabir.data.remote.reddit.DraftSubmit
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.GalleryItem
 import com.sofamaniac.crabir.data.remote.reddit.MediaUploadInterface
@@ -80,7 +81,7 @@ abstract class CreatorViewModel(
 
 @KoinViewModel
 class PostCreatorViewModel(
-    @InjectedParam draftId: String? = null,
+    @InjectedParam private val draftId: String? = null,
     api: RedditAPIService,
     private val draftsRepository: DraftsRepository,
     private val communities: SubredditDao,
@@ -116,6 +117,7 @@ class PostCreatorViewModel(
                 if (draft.kind == "link") {
                     urlState.edit { insert(0, draft.body.toString()) }
                     state = state.copy(kind = Kind.Link)
+                    textState.edit { insert(0, draft.optionalText ?: "") }
                 } else if (draft.body is DraftBody.Text) {
                     textState.edit { insert(0, draft.body.text) }
                 } else {
@@ -234,6 +236,30 @@ class PostCreatorViewModel(
                 }
             } else {
                 Result.failure(Exception("Failed to submit post: ${res.exceptionOrNull()}"))
+            }
+        }
+    }
+
+    suspend fun saveDraft(account: RedditAccount?) {
+        val title = (titleState.text as String).let { it.ifBlank { null } }
+        val url = (urlState.text as String).let { it.ifBlank { null } }
+        val text = (textState.text as String).let { it.ifBlank { null } }
+        val draft = DraftSubmit(
+            id = draftId,
+            title = title,
+            url = url,
+            text = text,
+            subreddit = community,
+            nsfw = state.nsfw,
+            spoiler = state.spoiler,
+            flairId = state.flairId,
+            flairText = state.flairText,
+        )
+        if (draft.check()) {
+            if (draftId != null) {
+                draftsRepository.updateDraft(draft, account)
+            } else {
+                draftsRepository.createDraft(draft, account)
             }
         }
     }

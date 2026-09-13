@@ -4,7 +4,9 @@ import android.util.Log
 import com.sofamaniac.crabir.data.remote.dto.Draft
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.data.remote.reddit.DraftAPI
+import com.sofamaniac.crabir.data.remote.reddit.DraftSubmit
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,4 +32,23 @@ class DraftsRepository(private val api: DraftAPI) {
                 draftResponse.subreddits.map { SubredditDTOMapper.map(it) }.associateBy { it.name }
         }
     }
+
+    suspend fun updateDraft(
+        draft: DraftSubmit,
+        account: RedditAccount?,
+    ): Result<Unit> {
+        if (!draft.check()) return Result.failure(InvalidDraftSubmit())
+        return api.updateDraft(draft.build(), account)
+    }
+
+    suspend fun createDraft(draft: DraftSubmit, account: RedditAccount?): Result<Unit> {
+        if (!draft.check()) return Result.failure(InvalidDraftSubmit())
+        return api.createDraft(draft.build(), account)
+    }
+
+    suspend fun deleteDraft(draftId: String): Result<Unit> {
+        return api.deleteDraft(draftId)
+    }
 }
+
+class InvalidDraftSubmit : Error("Invalid draft submission")

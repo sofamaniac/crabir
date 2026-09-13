@@ -15,7 +15,7 @@ import androidx.compose.ui.window.Dialog
 fun ThemedDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
-    roundedCorners: Boolean = false,
+    roundedCorners: Boolean = true,
     title: (@Composable () -> Unit)? = null,
     cancel: (@Composable () -> Unit)? = null,
     confirm: (@Composable () -> Unit)? = null,
@@ -23,7 +23,7 @@ fun ThemedDialog(
 ) {
     Dialog(onDismissRequest) {
         ThemedCard(modifier = modifier, roundedCorners) {
-            Column(modifier = Modifier.padding(8.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 title?.invoke()
                 if (title != null) Spacer(modifier = Modifier.height(8.dp))
                 content()
