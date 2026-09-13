@@ -6,12 +6,12 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
 import kotlinx.serialization.Serializable
 import retrofit2.http.DELETE
-import retrofit2.http.Field
 import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Query
 import retrofit2.http.Tag
 
 interface DraftAPI {
@@ -34,7 +34,7 @@ interface DraftAPI {
     ): Result<Unit>
 
     @DELETE("api/v1/draft")
-    suspend fun deleteDraft(@Field("draft_id") id: String): Result<Unit>
+    suspend fun deleteDraft(@Query("draft_id") id: String): Result<Unit>
 }
 
 @Serializable

@@ -371,4 +371,9 @@
     <string name="clear_history_dialog">Effacer l\'historique</string>
     <string name="clear">Effacer</string>
     <string name="clear_history_dialog_content">Êtes-vous sûr de vouloir effacer l\'historique ?</string>
+    <string name="drafts_page_title">Brouillons</string>
+    <string name="discard">Ignorer</string>
+    <string name="create_draft_title">Brouillon</string>
+    <string name="create_draft_content">Sauvegarder le brouillon</string>
+    <string name="delete_draft_content">Supprimer le brouillon</string>
 </resources>

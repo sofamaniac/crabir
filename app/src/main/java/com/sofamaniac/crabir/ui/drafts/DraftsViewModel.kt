@@ -31,4 +31,10 @@ class DraftsViewModel(private val repository: DraftsRepository) : ViewModel() {
             repository.getDrafts()
         }.invokeOnCompletion { refreshing.value = false }
     }
+
+    fun delete(draft: Draft) {
+        viewModelScope.launch {
+            repository.deleteDraft(draft.id)
+        }
+    }
 }

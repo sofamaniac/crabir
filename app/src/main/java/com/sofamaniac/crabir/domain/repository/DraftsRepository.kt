@@ -10,6 +10,7 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import org.koin.core.annotation.Single
 
 @Single
@@ -48,6 +49,11 @@ class DraftsRepository(private val api: DraftAPI) {
 
     suspend fun deleteDraft(draftId: String): Result<Unit> {
         return api.deleteDraft(draftId)
+            .onSuccess {
+                _drafts.update { drafts ->
+                    drafts.filter { it.id != draftId }
+                }
+            }
     }
 }
 
