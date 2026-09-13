@@ -97,7 +97,7 @@ fun CrosspostCreator(
     val accounts by viewModel.accounts.collectAsState(emptyList())
     Box {
         Scaffold(
-            modifier = Modifier.background(theme.cardBackground),
+            containerColor = theme.cardBackground,
             snackbarHost = { SnackbarHost(snackbar) },
             topBar = {
                 TopAppBar(

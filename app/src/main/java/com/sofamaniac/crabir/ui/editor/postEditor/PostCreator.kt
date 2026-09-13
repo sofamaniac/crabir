@@ -50,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalRedditAccount
+import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.InvalidUrl
@@ -105,9 +106,11 @@ fun PostCreator(
     }
 
     var showDraftDialog by remember { mutableStateOf(false) }
+    val theme = LocalTheme.current
 
     Scaffold(
         modifier = Modifier.imePadding(),
+        containerColor = theme.cardBackground,
         topBar = {
             EditorTopBar({ showDraftDialog = true }, ::submit)
         },
