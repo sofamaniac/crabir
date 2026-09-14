@@ -64,8 +64,8 @@ class AccountManager(
             val accessToken = response.getOrNull()!!
             val authResponse =
                 AuthorizationResponse.Builder(serviceConfig.createAuthorizationRequest())
-                    .setAccessToken(accessToken.access_token)
-                    .setAccessTokenExpiresIn(accessToken.expires_in)
+                    .setAccessToken(accessToken.accessToken)
+                    .setAccessTokenExpiresIn(accessToken.expiresIn)
                     .build()
             val tokenRequest = TokenRequest.Builder(
                 serviceConfig.authorizationServiceConfiguration(),
@@ -74,8 +74,8 @@ class AccountManager(
                 TokenRequest.GRANT_TYPE_CLIENT_CREDENTIALS
             ).build()
             val tokenResponse =
-                TokenResponse.Builder(tokenRequest).setAccessToken(accessToken.access_token)
-                    .setAccessTokenExpiresIn(accessToken.expires_in ?: Long.MAX_VALUE)
+                TokenResponse.Builder(tokenRequest).setAccessToken(accessToken.accessToken)
+                    .setAccessTokenExpiresIn(accessToken.expiresIn ?: Long.MAX_VALUE)
                     .setScope(accessToken.scope)
                     .build()
             val state = AuthState(authResponse, tokenResponse, null)

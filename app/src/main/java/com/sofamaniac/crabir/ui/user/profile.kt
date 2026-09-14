@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.user
 
-import androidx.annotation.Keep
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,11 +25,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalSnackBarHost
-import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
@@ -39,48 +36,9 @@ import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.postFeed.PostFeedViewer
 import com.sofamaniac.crabir.ui.postFeed.PostView
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-
-@Serializable
-@Keep
-enum class ProfileTabs {
-    Overview, About, Posts, Comments, Saved, Upvoted, Downvoted, Hidden;
-
-    @Composable
-    fun stringResource(): String {
-        return stringResource(
-            when (this) {
-                Overview -> R.string.profile_tab_overview
-                About -> R.string.profile_tab_about
-                Posts -> R.string.profile_tab_submitted
-                Comments -> R.string.profile_tab_comments
-                Saved -> R.string.profile_tab_saved
-                Upvoted -> R.string.profile_tab_upvoted
-                Downvoted -> R.string.profile_tab_downvoted
-                Hidden -> R.string.profile_tab_hidden
-            }
-        )
-    }
-
-    companion object {
-        val publicTabs = listOf(Overview, About, Posts, Comments)
-        fun fromString(string: String): ProfileTabs {
-            return when (string.lowercase()) {
-                "about" -> About
-                "submitted" -> Posts
-                "comments" -> Comments
-                "saved" -> Saved
-                "upvoted" -> Upvoted
-                "downvoted" -> Downvoted
-                "hidden" -> Hidden
-                else -> Overview
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
