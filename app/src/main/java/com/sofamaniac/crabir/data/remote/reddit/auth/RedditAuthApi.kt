@@ -6,6 +6,7 @@ import android.util.Log
 import com.sofamaniac.crabir.settings.api.apiSettingsDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.openid.appauth.TokenResponse
 import okhttp3.Request
@@ -57,11 +58,15 @@ fun Request.isUnauthenticated(): Boolean {
 
 @Serializable
 data class AccessTokenResponse(
-    val access_token: String,
-    val device_id: String?,
-    val expires_in: Long?,
+    @SerialName("access_token")
+    val accessToken: String,
+    @SerialName("device_id")
+    val deviceId: String?,
+    @SerialName("expires_in")
+    val expiresIn: Long?,
     val scope: String,
-    val token_type: String,
+    @SerialName("token_type")
+    val tokenType: String,
 )
 
 fun getAuthorizationHeader(context: Context): String {
