@@ -45,24 +45,36 @@ data class CommentDTO(
     val permalink: String = "",
     @Serializable(with = EmptyStringOrListingSerializer::class)
     val replies: Thing.Listing<Thing> = emptyListing(),
-    val media_metadata: Map<String, MediaMetadata> = emptyMap(),
+    @SerialName("media_metadata")
+    val mediaMetadata: Map<String, MediaMetadata> = emptyMap(),
 
     // ================================================ //
     // AUTHOR INFORMATION
     // ================================================ //
     val author: String = "[deleted]",
-    val author_fullname: Fullname = Fullname("[deleted]"),
-    val author_is_blocked: Boolean = false,
-    val author_patreon_flair: Boolean = false,
-    val author_premium: Boolean = false,
+    @SerialName("author_fullname")
+    val authorFullname: Fullname = Fullname("[deleted]"),
+    @SerialName("author_is_blocked")
+    val authorIsBlocked: Boolean = false,
+    @SerialName("author_patreon_flair")
+    val authorPatreonFlair: Boolean = false,
+    @SerialName("author_premium")
+    val authorPremium: Boolean = false,
     // Author flair
-    val author_flair_background_color: String? = null,
-    val author_flair_css_class: String? = null,
-    val author_flair_richtext: List<LinkFlairRichtext> = emptyList(),
-    val author_flair_template_id: String? = null,
-    val author_flair_text: String? = null,
-    val author_flair_text_color: String? = null,
-    val author_flair_type: String? = null,
+    @SerialName("author_flair_background_color")
+    val authorFlairBackgroundColor: String? = null,
+    @SerialName("author_flair_css_class")
+    val authorFlairCssClass: String? = null,
+    @SerialName("author_flair_richtext")
+    val authorFlairRichtext: List<LinkFlairRichtext> = emptyList(),
+    @SerialName("author_flair_template_id")
+    val authorFlairTemplateId: String? = null,
+    @SerialName("author_flair_text")
+    val authorFlairText: String? = null,
+    @SerialName("author_flair_text_color")
+    val authorFlairTextColor: String? = null,
+    @SerialName("author_flair_type")
+    val authorFlairType: String? = null,
 
     val saved: Boolean = false,
     val likes: Boolean? = null,
@@ -71,9 +83,12 @@ data class CommentDTO(
     val ups: Int = 0,
 
     val subreddit: String = "",
-    val subreddit_id: String = "",
-    val subreddit_name_prefixed: String = "",
-    val subreddit_type: String = "",
+    @SerialName("subreddit_id")
+    val subredditId: String = "",
+    @SerialName("subreddit_name_prefixed")
+    val subredditNamePrefixed: String = "",
+    @SerialName("subreddit_type")
+    val subredditType: String = "",
 
     // FIELD WHEN MESSAGE
     val subject: String = "",
@@ -90,53 +105,82 @@ data class CommentDTO(
 
 
     @Serializable(with = InstantAsFloatSerializer::class)
-    val approved_at_utc: Instant? = null,
-    val approved_by: String? = null,
+    @SerialName("approved_at_utc")
+    val approvedAtUtc: Instant? = null,
+    @SerialName("approved_by")
+    val approvedBy: String? = null,
     val archived: Boolean = false,
-    val all_awardings: List<String> = emptyList(),
-    val associated_award: String? = null,
+    @SerialName("all_awardings")
+    val allAwardings: List<String> = emptyList(),
+    @SerialName("associated_award")
+    val associatedAward: String? = null,
     val awarders: List<String> = emptyList(),
     @Serializable(with = InstantAsFloatSerializer::class)
-    val banned_at_utc: Instant? = null,
-    val banned_by: String? = null,
-    val can_gild: Boolean = false,
-    val can_mod_post: Boolean = false,
+    @SerialName("banned_at_utc")
+    val bannedAtUtc: Instant? = null,
+    @SerialName("banned_by")
+    val bannedBy: String? = null,
+    @SerialName("can_gild")
+    val canGild: Boolean = false,
+    @SerialName("can_mod_post")
+    val canModPost: Boolean = false,
     val collapsed: Boolean = false,
-    val collapsed_because_crowd_control: Boolean? = null,
-    val collapsed_reason: String? = null,
+    @SerialName("collapsed_because_crowd_control")
+    val collapsedBecauseCrowdControl: Boolean? = null,
+    @SerialName("collapsed_reason")
+    val collapsedReason: String? = null,
     // TODO Replace with enum
-    val collapsed_reason_code: String? = null,
-    val comment_type: String? = null,
+    @SerialName("collapsed_reason_code")
+    val collapsedReasonCode: String? = null,
+    @SerialName("comment_type")
+    val commentType: String? = null,
     val controversiality: Int = 0,
     @Serializable(with = InstantAsFloatSerializer::class)
     val created: Instant,
     @Serializable(with = InstantAsFloatSerializer::class)
-    val created_utc: Instant,
+    @SerialName("created_utc")
+    val createdUtc: Instant,
     val distinguished: String? = null,
     @Serializable(with = FalseOrTimestampSerializer::class)
     val edited: Instant? = null,
     val gilded: Int = 0,
     // FIXME
     //val gildings: List<String>,
-    val is_submitter: Boolean = false,
-    val link_id: String = "",
+    @SerialName("is_submitter")
+    val isSubmitter: Boolean = false,
+    @SerialName("link_id")
+    val linkId: String = "",
     val locked: Boolean = false,
-    val mod_note: String? = null,
-    val mod_reason_by: String? = null,
-    val mod_reason_title: String? = null,
-    val mod_reports: List<String> = emptyList(),
-    val no_follow: Boolean = false,
-    val num_reports: Int? = null,
-    val removal_reason: String? = null,
+    @SerialName("mod_note")
+    val modNote: String? = null,
+    @SerialName("mod_reason_by")
+    val modReasonBy: String? = null,
+    @SerialName("mod_reason_title")
+    val modReasonTitle: String? = null,
+    @SerialName("mod_reports")
+    val modReports: List<String> = emptyList(),
+    @SerialName("no_follow")
+    val noFollow: Boolean = false,
+    @SerialName("num_reports")
+    val numReports: Int? = null,
+    @SerialName("removal_reason")
+    val removalReason: String? = null,
     // val report_reasons: String? = null,
-    val score_hidden: Boolean = false,
-    val send_replies: Boolean = false,
+    @SerialName("score_hidden")
+    val scoreHidden: Boolean = false,
+    @SerialName("send_replies")
+    val sendReplies: Boolean = false,
     val stickied: Boolean = false,
-    val top_awarded_type: String? = null,
-    val total_awards_received: Int = 0,
-    val treatment_tags: List<String> = emptyList(),
-    val unrepliable_reason: String? = null,
-    val user_reports: List<String> = emptyList(),
+    @SerialName("top_awarded_type")
+    val topAwardedType: String? = null,
+    @SerialName("total_awards_received")
+    val totalAwardsReceived: Int = 0,
+    @SerialName("treatment_tags")
+    val treatmentTags: List<String> = emptyList(),
+    @SerialName("unrepliable_reason")
+    val unrepliableReason: String? = null,
+    @SerialName("user_reports")
+    val userReports: List<String> = emptyList(),
 )
 
 object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
@@ -154,9 +198,9 @@ object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
         CommentData::subredditInfo fromValue from.toSubredditInfo()
         //CommentData::replies fromValue from.mapReplies()
         CommentData::replies fromValue from.countReplies()
-        CommentData::createdUtc fromProperty from::created_utc
-        CommentData::mediaMetadata fromProperty from::media_metadata
-        CommentData::isSubmitter fromProperty from::is_submitter
+        CommentData::createdUtc fromProperty from::createdUtc
+        CommentData::mediaMetadata fromProperty from::mediaMetadata
+        CommentData::isSubmitter fromProperty from::isSubmitter
     }
 
 }
@@ -164,8 +208,8 @@ object CommentDataMapper : ObjectMappie<CommentDTO, CommentData>() {
 object CommentMessageMapper : ObjectMappie<CommentDTO, Message>() {
     override fun map(from: CommentDTO): Message = mapping {
         Message::type fromValue from.getType()
-        Message::authorFullname fromProperty from::author_fullname
-        Message::createdUtc fromProperty from::created_utc
+        Message::authorFullname fromProperty from::authorFullname
+        Message::createdUtc fromProperty from::createdUtc
         Message::replies fromValue ""
     }
 }
@@ -180,7 +224,7 @@ fun CommentDTO.getParentInfo(): ParentInfo {
         name = parentId,
         title = title,
         subreddit = subreddit,
-        subredditPrefixed = subreddit_name_prefixed
+        subredditPrefixed = subredditNamePrefixed
     )
 }
 
@@ -196,25 +240,25 @@ private fun CommentDTO.mapReplies(): List<CommentType> = replies.data.children.m
 }
 
 private fun CommentDTO.markdown(): ParsedMarkdown {
-    return ParsedMarkdown(body, media_metadata)
+    return ParsedMarkdown(body, mediaMetadata)
 }
 
 
 private fun CommentDTO.toAuthorInfo() = AuthorInfo(
     username = author,
     flair = this.toAuthorFlair(),
-    authorFullname = author_fullname,
-    isAuthorBlocked = author_is_blocked,
-    hasPatreonFlair = author_patreon_flair,
-    isAuthorPremium = author_premium,
+    authorFullname = authorFullname,
+    isAuthorBlocked = authorIsBlocked,
+    hasPatreonFlair = authorPatreonFlair,
+    isAuthorPremium = authorPremium,
 )
 
 private fun CommentDTO.toAuthorFlair() = Flair(
-    text = author_flair_text ?: "",
-    backgroundColor = author_flair_background_color ?: "",
-    textColor = author_flair_text_color ?: "",
-    richtext = author_flair_richtext,
-    type = author_flair_type ?: ""
+    text = authorFlairText ?: "",
+    backgroundColor = authorFlairBackgroundColor ?: "",
+    textColor = authorFlairTextColor ?: "",
+    richtext = authorFlairRichtext,
+    type = authorFlairType ?: ""
 )
 
 private fun CommentDTO.toRelationship() = Relationship(
@@ -230,14 +274,14 @@ private fun CommentDTO.toScore() = Score(
     ups = ups,
     downs = downs,
     score = score,
-    hideScore = score_hidden,
+    hideScore = scoreHidden,
     upvoteRatio = ups.toDouble() / (ups + downs).toDouble().coerceAtLeast(1.0)
 )
 
 private fun CommentDTO.toSubredditInfo() = SubredditInfo(
     name = subreddit,
-    subredditId = SubredditId(subreddit_id),
-    subredditPrefixed = subreddit_name_prefixed,
+    subredditId = SubredditId(subredditId),
+    subredditPrefixed = subredditNamePrefixed,
     subredditSubscribers = 0,
-    subredditType = subreddit_type
+    subredditType = subredditType
 )
