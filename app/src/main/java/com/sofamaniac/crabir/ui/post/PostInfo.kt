@@ -19,7 +19,7 @@ import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.SearchRoute
+import com.sofamaniac.crabir.navigation.routes.SearchRoute
 import com.sofamaniac.crabir.settings.post.FlairSettings
 import com.sofamaniac.crabir.ui.components.Flair
 import com.sofamaniac.crabir.ui.components.Over18Cartouche

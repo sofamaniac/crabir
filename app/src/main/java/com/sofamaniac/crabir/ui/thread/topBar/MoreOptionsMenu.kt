@@ -16,7 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
+import com.sofamaniac.crabir.navigation.routes.CommentsSettingsRoute
 
 @Composable
 fun MoreOptionsMenu(

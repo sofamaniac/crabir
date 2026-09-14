@@ -44,9 +44,9 @@ import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.RichtextDocument
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.PostCreatorRoute
-import com.sofamaniac.crabir.navigation.SubredditInfoRoute
-import com.sofamaniac.crabir.navigation.SubredditRoute
+import com.sofamaniac.crabir.navigation.routes.PostCreatorRoute
+import com.sofamaniac.crabir.navigation.routes.SubredditInfoRoute
+import com.sofamaniac.crabir.navigation.routes.SubredditRoute
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.components.Over18Cartouche
 import com.sofamaniac.crabir.ui.components.SubredditIcon

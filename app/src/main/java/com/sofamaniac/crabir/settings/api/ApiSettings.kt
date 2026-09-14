@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.dataStore
-import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.DataStoreJsonSerializer
 import kotlinx.serialization.Serializable
 
@@ -18,9 +17,6 @@ data class ApiSettings(
 ) {
     val isConfigured: Boolean get() = !redditClientId.isNullOrBlank() && !redditRedirectUri.isNullOrBlank()
 }
-
-@Serializable
-object ApiSettingsRoute : Route
 
 val Context.apiSettingsDataStore by dataStore(
     fileName = "reboost_api_settings.json",

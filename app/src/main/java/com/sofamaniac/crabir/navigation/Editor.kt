@@ -5,34 +5,17 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.navigation.routes.CrosspostCreatorRoute
+import com.sofamaniac.crabir.navigation.routes.DraftsRoute
+import com.sofamaniac.crabir.navigation.routes.MessageEditorRoute
+import com.sofamaniac.crabir.navigation.routes.PostCreatorRoute
+import com.sofamaniac.crabir.navigation.routes.TextEditorRoute
 import com.sofamaniac.crabir.ui.drafts.DraftsView
 import com.sofamaniac.crabir.ui.editor.TextEditor
 import com.sofamaniac.crabir.ui.editor.crosspostEditor.CrosspostCreator
 import com.sofamaniac.crabir.ui.editor.postEditor.PostCreator
 import com.sofamaniac.crabir.ui.inbox.MessageEditor
-import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
-
-@Serializable
-class PostCreatorRoute(
-    val kind: Kind,
-    val communityNamePrefixed: String?,
-    val draftId: String? = null,
-) :
-    Route
-
-@Serializable
-class CrosspostCreatorRoute(val post: Fullname) : Route
-
-@Serializable
-class MessageEditorRoute(val parent: Fullname? = null) : Route
-
-@Serializable
-class TextEditorRoute(val name: Fullname, val initial: String) : Route
-
-@Serializable
-object DraftsRoute : Route
 
 fun NavGraphBuilder.editorGraph(navController: NavController) {
     composable<PostCreatorRoute>(

@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.SubredditInfoRoute
+import com.sofamaniac.crabir.navigation.routes.SubredditInfoRoute
 import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
 import com.sofamaniac.crabir.settings.views.viewSettingDataStore
 import com.sofamaniac.crabir.ui.components.TabBar

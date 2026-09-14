@@ -20,13 +20,13 @@ import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.navigation.HomeRoute
-import com.sofamaniac.crabir.navigation.InboxRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.ProfileRoute
-import com.sofamaniac.crabir.navigation.Route
-import com.sofamaniac.crabir.navigation.SearchRoute
-import com.sofamaniac.crabir.navigation.SubscriptionsRoute
+import com.sofamaniac.crabir.navigation.routes.HomeRoute
+import com.sofamaniac.crabir.navigation.routes.InboxRoute
+import com.sofamaniac.crabir.navigation.routes.ProfileRoute
+import com.sofamaniac.crabir.navigation.routes.Route
+import com.sofamaniac.crabir.navigation.routes.SearchRoute
+import com.sofamaniac.crabir.navigation.routes.SubscriptionsRoute
 
 @Composable
 fun TabBar(

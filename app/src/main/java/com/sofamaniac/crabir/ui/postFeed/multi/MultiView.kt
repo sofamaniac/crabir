@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.MultiInfoRoute
+import com.sofamaniac.crabir.navigation.routes.MultiInfoRoute
 import com.sofamaniac.crabir.settings.views.viewSettingDataStore
 import com.sofamaniac.crabir.ui.components.TabBar
 import com.sofamaniac.crabir.ui.postFeed.FullFeedView

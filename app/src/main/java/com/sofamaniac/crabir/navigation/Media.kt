@@ -14,13 +14,16 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.navigation.routes.FullscreenGalleryRoute
+import com.sofamaniac.crabir.navigation.routes.FullscreenImageRoute
+import com.sofamaniac.crabir.navigation.routes.FullscreenVideoRoute
+import com.sofamaniac.crabir.navigation.routes.SimpleImageRoute
 import com.sofamaniac.crabir.ui.media.SimpleFullscreenImage
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.image.TransformableImage
 import com.sofamaniac.crabir.ui.media.videoPlayer.FullscreenVideo
 import com.sofamaniac.crabir.ui.post.FullscreenGallery
 import com.sofamaniac.crabir.ui.post.FullscreenImageView
-import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
 val URLS = listOf(
@@ -28,18 +31,6 @@ val URLS = listOf(
     "preview.redd.it",
     "i.redd.it"
 )
-
-@Serializable
-data class SimpleImageRoute(val url: String) : Route
-
-@Serializable
-class FullscreenImageRoute(val post: Fullname) : Route
-
-@Serializable
-class FullscreenVideoRoute(val post: Fullname) : Route
-
-@Serializable
-class FullscreenGalleryRoute(val post: Fullname, val page: Int = 0) : Route
 
 fun NavGraphBuilder.imagesGraph(navController: NavController) {
     for (base in URLS) {

@@ -18,10 +18,10 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.navigation.FullscreenGalleryRoute
-import com.sofamaniac.crabir.navigation.FullscreenImageRoute
-import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.routes.FullscreenGalleryRoute
+import com.sofamaniac.crabir.navigation.routes.FullscreenImageRoute
+import com.sofamaniac.crabir.navigation.routes.FullscreenVideoRoute
 import com.sofamaniac.crabir.ui.media.image.TransformableImage
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 

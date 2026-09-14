@@ -54,7 +54,7 @@ import com.sofamaniac.crabir.domain.model.Richtext
 import com.sofamaniac.crabir.domain.model.RichtextDocument
 import com.sofamaniac.crabir.domain.model.TableAlignment
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.SimpleImageRoute
+import com.sofamaniac.crabir.navigation.routes.SimpleImageRoute
 import com.sofamaniac.crabir.ui.protectedTouch
 
 @Composable

@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.dataStore
-import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.DataStoreJsonSerializer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
@@ -90,9 +89,6 @@ object PostSettingsDefaults {
     )
 
 }
-
-@Serializable
-object PostSettingsRoute : Route
 
 val Context.postSettingsDataStore by dataStore(
     fileName = "reboost_postSettings.json",

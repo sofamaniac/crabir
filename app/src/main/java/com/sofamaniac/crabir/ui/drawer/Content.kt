@@ -50,12 +50,12 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.subreddit.dummySubredditData
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.navigation.HomeRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.MultiRoute
-import com.sofamaniac.crabir.navigation.Route
-import com.sofamaniac.crabir.navigation.SearchRoute
-import com.sofamaniac.crabir.navigation.SubredditRoute
+import com.sofamaniac.crabir.navigation.routes.HomeRoute
+import com.sofamaniac.crabir.navigation.routes.MultiRoute
+import com.sofamaniac.crabir.navigation.routes.Route
+import com.sofamaniac.crabir.navigation.routes.SearchRoute
+import com.sofamaniac.crabir.navigation.routes.SubredditRoute
 import com.sofamaniac.crabir.ui.drawer.buttons.BlurTile
 import com.sofamaniac.crabir.ui.drawer.buttons.DarkModeTile
 import com.sofamaniac.crabir.ui.drawer.buttons.MultiTile

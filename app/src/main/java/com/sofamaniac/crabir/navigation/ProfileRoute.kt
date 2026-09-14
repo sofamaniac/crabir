@@ -7,17 +7,10 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.LocalRedditAccount
+import com.sofamaniac.crabir.navigation.routes.ProfileRoute
+import com.sofamaniac.crabir.navigation.routes.SavedRoute
 import com.sofamaniac.crabir.ui.user.ProfileTabs
 import com.sofamaniac.crabir.ui.user.ProfileView
-import kotlinx.serialization.Serializable
-
-@Serializable
-class ProfileRoute(val username: String, val tab: ProfileTabs = ProfileTabs.Overview) : Route
-
-@Serializable
-object SavedRoute : Route {
-    const val URL = "crabir://saved"
-}
 
 val baseUrls = listOf("user/{author}", "u/{author}")
 

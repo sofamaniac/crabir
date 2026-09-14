@@ -38,25 +38,24 @@ import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.remote.interceptors.CountInterceptor
-import com.sofamaniac.crabir.navigation.DebugOptionsRoute
-import com.sofamaniac.crabir.navigation.FiltersSettingRoute
-import com.sofamaniac.crabir.navigation.LicensesRoute
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.Route
-import com.sofamaniac.crabir.navigation.ThemeRoute
-import com.sofamaniac.crabir.navigation.ViewsSettingRoute
-import com.sofamaniac.crabir.settings.api.ApiSettingsRoute
-import com.sofamaniac.crabir.settings.comments.CommentsSettingsRoute
-import com.sofamaniac.crabir.settings.data.DataSettingsRoute
-import com.sofamaniac.crabir.settings.feedSettings.FeedSettingsRoute
-import com.sofamaniac.crabir.settings.history.HistorySettingsRoute
-import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuSettingsRoute
-import com.sofamaniac.crabir.settings.post.PostSettingsRoute
+import com.sofamaniac.crabir.navigation.routes.ApiSettingsRoute
+import com.sofamaniac.crabir.navigation.routes.CommentsSettingsRoute
+import com.sofamaniac.crabir.navigation.routes.DataSettingsRoute
+import com.sofamaniac.crabir.navigation.routes.DebugOptionsRoute
+import com.sofamaniac.crabir.navigation.routes.FeedSettingsRoute
+import com.sofamaniac.crabir.navigation.routes.FiltersSettingRoute
+import com.sofamaniac.crabir.navigation.routes.GeneralSettingsRoute
+import com.sofamaniac.crabir.navigation.routes.HistorySettingsRoute
+import com.sofamaniac.crabir.navigation.routes.LateralMenuSettingsRoute
+import com.sofamaniac.crabir.navigation.routes.LicensesRoute
+import com.sofamaniac.crabir.navigation.routes.PostSettingsRoute
+import com.sofamaniac.crabir.navigation.routes.ThemeRoute
+import com.sofamaniac.crabir.navigation.routes.ViewsSettingRoute
 import com.sofamaniac.crabir.ui.BackButton
 import com.sofamaniac.crabir.ui.components.ListItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.annotation.KoinViewModel
 
@@ -166,9 +165,6 @@ fun SettingsPage() {
         }
     }
 }
-
-@Serializable
-object GeneralSettingsRoute : Route
 
 @Composable
 fun GeneralSettingsPage() {

@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.dataStore
-import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.DataStoreJsonSerializer
 import kotlinx.serialization.Serializable
 
@@ -44,9 +43,6 @@ data class LateralMenuItems(
 object LateralMenuSettingsDefault {
     val default = LateralMenuSettings()
 }
-
-@Serializable
-object LateralMenuSettingsRoute : Route
 
 val Context.lateralMenuSettingsDataStore by dataStore(
     fileName = "reboost_lateralMenu.json",

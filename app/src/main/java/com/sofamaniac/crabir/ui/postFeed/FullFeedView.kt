@@ -23,7 +23,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.PostCreatorRoute
+import com.sofamaniac.crabir.navigation.routes.PostCreatorRoute
 import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.postFeed.components.BottomSheet

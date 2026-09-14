@@ -7,7 +7,7 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
-import com.sofamaniac.crabir.navigation.SavedRoute
+import com.sofamaniac.crabir.navigation.routes.SavedRoute
 
 @Composable
 fun SetShortcuts() {

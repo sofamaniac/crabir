@@ -14,16 +14,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.toRoute
+import com.sofamaniac.crabir.navigation.routes.PostRoute
 import com.sofamaniac.crabir.ui.thread.ThreadView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
 import okhttp3.OkHttpClient
 import okhttp3.Request
-
-@Serializable
-class PostRoute(val postPermalink: String, val comment: String? = null, val context: Int? = null) :
-    Route
 
 
 private const val ROUTE = "/r/{subreddit}/comments/{id}/{title}"

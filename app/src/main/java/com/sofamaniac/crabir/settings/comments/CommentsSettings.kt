@@ -8,7 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.dataStore
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
-import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.DataStoreJsonSerializer
 import com.sofamaniac.crabir.settings.views.ImageHeight
 import kotlinx.serialization.Serializable
@@ -69,5 +68,3 @@ internal fun rememberCommentsSettings(): CommentsSettings? {
 }
 
 
-@Serializable
-object CommentsSettingsRoute : Route

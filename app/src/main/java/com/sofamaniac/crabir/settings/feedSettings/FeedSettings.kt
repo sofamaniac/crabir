@@ -9,7 +9,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.dataStore
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
-import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.DataStoreJsonSerializer
 import kotlinx.serialization.Serializable
 
@@ -21,12 +20,6 @@ data class FeedSettings(
     val defaultTimeframe: Timeframe? = null,
     val rememberSort: Boolean = true,
 )
-
-@Serializable
-object FeedSettingsRoute : Route
-
-@Serializable
-object SortManagerRoute : Route
 
 val Context.feedSettingsStore by dataStore(
     fileName = "reboost_feedSettings.json",

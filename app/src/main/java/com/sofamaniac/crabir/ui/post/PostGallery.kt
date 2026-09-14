@@ -43,8 +43,8 @@ import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Gallery
 import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.navigation.FullscreenGalleryRoute
-import com.sofamaniac.crabir.navigation.Route
+import com.sofamaniac.crabir.navigation.routes.FullscreenGalleryRoute
+import com.sofamaniac.crabir.navigation.routes.Route
 import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.settings.data.NetworkPolicy
 import com.sofamaniac.crabir.settings.history.SaveToHistory

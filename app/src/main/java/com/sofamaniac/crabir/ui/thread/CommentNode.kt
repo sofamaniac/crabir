@@ -39,7 +39,7 @@ import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.ProfileRoute
+import com.sofamaniac.crabir.navigation.routes.ProfileRoute
 import com.sofamaniac.crabir.settings.theme.ADMIN_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.AUTHOR_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.MODERATOR_CARTOUCHE_COLOR

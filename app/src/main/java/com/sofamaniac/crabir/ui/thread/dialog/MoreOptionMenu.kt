@@ -26,7 +26,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.Kind
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.TextEditorRoute
+import com.sofamaniac.crabir.navigation.routes.TextEditorRoute
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.thread.CommentViewModel
 import com.sofamaniac.crabir.ui.votable.ReportMenu

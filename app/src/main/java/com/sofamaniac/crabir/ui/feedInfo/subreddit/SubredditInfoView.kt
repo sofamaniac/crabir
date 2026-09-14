@@ -31,7 +31,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.utils.fromHtml
 import com.sofamaniac.crabir.domain.model.RichtextDocument
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.SearchRoute
+import com.sofamaniac.crabir.navigation.routes.SearchRoute
 import com.sofamaniac.crabir.ui.BackButton
 import com.sofamaniac.crabir.ui.components.SubredditIcon
 import com.sofamaniac.crabir.ui.richtext.Richtext

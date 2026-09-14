@@ -10,7 +10,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.datastore.dataStore
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Quality
-import com.sofamaniac.crabir.navigation.Route
 import com.sofamaniac.crabir.settings.DataStoreJsonSerializer
 import kotlinx.serialization.Serializable
 
@@ -112,5 +111,3 @@ internal fun rememberDataSettings(): DataSettings? {
     return dataSettings
 }
 
-@Serializable
-object DataSettingsRoute : Route

@@ -22,9 +22,9 @@ import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.SearchRoute
-import com.sofamaniac.crabir.navigation.SubredditInfoRoute
-import com.sofamaniac.crabir.navigation.SubredditRoute
+import com.sofamaniac.crabir.navigation.routes.SearchRoute
+import com.sofamaniac.crabir.navigation.routes.SubredditInfoRoute
+import com.sofamaniac.crabir.navigation.routes.SubredditRoute
 import com.sofamaniac.crabir.ui.BackButton
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.components.MultiIcon

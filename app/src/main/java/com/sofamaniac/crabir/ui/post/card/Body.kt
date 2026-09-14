@@ -14,8 +14,8 @@ import com.sofamaniac.crabir.LocalFiltersSettings
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.PostRoute
-import com.sofamaniac.crabir.navigation.Route
+import com.sofamaniac.crabir.navigation.routes.PostRoute
+import com.sofamaniac.crabir.navigation.routes.Route
 import com.sofamaniac.crabir.settings.views.ImageHeight
 import com.sofamaniac.crabir.ui.markdown.HeightRestrictedWithGradient
 import com.sofamaniac.crabir.ui.post.PostGallery

@@ -70,8 +70,8 @@ import com.sofamaniac.crabir.data.remote.reddit.CommunitySearchSort
 import com.sofamaniac.crabir.data.remote.reddit.PostSearchSort
 import com.sofamaniac.crabir.domain.repository.search.PostSearchParams
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.ProfileRoute
-import com.sofamaniac.crabir.navigation.SearchRoute
+import com.sofamaniac.crabir.navigation.routes.ProfileRoute
+import com.sofamaniac.crabir.navigation.routes.SearchRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.ui.BackButton
 import com.sofamaniac.crabir.ui.components.ListItem

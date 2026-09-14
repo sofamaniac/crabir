@@ -32,8 +32,8 @@ import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Quality
-import com.sofamaniac.crabir.navigation.FullscreenVideoRoute
-import com.sofamaniac.crabir.navigation.Route
+import com.sofamaniac.crabir.navigation.routes.FullscreenVideoRoute
+import com.sofamaniac.crabir.navigation.routes.Route
 import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR
 import com.sofamaniac.crabir.settings.theme.VIDEO_CARTOUCHE_COLOR
