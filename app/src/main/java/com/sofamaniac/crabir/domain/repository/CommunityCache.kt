@@ -5,9 +5,7 @@ import com.sofamaniac.crabir.data.local.dao.CommunityDao
 import com.sofamaniac.crabir.domain.model.CommunityData
 import com.sofamaniac.crabir.domain.model.Fullname
 import kotlinx.coroutines.flow.Flow
-import org.koin.core.annotation.Singleton
 
-@Singleton
 abstract class CommunityCache<T : CommunityData>(val dao: CommunityDao<T>) : Cache<T> {
     override suspend fun insert(thing: T) {
         dao.insert(thing)

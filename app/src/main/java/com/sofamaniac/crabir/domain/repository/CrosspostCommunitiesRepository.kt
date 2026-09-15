@@ -7,12 +7,13 @@ import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import org.koin.core.annotation.ViewModelScope
 
 @ViewModelScope
 class CrosspostCommunitiesRepository(
     val api: RedditAPIService,
-    override val cache: CommunityCache<SubredditData>,
+    override val cache: SubredditCache,
 ) : ListingRepository<RedditAccount?, SubredditData>() {
     override fun thingToData(thing: Thing): SubredditData? {
         return when (thing) {
