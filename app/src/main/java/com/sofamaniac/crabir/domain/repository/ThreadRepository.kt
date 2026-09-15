@@ -67,6 +67,7 @@ class ThreadRepositoryNew(
     ThreadRepository {
 
     private var post: PostData? = null
+
     private val forest: MutableStateFlow<List<Fullname>> = MutableStateFlow(emptyList())
     override val comments: StateFlow<Iterable<Fullname>> = forest
 
@@ -78,6 +79,7 @@ class ThreadRepositoryNew(
         context: Int? = null,
     ) {
         if (post != null && forest.value.isNotEmpty()) {
+            Log.d("ThreadRepository", "fetchThread: post already loaded")
             return
         }
         val response = api.getThread(permalink, sort = sort, comment = comment, context = context)
@@ -97,6 +99,8 @@ class ThreadRepositoryNew(
                 this.forest.value = list.map { it.name }
                 postsRepository.insert(listOf(post!!))
             }
+        } else {
+            Log.e("ThreadRepository", "fetchThread: ${response.exceptionOrNull()}")
         }
     }
 
