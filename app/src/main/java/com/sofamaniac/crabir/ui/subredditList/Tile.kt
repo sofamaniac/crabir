@@ -13,15 +13,17 @@ import com.sofamaniac.crabir.ui.components.SubredditIcon
 
 @Composable
 fun Tile(subreddit: SubredditData, modifier: Modifier = Modifier) {
-    ListItem(leadingContent = {
-        SubredditIcon(
-            subreddit.displayName,
-            subreddit.icon,
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-        )
-    }) {
+    ListItem(
+        modifier = modifier,
+        leadingContent = {
+            SubredditIcon(
+                subreddit.displayName,
+                subreddit.icon,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+            )
+        }) {
         Text(text = subreddit.displayName)
     }
 }
