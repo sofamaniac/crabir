@@ -108,7 +108,7 @@ fun CrosspostCreator(
                     actions = {
                         IconButton(onClick = {
                             scope.launch {
-                                val res = viewModel.submit(account = null)
+                                val res = viewModel.submit(account = selectedAccount)
                                 if (res.isSuccess) {
                                     navController?.popBackStack()
                                 } else {

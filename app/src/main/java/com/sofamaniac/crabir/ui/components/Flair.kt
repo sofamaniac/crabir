@@ -94,6 +94,7 @@ fun mapColor(color: String, default: Color = Color.Transparent): Color {
     } else when (color) {
         "light" -> Color.White
         "dark" -> Color.Black
+        "transparent" -> Color.Transparent
         "" -> default
         else -> {
             Log.e("Flair.mapColor", "Could not parse color: $color")
