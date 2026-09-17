@@ -15,11 +15,9 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,6 +46,7 @@ import com.sofamaniac.crabir.navigation.routes.Route
 import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.settings.data.NetworkPolicy
 import com.sofamaniac.crabir.settings.history.SaveToHistory
+import com.sofamaniac.crabir.ui.components.ImageError
 import com.sofamaniac.crabir.ui.components.cartouche
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
@@ -230,15 +229,7 @@ fun EmbeddedGallery(
                                 "PostGallery",
                                 "Unsupported media type: ${metadata.javaClass.name}"
                             )
-                            Surface(
-                                modifier = Modifier.fillMaxSize(),
-                                color = Color(154, 154, 154, 255)
-                            ) {
-                                Icon(
-                                    Icons.Default.Warning,
-                                    contentDescription = "Content not found"
-                                )
-                            }
+                            ImageError()
                         }
                     }
                 }
@@ -372,12 +363,7 @@ fun FullscreenGallery(
 
 
                 else -> {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = Color(154, 154, 154, 255)
-                    ) {
-                        Icon(Icons.Default.Warning, contentDescription = "Content not found")
-                    }
+                    ImageError()
                 }
             }
         }
