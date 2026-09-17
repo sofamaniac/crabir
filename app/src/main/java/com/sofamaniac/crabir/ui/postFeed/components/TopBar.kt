@@ -31,6 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalFeedSettings
@@ -107,7 +109,10 @@ fun TopBar(
         scrollBehavior = scrollBehavior,
         colors = rememberTopAppBarColors(),
         title = {
-            Column(horizontalAlignment = Alignment.Start) {
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.semantics { isTraversalGroup = true }
+            ) {
                 Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 val sortString = stringResource(params.sort.representation)
                 val timeString = params.timeframe?.let { stringResource(it.representation) }
