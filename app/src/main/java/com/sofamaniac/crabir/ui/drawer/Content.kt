@@ -26,6 +26,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -73,6 +74,7 @@ fun DrawerContent(
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     viewModel: DrawerViewModel = koinViewModel(),
+    snackbarHostState: SnackbarHostState? = LocalSnackBarHost.current,
 ) {
     val apiSettings = LocalApiSettings.current
     if (apiSettings.redditClientId.isNullOrBlank()) {
@@ -87,7 +89,6 @@ fun DrawerContent(
 
     viewModel.initialize()
 
-    val snackbarHostState = LocalSnackBarHost.current
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Error) {
             snackbarHostState?.showSnackbar(

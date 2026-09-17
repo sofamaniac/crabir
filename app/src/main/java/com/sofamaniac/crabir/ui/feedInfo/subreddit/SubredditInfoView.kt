@@ -30,6 +30,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.utils.fromHtml
 import com.sofamaniac.crabir.domain.model.RichtextDocument
+import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.SearchRoute
 import com.sofamaniac.crabir.ui.BackButton
@@ -40,7 +41,7 @@ import org.koin.core.parameter.parametersOf
 import java.util.Locale
 
 @Composable
-fun SubredditInfoView(
+fun SubredditInfoViewScaffold(
     subreddit: String,
     viewModel: SubredditInfoViewModel = koinViewModel { parametersOf(subreddit) },
 ) {
@@ -55,62 +56,15 @@ fun SubredditInfoView(
         if (infoOpt == null) return@Scaffold
 
         val info = infoOpt!!
-        LazyColumn(modifier = Modifier.padding(padding)) {
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    SubredditIcon(info.displayName, info.icon, modifier = Modifier.size(48.dp))
-                    Column {
-                        Text(info.displayNamePrefixed, style = MaterialTheme.typography.titleMedium)
-                        val num = remember {
-                            CompactDecimalFormat.getInstance(
-                                Locale.getDefault(),
-                                CompactDecimalFormat.CompactStyle.SHORT
-                            ).format(info.subscribers)
-                        }
-                        val members = LocalResources.current.getQuantityString(
-                            R.plurals.subreddit_subscribers_count,
-                            info.subscribers,
-                            num
-                        )
-                        Text(members, style = MaterialTheme.typography.labelSmall)
-                        TextButton(onClick = {}) {
-                            Text(stringResource(R.string.edit_flair_button_title))
-                        }
-                    }
-                }
+        SubredditInfoView(info, modifier = Modifier.padding(padding), subscribe = { subscribed ->
+            if (subscribed) {
+                viewModel.unsubscribe()
+            } else {
+                viewModel.unsubscribe()
             }
-            item {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SubscribeButton(info.userIsSubscriber) {
-                        if (info.userIsSubscriber) {
-                            viewModel.unsubscribe()
-                        } else {
-                            viewModel.subscribe()
-                        }
-                    }
-                    FavoriteButton(info.userHasFavorited) {
-                        viewModel.favorite(!info.userHasFavorited)
-                    }
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.MoreVert, contentDescription = null)
-                    }
-                }
-            }
-            item {
-                Richtext(
-                    document = RichtextDocument.fromHtml(info.descriptionHtml),
-                    mediaMetadata = emptyMap(),
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                )
-            }
-        }
+        }, favorite = { isFav ->
+            viewModel.favorite(!isFav)
+        })
     }
 }
 
@@ -134,4 +88,66 @@ internal fun TopBar(subreddit: String?) {
             }
         }
     )
+}
+
+
+@Composable
+fun SubredditInfoView(
+    info: SubredditData,
+    modifier: Modifier = Modifier,
+    subscribe: (isSub: Boolean) -> Unit,
+    favorite: (isFavorite: Boolean) -> Unit,
+) {
+    LazyColumn(modifier = modifier) {
+        item {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                SubredditIcon(info.displayName, info.icon, modifier = Modifier.size(48.dp))
+                Column {
+                    Text(info.displayNamePrefixed, style = MaterialTheme.typography.titleMedium)
+                    val num = remember {
+                        CompactDecimalFormat.getInstance(
+                            Locale.getDefault(),
+                            CompactDecimalFormat.CompactStyle.SHORT
+                        ).format(info.subscribers)
+                    }
+                    val members = LocalResources.current.getQuantityString(
+                        R.plurals.subreddit_subscribers_count,
+                        info.subscribers,
+                        num
+                    )
+                    Text(members, style = MaterialTheme.typography.labelSmall)
+                    TextButton(onClick = {}) {
+                        Text(stringResource(R.string.edit_flair_button_title))
+                    }
+                }
+            }
+        }
+        item {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SubscribeButton(info.userIsSubscriber) {
+                    subscribe(info.userIsSubscriber)
+                }
+                FavoriteButton(info.userHasFavorited) {
+                    favorite(info.userHasFavorited)
+                }
+                IconButton(onClick = {}) {
+                    Icon(Icons.Default.MoreVert, contentDescription = null)
+                }
+            }
+        }
+        item {
+            Richtext(
+                document = RichtextDocument.fromHtml(info.descriptionHtml),
+                mediaMetadata = emptyMap(),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+            )
+        }
+    }
 }

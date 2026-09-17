@@ -14,7 +14,7 @@ import com.sofamaniac.crabir.navigation.routes.ProfileRoute
 import com.sofamaniac.crabir.navigation.routes.SubredditInfoRoute
 import com.sofamaniac.crabir.navigation.routes.SubredditRoute
 import com.sofamaniac.crabir.ui.feedInfo.multi.MultiInfo
-import com.sofamaniac.crabir.ui.feedInfo.subreddit.SubredditInfoView
+import com.sofamaniac.crabir.ui.feedInfo.subreddit.SubredditInfoViewScaffold
 import com.sofamaniac.crabir.ui.postFeed.multi.MultiView
 import com.sofamaniac.crabir.ui.postFeed.subreddit.SubredditViewer
 import com.sofamaniac.crabir.ui.user.ProfileTabs
@@ -60,7 +60,7 @@ fun NavGraphBuilder.subredditGraph(navController: NavController) {
         typeMap = mapOf(typeOf<Fullname>() to NullableFullnameType)
     ) { navBackStackEntry ->
         val subreddit = navBackStackEntry.toRoute<SubredditInfoRoute>()
-        SubredditInfoView(subreddit.subreddit)
+        SubredditInfoViewScaffold(subreddit.subreddit)
     }
 
     composable<MultiInfoRoute> {
