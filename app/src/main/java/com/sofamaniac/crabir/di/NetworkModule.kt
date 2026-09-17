@@ -124,7 +124,7 @@ class NetworkModule {
             .readTimeout(30, TimeUnit.SECONDS)
             .build()
         return Retrofit.Builder()
-            .baseUrl("https://crabir.com")
+            .baseUrl("https://randdit.com")
             .client(client)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .addCallAdapterFactory(ResultCallAdapterFactory.create())
