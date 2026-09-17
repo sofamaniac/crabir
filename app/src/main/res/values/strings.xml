@@ -418,6 +418,8 @@
     <string name="create_draft_title">Draft</string>
     <string name="create_draft_content">Save draft?</string>
     <string name="delete_draft_content">Delete draft?</string>
+    <string name="subreddit_posts_tab">Posts</string>
+    <string name="subreddit_info_tab">About</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>

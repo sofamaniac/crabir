@@ -28,11 +28,11 @@ class SubredditInfoViewModel(
         }
     }
 
-    fun favorite(favorite: Boolean) {
+    fun favorite(target: Boolean) {
         val infoLoc = info.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            redditApi.favorite(info.value!!.displayName, !infoLoc.userHasFavorited).onSuccess {
-                info.value = infoLoc.copy(userHasFavorited = favorite)
+            redditApi.favorite(info.value!!.displayName, target).onSuccess {
+                info.value = infoLoc.copy(userHasFavorited = target)
                 info.value?.let { subredditCache.update(it) }
             }
         }

@@ -101,7 +101,8 @@ fun ProfileView(
                 },
                 bottomBar = {
                     TabBar(selected = 4)
-                }) { innerPadding ->
+                }
+            ) { innerPadding ->
                 Column(
                     verticalArrangement = Arrangement.Top, modifier = Modifier.padding(innerPadding)
                 ) {
