@@ -420,6 +420,8 @@
     <string name="delete_draft_content">Delete draft?</string>
     <string name="subreddit_posts_tab">Posts</string>
     <string name="subreddit_info_tab">About</string>
+    <string name="streamable_cartouche">Streamable</string>
+    <string name="gif_cartouche">Gif</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>

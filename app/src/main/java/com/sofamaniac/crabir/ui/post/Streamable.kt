@@ -10,12 +10,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalFiltersSettings
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.streamable.StreamableAPI
 import com.sofamaniac.crabir.data.remote.streamable.Video
 import com.sofamaniac.crabir.domain.model.PostData
@@ -83,10 +86,10 @@ fun StreamableVideo(
         goFullscreen = goFullscreen,
         cartouche = {
             Text(
-                "Streamable",
+                stringResource(R.string.streamable_cartouche),
                 modifier = Modifier
                     .padding(8.dp)
-                    .cartouche(GIF_CARTOUCHE_COLOR)
+                    .cartouche(colorResource(GIF_CARTOUCHE_COLOR))
             )
         }
     ) {

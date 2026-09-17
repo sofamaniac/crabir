@@ -18,9 +18,11 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -97,52 +99,55 @@ fun ColumnScope.FullscreenBottomBar(
     val currentAccount = LocalRedditAccount.current
     var showShareMenu by remember { mutableStateOf(false) }
     val upvoteOnSave = LocalPostSettings.current.linksSettings.upvoteOnSave
-    AnimatedVisibility(
-        visible = enabled,
-        modifier = Modifier
-            .fillMaxWidth()
-            .align(Alignment.CenterHorizontally)
-            .background(color = Color.Black.copy(alpha = 0.6f))
-            .navigationBarsPadding(),
-        label = "decoration animation"
-    ) {
-
-        Column(
-            verticalArrangement = Arrangement.Bottom,
-            modifier = Modifier.height(IntrinsicSize.Min)
+    CompositionLocalProvider(LocalContentColor provides theme.secondaryText) {
+        AnimatedVisibility(
+            visible = enabled,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally)
+                .background(color = Color.Black.copy(alpha = 0.6f))
+                .navigationBarsPadding(),
+            label = "decoration animation"
         ) {
-            title()
 
-            Text(
-                post.title,
-                style = MaterialTheme.typography.labelLarge.copy(color = Color.White),
-                modifier = Modifier.padding(start = 8.dp)
-            )
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                verticalArrangement = Arrangement.Bottom,
+                modifier = Modifier.height(IntrinsicSize.Min)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    UpButton(likes, onClick = { viewModel.upvote(post.name) })
-                    ScoreString(post.score.score, likes)
-                    DownButton(likes, onClick = { viewModel.downvote(post.name) })
-                }
-                SavedButton(saved, onClick = { viewModel.save(post.name, !saved, upvoteOnSave) })
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    OpenThreadButton {
-                        viewModel.markPost(post, currentAccount.id)
-                        navController?.navigate(PostRoute(post.permalink))
+                title()
+
+                Text(
+                    post.title,
+                    style = MaterialTheme.typography.labelLarge.copy(color = Color.White),
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        UpButton(likes, onClick = { viewModel.upvote(post.name) })
+                        ScoreString(post.score.score, likes)
+                        DownButton(likes, onClick = { viewModel.downvote(post.name) })
                     }
-                    Text("${post.numComments}", color = theme.secondaryText)
-                }
-                IconButton(onClick = { showShareMenu = true }) {
-                    Icon(
-                        Icons.Default.Share,
-                        contentDescription = "share",
-                        tint = theme.secondaryText
-                    )
+                    SavedButton(
+                        saved,
+                        onClick = { viewModel.save(post.name, !saved, upvoteOnSave) })
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        OpenThreadButton {
+                            viewModel.markPost(post, currentAccount.id)
+                            navController?.navigate(PostRoute(post.permalink))
+                        }
+                        Text("${post.numComments}", color = theme.secondaryText)
+                    }
+                    IconButton(onClick = { showShareMenu = true }) {
+                        Icon(
+                            Icons.Default.Share,
+                            contentDescription = "share",
+                        )
+                    }
                 }
             }
         }

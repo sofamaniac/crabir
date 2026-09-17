@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.media3.common.util.UnstableApi
@@ -88,7 +89,7 @@ fun PostVideo(
             text,
             modifier = Modifier
                 .padding(8.dp)
-                .cartouche(backgroundColor = cartoucheColor)
+                .cartouche(backgroundColor = colorResource(cartoucheColor))
         )
     }
 
@@ -200,7 +201,7 @@ fun YoutubeVideo(post: PostData, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(8.dp)
-                .cartouche(YOUTUBE_CARTOUCHE_COLOR)
+                .cartouche(colorResource(YOUTUBE_CARTOUCHE_COLOR))
         )
     }
 }

@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -317,19 +318,19 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
             Text(
                 authorString,
                 color = Color.White,
-                modifier = authorModifier.cartouche(AUTHOR_CARTOUCHE_COLOR)
+                modifier = authorModifier.cartouche(colorResource(AUTHOR_CARTOUCHE_COLOR))
             )
         } else if (comment.distinguished == "moderator") {
             Text(
                 authorString,
                 color = Color.White,
-                modifier = authorModifier.cartouche(MODERATOR_CARTOUCHE_COLOR)
+                modifier = authorModifier.cartouche(colorResource(MODERATOR_CARTOUCHE_COLOR))
             )
         } else if (comment.distinguished == "admin") {
             Text(
                 authorString,
                 color = Color.White,
-                modifier = authorModifier.cartouche(ADMIN_CARTOUCHE_COLOR)
+                modifier = authorModifier.cartouche(colorResource(ADMIN_CARTOUCHE_COLOR))
             )
         } else {
             Text(comment.author.username, color = theme.highlight, modifier = authorModifier)

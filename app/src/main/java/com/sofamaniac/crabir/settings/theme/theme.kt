@@ -185,12 +185,12 @@ val DefaultLightTheme = CrabirTheme(
     saved = Color(0xFFFFD740),
 )
 
-val AUTHOR_CARTOUCHE_COLOR = Color(0xFF448AFF)
-val MODERATOR_CARTOUCHE_COLOR = Color(0xFF388E3C)
-val GIF_CARTOUCHE_COLOR = Color(0xFF0097A7)
-val VIDEO_CARTOUCHE_COLOR = Color(0xFFE64A19)
-val ADMIN_CARTOUCHE_COLOR = Color(0xFFE64A19)
-val YOUTUBE_CARTOUCHE_COLOR = Color(0xFFC00000)
+val AUTHOR_CARTOUCHE_COLOR = R.color.author_cartouche
+val MODERATOR_CARTOUCHE_COLOR = R.color.moderator_cartouche
+val GIF_CARTOUCHE_COLOR = R.color.gif_cartouche
+val VIDEO_CARTOUCHE_COLOR = R.color.video_cartouche
+val ADMIN_CARTOUCHE_COLOR = R.color.admin_cartouche
+val YOUTUBE_CARTOUCHE_COLOR = R.color.youtube_cartouche
 
 enum class ThemeMode {
     Dark, Light, System, Scheduled;

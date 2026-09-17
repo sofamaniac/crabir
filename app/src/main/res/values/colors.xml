@@ -2,4 +2,11 @@
   ~ Copyright (c) 2025 Antoine Grimod
   -->
 
-<resources></resources>
+<resources>
+    <color name="youtube_cartouche">#C00000</color>
+    <color name="admin_cartouche">#E64A19</color>
+    <color name="author_cartouche">#448AFF</color>
+    <color name="moderator_cartouche">#388E3C</color>
+    <color name="gif_cartouche">#0097A7</color>
+    <color name="video_cartouche">#E64A19</color>
+</resources>

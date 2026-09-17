@@ -25,11 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.ContentFrame
 import androidx.media3.ui.compose.state.rememberPresentationState
 import com.sofamaniac.crabir.LocalDataSettings
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.settings.data.VideoQuality
@@ -51,7 +54,10 @@ fun DecoratedVideoPlayer(
         }
     },
     cartouche: @Composable (() -> Unit)? = {
-        Text("Gif", modifier = Modifier.cartouche(GIF_CARTOUCHE_COLOR))
+        Text(
+            stringResource(R.string.gif_cartouche),
+            modifier = Modifier.cartouche(colorResource(GIF_CARTOUCHE_COLOR))
+        )
     },
     fullscreenButton: @Composable (() -> Unit)? = null,
     autostart: Boolean = false,
