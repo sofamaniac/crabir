@@ -12,8 +12,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ApiSettings(
-    val redditClientId: String? = null,
-    val redditRedirectUri: String? = null,
+    val redditClientId: String? = "yH0aTnJEt6qUgGn835B4vg",
+    val redditRedirectUri: String? = "redreader://rr_oauth_redir",
 ) {
     val isConfigured: Boolean get() = !redditClientId.isNullOrBlank() && !redditRedirectUri.isNullOrBlank()
 }
