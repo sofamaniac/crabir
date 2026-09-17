@@ -376,4 +376,11 @@
     <string name="create_draft_title">Brouillon</string>
     <string name="create_draft_content">Sauvegarder le brouillon</string>
     <string name="delete_draft_content">Supprimer le brouillon</string>
+    <string name="subreddit_posts_tab">Publications</string>
+    <string name="subreddit_info_tab">À propos</string>
+    <plurals name="post_comments_count">
+        <item quantity="one">%d commentaire</item>
+        <item quantity="many">%d commentaires</item>
+        <item quantity="other">%d commentaires</item>
+    </plurals>
 </resources>

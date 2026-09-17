@@ -420,10 +420,16 @@
     <string name="delete_draft_content">Delete draft?</string>
     <string name="subreddit_posts_tab">Posts</string>
     <string name="subreddit_info_tab">About</string>
-    <string name="streamable_cartouche">Streamable</string>
-    <string name="gif_cartouche">Gif</string>
+    <string name="streamable_cartouche" translatable="false">Streamable</string>
+    <string name="gif_cartouche" translatable="false">Gif</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>
+    </plurals>
+    <plurals name="post_comments_count">
+        <item quantity="zero">No comment</item>
+        <item quantity="one">%d comment</item>
+        <item quantity="many">%d comments</item>
+        <item quantity="other">%d comments</item>
     </plurals>
 </resources>

@@ -77,7 +77,7 @@ fun MoreOptionMenu(
         ListItem(
             onClick = { showUserMenu = true },
             leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
-            content = { Text("About ${comment.author.username}") },
+            content = { Text(stringResource(R.string.about_user, comment.author.username)) },
             trailingContent = {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowRight,

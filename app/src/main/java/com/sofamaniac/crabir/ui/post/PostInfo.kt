@@ -11,12 +11,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalFiltersSettings
 import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.SearchRoute
@@ -102,7 +104,13 @@ fun PostInfo(
                 Text(
                     buildAnnotatedString {
                         append(" · ")
-                        append("${post.numComments} comments")
+                        append(
+                            pluralStringResource(
+                                R.plurals.post_comments_count,
+                                post.numComments,
+                                post.numComments
+                            )
+                        )
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = theme.secondaryText
