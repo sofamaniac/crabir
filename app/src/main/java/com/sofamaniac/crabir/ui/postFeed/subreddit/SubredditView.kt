@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.ui.postFeed.subreddit
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -178,14 +177,13 @@ private fun InnerView(
         ) { innerPadding ->
             Column(modifier = modifier.padding(innerPadding)) {
                 SecondaryTabRow(
-                    containerColor = LocalTheme.current.cardBackground,
+                    containerColor = LocalTheme.current.toolbarBackground,
                     selectedTabIndex = pagerState.currentPage,
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 50.dp),
                 ) {
                     Tab(
-                        modifier = Modifier.background(LocalTheme.current.cardBackground),
                         selected = pagerState.currentPage == 0,
                         onClick = { scope.launch { pagerState.animateScrollToPage(0) } }
                     ) {

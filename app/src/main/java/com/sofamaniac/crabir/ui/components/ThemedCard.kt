@@ -26,7 +26,7 @@ fun ThemedCard(
 ) {
     val theme = LocalTheme.current
     val background = if (highlight) {
-        MaterialTheme.colorScheme.primaryContainer
+        MaterialTheme.colorScheme.surfaceBright
     } else {
         theme.cardBackground
     }
@@ -48,6 +48,7 @@ fun ThemedCard(
             )
         }
     }
+    val colors = CardDefaults.cardColors().copy(containerColor = background)
     if (onClick != null) {
         Card(
             modifier = modifier,
@@ -56,7 +57,7 @@ fun ThemedCard(
             elevation = elevation,
             //border = border,
             content = content,
-            colors = CardDefaults.cardColors().copy(containerColor = background)
+            colors = colors,
         )
     } else {
         Card(
@@ -65,7 +66,7 @@ fun ThemedCard(
             elevation = elevation,
             //border = border,
             content = content,
-            colors = CardDefaults.cardColors().copy(containerColor = background)
+            colors = colors,
         )
     }
 }

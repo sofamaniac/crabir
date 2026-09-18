@@ -113,7 +113,7 @@ data class CrabirTheme(
         return darkColorScheme(
             primary = primaryColor,
             background = background,
-            surface = cardBackground,
+            surfaceContainer = cardBackground,
             surfaceVariant = toolbarBackground,
             tertiary = highlight,
         )
@@ -123,7 +123,7 @@ data class CrabirTheme(
         return lightColorScheme(
             primary = primaryColor,
             background = background,
-            surface = cardBackground,
+            surfaceContainer = cardBackground,
             surfaceVariant = toolbarBackground,
             tertiary = highlight,
         )

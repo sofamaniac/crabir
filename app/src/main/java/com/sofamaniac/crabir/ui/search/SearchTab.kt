@@ -63,6 +63,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalSnackBarHost
+import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.SortInterface
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
@@ -153,6 +154,7 @@ fun SearchTab(
                     .fillMaxSize()
             ) {
                 SecondaryTabRow(
+                    containerColor = LocalTheme.current.toolbarBackground,
                     selectedTabIndex = currentTab.currentPage,
                 ) {
                     tabs.forEachIndexed { index, tab ->

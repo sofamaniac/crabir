@@ -28,6 +28,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalSnackBarHost
+import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
@@ -107,6 +108,7 @@ fun ProfileView(
                     verticalArrangement = Arrangement.Top, modifier = Modifier.padding(innerPadding)
                 ) {
                     SecondaryScrollableTabRow(
+                        containerColor = LocalTheme.current.toolbarBackground,
                         selectedTabIndex = currentTab.currentPage.coerceAtMost(tabs.size - 1),
                         modifier = Modifier.fillMaxWidth(),
                         edgePadding = 0.dp

@@ -50,6 +50,7 @@ fun TabBar(
         }
     }
     PrimaryTabRow(
+        containerColor = theme.toolbarBackground,
         selectedTabIndex = selected,
         modifier = modifier.navigationBarsPadding(),
         indicator = {}

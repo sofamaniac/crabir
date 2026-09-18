@@ -149,6 +149,7 @@ fun InboxView() {
                     verticalArrangement = Arrangement.Top, modifier = Modifier.padding(innerPadding)
                 ) {
                     SecondaryScrollableTabRow(
+                        containerColor = LocalTheme.current.toolbarBackground,
                         selectedTabIndex = pagerState.currentPage,
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -245,54 +246,56 @@ fun Message(
     }
     val navController = LocalNavController.current
     ThemedCard(modifier = modifier.fillMaxWidth(), highlight = message.new) {
-        Row( //horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(modifier = Modifier.weight(1f)) {
-                header()
-                Spacer(modifier = Modifier.weight(1f))
-            }
-            if (message.new) {
-                IconButton(onClick = { viewModel.markRead(message.name) }) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Row( //horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(modifier = Modifier.weight(1f)) {
+                    header()
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+                if (message.new) {
+                    IconButton(onClick = { viewModel.markRead(message.name) }) {
+                        Icon(
+                            Icons.Default.MarkEmailRead,
+                            contentDescription = stringResource(R.string.mark_as_read)
+                        )
+                    }
+                    //            } else {
+                    //                IconButton(onClick = { viewModel.markUnread() }) {
+                    //                    Icon(Icons.Default.MarkEmailUnread, contentDescription = "Mark as unread")
+                    //                }
+                }
+                IconButton(onClick = { navController?.navigate(MessageEditorRoute(message.name)) }) {
                     Icon(
-                        Icons.Default.MarkEmailRead,
-                        contentDescription = stringResource(R.string.mark_as_read)
+                        Icons.AutoMirrored.Filled.Reply,
+                        contentDescription = stringResource(R.string.reply)
                     )
                 }
-                //            } else {
-                //                IconButton(onClick = { viewModel.markUnread() }) {
-                //                    Icon(Icons.Default.MarkEmailUnread, contentDescription = "Mark as unread")
-                //                }
-            }
-            IconButton(onClick = { navController?.navigate(MessageEditorRoute(message.name)) }) {
-                Icon(
-                    Icons.AutoMirrored.Filled.Reply,
-                    contentDescription = stringResource(R.string.reply)
-                )
-            }
-            IconButton(onClick = {}) {
-                Icon(Icons.Default.MoreVert, contentDescription = null)
-            }
-        }
-        val textStyle = MaterialTheme.typography.titleSmall
-        val annotatedString = buildAnnotatedString {
-            withStyle(textStyle.copy(color = theme.highlight).toSpanStyle()) {
-                append(message.author)
-            }
-            if (message.parent?.subreddit != null) {
-                append(" via ")
-                withStyle(textStyle.copy(color = theme.highlight).toSpanStyle()) {
-                    append(message.parent?.subreddit)
+                IconButton(onClick = {}) {
+                    Icon(Icons.Default.MoreVert, contentDescription = null)
                 }
             }
-            append(" · ")
-            append(formatElapsedTimeLocalized(message.createdUtc))
+            val textStyle = MaterialTheme.typography.titleSmall
+            val annotatedString = buildAnnotatedString {
+                withStyle(textStyle.copy(color = theme.highlight).toSpanStyle()) {
+                    append(message.author)
+                }
+                if (message.parent?.subreddit != null) {
+                    append(" via ")
+                    withStyle(textStyle.copy(color = theme.highlight).toSpanStyle()) {
+                        append(message.parent?.subreddit)
+                    }
+                }
+                append(" · ")
+                append(formatElapsedTimeLocalized(message.createdUtc))
+            }
+            Text(annotatedString)
+            Spacer(modifier = Modifier.height(8.dp))
+            Richtext(
+                richtext, mediaMetadata = emptyMap(), modifier = Modifier.padding(horizontal = 8.dp)
+            )
         }
-        Text(annotatedString)
-        Spacer(modifier = Modifier.height(8.dp))
-        Richtext(
-            richtext, mediaMetadata = emptyMap(), modifier = Modifier.padding(horizontal = 8.dp)
-        )
     }
 }
 
