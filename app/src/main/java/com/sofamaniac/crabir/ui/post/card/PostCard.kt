@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -59,7 +60,10 @@ fun PostCard(
 ) {
     val postOpt by viewModel.post.collectAsState(post)
     if (postOpt == null) {
-        ThemedCard(modifier = Modifier.height(100.dp)) {}
+        ThemedCard(
+            modifier = Modifier.height(100.dp),
+            elevation = CardDefaults.elevatedCardElevation()
+        ) {}
     } else {
         val post = postOpt!!
         if (!showHidden && post.relationship.hidden) {

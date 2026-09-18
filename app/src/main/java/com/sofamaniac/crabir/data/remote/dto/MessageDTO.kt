@@ -63,7 +63,8 @@ fun MessageDTO.getParentInfo(): ParentInfo? {
         name = parentId,
         title = subject,
         subreddit = subreddit,
-        subredditPrefixed = subredditNamePrefixed
+        subredditPrefixed = subredditNamePrefixed,
+        permalink = context.ifBlank { null },
     )
 }
 

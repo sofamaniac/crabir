@@ -211,6 +211,7 @@ object CommentMessageMapper : ObjectMappie<CommentDTO, Message>() {
         Message::authorFullname fromProperty from::authorFullname
         Message::createdUtc fromProperty from::createdUtc
         Message::replies fromValue ""
+        Message::parent fromValue from.getParentInfo()
     }
 }
 
@@ -224,7 +225,8 @@ fun CommentDTO.getParentInfo(): ParentInfo {
         name = parentId,
         title = title,
         subreddit = subreddit,
-        subredditPrefixed = subredditNamePrefixed
+        subredditPrefixed = subredditNamePrefixed,
+        permalink = context,
     )
 }
 

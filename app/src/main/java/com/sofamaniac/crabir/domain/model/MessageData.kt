@@ -27,6 +27,7 @@ data class ParentInfo(
     val title: String? = null,
     val subreddit: String? = null,
     val subredditPrefixed: String? = null,
+    val permalink: String? = null,
 )
 
 

@@ -14,6 +14,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.toRoute
+import androidx.savedstate.read
 import com.sofamaniac.crabir.navigation.routes.PostRoute
 import com.sofamaniac.crabir.ui.thread.ThreadView
 import kotlinx.coroutines.Dispatchers
@@ -24,8 +25,13 @@ import okhttp3.Request
 
 private const val ROUTE = "/r/{subreddit}/comments/{id}/{title}"
 private const val SHORT_ROUTE = "/r/{subreddit}/s/{id}"
-private const val LONG_ROUTE = "/r/{subreddit}/comments/{id}/{title}/{commentId}"
-private const val LONGER_ROUTE = "/r/{subreddit}/comments/{id}/{title}/comment/{commentId}"
+private const val LONG_ROUTE = "/r/{subreddit}/comments/{id}/{title}/{commentId}?context={context}"
+private const val LONG_ROUTE_TRAILING =
+    "/r/{subreddit}/comments/{id}/{title}/{commentId}/?context={context}"
+private const val LONGER_ROUTE =
+    "/r/{subreddit}/comments/{id}/{title}/comment/{commentId}?context={context}"
+private const val LONGER_ROUTE_TRAILING =
+    "/r/{subreddit}/comments/{id}/{title}/comment/{commentId}/?context={context}"
 
 fun NavGraphBuilder.postGraph(navController: NavController) {
     composable(
@@ -50,7 +56,10 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
     }
     composable(
         route = LONG_ROUTE,
-        deepLinks = stringLink(url = LONG_ROUTE) + stringLink(LONGER_ROUTE),
+        deepLinks = stringLink(url = LONG_ROUTE)
+                + stringLink(LONGER_ROUTE)
+                + stringLink(LONG_ROUTE_TRAILING)
+                + stringLink(LONGER_ROUTE_TRAILING),
         arguments = listOf(
             navArgument("subreddit") { type = NavType.StringType },
             navArgument("id") { type = NavType.StringType },
@@ -65,10 +74,12 @@ fun NavGraphBuilder.postGraph(navController: NavController) {
         val title = arguments.getString("title") ?: return@composable
         val permalink = "/r/$subreddit/comments/$id/$title"
         val commentId = arguments.getString("commentId")
+        val context = arguments.read { getStringOrNull("context") }?.toIntOrNull()
         ThreadView(
             permalink = permalink,
             dismiss = { navController.popBackStack() },
-            comment = commentId
+            comment = commentId,
+            context = context
         )
     }
     composable(

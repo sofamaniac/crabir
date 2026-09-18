@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.MarkEmailRead
-import androidx.compose.material.icons.filled.MarkEmailUnread
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
@@ -64,20 +63,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Message
 import com.sofamaniac.crabir.domain.model.MessageType
-import com.sofamaniac.crabir.domain.model.RichtextDocument
 import com.sofamaniac.crabir.domain.repository.InboxFeed
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.MessageEditorRoute
-import com.sofamaniac.crabir.navigation.routes.PostRoute
 import com.sofamaniac.crabir.navigation.routes.ProfileRoute
 import com.sofamaniac.crabir.navigation.routes.SubredditRoute
 import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
@@ -91,7 +88,6 @@ import com.sofamaniac.crabir.ui.richtext.Richtext
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -246,7 +242,7 @@ fun Message(
     }
     val navController = LocalNavController.current
     ThemedCard(modifier = modifier.fillMaxWidth(), highlight = message.new) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.Start) {
             Row( //horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
             ) {
@@ -261,10 +257,6 @@ fun Message(
                             contentDescription = stringResource(R.string.mark_as_read)
                         )
                     }
-                    //            } else {
-                    //                IconButton(onClick = { viewModel.markUnread() }) {
-                    //                    Icon(Icons.Default.MarkEmailUnread, contentDescription = "Mark as unread")
-                    //                }
                 }
                 IconButton(onClick = { navController?.navigate(MessageEditorRoute(message.name)) }) {
                     Icon(
@@ -272,9 +264,7 @@ fun Message(
                         contentDescription = stringResource(R.string.reply)
                     )
                 }
-                IconButton(onClick = {}) {
-                    Icon(Icons.Default.MoreVert, contentDescription = null)
-                }
+                MoreOptionsButton(message, viewModel)
             }
             val textStyle = MaterialTheme.typography.titleSmall
             val annotatedString = buildAnnotatedString {
@@ -292,167 +282,124 @@ fun Message(
             }
             Text(annotatedString)
             Spacer(modifier = Modifier.height(8.dp))
-            Richtext(
-                richtext, mediaMetadata = emptyMap(), modifier = Modifier.padding(horizontal = 8.dp)
+            Richtext(richtext, mediaMetadata = emptyMap())
+        }
+    }
+}
+
+@Composable
+fun MoreOptionsButton(message: Message, viewModel: MessageViewModel) {
+    var showMenu by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { showMenu = true }) {
+            Icon(
+                Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.more_option_desc)
             )
         }
+        MessageDropdownMenu(message, viewModel, showMenu) { showMenu = false }
     }
 }
 
 @Composable
-fun Message(
-    header: @Composable () -> Unit,
-    author: String,
-    created: Instant,
-    body: RichtextDocument,
-    new: Boolean,
-    name: Fullname,
-    viewModel: InboxViewModel,
-    modifier: Modifier = Modifier,
-    subreddit: String? = null,
+fun MessageDropdownMenu(
+    message: Message,
+    viewModel: MessageViewModel,
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
 ) {
-    val theme = LocalTheme.current
-    Column(modifier = modifier.fillMaxWidth()) {
-        Row( //horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(modifier = Modifier.weight(1f)) {
-                header()
-                Spacer(modifier = Modifier.weight(1f))
-            }
-            if (new) {
-                IconButton(onClick = { viewModel.markRead(name) }) {
-                    Icon(Icons.Default.MarkEmailRead, contentDescription = "Mark as read")
-                }
-            } else {
-                IconButton(onClick = { viewModel.unread(name) }) {
-                    Icon(Icons.Default.MarkEmailUnread, contentDescription = "Mark as unread")
-                }
-            }
-            IconButton(onClick = {}) {
-                Icon(Icons.Default.MoreVert, contentDescription = null)
-            }
-        }
-        val textStyle = MaterialTheme.typography.titleSmall
-        val annotatedString = buildAnnotatedString {
-            withStyle(textStyle.copy(color = theme.highlight).toSpanStyle()) {
-                append(author)
-            }
-            if (subreddit != null) {
-                append(" via ")
-                withStyle(textStyle.copy(color = theme.highlight).toSpanStyle()) {
-                    append(subreddit)
-                }
-            }
-            append(" · ")
-            append(formatElapsedTimeLocalized(created))
-        }
-        Text(annotatedString)
-        Spacer(modifier = Modifier.height(8.dp))
-        Richtext(
-            body, mediaMetadata = emptyMap(), modifier = Modifier.padding(horizontal = 8.dp)
-        )
-    }
-}
-
-@Composable
-fun MessageDropdownMenu(message: Message, viewModel: MessageViewModel) {
     val navController = LocalNavController.current
-    var expanded by remember { mutableStateOf(false) }
     var showCopyDialog by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.padding(16.dp)) {
-        IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.MoreVert, contentDescription = "More actions")
-        }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = !expanded }) {
+    DropdownMenu(expanded = expanded, onDismissRequest = onDismissRequest) {
+        DropdownMenuItem(
+            leadingIcon = {
+                Icon(Icons.AutoMirrored.Filled.Reply, contentDescription = null)
+            },
+            text = { Text(stringResource(R.string.reply)) },
+            onClick = { navController?.navigate(MessageEditorRoute(message.name)) }
+        )
+        if (message.new) {
             DropdownMenuItem(
                 leadingIcon = {
-                    Icon(Icons.AutoMirrored.Filled.Reply, contentDescription = null)
+                    Icon(Icons.Default.MarkEmailRead, contentDescription = null)
                 },
-                text = { Text(stringResource(R.string.reply)) },
-                onClick = { navController?.navigate(MessageEditorRoute(message.name)) }
+                text = { Text(stringResource(R.string.mark_as_read)) },
+                onClick = { viewModel.markRead(message.name) }
             )
-            if (message.new) {
-                DropdownMenuItem(
-                    leadingIcon = {
-                        Icon(Icons.Default.MarkEmailRead, contentDescription = null)
-                    },
-                    text = { Text(stringResource(R.string.mark_as_read)) },
-                    onClick = { viewModel.markRead(message.name) }
-                )
-            }
+        }
 
-            if (message.author != null) {
-                DropdownMenuItem(
-                    leadingIcon = {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = null
-                        )
-                    },
-                    text = { Text(stringResource(R.string.about_user, message.author)) },
-                    onClick = {
-                        navController?.navigate(ProfileRoute(message.author))
-                    }
-                )
-            }
-            if (message.author != null) {
-                DropdownMenuItem(
-                    leadingIcon = {
-                        Icon(
-                            Icons.Default.Block,
-                            contentDescription = null
-                        )
-                    },
-                    text = { Text(stringResource(R.string.block_user, message.author)) },
-                    onClick = {
-                        viewModel.blockAuthor(message.author)
-                    }
-                )
-            }
-            if (message.parent?.subredditPrefixed != null) {
-                DropdownMenuItem(
-                    leadingIcon = {
-                        Icon(
-                            Icons.AutoMirrored.Filled.OpenInNew,
-                            contentDescription = null
-                        )
-                    },
-                    text = {
-                        Text(
-                            stringResource(
-                                R.string.go_to_parametrized,
-                                message.parent.subredditPrefixed
-                            )
-                        )
-                    }, onClick = {
-                        navController?.navigate(SubredditRoute(message.parent.subredditPrefixed))
-                    }
-                )
-            }
-            if (message.parent?.title != null) {
-                DropdownMenuItem(
-                    leadingIcon = {
-                        Icon(
-                            Icons.AutoMirrored.Filled.OpenInNew,
-                            contentDescription = null
-                        )
-                    },
-                    text = { Text(stringResource(R.string.go_to_parent_post)) }, onClick = {
-                        navController?.navigate(PostRoute(message.parent.title))
-                    }
-                )
-            }
-
+        if (message.author != null) {
             DropdownMenuItem(
-                leadingIcon = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
-                text = { Text(stringResource(R.string.copy)) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = null
+                    )
+                },
+                text = { Text(stringResource(R.string.about_user, message.author)) },
                 onClick = {
-                    showCopyDialog = true
+                    navController?.navigate(ProfileRoute(message.author))
                 }
             )
         }
+        if (message.author != null) {
+            DropdownMenuItem(
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Block,
+                        contentDescription = null
+                    )
+                },
+                text = { Text(stringResource(R.string.block_user, message.author)) },
+                onClick = {
+                    viewModel.blockAuthor(message.author)
+                }
+            )
+        }
+        if (message.parent?.subredditPrefixed != null) {
+            DropdownMenuItem(
+                leadingIcon = {
+                    Icon(
+                        Icons.AutoMirrored.Filled.OpenInNew,
+                        contentDescription = null
+                    )
+                },
+                text = {
+                    Text(
+                        stringResource(
+                            R.string.go_to_parametrized,
+                            message.parent.subredditPrefixed
+                        )
+                    )
+                }, onClick = {
+                    navController?.navigate(SubredditRoute(message.parent.subredditPrefixed))
+                }
+            )
+        }
+        if (message.parent?.permalink != null) {
+            DropdownMenuItem(
+                leadingIcon = {
+                    Icon(
+                        Icons.AutoMirrored.Filled.OpenInNew,
+                        contentDescription = null
+                    )
+                },
+                text = { Text(stringResource(R.string.go_to_parent_post)) }, onClick = {
+                    val uri =
+                        ("https://reddit.com" + message.parent.permalink).replace("/?", "?").toUri()
+                    navController?.navigate(uri)
+                }
+            )
+        }
+
+        DropdownMenuItem(
+            leadingIcon = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
+            text = { Text(stringResource(R.string.copy)) },
+            onClick = {
+                showCopyDialog = true
+            }
+        )
     }
     if (showCopyDialog) CopyDialog(message, onDismissRequest = { showCopyDialog = false })
 }
