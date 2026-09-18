@@ -49,7 +49,7 @@ abstract class MultiDatabase : RoomDatabase() {
     abstract fun multiDao(): MultiDao
 }
 
-@Database(entities = [Message::class], version = 1)
+@Database(entities = [Message::class], version = 2)
 @TypeConverters(RoomConverters::class)
 abstract class InboxDatabase : RoomDatabase() {
     abstract fun inboxDao(): InboxDao

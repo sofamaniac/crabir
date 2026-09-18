@@ -114,7 +114,6 @@ fun InboxView() {
             koinViewModel<InboxViewModel>(key = InboxFeed.Mentions.name) { parametersOf(InboxFeed.Mentions) })
     }
     val tabs = listOf(InboxFeed.All, InboxFeed.Unread, InboxFeed.Sent, InboxFeed.Mentions)
-    val theme = LocalTheme.current
     val navController = LocalNavController.current
     CompositionLocalProvider(LocalSnackBarHost provides snackbarHostState) {
         ModalNavigationDrawer(
@@ -245,7 +244,7 @@ fun Message(
         }
     }
     val navController = LocalNavController.current
-    ThemedCard(modifier = modifier.fillMaxWidth()) {
+    ThemedCard(modifier = modifier.fillMaxWidth(), highlight = message.new) {
         Row( //horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
         ) {
