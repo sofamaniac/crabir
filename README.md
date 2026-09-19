@@ -2,6 +2,8 @@
   <img width="96px" src="https://raw.githubusercontent.com/sofamaniac/Crabir/master/pictures/logo.png" />
 </p>
 
+[![Crowdin](https://badges.crowdin.net/crabir/localized.svg)](https://crowdin.com)
+
 # Crabir
 
 An open source replacement for Boost for Reddit.
