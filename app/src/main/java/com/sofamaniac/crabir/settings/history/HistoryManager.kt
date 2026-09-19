@@ -15,7 +15,7 @@ import java.time.Clock
 
 @Single
 class HistoryManager(val history: VisitedPostsDao) {
-    suspend fun addPost(name: Fullname, account: Int) {
+    suspend fun addPost(name: Fullname, account: Fullname) {
         val entity = history.getPost(name) ?: VisitedPostEntity(
             id = name,
             visitedAt = 0,
@@ -39,7 +39,7 @@ class HistoryManager(val history: VisitedPostsDao) {
 
 @Composable
 fun SaveToHistory(name: Fullname, nsfw: Boolean, historyManager: HistoryManager = koinInject()) {
-    val account = LocalRedditAccount.current.id
+    val account = LocalRedditAccount.current
     val settings = LocalHistorySettings.current
     LaunchedEffect(name, nsfw) {
         if (!settings.enabled) {
@@ -51,6 +51,6 @@ fun SaveToHistory(name: Fullname, nsfw: Boolean, historyManager: HistoryManager 
             return@LaunchedEffect
         }
         Log.i("HistoryManager", "Saving post to history: $name")
-        historyManager.addPost(name, account)
+        historyManager.addPost(name, account.name)
     }
 }

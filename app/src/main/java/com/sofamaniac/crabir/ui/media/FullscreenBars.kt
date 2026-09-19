@@ -137,7 +137,7 @@ fun ColumnScope.FullscreenBottomBar(
                         onClick = { viewModel.save(post.name, !saved, upvoteOnSave) })
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         OpenThreadButton {
-                            viewModel.markPost(post, currentAccount.id)
+                            viewModel.markPost(post, currentAccount.name)
                             navController?.navigate(PostRoute(post.permalink))
                         }
                         Text("${post.numComments}", color = theme.secondaryText)

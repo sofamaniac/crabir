@@ -30,6 +30,8 @@ data class RedditAccount(
     @Serializable(with = AuthStateSerializer::class)
     val auth: AuthState,
 ) {
+    val name get() = info?.name ?: Fullname(ANONYMOUS)
+
     companion object {
 
         const val ANONYMOUS = "Anonymous"

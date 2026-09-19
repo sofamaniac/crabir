@@ -85,7 +85,7 @@ open class LinkViewModel(
         false
     )
 
-    fun markPost(post: PostData, visitedBy: Int) {
+    fun markPost(post: PostData, visitedBy: Fullname) {
         viewModelScope.launch(Dispatchers.IO) {
             val entity =
                 VisitedPostEntity(post.name, System.currentTimeMillis(), visitedBy)

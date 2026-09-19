@@ -9,7 +9,7 @@ data class VisitedPostEntity(
     @PrimaryKey
     val id: Fullname,
     val visitedAt: Long,
-    val visitedBy: Int,
+    val visitedBy: Fullname,
     val focusedComment: Fullname? = null,
     val comments: List<Fullname> = emptyList(),
 )
