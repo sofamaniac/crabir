@@ -7,7 +7,7 @@ import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.domain.model.VotableData
+import com.sofamaniac.crabir.map
 import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Singleton
 
@@ -34,100 +34,85 @@ class PostNotFoundException(name: Fullname) : Exception("Post $name not found")
 class LinksRepositoryImpl(
     override val api: RedditAPIService,
     override val votableDao: VotableDao,
-) :
-    LinksRepository {
+) : LinksRepository {
+    private suspend inline fun updatePost(
+        name: Fullname,
+        update: (PostData) -> Result<Unit>,
+    ): Result<Unit> {
+        return get(name).first()
+            .map(default = { Result.failure(PostNotFoundException(name)) }, map = update)
+    }
+
     override suspend fun markNSFW(name: Fullname): Result<Unit> {
-        val post = get(name).first()
-        if (post == null) return Result.failure(PostNotFoundException(name))
-        val res = api.markNSFW(name)
-        if (res.isSuccess) {
-            update(post.copy(over18 = true))
+        return updatePost(name) { post ->
+            api.markNSFW(name).onSuccess { update(post.copy(over18 = true)) }
         }
-        return res
     }
 
     override suspend fun unmarkNSFW(name: Fullname): Result<Unit> {
-        val post = get(name).first()
-        if (post == null) return Result.failure(PostNotFoundException(name))
-        val res = api.unmarkNSFW(name)
-        if (res.isSuccess) {
-            update(post.copy(over18 = false))
+        return updatePost(name) { post ->
+            api.unmarkNSFW(name).onSuccess { update(post.copy(over18 = false)) }
         }
-        return res
     }
 
     override suspend fun unmarkSpoiler(name: Fullname): Result<Unit> {
-        val post = get(name).first()
-        if (post == null) return Result.failure(PostNotFoundException(name))
-        val res = api.unspoiler(name)
-        if (res.isSuccess) {
-            update(post.copy(spoiler = false))
+        return updatePost(name) { post ->
+            api.unspoiler(name).onSuccess { update(post.copy(spoiler = false)) }
         }
-        return res
     }
 
     override suspend fun markSpoiler(name: Fullname): Result<Unit> {
-        val post = get(name).first()
-        if (post == null) return Result.failure(PostNotFoundException(name))
-        val res = api.spoiler(name)
-        if (res.isSuccess) {
-            update(post.copy(spoiler = true))
+        return updatePost(name) { post ->
+            api.spoiler(name).onSuccess { update(post.copy(spoiler = true)) }
         }
-        return res
     }
 
     override suspend fun editFlair(name: Fullname, flairId: String, text: String?): Result<Unit> {
-        val post = get(name).first()
-        if (post == null) return Result.failure(PostNotFoundException(name))
-        val subreddit = post.subreddit.name
-        val res = api.selectFlair("r/$subreddit", name, flairId, text ?: "")
-        if (res.isSuccess) {
-            val oldFlair = post.linkFlair
-            update(post.copy(linkFlair = oldFlair.copy(text = text ?: oldFlair.text)))
+        return updatePost(name) { post ->
+            val subreddit = post.subreddit.name
+            api.selectFlair("r/$subreddit", name, flairId, text ?: "").onSuccess {
+                val oldFlair = post.linkFlair
+                update(post.copy(linkFlair = oldFlair.copy(text = text ?: oldFlair.text)))
+            }
         }
-        return res
     }
 
     override suspend fun getFlairs(name: Fullname): Result<List<FlairInfo>> {
-        val post = get(name).first()
-        if (post == null) return Result.failure(PostNotFoundException(name))
-        val subreddit = post.subreddit.name
-        val res = api.getPostFlair("r/$subreddit")
-        return res
+        return get(name).first()
+            .map(default = { Result.failure(PostNotFoundException(name)) }) { post ->
+                val subreddit = post.subreddit.name
+                api.getPostFlair("r/$subreddit")
+            }
     }
 
     override suspend fun setInboxReplies(name: Fullname, enabled: Boolean): Result<Unit> {
-        val post = get(name).first()
-        if (post == null) return Result.failure(PostNotFoundException(name))
-        val res = api.setSendReplies(name, enabled)
-        if (res.isSuccess) {
-            update(post.copy(sendReplies = enabled))
+        return updatePost(name) { post ->
+            api.setSendReplies(name, enabled).onSuccess {
+                update(post.copy(sendReplies = enabled))
+            }
         }
-        return res
     }
 
     override suspend fun hide(name: Fullname): Result<Unit> {
-        val res = api.hide(name)
-        if (res.isFailure) {
-            return res
+        return api.hide(name).onSuccess {
+            get(name).first()
+                .map(default = { Result.failure<Unit>(PostNotFoundException(name)) }) { post ->
+                    val relationship = post.relationship.copy(hidden = true)
+                    votableDao.update(name, post.copy(relationship = relationship).toEntity().data)
+                    Result.success(Unit)
+                }
         }
-        val post: VotableData? = get(name).first()
-        if (post == null) return Result.failure(PostNotFoundException(name))
-        val relationship = post.relationship.copy(hidden = true)
-        votableDao.update(name, post.copy(relationship = relationship).toEntity().data)
-        return Result.success(Unit)
     }
 
     override suspend fun unhide(name: Fullname): Result<Unit> {
-        val res = api.unhide(name)
-        if (res.isFailure) {
-            return res
+        return api.unhide(name).onSuccess {
+            get(name).first()
+                .map(default = { Result.failure<Unit>(PostNotFoundException(name)) }) { post ->
+                    val relationship = post.relationship.copy(hidden = false)
+                    votableDao.update(name, post.copy(relationship = relationship).toEntity().data)
+                    Result.success(Unit)
+                }
         }
-        val post: VotableData? = get(name).first()
-        if (post == null) return Result.failure(PostNotFoundException(name))
-        val relationship = post.relationship.copy(hidden = false)
-        votableDao.update(name, post.copy(relationship = relationship).toEntity().data)
-        return Result.success(Unit)
     }
 }
 

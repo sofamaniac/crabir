@@ -57,9 +57,7 @@ fun getKind(post: PostDTO): Kind {
         null
     }
 
-    if (kind != null) return kind
-
-    return when (post.postHint) {
+    return kind ?: when (post.postHint) {
         "image" -> Kind.Image
         "rich:video", "hosted:video" -> Kind.Video
         "link" -> Kind.Link

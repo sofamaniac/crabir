@@ -8,6 +8,7 @@ import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.map
 import org.koin.compose.koinInject
 import org.koin.core.annotation.Single
 import java.time.Clock
@@ -23,13 +24,12 @@ class HistoryManager(val history: VisitedPostsDao) {
         history.insert(entity.copy(visitedAt = Clock.systemUTC().millis(), visitedBy = account))
     }
 
-    suspend fun updateComments(name: Fullname, comments: List<String>, focusedComment: String) {
-        val entity = history.getPost(name)
-        if (entity == null) {
+    suspend fun updateComments(name: Fullname, comments: List<Fullname>, focusedComment: Fullname) {
+        history.getPost(name).map(default = {
             Log.e("HistoryManager", "updateComments: Post not found in database ($name)")
-            return
+        }) { entity ->
+            history.insert(entity.copy(comments = comments, focusedComment = focusedComment))
         }
-        history.insert(entity.copy(comments = comments, focusedComment = focusedComment))
     }
 
     suspend fun clearHistory() {
@@ -50,7 +50,7 @@ fun SaveToHistory(name: Fullname, nsfw: Boolean, historyManager: HistoryManager 
             Log.v("HistoryManager", "NSFW post is disabled")
             return@LaunchedEffect
         }
-        Log.d("HistoryManager", "Saving post to history: $name")
+        Log.i("HistoryManager", "Saving post to history: $name")
         historyManager.addPost(name, account)
     }
 }

@@ -32,23 +32,10 @@ import com.sofamaniac.crabir.ui.post.PostViewModelInterface
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-/**
- * Composable function that displays a single post in a Card format.
- *
- * This function creates a view for a given [Post], including its header,
- * content, and bottom row of actions.
- *
- * @param post The [com.sofamaniac.crabir.domain.model.PostData] data to display.
- * @param modifier Modifier for the root layout of the post.
- * @param clickable Whether the post is clickable to navigate to the thread view. Defaults to true.
- * @param markAsRead A lambda that takes a [com.sofamaniac.crabir.domain.model.PostData] and is called before navigating to the post.
- * @param canStartVideo Whether the post can start a video. Defaults to false.
- */
 @Composable
 fun PostCard(
     post: PostData,
     modifier: Modifier = Modifier,
-    clickable: Boolean = true,
     showHidden: Boolean = false,
     dim: Boolean = false,
     isMostVisible: Boolean,

@@ -37,13 +37,16 @@ abstract class ListingRepository<Params, Data : DataInterface> {
     protected suspend fun <T : Thing> makeRequest(
         request: suspend () -> Result<Thing.Listing<T>>,
     ): PagingSource.LoadResult<Fullname, Fullname> {
-        val response = request()
-        if (response.isFailure) {
-            Log.e("ListingRepository", "Error while making request", response.exceptionOrNull())
-            return PagingSource.LoadResult.Error(response.exceptionOrNull()!!)
-        } else {
-            val listing = response.getOrNull()
-            if (listing != null) {
+        return request().fold(
+            onFailure = { err ->
+                Log.e(
+                    "ListingRepository",
+                    "Error while making request",
+                    err,
+                )
+                PagingSource.LoadResult.Error(err)
+            },
+            onSuccess = { listing ->
                 val things = listing.data.children
                     .filter { thing -> !_seenThings.contains(thing.name) }
                 things.forEach { data ->
@@ -55,19 +58,13 @@ abstract class ListingRepository<Params, Data : DataInterface> {
                 val thingsName = things.map { thing ->
                     thing.name
                 }
-                return PagingSource.LoadResult.Page(
+                PagingSource.LoadResult.Page(
                     data = thingsName,
                     nextKey = listing.data.after,
                     prevKey = null
                 )
-            } else {
-                return PagingSource.LoadResult.Page(
-                    data = emptyList(),
-                    nextKey = null,
-                    prevKey = null
-                )
-            }
-        }
+            },
+        )
     }
 }
 

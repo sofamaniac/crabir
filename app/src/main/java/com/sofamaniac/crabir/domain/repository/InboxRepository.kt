@@ -8,8 +8,10 @@ import com.sofamaniac.crabir.data.remote.dto.comment.CommentMessageMapper
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Message
+import com.sofamaniac.crabir.map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.ViewModelScope
@@ -111,25 +113,23 @@ class InboxRepositoryImpl(private val inbox: RedditAPIService, private val inbox
     }
 
     override suspend fun read(name: Fullname): Result<Unit> {
-        val res = inbox.markRead(name.name)
-        if (res.isFailure) return res
-        val message =
-            inboxDao.getValue(name) ?: return Result.failure(MessageNotFoundException())
-        withContext(Dispatchers.IO) {
-            inboxDao.insert(message.copy(new = false))
+        return inbox.markRead(name.name).onSuccess {
+            inboxDao.get(name).first()
+                .map(default = { Result.failure<Unit>(MessageNotFoundException()) }) {
+                    inboxDao.update(it.copy(new = false))
+                    Result.success(Unit)
+                }
         }
-        return Result.success(Unit)
     }
 
     override suspend fun unread(name: Fullname): Result<Unit> {
-        val res = inbox.markUnread(name.name)
-        if (res.isFailure) return res
-        val message =
-            inboxDao.getValue(name) ?: return Result.failure(MessageNotFoundException())
-        withContext(Dispatchers.IO) {
-            inboxDao.update(message.copy(new = true))
+        return inbox.markUnread(name.name).onSuccess {
+            inboxDao.get(name).first()
+                .map(default = { Result.failure<Unit>(MessageNotFoundException()) }) {
+                    inboxDao.update(it.copy(new = true))
+                    Result.success(Unit)
+                }
         }
-        return Result.success(Unit)
     }
 
     override suspend fun delete(name: Fullname): Result<Unit> {

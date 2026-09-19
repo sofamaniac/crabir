@@ -7,3 +7,11 @@ fun <T> Result<T>.toOption(): T? {
         null
     }
 }
+
+inline fun <T, F> T?.map(default: () -> F, map: (T) -> F): F {
+    return if (this != null) {
+        map(this)
+    } else {
+        default()
+    }
+}

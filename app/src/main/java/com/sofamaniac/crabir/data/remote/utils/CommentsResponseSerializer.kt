@@ -33,21 +33,17 @@ object CommentsResponseSerializer : KSerializer<CommentsResponse> {
         val jsonDecoder = decoder as? JsonDecoder
             ?: throw SerializationException("Expected JsonDecoder")
         return when (val element = jsonDecoder.decodeJsonElement()) {
-            is JsonArray -> {
-                if (element.size == 2) {
-                    val postListing = jsonDecoder.json.decodeFromJsonElement(
-                        Listing.serializer(Post.serializer()),
-                        element[0]
-                    )
-                    val commentListing = jsonDecoder.json.decodeFromJsonElement(
-                        Listing.serializer(Thing.serializer()),
-                        element[1]
-                    )
+            is JsonArray if element.size == 2 -> {
+                val postListing = jsonDecoder.json.decodeFromJsonElement(
+                    Listing.serializer(Post.serializer()),
+                    element[0]
+                )
+                val commentListing = jsonDecoder.json.decodeFromJsonElement(
+                    Listing.serializer(Thing.serializer()),
+                    element[1]
+                )
 
-                    CommentsResponse(postListing, commentListing)
-                } else {
-                    throw SerializationException("Expected 2 elements in the array")
-                }
+                CommentsResponse(postListing, commentListing)
             }
 
             else -> {

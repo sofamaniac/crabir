@@ -376,7 +376,8 @@ fun setSystemBarsColor(): (ThemeMode, Color) -> Unit {
         WindowCompat.getInsetsController(window, window.decorView)
     return { mode, color ->
         Log.d("setSystemBarsColor", "setSystemBarsColor: $mode")
-        if (Build.VERSION.SDK_INT < 35) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            @Suppress("DEPRECATION")
             window.navigationBarColor = color.toArgb()
         }
         when (mode) {
