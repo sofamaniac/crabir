@@ -1,8 +1,8 @@
 package com.sofamaniac.crabir.ui.postFeed.subreddit
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -32,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
@@ -175,13 +174,14 @@ private fun InnerView(
                 })
             }
         ) { innerPadding ->
-            Column(modifier = modifier.padding(innerPadding)) {
+            Column(
+                modifier = modifier.padding(innerPadding),
+                verticalArrangement = Arrangement.Top
+            ) {
                 SecondaryTabRow(
                     containerColor = LocalTheme.current.toolbarBackground,
                     selectedTabIndex = pagerState.currentPage,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 50.dp),
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Tab(
                         selected = pagerState.currentPage == 0,
