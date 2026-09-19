@@ -102,6 +102,7 @@ open class CommentViewModel(
 fun CommentContent(
     viewModel: CommentViewModel,
     opened: Boolean,
+    highlight: Boolean,
     toggleComment: (Boolean) -> Unit,
     startReply: () -> Unit,
     modifier: Modifier = Modifier,
@@ -118,6 +119,7 @@ fun CommentContent(
         if (comment.depth == 0) HorizontalDivider()
         ThemedCard(
             roundedCorners = false,
+            highlight = highlight,
             modifier = Modifier
                 .fillMaxWidth()
                 .background(theme.cardBackground)
@@ -154,9 +156,11 @@ fun CommentNode(
         parametersOf(comment)
     }
     val opened by viewModel.openComment.collectAsState()
+    val newComments by viewModel.newComments.collectAsState()
     CommentContent(
         commentViewModel,
         opened == comment.name,
+        highlight = newComments.contains(comment.name),
         toggleComment = { target ->
             viewModel.toggleComment(comment.name, target)
         },

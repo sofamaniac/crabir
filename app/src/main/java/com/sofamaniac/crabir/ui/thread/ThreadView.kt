@@ -4,7 +4,6 @@
 
 package com.sofamaniac.crabir.ui.thread
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -57,7 +56,6 @@ fun ThreadView(
     }
     ThreadView(
         viewModel = viewModel,
-        permalink = permalink,
         comment = comment,
         context = context,
         dismiss = dismiss,
@@ -74,7 +72,6 @@ fun ThreadView(
 @Composable
 fun ThreadView(
     viewModel: ThreadViewModel,
-    permalink: String,
     modifier: Modifier = Modifier,
     comment: String? = null,
     context: Int? = null,
@@ -89,33 +86,18 @@ fun ThreadView(
     val historyManager: HistoryManager = koinInject()
     val scope = rememberCoroutineScope()
     BackHandler {
-        val comments = viewModel.comments.value.toList().map { it.id }
+        val comments = viewModel.comments.value.toList().map { it.name }
         val focusedIndex = viewModel.listState.firstVisibleItemIndex
         val focusedComment = comments.getOrNull(focusedIndex)
         if (focusedComment != null) {
             scope.launch(Dispatchers.IO) {
                 historyManager.updateComments(viewModel.name, comments, focusedComment)
-                val entity = historyManager.history.getPost(viewModel.name)
-                Log.d("ThreadView", "Disposed: $entity")
             }
         }
         dismiss()
     }
 
     val comments by viewModel.comments.collectAsState()
-
-    LaunchedEffect(comments) {
-        if (viewModel.initialLoad || comments.count() == 0) return@LaunchedEffect
-        val comments = viewModel.comments.value.toList().map { it.id }
-        val entity = historyManager.history.getPost(viewModel.name)
-        if (entity?.focusedComment != null) {
-            val index = comments.indexOf(entity.focusedComment)
-            if (index > 0) {
-                viewModel.listState.scrollToItem(index)
-            }
-        }
-        viewModel.initialLoad = true
-    }
 
     fun move(offset: Int) {
         val index = viewModel.listState.firstVisibleItemIndex
@@ -136,6 +118,12 @@ fun ThreadView(
     LaunchedEffect(uiState) {
         if (uiState is UiState.Error) {
             snackbarHostState.showSnackbar((uiState as UiState.Error).e.message ?: "Unknown error")
+        }
+    }
+    val newComments by viewModel.newComments.collectAsState()
+    LaunchedEffect(newComments) {
+        if (newComments.isNotEmpty()) {
+            snackbarHostState.showSnackbar("${newComments.size} new comments")
         }
     }
 

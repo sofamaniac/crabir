@@ -15,6 +15,7 @@ import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
 import com.sofamaniac.crabir.settings.comments.CommentsSettings
+import com.sofamaniac.crabir.settings.history.HistoryManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -42,6 +43,7 @@ class ThreadViewModel(
     private val repository: ThreadRepository,
     private val commentsRepository: CommentsRepository,
     accountsRepository: AccountsRepository,
+    private val historyManager: HistoryManager,
     @InjectedParam val permalink: String,
     @InjectedParam val comment: String?,
     @InjectedParam val context: Int?,
@@ -57,15 +59,14 @@ class ThreadViewModel(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    var initialLoad: Boolean = false
-    var commentsLoaded: MutableStateFlow<Boolean> = MutableStateFlow(false)
-
     private val replyState = MutableStateFlow<Fullname?>(null)
     val reply: StateFlow<Fullname?> = replyState.asStateFlow()
 
     val listState = LazyListState()
 
 
+    private var _newComments: MutableStateFlow<Set<Fullname>> = MutableStateFlow(emptySet())
+    val newComments: StateFlow<Set<Fullname>> = _newComments.asStateFlow()
     private val commentsNames = repository.comments
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -144,24 +145,56 @@ class ThreadViewModel(
         _uiState.update { UiState.Success }
     }
 
+    suspend fun collapseAutomod() {
+        if (commentsSettings.collapseAutoMod) {
+            val automodComments =
+                comments.value.filter {
+                    it is CommentType.Comment &&
+                            it.comment.author.username == "AutoModerator"
+                }
+            for (comment in automodComments) {
+                val comment = comment as CommentType.Comment
+                repository.updateComment(
+                    name,
+                    CommentType.Comment(comment = comment.comment.copy(collapsed = true))
+                )
+            }
+        }
+    }
+
+    private var scrollRestored = false
+    suspend fun restoreScroll() {
+        if (!scrollRestored) {
+            val entity = historyManager.history.getPost(name)
+            if (entity?.focusedComment != null) {
+                val index =
+                    comments.value.indexOfFirst { it.name == entity.focusedComment }
+                if (index > 0) {
+                    listState.scrollToItem(index)
+                }
+            }
+            scrollRestored = true
+        }
+    }
+
+    suspend fun highlightNewComments() {
+        val entity = historyManager.history.getPost(name)
+        if (entity == null) return
+        var new = commentsNames.value.toSet()
+        new = new - entity.comments.toSet()
+        Log.d(
+            "ThreadViewModel",
+            "highlightNewComments: $new = ${commentsNames.value} - ${entity.comments}"
+        )
+        _newComments.value = new
+    }
+
     fun fetchComments() {
         viewModelScope.launch(Dispatchers.IO) {
             fetchAsync()
-            if (commentsSettings.collapseAutoMod) {
-                val automodComments =
-                    comments.value.filter {
-                        it is CommentType.Comment &&
-                                it.comment.author.username == "AutoModerator"
-                    }
-                for (comment in automodComments) {
-                    val comment = comment as CommentType.Comment
-                    repository.updateComment(
-                        name,
-                        CommentType.Comment(comment = comment.comment.copy(collapsed = true))
-                    )
-                }
-            }
-            commentsLoaded.update { true }
+            collapseAutomod()
+            restoreScroll()
+            highlightNewComments()
         }
     }
 
