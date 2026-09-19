@@ -11,5 +11,5 @@ data class VisitedPostEntity(
     val visitedAt: Long,
     val visitedBy: Fullname,
     val focusedComment: Fullname? = null,
-    val comments: List<Fullname> = emptyList(),
+    val comments: List<Fullname>? = null,
 )

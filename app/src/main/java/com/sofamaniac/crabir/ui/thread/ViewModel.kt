@@ -180,6 +180,8 @@ class ThreadViewModel(
     suspend fun highlightNewComments() {
         val entity = historyManager.history.getPost(name)
         if (entity == null) return
+        // If the post was just loaded for the first time, skip highlighting new comments
+        if (entity.comments == null) return
         var new = commentsNames.value.toSet()
         new = new - entity.comments.toSet()
         Log.d(
