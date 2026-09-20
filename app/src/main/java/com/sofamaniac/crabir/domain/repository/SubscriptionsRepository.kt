@@ -42,7 +42,7 @@ class SubscriptionsRepository(
                 if (!account.isAnonymous()) {
                     flow { emit(loadSubscriptions()) }
                 } else {
-                    flowOf(emptyList())
+                    flow { emit(loadDefaults()) }
                 }
             }.stateIn(
                 scope = CoroutineScope(Dispatchers.IO),
@@ -88,11 +88,15 @@ class SubscriptionsRepository(
         return makeRequest { api.getSubreddits(after = after) }
     }
 
-    suspend fun loadSubscriptions(): List<Subreddit> {
+    suspend fun getDefaults(after: Fullname): PagedResponse<Subreddit> {
+        return makeRequest { api.getDefaultSubreddits(after = after) }
+    }
+
+    suspend fun load(request: suspend (after: Fullname) -> PagedResponse<Subreddit>): List<Subreddit> {
         var after: Fullname? = Fullname("")
         var subs: List<Subreddit> = emptyList()
         while (after != null) {
-            val response = runCatching { getSubreddits(after) }.getOrNull()
+            val response = runCatching { request(after) }.getOrNull()
             after = response?.data?.lastOrNull()?.data?.name
             subs = subs.plus(response?.data ?: emptyList())
         }
@@ -105,6 +109,14 @@ class SubscriptionsRepository(
             subredditCache.insert(mapped)
         }
         return subs
+    }
+
+    suspend fun loadDefaults(): List<Subreddit> {
+        return load { after -> getDefaults(after) }
+    }
+
+    suspend fun loadSubscriptions(): List<Subreddit> {
+        return load { after -> getSubreddits(after) }
     }
 
     suspend fun loadMultis(): List<Thing.Multi> {

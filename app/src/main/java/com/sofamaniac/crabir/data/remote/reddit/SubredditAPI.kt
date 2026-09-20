@@ -43,6 +43,14 @@ interface SubredditAPI {
         @Query("limit") limit: Int = API_LIMIT,
     ): Result<Listing<Subreddit>>
 
+    @GET("/subreddits/default.json")
+    suspend fun getDefaultSubreddits(
+        @Query("after") after: Fullname? = null,
+        @Query("before") before: String? = null,
+        @Query("count") count: Int = 0,
+        @Query("limit") limit: Int = API_LIMIT,
+    ): Result<Listing<Subreddit>>
+
     /** Get the post of a given subreddit.
      *
      * @param subreddit The name of the subreddit without the `r/` prefix
