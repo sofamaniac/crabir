@@ -11,18 +11,22 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.ui.res.stringResource
-import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.R
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.navigation.routes.DraftsRoute
 import com.sofamaniac.crabir.navigation.routes.InboxRoute
 import com.sofamaniac.crabir.navigation.routes.ProfileRoute
 import com.sofamaniac.crabir.navigation.routes.Route
 import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuItems
 
-internal fun LazyListScope.profileButtons(settings: LateralMenuItems, onClick: (Route) -> Unit) {
+internal fun LazyListScope.profileButtons(
+    settings: LateralMenuItems,
+    currentAccount: RedditAccount,
+    onClick: (Route) -> Unit,
+) {
+    if (currentAccount.isAnonymous()) return
     if (settings.profile) {
         item {
-            val currentAccount = LocalRedditAccount.current
             NavigationDrawerItem(
                 label = { Text(stringResource(R.string.profile)) },
                 selected = false,

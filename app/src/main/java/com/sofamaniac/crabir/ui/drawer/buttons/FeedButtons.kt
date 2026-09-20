@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.Thing
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.navigation.routes.HistoryRoute
 import com.sofamaniac.crabir.navigation.routes.HomeRoute
 import com.sofamaniac.crabir.navigation.routes.Route
@@ -93,7 +94,11 @@ internal fun SubredditTile(
     )
 }
 
-internal fun LazyListScope.feeds(settings: LateralMenuItems, onClick: (Route) -> Unit) {
+internal fun LazyListScope.feeds(
+    settings: LateralMenuItems,
+    currentAccount: RedditAccount,
+    onClick: (Route) -> Unit,
+) {
 
     if (settings.defaultFeed) {
         item {
@@ -147,7 +152,7 @@ internal fun LazyListScope.feeds(settings: LateralMenuItems, onClick: (Route) ->
         }
     }
 
-    if (settings.saved) {
+    if (settings.saved && !currentAccount.isAnonymous()) {
         item {
             NavigationDrawerItem(
                 label = { Text(stringResource(R.string.saved)) },

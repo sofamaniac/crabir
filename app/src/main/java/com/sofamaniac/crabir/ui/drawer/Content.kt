@@ -45,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalApiSettings
 import com.sofamaniac.crabir.LocalLateralMenuSettings
+import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.PreviewLocalComposition
 import com.sofamaniac.crabir.R
@@ -167,6 +168,7 @@ internal fun DrawerContent(
     val navController = LocalNavController.current
     val sortedSubscriptions =
         sortedSubscriptions.filter { !settings.showFavOnly || it.data.userHasFavorited }
+    val currentAccount = LocalRedditAccount.current
     ModalDrawerSheet(drawerState = drawerState) {
         LazyColumn(
             modifier = modifier
@@ -178,11 +180,14 @@ internal fun DrawerContent(
                 accountSelector()
             }
             item { HorizontalDivider() }
-            feeds(settings.items) { route ->
+            feeds(settings.items, currentAccount) { route ->
                 onFeedClick(route)
             }
             item { HorizontalDivider() }
-            profileButtons(settings.items) { route -> navController?.navigate(route) }
+            profileButtons(
+                settings.items,
+                currentAccount
+            ) { route -> navController?.navigate(route) }
             item { HorizontalDivider() }
             goToMenu(expandGoTo, onClick = { expandGoTo = !expandGoTo })
             if (settings.items.goToCommunity) {
