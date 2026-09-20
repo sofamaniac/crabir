@@ -14,6 +14,10 @@ import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -37,6 +41,7 @@ fun TabBar(
     val user = LocalRedditAccount.current
     val navController = LocalNavController.current
     val theme = LocalTheme.current
+    var showAccountSelector by remember { mutableStateOf(false) }
     fun onClick(selected: Int, index: Int, destination: Route) {
         if (onTabReselect != null && selected == index) {
             onTabReselect()
@@ -114,7 +119,7 @@ fun TabBar(
                 if (!user.isAnonymous() && !user.isUninitialized()) {
                     onClick(selected, 4, ProfileRoute(user.info?.username ?: "Anonymous"))
                 } else {
-                    // TODO ask user to log in
+                    showAccountSelector = true
                 }
             },
             icon = {
@@ -125,4 +130,8 @@ fun TabBar(
             }
         )
     }
+    if (showAccountSelector) {
+        AccountSelectorDialog(onDismiss = { showAccountSelector = false })
+    }
 }
+
