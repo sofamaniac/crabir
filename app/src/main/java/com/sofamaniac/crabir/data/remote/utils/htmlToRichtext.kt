@@ -59,7 +59,9 @@ private fun Richtext.Companion.fromHtml(node: Node, style: Int = 0): List<Richte
         )
 
         else -> {
-            Log.e("Richtext", "Unknown node: $node")
+            if (node.toString().isNotBlank()) {
+                Log.e("Richtext", "Unknown node: '$node'")
+            }
             emptyList()
         }
     }

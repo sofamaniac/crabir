@@ -25,7 +25,6 @@ class MessageViewModel(
     @InjectedParam initialMessage: Message,
 ) : ViewModel(), MessageInteraction {
     val message: StateFlow<Message> = messageRepository.get(name).map {
-        Log.d("MessageViewModel", "message: $it")
         it ?: initialMessage
     }
         .stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = initialMessage)

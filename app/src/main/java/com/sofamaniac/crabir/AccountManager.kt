@@ -39,7 +39,6 @@ class AccountManager(
         if (apiSettings.redditClientId == null || apiSettings.redditRedirectUri == null) return
         clientId = apiSettings.redditClientId
         serviceConfig = Config(clientId, apiSettings.redditRedirectUri)
-        Log.d("AccountManager", "Initializing account manager: $clientId")
         setupAnonymous(apiSettings.redditClientId, onError)
         initialized = true
     }

@@ -2,7 +2,6 @@ package com.sofamaniac.crabir.data.remote.reddit.auth
 
 import android.content.Context
 import android.util.Base64
-import android.util.Log
 import com.sofamaniac.crabir.settings.api.apiSettingsDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -72,7 +71,6 @@ data class AccessTokenResponse(
 fun getAuthorizationHeader(context: Context): String {
     return runBlocking {
         val clientId = context.apiSettingsDataStore.data.first().redditClientId
-        Log.d("RedditAuthApi", "getAuthorizationHeader: $clientId")
         "Basic " + Base64.encodeToString(
             "${clientId}:".toByteArray(),
             Base64.NO_WRAP
