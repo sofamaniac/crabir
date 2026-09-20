@@ -1,57 +1,48 @@
 package com.sofamaniac.crabir.ui.postFeed
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import com.sofamaniac.crabir.LocalFeedSettings
 import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
+import com.sofamaniac.crabir.settings.views.Views
 
 @Composable
-private fun defaultCommunityEntity(name: String, displayName: String): CommunityViewEntity {
-    Log.d("defaultCommunityEntity", "name: $name, displayName: $displayName")
-    val viewSettings = LocalViewSettings.current
-    val feedSettings = LocalFeedSettings.current
-    Log.d("defaultCommunityEntity", "default timeframe: ${feedSettings.defaultTimeframe}")
+fun defaultCommunityEntity(name: String, displayName: String): CommunityViewEntity {
     return CommunityViewEntity(
         name, displayName,
-        sort = feedSettings.defaultSort,
-        timeframe = feedSettings.defaultTimeframe,
-        view = viewSettings.defaultView,
-        columns = viewSettings.defaultColumns
     )
 }
 
+data class SortFull(val sort: Sort, val timeframe: Timeframe?)
+
 @Composable
-fun getCommunityViewEntity(
+fun getCommunitySort(
     name: String,
-    displayName: String,
     defaultSort: Sort = LocalFeedSettings.current.defaultSort,
     defaultTimeframe: Timeframe? = LocalFeedSettings.current.defaultTimeframe,
-): CommunityViewEntity {
+): SortFull {
     val entity = LocalViewSettings.current.rememberedViews[name]
     val feedSettings = LocalFeedSettings.current
-    val viewSettings = LocalViewSettings.current
-    if (entity == null) {
-        return defaultCommunityEntity(name, displayName)
-    } else {
-        return entity.let {
-            if (!feedSettings.rememberSort) {
-                it.copy(sort = defaultSort, timeframe = defaultTimeframe)
-            } else {
-                val sort = it.sort ?: defaultSort
-                val timeframe = it.timeframe ?: defaultTimeframe
-                it.copy(sort = sort, timeframe = timeframe)
-            }
-        }.let {
-            if (!viewSettings.rememberView) {
-                it.copy(view = viewSettings.defaultView, columns = viewSettings.defaultColumns)
-            } else {
-                val view = it.view ?: viewSettings.defaultView
-                val columns = it.columns ?: viewSettings.defaultColumns
-                it.copy(view = view, columns = columns)
-            }
-        }
+    if (entity == null || !feedSettings.rememberSort) {
+        return SortFull(defaultSort, defaultTimeframe)
     }
+    return SortFull(entity.sort ?: defaultSort, entity.timeframe ?: defaultTimeframe)
+}
+
+data class ViewFull(val view: Views, val columns: Int)
+
+@Composable
+fun getCommunityView(
+    name: String,
+    defaultView: Views = LocalViewSettings.current.defaultView,
+    defaultColumns: Int = LocalViewSettings.current.defaultColumns,
+): ViewFull {
+    val entity = LocalViewSettings.current.rememberedViews[name]
+    val viewSettings = LocalViewSettings.current
+    if (entity == null || !viewSettings.rememberView) {
+        return ViewFull(defaultView, defaultColumns)
+    }
+    return ViewFull(entity.view ?: defaultView, entity.columns ?: defaultColumns)
 }

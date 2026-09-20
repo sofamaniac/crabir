@@ -30,27 +30,27 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.PostCreatorRoute
 import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
-import com.sofamaniac.crabir.settings.views.viewSettingDataStore
 import com.sofamaniac.crabir.ui.components.TabBar
 import com.sofamaniac.crabir.ui.components.ThemedScaffold
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.feedInfo.subreddit.SubredditInfoView
 import com.sofamaniac.crabir.ui.postFeed.PostFeedViewer
 import com.sofamaniac.crabir.ui.postFeed.PostView
+import com.sofamaniac.crabir.ui.postFeed.ViewFull
 import com.sofamaniac.crabir.ui.postFeed.components.BottomSheet
 import com.sofamaniac.crabir.ui.postFeed.components.Fab
 import com.sofamaniac.crabir.ui.postFeed.components.TopBar
-import com.sofamaniac.crabir.ui.postFeed.getCommunityViewEntity
+import com.sofamaniac.crabir.ui.postFeed.defaultCommunityEntity
+import com.sofamaniac.crabir.ui.postFeed.getCommunitySort
+import com.sofamaniac.crabir.ui.postFeed.getCommunityView
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -61,16 +61,16 @@ fun SubredditViewer(
     subreddit: String,
     modifier: Modifier = Modifier,
 ) {
-    val defaultEntity = getCommunityViewEntity(subreddit, subreddit)
+    val initialSort = getCommunitySort(subreddit)
     val subredditName = subreddit.split("/").last()
     val viewModel: SubredditViewModel =
         koinViewModel(key = subreddit) {
             parametersOf(
                 subreddit,
-                defaultEntity,
+                initialSort.sort,
+                initialSort.timeframe,
             )
         }
-    var entity by remember(subreddit) { mutableStateOf(defaultEntity) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val params by viewModel.params.collectAsState()
     val feedInfo by viewModel.info.collectAsState()
@@ -82,19 +82,8 @@ fun SubredditViewer(
         viewModel.updateFilters(filters)
     }
 
-    val viewDataStore = LocalContext.current.viewSettingDataStore
-    LaunchedEffect(feedInfo) {
-        if (feedInfo == null) return@LaunchedEffect
-        scope.launch {
-            viewDataStore.updateData {
-                it.copy(
-                    rememberedViews = it.rememberedViews + (subreddit to entity.copy(
-                        displayName = feedInfo!!.displayNamePrefixed
-                    ))
-                )
-            }
-        }
-    }
+    val defaultView = getCommunityView(subreddit)
+    var fullView by remember { mutableStateOf(defaultView) }
 
     val topBar = @Composable {
         TopBar(
@@ -102,9 +91,9 @@ fun SubredditViewer(
             params,
             slug = subreddit,
             updateSort = viewModel::updateSort,
-            updateView = { entity = entity.copy(view = it) },
+            updateView = { fullView = fullView.copy(view = it) },
             refresh = viewModel::refresh,
-            entity = entity,
+            defaultEntity = defaultCommunityEntity(subreddit, feedInfo?.displayName ?: subreddit),
             scrollBehavior = scrollBehavior,
             openDrawer = { scope.launch { drawerState.open() } }
         )
@@ -118,7 +107,7 @@ fun SubredditViewer(
         filter = rememberPostsFilter(whitelistSubreddit = listOf(subredditName)),
         drawerState = drawerState,
         feedInfo = feedInfo,
-        viewEntity = entity,
+        viewEntity = fullView,
     )
 }
 
@@ -131,7 +120,7 @@ private fun InnerView(
     viewModel: SubredditViewModel,
     modifier: Modifier = Modifier,
     drawerState: DrawerState,
-    viewEntity: CommunityViewEntity? = null,
+    viewEntity: ViewFull? = null,
     filter: (PostData) -> Boolean = rememberPostsFilter(),
     feedInfo: SubredditData? = null,
 ) {
@@ -237,7 +226,7 @@ private fun InnerView(
                         navController?.navigate(
                             PostCreatorRoute(
                                 kind,
-                                viewEntity?.name
+                                feedInfo?.displayNamePrefixed
                             )
                         )
                     },

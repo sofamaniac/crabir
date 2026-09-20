@@ -2,7 +2,8 @@ package com.sofamaniac.crabir.ui.postFeed.history
 
 import com.sofamaniac.crabir.data.local.dao.SubredditDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
+import com.sofamaniac.crabir.data.remote.dto.Timeframe
+import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.feed.HistoryRepository
 import com.sofamaniac.crabir.ui.postFeed.PostFeedViewModel
@@ -14,10 +15,12 @@ class HistoryViewModel(
     repository: HistoryRepository,
     visitedPostsDao: VisitedPostsDao,
     communityDao: SubredditDao,
-    @InjectedParam viewEntity: CommunityViewEntity,
+    @InjectedParam initialSort: Sort,
+    @InjectedParam initialTimeframe: Timeframe?,
 ) : PostFeedViewModel<SubredditData>(
     repository,
     visitedPostsDao,
     communityDao,
-    viewEntity,
+    initialSort,
+    initialTimeframe
 )

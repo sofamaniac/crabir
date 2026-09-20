@@ -15,14 +15,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import com.sofamaniac.crabir.LocalFeedSettings
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.reddit.HOME
 import com.sofamaniac.crabir.ui.components.TabBar
 import com.sofamaniac.crabir.ui.postFeed.FullFeedView
 import com.sofamaniac.crabir.ui.postFeed.components.TopBar
-import com.sofamaniac.crabir.ui.postFeed.getCommunityViewEntity
+import com.sofamaniac.crabir.ui.postFeed.defaultCommunityEntity
+import com.sofamaniac.crabir.ui.postFeed.getCommunitySort
+import com.sofamaniac.crabir.ui.postFeed.getCommunityView
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -33,18 +33,13 @@ fun HomeViewer(
     modifier: Modifier = Modifier,
 ) {
     val title = stringResource(R.string.Home)
-    val feedSettings = LocalFeedSettings.current
-    val defaultEntity: CommunityViewEntity =
-        getCommunityViewEntity(
-            HOME,
-            title,
-            defaultSort = feedSettings.homeSort,
-            defaultTimeframe = feedSettings.homeTimeframe
-        )
+    val initialSort = getCommunitySort(HOME)
     val viewModel: HomeViewModel = koinViewModel(key = HOME) {
-        parametersOf(defaultEntity)
+        parametersOf(initialSort.sort, initialSort.timeframe)
     }
-    var viewEntity by remember(HOME) { mutableStateOf(defaultEntity) }
+
+    val defaultView = getCommunityView(HOME)
+    var viewEntity by remember(HOME) { mutableStateOf(defaultView) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
     val params by viewModel.params.collectAsState()
@@ -60,7 +55,7 @@ fun HomeViewer(
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
             openDrawer = { scope.launch { drawerState.open() } },
-            entity = viewEntity
+            defaultEntity = defaultCommunityEntity(HOME, title)
         )
     }
     val bottomBar = @Composable {

@@ -3,8 +3,9 @@ package com.sofamaniac.crabir.ui.postFeed.multi
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.local.dao.MultiDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
-import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.MultiData
+import com.sofamaniac.crabir.data.remote.dto.Timeframe
+import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.repository.feed.MultiPostsRepository
 import com.sofamaniac.crabir.ui.postFeed.PostFeedViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,12 +21,14 @@ class MultiViewModel(
     visitedPostsDao: VisitedPostsDao,
     communityDao: MultiDao,
     @InjectedParam slug: String,
-    @InjectedParam viewEntity: CommunityViewEntity,
+    @InjectedParam initialSort: Sort,
+    @InjectedParam initialTimeframe: Timeframe?,
 ) : PostFeedViewModel<MultiData>(
     repository,
     visitedPostsDao,
     communityDao,
-    viewEntity,
+    initialSort = initialSort,
+    initialTimeframe = initialTimeframe,
 ) {
     private val _info = MutableStateFlow<MultiData?>(null)
     val info = _info.asStateFlow()

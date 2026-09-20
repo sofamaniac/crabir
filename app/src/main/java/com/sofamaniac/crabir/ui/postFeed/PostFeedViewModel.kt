@@ -88,15 +88,16 @@ abstract class PostFeedViewModel<T : CommunityData>(
     private val repository: PostFeedRepository<FeedParams>,
     visitedPostsDao: VisitedPostsDao,
     private val communityRepository: CommunityDao<T>,
-    viewEntity: CommunityViewEntity,
+    initialSort: Sort,
+    initialTimeframe: Timeframe?,
 ) : ViewModel(), FeedViewModelInterface<PostData> {
 
     override val listState = LazyStaggeredGridState()
     override var needScrollToTop = false
     private val _params = MutableStateFlow(
         FeedParams(
-            sort = viewEntity.sort!!,
-            timeframe = viewEntity.timeframe,
+            sort = initialSort,
+            timeframe = initialTimeframe,
         )
     )
 

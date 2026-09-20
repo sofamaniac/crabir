@@ -16,10 +16,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
+import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.routes.PostCreatorRoute
 import com.sofamaniac.crabir.settings.filters.rememberPostsFilter
 import com.sofamaniac.crabir.ui.components.ThemedScaffold
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
@@ -36,7 +35,8 @@ fun FullFeedView(
     viewModel: FeedViewModelInterface<PostData>,
     modifier: Modifier = Modifier,
     drawerState: DrawerState,
-    viewEntity: CommunityViewEntity? = null,
+    viewEntity: ViewFull? = null,
+    createPost: (Kind) -> Unit = {},
     filter: (PostData) -> Boolean = rememberPostsFilter(),
     feedInfo: (@Composable () -> Unit)? = null,
 ) {
@@ -97,14 +97,7 @@ fun FullFeedView(
                             showBottomSheet = false
                         }
                     },
-                    createPost = { kind ->
-                        navController?.navigate(
-                            PostCreatorRoute(
-                                kind,
-                                viewEntity?.name
-                            )
-                        )
-                    },
+                    createPost = createPost,
                     cancel = {
                         scope.launch { bottomSheetState.hide() }
                             .invokeOnCompletion { showBottomSheet = false }

@@ -20,7 +20,9 @@ import com.sofamaniac.crabir.data.remote.reddit.HISTORY
 import com.sofamaniac.crabir.ui.components.TabBar
 import com.sofamaniac.crabir.ui.postFeed.FullFeedView
 import com.sofamaniac.crabir.ui.postFeed.components.TopBar
-import com.sofamaniac.crabir.ui.postFeed.getCommunityViewEntity
+import com.sofamaniac.crabir.ui.postFeed.defaultCommunityEntity
+import com.sofamaniac.crabir.ui.postFeed.getCommunitySort
+import com.sofamaniac.crabir.ui.postFeed.getCommunityView
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -31,11 +33,12 @@ fun HistoryViewer(
     modifier: Modifier = Modifier,
 ) {
     val title = stringResource(R.string.History)
-    val defaultEntity = getCommunityViewEntity(HISTORY, title)
+    val initialSort = getCommunitySort(HISTORY)
     val viewModel: HistoryViewModel = koinViewModel(key = HISTORY) {
-        parametersOf(defaultEntity)
+        parametersOf(initialSort.sort, initialSort.timeframe)
     }
-    var entity by remember(HISTORY) { mutableStateOf(defaultEntity) }
+    val defaultView = getCommunityView(HISTORY)
+    var entity by remember(HISTORY) { mutableStateOf(defaultView) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
     val params by viewModel.params.collectAsState()
@@ -51,7 +54,7 @@ fun HistoryViewer(
             updateView = { entity = entity.copy(view = it) },
             refresh = viewModel::refresh,
             scrollBehavior = scrollBehavior,
-            entity = entity,
+            defaultEntity = defaultCommunityEntity(HISTORY, title),
         )
     }
     val bottomBar = @Composable {

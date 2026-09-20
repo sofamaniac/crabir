@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,7 +66,7 @@ fun TopBar(
     refresh: () -> Unit,
     openDrawer: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior?,
-    entity: CommunityViewEntity,
+    defaultEntity: CommunityViewEntity,
 ) {
     val navController = LocalNavController.current
 
@@ -78,8 +79,9 @@ fun TopBar(
         scope.launch {
             viewSettingsStore.updateData {
                 if (it.rememberView) {
+                    val old = it.rememberedViews[slug] ?: defaultEntity
                     it.copy(
-                        rememberedViews = it.rememberedViews + (slug to entity.copy(view = view))
+                        rememberedViews = it.rememberedViews + (slug to old.copy(view = view))
                     )
                 } else {
                     it
@@ -93,12 +95,28 @@ fun TopBar(
         if (feedSettings.rememberSort) {
             scope.launch {
                 viewSettingsStore.updateData {
+                    val old = it.rememberedViews[slug] ?: defaultEntity
                     it.copy(
-                        rememberedViews = it.rememberedViews + (slug to entity.copy(
+                        rememberedViews = it.rememberedViews + (slug to old.copy(
                             sort = sort,
                             timeframe = timeframe
                         ))
                     )
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(title) {
+        scope.launch {
+            viewSettingsStore.updateData {
+                if (it.rememberView) {
+                    val old = it.rememberedViews[slug] ?: defaultEntity
+                    it.copy(
+                        rememberedViews = it.rememberedViews + (slug to old.copy(displayName = title))
+                    )
+                } else {
+                    it
                 }
             }
         }
@@ -152,7 +170,7 @@ fun TopBar(
     if (showViewSelect) {
         SelectViewDialog(
             onDismiss = { showViewSelect = false },
-            selectedView = entity.view ?: LocalViewSettings.current.defaultView,
+            selectedView = defaultEntity.view ?: LocalViewSettings.current.defaultView,
             updateView = ::updateViewInner
         )
     }

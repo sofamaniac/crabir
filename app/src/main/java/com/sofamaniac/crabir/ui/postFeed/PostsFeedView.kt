@@ -46,7 +46,6 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.PreviewLocalComposition
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
 import com.sofamaniac.crabir.settings.history.SaveToHistory
@@ -77,7 +76,7 @@ import kotlin.math.max
 @Composable
 fun <T : VotableData> PostFeedViewer(
     viewModel: FeedViewModelInterface<T>,
-    viewEntity: CommunityViewEntity?,
+    viewEntity: ViewFull?,
     modifier: Modifier = Modifier,
     filter: (T) -> Boolean = { true },
     // If set to {}, breaks pull to refresh
