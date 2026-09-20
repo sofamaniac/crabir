@@ -1,7 +1,10 @@
 package com.sofamaniac.crabir.settings.feedSettings
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +14,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
@@ -118,15 +123,24 @@ private fun ViewTile(
         onClick = { showEditDialog = true },
         trailingContent = {
             IconButton(onClick = { deleteView() }) {
-                Icon(Icons.Default.Delete, contentDescription = null)
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
             }
         },
         supportingContent = {
-            Row {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.height(IntrinsicSize.Min)
+            ) {
                 if (entity.sort != null) {
                     Text(stringResource(entity.sort.representation))
                 }
-                VerticalDivider()
+                if (entity.sort != null && entity.timeframe != null) {
+                    VerticalDivider()
+                }
                 if (entity.timeframe != null) {
                     Text(stringResource(entity.timeframe.representation))
                 }
