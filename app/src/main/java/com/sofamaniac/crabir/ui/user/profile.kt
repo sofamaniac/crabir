@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.user
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,9 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -123,33 +127,64 @@ fun ProfileView(
                         state = currentTab, modifier = Modifier.fillMaxSize()
                     ) {
                         val page = tabs[it]
-                        val viewModel = viewModels[page]
-                        if (viewModel != null) {
-                            PostFeedViewer(
-                                viewModel = viewModel,
-                                viewEntity = null,
-                                filter = { true }
-                            ) { thing, isMostVisible ->
-                                when (thing) {
-                                    is PostData -> PostView(
-                                        thing,
-                                        isMostVisible = isMostVisible,
-                                        showHidden = page == ProfileTabs.Hidden,
-                                    )
-
-                                    is CommentType.Comment -> CommentView(thing)
-
-                                    else -> Text("Unknown type ${thing::class}")
-                                }
+                        when (val viewModel = viewModels[page]) {
+                            null -> {
+                                AboutTab(
+                                    profileViewModel.userProfile.value,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                )
                             }
-                        } else {
-                            AboutTab(
-                                profileViewModel.userProfile.value,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                            )
+
+                            is SavedViewModel -> {
+                                val filter by viewModel.filters.collectAsState()
+                                TabInner(
+                                    viewModel,
+                                    filter = filter,
+                                    showHidden = false
+                                )
+                            }
+
+                            else -> {
+                                TabInner(
+                                    viewModel,
+                                    filter = { true },
+                                    showHidden = page == ProfileTabs.Hidden,
+                                )
+                            }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun TabInner(
+    viewModel: ProfileFeedViewModel<out VotableData>,
+    showHidden: Boolean,
+    filter: (VotableData) -> Boolean,
+) {
+
+    PostFeedViewer(
+        viewModel = viewModel,
+        viewEntity = null,
+        filter = filter,
+    ) { thing, isMostVisible ->
+        when (thing) {
+            is PostData -> PostView(
+                thing,
+                isMostVisible = isMostVisible,
+                showHidden = showHidden,
+            )
+
+            is CommentType.Comment -> CommentView(thing)
+
+            else -> {
+                LaunchedEffect(thing) {
+                    Log.e("ProfileView", "Unknown thing: $thing")
                 }
             }
         }

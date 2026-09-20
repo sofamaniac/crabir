@@ -9,6 +9,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.filter
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.remote.RandditAPI
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
@@ -29,6 +30,7 @@ import com.sofamaniac.crabir.domain.repository.search.PostSearchRepository
 import com.sofamaniac.crabir.domain.repository.search.UserSearchRepository
 import com.sofamaniac.crabir.ui.postFeed.FeedViewModelInterface
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -37,6 +39,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -114,7 +117,17 @@ class PostSearchViewModel(
     @InjectedParam initialParams: PostSearchParams,
 ) : SearchViewModel<PostSearchParams, PostData>(repository, initialParams),
     FeedViewModelInterface<PostData> {
-    override val data: StateFlow<PagingData<PostData>> = items.stateIn(
+    private val _filters: MutableStateFlow<(PostData) -> Boolean> = MutableStateFlow({ true })
+    override val filters: StateFlow<(PostData) -> Boolean> = _filters.asStateFlow()
+
+    override fun updateFilters(filters: (PostData) -> Boolean) {
+        _filters.value = filters
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override val data: StateFlow<PagingData<PostData>> = items.flatMapLatest { pagingData ->
+        filters.map { filters -> pagingData.filter(filters) }
+    }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
         initialValue = PagingData.empty()

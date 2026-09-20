@@ -9,6 +9,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +46,11 @@ fun FullFeedView(
 
     val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(filter) {
+        viewModel.updateFilters(filter)
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {

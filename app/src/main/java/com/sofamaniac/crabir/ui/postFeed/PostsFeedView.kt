@@ -103,6 +103,11 @@ fun <T : VotableData> PostFeedViewer(
         }
     }
 
+    LaunchedEffect(filter) {
+        Log.d("PostFeedViewer", "Updating filter")
+        viewModel.updateFilters(filter)
+    }
+
 
     val mostVisibleItemKey by remember(listState) {
         snapshotFlow {
@@ -156,7 +161,7 @@ fun <T : VotableData> PostFeedViewer(
             }
             items(count = posts.itemCount, key = posts.itemKey { p -> p.id }) { index ->
                 val post = posts[index]
-                if (post != null && filter(post)) {
+                if (post != null) {
                     val isMostVisible = mostVisibleItemKey == post.id
                     Column {
                         itemView(post, isMostVisible)

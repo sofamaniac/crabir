@@ -16,6 +16,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.filter
 import com.sofamaniac.crabir.data.local.dao.CommunityDao
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
@@ -30,17 +31,22 @@ import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.domain.repository.feed.FeedSource
 import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 interface FeedViewModelInterface<T : VotableData> {
+    val filters: StateFlow<(T) -> Boolean>
+    fun updateFilters(filters: (T) -> Boolean)
     val listState: LazyStaggeredGridState
     val data: Flow<PagingData<T>>
     var needScrollToTop: Boolean
@@ -51,6 +57,12 @@ interface FeedViewModelInterface<T : VotableData> {
 }
 
 object FeedViewModelInterfacePreview : FeedViewModelInterface<PostData> {
+    private var _filters = MutableStateFlow<(PostData) -> Boolean>({ true })
+    override val filters: StateFlow<(PostData) -> Boolean> = _filters.asStateFlow()
+    override fun updateFilters(filters: (PostData) -> Boolean) {
+        this._filters.value = filters
+    }
+
     override val listState: LazyStaggeredGridState = LazyStaggeredGridState()
     override val data: Flow<PagingData<PostData>> =
         flowOf(
@@ -90,6 +102,12 @@ abstract class PostFeedViewModel<T : CommunityData>(
 
     val params: StateFlow<FeedParams> = _params.asStateFlow()
 
+    private var _filters = MutableStateFlow<(PostData) -> Boolean>({ true })
+    override val filters: StateFlow<(PostData) -> Boolean> = _filters.asStateFlow()
+    override fun updateFilters(filters: (PostData) -> Boolean) {
+        _filters.value = filters
+    }
+
     val history = visitedPostsDao.getHistoryFlow()
         .stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = emptyList())
 
@@ -100,6 +118,8 @@ abstract class PostFeedViewModel<T : CommunityData>(
     }
 
     private var feedSource: FeedSource<FeedParams, PostData>? = null
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     override val data: Flow<PagingData<PostData>> = Pager(
         config = PagingConfig(pageSize = 100, prefetchDistance = 10, initialLoadSize = 100),
         initialKey = Fullname(""),
@@ -112,7 +132,9 @@ abstract class PostFeedViewModel<T : CommunityData>(
     )
         .flow.cachedIn(
             viewModelScope
-        )
+        ).flatMapLatest { pagingData ->
+            filters.map { filters -> pagingData.filter(filters) }
+        }
 
     open suspend fun createViewEntity(name: String): CommunityViewEntity {
         val info = communityRepository.getBySlug(name)

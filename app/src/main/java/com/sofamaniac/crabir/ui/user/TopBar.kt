@@ -1,13 +1,18 @@
 package com.sofamaniac.crabir.ui.user
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -16,10 +21,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.TwoRowsTopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.R
@@ -91,10 +102,54 @@ fun TopBar(
                     }
                 }
 
-                else -> {
-                    Log.d("TopBar", "No sort menu")
+                is SavedViewModel -> {
+                    val filter by viewModel.currentFilter.collectAsState()
+                    SavedFilterMenu(filter) { filter ->
+                        viewModel.updateFilter(filter)
+                    }
                 }
+
+                else -> {}
             }
         }
     )
+}
+
+@Composable
+fun SavedFilterMenu(selected: SavedFilter, update: (SavedFilter) -> Unit) {
+    var showDropdown by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { showDropdown = true }) {
+            Icon(Icons.Default.FilterAlt, contentDescription = "Filter")
+        }
+        DropdownMenu(
+            expanded = showDropdown,
+            onDismissRequest = { showDropdown = false },
+            modifier = Modifier.selectableGroup()
+        ) {
+            SavedFilter.entries.forEach { filter ->
+                val isSelected = filter == selected
+                DropdownMenuItem(
+                    text = { Text(filter.toStringResource()) },
+                    onClick = {
+                        update(filter)
+                        showDropdown = false
+                    },
+                    modifier = Modifier.selectable(
+                        selected = isSelected,
+                        onClick = {
+                            update(filter)
+                            showDropdown = false
+                        },
+                        role = Role.RadioButton
+                    ),
+                    trailingIcon = {
+                        if (isSelected) {
+                            Icon(Icons.Default.Check, contentDescription = "Selected")
+                        }
+                    }
+                )
+            }
+        }
+    }
 }

@@ -422,6 +422,9 @@
     <string name="subreddit_info_tab">About</string>
     <string name="streamable_cartouche" translatable="false">Streamable</string>
     <string name="gif_cartouche" translatable="false">Gif</string>
+    <string name="saved_filter_all">All</string>
+    <string name="saved_filter_posts">Posts</string>
+    <string name="saved_filter_comments">Comments</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>

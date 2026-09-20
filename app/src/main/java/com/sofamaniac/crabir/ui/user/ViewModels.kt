@@ -4,15 +4,20 @@
 
 package com.sofamaniac.crabir.ui.user
 
+import android.util.Log
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.filter
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
@@ -33,11 +38,14 @@ import com.sofamaniac.crabir.domain.repository.profile.SavedRepository
 import com.sofamaniac.crabir.domain.repository.profile.SubmittedRepository
 import com.sofamaniac.crabir.domain.repository.profile.UpvotedRepository
 import com.sofamaniac.crabir.ui.postFeed.FeedViewModelInterface
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -61,12 +69,46 @@ class ProfileViewModel(
     }
 }
 
+
+enum class SavedFilter {
+    All,
+    Posts,
+    Comments;
+
+    @Composable
+    fun toStringResource(): String {
+        return when (this) {
+            All -> stringResource(R.string.saved_filter_all)
+            Posts -> stringResource(R.string.saved_filter_posts)
+            Comments -> stringResource(R.string.saved_filter_comments)
+        }
+    }
+}
+
 @KoinViewModel
 class SavedViewModel(
     @InjectedParam username: String,
     repository: SavedRepository,
     visitedPostsDao: VisitedPostsDao,
-) : ProfileFeedViewModel<VotableData>(username, repository, visitedPostsDao)
+) : ProfileFeedViewModel<VotableData>(username, repository, visitedPostsDao) {
+    private val filterMut = MutableStateFlow(SavedFilter.All)
+    val currentFilter: StateFlow<SavedFilter> = filterMut.asStateFlow()
+    private val _filters: Flow<(VotableData) -> Boolean> = filterMut.map { filter ->
+        Log.d("SavedViewModel", "Filter changed to $filter");
+        { thing ->
+            when (filter) {
+                SavedFilter.All -> true
+                SavedFilter.Posts -> thing is PostData
+                SavedFilter.Comments -> thing is CommentType.Comment
+            }
+        }
+    }
+    override val filters = _filters.stateIn(viewModelScope, SharingStarted.Lazily, { true })
+
+    fun updateFilter(filter: SavedFilter) {
+        filterMut.value = filter
+    }
+}
 
 @KoinViewModel
 class OverviewViewModel(
@@ -145,6 +187,12 @@ abstract class ProfileFeedViewModel<T : VotableData>(
     visitedPostsDao: VisitedPostsDao,
 ) : ViewModel(), FeedViewModelInterface<T> {
 
+    private val _filters: MutableStateFlow<(T) -> Boolean> = MutableStateFlow { true }
+    override val filters: StateFlow<(T) -> Boolean> = _filters.asStateFlow()
+    override fun updateFilters(filters: (T) -> Boolean) {
+        _filters.value = filters
+    }
+
     override val listState = LazyStaggeredGridState()
     override var needScrollToTop = false
     protected val paramsMut = MutableStateFlow(
@@ -167,6 +215,8 @@ abstract class ProfileFeedViewModel<T : VotableData>(
     }
 
     private var feedSource: FeedSource<ProfileFeedParams, T>? = null
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     override val data: Flow<PagingData<T>> = Pager(
         config = PagingConfig(pageSize = 100, prefetchDistance = 10, initialLoadSize = 100),
         initialKey = Fullname(""),
@@ -179,7 +229,9 @@ abstract class ProfileFeedViewModel<T : VotableData>(
     )
         .flow.cachedIn(
             viewModelScope
-        )
+        ).flatMapLatest { pagingData ->
+            filters.map { filters -> pagingData.filter(filters) }
+        }
 
     override fun isPostRead(post: PostData): Boolean {
         return history.value.contains(post.name)

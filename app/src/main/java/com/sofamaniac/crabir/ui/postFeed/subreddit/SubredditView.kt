@@ -77,6 +77,11 @@ fun SubredditViewer(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    val filters = rememberPostsFilter(whitelistSubreddit = listOf(subredditName))
+    LaunchedEffect(filters) {
+        viewModel.updateFilters(filters)
+    }
+
     val viewDataStore = LocalContext.current.viewSettingDataStore
     LaunchedEffect(feedInfo) {
         if (feedInfo == null) return@LaunchedEffect
@@ -90,7 +95,6 @@ fun SubredditViewer(
             }
         }
     }
-    val navController = LocalNavController.current
 
     val topBar = @Composable {
         TopBar(
@@ -102,13 +106,6 @@ fun SubredditViewer(
             refresh = viewModel::refresh,
             entity = entity,
             scrollBehavior = scrollBehavior,
-            //            onInfoClick = {
-            //                navController?.navigate(
-            //                    SubredditInfoRoute(
-            //                        feedInfo?.displayNamePrefixed ?: subreddit
-            //                    )
-            //                )
-            //            },
             openDrawer = { scope.launch { drawerState.open() } }
         )
     }
