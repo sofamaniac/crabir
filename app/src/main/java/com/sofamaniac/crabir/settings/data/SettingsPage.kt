@@ -1,7 +1,13 @@
 package com.sofamaniac.crabir.settings.data
 
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -15,6 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.net.toUri
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Quality
@@ -22,7 +29,9 @@ import com.sofamaniac.crabir.domain.model.stringResource
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SettingHeader
+import com.sofamaniac.crabir.settings.helper.SwitchTile
 import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.components.ListItem
 import kotlinx.coroutines.launch
 
 @Composable
@@ -49,6 +58,24 @@ fun DataSettingsPage() {
             }
         ) { paddingValues ->
             Column(modifier = Modifier.padding(paddingValues)) {
+                SettingHeader("Downloads")
+                //                LocationTile(dataSettings) { newVal ->
+                //                    scope.launch {
+                //                        dataSettingsStore.updateData { settings ->
+                //                            settings.copy(downloadLocation = newVal.downloadLocation)
+                //                        }
+                //                    }
+                //                }
+                SwitchTile(
+                    headlineContent = { Text(stringResource(R.string.downloads_community_subfolders)) },
+                    checked = dataSettings.subfolderPerCommunity,
+                    onCheckedChange = {
+                        scope.launch {
+                            dataSettingsStore.updateData { settings ->
+                                settings.copy(subfolderPerCommunity = it)
+                            }
+                        }
+                    })
                 SettingHeader(stringResource(R.string.Image_header))
                 ListSelector(
                     options = Quality.entries,
@@ -132,4 +159,32 @@ fun DataSettingsPage() {
             }
         }
     }
+}
+
+@Composable
+fun LocationTile(settings: DataSettings, updateSettings: (DataSettings) -> Unit) {
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        if (uri != null) {
+            context.contentResolver.takePersistableUriPermission(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+            updateSettings(settings.copy(downloadLocation = uri.encodedPath))
+        }
+    }
+    val folder = remember(settings) {
+        settings.downloadLocation?.toUri()?.path?.split(":")?.last() ?: ""
+    }
+    ListItem(
+        leadingContent = { Icon(Icons.Outlined.Download, contentDescription = null) },
+        content = { Text("Downloads location") },
+        supportingContent = { Text(folder) },
+        onClick = {
+            launcher.launch(null)
+        }
+    )
+
 }

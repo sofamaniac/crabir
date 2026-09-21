@@ -71,8 +71,10 @@ data class VideoQualitySettings(
 
 @Serializable
 data class DataSettings(
-    val imageQuality: ImageQualitySettings,
-    val videoQuality: VideoQualitySettings,
+    val imageQuality: ImageQualitySettings = DataSettingsDefault.defaultImageQuality,
+    val videoQuality: VideoQualitySettings = DataSettingsDefault.defaultVideoQuality,
+    val downloadLocation: String? = null,
+    val subfolderPerCommunity: Boolean = false,
 )
 
 object DataSettingsDefault {
@@ -87,10 +89,7 @@ object DataSettingsDefault {
         autostart = NetworkPolicy.Always,
     )
 
-    val defaultDataSettings = DataSettings(
-        imageQuality = defaultImageQuality,
-        videoQuality = defaultVideoQuality,
-    )
+    val defaultDataSettings = DataSettings()
 }
 
 val Context.dataSettingsStore by dataStore(

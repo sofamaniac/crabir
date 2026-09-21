@@ -29,6 +29,7 @@ exoplayer = "1.11.0"
 koin-bom = "4.2.2"
 koin-plugin = "1.1.0"
 detekt = "2.0.0-alpha.6"
+documentfile = "1.1.0"
 
 [libraries]
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
@@ -94,6 +95,7 @@ koin-compose = { module = "io.insert-koin:koin-compose" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose" }
 koin-androidx-compose-navigation = { module = "io.insert-koin:koin-androidx-compose-navigation" }
 koin-annotations = { module = "io.insert-koin:koin-annotations" }
+androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentfile" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

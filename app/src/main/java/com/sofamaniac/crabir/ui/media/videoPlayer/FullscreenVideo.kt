@@ -41,7 +41,9 @@ fun FullscreenVideo(
     SaveToHistory(post.name, post.over18)
     VerticalSwipeToDismiss(
         topBar = {
-            FullscreenTopBar(showDecorations, actions = { DownloadButton(video.url.toUri()) })
+            FullscreenTopBar(
+                showDecorations,
+                actions = { DownloadButton(video.url.toUri(), post.subreddit.name) })
         },
         bottomBar = {
             FullscreenBottomBar(post, showDecorations) {

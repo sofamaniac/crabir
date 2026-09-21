@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,6 +37,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.PostRoute
+import com.sofamaniac.crabir.ui.BackButton
 import com.sofamaniac.crabir.ui.post.LinkViewModel
 import com.sofamaniac.crabir.ui.post.buttons.OpenThreadButton
 import com.sofamaniac.crabir.ui.post.dialog.ShareMenu
@@ -63,22 +63,18 @@ fun ColumnScope.FullscreenTopBar(
             .statusBarsPadding(),
         label = "decoration animation"
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .height(IntrinsicSize.Min)
-        ) {
-            IconButton(onClick = { navController?.popBackStack() }) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Go back",
-                    tint = Color.White
-                )
+        CompositionLocalProvider(LocalContentColor provides Color.White) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .height(IntrinsicSize.Min)
+            ) {
+                BackButton { navController?.popBackStack() }
+                Spacer(modifier = Modifier.weight(1f))
+                actions()
             }
-            Spacer(modifier = Modifier.weight(1f))
-            actions()
         }
     }
 }

@@ -168,7 +168,7 @@ fun FullscreenImageView(
         topBar = {
             if (postData == null) return@VerticalSwipeToDismiss
             FullscreenTopBar(showDecorations, actions = {
-                DownloadButton(postData!!.getSourceUrl().toUri())
+                DownloadButton(postData!!.getSourceUrl().toUri(), postData!!.subreddit.name)
                 if (quality != Quality.Source) {
                     IconButton(onClick = { quality = Quality.Source }) {
                         Icon(
