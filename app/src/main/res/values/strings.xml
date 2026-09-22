@@ -428,6 +428,8 @@
     <string name="download">Download</string>
     <string name="downloading">Downloading</string>
     <string name="downloads_community_subfolders">Community subfolder</string>
+    <string name="gallery_download_page">Current page only</string>
+    <string name="gallery_download_all">All pages</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>

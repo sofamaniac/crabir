@@ -29,6 +29,8 @@ import com.sofamaniac.crabir.data.remote.MediaDownloader
 import com.sofamaniac.crabir.settings.data.dataSettingsStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.io.IOException
 import okhttp3.MediaType
@@ -85,7 +87,7 @@ class MediaDownloaderRepository(private val client: MediaDownloader, private val
                             onProgress = onProgress
                         )
                     } else {
-                        saveToDownloads(context, body, filename, type, folder, onProgress)
+                        saveToDownloads(body, filename, type, folder, onProgress)
                     }
                     Pair(uri, type)
                 }.onFailure {
@@ -97,14 +99,15 @@ class MediaDownloaderRepository(private val client: MediaDownloader, private val
             })
         }
 
-    private fun saveToStorage(
+    private val lock = Mutex()
+    private suspend fun saveToStorage(
         body: ResponseBody,
         filename: String,
         type: MediaType,
         destination: Uri,
         folder: String?,
         onProgress: (Int) -> Unit,
-    ): Uri {
+    ): Uri = lock.withLock {
         Log.d(TAG, "saveToStorage: $destination")
         val directory = DocumentFile.fromTreeUri(context, destination)
         if (directory == null) {
@@ -138,62 +141,61 @@ class MediaDownloaderRepository(private val client: MediaDownloader, private val
         }
         return file.uri
     }
-}
 
-private fun saveToDownloads(
-    context: Context,
-    body: ResponseBody,
-    filename: String,
-    type: MediaType,
-    folder: String?,
-    onProgress: (Int) -> Unit,
-): Uri {
-    val directory =
-        Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_DOWNLOADS
+    private suspend fun saveToDownloads(
+        body: ResponseBody,
+        filename: String,
+        type: MediaType,
+        folder: String?,
+        onProgress: (Int) -> Unit,
+    ): Uri = lock.withLock {
+        val directory =
+            Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS
+            )
+
+        if (!directory.exists()) {
+            directory.mkdirs()
+        }
+        val folder =
+            if (folder != null) {
+                val subdirectory = File(directory, folder)
+                if (!subdirectory.exists()) {
+                    subdirectory.mkdirs()
+                }
+                subdirectory
+            } else {
+                directory
+            }
+        val name = "$filename.${type.subtype}"
+
+        val file = File(
+            folder,
+            name
         )
 
-    if (!directory.exists()) {
-        directory.mkdirs()
-    }
-    val folder =
-        if (folder != null) {
-            val subdirectory = File(directory, folder)
-            if (!subdirectory.exists()) {
-                subdirectory.mkdirs()
+        FileOutputStream(file).use { output ->
+
+            body.byteStream().use { input ->
+
+                copyWithProgress(
+                    input = input,
+                    output = output,
+                    totalBytes = body.contentLength(),
+                    onProgress = onProgress,
+                )
             }
-            subdirectory
-        } else {
-            directory
         }
-    val name = "$filename.${type.subtype}"
 
-    val file = File(
-        folder,
-        name
-    )
+        MediaScannerConnection.scanFile(
+            context,
+            arrayOf(file.absolutePath),
+            arrayOf(body.contentType()?.toString()),
+            null
+        )
 
-    FileOutputStream(file).use { output ->
-
-        body.byteStream().use { input ->
-
-            copyWithProgress(
-                input = input,
-                output = output,
-                totalBytes = body.contentLength(),
-                onProgress = onProgress,
-            )
-        }
+        return Uri.fromFile(file)
     }
-
-    MediaScannerConnection.scanFile(
-        context,
-        arrayOf(file.absolutePath),
-        arrayOf(body.contentType()?.toString()),
-        null
-    )
-
-    return Uri.fromFile(file)
 }
 
 
@@ -225,6 +227,7 @@ private fun copyWithProgress(
         }
     }
 }
+
 
 class MediaDownloadWorker(context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params), KoinComponent {

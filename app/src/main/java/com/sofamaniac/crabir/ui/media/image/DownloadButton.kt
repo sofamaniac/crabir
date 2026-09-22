@@ -142,7 +142,8 @@ class DownloadButtonViewModel(application: Application) : AndroidViewModel(appli
         subreddit: String? = null,
     ) {
         urls.forEachIndexed { index, url ->
-            download(url, "$basename-${index + 1}", subreddit)
+            val suffix = (index + 1).toString().padStart(2, '0')
+            download(url, "$basename-$suffix", subreddit)
         }
     }
 }

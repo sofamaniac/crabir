@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
-import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -56,7 +58,6 @@ import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.gallery.Gallery
-import com.sofamaniac.crabir.ui.media.image.DownloadButton
 import com.sofamaniac.crabir.ui.media.image.DownloadButtonViewModel
 import com.sofamaniac.crabir.ui.media.image.ImageView
 import com.sofamaniac.crabir.ui.media.image.TransformableImage
@@ -303,15 +304,7 @@ fun FullscreenGallery(
         topBar = {
             FullscreenTopBar(showDecorations) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    //DownloadAllButton(post, gallery)
-                    val url = currentPage?.toMediaResource()?.url?.toUri()
-                    if (url != null) {
-                        DownloadButton(
-                            url,
-                            suffix = state.currentPage.toString(),
-                            subreddit = post.subreddit.name
-                        )
-                    }
+                    DownloadAllButton(post, gallery, state)
                     Text(
                         "${state.currentPage + 1}/${state.pageCount}",
                         style = MaterialTheme.typography.labelMedium.copy(color = Color.White)
@@ -394,26 +387,55 @@ fun FullscreenGallery(
 private fun DownloadAllButton(
     post: PostData,
     gallery: Gallery,
+    state: PagerState,
     viewModel: DownloadButtonViewModel = koinViewModel(),
 ) {
+    var showMenu by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val toast = stringResource(R.string.downloading)
     val settings = LocalDataSettings.current
     val subreddit = post.subreddit.name
-    IconButton(onClick = {
-        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-        val subfolder =
-            if (settings.subfolderPerCommunity) subreddit else null
-        viewModel.downloadAll(
-            gallery.images.indices.mapNotNull { gallery.get(it)?.toMediaResource()?.url?.toUri() },
-            post.id,
-            subfolder
-        )
-    }) {
-        Icon(
-            Icons.Default.Save,
-            contentDescription = stringResource(R.string.download)
-        )
+    val subfolder = if (settings.subfolderPerCommunity) subreddit else null
+    Box {
+        IconButton(onClick = {
+            showMenu = true
+        }) {
+            Icon(
+                Icons.Default.Download,
+                contentDescription = stringResource(R.string.download)
+            )
+        }
+        DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.gallery_download_all)) },
+                onClick = {
+                    showMenu = false
+                    Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+                    viewModel.downloadAll(
+                        gallery.images.indices.mapNotNull {
+                            gallery.get(it)?.toMediaResource()?.url?.toUri()
+                        },
+                        post.id,
+                        subfolder
+                    )
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.gallery_download_page)) },
+                onClick = {
+                    showMenu = false
+                    Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+                    val current = gallery.get(state.currentPage)?.toMediaResource()?.url?.toUri()
+                    if (current != null) {
+                        viewModel.download(
+                            current,
+                            post.id + "-" + (state.currentPage + 1).toString().padStart(2, '0'),
+                            subfolder
+                        )
+                    }
+                }
+            )
+        }
     }
 }
 
