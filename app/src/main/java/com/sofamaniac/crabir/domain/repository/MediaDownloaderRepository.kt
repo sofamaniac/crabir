@@ -1,18 +1,22 @@
 package com.sofamaniac.crabir.domain.repository
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.util.Log
+import androidx.annotation.RequiresPermission
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.work.Constraints
@@ -29,6 +33,7 @@ import com.sofamaniac.crabir.data.remote.MediaDownloader
 import com.sofamaniac.crabir.settings.data.dataSettingsStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -54,7 +59,7 @@ class MediaDownloaderRepository(private val client: MediaDownloader, private val
         url: String,
         filename: String?,
         folder: String?,
-        onProgress: (Int) -> Unit = {},
+        onProgress: suspend (Int) -> Unit = {},
     ): Result<Pair<Uri, MediaType>> =
         withContext(Dispatchers.IO) {
             val destination = context.dataSettingsStore.data.first().downloadLocation?.toUri()
@@ -106,7 +111,7 @@ class MediaDownloaderRepository(private val client: MediaDownloader, private val
         type: MediaType,
         destination: Uri,
         folder: String?,
-        onProgress: (Int) -> Unit,
+        onProgress: suspend (Int) -> Unit,
     ): Uri = lock.withLock {
         Log.d(TAG, "saveToStorage: $destination")
         val directory = DocumentFile.fromTreeUri(context, destination)
@@ -147,7 +152,7 @@ class MediaDownloaderRepository(private val client: MediaDownloader, private val
         filename: String,
         type: MediaType,
         folder: String?,
-        onProgress: (Int) -> Unit,
+        onProgress: suspend (Int) -> Unit,
     ): Uri = lock.withLock {
         val directory =
             Environment.getExternalStoragePublicDirectory(
@@ -175,9 +180,7 @@ class MediaDownloaderRepository(private val client: MediaDownloader, private val
         )
 
         FileOutputStream(file).use { output ->
-
             body.byteStream().use { input ->
-
                 copyWithProgress(
                     input = input,
                     output = output,
@@ -203,7 +206,7 @@ private fun copyWithProgress(
     input: InputStream,
     output: OutputStream,
     totalBytes: Long,
-    onProgress: (Int) -> Unit,
+    onProgress: suspend (Int) -> Unit,
 ) {
     val buffer = ByteArray(32 * 1024)
     var downloadedBytes = 0L
@@ -222,7 +225,9 @@ private fun copyWithProgress(
             // Update every 10%
             if (progress / 10 != lastProgress / 10) {
                 lastProgress = progress
-                onProgress(progress)
+                runBlocking {
+                    onProgress(progress)
+                }
             }
         }
     }
@@ -233,37 +238,72 @@ class MediaDownloadWorker(context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params), KoinComponent {
     private val repository: MediaDownloaderRepository by inject()
 
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        return super.getForegroundInfo()
+    }
+
     override suspend fun doWork(): Result {
         val url = inputData.getString(KEY_URL) ?: return Result.failure()
         val filename = inputData.getString(KEY_FILENAME) ?: return Result.failure()
         val folder = inputData.getString(KEY_FOLDER)
+        val workId = UUID.fromString(inputData.getString(KEY_ID)) ?: return Result.failure()
+        val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.checkSelfPermission(
+                applicationContext,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
         DownloadNotification.createNotificationChannel(applicationContext)
-        setForeground(DownloadNotification.createForegroundInfo(applicationContext, filename, 0))
+        if (hasPermission) {
+            setForeground(
+                DownloadNotification.createForegroundInfo(
+                    applicationContext,
+                    filename,
+                    workId,
+                    0
+                )
+            )
+        }
         val savedUri =
             repository.download(
                 url,
                 folder = folder,
                 filename = filename,
                 onProgress = { progress ->
-                    setProgressAsync(workDataOf(KEY_PROGRESS to progress))
-                    setForegroundAsync(
-                        DownloadNotification.createForegroundInfo(
-                            applicationContext,
-                            filename,
-                            progress
+                    if (hasPermission) {
+                        setProgress(workDataOf(KEY_PROGRESS to progress))
+                        setForeground(
+                            DownloadNotification.createForegroundInfo(
+                                applicationContext,
+                                filename,
+                                workId,
+                                progress
+                            )
                         )
-                    )
+                    }
                 }
             ).onSuccess { res ->
-                setProgress(
-                    workDataOf(
-                        KEY_PROGRESS to 100,
-                        KEY_DESTINATION to res.first.toString()
+                if (hasPermission) {
+                    setProgress(
+                        workDataOf(
+                            KEY_PROGRESS to 100,
+                            KEY_DESTINATION to res.first.toString()
+                        )
                     )
-                )
-                DownloadNotification.complete(applicationContext, filename, res.first, res.second)
+                    DownloadNotification.complete(
+                        applicationContext,
+                        filename,
+                        workId,
+                        res.first,
+                        res.second
+                    )
+                }
             }.onFailure {
-                DownloadNotification.error(applicationContext, filename)
+                if (hasPermission) {
+                    DownloadNotification.error(applicationContext, filename, workId)
+                }
             }
         return savedUri.fold(onSuccess = {
             Result.success(workDataOf(KEY_DESTINATION to savedUri.toString()))
@@ -280,17 +320,22 @@ class MediaDownloadWorker(context: Context, params: WorkerParameters) :
         const val KEY_PROGRESS = "progress"
         const val KEY_DESTINATION = "uri"
         const val KEY_ERROR = "error"
+        const val KEY_ID = "id"
     }
 }
 
 object DownloadNotification {
     private const val CHANNEL_ID = "download_channel"
+    private const val GROUP_KEY = "download_group"
     private const val NOTIFICATION_ID = 1001
     private const val COMPLETE_NOTIFICATION_ID = 1002
     private const val ERROR_NOTIFICATION_ID = 1003
+
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     fun complete(
         applicationContext: Context,
         filename: String,
+        id: UUID,
         savedUri: Uri,
         type: MediaType,
     ) {
@@ -314,53 +359,90 @@ object DownloadNotification {
             PendingIntent.FLAG_UPDATE_CURRENT or
                     PendingIntent.FLAG_IMMUTABLE
         )
+        val summaryNotification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_download_done)
+            .setContentTitle("Download complete")
+            .setGroup(GROUP_KEY)
+            .setAutoCancel(true)
+            .setCategory(NotificationCompat.CATEGORY_STATUS)
+            .setGroupSummary(true)
+            .build()
+
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_download_done)
             .setContentTitle("Download complete")
             .setContentIntent(pendingIntent)
             .setContentText(filename)
+            .setGroup(GROUP_KEY)
             .setAutoCancel(true)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .build()
-        val manager =
-            ContextCompat.getSystemService(applicationContext, NotificationManager::class.java)
-        manager?.notify(COMPLETE_NOTIFICATION_ID, notification)
+
+        NotificationManagerCompat.from(applicationContext).apply {
+            notify(COMPLETE_NOTIFICATION_ID, summaryNotification)
+            notify(id.hashCode(), notification)
+        }
+
     }
 
-    fun error(applicationContext: Context, filename: String) {
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+    fun error(applicationContext: Context, filename: String, id: UUID) {
+        val summaryNotification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_error)
+            .setContentTitle("Download failed")
+            .setAutoCancel(true)
+            .setGroup(GROUP_KEY)
+            .setGroupSummary(true)
+            .setCategory(NotificationCompat.CATEGORY_ERROR)
+            .build()
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_error)
             .setContentTitle("Download failed")
             .setContentText(filename)
             .setAutoCancel(true)
+            .setGroup(GROUP_KEY)
             .setCategory(NotificationCompat.CATEGORY_ERROR)
             .build()
-        val manager =
-            ContextCompat.getSystemService(applicationContext, NotificationManager::class.java)
-        manager?.notify(ERROR_NOTIFICATION_ID, notification)
+        NotificationManagerCompat.from(applicationContext).apply {
+            notify(ERROR_NOTIFICATION_ID, summaryNotification)
+            notify(id.hashCode(), notification)
+        }
     }
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     fun createForegroundInfo(
         applicationContext: Context,
         filename: String,
+        id: UUID,
         progress: Int,
     ): ForegroundInfo {
+        val summaryNotification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_download)
+            .setContentTitle("Downloading")
+            .setContentText(filename)
+            .setGroup(GROUP_KEY)
+            .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+            .build()
+        NotificationManagerCompat.from(applicationContext).apply {
+            notify(NOTIFICATION_ID, summaryNotification)
+        }
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_download)
             .setContentTitle("Downloading")
             .setContentText(filename)
             .setProgress(100, progress, false)
             .setOngoing(true)
+            .setGroup(GROUP_KEY)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .build()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ForegroundInfo(
-                NOTIFICATION_ID,
+                id.hashCode(),
                 notification,
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
             )
         } else {
-            ForegroundInfo(NOTIFICATION_ID, notification)
+            ForegroundInfo(id.hashCode(), notification)
         }
     }
 
@@ -388,7 +470,8 @@ object MediaDownloadManager {
         val inputData = workDataOf(
             MediaDownloadWorker.KEY_URL to url,
             MediaDownloadWorker.KEY_FILENAME to filename,
-            MediaDownloadWorker.KEY_FOLDER to folder
+            MediaDownloadWorker.KEY_FOLDER to folder,
+            MediaDownloadWorker.KEY_ID to UUID.randomUUID().toString()
         )
         val constraints =
             Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
