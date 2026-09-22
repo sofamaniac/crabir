@@ -1,10 +1,12 @@
 package com.sofamaniac.crabir.ui.post
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +17,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +37,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.R
@@ -54,6 +58,7 @@ import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.gallery.Gallery
 import com.sofamaniac.crabir.ui.media.image.ImageView
 import com.sofamaniac.crabir.ui.media.image.TransformableImage
+import com.sofamaniac.crabir.ui.media.image.saveToStorage
 import com.sofamaniac.crabir.ui.media.videoPlayer.DecoratedVideoPlayer
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayer
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
@@ -293,10 +298,13 @@ fun FullscreenGallery(
         enabled = enableDismiss,
         topBar = {
             FullscreenTopBar(showDecorations) {
-                Text(
-                    "${state.currentPage + 1}/${state.pageCount}",
-                    style = MaterialTheme.typography.labelMedium.copy(color = Color.White)
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    DownloadButton(post, gallery)
+                    Text(
+                        "${state.currentPage + 1}/${state.pageCount}",
+                        style = MaterialTheme.typography.labelMedium.copy(color = Color.White)
+                    )
+                }
             }
         },
         bottomBar = {
@@ -367,6 +375,31 @@ fun FullscreenGallery(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun DownloadButton(post: PostData, gallery: Gallery) {
+    val context = LocalContext.current
+    val toast = stringResource(R.string.downloading)
+    val settings = LocalDataSettings.current
+    val subreddit = post.subreddit.name
+    IconButton(onClick = {
+        Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+        val destination = settings.downloadLocation?.toUri()
+        val subfolder =
+            if (settings.subfolderPerCommunity) subreddit else null
+        for (index in gallery.images.indices) {
+            val url = gallery.get(index)?.toMediaResource()?.url?.toUri()
+            if (url != null) {
+                saveToStorage(context, url, destination, subfolder, name = "${post.id}-$index")
+            }
+        }
+    }) {
+        Icon(
+            Icons.Outlined.Download,
+            contentDescription = stringResource(R.string.download)
+        )
     }
 }
 

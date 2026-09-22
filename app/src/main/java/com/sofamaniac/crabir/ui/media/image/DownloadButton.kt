@@ -65,10 +65,11 @@ fun saveToStorage(
     url: Uri,
     destination: Uri?,
     subfolder: String?,
+    name: String? = null,
 ) {
     Log.d("DownloadButton", "saveToStorage: $url")
     val request = DownloadManager.Request(url)
-    val name = url.lastPathSegment ?: return
+    val name = name ?: url.lastPathSegment ?: return
     Log.d("DownloadButton", "saveToStorage: $destination")
     request.setTitle(name)
     request.setDescription("Downloading Media")
