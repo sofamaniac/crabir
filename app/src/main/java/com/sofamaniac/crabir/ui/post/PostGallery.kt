@@ -17,7 +17,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
-import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -56,9 +56,10 @@ import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
 import com.sofamaniac.crabir.ui.media.VerticalSwipeToDismiss
 import com.sofamaniac.crabir.ui.media.gallery.Gallery
+import com.sofamaniac.crabir.ui.media.image.DownloadButton
+import com.sofamaniac.crabir.ui.media.image.DownloadButtonViewModel
 import com.sofamaniac.crabir.ui.media.image.ImageView
 import com.sofamaniac.crabir.ui.media.image.TransformableImage
-import com.sofamaniac.crabir.ui.media.image.saveToStorage
 import com.sofamaniac.crabir.ui.media.videoPlayer.DecoratedVideoPlayer
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayer
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
@@ -289,6 +290,9 @@ fun FullscreenGallery(
     }
     var showControls by remember { mutableStateOf(false) }
     var enableDismiss by remember { mutableStateOf(true) }
+    val currentPage = remember(state.currentPage) {
+        gallery.get(state.currentPage)
+    }
     LaunchedEffect(state.currentPage) {
         onPageChanged(state.currentPage)
         enableDismiss = true
@@ -299,7 +303,15 @@ fun FullscreenGallery(
         topBar = {
             FullscreenTopBar(showDecorations) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    DownloadButton(post, gallery)
+                    //DownloadAllButton(post, gallery)
+                    val url = currentPage?.toMediaResource()?.url?.toUri()
+                    if (url != null) {
+                        DownloadButton(
+                            url,
+                            suffix = state.currentPage.toString(),
+                            subreddit = post.subreddit.name
+                        )
+                    }
                     Text(
                         "${state.currentPage + 1}/${state.pageCount}",
                         style = MaterialTheme.typography.labelMedium.copy(color = Color.White)
@@ -379,25 +391,27 @@ fun FullscreenGallery(
 }
 
 @Composable
-private fun DownloadButton(post: PostData, gallery: Gallery) {
+private fun DownloadAllButton(
+    post: PostData,
+    gallery: Gallery,
+    viewModel: DownloadButtonViewModel = koinViewModel(),
+) {
     val context = LocalContext.current
     val toast = stringResource(R.string.downloading)
     val settings = LocalDataSettings.current
     val subreddit = post.subreddit.name
     IconButton(onClick = {
         Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
-        val destination = settings.downloadLocation?.toUri()
         val subfolder =
             if (settings.subfolderPerCommunity) subreddit else null
-        for (index in gallery.images.indices) {
-            val url = gallery.get(index)?.toMediaResource()?.url?.toUri()
-            if (url != null) {
-                saveToStorage(context, url, destination, subfolder, name = "${post.id}-$index")
-            }
-        }
+        viewModel.downloadAll(
+            gallery.images.indices.mapNotNull { gallery.get(it)?.toMediaResource()?.url?.toUri() },
+            post.id,
+            subfolder
+        )
     }) {
         Icon(
-            Icons.Outlined.Download,
+            Icons.Default.Save,
             contentDescription = stringResource(R.string.download)
         )
     }

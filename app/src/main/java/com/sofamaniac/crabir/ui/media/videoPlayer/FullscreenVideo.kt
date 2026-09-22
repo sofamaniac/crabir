@@ -43,7 +43,12 @@ fun FullscreenVideo(
         topBar = {
             FullscreenTopBar(
                 showDecorations,
-                actions = { DownloadButton(video.url.toUri(), post.subreddit.name) })
+                actions = {
+                    DownloadButton(
+                        video.url.toUri(),
+                        post.subreddit.name,
+                    )
+                })
         },
         bottomBar = {
             FullscreenBottomBar(post, showDecorations) {

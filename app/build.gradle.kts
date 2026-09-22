@@ -112,6 +112,7 @@ tasks.preBuild {
 dependencies {
 
     implementation(libs.androidx.documentfile)
+    implementation(libs.androidx.work.runtime.ktx)
     lintChecks(project(":lint-rules"))
 
     implementation(libs.androidx.compose.material3)

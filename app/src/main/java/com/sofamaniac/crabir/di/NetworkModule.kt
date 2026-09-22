@@ -4,6 +4,7 @@ import android.app.Application
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.skydoves.retrofit.adapters.result.ResultCallAdapterFactory
 import com.sofamaniac.crabir.BuildConfig
+import com.sofamaniac.crabir.data.remote.MediaDownloader
 import com.sofamaniac.crabir.data.remote.RandditAPI
 import com.sofamaniac.crabir.data.remote.interceptors.CountInterceptor
 import com.sofamaniac.crabir.data.remote.interceptors.ForceJsonInterceptor
@@ -171,6 +172,25 @@ class NetworkModule {
             .addCallAdapterFactory(ResultCallAdapterFactory.create())
             .build()
             .create(StreamableAPI::class.java)
+    }
+
+    @Single
+    fun provideMediaDownloader(
+    ): MediaDownloader {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.HEADERS
+        }
+        val client = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+        return Retrofit.Builder()
+            .baseUrl("https://example.com")
+            .client(client)
+            .addCallAdapterFactory(ResultCallAdapterFactory.create())
+            .build()
+            .create(MediaDownloader::class.java)
     }
 }
 

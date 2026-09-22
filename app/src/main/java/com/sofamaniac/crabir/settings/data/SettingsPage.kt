@@ -59,13 +59,13 @@ fun DataSettingsPage() {
         ) { paddingValues ->
             Column(modifier = Modifier.padding(paddingValues)) {
                 SettingHeader("Downloads")
-                //                LocationTile(dataSettings) { newVal ->
-                //                    scope.launch {
-                //                        dataSettingsStore.updateData { settings ->
-                //                            settings.copy(downloadLocation = newVal.downloadLocation)
-                //                        }
-                //                    }
-                //                }
+                LocationTile(dataSettings) { newVal ->
+                    scope.launch {
+                        dataSettingsStore.updateData { settings ->
+                            settings.copy(downloadLocation = newVal.downloadLocation)
+                        }
+                    }
+                }
                 SwitchTile(
                     headlineContent = { Text(stringResource(R.string.downloads_community_subfolders)) },
                     checked = dataSettings.subfolderPerCommunity,
@@ -172,7 +172,7 @@ fun LocationTile(settings: DataSettings, updateSettings: (DataSettings) -> Unit)
                 uri,
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             )
-            updateSettings(settings.copy(downloadLocation = uri.encodedPath))
+            updateSettings(settings.copy(downloadLocation = uri.toString()))
         }
     }
     val folder = remember(settings) {
