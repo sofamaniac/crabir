@@ -48,7 +48,6 @@ import com.sofamaniac.crabir.navigation.NavigationGraph
 import com.sofamaniac.crabir.settings.ConfigureSettings
 import com.sofamaniac.crabir.settings.theme.ConfigureCrabirTheme
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
-import com.sofamaniac.crabir.ui.rememberCurrentAccount
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.annotation.KoinApplication
 import org.koin.core.annotation.KoinViewModelScopeApi
@@ -177,29 +176,21 @@ fun MainScreen(
             lifecycle.removeObserver(observer)
         }
     }
-    val currentAccount = rememberCurrentAccount()
     ConfigureCrabirTheme {
         ConfigureSettings {
-            CompositionLocalProvider(
-                LocalNavController provides navController,
-                LocalRedditAccount provides currentAccount,
-            ) {
-                LaunchedEffect(Unit) {
-                    // App is done loading
-                    onLoad()
+            ConfigureAccount() {
+                CompositionLocalProvider(
+                    LocalNavController provides navController,
+                ) {
+                    LaunchedEffect(Unit) {
+                        // App is done loading
+                        onLoad()
+                    }
+                    SetShortcuts()
+                    NavigationGraph(
+                        navController,
+                    )
                 }
-                //                val apiSettings = LocalApiSettings.current
-                //                LaunchedEffect(currentAccount) {
-                //                    if (!currentAccount.isUninitialized() && apiSettings.isConfigured) {
-                //                        navController.navigate(HomeRoute) {
-                //                            popUpTo(0) { inclusive = true }
-                //                        }
-                //                    }
-                //                }
-                SetShortcuts()
-                NavigationGraph(
-                    navController,
-                )
             }
         }
     }

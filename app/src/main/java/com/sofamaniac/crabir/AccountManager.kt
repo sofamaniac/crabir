@@ -3,6 +3,12 @@ package com.sofamaniac.crabir
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.auth.BasicAuthClient
 import com.sofamaniac.crabir.data.remote.reddit.auth.Config
@@ -12,6 +18,7 @@ import com.sofamaniac.crabir.settings.api.apiSettingsDataStore
 import com.sofamaniac.crabir.ui.drawer.LoginState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthState
@@ -20,6 +27,8 @@ import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.TokenRequest
 import net.openid.appauth.TokenResponse
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.KoinViewModel
 import org.koin.core.annotation.Single
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -159,4 +168,31 @@ class AccountManager(
         accountsRepository.setActiveAccount(id)
     }
 
+}
+
+@KoinViewModel
+class AccountConfigurationViewModel(private val manager: AccountManager) : ViewModel() {
+    val currentAccount =
+        manager.accountsRepository.activeAccount.dropWhile { account -> account.isUninitialized() }
+
+    init {
+        viewModelScope.launch {
+            manager.initialize { err ->
+                Log.e("AccountConfigurationViewModel", "Failed to initialize: $err")
+            }
+        }
+    }
+}
+
+@Composable
+fun ConfigureAccount(
+    viewModel: AccountConfigurationViewModel = koinViewModel(),
+    content: @Composable () -> Unit,
+) {
+    val currentAccount by viewModel.currentAccount.collectAsState(null)
+    CompositionLocalProvider(
+        LocalRedditAccount provides (currentAccount ?: RedditAccount.anonymous())
+    ) {
+        content()
+    }
 }

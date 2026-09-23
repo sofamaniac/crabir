@@ -143,7 +143,9 @@ fun DrawerContent(
                     viewModel.toggleSelectAccount()
                 }.invokeOnCompletion {
                     navController?.navigate(HomeRoute) {
-                        popUpTo(HomeRoute)
+                        popUpTo(HomeRoute) {
+                            inclusive = true
+                        }
                     }
                 }
             }
