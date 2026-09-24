@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.VerticalSplit
 import androidx.compose.material.icons.filled.ViewComfy
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -88,6 +89,25 @@ fun ViewsSettingsPage(navigateBack: () -> Unit) {
                                 }
                             }
                         )
+                    }
+                )
+            }
+            item {
+                SwitchTile(
+                    checked = viewSettings.splitScreenEnabled,
+                    onCheckedChange = { target ->
+                        scope.launch {
+                            settingsDataStore.updateData {
+                                it.copy(splitScreenEnabled = target)
+                            }
+                        }
+                    },
+                    leadingContent = {
+                        Icon(Icons.Default.VerticalSplit, contentDescription = null)
+                    },
+                    headlineContent = { Text(stringResource(R.string.tablet_split_screen_mode_title)) },
+                    supportingContent = {
+                        Text(stringResource(R.string.table_split_screen_mode_supporting))
                     }
                 )
             }

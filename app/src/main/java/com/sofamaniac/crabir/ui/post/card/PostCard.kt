@@ -17,8 +17,6 @@ import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.routes.PostRoute
 import com.sofamaniac.crabir.onWifiConnection
 import com.sofamaniac.crabir.settings.data.NetworkPolicy
 import com.sofamaniac.crabir.ui.components.ThemedCard
@@ -36,6 +34,7 @@ import org.koin.core.parameter.parametersOf
 fun PostCard(
     post: PostData,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
     showHidden: Boolean = false,
     dim: Boolean = false,
     isMostVisible: Boolean,
@@ -49,7 +48,8 @@ fun PostCard(
     if (postOpt == null) {
         ThemedCard(
             modifier = Modifier.height(100.dp),
-            elevation = CardDefaults.elevatedCardElevation()
+            elevation = CardDefaults.elevatedCardElevation(),
+            onClick = onClick,
         ) {}
     } else {
         val post = postOpt!!
@@ -62,6 +62,7 @@ fun PostCard(
             interactions = viewModel,
             dim = dim,
             isMostVisible = isMostVisible,
+            onClick = onClick,
         )
     }
 }
@@ -70,6 +71,7 @@ fun PostCard(
 internal fun PostCardContent(
     post: PostData,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
     isMostVisible: Boolean = false,
     dim: Boolean = false,
     interactions: LinkInteraction,
@@ -89,13 +91,10 @@ internal fun PostCardContent(
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = 4.dp)
-    val navController = LocalNavController.current
     ThemedCard(
         roundedCorners = viewSettings.cardSettings.roundedCorners,
         modifier = modifier.fillMaxWidth(),
-        onClick = {
-            navController?.navigate(PostRoute(post.permalink)) ?: Unit
-        }
+        onClick = onClick,
     ) {
         PostHeader(
             post,

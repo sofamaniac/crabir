@@ -220,6 +220,7 @@ fun PostView(
     view: Views,
     viewModel: PostViewModelInterface,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
 ) {
     val settings = LocalHistorySettings.current
     val dim = settings.dimImages
@@ -229,6 +230,7 @@ fun PostView(
     when (view) {
         Views.Card -> PostCard(
             thing,
+            onClick = onClick,
             modifier = modifier,
             isMostVisible = isMostVisible,
             showHidden = showHidden,
@@ -238,6 +240,7 @@ fun PostView(
 
         Views.Compact -> CompactView(
             thing,
+            onClick = onClick,
             modifier = modifier,
             showHidden = showHidden,
             viewModel = viewModel,
@@ -251,6 +254,7 @@ fun PostView(
     isMostVisible: Boolean,
     showHidden: Boolean,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
     view: Views? = null,
     viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = thing.id) {
         parametersOf(
@@ -267,6 +271,7 @@ fun PostView(
         view ?: viewSettings.defaultView,
         viewModel = viewModel,
         modifier = modifier,
+        onClick = onClick,
     )
 }
 

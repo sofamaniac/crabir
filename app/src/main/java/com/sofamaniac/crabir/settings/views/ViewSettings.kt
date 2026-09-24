@@ -40,6 +40,7 @@ data class ViewSettings(
     //    val postFontSettings: FontSettings = FontSettings(),
     //    val commentFontSettings: FontSettings = FontSettings(),
     val prefixCommunity: Boolean = true,
+    val splitScreenEnabled: Boolean = true,
     val cardSettings: CardSettings = CardSettings(),
     val rememberedViews: Map<String, CommunityViewEntity> = emptyMap(),
 )

@@ -11,8 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.routes.PostRoute
 import com.sofamaniac.crabir.ui.components.ThemedCard
 import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.ScoreString
@@ -24,7 +22,7 @@ import org.koin.core.parameter.parametersOf
 fun CompactView(
     post: PostData,
     modifier: Modifier = Modifier,
-    clickable: Boolean = true,
+    onClick: (() -> Unit)? = null,
     showHidden: Boolean = false,
     viewModel: PostViewModelInterface = koinViewModel<LinkViewModel>(key = post.id) {
         parametersOf(
@@ -32,12 +30,6 @@ fun CompactView(
         )
     },
 ) {
-    val navController = LocalNavController.current
-    val onClick = {
-        if (clickable) {
-            navController?.navigate(PostRoute(post.permalink))
-        }
-    }
     val likes by viewModel.likes.collectAsState()
     val postOpt by viewModel.post.collectAsState()
     val read by viewModel.read.collectAsState()

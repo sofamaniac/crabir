@@ -431,6 +431,9 @@
     <string name="gallery_download_page">Current page only</string>
     <string name="gallery_download_all">All pages</string>
     <string name="debug_options_tile">Debug Options</string>
+    <string name="split_screen_placeholder"><![CDATA[Tap a post to display comments in this panel.\nSplit screen can be disabled in Settings -> General -> Views]]></string>
+    <string name="tablet_split_screen_mode_title">Tablet split screen mode</string>
+    <string name="table_split_screen_mode_supporting">Show posts and comments in two columns in landscape mode</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>
