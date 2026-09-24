@@ -39,8 +39,8 @@ import java.net.URI
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-private const val BaseUrl = "https://oauth.reddit.com/"
-private const val Timeout: Long = 30
+private const val BASE_URL = "https://oauth.reddit.com/"
+private const val TIMEOUT: Long = 30
 
 @Module(includes = [AccountsModule::class, AuthModule::class])
 @ComponentScan
@@ -81,8 +81,8 @@ class NetworkModule {
             .addInterceptor(forceJsonInterceptor)
             .addInterceptor(loggingInterceptor)
             .addInterceptor(CountInterceptor)
-            .connectTimeout(Timeout, TimeUnit.SECONDS)
-            .readTimeout(Timeout, TimeUnit.SECONDS)
+            .connectTimeout(TIMEOUT, TimeUnit.SECONDS)
+            .readTimeout(TIMEOUT, TimeUnit.SECONDS)
             .build()
     }
 
@@ -109,7 +109,7 @@ class NetworkModule {
     ): RedditAPIService {
         val contentType = "application/json".toMediaType()
         return Retrofit.Builder()
-            .baseUrl(BaseUrl)
+            .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory(contentType))
             .addCallAdapterFactory(ResultCallAdapterFactory.create())
@@ -144,7 +144,7 @@ class NetworkModule {
             .readTimeout(30, TimeUnit.SECONDS)
             .build()
         return Retrofit.Builder()
-            .baseUrl(BaseUrl)
+            .baseUrl(BASE_URL)
             .addConverterFactory(
                 XML.v1.asConverterFactory("application/xml".toMediaType())
             )

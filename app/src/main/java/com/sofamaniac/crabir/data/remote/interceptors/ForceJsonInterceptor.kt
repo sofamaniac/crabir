@@ -13,7 +13,7 @@ import okhttp3.Response
  */
 class ForceJsonInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        // TODO: not sure if needed
+        // not sure if needed
         val headerRequest = chain.request().newBuilder()
             .addHeader("Accept", "application/json")
             .build()

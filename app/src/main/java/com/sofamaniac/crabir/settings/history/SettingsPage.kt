@@ -1,8 +1,6 @@
 package com.sofamaniac.crabir.settings.history
 
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -20,10 +18,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.settings.helper.SwitchTile
-import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.components.BackButton
+import com.sofamaniac.crabir.ui.components.ListItemSpacer
 import com.sofamaniac.crabir.ui.components.ThemedDialog
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -100,7 +98,7 @@ private fun ClearHistoryButton(historyManager: HistoryManager = koinInject()) {
     var showConfirmationDialog by remember { mutableStateOf(false) }
     ListItem(
         onClick = { showConfirmationDialog = true },
-        leadingContent = { Spacer(Modifier.size(24.dp)) }
+        leadingContent = { ListItemSpacer() }
     ) {
         Text(stringResource(R.string.clear_history))
     }

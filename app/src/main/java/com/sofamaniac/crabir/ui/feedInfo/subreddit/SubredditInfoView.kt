@@ -34,7 +34,7 @@ import com.sofamaniac.crabir.domain.model.RichtextDocument
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.SearchRoute
-import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.components.BackButton
 import com.sofamaniac.crabir.ui.components.SubredditIcon
 import com.sofamaniac.crabir.ui.richtext.Richtext
 import org.koin.androidx.compose.koinViewModel

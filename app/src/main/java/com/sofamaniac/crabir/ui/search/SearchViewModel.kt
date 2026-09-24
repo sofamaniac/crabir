@@ -25,6 +25,7 @@ import com.sofamaniac.crabir.domain.repository.ListingSource
 import com.sofamaniac.crabir.domain.repository.SubscriptionsRepository
 import com.sofamaniac.crabir.domain.repository.search.CommunitySearchParams
 import com.sofamaniac.crabir.domain.repository.search.CommunitySearchRepository
+import com.sofamaniac.crabir.domain.repository.search.MIN_SEARCH_LENGTH
 import com.sofamaniac.crabir.domain.repository.search.PostSearchParams
 import com.sofamaniac.crabir.domain.repository.search.PostSearchRepository
 import com.sofamaniac.crabir.domain.repository.search.UserSearchRepository
@@ -88,7 +89,7 @@ abstract class SearchViewModel<Params : SearchParams<Params>, Data : DataInterfa
     fun onQueryUpdate(q: String) {
         if (queryState.text as String == q) return
         queryState.edit { replace(0, length, q) }
-        if (q.length < 3) return
+        if (q.length < MIN_SEARCH_LENGTH) return
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             delay(500.milliseconds)

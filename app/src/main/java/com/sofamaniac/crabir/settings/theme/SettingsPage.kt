@@ -28,7 +28,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.routes.SettingsRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SwitchTile
-import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.components.BackButton
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.components.ThemedDialog
 import kotlinx.coroutines.launch

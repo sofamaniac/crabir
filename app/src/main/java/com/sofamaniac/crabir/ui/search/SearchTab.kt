@@ -74,7 +74,7 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.ProfileRoute
 import com.sofamaniac.crabir.navigation.routes.SearchRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
-import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.components.BackButton
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.components.ThemedSwitch
 import com.sofamaniac.crabir.ui.components.TimeframeMenu

@@ -3,8 +3,6 @@ package com.sofamaniac.crabir.ui.postFeed.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
@@ -30,7 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
@@ -50,6 +48,7 @@ import com.sofamaniac.crabir.settings.views.ViewSettings
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.settings.views.viewSettingDataStore
 import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ListItemSpacer
 import com.sofamaniac.crabir.ui.components.SortMenu
 import com.sofamaniac.crabir.ui.components.ThemedDialog
 import com.sofamaniac.crabir.ui.postFeed.ViewFull
@@ -290,7 +289,7 @@ fun ColumnsEditor(current: Int, updateColumns: (Int) -> Unit) {
         }
     }
     ListItem(
-        leadingContent = { Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.list_item_leading_size))) },
+        leadingContent = { ListItemSpacer() },
         enabled = true,
         content = { Text(stringResource(R.string.feed_columns_editor)) },
         supportingContent = {
@@ -301,7 +300,7 @@ fun ColumnsEditor(current: Int, updateColumns: (Int) -> Unit) {
                 Slider(
                     modifier = Modifier.weight(1f),
                     value = selectedColumns.toFloat(),
-                    valueRange = 1f..3f,
+                    valueRange = integerResource(R.integer.min_columns).toFloat()..integerResource(R.integer.max_columns).toFloat(),
                     steps = 1,
                     onValueChange = { target ->
                         selectOption(target.toInt())

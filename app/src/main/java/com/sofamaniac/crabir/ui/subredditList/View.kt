@@ -34,7 +34,7 @@ import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTOMapper
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.components.BackButton
 import org.koin.androidx.compose.koinViewModel
 
 

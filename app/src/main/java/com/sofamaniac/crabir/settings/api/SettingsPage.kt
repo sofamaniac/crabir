@@ -23,7 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.components.BackButton
 import com.sofamaniac.crabir.ui.components.ThemedCard
 import kotlinx.coroutines.launch
 

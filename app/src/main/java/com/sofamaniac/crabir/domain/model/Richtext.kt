@@ -246,6 +246,7 @@ object TableAlignmentSerializer : KSerializer<TableAlignment> {
     }
 }
 
+@Suppress("MagicNumber")
 enum class TextStyle(val value: Int) {
     Bold(1),
     Italic(2),

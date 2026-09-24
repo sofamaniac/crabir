@@ -3,11 +3,11 @@ package com.sofamaniac.crabir.settings.helper
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.material3.ButtonDefaults.SmallIconSize
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.components.ThemedCheckbox
 
@@ -17,7 +17,7 @@ fun CheckboxTile(
     headlineContent: @Composable () -> Unit,
     supportingContent: @Composable (() -> Unit)? = null,
     leadingContent: @Composable () -> Unit = {
-        Spacer(modifier = Modifier.size(24.dp))
+        Spacer(modifier = Modifier.size(SmallIconSize))
     },
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,

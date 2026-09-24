@@ -22,6 +22,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import com.sofamaniac.crabir.LocalTheme
 
+
+const val SCORE_ANIM_TARGET = 1.7f
+const val SCORE_ANIM_DURATION = 100
+
 @Composable
 fun ScoreString(score: Int, likes: Boolean?, hidden: Boolean = false) {
     val scoreStyle =
@@ -56,8 +60,14 @@ fun ScoreString(score: Int, likes: Boolean?, hidden: Boolean = false) {
         previousLike = likes
 
         if (likes == true && trigger) {
-            scale.animateTo(1.7f, animationSpec = tween(100, easing = EaseOut))
-            scale.animateTo(1f, animationSpec = tween(100, easing = EaseIn))
+            scale.animateTo(
+                SCORE_ANIM_TARGET,
+                animationSpec = tween(SCORE_ANIM_DURATION / 2, easing = EaseOut)
+            )
+            scale.animateTo(
+                1f,
+                animationSpec = tween(SCORE_ANIM_DURATION / 2, easing = EaseIn)
+            )
         }
     }
 

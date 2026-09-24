@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.flowOf
 import org.koin.core.annotation.Singleton
 import org.koin.core.annotation.ViewModelScope
 
+const val MIN_SEARCH_LENGTH = 3
+
 @ViewModelScope
 class PostSearchRepository(
     private val api: RedditAPIService,
@@ -33,17 +35,24 @@ class PostSearchRepository(
         after: Fullname,
         params: PostSearchParams,
     ): PagingSource.LoadResult<Fullname, Fullname> {
-        if (params.query.length < 3) return PagingSource.LoadResult.Page(emptyList(), null, null)
-        return makeRequest {
-            api.search(
-                subreddit = params.subreddit ?: "all",
-                restrictSubreddit = params.restrictSubreddit,
-                query = params.query,
-                sort = params.sort,
-                timeframe = params.timeframe,
-                after = after,
-                type = "link"
+        if (params.query.length < MIN_SEARCH_LENGTH) {
+            return PagingSource.LoadResult.Page(
+                emptyList(),
+                null,
+                null
             )
+        } else {
+            return makeRequest {
+                api.search(
+                    subreddit = params.subreddit ?: "all",
+                    restrictSubreddit = params.restrictSubreddit,
+                    query = params.query,
+                    sort = params.sort,
+                    timeframe = params.timeframe,
+                    after = after,
+                    type = "link"
+                )
+            }
         }
     }
 }
@@ -63,14 +72,17 @@ class CommunitySearchRepository(
         after: Fullname,
         params: CommunitySearchParams,
     ): PagingSource.LoadResult<Fullname, Fullname> {
-        if (params.query.length < 3) return PagingSource.LoadResult.Page(emptyList(), null, null)
-        return makeRequest {
-            api.searchSubreddits(
-                query = params.query,
-                includeOver18 = params.includeOver18,
-                exact = params.exact,
-                after = after.name,
-            )
+        if (params.query.length < MIN_SEARCH_LENGTH) {
+            return PagingSource.LoadResult.Page(emptyList(), null, null)
+        } else {
+            return makeRequest {
+                api.searchSubreddits(
+                    query = params.query,
+                    includeOver18 = params.includeOver18,
+                    exact = params.exact,
+                    after = after.name,
+                )
+            }
         }
     }
 }
@@ -124,17 +136,24 @@ class UserSearchRepository(private val api: RedditAPIService, override val cache
         after: Fullname,
         params: PostSearchParams,
     ): PagingSource.LoadResult<Fullname, Fullname> {
-        if (params.query.length < 3) return PagingSource.LoadResult.Page(emptyList(), null, null)
-        return makeRequest {
-            api.search(
-                subreddit = params.subreddit ?: "all",
-                restrictSubreddit = params.restrictSubreddit,
-                query = params.query,
-                sort = params.sort,
-                timeframe = params.timeframe,
-                after = after,
-                type = "user"
+        if (params.query.length < MIN_SEARCH_LENGTH) {
+            return PagingSource.LoadResult.Page(
+                emptyList(),
+                null,
+                null
             )
+        } else {
+            return makeRequest {
+                api.search(
+                    subreddit = params.subreddit ?: "all",
+                    restrictSubreddit = params.restrictSubreddit,
+                    query = params.query,
+                    sort = params.sort,
+                    timeframe = params.timeframe,
+                    after = after,
+                    type = "user"
+                )
+            }
         }
     }
 }

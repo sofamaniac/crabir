@@ -1,7 +1,6 @@
 package com.sofamaniac.crabir.settings.helper
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.ZeroCornerSize
@@ -33,8 +32,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ListItemSpacer
 
 @Composable
 fun <T> ListSelector(
@@ -42,7 +41,7 @@ fun <T> ListSelector(
     selectedOption: T,
     modifier: Modifier = Modifier,
     leadingContent: @Composable () -> Unit = {
-        Spacer(modifier = Modifier.size(24.dp))
+        ListItemSpacer()
     },
     headlineContent: @Composable () -> Unit = {},
     enabled: Boolean = true,

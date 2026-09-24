@@ -1,9 +1,7 @@
 package com.sofamaniac.crabir.settings.views
 
 import android.util.Log
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -23,17 +21,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.ViewManagerRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
-import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.components.BackButton
 import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ListItemSpacer
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -73,13 +72,15 @@ fun ViewsSettingsPage(navigateBack: () -> Unit) {
             item {
                 ListItem(
                     enabled = true,
-                    leadingContent = { Spacer(modifier = Modifier.size(24.dp)) },
+                    leadingContent = { ListItemSpacer() },
                     content = { Text(stringResource(R.string.default_number_of_columns)) },
                     trailingContent = { Text(viewSettings.defaultColumns.toString()) },
                     supportingContent = {
                         Slider(
                             value = viewSettings.defaultColumns.toFloat(),
-                            valueRange = 1f..3f,
+                            valueRange = integerResource(R.integer.min_columns).toFloat()..integerResource(
+                                R.integer.max_columns
+                            ).toFloat(),
                             steps = 1,
                             onValueChange = { target ->
                                 scope.launch {
@@ -128,7 +129,7 @@ fun ViewsSettingsPage(navigateBack: () -> Unit) {
             }
             item {
                 ListItem(
-                    leadingContent = { Spacer(modifier = Modifier.size(24.dp)) },
+                    leadingContent = { ListItemSpacer() },
                     onClick = { navController?.navigate(ViewManagerRoute) },
                     enabled = viewSettings.rememberView
                 ) {
@@ -213,7 +214,7 @@ fun ViewsSettingsPage(navigateBack: () -> Unit) {
 
             item {
                 ListItem(
-                    leadingContent = { Spacer(modifier = Modifier.size(24.dp)) },
+                    leadingContent = { ListItemSpacer() },
                     content = {
                         TextField(
                             enabled = viewSettings.cardSettings.enableTextPreview,

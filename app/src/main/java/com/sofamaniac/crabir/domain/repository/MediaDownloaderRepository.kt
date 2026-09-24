@@ -208,6 +208,7 @@ private fun copyWithProgress(
     totalBytes: Long,
     onProgress: suspend (Int) -> Unit,
 ) {
+    val updateThreshold = 10
     val buffer = ByteArray(32 * 1024)
     var downloadedBytes = 0L
     var lastProgress = 0
@@ -223,7 +224,7 @@ private fun copyWithProgress(
         if (totalBytes > 0) {
             val progress = (downloadedBytes * 100 / totalBytes).toInt().coerceAtMost(100)
             // Update every 10%
-            if (progress / 10 != lastProgress / 10) {
+            if (progress / updateThreshold != lastProgress / updateThreshold) {
                 lastProgress = progress
                 runBlocking {
                     onProgress(progress)

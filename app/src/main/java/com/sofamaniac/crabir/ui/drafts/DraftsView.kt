@@ -40,7 +40,7 @@ import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.PostCreatorRoute
-import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.components.BackButton
 import com.sofamaniac.crabir.ui.components.RefreshIndicator
 import com.sofamaniac.crabir.ui.components.SubredditIcon
 import com.sofamaniac.crabir.ui.components.ThemedDialog

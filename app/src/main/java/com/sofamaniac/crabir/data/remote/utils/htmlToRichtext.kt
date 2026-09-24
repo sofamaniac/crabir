@@ -67,6 +67,7 @@ private fun Richtext.Companion.fromHtml(node: Node, style: Int = 0): List<Richte
     }
 }
 
+@Suppress("MagicNumber")
 private fun Richtext.Companion.fromHtml(node: Element, style: Int = 0): List<Richtext> {
     return when (node.tagName()) {
         "h1" -> {

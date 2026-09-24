@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled._18UpRating
+import androidx.compose.material3.ButtonDefaults.SmallIconSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
@@ -174,7 +174,7 @@ private fun ListItemPadded(content: @Composable () -> Unit, modifier: Modifier =
     ListItem(
         content = content,
         modifier = modifier,
-        leadingContent = { Spacer(modifier.size(24.dp)) })
+        leadingContent = { Spacer(modifier.size(SmallIconSize)) })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

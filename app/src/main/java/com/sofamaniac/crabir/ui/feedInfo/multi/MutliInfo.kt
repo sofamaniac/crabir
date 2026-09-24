@@ -25,7 +25,7 @@ import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.SearchRoute
 import com.sofamaniac.crabir.navigation.routes.SubredditInfoRoute
 import com.sofamaniac.crabir.navigation.routes.SubredditRoute
-import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.components.BackButton
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.components.MultiIcon
 import com.sofamaniac.crabir.ui.components.SubredditIcon

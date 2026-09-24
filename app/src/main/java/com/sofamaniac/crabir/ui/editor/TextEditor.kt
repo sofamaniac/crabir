@@ -27,7 +27,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.ui.CloseButton
+import com.sofamaniac.crabir.ui.components.CloseButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

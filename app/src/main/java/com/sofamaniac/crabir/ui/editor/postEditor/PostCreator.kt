@@ -59,7 +59,7 @@ import com.sofamaniac.crabir.data.remote.reddit.MissingUrl
 import com.sofamaniac.crabir.data.remote.reddit.PostSubmissionBuilder
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.settings.helper.SwitchTile
-import com.sofamaniac.crabir.ui.CloseButton
+import com.sofamaniac.crabir.ui.components.CloseButton
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.components.ThemedDialog
 import com.sofamaniac.crabir.ui.components.cartouche

@@ -18,7 +18,7 @@ import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.SubredditInfoRoute
 import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
-import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.components.BackButton
 import com.sofamaniac.crabir.ui.post.dialog.ShareMenu
 import com.sofamaniac.crabir.ui.thread.SortMenu
 import com.sofamaniac.crabir.ui.thread.ThreadViewModel

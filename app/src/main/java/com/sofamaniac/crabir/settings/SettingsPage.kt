@@ -59,7 +59,7 @@ import com.sofamaniac.crabir.settings.post.PostSettingsPage
 import com.sofamaniac.crabir.settings.theme.ThemeEditor
 import com.sofamaniac.crabir.settings.theme.ThemeSettingsPage
 import com.sofamaniac.crabir.settings.views.ViewsSettingsPage
-import com.sofamaniac.crabir.ui.BackButton
+import com.sofamaniac.crabir.ui.components.BackButton
 import com.sofamaniac.crabir.ui.components.ListItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

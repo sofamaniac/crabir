@@ -34,6 +34,8 @@ import com.sofamaniac.crabir.R
 import kotlinx.coroutines.launch
 
 const val MAX_OFFSET = 10f
+const val SCALE_TARGET = 1.7f
+const val ANIM_DURATION = 100
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +45,7 @@ fun UpButton(likes: Boolean?, onClick: () -> Unit) {
     val offset = remember { Animatable(0f) }
     suspend fun animate(likes: Boolean?) {
         if (likes == true) return
-        offset.animateTo(-MAX_OFFSET, animationSpec = tween(50, easing = EaseIn))
+        offset.animateTo(-MAX_OFFSET, animationSpec = tween(ANIM_DURATION, easing = EaseIn))
         offset.animateTo(
             0f,
             animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium)
@@ -91,7 +93,7 @@ fun DownButton(likes: Boolean?, onClick: () -> Unit) {
 
     suspend fun animate(likes: Boolean?) {
         if (likes == false) return
-        offset.animateTo(MAX_OFFSET, animationSpec = tween(50, easing = EaseIn))
+        offset.animateTo(MAX_OFFSET, animationSpec = tween(ANIM_DURATION, easing = EaseIn))
         offset.animateTo(
             0f,
             animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium)
@@ -144,8 +146,14 @@ fun SavedButton(saved: Boolean, onClick: () -> Unit) {
 
     suspend fun animate(saved: Boolean) {
         if (saved) {
-            scale.animateTo(1.7f, animationSpec = tween(100, easing = EaseOut))
-            scale.animateTo(1f, animationSpec = tween(100, easing = EaseIn))
+            scale.animateTo(
+                SCALE_TARGET,
+                animationSpec = tween(ANIM_DURATION / 2, easing = EaseOut)
+            )
+            scale.animateTo(
+                1f,
+                animationSpec = tween(ANIM_DURATION / 2, easing = EaseIn)
+            )
         }
     }
 

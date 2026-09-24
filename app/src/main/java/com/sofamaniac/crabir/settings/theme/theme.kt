@@ -16,6 +16,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -130,6 +131,25 @@ data class CrabirTheme(
     }
 
     companion object {
+        @Stable
+        val primaryColor = Color(0xffff6e40)
+
+        @Stable
+        val highlight = Color(0xffff0000)
+
+        @Stable
+        val announcement = Color(0xff00ff00)
+
+        @Stable
+        val linkColor = Color(0xff4b91e2)
+
+        @Stable
+        val downvote = Color(0xFF448AFF)
+
+        @Stable
+        val saved = Color(0xFFFFD740)
+
+        @Composable
         internal fun fromColorScheme(colorScheme: ColorScheme): CrabirTheme {
             return CrabirTheme(
                 primaryColor = colorScheme.primary,
@@ -141,11 +161,11 @@ data class CrabirTheme(
                 toolbarText = colorScheme.onSurfaceVariant,
                 postTitle = colorScheme.onPrimaryContainer,
                 readPost = colorScheme.onSurface,
-                announcement = Color(0xff00ff00),
-                linkColor = Color(0xff4b91e2),
-                downvote = Color(0xFF448AFF),
                 secondaryText = colorScheme.secondary,
-                saved = Color(0xFFFFD740)
+                announcement = announcement,
+                linkColor = linkColor,
+                downvote = downvote,
+                saved = saved,
             )
         }
     }
@@ -156,16 +176,16 @@ val DefaultDarkTheme = CrabirTheme(
     cardBackground = Color.Black,
     toolbarBackground = Color.Black,
     toolbarText = Color.White,
-    primaryColor = Color(0xffff6e40),
+    primaryColor = CrabirTheme.primaryColor,
+    highlight = CrabirTheme.highlight,
+    postTitle = Color.Black,
+    announcement = CrabirTheme.announcement,
+    contentColor = Color.Black,
+    linkColor = CrabirTheme.linkColor,
+    downvote = CrabirTheme.downvote,
+    saved = CrabirTheme.saved,
     secondaryText = Color(0xffb7b8bc),
-    highlight = Color(0xffff0000),
-    postTitle = Color(0xfff5f6f8),
     readPost = Color(0xffb7b8bc),
-    announcement = Color(0xff00ff00),
-    contentColor = Color(0xfff5f6f8),
-    linkColor = Color(0xff4b91e2),
-    downvote = Color(0xFF448AFF),
-    saved = Color(0xFFFFD740),
 )
 
 val DefaultLightTheme = CrabirTheme(
@@ -173,16 +193,16 @@ val DefaultLightTheme = CrabirTheme(
     cardBackground = Color.White,
     toolbarBackground = Color.White,
     toolbarText = Color.Black,
-    primaryColor = Color(0xffff6e40),
-    secondaryText = Color(0xffb7b8bc),
-    highlight = Color(0xffff0000),
+    primaryColor = CrabirTheme.primaryColor,
+    highlight = CrabirTheme.highlight,
     postTitle = Color.Black,
-    readPost = Color(0xffb7b8bc),
-    announcement = Color(0xff00ff00),
+    announcement = CrabirTheme.announcement,
     contentColor = Color.Black,
-    linkColor = Color(0xff4b91e2),
-    downvote = Color(0xFF448AFF),
-    saved = Color(0xFFFFD740),
+    linkColor = CrabirTheme.linkColor,
+    downvote = CrabirTheme.downvote,
+    saved = CrabirTheme.saved,
+    secondaryText = Color(0xffb7b8bc),
+    readPost = Color(0xffb7b8bc),
 )
 
 val AUTHOR_CARTOUCHE_COLOR = R.color.author_cartouche
