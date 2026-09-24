@@ -1,10 +1,10 @@
 package com.sofamaniac.crabir.ui.postFeed.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
@@ -15,7 +15,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -30,14 +30,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalFeedSettings
-import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
@@ -45,6 +44,7 @@ import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.SettingsPage
+import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
 import com.sofamaniac.crabir.settings.views.ViewSettings
 import com.sofamaniac.crabir.settings.views.Views
@@ -52,6 +52,7 @@ import com.sofamaniac.crabir.settings.views.viewSettingDataStore
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.components.SortMenu
 import com.sofamaniac.crabir.ui.components.ThemedDialog
+import com.sofamaniac.crabir.ui.postFeed.ViewFull
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,9 +61,10 @@ fun TopBar(
     title: String,
     params: FeedParams,
     slug: String,
+    currentView: ViewFull,
     onInfoClick: (() -> Unit)? = null,
     updateSort: (Sort, Timeframe?) -> Unit,
-    updateView: (Views) -> Unit,
+    updateView: (ViewFull) -> Unit,
     refresh: () -> Unit,
     openDrawer: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior?,
@@ -74,14 +76,31 @@ fun TopBar(
     val scope = rememberCoroutineScope()
     val viewSettingsStore = LocalContext.current.viewSettingDataStore
     val feedSettings = LocalFeedSettings.current
+
     fun updateViewInner(view: Views) {
-        updateView(view)
+        updateView(currentView.copy(view = view))
         scope.launch {
             viewSettingsStore.updateData {
                 if (it.rememberView) {
                     val old = it.rememberedViews[slug] ?: defaultEntity
                     it.copy(
                         rememberedViews = it.rememberedViews + (slug to old.copy(view = view))
+                    )
+                } else {
+                    it
+                }
+            }
+        }
+    }
+
+    fun updateColumns(columns: Int) {
+        updateView(currentView.copy(columns = columns))
+        scope.launch {
+            viewSettingsStore.updateData {
+                if (it.rememberView) {
+                    val old = it.rememberedViews[slug] ?: defaultEntity
+                    it.copy(
+                        rememberedViews = it.rememberedViews + (slug to old.copy(columns = columns))
                     )
                 } else {
                     it
@@ -168,10 +187,12 @@ fun TopBar(
         }
     )
     if (showViewSelect) {
-        SelectViewDialog(
+        ViewEditDialog(
             onDismiss = { showViewSelect = false },
-            selectedView = defaultEntity.view ?: LocalViewSettings.current.defaultView,
-            updateView = ::updateViewInner
+            selectedView = currentView.view,
+            updateView = ::updateViewInner,
+            selectedColumns = currentView.columns,
+            updateColumns = ::updateColumns
         )
     }
 }
@@ -211,16 +232,27 @@ private fun OptionMenu(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SelectViewDialog(
+private fun ViewEditDialog(
     onDismiss: () -> Unit,
     selectedView: Views,
     updateView: (Views) -> Unit,
+    selectedColumns: Int,
+    updateColumns: (Int) -> Unit,
 ) {
+    ThemedDialog(onDismiss) {
+        ViewSelector(selectedView, updateView)
+        ColumnsEditor(selectedColumns, updateColumns)
+    }
+}
+
+@Composable
+private fun ViewSelector(selectedView: Views, updateView: (Views) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val viewSettingDataStore = remember(context) { context.viewSettingDataStore }
     val viewSettings by viewSettingDataStore.data.collectAsState(ViewSettings())
     val useDefault = !viewSettings.rememberView
+    val selectedView = if (useDefault) viewSettings.defaultView else selectedView
     fun selectOption(view: Views) {
         if (useDefault) {
             scope.launch {
@@ -230,31 +262,53 @@ private fun SelectViewDialog(
             updateView(view)
         }
     }
+    ListSelector(
+        options = Views.entries,
+        selectedOption = selectedView,
+        headlineContent = { Text(stringResource(R.string.view)) },
+        optionLabel = { view -> stringResource(view.toStringResource()) }
+    ) { view ->
+        selectOption(view)
+    }
+}
 
-    val selectedView = if (useDefault) viewSettings.defaultView else selectedView
-    ThemedDialog(onDismiss) {
-        Column(Modifier.selectableGroup()) {
-            for (view in Views.entries) {
-                ListItem(
-                    selected = view == selectedView,
-                    onClick = { selectOption(view) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .selectable(
-                            selected = view == selectedView,
-                            onClick = { selectOption(view) },
-                            role = Role.RadioButton,
-                        ),
-                    content = { Text(stringResource(view.toStringResource())) },
-                    trailingContent = {
-                        RadioButton(
-                            selected = view == selectedView,
-                            onClick = null
-                        )
-                    }
-                )
+@Composable
+fun ColumnsEditor(current: Int, updateColumns: (Int) -> Unit) {
+    val context = LocalContext.current
+    val viewSettingDataStore = remember(context) { context.viewSettingDataStore }
+    val viewSettings by viewSettingDataStore.data.collectAsState(ViewSettings())
+    val useDefault = !viewSettings.rememberView
+    val selectedColumns = if (useDefault) viewSettings.defaultColumns else current
+    val scope = rememberCoroutineScope()
+    fun selectOption(columns: Int) {
+        if (useDefault) {
+            scope.launch {
+                viewSettingDataStore.updateData { it.copy(defaultColumns = columns) }
             }
+        } else {
+            updateColumns(columns)
         }
     }
+    ListItem(
+        leadingContent = { Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.list_item_leading_size))) },
+        enabled = true,
+        content = { Text(stringResource(R.string.feed_columns_editor)) },
+        supportingContent = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Slider(
+                    modifier = Modifier.weight(1f),
+                    value = selectedColumns.toFloat(),
+                    valueRange = 1f..3f,
+                    steps = 1,
+                    onValueChange = { target ->
+                        selectOption(target.toInt())
+                    }
+                )
+                Text(selectedColumns.toString())
+            }
+        }
+    )
 }
