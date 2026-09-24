@@ -145,6 +145,7 @@ dependencies {
 
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.adaptive.layout)
+    implementation(libs.androidx.compose.adaptive.navigation)
     ksp(libs.kotlin.metadata.jvm)
 
 

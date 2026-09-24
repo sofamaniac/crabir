@@ -11,11 +11,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.LocalApiSettings
-import com.sofamaniac.crabir.navigation.routes.ApiSettingsRoute
 import com.sofamaniac.crabir.navigation.routes.HistoryRoute
 import com.sofamaniac.crabir.navigation.routes.HomeRoute
 import com.sofamaniac.crabir.navigation.routes.InboxRoute
 import com.sofamaniac.crabir.navigation.routes.SearchRoute
+import com.sofamaniac.crabir.navigation.routes.SettingsPage
+import com.sofamaniac.crabir.navigation.routes.SettingsRoute
 import com.sofamaniac.crabir.navigation.routes.SubscriptionsRoute
 import com.sofamaniac.crabir.ui.inbox.InboxView
 import com.sofamaniac.crabir.ui.postFeed.history.HistoryViewer
@@ -30,7 +31,7 @@ fun NavigationGraph(
     modifier: Modifier = Modifier,
 ) {
     val startRoute = if (!LocalApiSettings.current.isConfigured) {
-        ApiSettingsRoute
+        SettingsPage(SettingsRoute.Api)
     } else {
         HomeRoute
     }

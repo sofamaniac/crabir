@@ -85,6 +85,7 @@ retrofit2-kotlinx-serialization-converter = { group = "com.jakewharton.retrofit"
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout" }
 xml-serialization = { module = "io.github.pdvrieze.xmlutil:serialization", version.ref = "serialization" }
 androidx-compose-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout" }
+androidx-compose-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation" }
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
 aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose-core", version.ref = "aboutLibraries" } # Common compose core
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }

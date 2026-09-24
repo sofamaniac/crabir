@@ -22,7 +22,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import com.sofamaniac.crabir.ui.BackButton
 import com.sofamaniac.crabir.ui.components.ThemedDialog
@@ -30,11 +29,10 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
-fun HistorySettingsPage() {
+fun HistorySettingsPage(navigateBack: () -> Unit) {
     val context = LocalContext.current
     val store = context.historySettingsDataStore
     val settings by store.data.collectAsState(initial = HistorySettings())
-    val navController = LocalNavController.current
     val scope = rememberCoroutineScope()
 
     fun update(newValue: HistorySettings) {
@@ -48,7 +46,7 @@ fun HistorySettingsPage() {
             TopAppBar(
                 title = { Text(stringResource(R.string.history_settings_title)) },
                 navigationIcon = {
-                    BackButton { navController?.popBackStack() }
+                    BackButton { navigateBack() }
                 }
             )
         }

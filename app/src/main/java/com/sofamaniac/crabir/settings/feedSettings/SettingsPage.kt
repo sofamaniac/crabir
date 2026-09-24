@@ -32,19 +32,22 @@ import com.sofamaniac.crabir.ui.components.ListItem
 import kotlinx.coroutines.launch
 
 @Composable
-fun FeedSettingsPage() {
+fun FeedSettingsPage(
+    navigateBack: () -> Unit,
+) {
 
     val context = LocalContext.current
-    val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
     val settingsStore = remember(context) { context.feedSettingsStore }
     val settings by settingsStore.data.collectAsState(FeedSettings())
     val scope = rememberCoroutineScope()
+    val navController = LocalNavController.current
     fun update(transform: (FeedSettings) -> FeedSettings) {
         scope.launch {
             settingsStore.updateData(transform)
         }
     }
+
     CompositionLocalProvider(LocalSnackBarHost provides snackbarHostState) {
         Scaffold(
             topBar = {
@@ -54,7 +57,7 @@ fun FeedSettingsPage() {
                     },
                     navigationIcon = {
                         BackButton {
-                            navController?.popBackStack()
+                            navigateBack()
                         }
                     }
                 )
@@ -144,7 +147,6 @@ fun FeedSettingsPage() {
                     )
                 }
                 item {
-                    val navController = LocalNavController.current
                     ListItem(
                         onClick = { navController?.navigate(SortManagerRoute) },
                         enabled = settings.rememberSort,

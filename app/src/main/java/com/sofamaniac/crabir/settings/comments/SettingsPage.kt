@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
-import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
@@ -29,19 +28,18 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun CommentsSettingsPage() {
+fun CommentsSettingsPage(navigateBack: () -> Unit) {
     val context = LocalContext.current
     val settingsDataStore = remember(context) { context.commentsSettingsDataStore }
     val commentsSettingsOpt by settingsDataStore.data.collectAsState(initial = null)
     val scope = rememberCoroutineScope()
-    val navController = LocalNavController.current
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.comments_settings_page_title)) },
                 navigationIcon = {
-                    IconButton(onClick = { navController?.popBackStack() }) {
+                    IconButton(onClick = { navigateBack() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back)

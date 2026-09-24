@@ -28,7 +28,7 @@ import com.sofamaniac.crabir.ui.components.ThemedCard
 import kotlinx.coroutines.launch
 
 @Composable
-fun ApiSettingsPage() {
+fun ApiSettingsPage(navigateBack: () -> Unit) {
     val context = LocalContext.current
     val datastore = remember(context) { context.apiSettingsDataStore }
     val apiSettingsOpt by datastore.data.collectAsState(
@@ -52,7 +52,7 @@ fun ApiSettingsPage() {
                 title = { Text(stringResource(R.string.api_settings_title)) },
                 navigationIcon = {
                     BackButton {
-                        navController?.popBackStack()
+                        navigateBack()
                     }
                 })
         }

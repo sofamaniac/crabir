@@ -16,7 +16,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.routes.CommentsSettingsRoute
+import com.sofamaniac.crabir.navigation.routes.SettingsPage
+import com.sofamaniac.crabir.navigation.routes.SettingsRoute
 
 @Composable
 fun MoreOptionsMenu(
@@ -47,7 +48,7 @@ fun MoreOptionsMenu(
             )
             DropdownMenuItem(text = { Text(stringResource(R.string.settings)) }, onClick = {
                 navController?.navigate(
-                    CommentsSettingsRoute
+                    SettingsPage(SettingsRoute.General.Comments)
                 )
             })
         }

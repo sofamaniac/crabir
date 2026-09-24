@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.routes.SettingsRoute
+import com.sofamaniac.crabir.navigation.routes.SettingsPage
 import com.sofamaniac.crabir.settings.theme.ThemeMode
 import com.sofamaniac.crabir.settings.theme.themeDataStore
 import kotlinx.coroutines.flow.map
@@ -64,7 +64,7 @@ internal fun SettingsTile(drawerState: DrawerState) {
         onClick = {
             coroutineScope.launch {
                 drawerState.close()
-                navController?.navigate(SettingsRoute)
+                navController?.navigate(SettingsPage())
             }
         }
     )

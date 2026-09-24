@@ -15,21 +15,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import com.sofamaniac.crabir.ui.BackButton
 import kotlinx.coroutines.launch
 
 @Composable
-fun PostSettingsPage() {
+fun PostSettingsPage(navigateBack: () -> Unit) {
     val context = LocalContext.current
     val postSettingsDataStore = remember(context) { context.postSettingsDataStore }
     val postSettings by postSettingsDataStore.data.collectAsState(
         initial = PostSettingsDefaults.defaultPostSettings,
     )
     val scope = rememberCoroutineScope()
-    val navController = LocalNavController.current
     fun update(transform: (PostSettings) -> PostSettings) {
         scope.launch {
             postSettingsDataStore.updateData(transform)
@@ -59,7 +57,7 @@ fun PostSettingsPage() {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(stringResource(R.string.post_settings)) }, navigationIcon = {
-                BackButton { navController?.popBackStack() }
+                BackButton { navigateBack() }
             })
         }
     ) { innerPadding ->

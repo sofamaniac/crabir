@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -33,18 +32,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
-import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.Menu
+import com.sofamaniac.crabir.ui.BackButton
 import com.sofamaniac.crabir.ui.components.ListItem
 import kotlinx.coroutines.launch
 
 @Composable
-fun ViewManagerPage() {
+fun ViewManagerPage(navigateBack: () -> Unit) {
     val context = LocalContext.current
     val settingsDataStore = remember(context) { context.viewSettingDataStore }
     val viewSettings by settingsDataStore.data.collectAsState(initial = ViewSettings())
     val scope = rememberCoroutineScope()
-    val navController = LocalNavController.current
 
     val views = viewSettings.rememberedViews
     fun updateView(slug: String, view: CommunityViewEntity) {
@@ -76,12 +74,7 @@ fun ViewManagerPage() {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(stringResource(R.string.manage_views)) }, navigationIcon = {
-                IconButton(onClick = { navController?.popBackStack() }) {
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = stringResource(R.string.close)
-                    )
-                }
+                BackButton { navigateBack() }
             })
         }
     ) { innerPadding ->

@@ -35,7 +35,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import com.sofamaniac.crabir.ui.components.ListItem
@@ -44,8 +43,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FiltersSettingsPage() {
-    val navController = LocalNavController.current
+fun FiltersSettingsPage(navigateBack: () -> Unit) {
     val context = LocalContext.current
     val settingsDataStore = remember(context) { context.filtersDataStore }
     val settings by settingsDataStore.data.collectAsState(FiltersSettings())
@@ -65,7 +63,7 @@ fun FiltersSettingsPage() {
                 title = { Text(stringResource(R.string.filter_settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController?.popBackStack()
+                        navigateBack()
                     }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
@@ -255,5 +253,5 @@ private fun TestEditor() {
 @Preview
 @Composable
 private fun PreviewSettingsPage() {
-    FiltersSettingsPage()
+    FiltersSettingsPage({})
 }

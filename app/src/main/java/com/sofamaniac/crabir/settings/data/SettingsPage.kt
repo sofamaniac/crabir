@@ -26,7 +26,6 @@ import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Quality
 import com.sofamaniac.crabir.domain.model.stringResource
-import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
@@ -35,9 +34,8 @@ import com.sofamaniac.crabir.ui.components.ListItem
 import kotlinx.coroutines.launch
 
 @Composable
-fun DataSettingsPage() {
+fun DataSettingsPage(navigateBack: () -> Unit) {
     val context = LocalContext.current
-    val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
     val dataSettingsStore = remember(context) { context.dataSettingsStore }
     val dataSettings by dataSettingsStore.data.collectAsState(DataSettingsDefault.defaultDataSettings)
@@ -51,7 +49,7 @@ fun DataSettingsPage() {
                     },
                     navigationIcon = {
                         BackButton {
-                            navController?.popBackStack()
+                            navigateBack()
                         }
                     }
                 )

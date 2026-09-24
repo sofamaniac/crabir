@@ -32,7 +32,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.CheckboxTile
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
@@ -40,14 +39,13 @@ import com.sofamaniac.crabir.ui.BackButton
 import kotlinx.coroutines.launch
 
 @Composable
-fun LateralMenuSettingsPage() {
+fun LateralMenuSettingsPage(navigateBack: () -> Unit) {
     val context = LocalContext.current
     val datastore = remember(context) { context.lateralMenuSettingsDataStore }
     val lateralMenuSettings by datastore.data.collectAsState(
         initial = LateralMenuSettingsDefault.default,
     )
     val scope = rememberCoroutineScope()
-    val navController = LocalNavController.current
     fun update(transform: (LateralMenuSettings) -> LateralMenuSettings) {
         scope.launch {
             datastore.updateData(transform)
@@ -60,7 +58,7 @@ fun LateralMenuSettingsPage() {
                 title = { Text(stringResource(R.string.lateral_menu_settings)) },
                 navigationIcon = {
                     BackButton {
-                        navController?.popBackStack()
+                        navigateBack()
                     }
                 }
             )

@@ -44,7 +44,7 @@ import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.routes.SettingsRoute
+import com.sofamaniac.crabir.navigation.routes.SettingsPage
 import com.sofamaniac.crabir.settings.theme.rememberTopAppBarColors
 import com.sofamaniac.crabir.settings.views.ViewSettings
 import com.sofamaniac.crabir.settings.views.Views
@@ -153,7 +153,7 @@ fun TopBar(
         actions = {
             OptionMenu(
                 onPostViewClick = { showViewSelect = true },
-                onSettingsClick = { navController?.navigate(SettingsRoute) },
+                onSettingsClick = { navController?.navigate(SettingsPage()) },
                 refresh = refresh,
                 onInfoClick = onInfoClick,
             )

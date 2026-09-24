@@ -7,11 +7,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ViewComfy
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -33,27 +31,22 @@ import com.sofamaniac.crabir.navigation.routes.ViewManagerRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SettingHeader
 import com.sofamaniac.crabir.settings.helper.SwitchTile
+import com.sofamaniac.crabir.ui.BackButton
 import com.sofamaniac.crabir.ui.components.ListItem
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ViewsSettingsPage() {
+fun ViewsSettingsPage(navigateBack: () -> Unit) {
     val context = LocalContext.current
+    val navController = LocalNavController.current
     val settingsDataStore = remember(context) { context.viewSettingDataStore }
     val viewSettingsOpt by settingsDataStore.data.collectAsState(initial = null)
     val scope = rememberCoroutineScope()
-    val navController = LocalNavController.current
-
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(stringResource(R.string.view_settings)) }, navigationIcon = {
-                IconButton(onClick = { navController?.popBackStack() }) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )
-                }
+                BackButton { navigateBack() }
             })
         }
     ) { innerPadding ->

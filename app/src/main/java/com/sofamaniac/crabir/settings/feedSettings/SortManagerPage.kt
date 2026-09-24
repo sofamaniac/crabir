@@ -35,7 +35,6 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
-import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.settings.helper.Menu
 import com.sofamaniac.crabir.settings.views.ViewSettings
 import com.sofamaniac.crabir.settings.views.viewSettingDataStore
@@ -43,12 +42,11 @@ import com.sofamaniac.crabir.ui.components.ListItem
 import kotlinx.coroutines.launch
 
 @Composable
-fun SortManagerPage() {
+fun SortManagerPage(navigateBack: () -> Unit) {
     val context = LocalContext.current
     val settingsDataStore = remember(context) { context.viewSettingDataStore }
     val viewSettings by settingsDataStore.data.collectAsState(initial = ViewSettings())
     val scope = rememberCoroutineScope()
-    val navController = LocalNavController.current
 
     val views = viewSettings.rememberedViews
 
@@ -81,7 +79,7 @@ fun SortManagerPage() {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(stringResource(R.string.manage_sorts)) }, navigationIcon = {
-                IconButton(onClick = { navController?.popBackStack() }) {
+                IconButton(onClick = { navigateBack() }) {
                     Icon(
                         Icons.Default.Close,
                         contentDescription = stringResource(R.string.close)

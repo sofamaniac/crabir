@@ -25,8 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.routes.ThemeEditorRoute
+import com.sofamaniac.crabir.navigation.routes.SettingsRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import com.sofamaniac.crabir.ui.BackButton
@@ -35,13 +34,12 @@ import com.sofamaniac.crabir.ui.components.ThemedDialog
 import kotlinx.coroutines.launch
 
 @Composable
-fun ThemeSettingsPage() {
+fun ThemeSettingsPage(navigateTo: (SettingsRoute) -> Unit, navigateBack: () -> Unit) {
     val context = LocalContext.current
     val themeDataStore = remember(context) { context.themeDataStore }
 
     val settings = rememberThemeSettings()
     val scope = rememberCoroutineScope()
-    val navController = LocalNavController.current!!
     val startTimeState = rememberTimePickerState(
         initialHour = settings.lightModeStartTime,
         initialMinute = 0,
@@ -89,7 +87,7 @@ fun ThemeSettingsPage() {
         topBar = {
             TopAppBar(title = { Text(stringResource(R.string.theme_settings)) }, navigationIcon = {
                 BackButton {
-                    navController.popBackStack()
+                    navigateBack()
                 }
             })
         }
@@ -132,7 +130,7 @@ fun ThemeSettingsPage() {
                 content = { Text(stringResource(R.string.edit_colors)) },
                 enabled = !settings.dynamicColor || Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
                 onClick = {
-                    navController.navigate(ThemeEditorRoute)
+                    navigateTo(SettingsRoute.Theme.Editor)
                 },
                 leadingContent = {
                     Icon(Icons.Default.Palette, contentDescription = null)

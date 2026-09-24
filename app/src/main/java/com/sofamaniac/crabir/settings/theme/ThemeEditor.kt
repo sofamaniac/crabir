@@ -41,7 +41,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.CloseButton
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.components.ThemedCard
@@ -51,7 +50,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ThemeEditor() {
+fun ThemeEditor(navigateBack: () -> Unit) {
     val context = LocalContext.current
     val themeDataStore = remember(context) { context.themeDataStore }
     val themeSettings by themeDataStore.data.collectAsState(
@@ -64,7 +63,6 @@ fun ThemeEditor() {
     val parentTheme = themeSettings.getParentTheme(mode)
     var activeColorField by remember { mutableStateOf<ColorFields?>(null) }
     val scope = rememberCoroutineScope()
-    val navController = LocalNavController.current
 
     var showSavedThemesDialog by remember { mutableStateOf(false) }
 
@@ -84,7 +82,7 @@ fun ThemeEditor() {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(stringResource(R.string.theme_editor)) }, navigationIcon = {
-                CloseButton { navController?.popBackStack() }
+                CloseButton { navigateBack() }
             })
         },
     ) { paddingValues ->
