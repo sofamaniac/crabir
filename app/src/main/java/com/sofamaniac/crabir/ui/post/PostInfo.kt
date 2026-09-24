@@ -4,13 +4,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -47,18 +49,16 @@ fun PostInfo(
     val blur = LocalFiltersSettings.current.blurNSFW && post.over18
     Row(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 2.dp, end = 2.dp),
-        verticalAlignment = Alignment.Top
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
+                .weight(1f)
+                .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val width = if (enableThumbnail) 0.8f else 1f
-            val titleModifier = Modifier.fillMaxWidth(fraction = width)
             val titleColor = when {
                 post.stickied -> theme.announcement
                 read -> theme.readPost
@@ -68,7 +68,7 @@ fun PostInfo(
                 post.title,
                 color = titleColor,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = titleModifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Start,
             )
             Row(
@@ -121,7 +121,11 @@ fun PostInfo(
             }
         }
         if (enableThumbnail) {
-            Thumbnail(post, blur = blur)
+            val modifier = Modifier
+                .width(64.dp)
+                .aspectRatio(1f)
+                .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+            Thumbnail(post, blur = blur, modifier = modifier)
         }
     }
 }

@@ -2,20 +2,16 @@ package com.sofamaniac.crabir.ui.post
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
@@ -28,6 +24,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 @Composable
 fun Thumbnail(
     post: PostData,
+    modifier: Modifier = Modifier,
     blur: Boolean = false,
 ) {
     val thumbnailURL = post.getThumbnailUrl()
@@ -43,11 +40,7 @@ fun Thumbnail(
         }
         Unit
     }
-    val modifier = Modifier
-        .fillMaxWidth(fraction = 0.2f)
-        .aspectRatio(1f)
-        .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
-        .clickable(onClick = goFullscreen)
+    val modifier = modifier.clickable(onClick = goFullscreen)
     if (thumbnailURL != null) {
         TransformableImage(
             source = thumbnailURL,
