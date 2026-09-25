@@ -19,13 +19,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.navigation.routes.DefaultFeedRoute
 import com.sofamaniac.crabir.navigation.routes.HistoryRoute
 import com.sofamaniac.crabir.navigation.routes.HomeRoute
 import com.sofamaniac.crabir.navigation.routes.Route
@@ -35,16 +35,6 @@ import com.sofamaniac.crabir.navigation.routes.SubredditRoute
 import com.sofamaniac.crabir.settings.lateralMenu.LateralMenuItems
 import com.sofamaniac.crabir.ui.components.MultiIcon
 import com.sofamaniac.crabir.ui.components.SubredditIcon
-
-enum class FeedButtons(val icon: ImageVector, val route: Route) {
-    Home(Icons.Default.Home, HomeRoute),
-    Default(Icons.Default.RssFeed, HomeRoute),
-    Popular(Icons.Default.Moving, SubredditRoute("r/popular")),
-    All(Icons.Default.BarChart, SubredditRoute("r/all")),
-    Saved(Icons.Default.BookmarkBorder, SavedRoute),
-    History(Icons.Default.History, HistoryRoute),
-    Search(Icons.Default.Search, SearchRoute()),
-}
 
 @Composable
 internal fun MultiTile(multi: Thing.Multi, showIcon: Boolean, onClick: () -> Unit) {
@@ -107,7 +97,7 @@ internal fun LazyListScope.feeds(
                 selected = false,
                 icon = { Icon(Icons.Default.Home, contentDescription = null) },
                 onClick = {
-                    onClick(HomeRoute)
+                    onClick(DefaultFeedRoute)
                 }
             )
         }
@@ -118,7 +108,7 @@ internal fun LazyListScope.feeds(
             NavigationDrawerItem(
                 label = { Text(stringResource(R.string.home_feed)) },
                 selected = false,
-                icon = { Icon(Icons.Default.Home, contentDescription = null) },
+                icon = { Icon(Icons.Default.RssFeed, contentDescription = null) },
                 onClick = {
                     onClick(HomeRoute)
                 }

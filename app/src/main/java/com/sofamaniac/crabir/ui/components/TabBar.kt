@@ -25,7 +25,7 @@ import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.routes.HomeRoute
+import com.sofamaniac.crabir.navigation.routes.DefaultFeedRoute
 import com.sofamaniac.crabir.navigation.routes.InboxRoute
 import com.sofamaniac.crabir.navigation.routes.ProfileRoute
 import com.sofamaniac.crabir.navigation.routes.Route
@@ -63,7 +63,7 @@ fun TabBar(
         Tab(
             selected = selected == 0,
             unselectedContentColor = Color.Gray,
-            onClick = { onClick(selected, 0, HomeRoute) },
+            onClick = { onClick(selected, 0, DefaultFeedRoute) },
             icon = {
                 Icon(
                     Icons.Filled.Home,

@@ -7,7 +7,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
+import com.sofamaniac.crabir.LocalFeedSettings
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.navigation.routes.DefaultFeedRoute
 import com.sofamaniac.crabir.navigation.routes.MultiInfoRoute
 import com.sofamaniac.crabir.navigation.routes.MultiRoute
 import com.sofamaniac.crabir.navigation.routes.ProfileRoute
@@ -15,6 +17,7 @@ import com.sofamaniac.crabir.navigation.routes.SubredditInfoRoute
 import com.sofamaniac.crabir.navigation.routes.SubredditRoute
 import com.sofamaniac.crabir.ui.feedInfo.multi.MultiInfo
 import com.sofamaniac.crabir.ui.feedInfo.subreddit.SubredditInfoViewScaffold
+import com.sofamaniac.crabir.ui.postFeed.DefaultFeedView
 import com.sofamaniac.crabir.ui.postFeed.multi.MultiView
 import com.sofamaniac.crabir.ui.postFeed.subreddit.SubredditViewer
 import com.sofamaniac.crabir.ui.user.ProfileTabs
@@ -66,5 +69,9 @@ fun NavGraphBuilder.subredditGraph(navController: NavController) {
     composable<MultiInfoRoute> {
         val multi = it.toRoute<MultiInfoRoute>()
         MultiInfo(multi.name)
+    }
+    composable<DefaultFeedRoute> {
+        val defaultFeed = LocalFeedSettings.current.defaultFeed
+        DefaultFeedView(defaultFeed)
     }
 }

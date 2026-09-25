@@ -22,12 +22,12 @@ fun SettingHeader(title: String) {
             .background(color = theme.cardBackground),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        HorizontalDivider()
         Text(
             title,
             color = theme.highlight,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 32.dp)
         )
-        HorizontalDivider()
     }
 }

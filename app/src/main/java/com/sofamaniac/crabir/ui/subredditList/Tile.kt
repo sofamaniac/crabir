@@ -23,7 +23,8 @@ fun Tile(subreddit: SubredditData, modifier: Modifier = Modifier) {
                     .size(40.dp)
                     .clip(CircleShape)
             )
-        }) {
+        }
+    ) {
         Text(text = subreddit.displayName)
     }
 }

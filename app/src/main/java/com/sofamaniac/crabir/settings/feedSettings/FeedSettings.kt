@@ -19,6 +19,7 @@ data class FeedSettings(
     val defaultSort: Sort = Sort.Hot,
     val defaultTimeframe: Timeframe? = null,
     val rememberSort: Boolean = true,
+    val defaultFeed: String? = null,
 )
 
 val Context.feedSettingsStore by dataStore(

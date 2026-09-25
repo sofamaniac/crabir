@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.RssFeed
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.Icon
@@ -113,9 +114,20 @@ private fun LazyListScope.itemsToShow(
 ) {
     item {
         CheckboxTile(
+            headlineContent = { Text(stringResource(R.string.default_feed)) },
+            supportingContent = { Text(stringResource(R.string.default_feed_support)) },
+            leadingContent = { Icon(Icons.Default.Home, contentDescription = null) },
+            checked = settings.defaultFeed,
+            onCheckedChange = { target ->
+                update(settings.copy(defaultFeed = target))
+            }
+        )
+    }
+    item {
+        CheckboxTile(
             headlineContent = { Text(stringResource(R.string.home_feed)) },
             supportingContent = { Text(stringResource(R.string.home_feed_support)) },
-            leadingContent = { Icon(Icons.Default.Home, contentDescription = null) },
+            leadingContent = { Icon(Icons.Default.RssFeed, contentDescription = null) },
             checked = settings.homeFeed,
             onCheckedChange = { target ->
                 update(settings.copy(homeFeed = target))

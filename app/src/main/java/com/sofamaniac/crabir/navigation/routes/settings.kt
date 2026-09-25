@@ -13,6 +13,9 @@ object ViewManagerRoute : Route
 @Serializable
 object SortManagerRoute : Route
 
+@Serializable
+object DefaultFeedSetterRoute : Route
+
 
 sealed interface SettingsRoute : Parcelable {
     sealed interface DetailsRoute : SettingsRoute

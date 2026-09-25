@@ -44,6 +44,7 @@ import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.feedInfo.subreddit.SubredditInfoView
 import com.sofamaniac.crabir.ui.postFeed.PostFeedViewer
 import com.sofamaniac.crabir.ui.postFeed.PostView
+import com.sofamaniac.crabir.ui.postFeed.SortFull
 import com.sofamaniac.crabir.ui.postFeed.ViewFull
 import com.sofamaniac.crabir.ui.postFeed.components.BottomSheet
 import com.sofamaniac.crabir.ui.postFeed.components.Fab
@@ -55,14 +56,14 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun SubredditViewer(
     subreddit: String,
     modifier: Modifier = Modifier,
+    tabSelected: Int = 2,
 ) {
-    val initialSort = getCommunitySort(subreddit)
-    val subredditName = subreddit.split("/").last()
+
+    val initialSort: SortFull = getCommunitySort(subreddit)
     val viewModel: SubredditViewModel =
         koinViewModel(key = subreddit) {
             parametersOf(
@@ -71,6 +72,18 @@ fun SubredditViewer(
                 initialSort.timeframe,
             )
         }
+    SubredditViewer(subreddit, modifier, viewModel = viewModel, tabSelected = tabSelected)
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+private fun SubredditViewer(
+    subreddit: String,
+    modifier: Modifier = Modifier,
+    viewModel: SubredditViewModel,
+    tabSelected: Int,
+) {
+    val subredditName = subreddit.split("/").last()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val params by viewModel.params.collectAsState()
     val feedInfo by viewModel.info.collectAsState()
@@ -100,12 +113,12 @@ fun SubredditViewer(
         )
     }
     val bottomBar = @Composable {
-        TabBar(2)
+        TabBar(tabSelected)
     }
     InnerView(
         topBar, bottomBar, viewModel,
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        filter = rememberPostsFilter(whitelistSubreddit = listOf(subredditName)),
+        filter = filters,
         drawerState = drawerState,
         feedInfo = feedInfo,
         viewEntity = fullView,

@@ -77,7 +77,7 @@ object PostSettingsDefaults {
 
     val defaultLinksSettings = LinksSettings(
         upvoteOnSave = false,
-        startMuted = false
+        startMuted = true
     )
 
     val defaultPostSettings = PostSettings(

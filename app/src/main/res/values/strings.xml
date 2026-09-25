@@ -435,6 +435,10 @@
     <string name="tablet_split_screen_mode_title">Tablet split screen mode</string>
     <string name="table_split_screen_mode_supporting">Show posts and comments in two columns in landscape mode</string>
     <string name="feed_columns_editor">Number of columns</string>
+    <string name="default_feed_home">Posts from subscriptions</string>
+    <string name="change_default_feed">Change default feed</string>
+    <string name="default_feed">Home</string>
+    <string name="default_feed_support"><![CDATA[Default feed. To set any community, go to Settings -> General-> Feed]]></string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>

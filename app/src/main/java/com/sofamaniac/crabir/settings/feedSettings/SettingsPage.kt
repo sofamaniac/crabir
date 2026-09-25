@@ -23,12 +23,15 @@ import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
+import com.sofamaniac.crabir.data.remote.reddit.HOME
 import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.routes.DefaultFeedSetterRoute
 import com.sofamaniac.crabir.navigation.routes.SortManagerRoute
 import com.sofamaniac.crabir.settings.helper.ListSelector
 import com.sofamaniac.crabir.settings.helper.SwitchTile
 import com.sofamaniac.crabir.ui.components.BackButton
 import com.sofamaniac.crabir.ui.components.ListItem
+import com.sofamaniac.crabir.ui.components.ListItemSpacer
 import kotlinx.coroutines.launch
 
 @Composable
@@ -148,11 +151,25 @@ fun FeedSettingsPage(
                 }
                 item {
                     ListItem(
+                        leadingContent = { ListItemSpacer() },
                         onClick = { navController?.navigate(SortManagerRoute) },
                         enabled = settings.rememberSort,
                         content = {
                             Text(stringResource(R.string.managed_remembered_sorts))
                         },
+                    )
+                }
+                item {
+                    ListItem(
+                        leadingContent = { ListItemSpacer() },
+                        content = { Text(stringResource(R.string.change_default_feed)) },
+                        onClick = { navController?.navigate(DefaultFeedSetterRoute) },
+                        supportingContent = {
+                            when (settings.defaultFeed) {
+                                null, HOME -> Text(stringResource(R.string.default_feed_home))
+                                else -> Text(settings.defaultFeed!!)
+                            }
+                        }
                     )
                 }
             }

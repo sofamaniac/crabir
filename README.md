@@ -1,4 +1,4 @@
-<p align="center">
+<p>
   <img width="96px" src="https://raw.githubusercontent.com/sofamaniac/Crabir/master/pictures/logo.png" />
 </p>
 
@@ -19,4 +19,5 @@ An open source replacement for Boost for Reddit.
 - Create posts
 - Edit posts
 - See inbox
+- Tablet support
 - ...

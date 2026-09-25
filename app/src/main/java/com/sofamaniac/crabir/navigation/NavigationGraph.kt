@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.sofamaniac.crabir.LocalApiSettings
+import com.sofamaniac.crabir.navigation.routes.DefaultFeedRoute
 import com.sofamaniac.crabir.navigation.routes.HistoryRoute
 import com.sofamaniac.crabir.navigation.routes.HomeRoute
 import com.sofamaniac.crabir.navigation.routes.InboxRoute
@@ -33,7 +34,7 @@ fun NavigationGraph(
     val startRoute = if (!LocalApiSettings.current.isConfigured) {
         SettingsPage(SettingsRoute.Api)
     } else {
-        HomeRoute
+        DefaultFeedRoute
     }
     NavHost(
         navController = navController,

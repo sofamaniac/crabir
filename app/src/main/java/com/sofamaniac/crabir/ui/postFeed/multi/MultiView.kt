@@ -32,6 +32,7 @@ import org.koin.core.parameter.parametersOf
 fun MultiView(
     slug: String,
     modifier: Modifier = Modifier,
+    tabSelected: Int = 2,
 ) {
     val sort = getCommunitySort(slug)
     val viewModel: MultiViewModel = koinViewModel<MultiViewModel>(key = slug) {
@@ -76,7 +77,7 @@ fun MultiView(
     }
     val bottomBar = @Composable {
         TabBar(
-            2,
+            tabSelected,
             onTabReselect = {
                 scope.launch {
                     viewModel.listState.animateScrollToItem(0)

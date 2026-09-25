@@ -4,11 +4,13 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.toRoute
+import com.sofamaniac.crabir.navigation.routes.DefaultFeedSetterRoute
 import com.sofamaniac.crabir.navigation.routes.SettingsPage
 import com.sofamaniac.crabir.navigation.routes.SettingsRoute
 import com.sofamaniac.crabir.navigation.routes.SortManagerRoute
 import com.sofamaniac.crabir.navigation.routes.ViewManagerRoute
 import com.sofamaniac.crabir.settings.SettingsPageAdaptive
+import com.sofamaniac.crabir.settings.feedSettings.DefaultFeedSetterPage
 import com.sofamaniac.crabir.settings.feedSettings.SortManagerPage
 import com.sofamaniac.crabir.settings.views.ViewManagerPage
 import kotlin.reflect.typeOf
@@ -29,5 +31,10 @@ fun NavGraphBuilder.settingsGraph() {
     dialog<SortManagerRoute> {
         val navController = LocalNavController.current
         SortManagerPage { navController?.navigateUp() }
+    }
+
+    dialog<DefaultFeedSetterRoute> {
+        val navController = LocalNavController.current
+        DefaultFeedSetterPage { navController?.navigateUp() }
     }
 }

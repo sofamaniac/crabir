@@ -185,6 +185,7 @@ class CommunitySearchViewModel(
 ) {
 
     val subscriptions = subscriptionsRepository.subscriptions
+    val multis = subscriptionsRepository.multis
 
     private val cache = mutableMapOf<Fullname, Flow<SubredditData>>()
 

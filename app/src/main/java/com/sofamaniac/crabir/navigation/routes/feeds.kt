@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 object HomeRoute : Route
 
 @Serializable
+object DefaultFeedRoute : Route
+
+@Serializable
 object SubscriptionsRoute : Route
 
 @Serializable
