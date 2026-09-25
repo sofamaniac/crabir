@@ -102,12 +102,6 @@ fun <T : VotableData> PostFeedViewer(
         }
     }
 
-    LaunchedEffect(filter) {
-        Log.d("PostFeedViewer", "Updating filter")
-        viewModel.updateFilters(filter)
-    }
-
-
     val mostVisibleItemKey by remember(listState) {
         snapshotFlow {
             listState.layoutInfo.visibleItemsInfo

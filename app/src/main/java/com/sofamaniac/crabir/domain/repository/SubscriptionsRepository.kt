@@ -28,7 +28,7 @@ import org.koin.core.annotation.Singleton
 @Singleton
 class SubscriptionsRepository(
     val api: RedditAPIService,
-    val accountsStorage: AccountsStorage,
+    accountsStorage: AccountsStorage,
     val subredditCache: SubredditCache,
     val multiCache: MultiCache,
 ) {
@@ -55,10 +55,10 @@ class SubscriptionsRepository(
     val multis: StateFlow<List<Thing.Multi>> =
         activeAccountId
             .flatMapLatest { account ->
-                if (account != RedditAccount.ANONYMOUS_ID && account > 0) {
-                    flow { emit(loadMultis()) }
-                } else {
+                if (account < 0 || account == RedditAccount.ANONYMOUS_ID) {
                     flowOf(emptyList())
+                } else {
+                    flow { emit(loadMultis()) }
                 }
             }.stateIn(
                 scope = CoroutineScope(Dispatchers.IO),

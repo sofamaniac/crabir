@@ -1,18 +1,22 @@
 package com.sofamaniac.crabir.ui.postFeed
 
 import android.os.Parcelable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDragHandle
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
@@ -78,50 +82,69 @@ fun FullFeedView(
         viewModel.updateFilters(filter)
     }
 
+    val navigator = rememberListDetailPaneScaffoldNavigator<FeedViewRoute>()
+    val enableDrawer = navigator.currentDestination?.contentKey !is FeedViewRoute.Post
     ModalNavigationDrawer(
+        gesturesEnabled = enableDrawer,
         drawerState = drawerState,
         drawerContent = {
             DrawerContent(drawerState, snackbarHostState = snackbarHostState)
         },
     ) {
-        val navigator = rememberListDetailPaneScaffoldNavigator<FeedViewRoute>()
         Surface(color = theme.cardBackground) {
             NavigableListDetailPaneScaffold(
                 navigator = navigator,
+                paneExpansionDragHandle = { state ->
+                    val interactionSource = remember { MutableInteractionSource() }
+                    VerticalDragHandle(
+                        interactionSource = interactionSource,
+                        modifier = Modifier.paneExpansionDraggable(
+                            state,
+                            LocalMinimumInteractiveComponentSize.current,
+                            interactionSource,
+                        ),
+                    )
+                },
                 listPane = {
-                    val route = navigator.currentDestination?.contentKey
-                    val showFeed = (route !is FeedViewRoute.Post || viewSettings.splitScreenEnabled)
-                    if (showFeed) {
-                        FeedView(
-                            snackbarHostState,
-                            topBar,
-                            bottomBar,
-                            viewModel,
-                            modifier,
-                            viewEntity,
-                            createPost,
-                            filter,
-                            feedInfo,
-                            navigate = { route ->
-                                scope.launch {
-                                    navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, route)
+                    AnimatedPane {
+                        val route = navigator.currentDestination?.contentKey
+                        val showFeed =
+                            (route !is FeedViewRoute.Post || viewSettings.splitScreenEnabled)
+                        if (showFeed) {
+                            FeedView(
+                                snackbarHostState,
+                                topBar,
+                                bottomBar,
+                                viewModel,
+                                modifier,
+                                viewEntity,
+                                createPost,
+                                filter,
+                                feedInfo,
+                                navigate = { route ->
+                                    scope.launch {
+                                        navigator.navigateTo(
+                                            ListDetailPaneScaffoldRole.Detail,
+                                            route
+                                        )
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 },
                 detailPane = {
-                    val route = navigator.currentDestination?.contentKey
-                    if (route !is FeedViewRoute.Post) {
-                        if (viewSettings.splitScreenEnabled) {
+                    AnimatedPane {
+                        val route = navigator.currentDestination?.contentKey
+                        if (route is FeedViewRoute.Post) {
+                            ThreadView(permalink = route.permalink, dismiss = {
+                                scope.launch {
+                                    navigator.navigateBack()
+                                }
+                            })
+                        } else if (viewSettings.splitScreenEnabled) {
                             SplitScreenPlaceHolder()
                         }
-                    } else {
-                        ThreadView(permalink = route.permalink, dismiss = {
-                            scope.launch {
-                                navigator.navigateBack()
-                            }
-                        })
                     }
                 }
             )
@@ -130,7 +153,7 @@ fun FullFeedView(
 }
 
 @Composable
-private fun SplitScreenPlaceHolder() {
+internal fun SplitScreenPlaceHolder() {
     Box(modifier = Modifier.fillMaxSize()) {
         Text(
             stringResource(R.string.split_screen_placeholder),
