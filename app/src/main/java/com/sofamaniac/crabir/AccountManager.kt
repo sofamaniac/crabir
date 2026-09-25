@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
@@ -18,8 +19,11 @@ import com.sofamaniac.crabir.settings.api.apiSettingsDataStore
 import com.sofamaniac.crabir.ui.drawer.LoginState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
@@ -40,7 +44,8 @@ class AccountManager(
     private val context: Context,
     private val authService: AuthorizationService,
 ) {
-    private var initialized = false
+    var initialized = false
+        private set
     private var clientId = ""
     suspend fun initialize(onError: (Throwable) -> Unit) {
         if (initialized) return
@@ -89,6 +94,9 @@ class AccountManager(
             val state = AuthState(authResponse, tokenResponse, null)
             val account = RedditAccount.anonymous().copy(auth = state)
             accountsRepository.addAccount(account)
+            if (accountsRepository.activeAccountId.first() < 0) {
+                accountsRepository.setActiveAccount(account.id)
+            }
         } else {
             val error = response.exceptionOrNull()
             Log.e("AccountManager", "failed to setup anonymous: ${error}")
@@ -174,6 +182,19 @@ class AccountManager(
 class AccountConfigurationViewModel(private val manager: AccountManager) : ViewModel() {
     val currentAccount =
         manager.accountsRepository.activeAccount.dropWhile { account -> account.isUninitialized() }
+            .distinctUntilChanged { old, new ->
+                old.id == new.id
+            }.stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                RedditAccount.anonymous()
+            )
+    val activeId = manager.accountsRepository.activeAccountId.distinctUntilChanged()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            -1
+        )
 
     init {
         viewModelScope.launch {
@@ -186,12 +207,21 @@ class AccountConfigurationViewModel(private val manager: AccountManager) : ViewM
 
 @Composable
 fun ConfigureAccount(
+    onAccountChange: () -> Unit,
     viewModel: AccountConfigurationViewModel = koinViewModel(),
     content: @Composable () -> Unit,
 ) {
-    val currentAccount by viewModel.currentAccount.collectAsState(null)
+    val currentAccount by viewModel.currentAccount.collectAsState()
+    val activeId by viewModel.activeId.collectAsState()
+    LaunchedEffect(activeId) {
+        if (activeId > 0) {
+            Log.d("ConfigureAccount", "Account changed: $activeId")
+            onAccountChange()
+        }
+    }
+    val account = currentAccount
     CompositionLocalProvider(
-        LocalRedditAccount provides (currentAccount ?: RedditAccount.anonymous())
+        LocalRedditAccount provides account
     ) {
         content()
     }

@@ -37,17 +37,7 @@ import java.io.OutputStream
 data class Accounts(
     val accounts: List<RedditAccount>,
     val activeId: Int,
-) {
-    fun getCurrent(): RedditAccount {
-        return if (activeId < 0) {
-            RedditAccount.anonymous()
-        } else {
-            accounts.firstOrNull { it.id == activeId }
-                ?: accounts.lastOrNull()
-                ?: RedditAccount.anonymous()
-        }
-    }
-}
+)
 
 val Context.accountsDataStore: DataStore<Accounts> by dataStore(
     fileName = "accounts.json",
@@ -56,7 +46,7 @@ val Context.accountsDataStore: DataStore<Accounts> by dataStore(
 
 object AccountsSerializer : Serializer<Accounts> {
     override val defaultValue: Accounts
-        get() = Accounts(listOf(RedditAccount.anonymous()), -1)
+        get() = Accounts(listOf(), -1)
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -139,12 +129,12 @@ class AccountsRepositoryImpl(
 
     override val accounts: Flow<List<RedditAccount>> =
         accountsData.distinctUntilChanged { old, new ->
-            if (old.accounts.size != new.accounts.size) return@distinctUntilChanged false
-            var acc = true
-            for (i in old.accounts.indices) {
-                acc = acc && old.accounts[i].equalsShallow(new.accounts[i])
-            }
-            acc
+            old.accounts.size == new.accounts.size
+                    && old.accounts
+                .zip(new.accounts)
+                .all { (old, new) ->
+                    old.equalsShallow(new)
+                }
         }.map {
             it.accounts
         }.distinctUntilChanged()

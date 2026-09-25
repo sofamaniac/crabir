@@ -8,6 +8,8 @@ import net.openid.appauth.AuthState
 interface AccountsRepository {
     val accounts: Flow<List<RedditAccount>>
     val activeAccount: Flow<RedditAccount>
+
+    /** Negative until there is an active account */
     val activeAccountId: Flow<Int>
 
     suspend fun addAccount(account: RedditAccount)

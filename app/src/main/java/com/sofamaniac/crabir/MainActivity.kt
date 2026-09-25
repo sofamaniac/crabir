@@ -45,6 +45,7 @@ import coil3.memoryCacheMaxSizePercentWhileInBackground
 import coil3.util.DebugLogger
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.NavigationGraph
+import com.sofamaniac.crabir.navigation.routes.HomeRoute
 import com.sofamaniac.crabir.settings.ConfigureSettings
 import com.sofamaniac.crabir.settings.theme.ConfigureCrabirTheme
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayerManager
@@ -178,7 +179,13 @@ fun MainScreen(
     }
     ConfigureCrabirTheme {
         ConfigureSettings {
-            ConfigureAccount() {
+            ConfigureAccount(onAccountChange = {
+                navController.navigate(HomeRoute) {
+                    popUpTo(HomeRoute) {
+                        inclusive = true
+                    }
+                }
+            }) {
                 CompositionLocalProvider(
                     LocalNavController provides navController,
                 ) {

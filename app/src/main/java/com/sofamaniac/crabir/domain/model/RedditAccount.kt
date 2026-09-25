@@ -35,10 +35,10 @@ data class RedditAccount(
     companion object {
 
         const val ANONYMOUS = "Anonymous"
-        const val UNINITIALIZED_ID = -2
-        const val ANONYMOUS_ID = -1
+        const val UNINITIALIZED_ID = Int.MAX_VALUE - 1
+        const val ANONYMOUS_ID = Int.MAX_VALUE
         fun anonymous(): RedditAccount {
-            return RedditAccount(-1, null, AuthState())
+            return RedditAccount(ANONYMOUS_ID, null, AuthState())
         }
 
         fun uninitialized(id: Int, authState: AuthState): RedditAccount {
