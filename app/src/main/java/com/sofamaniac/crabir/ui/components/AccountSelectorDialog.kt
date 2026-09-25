@@ -29,11 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
-import com.sofamaniac.crabir.AccountManager
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.domain.repository.AccountsRepository
+import com.sofamaniac.crabir.domain.repository.accounts.AccountsRepository
+import com.sofamaniac.crabir.domain.repository.accounts.AccountsStorage
 import com.sofamaniac.crabir.ui.drawer.LoginState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -58,7 +58,6 @@ fun AccountSelectorDialog(onDismiss: () -> Unit, viewModel: AccountViewModel = k
         Log.d("AccountSelector", "Result: $result")
         viewModel.handleAuthResult(result.data)
     }
-    val activeAccount by viewModel.activeAccount.collectAsState(RedditAccount.anonymous())
     val otherAccounts by viewModel.otherAccounts.collectAsState(emptyList())
     val onAccountSelection = { accountId: Int ->
         viewModel.setActiveAccount(accountId)
@@ -126,16 +125,16 @@ fun AccountSelectorDialog(onDismiss: () -> Unit, viewModel: AccountViewModel = k
 
 @KoinViewModel
 class AccountViewModel(
-    private val accountsRepository: AccountsRepository,
+    private val accountsStorage: AccountsStorage,
     private val redditApi: RedditAPIService,
-    private val accountManager: AccountManager,
+    private val accountsRepository: AccountsRepository,
 ) : ViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
-    val activeAccount = accountsRepository.activeAccount
+    val activeAccount = accountsStorage.activeAccount
     val otherAccounts = combine(
-        accountsRepository.accounts,
-        accountsRepository.activeAccount
+        accountsStorage.accounts,
+        accountsStorage.activeAccount
     ) { accounts, active ->
         accounts.filterNot { it.id == active.id || it.isAnonymous() }
             .sortedByDescending { it.id }
@@ -144,7 +143,7 @@ class AccountViewModel(
     fun setActiveAccount(accountId: Int) {
         viewModelScope.launch {
             if (activeAccount.first().id == accountId) return@launch
-            accountsRepository.setActiveAccount(accountId)
+            accountsStorage.setActiveAccount(accountId)
             val account = activeAccount.first()
             Log.d(
                 "LoginViewModel",
@@ -157,28 +156,23 @@ class AccountViewModel(
     }
 
     fun createAuthIntent(): Intent {
-        return accountManager.createAuthIntent()
+        return accountsRepository.createAuthIntent()
     }
 
     fun handleAuthResult(intent: Intent?) {
-        accountManager.handleAuthResult(
+        accountsRepository.handleAuthResult(
             intent,
             viewModelScope,
             updateState = { target -> _loginState.update { target } })
-        if (_loginState.value !is LoginState.Error) {
-            viewModelScope.launch {
-                fetchUserInfo()
-            }
-        }
     }
 
     suspend fun fetchUserInfo() {
-        val currentAccount = accountsRepository.activeAccount.first()
+        val currentAccount = accountsStorage.activeAccount.first()
         val user = redditApi.getIdentity()
         if (user.isSuccess) {
             val identity = user.getOrNull()!!
             Log.d("LoginViewModel", "Updating ${currentAccount.id}")
-            accountsRepository.updateAccount(
+            accountsStorage.updateAccount(
                 currentAccount.id,
                 currentAccount.copy(
                     info = identity,

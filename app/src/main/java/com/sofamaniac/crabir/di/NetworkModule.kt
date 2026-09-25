@@ -1,6 +1,5 @@
 package com.sofamaniac.crabir.di
 
-import android.app.Application
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.skydoves.retrofit.adapters.result.ResultCallAdapterFactory
 import com.sofamaniac.crabir.BuildConfig
@@ -19,12 +18,9 @@ import com.sofamaniac.crabir.data.remote.reddit.auth.RedditAuthenticator
 import com.sofamaniac.crabir.data.remote.streamable.StreamableAPI
 import com.sofamaniac.crabir.data.remote.utils.URISerializer
 import com.sofamaniac.crabir.data.remote.utils.URLSerializer
-import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
-import net.openid.appauth.AuthorizationService
-import net.openid.appauth.ClientAuthentication
 import nl.adaptivity.xmlutil.serialization.XML
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -42,32 +38,32 @@ import java.util.concurrent.TimeUnit
 private const val BASE_URL = "https://oauth.reddit.com/"
 private const val TIMEOUT: Long = 30
 
-@Module(includes = [AccountsModule::class, AuthModule::class])
+@Module(includes = [AuthModule::class])
 @ComponentScan
 @Configuration
 class NetworkModule {
 
-    @Single
-    fun provideRedditAuthenticator(
-        accountsRepository: AccountsRepository,
-        authService: AuthorizationService,
-        clientAuth: ClientAuthentication,
-        context: Application,
-    ): RedditAuthenticator {
-        return RedditAuthenticator(
-            accountsRepository, authService, clientAuth, context
-        )
-    }
+    //    @Single
+    //    fun provideRedditAuthenticator(
+    //        accountsRepository: AccountsRepository,
+    //        authService: AuthorizationService,
+    //        clientAuth: ClientAuthentication,
+    //        context: Application,
+    //    ): RedditAuthenticator {
+    //        return RedditAuthenticator(
+    //            accountsRepository, authService, clientAuth, context
+    //        )
+    //    }
 
-    @Single
-    fun provideRateLimiter(): RateLimitInterceptor {
-        return RateLimitInterceptor()
-    }
-
-    @Single
-    fun provideForceJsonInterceptor(): ForceJsonInterceptor {
-        return ForceJsonInterceptor()
-    }
+    //    @Single
+    //    fun provideRateLimiter(): RateLimitInterceptor {
+    //        return RateLimitInterceptor()
+    //    }
+    //
+    //    @Single
+    //    fun provideForceJsonInterceptor(): ForceJsonInterceptor {
+    //        return ForceJsonInterceptor()
+    //    }
 
     @Single
     fun provideOkHttpClient(

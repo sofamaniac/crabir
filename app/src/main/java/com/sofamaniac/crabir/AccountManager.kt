@@ -1,7 +1,5 @@
 package com.sofamaniac.crabir
 
-import android.content.Context
-import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -10,178 +8,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
-import com.sofamaniac.crabir.data.remote.reddit.auth.BasicAuthClient
-import com.sofamaniac.crabir.data.remote.reddit.auth.Config
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.domain.repository.AccountsRepository
-import com.sofamaniac.crabir.settings.api.apiSettingsDataStore
-import com.sofamaniac.crabir.ui.drawer.LoginState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.sofamaniac.crabir.domain.repository.accounts.AccountsRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import net.openid.appauth.AuthState
-import net.openid.appauth.AuthorizationException
-import net.openid.appauth.AuthorizationResponse
-import net.openid.appauth.AuthorizationService
-import net.openid.appauth.TokenRequest
-import net.openid.appauth.TokenResponse
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.annotation.KoinViewModel
-import org.koin.core.annotation.Single
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
-
-@Single
-class AccountManager(
-    val accountsRepository: AccountsRepository,
-    val redditApi: RedditAPIService,
-    private val context: Context,
-    private val authService: AuthorizationService,
-) {
-    var initialized = false
-        private set
-    private var clientId = ""
-    suspend fun initialize(onError: (Throwable) -> Unit) {
-        if (initialized) return
-        val apiSettings = context.apiSettingsDataStore.data.first()
-        if (apiSettings.redditClientId == null || apiSettings.redditRedirectUri == null) return
-        clientId = apiSettings.redditClientId
-        serviceConfig = Config(clientId, apiSettings.redditRedirectUri)
-        setupAnonymous(apiSettings.redditClientId, onError)
-        initialized = true
-    }
-
-    private lateinit var serviceConfig: Config
-    fun createAuthIntent(): Intent {
-        if (!initialized) throw IllegalStateException("AccountManager not initialized")
-        val authRequest = serviceConfig.createAuthorizationRequest()
-        val intent = authService.getAuthorizationRequestIntent(authRequest)
-        Log.d("LoginViewModel", "Creating auth intent: $intent")
-        return intent
-    }
-
-    @OptIn(ExperimentalUuidApi::class)
-    private suspend fun setupAnonymous(clientId: String, onError: (Throwable) -> Unit) {
-        Log.d("AccountManager", "Setting up anonymous")
-        val response = redditApi.getAnonymousAccessToken(
-            deviceId = Uuid.random().toHexDashString()
-        )
-        if (response.isSuccess) {
-            Log.d("AccountManager", "Obtained access token for anonymous")
-            val accessToken = response.getOrNull()!!
-            val authResponse =
-                AuthorizationResponse.Builder(serviceConfig.createAuthorizationRequest())
-                    .setAccessToken(accessToken.accessToken)
-                    .setAccessTokenExpiresIn(accessToken.expiresIn)
-                    .build()
-            val tokenRequest = TokenRequest.Builder(
-                serviceConfig.authorizationServiceConfiguration(),
-                clientId,
-            ).setGrantType(
-                TokenRequest.GRANT_TYPE_CLIENT_CREDENTIALS
-            ).build()
-            val tokenResponse =
-                TokenResponse.Builder(tokenRequest).setAccessToken(accessToken.accessToken)
-                    .setAccessTokenExpiresIn(accessToken.expiresIn ?: Long.MAX_VALUE)
-                    .setScope(accessToken.scope)
-                    .build()
-            val state = AuthState(authResponse, tokenResponse, null)
-            val account = RedditAccount.anonymous().copy(auth = state)
-            accountsRepository.addAccount(account)
-            if (accountsRepository.activeAccountId.first() < 0) {
-                accountsRepository.setActiveAccount(account.id)
-            }
-        } else {
-            val error = response.exceptionOrNull()
-            Log.e("AccountManager", "failed to setup anonymous: ${error}")
-            onError(
-                error ?: Exception("Something went wrong")
-            )
-        }
-    }
-
-    fun handleAuthResult(
-        intent: Intent?,
-        scope: CoroutineScope,
-        updateState: (LoginState) -> Unit,
-    ) {
-        Log.d("LoginViewModel", "Handling auth result ${intent?.data}")
-        if (intent == null) {
-            updateState(LoginState.Error(Exception("Login cancelled")))
-            return
-        }
-
-        val authResponse = AuthorizationResponse.fromIntent(intent)
-        val authException = AuthorizationException.fromIntent(intent)
-
-        Log.d("LoginViewModel", "Auth response: $authResponse")
-
-
-        when {
-            authException != null -> {
-                Log.e("LoginViewModel", "Authorization exception: $authException")
-                updateState(LoginState.Error(authException))
-            }
-
-            authResponse != null -> {
-                updateState(LoginState.Loading)
-                exchangeAuthCodeForToken(authResponse, scope, updateState)
-            }
-        }
-    }
-
-
-    private fun exchangeAuthCodeForToken(
-        authResponse: AuthorizationResponse,
-        scope: CoroutineScope,
-        updateState: (LoginState) -> Unit,
-    ) {
-        val clientAuth = BasicAuthClient
-        authService.performTokenRequest(
-            authResponse.createTokenExchangeRequest(),
-            clientAuth
-        ) { tokenResponse, ex ->
-            when {
-                ex != null -> {
-                    Log.e("LoginViewModel", "Token exchange failed: $ex")
-                    updateState(LoginState.Error(ex))
-                }
-
-                tokenResponse != null -> {
-                    Log.d("LoginViewModel", "Got authorization token")
-                    val authState = AuthState(authResponse, tokenResponse, null)
-                    scope.launch(Dispatchers.IO) {
-                        save(authState)
-                    }
-                }
-
-                else -> {
-                    Log.e("LoginViewModel", "Something went wrong")
-                }
-            }
-        }
-    }
-
-
-    private suspend fun save(authState: AuthState) {
-        val id = (accountsRepository.accounts.first().maxByOrNull { it.id }?.id ?: 0) + 1
-        val newAccount = RedditAccount.uninitialized(id, authState)
-        accountsRepository.addAccount(newAccount)
-        accountsRepository.setActiveAccount(id)
-    }
-
-}
 
 @KoinViewModel
-class AccountConfigurationViewModel(private val manager: AccountManager) : ViewModel() {
+class AccountConfigurationViewModel(private val manager: AccountsRepository) : ViewModel() {
     val currentAccount =
-        manager.accountsRepository.activeAccount.dropWhile { account -> account.isUninitialized() }
+        manager.activeAccount.dropWhile { account -> account.isUninitialized() }
             .distinctUntilChanged { old, new ->
                 old.id == new.id
             }.stateIn(
@@ -189,12 +29,18 @@ class AccountConfigurationViewModel(private val manager: AccountManager) : ViewM
                 SharingStarted.WhileSubscribed(5000),
                 RedditAccount.anonymous()
             )
-    val activeId = manager.accountsRepository.activeAccountId.distinctUntilChanged()
+    val activeId = manager.activeAccountId.distinctUntilChanged()
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             -1
         )
+
+    fun updateInfo() {
+        viewModelScope.launch {
+            manager.fetchUserInfo(activeId.value)
+        }
+    }
 
     init {
         viewModelScope.launch {
@@ -217,6 +63,7 @@ fun ConfigureAccount(
         if (activeId > 0) {
             Log.d("ConfigureAccount", "Account changed: $activeId")
             onAccountChange()
+            viewModel.updateInfo()
         }
     }
     val account = currentAccount

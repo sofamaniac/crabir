@@ -34,13 +34,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.AccountManager
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.InboxAPI
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.InboxRepository
+import com.sofamaniac.crabir.domain.repository.accounts.AccountsRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.ui.components.CloseButton
 import com.sofamaniac.crabir.ui.components.ListItem
@@ -179,12 +179,12 @@ enum class MessageEditorError {
 
 @KoinViewModel
 class MessageEditorViewModel(
-    accountManager: AccountManager,
+    accountsRepository: AccountsRepository,
     val messageRepository: InboxRepository,
     val api: InboxAPI,
     @InjectedParam val parent: Fullname?,
 ) : ViewModel() {
-    val accounts = accountManager.accountsRepository.accounts
+    val accounts = accountsRepository.accounts
 
     val message = parent?.let {
         messageRepository.get(it)

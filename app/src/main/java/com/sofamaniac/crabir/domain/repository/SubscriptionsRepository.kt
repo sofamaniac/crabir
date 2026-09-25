@@ -9,7 +9,9 @@ import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.SubscribeAction
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PagedResponse
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.repository.accounts.AccountsStorage
 import com.sofamaniac.crabir.domain.repository.feed.MultiCache
 import com.sofamaniac.crabir.domain.repository.feed.SubredditCache
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +19,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -27,22 +28,22 @@ import org.koin.core.annotation.Singleton
 @Singleton
 class SubscriptionsRepository(
     val api: RedditAPIService,
-    val accountsRepository: AccountsRepository,
+    val accountsStorage: AccountsStorage,
     val subredditCache: SubredditCache,
     val multiCache: MultiCache,
 ) {
-    val activeAccount = accountsRepository.activeAccount.distinctUntilChanged { old, new ->
-        old.id == new.id
-    }
+    val activeAccountId = accountsStorage.activeAccountId
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val subscriptions: StateFlow<List<Subreddit>> =
-        activeAccount
+        activeAccountId
             .flatMapLatest { account ->
-                if (!account.isAnonymous()) {
-                    flow { emit(loadSubscriptions()) }
-                } else {
+                if (account < 0) {
+                    flowOf(emptyList())
+                } else if (account == RedditAccount.ANONYMOUS_ID) {
                     flow { emit(loadDefaults()) }
+                } else {
+                    flow { emit(loadSubscriptions()) }
                 }
             }.stateIn(
                 scope = CoroutineScope(Dispatchers.IO),
@@ -52,9 +53,9 @@ class SubscriptionsRepository(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val multis: StateFlow<List<Thing.Multi>> =
-        activeAccount
+        activeAccountId
             .flatMapLatest { account ->
-                if (!account.isAnonymous()) {
+                if (account != RedditAccount.ANONYMOUS_ID && account > 0) {
                     flow { emit(loadMultis()) }
                 } else {
                     flowOf(emptyList())

@@ -1,12 +1,4 @@
-/*
- * *
- *  * Created by sofamaniac
- *  * Copyright (c) 2026 . All rights reserved.
- *  * Last modified 1/12/26, 4:45 PM
- *
- */
-
-package com.sofamaniac.crabir.domain.repository
+package com.sofamaniac.crabir.domain.repository.accounts
 
 import android.content.Context
 import android.util.Log
@@ -75,9 +67,9 @@ object AccountsSerializer : Serializer<Accounts> {
 }
 
 @Singleton
-class AccountsRepositoryImplRoom(
+class AccountsStorageImplRoom(
     private val accountsDao: AccountsDao,
-) : AccountsRepository {
+) : AccountsStorage {
     override val accounts: Flow<List<RedditAccount>> =
         accountsDao.getAll().map { it.map { account -> account.toDomainModel() } }
     override val activeAccount: Flow<RedditAccount> =
@@ -120,10 +112,10 @@ class AccountsRepositoryImplRoom(
     }
 }
 
-@Singleton(binds = [AccountsRepository::class])
-class AccountsRepositoryImpl(
+@Singleton(binds = [AccountsStorage::class])
+class AccountsStorageImpl(
     context: Context,
-) : AccountsRepository {
+) : AccountsStorage {
     private val dataStore: DataStore<Accounts> = context.accountsDataStore
     private val accountsData: Flow<Accounts> = dataStore.data.distinctUntilChanged()
 

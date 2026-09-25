@@ -12,12 +12,10 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sofamaniac.crabir.AccountManager
 import com.sofamaniac.crabir.data.remote.dto.Thing
-import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.SubscriptionsRepository
+import com.sofamaniac.crabir.domain.repository.accounts.AccountsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,8 +58,6 @@ abstract class DrawerViewModel : ViewModel() {
 class DrawerViewModelImpl(
     private val accountsRepository: AccountsRepository,
     subsRepository: SubscriptionsRepository,
-    private val redditApi: RedditAPIService,
-    private val accountManager: AccountManager,
 ) : DrawerViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     override val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
@@ -114,12 +110,8 @@ class DrawerViewModelImpl(
     override fun initialize() {
         if (initialized) return
         viewModelScope.launch(Dispatchers.IO) {
-            accountManager.initialize { err ->
+            accountsRepository.initialize { err ->
                 _loginState.update { LoginState.Error(err) }
-            }
-            val account = activeAccount.first()
-            if (!account.isAnonymous() && !account.isUninitialized()) {
-                fetchUserInfo()
             }
             initialized = true
         }
@@ -127,13 +119,9 @@ class DrawerViewModelImpl(
 
     override fun logout() {
         viewModelScope.launch(Dispatchers.IO) {
-            val res = redditApi.logout(activeAccount.first().auth.refreshToken!!)
-            if (res.isSuccess) {
-                accountsRepository.deleteAccount(activeAccount.first().id)
-            } else {
-                val error = res.exceptionOrNull()!!
-                Log.e("LoginViewModel", "Failed to logout: $error")
-                _loginState.update { LoginState.Error(error) }
+            accountsRepository.logout(activeAccount.first().id).onFailure { err ->
+                Log.e("LoginViewModel", "Failed to logout: $err")
+                _loginState.update { LoginState.Error(err) }
             }
         }
     }
@@ -141,51 +129,21 @@ class DrawerViewModelImpl(
 
     override suspend fun setActiveAccount(accountId: Int) {
         if (activeAccount.first().id == accountId) return
-        accountsRepository.setActiveAccount(accountId)
-        val account = activeAccount.first()
-        Log.d(
-            "LoginViewModel",
-            "Setting active account to '${activeAccount.first().info?.username ?: "Anonymous"}'"
-        )
-        if (account.info?.username.isNullOrBlank() && !account.isAnonymous()) {
-            fetchUserInfo()
+        accountsRepository.setActiveAccount(accountId).onFailure { err ->
+            Log.e("LoginViewModel", "Failed to set active account:", err)
+            _loginState.update { LoginState.Error(err) }
         }
     }
 
     override fun createAuthIntent(): Intent {
-        return accountManager.createAuthIntent()
+        return accountsRepository.createAuthIntent()
     }
 
     override fun handleAuthResult(intent: Intent?) {
-        accountManager.handleAuthResult(
+        accountsRepository.handleAuthResult(
             intent,
             viewModelScope,
-            updateState = { target -> _loginState.update { target } })
-        if (_loginState.value !is LoginState.Error) {
-            viewModelScope.launch {
-                fetchUserInfo()
-            }
-        }
-    }
-
-    suspend fun fetchUserInfo() {
-        val currentAccount = accountsRepository.activeAccount.first()
-        val user = redditApi.getIdentity()
-        if (user.isSuccess) {
-            val identity = user.getOrNull()!!
-            Log.d("LoginViewModel", "Updating ${currentAccount.id}")
-            accountsRepository.updateAccount(
-                currentAccount.id,
-                currentAccount.copy(
-                    info = identity,
-                )
-            )
-
-        } else {
-            val err = user.exceptionOrNull()!!
-            Log.e("LoginViewModel", "Failed to get user info: $err")
-            //accountsRepository.deleteAccount(accounts.size)
-            _loginState.update { LoginState.Error(err) }
-        }
+            updateState = { target -> _loginState.update { target } }
+        )
     }
 }

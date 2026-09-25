@@ -1,11 +1,11 @@
-package com.sofamaniac.crabir.domain.repository
+package com.sofamaniac.crabir.domain.repository.accounts
 
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import net.openid.appauth.AuthState
 
-interface AccountsRepository {
+interface AccountsStorage {
     val accounts: Flow<List<RedditAccount>>
     val activeAccount: Flow<RedditAccount>
 
@@ -25,7 +25,7 @@ interface AccountsRepository {
     suspend fun clearAll()
 }
 
-class AccountsRepositoryPreview : AccountsRepository {
+class AccountsStoragePreview : AccountsStorage {
     override val accounts: Flow<List<RedditAccount>> = flowOf(listOf(RedditAccount.anonymous()))
     override val activeAccount: Flow<RedditAccount> = flowOf(RedditAccount.anonymous())
     override val activeAccountId: Flow<Int> = flowOf(-1)

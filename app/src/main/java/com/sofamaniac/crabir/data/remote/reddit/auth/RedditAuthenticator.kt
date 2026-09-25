@@ -11,7 +11,7 @@ package com.sofamaniac.crabir.data.remote.reddit.auth
 import android.app.Application
 import android.util.Log
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.domain.repository.AccountsRepository
+import com.sofamaniac.crabir.domain.repository.accounts.AccountsStorage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -27,13 +27,13 @@ import kotlin.coroutines.resume
 
 @Singleton
 class RedditAuthenticator(
-    private val accountsRepository: AccountsRepository,
+    private val accountsStorage: AccountsStorage,
     private val authService: AuthorizationService,
     private val clientAuth: ClientAuthentication,
     private val context: Application,
 ) : Interceptor {
 
-    private val activeAccount: Flow<RedditAccount> = accountsRepository.activeAccount
+    private val activeAccount: Flow<RedditAccount> = accountsStorage.activeAccount
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
@@ -84,7 +84,7 @@ class RedditAuthenticator(
             }.also { token ->
                 if (token != null) {
                     runBlocking {
-                        accountsRepository.updateAuthState(account.id, account.auth)
+                        accountsStorage.updateAuthState(account.id, account.auth)
                     }
                 }
             }

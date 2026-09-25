@@ -3,7 +3,9 @@ package com.sofamaniac.crabir.data.remote.interceptors
 import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.Response
+import org.koin.core.annotation.Single
 
+@Single
 class RateLimitInterceptor : Interceptor {
 
     private var lastRequestTime: Long = 0

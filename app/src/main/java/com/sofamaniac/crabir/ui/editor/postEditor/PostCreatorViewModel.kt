@@ -26,8 +26,8 @@ import com.sofamaniac.crabir.data.remote.reddit.makeMediaUploadBody
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
-import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.DraftsRepository
+import com.sofamaniac.crabir.domain.repository.accounts.AccountsStorage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
@@ -86,7 +86,7 @@ class PostCreatorViewModel(
     private val draftsRepository: DraftsRepository,
     private val communities: SubredditDao,
     private val mediaUploader: MediaUploadInterface,
-    accountsRepository: AccountsRepository,
+    accountsStorage: AccountsStorage,
 ) : CreatorViewModel(api) {
     var state by mutableStateOf(PostSubmissionBuilder())
     val textState = TextFieldState()
@@ -96,7 +96,7 @@ class PostCreatorViewModel(
     var captions: MutableMap<Uri, String> = mutableMapOf()
     var loading by mutableStateOf(false)
 
-    val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
+    val accounts: Flow<List<RedditAccount>> = accountsStorage.accounts
 
     init {
         viewModelScope.launch {

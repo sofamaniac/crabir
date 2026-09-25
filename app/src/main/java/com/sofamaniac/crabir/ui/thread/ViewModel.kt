@@ -11,9 +11,9 @@ import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.RedditAccount
-import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.domain.repository.ThreadRepository
+import com.sofamaniac.crabir.domain.repository.accounts.AccountsStorage
 import com.sofamaniac.crabir.settings.comments.CommentsSettings
 import com.sofamaniac.crabir.settings.history.HistoryManager
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +42,7 @@ sealed class UiState {
 class ThreadViewModel(
     private val repository: ThreadRepository,
     private val commentsRepository: CommentsRepository,
-    accountsRepository: AccountsRepository,
+    accountsStorage: AccountsStorage,
     private val historyManager: HistoryManager,
     @InjectedParam val permalink: String,
     @InjectedParam val comment: String?,
@@ -54,7 +54,7 @@ class ThreadViewModel(
     private var _post = MutableStateFlow<PostData?>(null)
     val post: StateFlow<PostData?> = _post.asStateFlow()
 
-    val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
+    val accounts: Flow<List<RedditAccount>> = accountsStorage.accounts
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()

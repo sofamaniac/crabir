@@ -15,10 +15,10 @@ import com.sofamaniac.crabir.data.remote.reddit.SubmissionBuilderError
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
-import com.sofamaniac.crabir.domain.repository.AccountsRepository
 import com.sofamaniac.crabir.domain.repository.CrosspostCommunitiesRepository
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ListingSource
+import com.sofamaniac.crabir.domain.repository.accounts.AccountsStorage
 import com.sofamaniac.crabir.ui.editor.postEditor.CreatorViewModel
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.annotation.InjectedParam
@@ -30,7 +30,7 @@ class CrosspostCreatorViewModel(
     api: RedditAPIService,
     private val communities: CrosspostCommunitiesRepository,
     linksRepository: LinksRepository,
-    accountsRepository: AccountsRepository,
+    accountsStorage: AccountsStorage,
 ) : CreatorViewModel(api) {
     var state by mutableStateOf(
         CrosspostSubmissionBuilder(
@@ -40,7 +40,7 @@ class CrosspostCreatorViewModel(
     val post = linksRepository.get(parentFullname)
 
     var loading by mutableStateOf(false)
-    val accounts: Flow<List<RedditAccount>> = accountsRepository.accounts
+    val accounts: Flow<List<RedditAccount>> = accountsStorage.accounts
     private var account: RedditAccount? = null
 
     var source = CrosspostCommunitiesSource(communities, params = account)
