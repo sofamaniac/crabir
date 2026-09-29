@@ -50,7 +50,7 @@ import org.koin.core.parameter.parametersOf
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileView(
-    user: String,
+    user: String?,
     modifier: Modifier = Modifier,
     initialTab: ProfileTabs = ProfileTabs.Overview,
     profileViewModel: ProfileViewModel = koinViewModel<ProfileViewModel> {
@@ -61,33 +61,22 @@ fun ProfileView(
     //        true
     //    )
     val currentUser = LocalRedditAccount.current
-    val isConnectedUser = currentUser.info?.username == user
+    val isConnectedUser = (currentUser.info?.username == null ||
+            currentUser.info.username == user)
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val tabs = if (isConnectedUser) ProfileTabs.entries else ProfileTabs.publicTabs
     val initialIndex = tabs.indexOf(initialTab).coerceIn(0, tabs.size)
     val currentTab = rememberPagerState(initialPage = initialIndex, pageCount = { tabs.size })
     val scope = rememberCoroutineScope()
 
-    val viewModels: Map<ProfileTabs, ProfileFeedViewModel<out VotableData>> = mapOf(
-        ProfileTabs.Overview to koinViewModel<OverviewViewModel> { parametersOf(user) },
-        ProfileTabs.Saved to koinViewModel<SavedViewModel> { parametersOf(user) },
-        ProfileTabs.Comments to koinViewModel<CommentsViewModel> { parametersOf(user) },
-        ProfileTabs.Upvoted to koinViewModel<UpvotedViewModel> { parametersOf(user) },
-        ProfileTabs.Downvoted to koinViewModel<DownvotedViewModel> { parametersOf(user) },
-        ProfileTabs.Hidden to koinViewModel<HiddenViewModel> { parametersOf(user) },
-        ProfileTabs.Posts to koinViewModel<SubmittedViewModel> { parametersOf(user) },
-    )
-
-
+    val userInfo by profileViewModel.userProfile.collectAsState(currentUser.info)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val activeViewModel = tabs.getOrNull(currentTab.currentPage).let {
-        viewModels.getOrDefault(it, defaultValue = null)
-    }
     val snackbarHostState = remember { SnackbarHostState() }
     val navController = LocalNavController.current
     val onPostClick: (PostData) -> Unit = {
         navController?.navigate(PostRoute(it.permalink))
     }
+
     CompositionLocalProvider(LocalSnackBarHost provides snackbarHostState) {
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -95,6 +84,22 @@ fun ProfileView(
                 DrawerContent(drawerState)
             },
         ) {
+            val user = userInfo?.username
+            if (user == null) return@ModalNavigationDrawer
+            val viewModels: Map<ProfileTabs, ProfileFeedViewModel<out VotableData>> = mapOf(
+                ProfileTabs.Overview to koinViewModel<OverviewViewModel> { parametersOf(user) },
+                ProfileTabs.Saved to koinViewModel<SavedViewModel> { parametersOf(user) },
+                ProfileTabs.Comments to koinViewModel<CommentsViewModel> { parametersOf(user) },
+                ProfileTabs.Upvoted to koinViewModel<UpvotedViewModel> { parametersOf(user) },
+                ProfileTabs.Downvoted to koinViewModel<DownvotedViewModel> { parametersOf(user) },
+                ProfileTabs.Hidden to koinViewModel<HiddenViewModel> { parametersOf(user) },
+                ProfileTabs.Posts to koinViewModel<SubmittedViewModel> { parametersOf(user) },
+            )
+
+
+            val activeViewModel = tabs.getOrNull(currentTab.currentPage).let {
+                viewModels.getOrDefault(it, defaultValue = null)
+            }
             Scaffold(
                 snackbarHost = {
                     SnackbarHost(snackbarHostState)
@@ -103,8 +108,8 @@ fun ProfileView(
                 topBar = {
                     TopBar(
                         scrollBehavior,
-                        user,
-                        profileViewModel.userProfile.value,
+                        user ?: "",
+                        userInfo,
                         viewModel = activeViewModel,
                         openDrawer = { scope.launch { drawerState.open() } }
                     )
@@ -136,7 +141,7 @@ fun ProfileView(
                         when (val viewModel = viewModels[page]) {
                             null -> {
                                 AboutTab(
-                                    profileViewModel.userProfile.value,
+                                    userInfo,
                                     modifier = Modifier
                                         .fillMaxSize()
                                 )

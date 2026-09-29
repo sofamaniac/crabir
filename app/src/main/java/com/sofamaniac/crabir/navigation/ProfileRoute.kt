@@ -54,7 +54,7 @@ fun NavGraphBuilder.profileGraph() {
             return@composable
         }
         ProfileView(
-            currentAccount.info!!.username,
+            currentAccount.info?.username,
             initialTab = ProfileTabs.Saved,
         )
     }

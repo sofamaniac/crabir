@@ -7,8 +7,6 @@ package com.sofamaniac.crabir.ui.user
 import android.util.Log
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -55,15 +53,19 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 class ProfileViewModel(
     api: RedditAPIService,
-    @InjectedParam username: String,
+    @InjectedParam username: String?,
 ) : ViewModel() {
-    val userProfile: MutableState<UserDTO?> = mutableStateOf(null)
+    val userProfile: MutableStateFlow<UserDTO?> = MutableStateFlow(null)
 
     init {
         viewModelScope.launch {
-            val res = api.getUser(username)
-            if (res.isSuccess) {
-                userProfile.value = res.getOrNull()?.data
+            val res = if (username == null) {
+                api.getIdentity()
+            } else {
+                api.getUser(username).map { it.data }
+            }
+            res.onSuccess {
+                userProfile.value = it
             }
         }
     }

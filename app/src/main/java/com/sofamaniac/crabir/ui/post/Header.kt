@@ -90,6 +90,15 @@ fun PostHeader(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        val navigateToSubreddit = {
+            if (post.subredditDetails?.subredditType == "user") {
+                navController?.navigate(
+                    post.subredditDetails.url
+                )
+            } else {
+                navController?.navigate(SubredditRoute(post.subreddit.subredditPrefixed))
+            }
+        }
         if (showSubredditIcon) {
             SubredditIcon(
                 post.subreddit.name,
@@ -99,9 +108,7 @@ fun PostHeader(
                     .clip(CircleShape)
                     .clickable(
                         enabled = settings.clickableCommunity,
-                        onClick = {
-                            navController?.navigate(SubredditRoute(post.subreddit.subredditPrefixed))
-                        }
+                        onClick = { navigateToSubreddit() },
                     )
             )
             Spacer(modifier = Modifier.width(4.dp))
@@ -118,9 +125,7 @@ fun PostHeader(
                     LinkAnnotation.Clickable(
                         tag = "Subreddit",
                         styles = TextLinkStyles(style = SpanStyle(color = theme.highlight)),
-                        linkInteractionListener = {
-                            navController?.navigate(SubredditRoute(post.subreddit.subredditPrefixed))
-                        })
+                        linkInteractionListener = { navigateToSubreddit() })
                 ) {
                     appendCommunity()
                 }
