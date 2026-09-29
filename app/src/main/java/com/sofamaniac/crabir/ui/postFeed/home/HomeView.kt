@@ -17,6 +17,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.HOME
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.routes.PostCreatorRoute
 import com.sofamaniac.crabir.ui.components.TabBar
 import com.sofamaniac.crabir.ui.postFeed.FullFeedView
 import com.sofamaniac.crabir.ui.postFeed.components.TopBar
@@ -66,6 +68,7 @@ fun HomeViewer(
             }
         })
     }
+    val navController = LocalNavController.current
     FullFeedView(
         topBar,
         bottomBar,
@@ -74,6 +77,14 @@ fun HomeViewer(
         feedInfo = null,
         drawerState = drawerState,
         viewEntity = viewEntity,
+        createPost = { kind ->
+            navController?.navigate(
+                PostCreatorRoute(
+                    kind,
+                    null
+                )
+            )
+        }
     )
 
 }
