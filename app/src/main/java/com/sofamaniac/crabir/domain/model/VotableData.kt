@@ -30,10 +30,11 @@ interface VotableData : DataInterface {
             oldLikes == false -> -1
             else -> 0
         }
+        val total = (ups + downs).coerceAtLeast(1).toDouble()
         val newScore = score.copy(
             ups = ups,
             downs = downs, score = ups - downs,
-            upvoteRatio = ups / (ups + downs).toDouble().coerceAtMost(1.0)
+            upvoteRatio = (ups / total).coerceAtMost(1.0)
         )
         return copy(score = newScore)
     }
