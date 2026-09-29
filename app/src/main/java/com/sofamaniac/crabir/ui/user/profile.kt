@@ -36,6 +36,8 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
+import com.sofamaniac.crabir.navigation.LocalNavController
+import com.sofamaniac.crabir.navigation.routes.PostRoute
 import com.sofamaniac.crabir.ui.components.TabBar
 import com.sofamaniac.crabir.ui.drawer.DrawerContent
 import com.sofamaniac.crabir.ui.postFeed.PostFeedViewer
@@ -82,6 +84,10 @@ fun ProfileView(
         viewModels.getOrDefault(it, defaultValue = null)
     }
     val snackbarHostState = remember { SnackbarHostState() }
+    val navController = LocalNavController.current
+    val onPostClick: (PostData) -> Unit = {
+        navController?.navigate(PostRoute(it.permalink))
+    }
     CompositionLocalProvider(LocalSnackBarHost provides snackbarHostState) {
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -141,7 +147,8 @@ fun ProfileView(
                                 TabInner(
                                     viewModel,
                                     filter = filter,
-                                    showHidden = false
+                                    showHidden = false,
+                                    onPostClick = onPostClick
                                 )
                             }
 
@@ -150,6 +157,7 @@ fun ProfileView(
                                     viewModel,
                                     filter = { true },
                                     showHidden = page == ProfileTabs.Hidden,
+                                    onPostClick = onPostClick
                                 )
                             }
                         }
@@ -166,6 +174,7 @@ private fun TabInner(
     viewModel: ProfileFeedViewModel<out VotableData>,
     showHidden: Boolean,
     filter: (VotableData) -> Boolean,
+    onPostClick: (PostData) -> Unit = {},
 ) {
 
     PostFeedViewer(
@@ -178,6 +187,7 @@ private fun TabInner(
                 thing,
                 isMostVisible = isMostVisible,
                 showHidden = showHidden,
+                onClick = { onPostClick(thing) }
             )
 
             is CommentType.Comment -> CommentView(thing)
