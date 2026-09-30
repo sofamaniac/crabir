@@ -439,6 +439,9 @@
     <string name="change_default_feed">Change default feed</string>
     <string name="default_feed">Home</string>
     <string name="default_feed_support"><![CDATA[Default feed. To set any community, go to Settings -> General-> Feed]]></string>
+    <string name="post_locked">🔒</string>
+    <string name="post_archived">🗄️</string>
+    <string name="text_separator">·</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>

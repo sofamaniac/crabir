@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,14 +27,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.CommentData
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
@@ -298,10 +300,6 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
 
     val theme = LocalTheme.current
     val timeString = formatElapsedTimeLocalized(comment.createdUtc)
-    val rightString = buildAnnotatedString {
-        append("· ")
-        append(timeString)
-    }
 
     val navController = LocalNavController.current!!
     val authorModifier = Modifier.clickable {
@@ -311,6 +309,16 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
                 ProfileTabs.Overview
             )
         )
+    }.let {
+        if (comment.isSubmitter) {
+            it.cartouche(colorResource(AUTHOR_CARTOUCHE_COLOR))
+        } else if (comment.distinguished == "moderator") {
+            it.cartouche(colorResource(MODERATOR_CARTOUCHE_COLOR))
+        } else if (comment.distinguished == "admin") {
+            it.cartouche(colorResource(ADMIN_CARTOUCHE_COLOR))
+        } else {
+            it
+        }
     }
     val authorString = comment.author.username
     Row(
@@ -318,36 +326,27 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (comment.isSubmitter) {
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 authorString,
-                color = Color.White,
-                modifier = authorModifier.cartouche(colorResource(AUTHOR_CARTOUCHE_COLOR))
+                modifier = authorModifier,
+                color = if (comment.isSubmitter || !comment.distinguished.isNullOrBlank()) Color.White else theme.highlight,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
-        } else if (comment.distinguished == "moderator") {
-            Text(
-                authorString,
-                color = Color.White,
-                modifier = authorModifier.cartouche(colorResource(MODERATOR_CARTOUCHE_COLOR))
-            )
-        } else if (comment.distinguished == "admin") {
-            Text(
-                authorString,
-                color = Color.White,
-                modifier = authorModifier.cartouche(colorResource(ADMIN_CARTOUCHE_COLOR))
-            )
-        } else {
-            Text(comment.author.username, color = theme.highlight, modifier = authorModifier)
-        }
-        Box(modifier = Modifier.weight(10f)) {
             Flair(comment.author.flair)
+            Spacer(modifier = Modifier.weight(1f))
         }
-        Spacer(modifier = Modifier.weight(1f))
         ScoreString(
             comment.score.score,
             comment.relationship.liked,
             hidden = comment.score.hideScore
         )
-        Text(rightString, maxLines = 1)
+        Text(stringResource(R.string.text_separator))
+        Text(timeString, maxLines = 1)
     }
 }
