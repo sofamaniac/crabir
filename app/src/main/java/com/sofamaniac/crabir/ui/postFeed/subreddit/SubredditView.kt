@@ -31,6 +31,7 @@ import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.window.core.layout.WindowSizeClass
+import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.R
@@ -168,101 +170,104 @@ private fun SubredditScaffold(
         WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND
     )
     val enableDrawer = navigator.currentDestination?.contentKey !is FeedViewRoute.Post
-    ModalNavigationDrawer(
-        gesturesEnabled = enableDrawer,
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerContent(drawerState, snackbarHostState = snackbarHostState)
-        },
-    ) {
-        NavigableListDetailPaneScaffold(
-            navigator = navigator,
-            paneExpansionDragHandle = { state ->
-                val interactionSource = remember { MutableInteractionSource() }
-                VerticalDragHandle(
-                    interactionSource = interactionSource,
-                    modifier = Modifier.paneExpansionDraggable(
-                        state,
-                        LocalMinimumInteractiveComponentSize.current,
-                        interactionSource,
-                    ),
-                )
+    val infoSettings = LocalPostSettings.current.infoSettings.copy(clickableCommunity = false)
+    CompositionLocalProvider(LocalPostSettings provides LocalPostSettings.current.copy(infoSettings = infoSettings)) {
+        ModalNavigationDrawer(
+            gesturesEnabled = enableDrawer,
+            drawerState = drawerState,
+            drawerContent = {
+                DrawerContent(drawerState, snackbarHostState = snackbarHostState)
             },
-            listPane = {
-                AnimatedPane {
-                    val route = navigator.currentDestination?.contentKey
-                    val showFeed = (route == null || viewSettings.splitScreenEnabled)
-                    if (showFeed) {
-                        SubredditListPane(
-                            isLarge = isLarge && viewSettings.splitScreenEnabled,
-                            topBar = topBar,
-                            bottomBar = bottomBar,
-                            viewModel = viewModel,
-                            modifier = modifier,
-                            snackbarHostState = snackbarHostState,
-                            viewEntity = viewEntity,
-                            filter = filter,
-                            feedInfo = feedInfo,
-                            showBottomSheet = {
-                                scope.launch {
-                                    bottomSheetState.show()
-                                    showBottomSheet = true
+        ) {
+            NavigableListDetailPaneScaffold(
+                navigator = navigator,
+                paneExpansionDragHandle = { state ->
+                    val interactionSource = remember { MutableInteractionSource() }
+                    VerticalDragHandle(
+                        interactionSource = interactionSource,
+                        modifier = Modifier.paneExpansionDraggable(
+                            state,
+                            LocalMinimumInteractiveComponentSize.current,
+                            interactionSource,
+                        ),
+                    )
+                },
+                listPane = {
+                    AnimatedPane {
+                        val route = navigator.currentDestination?.contentKey
+                        val showFeed = (route == null || viewSettings.splitScreenEnabled)
+                        if (showFeed) {
+                            SubredditListPane(
+                                isLarge = isLarge && viewSettings.splitScreenEnabled,
+                                topBar = topBar,
+                                bottomBar = bottomBar,
+                                viewModel = viewModel,
+                                modifier = modifier,
+                                snackbarHostState = snackbarHostState,
+                                viewEntity = viewEntity,
+                                filter = filter,
+                                feedInfo = feedInfo,
+                                showBottomSheet = {
+                                    scope.launch {
+                                        bottomSheetState.show()
+                                        showBottomSheet = true
+                                    }
+                                },
+                                navigate = {
+                                    scope.launch {
+                                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it)
+                                    }
                                 }
-                            },
-                            navigate = {
-                                scope.launch {
-                                    navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it)
-                                }
-                            }
-                        )
-                    }
-                }
-            },
-            detailPane = {
-                AnimatedPane {
-                    val route = navigator.currentDestination?.contentKey
-                    if (route is FeedViewRoute.Post) {
-                        ThreadView(permalink = route.permalink, dismiss = {
-                            scope.launch {
-                                navigator.navigateBack()
-                            }
-                        })
-                    } else if (viewSettings.splitScreenEnabled && isLarge && feedInfo != null) {
-                        Scaffold { padding ->
-                            SubredditInfoView(
-                                feedInfo,
-                                viewModel,
-                                modifier = modifier.padding(padding)
                             )
                         }
                     }
-                }
-            }
-        )
-
-        if (showBottomSheet) {
-            BottomSheet(
-                bottomSheetState,
-                onDismiss = {
-                    scope.launch {
-                        bottomSheetState.hide()
-                    }.invokeOnCompletion {
-                        showBottomSheet = false
+                },
+                detailPane = {
+                    AnimatedPane {
+                        val route = navigator.currentDestination?.contentKey
+                        if (route is FeedViewRoute.Post) {
+                            ThreadView(permalink = route.permalink, dismiss = {
+                                scope.launch {
+                                    navigator.navigateBack()
+                                }
+                            })
+                        } else if (viewSettings.splitScreenEnabled && isLarge && feedInfo != null) {
+                            Scaffold { padding ->
+                                SubredditInfoView(
+                                    feedInfo,
+                                    viewModel,
+                                    modifier = modifier.padding(padding)
+                                )
+                            }
+                        }
                     }
-                },
-                createPost = { kind ->
-                    navController?.navigate(
-                        PostCreatorRoute(
-                            kind,
-                            feedInfo?.displayNamePrefixed
-                        )
-                    )
-                },
-                cancel = {
-                    scope.launch { bottomSheetState.hide() }
-                        .invokeOnCompletion { showBottomSheet = false }
                 }
             )
+
+            if (showBottomSheet) {
+                BottomSheet(
+                    bottomSheetState,
+                    onDismiss = {
+                        scope.launch {
+                            bottomSheetState.hide()
+                        }.invokeOnCompletion {
+                            showBottomSheet = false
+                        }
+                    },
+                    createPost = { kind ->
+                        navController?.navigate(
+                            PostCreatorRoute(
+                                kind,
+                                feedInfo?.displayNamePrefixed
+                            )
+                        )
+                    },
+                    cancel = {
+                        scope.launch { bottomSheetState.hide() }
+                            .invokeOnCompletion { showBottomSheet = false }
+                    }
+                )
+            }
         }
     }
 }
