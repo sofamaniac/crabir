@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import com.sofamaniac.crabir.R
 import java.time.Clock
 import java.time.Duration
@@ -62,3 +63,10 @@ fun Modifier.protectedTouch(enabled: Boolean = true, onClick: () -> Unit): Modif
     )
 }
 
+inline fun <R : Any> AnnotatedString.Builder.withSeparator(
+    separator: String = " · ",
+    block: AnnotatedString.Builder.() -> R,
+): R {
+    append(separator)
+    return block(this)
+}

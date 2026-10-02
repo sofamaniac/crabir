@@ -28,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalPostSettings
@@ -158,10 +157,3 @@ fun PostHeader(
     }
 }
 
-inline fun <R : Any> AnnotatedString.Builder.withSeparator(
-    separator: String = " · ",
-    block: AnnotatedString.Builder.() -> R,
-): R {
-    append(separator)
-    return block(this)
-}

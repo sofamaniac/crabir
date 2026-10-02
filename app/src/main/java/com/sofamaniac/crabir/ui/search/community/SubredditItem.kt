@@ -53,8 +53,8 @@ import com.sofamaniac.crabir.ui.components.SubredditIcon
 import com.sofamaniac.crabir.ui.components.ThemedCard
 import com.sofamaniac.crabir.ui.components.ThemedDialog
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
-import com.sofamaniac.crabir.ui.post.withSeparator
 import com.sofamaniac.crabir.ui.richtext.Richtext
+import com.sofamaniac.crabir.ui.withSeparator
 import java.util.Locale
 
 @Composable
