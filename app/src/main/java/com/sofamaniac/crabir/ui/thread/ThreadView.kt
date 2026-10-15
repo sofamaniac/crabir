@@ -86,7 +86,7 @@ fun ThreadView(
     val historyManager: HistoryManager = koinInject()
     val scope = rememberCoroutineScope()
     BackHandler {
-        val comments = viewModel.comments.value.toList().map { it.name }
+        val comments = viewModel.comments.value.toList().map { it.second.name }
         val focusedIndex = viewModel.listState.firstVisibleItemIndex
         val focusedComment = comments.getOrNull(focusedIndex)
         if (focusedComment != null) {

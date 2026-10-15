@@ -70,7 +70,12 @@ class ThreadViewModel(
     private val commentsNames = repository.comments
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val comments = commentsNames.flatMapLatest { names ->
+    val comments: StateFlow<List<Pair<Int, CommentType>>> = commentsNames.flatMapLatest { names ->
+        val depths = HashMap<Fullname, Int>()
+        for (comment in names) {
+            depths[comment.second] = comment.first
+        }
+        val names = names.map { it.second }
         commentsRepository.getMany(names).map { comments ->
             val table = comments.associateBy { it.name }
             val orderedList = names.mapNotNull { table[it] }
@@ -81,7 +86,7 @@ class ThreadViewModel(
                         if (comment.depth > collapsedDepthThreshold) continue
                         collapsedDepthThreshold = null
                     }
-                    add(comment)
+                    add(Pair(depths[comment.name] ?: 0, comment))
                     if (comment is CommentType.Comment && comment.comment.collapsed) {
                         collapsedDepthThreshold = comment.depth
                     }
@@ -149,11 +154,12 @@ class ThreadViewModel(
         if (commentsSettings.collapseAutoMod) {
             val automodComments =
                 comments.value.filter {
-                    it is CommentType.Comment &&
-                            it.comment.author.username == "AutoModerator"
+                    val c = it.second
+                    c is CommentType.Comment &&
+                            c.comment.author.username == "AutoModerator"
                 }
             for (comment in automodComments) {
-                val comment = comment as CommentType.Comment
+                val comment = comment.second as CommentType.Comment
                 repository.updateComment(
                     name,
                     CommentType.Comment(comment = comment.comment.copy(collapsed = true))
@@ -168,7 +174,7 @@ class ThreadViewModel(
             val entity = historyManager.history.getPost(name)
             if (entity?.focusedComment != null) {
                 val index =
-                    comments.value.indexOfFirst { it.name == entity.focusedComment }
+                    comments.value.indexOfFirst { it.second.name == entity.focusedComment }
                 if (index > 0) {
                     listState.scrollToItem(index)
                 }
@@ -182,7 +188,7 @@ class ThreadViewModel(
         if (entity == null) return
         // If the post was just loaded for the first time, skip highlighting new comments
         if (entity.comments == null) return
-        var new = commentsNames.value.toSet()
+        var new = commentsNames.value.map { it.second }.toSet()
         new = new - entity.comments.toSet()
         Log.d(
             "ThreadViewModel",
@@ -234,8 +240,8 @@ class ThreadViewModel(
             var commentData = CommentDataMapper.map(commentDTO.data)
             commentData =
                 commentData.copy(relationship = commentData.relationship.copy(liked = true))
-            val p = comments.value.find { it.name == parent }
-            commentData = commentData.copy(depth = (p?.depth ?: -1) + 1)
+            val p = comments.value.find { it.second.name == parent }
+            commentData = commentData.copy(depth = (p?.first ?: -1) + 1)
             repository.insertReply(parent, CommentType.Comment(commentData))
             replyState.value = null
         }

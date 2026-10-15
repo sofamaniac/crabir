@@ -28,6 +28,7 @@ sealed class CommentType : VotableData {
         override val body: ParsedMarkdown = comment.body
 
         override val id: String = comment.id
+        override val name: Fullname = comment.name
     }
 
     @Serializable
@@ -44,15 +45,9 @@ sealed class CommentType : VotableData {
         override val score: Score get() = throw IllegalAccessError("More has no score")
         override val body: ParsedMarkdown get() = throw IllegalAccessError("More has no body")
 
+        override val name: Fullname = data.name
         override val id: String = name.name
     }
-
-    override val name: Fullname
-        get() =
-            when (this) {
-                is Comment -> comment.name
-                is More -> data.name
-            }
 
     val parentId: Fullname
         get() =

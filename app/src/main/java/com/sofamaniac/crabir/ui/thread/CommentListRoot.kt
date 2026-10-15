@@ -143,11 +143,14 @@ fun CommentListRoot(
 
             items(
                 items = comments,
-                key = { it.name }
-            ) { comment ->
+                key = { it.second.name }
+            ) { element ->
+                val comment = element.second
+                val depth = element.first
                 when (comment) {
                     is CommentType.Comment -> {
                         CommentNode(
+                            depth = depth,
                             comment = comment,
                             viewModel = viewModel,
                             enableAnimation = !commentsSettings.buttonsAlwaysVisible,
@@ -157,6 +160,7 @@ fun CommentListRoot(
                     is CommentType.More -> {
                         MoreViewer(
                             more = comment,
+                            depth = depth,
                             viewModel = viewModel
                         )
                     }

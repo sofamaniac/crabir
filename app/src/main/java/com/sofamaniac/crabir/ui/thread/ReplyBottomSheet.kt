@@ -37,7 +37,10 @@ fun ReplyBottomSheet(viewModel: ThreadViewModel) {
     val parentName by viewModel.reply.collectAsState()
     val post by viewModel.post.collectAsState(null)
     val comments by viewModel.comments.collectAsState()
-    val parent = if (parentName == post?.name) post else comments.find { it.name == parentName }
+    val parent =
+        if (parentName == post?.name) post else {
+            comments.find { it.second.name == parentName }?.second
+        }
     if (parent == null) return
     val textFieldState = rememberTextFieldState()
     val initialAccount = LocalRedditAccount.current

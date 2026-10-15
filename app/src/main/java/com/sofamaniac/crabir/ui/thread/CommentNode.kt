@@ -103,6 +103,7 @@ open class CommentViewModel(
 @Composable
 fun CommentContent(
     viewModel: CommentViewModel,
+    depth: Int,
     opened: Boolean,
     highlight: Boolean,
     toggleComment: (Boolean) -> Unit,
@@ -118,14 +119,14 @@ fun CommentContent(
     val comment = commentOpt!!.comment
 
     Column(modifier = modifier) {
-        if (comment.depth == 0) HorizontalDivider()
+        if (depth == 0) HorizontalDivider()
         ThemedCard(
             roundedCorners = false,
             highlight = highlight,
             modifier = Modifier
                 .fillMaxWidth()
                 .background(theme.cardBackground)
-                .depthIndent(comment.depth.coerceAtLeast(0))
+                .depthIndent(depth.coerceAtLeast(0))
                 .combinedClickable(
                     onClick = { if (!comment.collapsed) toggleComment(!opened) },
                     onLongClick = { viewModel.collapse(!comment.collapsed) },
@@ -150,6 +151,7 @@ fun CommentContent(
 
 @Composable
 fun CommentNode(
+    depth: Int,
     comment: CommentType.Comment,
     viewModel: ThreadViewModel,
     enableAnimation: Boolean = true,
@@ -161,6 +163,7 @@ fun CommentNode(
     val newComments by viewModel.newComments.collectAsState()
     CommentContent(
         commentViewModel,
+        depth = depth,
         opened == comment.name,
         highlight = newComments.contains(comment.name),
         toggleComment = { target ->

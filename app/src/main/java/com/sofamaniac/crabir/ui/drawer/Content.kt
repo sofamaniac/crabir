@@ -87,7 +87,9 @@ fun DrawerContent(
     val coroutineScope = rememberCoroutineScope()
     val loginState by viewModel.loginState.collectAsState()
 
-    viewModel.initialize()
+    LaunchedEffect(Unit) {
+        viewModel.initialize()
+    }
 
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Error) {

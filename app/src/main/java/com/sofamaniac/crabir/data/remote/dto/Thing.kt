@@ -112,9 +112,13 @@ fun emptyListing(): Thing.Listing<Thing> {
 @Serializable
 data class MoreData(
     val count: Int,
-    val name: Fullname,
     val id: String,
     @SerialName("parent_id") val parentId: Fullname,
     val depth: Int,
     val children: List<String>,
-)
+) {
+    // More name is not necessarily unique:
+    // - it sometimes return a name of "t1__"
+    // - the depth is not always the same (ie when seeing more responses after depth 10)
+    val name: Fullname get() = Fullname("more_${parentId.name}_$depth")
+}

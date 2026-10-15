@@ -36,6 +36,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.VotableData
+import com.sofamaniac.crabir.map
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.PostRoute
 import com.sofamaniac.crabir.ui.components.TabBar
@@ -61,15 +62,15 @@ fun ProfileView(
     //        true
     //    )
     val currentUser = LocalRedditAccount.current
-    val isConnectedUser = (currentUser.info?.username == null ||
-            currentUser.info.username == user)
+    val isConnectedUser =
+        currentUser.info?.username.map(default = { true }, map = { it == user })
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val tabs = if (isConnectedUser) ProfileTabs.entries else ProfileTabs.publicTabs
     val initialIndex = tabs.indexOf(initialTab).coerceIn(0, tabs.size)
     val currentTab = rememberPagerState(initialPage = initialIndex, pageCount = { tabs.size })
     val scope = rememberCoroutineScope()
 
-    val userInfo by profileViewModel.userProfile.collectAsState(currentUser.info)
+    val userInfo by profileViewModel.userProfile.collectAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val snackbarHostState = remember { SnackbarHostState() }
     val navController = LocalNavController.current
@@ -84,16 +85,44 @@ fun ProfileView(
                 DrawerContent(drawerState)
             },
         ) {
-            val user = userInfo?.username
+            val user = userInfo?.username ?: user
             if (user == null) return@ModalNavigationDrawer
             val viewModels: Map<ProfileTabs, ProfileFeedViewModel<out VotableData>> = mapOf(
-                ProfileTabs.Overview to koinViewModel<OverviewViewModel> { parametersOf(user) },
-                ProfileTabs.Saved to koinViewModel<SavedViewModel> { parametersOf(user) },
-                ProfileTabs.Comments to koinViewModel<CommentsViewModel> { parametersOf(user) },
-                ProfileTabs.Upvoted to koinViewModel<UpvotedViewModel> { parametersOf(user) },
-                ProfileTabs.Downvoted to koinViewModel<DownvotedViewModel> { parametersOf(user) },
-                ProfileTabs.Hidden to koinViewModel<HiddenViewModel> { parametersOf(user) },
-                ProfileTabs.Posts to koinViewModel<SubmittedViewModel> { parametersOf(user) },
+                ProfileTabs.Overview to koinViewModel<OverviewViewModel>(key = user + "_overview") {
+                    parametersOf(
+                        user
+                    )
+                },
+                ProfileTabs.Saved to koinViewModel<SavedViewModel>(key = user + "_saved") {
+                    parametersOf(
+                        user
+                    )
+                },
+                ProfileTabs.Comments to koinViewModel<CommentsViewModel>(key = user + "_comments") {
+                    parametersOf(
+                        user
+                    )
+                },
+                ProfileTabs.Upvoted to koinViewModel<UpvotedViewModel>(key = user + "_upvoted") {
+                    parametersOf(
+                        user
+                    )
+                },
+                ProfileTabs.Downvoted to koinViewModel<DownvotedViewModel>(key = user + "_downvoted") {
+                    parametersOf(
+                        user
+                    )
+                },
+                ProfileTabs.Hidden to koinViewModel<HiddenViewModel>(key = user + "_hidden") {
+                    parametersOf(
+                        user
+                    )
+                },
+                ProfileTabs.Posts to koinViewModel<SubmittedViewModel>(key = user + "_submitted") {
+                    parametersOf(
+                        user
+                    )
+                },
             )
 
 

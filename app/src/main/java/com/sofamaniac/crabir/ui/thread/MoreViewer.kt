@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,6 +29,7 @@ import com.sofamaniac.crabir.ui.components.ThemedCard
 @Composable
 fun MoreViewer(
     more: CommentType.More,
+    depth: Int,
     viewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -46,7 +46,7 @@ fun MoreViewer(
     ThemedCard(
         modifier = modifier
             .background(theme.cardBackground)
-            .depthIndent(more.depth.coerceAtLeast(0))
+            .depthIndent(depth.coerceAtLeast(0))
             .fillMaxWidth(),
         roundedCorners = false,
         onClick = {
@@ -79,15 +79,5 @@ fun MoreViewer(
                 CircularProgressIndicator(modifier = Modifier.size(16.dp))
             }
         }
-    }
-}
-
-fun LazyListScope.moreNode(
-    more: CommentType.More,
-    viewModel: ThreadViewModel,
-    modifier: Modifier = Modifier,
-) {
-    item {
-        MoreViewer(more, viewModel, modifier)
     }
 }

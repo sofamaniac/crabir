@@ -20,7 +20,7 @@ import org.koin.core.annotation.ViewModelScope
 
 interface ThreadRepository {
 
-    val comments: StateFlow<Iterable<Fullname>>
+    val comments: StateFlow<Iterable<Pair<Int, Fullname>>>
     suspend fun getComments(
         permalink: String,
         sort: Sort? = null,
@@ -68,8 +68,8 @@ class ThreadRepositoryNew(
 
     private var post: PostData? = null
 
-    private val forest: MutableStateFlow<List<Fullname>> = MutableStateFlow(emptyList())
-    override val comments: StateFlow<Iterable<Fullname>> = forest
+    private val forest: MutableStateFlow<List<Pair<Int, Fullname>>> = MutableStateFlow(emptyList())
+    override val comments: StateFlow<Iterable<Pair<Int, Fullname>>> = forest
 
 
     suspend fun fetchThread(
@@ -95,8 +95,8 @@ class ThreadRepositoryNew(
                         post!!.numComments
                     )
                 val list = forest.toList()
-                repository.insert(list)
-                this.forest.value = list.map { it.name }
+                repository.insert(list.map { it.second })
+                this.forest.value = list.map { Pair(it.first, it.second.name) }
                 postsRepository.insert(listOf(post!!))
             }
         } else {
@@ -146,15 +146,15 @@ class ThreadRepositoryNew(
                 )
                 val temp = Forest.create(things, Fullname(""), things.size)
                 val list = temp.toList()
-                repository.insert(list)
+                repository.insert(list.map { it.second })
                 forest.update { list ->
                     Log.d("ThreadRepository", "getMoreComments update forest")
-                    val startIndex = list.indexOfFirst { it == more.data.name }
+                    val startIndex = list.indexOfFirst { it.second == more.data.name }
                     val head = runCatching { list.subList(0, startIndex) }.getOrDefault(emptyList())
                     val tail = runCatching { list.subList(startIndex + 1, list.size) }.getOrDefault(
                         emptyList()
                     )
-                    head + temp.asSequence().map { it.name } + tail
+                    head + temp.asSequence().map { Pair(it.first, it.second.name) } + tail
                 }
             }
         }
@@ -180,8 +180,11 @@ class ThreadRepositoryNew(
     override suspend fun insertReply(parent: Fullname, comment: CommentType) {
         repository.insert(comment)
         forest.update { list ->
-            val index = list.indexOfFirst { it == parent }
-            list.subList(0, index + 1) + comment.name + list.subList(index + 1, list.size)
+            val index = list.indexOfFirst { it.second == parent }
+            list.subList(0, index + 1) + Pair(comment.depth, comment.name) + list.subList(
+                index + 1,
+                list.size
+            )
         }
     }
 
@@ -195,7 +198,7 @@ class Forest private constructor(
     val comments: Map<Fullname, CommentType>,
     val next: Map<Fullname, Fullname>,
     val root: Fullname,
-) : Iterable<CommentType> {
+) : Iterable<Pair<Int, CommentType>> {
     companion object {
         fun empty(root: Fullname = Fullname("EmptyRoute")): Forest {
             return Forest(emptyMap(), emptyMap(), root)
@@ -253,9 +256,12 @@ class Forest private constructor(
                 is Thing.More -> CommentType.More(current.data)
                 else -> continue
             }
-            next[lastSeen] = current.name
+            if (current.name.name.contains("__")) {
+                Log.d("Forest", "insert: ${current} ${comment.name}")
+            }
+            next[lastSeen] = comment.name
             comments[current.name] = comment
-            lastSeen = current.name
+            lastSeen = comment.name
             if (current is Thing.Comment) {
                 for (child in current.data.replies.reversed()) {
                     stack.addLast(child)
@@ -268,19 +274,29 @@ class Forest private constructor(
         return Forest(comments, next, this.root)
     }
 
-    override fun iterator(): Iterator<CommentType> {
-        val iterator = object : Iterator<CommentType> {
+    override fun iterator(): Iterator<Pair<Int, CommentType>> {
+        val iterator = object : Iterator<Pair<Int, CommentType>> {
 
             var current = this@Forest.root
-            override fun next(): CommentType {
+            var seen: HashSet<Fullname> = HashSet()
+            override fun next(): Pair<Int, CommentType> {
                 val next = this@Forest.next[current]
                 if (next == null) throw NoSuchElementException()
+                seen.add(current)
                 current = next
-                return this@Forest.comments[next] ?: throw NoSuchElementException()
+                val comment = this@Forest.comments[next]
+                if (comment == null) {
+                    throw NoSuchElementException()
+                }
+                return Pair(comment.depth, comment)
             }
 
             override fun hasNext(): Boolean {
-                return this@Forest.next[current] != null
+                val next = this@Forest.next[current]
+                if (seen.contains(next)) {
+                    Log.w("Forest", "hasNext: seen $next")
+                }
+                return next != null && !seen.contains(next)
             }
         }
 
