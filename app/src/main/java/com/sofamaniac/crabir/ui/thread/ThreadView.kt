@@ -4,7 +4,6 @@
 
 package com.sofamaniac.crabir.ui.thread
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -17,6 +16,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -85,16 +85,17 @@ fun ThreadView(
     SaveToHistory(viewModel.name, post?.over18 ?: true)
     val historyManager: HistoryManager = koinInject()
     val scope = rememberCoroutineScope()
-    BackHandler {
-        val comments = viewModel.comments.value.toList().map { it.second.name }
-        val focusedIndex = viewModel.listState.firstVisibleItemIndex
-        val focusedComment = comments.getOrNull(focusedIndex)
-        if (focusedComment != null) {
-            scope.launch(Dispatchers.IO) {
-                historyManager.updateComments(viewModel.name, comments, focusedComment)
+    DisposableEffect(Unit) {
+        onDispose {
+            val comments = viewModel.comments.value.toList().map { it.second.name }
+            val focusedIndex = viewModel.listState.firstVisibleItemIndex
+            val focusedComment = comments.getOrNull(focusedIndex)
+            if (focusedComment != null) {
+                scope.launch(Dispatchers.IO) {
+                    historyManager.updateComments(viewModel.name, comments, focusedComment)
+                }
             }
         }
-        dismiss()
     }
 
     val comments by viewModel.comments.collectAsState()
