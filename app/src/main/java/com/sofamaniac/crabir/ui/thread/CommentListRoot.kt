@@ -54,6 +54,7 @@ fun CommentListRoot(
 
     val comments by viewModel.comments.collectAsState()
     val post by viewModel.post.collectAsState()
+    val depths by viewModel.depths.collectAsState()
     PullToRefreshBox(
         state = refreshBoxState,
         isRefreshing = isLoading,
@@ -143,14 +144,12 @@ fun CommentListRoot(
 
             items(
                 items = comments,
-                key = { it.second.name }
-            ) { element ->
-                val comment = element.second
-                val depth = element.first
+                key = { it.name }
+            ) { comment ->
                 when (comment) {
                     is CommentType.Comment -> {
                         CommentNode(
-                            depth = depth,
+                            depth = depths[comment.name] ?: comment.depth,
                             comment = comment,
                             viewModel = viewModel,
                             enableAnimation = !commentsSettings.buttonsAlwaysVisible,
@@ -160,7 +159,7 @@ fun CommentListRoot(
                     is CommentType.More -> {
                         MoreViewer(
                             more = comment,
-                            depth = depth,
+                            depth = depths[comment.name] ?: comment.depth,
                             viewModel = viewModel
                         )
                     }

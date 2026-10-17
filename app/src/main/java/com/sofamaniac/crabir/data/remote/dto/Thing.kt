@@ -9,10 +9,12 @@
 package com.sofamaniac.crabir.data.remote.dto
 
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDTO
+import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.crabir.data.remote.dto.post.PostDTO
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTO
 import com.sofamaniac.crabir.data.remote.dto.subreddit.dummySubredditData
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
+import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.repository.DataInterface
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -32,6 +34,10 @@ sealed class Thing : DataInterface {
     data class Comment(val data: CommentDTO) : Thing() {
         override val id: String = data.id
         override val name: Fullname = data.name
+
+        fun toCommentType(): CommentType.Comment {
+            return CommentType.Comment(CommentDataMapper.map(data))
+        }
     }
 
     @Serializable

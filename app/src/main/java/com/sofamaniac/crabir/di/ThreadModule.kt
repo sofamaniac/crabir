@@ -1,7 +1,7 @@
 package com.sofamaniac.crabir.di
 
-//import com.sofamaniac.crabir.domain.repository.ThreadRepository
-//import com.sofamaniac.crabir.domain.repository.ThreadRepositoryImpl
+//import com.sofamaniac.crabir.domain.repository.thread.ThreadRepository
+//import com.sofamaniac.crabir.domain.repository.thread.ThreadRepositoryImpl
 //import dagger.Binds
 //import dagger.Module
 //import dagger.hilt.InstallIn

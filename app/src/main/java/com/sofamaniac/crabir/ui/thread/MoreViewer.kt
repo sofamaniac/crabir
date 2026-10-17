@@ -55,7 +55,7 @@ fun MoreViewer(
                 loading = true
                 viewModel.fetchMoreComments(more)
             } else {
-                val parentId = more.parentId.name.split('_').last()
+                val parentId = more.parent.name.split('_').last()
                 navController.navigate(
                     PostRoute(
                         postPermalink = viewModel.permalink,

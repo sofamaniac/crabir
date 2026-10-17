@@ -87,7 +87,7 @@ fun ThreadView(
     val scope = rememberCoroutineScope()
     DisposableEffect(Unit) {
         onDispose {
-            val comments = viewModel.comments.value.toList().map { it.second.name }
+            val comments = viewModel.comments.value.toList().map { it.name }
             val focusedIndex = viewModel.listState.firstVisibleItemIndex
             val focusedComment = comments.getOrNull(focusedIndex)
             if (focusedComment != null) {

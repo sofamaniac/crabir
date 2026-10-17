@@ -12,8 +12,8 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
-import com.sofamaniac.crabir.domain.repository.ThreadRepository
 import com.sofamaniac.crabir.domain.repository.accounts.AccountsStorage
+import com.sofamaniac.crabir.domain.repository.thread.ThreadRepository
 import com.sofamaniac.crabir.settings.comments.CommentsSettings
 import com.sofamaniac.crabir.settings.history.HistoryManager
 import kotlinx.coroutines.Dispatchers
@@ -51,8 +51,8 @@ class ThreadViewModel(
 ) : ViewModel() {
 
     var name: Fullname = repository.getPostId(permalink)
-    private var _post = MutableStateFlow<PostData?>(null)
-    val post: StateFlow<PostData?> = _post.asStateFlow()
+    val post: StateFlow<PostData?> =
+        repository.post.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val accounts: Flow<List<RedditAccount>> = accountsStorage.accounts
 
@@ -67,15 +67,11 @@ class ThreadViewModel(
 
     private var _newComments: MutableStateFlow<Set<Fullname>> = MutableStateFlow(emptySet())
     val newComments: StateFlow<Set<Fullname>> = _newComments.asStateFlow()
-    private val commentsNames = repository.comments
+    private val _comments = repository.comments
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val comments: StateFlow<List<Pair<Int, CommentType>>> = commentsNames.flatMapLatest { names ->
-        val depths = HashMap<Fullname, Int>()
-        for (comment in names) {
-            depths[comment.second] = comment.first
-        }
-        val names = names.map { it.second }
+    val comments: StateFlow<List<CommentType>> = _comments.flatMapLatest { names ->
+        val names = names.map { it.name }
         commentsRepository.getMany(names).map { comments ->
             val table = comments.associateBy { it.name }
             val orderedList = names.mapNotNull { table[it] }
@@ -86,7 +82,7 @@ class ThreadViewModel(
                         if (comment.depth > collapsedDepthThreshold) continue
                         collapsedDepthThreshold = null
                     }
-                    add(Pair(depths[comment.name] ?: 0, comment))
+                    add(comment)
                     if (comment is CommentType.Comment && comment.comment.collapsed) {
                         collapsedDepthThreshold = comment.depth
                     }
@@ -95,9 +91,20 @@ class ThreadViewModel(
         }.dropWhile { it.isEmpty() }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
+    val depths = repository.depths.stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
+
+
+    fun getNumberOfChildren(name: Fullname): Int {
+        val startIndex = _comments.value.indexOfFirst { it.name == name }
+        if (startIndex < 0) return 0
+        val startDepth = _comments.value.drop(startIndex).first().depth
+        return _comments.value.drop(startIndex + 1).takeWhile { it.depth > startDepth }
+            .count()
+    }
+
     private var _openComment = MutableStateFlow<Fullname?>(null)
 
-    /** Id of the comment of which the bottom bar is currently open */
+    /** Name of the comment of which the bottom bar is currently open */
     val openComment: StateFlow<Fullname?> = _openComment.asStateFlow()
 
     /** If [openComment] is equal to [name], close it. Otherwise, open it. */
@@ -113,12 +120,6 @@ class ThreadViewModel(
         }
     }
 
-    fun closeComment(name: Fullname) {
-        if (_openComment.value == name) {
-            _openComment.value = null
-        }
-    }
-
     private val _sort = MutableStateFlow<Sort?>(null)
     val sort: StateFlow<Sort?> = _sort.asStateFlow()
 
@@ -126,14 +127,6 @@ class ThreadViewModel(
         _sort.value =
             if (commentsSettings.useRecommendedSort) null else commentsSettings.preferredSort
         fetchComments()
-    }
-
-    private suspend fun getPost(): PostData? {
-        val post = repository.getPost(name)
-        if (post == null) {
-            Log.e("ThreadViewModel", "getPost: Post not found in database ($name)")
-        }
-        return post
     }
 
     private suspend fun fetchAsync() {
@@ -144,22 +137,19 @@ class ThreadViewModel(
             comment = comment,
             context = context
         )
-        // If post was not found set it here.
-        _post.value = getPost() ?: _post.value
-        _sort.value = _sort.value ?: _post.value?.suggestedSort
+        _sort.value = _sort.value ?: post.value?.suggestedSort
         _uiState.update { UiState.Success }
     }
 
     suspend fun collapseAutomod() {
         if (commentsSettings.collapseAutoMod) {
             val automodComments =
-                comments.value.filter {
-                    val c = it.second
+                comments.value.filter { c ->
                     c is CommentType.Comment &&
                             c.comment.author.username == "AutoModerator"
                 }
             for (comment in automodComments) {
-                val comment = comment.second as CommentType.Comment
+                val comment = comment as CommentType.Comment
                 repository.updateComment(
                     name,
                     CommentType.Comment(comment = comment.comment.copy(collapsed = true))
@@ -174,7 +164,7 @@ class ThreadViewModel(
             val entity = historyManager.history.getPost(name)
             if (entity?.focusedComment != null) {
                 val index =
-                    comments.value.indexOfFirst { it.second.name == entity.focusedComment }
+                    comments.value.indexOfFirst { it.name == entity.focusedComment }
                 if (index > 0) {
                     listState.scrollToItem(index)
                 }
@@ -188,11 +178,11 @@ class ThreadViewModel(
         if (entity == null) return
         // If the post was just loaded for the first time, skip highlighting new comments
         if (entity.comments == null) return
-        var new = commentsNames.value.map { it.second }.toSet()
-        new = new - entity.comments.toSet()
+        val new = _comments.value.map { it.name }.toSet().toMutableSet()
+        new -= entity.comments.toSet()
         Log.d(
             "ThreadViewModel",
-            "highlightNewComments: $new = ${commentsNames.value} - ${entity.comments}"
+            "highlightNewComments: $new = ${_comments.value} - ${entity.comments}"
         )
         _newComments.value = new
     }
@@ -240,8 +230,8 @@ class ThreadViewModel(
             var commentData = CommentDataMapper.map(commentDTO.data)
             commentData =
                 commentData.copy(relationship = commentData.relationship.copy(liked = true))
-            val p = comments.value.find { it.second.name == parent }
-            commentData = commentData.copy(depth = (p?.first ?: -1) + 1)
+            val p = comments.value.find { it.name == parent }
+            commentData = commentData.copy(depth = (p?.depth ?: -1) + 1)
             repository.insertReply(parent, CommentType.Comment(commentData))
             replyState.value = null
         }

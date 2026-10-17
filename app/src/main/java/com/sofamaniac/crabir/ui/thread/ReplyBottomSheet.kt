@@ -39,7 +39,7 @@ fun ReplyBottomSheet(viewModel: ThreadViewModel) {
     val comments by viewModel.comments.collectAsState()
     val parent =
         if (parentName == post?.name) post else {
-            comments.find { it.second.name == parentName }?.second
+            comments.find { it.name == parentName }
         }
     if (parent == null) return
     val textFieldState = rememberTextFieldState()

@@ -7,19 +7,62 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 
+enum class CommentState {
+    Visible,
+    Collapsed,
+    Hidden,
+}
+
 @Serializable
 sealed class CommentType : VotableData {
+
+    abstract val depth: Int
+    abstract val parent: Fullname?
+    abstract val descendants: Int
+    abstract val state: CommentState
+    abstract val previousSibling: Fullname?
+    abstract val nextSibling: Fullname?
+
+    abstract fun copy(
+        depth: Int = this.depth,
+        state: CommentState = this.state,
+        previousSibling: Fullname? = this.previousSibling,
+        nextSibling: Fullname? = this.nextSibling,
+    ): CommentType
+
     override fun toEntity(): VotableEntity {
         return VotableEntity(id = name, data = Json.encodeToString(this))
     }
 
     @Serializable
-    data class Comment(val comment: CommentData) : CommentType() {
+    data class Comment(
+        val comment: CommentData,
+        override val depth: Int = comment.depth,
+        override val descendants: Int = 0,
+        override val state: CommentState = CommentState.Visible,
+        override val previousSibling: Fullname? = null,
+        override val nextSibling: Fullname? = null,
+    ) : CommentType() {
         override fun copy(
             relationship: Relationship?,
             score: Score?,
         ): VotableData {
             return copy(comment = comment.copy(relationship = relationship, score = score))
+        }
+
+        override fun copy(
+            depth: Int,
+            state: CommentState,
+            previousSibling: Fullname?,
+            nextSibling: Fullname?,
+        ): CommentType {
+            return copy(
+                comment = comment,
+                depth = depth,
+                state = state,
+                previousSibling = previousSibling,
+                nextSibling = nextSibling
+            )
         }
 
         override val author: AuthorInfo = comment.author
@@ -29,15 +72,37 @@ sealed class CommentType : VotableData {
 
         override val id: String = comment.id
         override val name: Fullname = comment.name
+        override val parent: Fullname = comment.parentInfo.name
     }
 
     @Serializable
-    data class More(val data: MoreData) : CommentType() {
+    data class More(
+        val data: MoreData,
+        override val depth: Int = data.depth,
+        override val state: CommentState = CommentState.Visible,
+        override val previousSibling: Fullname? = null,
+        override val nextSibling: Fullname? = null,
+    ) : CommentType() {
         override fun copy(
             relationship: Relationship?,
             score: Score?,
         ): VotableData {
             return this
+        }
+
+        override fun copy(
+            depth: Int,
+            state: CommentState,
+            previousSibling: Fullname?,
+            nextSibling: Fullname?,
+        ): CommentType {
+            return copy(
+                data = data,
+                depth = depth,
+                state = state,
+                previousSibling = previousSibling,
+                nextSibling = nextSibling
+            )
         }
 
         override val author: AuthorInfo? = null
@@ -47,22 +112,9 @@ sealed class CommentType : VotableData {
 
         override val name: Fullname = data.name
         override val id: String = name.name
+        override val parent: Fullname = data.parentId
+        override val descendants: Int = data.children.size
     }
-
-    val parentId: Fullname
-        get() =
-            when (this) {
-                is Comment -> comment.parentInfo.name
-                is More -> data.parentId
-            }
-
-
-    val depth: Int
-        get() =
-            when (this) {
-                is Comment -> comment.depth
-                is More -> data.depth
-            }
 }
 
 @Serializable

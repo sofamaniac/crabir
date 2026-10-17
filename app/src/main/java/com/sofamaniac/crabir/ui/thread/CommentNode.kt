@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -104,6 +105,7 @@ open class CommentViewModel(
 fun CommentContent(
     viewModel: CommentViewModel,
     depth: Int,
+    children: Int,
     opened: Boolean,
     highlight: Boolean,
     toggleComment: (Boolean) -> Unit,
@@ -134,7 +136,11 @@ fun CommentContent(
                 ),
         ) {
             if (comment.collapsed) {
-                CollapsedComment(comment, modifier = innerModifier.padding(vertical = 8.dp))
+                CollapsedComment(
+                    comment,
+                    children,
+                    modifier = innerModifier.padding(vertical = 8.dp)
+                )
             } else {
                 OpenedComment(
                     viewModel,
@@ -161,9 +167,11 @@ fun CommentNode(
     }
     val opened by viewModel.openComment.collectAsState()
     val newComments by viewModel.newComments.collectAsState()
+    val children = remember(comment.name) { viewModel.getNumberOfChildren(comment.name) }
     CommentContent(
         commentViewModel,
         depth = depth,
+        children = children,
         opened == comment.name,
         highlight = newComments.contains(comment.name),
         toggleComment = { target ->
@@ -177,6 +185,7 @@ fun CommentNode(
 @Composable
 private fun CollapsedComment(
     comment: CommentData,
+    children: Int,
     modifier: Modifier = Modifier,
 ) {
     val theme = LocalTheme.current
@@ -203,8 +212,7 @@ private fun CollapsedComment(
         Text(authorString, color = theme.secondaryText)
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            //"+${comment.replies.size}",
-            "+${comment.replies}",
+            "+$children",
             color = Color.White,
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.cartouche(backgroundColor = Color.Green)
