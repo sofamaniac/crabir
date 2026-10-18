@@ -91,6 +91,7 @@ data class CommentData(
     val mediaMetadata: Map<String, MediaMetadata>,
     val distinguished: String? = "",
     val locked: Boolean = false,
+    val stickied: Boolean = false,
 ) : VotableData {
 
     val canComment: Boolean = !locked

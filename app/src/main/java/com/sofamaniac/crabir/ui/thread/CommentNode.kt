@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -352,6 +353,12 @@ fun TopRow(comment: CommentData, modifier: Modifier = Modifier) {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+            if (comment.locked) {
+                Text(stringResource(R.string.post_locked))
+            }
+            if (comment.stickied) {
+                Icon(painterResource(R.drawable.ic_stickied), contentDescription = "Stickied")
+            }
             Flair(comment.author.flair)
             Spacer(modifier = Modifier.weight(1f))
         }

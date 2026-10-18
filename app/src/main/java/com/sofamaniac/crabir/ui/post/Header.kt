@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,7 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Kind
 import com.sofamaniac.crabir.domain.model.votable.post.PostData
+import com.sofamaniac.crabir.domain.model.votable.post.RemovalKind
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.ProfileRoute
 import com.sofamaniac.crabir.navigation.routes.SubredditRoute
@@ -55,6 +57,7 @@ fun PostHeader(
 ) {
     val navController = LocalNavController.current
     val theme = LocalTheme.current
+    val wasRemoved = post.removalInfo.kind != null
     CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodySmall.copy(color = theme.secondaryText)) {
         Row(
             modifier = modifier
@@ -122,11 +125,26 @@ fun PostHeader(
                     if (post.kind != Kind.Self) {
                         add({ Text(post.domain) })
                     }
+                    if (post.removalInfo.kind == RemovalKind.Reddit) {
+                        add({ Text("\uD83E\uDD16") })
+                    }
+                    if (post.removalInfo.kind == RemovalKind.Moderator) {
+                        add({ Text("\uD83E\uDDF9") })
+                    }
                     if (post.locked) {
                         add({ Text(stringResource(R.string.post_locked)) })
                     }
-                    if (post.archived) {
+                    if (post.archived || wasRemoved) {
                         add({ Text(stringResource(R.string.post_archived)) })
+                    }
+                    if (post.stickied) {
+                        add({
+                                Icon(
+                                    painterResource(R.drawable.ic_stickied),
+                                    contentDescription = "Stickied",
+                                    modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
+                                )
+                            })
                     }
                     if (post.isDistinguished) {
                         add({
