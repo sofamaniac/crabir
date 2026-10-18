@@ -278,25 +278,13 @@ fun Heading(heading: Richtext.Heading, context: Context) {
         else -> MaterialTheme.typography.headlineLarge
     }.toSpanStyle()
     val context = context.copy(style = style.merge(context.style))
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(0.dp, alignment = Alignment.Start),
-        modifier = Modifier.semantics(mergeDescendants = true, properties = { heading() })
-    ) {
-        val tail = heading.children.fold(AnnotatedString("")) { acc, child ->
-            if (child is Richtext.TextNode) {
-                acc + child.toAnnotatedString(context)
-            } else {
-                if (acc.isNotEmpty()) {
-                    Text(acc)
-                }
-                context.configuration.components.render(child, context)
-                AnnotatedString("")
-            }
-        }
-        if (tail.isNotEmpty()) {
-            Text(tail)
-        }
-    }
+    RenderMixed(
+        heading.children,
+        context,
+        modifier = Modifier.semantics(
+            mergeDescendants = true,
+            properties = { heading() })
+    )
 }
 
 @Composable
@@ -403,24 +391,39 @@ fun Paragraph(
     paragraph: Richtext.Paragraph,
     context: Context,
 ) {
-
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(0.dp, alignment = Alignment.Start),
+    RenderMixed(
+        nodes = paragraph.children,
+        context = context,
         modifier = Modifier.semantics(mergeDescendants = true, properties = {})
-    ) {
-        val tail = paragraph.children.fold(AnnotatedString("")) { acc, child ->
-            if (child is Richtext.TextNode) {
-                acc + child.toAnnotatedString(context)
-            } else {
-                if (acc.isNotEmpty()) {
-                    Text(acc)
-                }
-                context.configuration.components.render(child, context)
-                AnnotatedString("")
-            }
+    )
+}
+
+@Composable
+fun RenderMixed(nodes: List<Richtext>, context: Context, modifier: Modifier = Modifier) {
+    if (nodes.all { it is Richtext.TextNode }) {
+        val text = nodes.fold(AnnotatedString("")) { acc, child ->
+            acc + (child as Richtext.TextNode).toAnnotatedString(context)
         }
-        if (tail.isNotEmpty()) {
-            Text(tail)
+        Text(text, modifier = modifier)
+    } else {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(0.dp, alignment = Alignment.Start),
+            modifier = modifier,
+        ) {
+            val tail = nodes.fold(AnnotatedString("")) { acc, child ->
+                if (child is Richtext.TextNode) {
+                    acc + child.toAnnotatedString(context)
+                } else {
+                    if (acc.isNotEmpty()) {
+                        Text(acc)
+                    }
+                    context.configuration.components.render(child, context)
+                    AnnotatedString("")
+                }
+            }
+            if (tail.isNotEmpty()) {
+                Text(tail)
+            }
         }
     }
 }
