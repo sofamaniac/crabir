@@ -28,7 +28,7 @@ import com.sofamaniac.crabir.domain.model.votable.CommentData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.TextEditorRoute
 import com.sofamaniac.crabir.ui.components.ListItem
-import com.sofamaniac.crabir.ui.thread.CommentViewModel
+import com.sofamaniac.crabir.ui.thread.comment.CommentViewModel
 import com.sofamaniac.crabir.ui.votable.ReportMenu
 
 @Composable

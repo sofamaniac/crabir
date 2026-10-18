@@ -37,7 +37,7 @@ import com.sofamaniac.crabir.ui.components.ThemedCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommentListRoot(
+fun ThreadListView(
     viewModel: ThreadViewModel,
     modifier: Modifier = Modifier,
     comment: String? = null,

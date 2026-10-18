@@ -100,18 +100,8 @@ fun ThreadView(
         }
     }
 
-    val comments by viewModel.comments.collectAsState()
-
-    fun move(offset: Int) {
-        val index = viewModel.listState.firstVisibleItemIndex
-        if (index + offset < 0 || index + offset >= comments.count()) return
-        scope.launch {
-            viewModel.listState.animateScrollToItem(index + offset)
-        }
-    }
-
     if (commentsSettings.useVolumeKeyNavigation) {
-        VolumeKeyNavigation { move(it) }
+        VolumeKeyNavigation { viewModel.move(it) }
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -148,10 +138,12 @@ fun ThreadView(
                             .align(Alignment.BottomCenter)
                             .offset(y = -ScreenOffset)
                             .zIndex(1f),
-                        move = { move(it) },
+                        move = { viewModel.move(it) },
+                        nextTopLevel = { viewModel.nextTopLevel() },
+                        previousTopLevel = { viewModel.previousTopLevel() }
                     )
                 }
-                CommentListRoot(
+                ThreadListView(
                     viewModel = viewModel,
                     comment = comment,
                     context = context,

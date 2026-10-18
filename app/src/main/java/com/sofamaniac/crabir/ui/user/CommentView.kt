@@ -16,7 +16,7 @@ import com.sofamaniac.crabir.domain.model.votable.CommentType
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.PostRoute
 import com.sofamaniac.crabir.ui.components.ThemedCard
-import com.sofamaniac.crabir.ui.thread.CommentInner
+import com.sofamaniac.crabir.ui.thread.comment.CommentContent
 
 @Composable
 fun CommentView(
@@ -62,7 +62,7 @@ fun CommentView(
                     color = theme.highlight
                 )
             }
-            CommentInner(
+            CommentContent(
                 comment = comment
             )
         }
