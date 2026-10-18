@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.ui.media.videoPlayer
 
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -18,6 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
+import com.sofamaniac.crabir.isVideoUrl
 import com.sofamaniac.crabir.settings.history.SaveToHistory
 import com.sofamaniac.crabir.ui.media.FullscreenBottomBar
 import com.sofamaniac.crabir.ui.media.FullscreenTopBar
@@ -38,17 +41,21 @@ fun FullscreenVideo(
     val post = viewModel.post.collectAsState(initial = null).value ?: return
     var showDecorations by remember { mutableStateOf(true) }
     val video = getVideoUrl(post)!!
+    val downloadUrl = post.getDownloadUrl()
     SaveToHistory(post.name, post.over18)
     VerticalSwipeToDismiss(
         topBar = {
             FullscreenTopBar(
                 showDecorations,
                 actions = {
-                    DownloadButton(
-                        video.url.toUri(),
-                        post.subreddit.name,
-                    )
-                })
+                    if (downloadUrl != null) {
+                        DownloadButton(
+                            downloadUrl,
+                            subreddit = post.subreddit.name,
+                        )
+                    }
+                }
+            )
         },
         bottomBar = {
             FullscreenBottomBar(post, showDecorations) {
@@ -102,4 +109,13 @@ fun FullscreenVideo(
                 .fillMaxSize()
         )
     }
+}
+
+fun PostData.getDownloadUrl(): Uri? {
+    val default = getVideoUrl(this)?.url?.toUri()
+    val ext = default?.lastPathSegment?.split(".")?.last()
+    if (default == null || !default.isVideoUrl()) {
+        return this.preview?.redditVideoPreview?.fallbackUrl?.toUri()
+    }
+    return default
 }

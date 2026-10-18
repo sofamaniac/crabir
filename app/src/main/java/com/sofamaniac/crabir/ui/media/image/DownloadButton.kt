@@ -118,6 +118,7 @@ fun DownloadButton(
             val filename = suffix?.let { suffix ->
                 url.lastPathSegment?.split(".")?.first() + "-$suffix"
             }
+            Log.i("DownloadButton", "Downloading $url")
             viewModel.download(url, filename, subfolder)
         }
     }) {

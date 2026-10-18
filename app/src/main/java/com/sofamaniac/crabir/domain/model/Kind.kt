@@ -6,6 +6,8 @@ package com.sofamaniac.crabir.domain.model
 
 import androidx.annotation.Keep
 import com.sofamaniac.crabir.data.remote.dto.post.PostDTO
+import com.sofamaniac.crabir.isImageUrl
+import com.sofamaniac.crabir.isVideoUrl
 import kotlinx.serialization.Serializable
 
 @Keep
@@ -22,42 +24,60 @@ enum class Kind {
     Unknown,
 }
 
-fun isVideoPost(post: PostDTO): Boolean {
+fun getKind(post: PostDTO): Kind {
+    if (post.crosspostParentList.isNotEmpty()) return getKind(post.crosspostParentList.first())
+
+    return when {
+        post.isSelfPost -> {
+            Kind.Self
+        }
+
+        post.isVideo -> {
+            Kind.Video
+        }
+
+        post.isGallery || post.galleryData != null -> {
+            Kind.Gallery
+        }
+
+        post.isMeta -> {
+            Kind.Meta
+        }
+
+        isStreamable(post) -> {
+            Kind.Streamable
+        }
+
+        isVideoPost(post) -> {
+            Kind.Video
+        }
+
+        isYoutubeVideo(post) -> {
+            Kind.YoutubeVideo
+        }
+
+        else -> {
+            kindFromHint(post)
+        }
+    }
+}
+
+private fun isVideoPost(post: PostDTO): Boolean {
     return post.isVideo || (post.postHint == "image" && isVideoUrl(post.url)) ||
             (post.preview?.images?.any { it.variants?.mp4 != null } ?: false) ||
             (post.preview?.redditVideoPreview != null)
 }
 
-fun isStreamable(post: PostDTO): Boolean {
+private fun isStreamable(post: PostDTO): Boolean {
     return post.secureMedia?.type == "streamable.com"
 }
 
-fun isYoutubeVideo(post: PostDTO): Boolean {
+private fun isYoutubeVideo(post: PostDTO): Boolean {
     return post.domain.contains("youtube") || post.domain.contains("youtu.be")
 }
 
-fun getKind(post: PostDTO): Kind {
-    if (post.crosspostParentList.isNotEmpty()) return getKind(post.crosspostParentList.first())
-
-    val kind = if (isStreamable(post)) {
-        Kind.Streamable
-    } else if (isVideoPost(post)) {
-        Kind.Video
-    } else if (isYoutubeVideo(post)) {
-        Kind.YoutubeVideo
-    } else if (post.isSelfPost) {
-        Kind.Self
-    } else if (post.isVideo) {
-        Kind.Video
-    } else if (post.isGallery || post.galleryData != null) {
-        Kind.Gallery
-    } else if (post.isMeta) {
-        Kind.Meta
-    } else {
-        null
-    }
-
-    return kind ?: when (post.postHint) {
+private fun kindFromHint(post: PostDTO): Kind {
+    return when (post.postHint) {
         "image" -> Kind.Image
         "rich:video", "hosted:video" -> Kind.Video
         "link" -> Kind.Link
@@ -75,12 +95,4 @@ fun getKind(post: PostDTO): Kind {
     }
 }
 
-fun isVideoUrl(url: String): Boolean {
-    val extensions = listOf("gif", "mp4")
-    return extensions.any { url.endsWith(it) }
-}
 
-fun isImageUrl(url: String): Boolean {
-    val extensions = listOf("jpg", "png", "jpeg", "png", "svg")
-    return extensions.any { url.endsWith(it) }
-}
