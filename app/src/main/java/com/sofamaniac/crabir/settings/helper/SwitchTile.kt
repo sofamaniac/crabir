@@ -38,7 +38,7 @@ fun SwitchTile(
             ThemedSwitch(
                 enabled = enabled,
                 checked = checked,
-                onCheckedChange = onCheckedChange,
+                onCheckedChange = null,
             )
         },
     )

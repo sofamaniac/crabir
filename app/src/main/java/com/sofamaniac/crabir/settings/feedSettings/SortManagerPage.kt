@@ -35,7 +35,7 @@ import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
-import com.sofamaniac.crabir.settings.helper.Menu
+import com.sofamaniac.crabir.settings.helper.ListSelectorOption
 import com.sofamaniac.crabir.settings.views.ViewSettings
 import com.sofamaniac.crabir.settings.views.viewSettingDataStore
 import com.sofamaniac.crabir.ui.components.ListItem
@@ -180,7 +180,7 @@ internal fun EditViewDialog(
         title = { Text(stringResource(R.string.sort_edit_title, community)) },
         text = {
             Column {
-                ListSelector(
+                ListSelectorOption(
                     options = Sort.entries.toList(),
                     selectedOption = sort,
                     optionLabel = {
@@ -189,10 +189,10 @@ internal fun EditViewDialog(
                     onOptionSelected = {
                         sort = it
                     },
-                    label = { Text(stringResource(R.string.sort)) }
+                    headlineContent = { Text(stringResource(R.string.sort)) }
                 )
                 if (sort?.isTimeframe == true) {
-                    ListSelector(
+                    ListSelectorOption(
                         options = Timeframe.entries.toList(),
                         selectedOption = timeframe,
                         optionLabel = {
@@ -201,39 +201,10 @@ internal fun EditViewDialog(
                         onOptionSelected = {
                             timeframe = it
                         },
-                        label = { Text(stringResource(R.string.timeframe)) }
+                        headlineContent = { Text(stringResource(R.string.timeframe)) }
                     )
                 }
             }
-        }
-    )
-}
-
-@Composable
-private fun <T> ListSelector(
-    options: List<T>,
-    selectedOption: T?,
-    optionLabel: @Composable (T) -> String,
-    label: @Composable () -> Unit,
-    onOptionSelected: (T?) -> Unit,
-) {
-    val options = options + null
-    ListItem(
-        content = {
-            Menu(
-                options,
-                selectedOption,
-                enabled = true,
-                onOptionSelected = onOptionSelected,
-                label = label,
-                optionLabel = {
-                    if (it == null) {
-                        stringResource(R.string.default_option)
-                    } else {
-                        optionLabel(it)
-                    }
-                }
-            )
         }
     )
 }

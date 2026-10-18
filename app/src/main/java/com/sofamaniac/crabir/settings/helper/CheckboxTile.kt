@@ -40,7 +40,7 @@ fun CheckboxTile(
             ThemedCheckbox(
                 enabled = enabled,
                 checked = checked,
-                onCheckedChange = onCheckedChange,
+                onCheckedChange = null,
             )
         },
     )

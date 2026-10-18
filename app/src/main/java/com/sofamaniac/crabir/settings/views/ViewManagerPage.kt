@@ -32,7 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
-import com.sofamaniac.crabir.settings.helper.Menu
+import com.sofamaniac.crabir.settings.helper.ListSelectorOption
 import com.sofamaniac.crabir.ui.components.BackButton
 import com.sofamaniac.crabir.ui.components.ListItem
 import kotlinx.coroutines.launch
@@ -170,7 +170,7 @@ internal fun EditViewDialog(
         title = { Text("Edit view for $community") },
         text = {
             Column {
-                ListSelector(
+                ListSelectorOption(
                     options = Views.entries.toList(),
                     selectedOption = view,
                     optionLabel = {
@@ -179,9 +179,9 @@ internal fun EditViewDialog(
                     onOptionSelected = {
                         view = it
                     },
-                    label = { Text(stringResource(R.string.view)) }
+                    headlineContent = { Text(stringResource(R.string.view)) }
                 )
-                ListSelector(
+                ListSelectorOption(
                     options = (1..3).toList(),
                     selectedOption = columns,
                     optionLabel = {
@@ -190,38 +190,9 @@ internal fun EditViewDialog(
                     onOptionSelected = {
                         columns = it
                     },
-                    label = { Text(stringResource(R.string.columns)) }
+                    headlineContent = { Text(stringResource(R.string.columns)) }
                 )
             }
-        }
-    )
-}
-
-@Composable
-private fun <T> ListSelector(
-    options: List<T>,
-    selectedOption: T?,
-    optionLabel: @Composable (T) -> String,
-    label: @Composable () -> Unit,
-    onOptionSelected: (T?) -> Unit,
-) {
-    val options = options + null
-    ListItem(
-        content = {
-            Menu(
-                options,
-                selectedOption,
-                enabled = true,
-                onOptionSelected = onOptionSelected,
-                label = label,
-                optionLabel = {
-                    if (it == null) {
-                        stringResource(R.string.default_option)
-                    } else {
-                        optionLabel(it)
-                    }
-                }
-            )
         }
     )
 }
