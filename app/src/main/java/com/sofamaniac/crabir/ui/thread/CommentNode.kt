@@ -293,7 +293,10 @@ fun BottomRow(
                 viewModel.save(comment.name, !saved, false)
                 onAction()
             })
-            ReplyButton(startReply = startReply)
+            ReplyButton(
+                enabled = comment.canComment,
+                startReply = startReply
+            )
             MoreOptionButton(comment, viewModel)
             if (BuildConfig.DEBUG) {
                 IconButton(onClick = {

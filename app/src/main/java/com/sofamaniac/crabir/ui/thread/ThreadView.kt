@@ -16,6 +16,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.zIndex
 import com.sofamaniac.crabir.LocalCommentsSettings
+import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.settings.history.HistoryManager
 import com.sofamaniac.crabir.settings.history.SaveToHistory
 import com.sofamaniac.crabir.ui.thread.topBar.TopBar
@@ -128,34 +130,36 @@ fun ThreadView(
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = { TopBar(viewModel, scrollBehavior, dismiss) },
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
+    CompositionLocalProvider(LocalSnackBarHost provides snackbarHostState) {
+        Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            topBar = { TopBar(viewModel, scrollBehavior, dismiss) },
+            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            ) {
 
-            if (commentsSettings.showNavigationBar) {
-                Toolbar(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .offset(y = -ScreenOffset)
-                        .zIndex(1f),
-                    move = { move(it) },
+                if (commentsSettings.showNavigationBar) {
+                    Toolbar(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .offset(y = -ScreenOffset)
+                            .zIndex(1f),
+                        move = { move(it) },
+                    )
+                }
+                CommentListRoot(
+                    viewModel = viewModel,
+                    comment = comment,
+                    context = context,
                 )
-            }
-            CommentListRoot(
-                viewModel = viewModel,
-                comment = comment,
-                context = context,
-            )
 
-            if (showReplySheet != null) {
-                ReplyBottomSheet(viewModel)
+                if (showReplySheet != null) {
+                    ReplyBottomSheet(viewModel)
+                }
             }
         }
     }

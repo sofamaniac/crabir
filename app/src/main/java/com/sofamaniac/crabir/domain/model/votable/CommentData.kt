@@ -90,7 +90,11 @@ data class CommentData(
     val edited: Instant?,
     val mediaMetadata: Map<String, MediaMetadata>,
     val distinguished: String? = "",
+    val locked: Boolean = false,
 ) : VotableData {
+
+    val canComment: Boolean = !locked
+
     override val body: ParsedMarkdown = bodyMd
     override fun copy(relationship: Relationship?, score: Score?): CommentData =
         copy(relationship = relationship ?: this.relationship, score = score ?: this.score)

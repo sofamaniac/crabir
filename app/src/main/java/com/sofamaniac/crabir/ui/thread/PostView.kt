@@ -169,7 +169,10 @@ fun PostCard(
         )
         body()
         BottomRow(post, modifier, interactions = viewModel) {
-            ReplyButton(startReply = { threadViewModel.replyTo(post.name) })
+            ReplyButton(
+                enabled = post.canComment,
+                startReply = { threadViewModel.replyTo(post.name) }
+            )
         }
     }
 }
