@@ -7,7 +7,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
-import com.sofamaniac.crabir.domain.model.Gallery
+import com.sofamaniac.crabir.domain.model.votable.post.Gallery
 
 @Composable
 fun Gallery(

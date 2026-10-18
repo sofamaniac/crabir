@@ -33,9 +33,9 @@ import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.LocalTheme
-import com.sofamaniac.crabir.domain.model.CommentType
-import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.domain.model.VotableData
+import com.sofamaniac.crabir.domain.model.votable.CommentType
+import com.sofamaniac.crabir.domain.model.votable.VotableData
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.map
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.PostRoute

@@ -1,34 +1,23 @@
-package com.sofamaniac.crabir.domain.model
+package com.sofamaniac.crabir.domain.model.votable
 
 import com.sofamaniac.crabir.data.local.entities.VotableEntity
 import com.sofamaniac.crabir.data.remote.dto.MoreData
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
+import com.sofamaniac.crabir.domain.model.AuthorInfo
+import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.ParentInfo
+import com.sofamaniac.crabir.domain.model.ParsedMarkdown
+import com.sofamaniac.crabir.domain.model.RichtextDocument
+import com.sofamaniac.crabir.domain.model.SubredditInfo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.time.Instant
-
-enum class CommentState {
-    Visible,
-    Collapsed,
-    Hidden,
-}
 
 @Serializable
 sealed class CommentType : VotableData {
 
     abstract val depth: Int
-    abstract val parent: Fullname?
-    abstract val descendants: Int
-    abstract val state: CommentState
-    abstract val previousSibling: Fullname?
-    abstract val nextSibling: Fullname?
-
-    abstract fun copy(
-        depth: Int = this.depth,
-        state: CommentState = this.state,
-        previousSibling: Fullname? = this.previousSibling,
-        nextSibling: Fullname? = this.nextSibling,
-    ): CommentType
+    abstract val parent: Fullname
 
     override fun toEntity(): VotableEntity {
         return VotableEntity(id = name, data = Json.encodeToString(this))
@@ -38,31 +27,12 @@ sealed class CommentType : VotableData {
     data class Comment(
         val comment: CommentData,
         override val depth: Int = comment.depth,
-        override val descendants: Int = 0,
-        override val state: CommentState = CommentState.Visible,
-        override val previousSibling: Fullname? = null,
-        override val nextSibling: Fullname? = null,
     ) : CommentType() {
         override fun copy(
             relationship: Relationship?,
             score: Score?,
         ): VotableData {
             return copy(comment = comment.copy(relationship = relationship, score = score))
-        }
-
-        override fun copy(
-            depth: Int,
-            state: CommentState,
-            previousSibling: Fullname?,
-            nextSibling: Fullname?,
-        ): CommentType {
-            return copy(
-                comment = comment,
-                depth = depth,
-                state = state,
-                previousSibling = previousSibling,
-                nextSibling = nextSibling
-            )
         }
 
         override val author: AuthorInfo = comment.author
@@ -79,30 +49,12 @@ sealed class CommentType : VotableData {
     data class More(
         val data: MoreData,
         override val depth: Int = data.depth,
-        override val state: CommentState = CommentState.Visible,
-        override val previousSibling: Fullname? = null,
-        override val nextSibling: Fullname? = null,
     ) : CommentType() {
         override fun copy(
             relationship: Relationship?,
             score: Score?,
         ): VotableData {
             return this
-        }
-
-        override fun copy(
-            depth: Int,
-            state: CommentState,
-            previousSibling: Fullname?,
-            nextSibling: Fullname?,
-        ): CommentType {
-            return copy(
-                data = data,
-                depth = depth,
-                state = state,
-                previousSibling = previousSibling,
-                nextSibling = nextSibling
-            )
         }
 
         override val author: AuthorInfo? = null
@@ -113,7 +65,6 @@ sealed class CommentType : VotableData {
         override val name: Fullname = data.name
         override val id: String = name.name
         override val parent: Fullname = data.parentId
-        override val descendants: Int = data.children.size
     }
 }
 

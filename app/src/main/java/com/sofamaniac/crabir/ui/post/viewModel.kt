@@ -6,10 +6,10 @@ import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.data.local.entities.VisitedPostEntity
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.Rules
-import com.sofamaniac.crabir.domain.model.DUMMY_POST
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.Kind
-import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.votable.post.DUMMY_POST
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.settings.post.LinksSettings
 import com.sofamaniac.crabir.settings.post.PostSettingsDefaults

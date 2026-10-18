@@ -27,7 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.domain.model.CommentData
+import com.sofamaniac.crabir.domain.model.votable.CommentData
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.components.ThemedDialog
 import kotlinx.coroutines.launch

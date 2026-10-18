@@ -6,8 +6,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import com.sofamaniac.crabir.data.remote.dto.post.Preview
 import com.sofamaniac.crabir.domain.model.MediaResource
-import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Quality
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
 
 @Composable
 fun ImageView(

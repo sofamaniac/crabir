@@ -23,10 +23,10 @@ import com.sofamaniac.crabir.data.local.entities.CommunityViewEntity
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.post.Sort
 import com.sofamaniac.crabir.domain.model.CommunityData
-import com.sofamaniac.crabir.domain.model.DUMMY_POST
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.domain.model.VotableData
+import com.sofamaniac.crabir.domain.model.votable.VotableData
+import com.sofamaniac.crabir.domain.model.votable.post.DUMMY_POST
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.domain.repository.feed.FeedParams
 import com.sofamaniac.crabir.domain.repository.feed.FeedSource
 import com.sofamaniac.crabir.domain.repository.feed.PostFeedRepository

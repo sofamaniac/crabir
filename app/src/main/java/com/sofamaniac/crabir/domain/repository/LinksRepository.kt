@@ -6,7 +6,7 @@ import com.sofamaniac.crabir.data.local.entities.into
 import com.sofamaniac.crabir.data.remote.reddit.FlairInfo
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.map
 import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Singleton

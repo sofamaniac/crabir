@@ -45,8 +45,8 @@ import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.Gallery
-import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.votable.post.Gallery
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.navigation.routes.FullscreenGalleryRoute
 import com.sofamaniac.crabir.navigation.routes.Route
 import com.sofamaniac.crabir.onWifiConnection

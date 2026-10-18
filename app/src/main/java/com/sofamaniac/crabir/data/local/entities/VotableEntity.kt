@@ -2,10 +2,10 @@ package com.sofamaniac.crabir.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.domain.model.VotableData
+import com.sofamaniac.crabir.domain.model.votable.CommentType
+import com.sofamaniac.crabir.domain.model.votable.VotableData
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.toOption
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json

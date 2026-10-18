@@ -46,8 +46,8 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.LocalViewSettings
 import com.sofamaniac.crabir.PreviewLocalComposition
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.domain.model.VotableData
+import com.sofamaniac.crabir.domain.model.votable.VotableData
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.settings.history.SaveToHistory
 import com.sofamaniac.crabir.settings.views.Views
 import com.sofamaniac.crabir.ui.components.RefreshIndicator

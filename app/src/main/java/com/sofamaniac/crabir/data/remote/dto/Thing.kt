@@ -14,8 +14,8 @@ import com.sofamaniac.crabir.data.remote.dto.post.PostDTO
 import com.sofamaniac.crabir.data.remote.dto.subreddit.SubredditDTO
 import com.sofamaniac.crabir.data.remote.dto.subreddit.dummySubredditData
 import com.sofamaniac.crabir.data.remote.dto.user.UserDTO
-import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.votable.CommentType
 import com.sofamaniac.crabir.domain.repository.DataInterface
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName

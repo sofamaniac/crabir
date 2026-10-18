@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.domain.model
+package com.sofamaniac.crabir.domain.model.votable.post
 
 import com.sofamaniac.crabir.data.remote.dto.post.GalleryDataImage
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata

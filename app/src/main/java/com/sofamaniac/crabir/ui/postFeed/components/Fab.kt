@@ -29,7 +29,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.ui.postFeed.FeedViewModelInterface
 import kotlinx.coroutines.launch
 

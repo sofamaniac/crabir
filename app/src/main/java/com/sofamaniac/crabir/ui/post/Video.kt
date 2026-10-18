@@ -31,8 +31,8 @@ import coil3.compose.AsyncImage
 import com.sofamaniac.crabir.LocalDataSettings
 import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.domain.model.MediaResource
-import com.sofamaniac.crabir.domain.model.PostData
 import com.sofamaniac.crabir.domain.model.Quality
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.navigation.routes.FullscreenVideoRoute
 import com.sofamaniac.crabir.navigation.routes.Route
 import com.sofamaniac.crabir.onWifiConnection

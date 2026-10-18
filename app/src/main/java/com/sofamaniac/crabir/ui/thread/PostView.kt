@@ -3,24 +3,31 @@ package com.sofamaniac.crabir.ui.thread
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalDataSettings
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Kind
-import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
+import com.sofamaniac.crabir.domain.model.votable.post.RemovalKind
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.PostRoute
 import com.sofamaniac.crabir.onWifiConnection
@@ -84,6 +91,29 @@ internal fun PostView(
                         post.selftext.richtext,
                         mediaMetadata = post.mediaMetadata,
                         threadId = post.id
+                    )
+                }
+            }
+        }
+        val removalKind = post.removalInfo.kind
+        if (removalKind != null) {
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                HorizontalDivider()
+                when (removalKind) {
+                    RemovalKind.Moderator -> Text(
+                        stringResource(
+                            R.string.post_removed_by_moderation,
+                            post.subredditDetails?.displayNamePrefixed ?: "r/${post.subreddit.name}"
+                        ),
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    RemovalKind.Reddit -> Text(
+                        stringResource(R.string.post_removed_by_reddit),
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }

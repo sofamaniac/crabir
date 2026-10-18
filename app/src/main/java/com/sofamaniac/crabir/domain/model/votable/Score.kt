@@ -1,8 +1,4 @@
-/*
- * Copyright (c) 2025 Antoine Grimod
- */
-
-package com.sofamaniac.crabir.domain.model
+package com.sofamaniac.crabir.domain.model.votable
 
 import kotlinx.serialization.Serializable
 

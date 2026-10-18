@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.domain.model.CommentType
+import com.sofamaniac.crabir.domain.model.votable.CommentType
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.PostRoute
 import com.sofamaniac.crabir.ui.components.RefreshIndicator

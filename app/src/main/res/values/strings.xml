@@ -442,6 +442,8 @@
     <string name="post_locked">🔒</string>
     <string name="post_archived">🗄️</string>
     <string name="text_separator">·</string>
+    <string name="post_removed_by_moderation">This post was removed by the moderation team of %1$s.</string>
+    <string name="post_removed_by_reddit">This post was removed by Reddit spam filters.</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>

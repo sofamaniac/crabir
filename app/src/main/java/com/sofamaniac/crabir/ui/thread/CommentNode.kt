@@ -39,8 +39,8 @@ import com.sofamaniac.crabir.BuildConfig
 import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.domain.model.CommentData
-import com.sofamaniac.crabir.domain.model.CommentType
+import com.sofamaniac.crabir.domain.model.votable.CommentData
+import com.sofamaniac.crabir.domain.model.votable.CommentType
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.ProfileRoute

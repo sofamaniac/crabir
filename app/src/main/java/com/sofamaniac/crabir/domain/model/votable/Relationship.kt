@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.domain.model
+package com.sofamaniac.crabir.domain.model.votable
 
 import kotlinx.serialization.Serializable
 

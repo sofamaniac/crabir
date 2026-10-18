@@ -22,17 +22,18 @@ import com.sofamaniac.crabir.data.remote.utils.TranscodedMediaSerializer
 import com.sofamaniac.crabir.domain.model.AuthorInfo
 import com.sofamaniac.crabir.domain.model.Flair
 import com.sofamaniac.crabir.domain.model.Fullname
-import com.sofamaniac.crabir.domain.model.Gallery
 import com.sofamaniac.crabir.domain.model.MediaInfo
 import com.sofamaniac.crabir.domain.model.MediaResource
 import com.sofamaniac.crabir.domain.model.ParsedMarkdown
-import com.sofamaniac.crabir.domain.model.PostData
-import com.sofamaniac.crabir.domain.model.Relationship
 import com.sofamaniac.crabir.domain.model.RichtextDocument
-import com.sofamaniac.crabir.domain.model.Score
 import com.sofamaniac.crabir.domain.model.Selftext
 import com.sofamaniac.crabir.domain.model.SubredditInfo
 import com.sofamaniac.crabir.domain.model.getKind
+import com.sofamaniac.crabir.domain.model.votable.Relationship
+import com.sofamaniac.crabir.domain.model.votable.Score
+import com.sofamaniac.crabir.domain.model.votable.post.Gallery
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
+import com.sofamaniac.crabir.domain.model.votable.post.RemovalInfo
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -300,6 +301,12 @@ private fun PostDTO.toRelationship() = Relationship(
     hidden = hidden
 )
 
+private fun PostDTO.toRemovalInfo() = RemovalInfo(
+    removedBy = removedBy,
+    removedByCategory = removedByCategory,
+    removalReason = removalReason
+)
+
 private fun PostDTO.getPreview() = preview ?: crosspostParentList.firstOrNull()?.preview
 
 private fun PostDTO.getGalleryData(): Gallery? {
@@ -331,6 +338,7 @@ object PostDataMapper : ObjectMappie<PostDTO, PostData>() {
         PostData::linkFlair fromValue from.toLinkFlair()
         PostData::media fromValue from.toMediaInfo()
         PostData::relationship fromValue from.toRelationship()
+        PostData::removalInfo fromValue from.toRemovalInfo()
         PostData::kind fromValue getKind(from)
 
         PostData::createdUtc fromProperty from::createdUtc

@@ -10,7 +10,7 @@ package com.sofamaniac.crabir.data.remote.utils
 
 import com.sofamaniac.crabir.data.remote.dto.post.PostDTO
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
-import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind

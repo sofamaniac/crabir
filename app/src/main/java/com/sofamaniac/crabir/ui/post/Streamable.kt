@@ -21,7 +21,7 @@ import com.sofamaniac.crabir.LocalFiltersSettings
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.streamable.StreamableAPI
 import com.sofamaniac.crabir.data.remote.streamable.Video
-import com.sofamaniac.crabir.domain.model.PostData
+import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.navigation.routes.FullscreenVideoRoute
 import com.sofamaniac.crabir.navigation.routes.Route
 import com.sofamaniac.crabir.settings.theme.GIF_CARTOUCHE_COLOR

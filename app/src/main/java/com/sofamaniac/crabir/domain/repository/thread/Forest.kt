@@ -1,8 +1,8 @@
 package com.sofamaniac.crabir.domain.repository.thread
 
 import com.sofamaniac.crabir.data.remote.dto.Thing
-import com.sofamaniac.crabir.domain.model.CommentType
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.votable.CommentType
 
 data class Forest(
     val root: Fullname,

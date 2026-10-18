@@ -1,4 +1,4 @@
-package com.sofamaniac.crabir.domain.model
+package com.sofamaniac.crabir.domain.model.votable.post
 
 import com.sofamaniac.crabir.data.local.entities.VotableEntity
 import com.sofamaniac.crabir.data.remote.dto.Thumbnail
@@ -6,6 +6,18 @@ import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.post.MediaMetadata
 import com.sofamaniac.crabir.data.remote.dto.post.Preview
 import com.sofamaniac.crabir.data.remote.utils.CommentSortSerializer
+import com.sofamaniac.crabir.domain.model.AuthorInfo
+import com.sofamaniac.crabir.domain.model.Flair
+import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.Kind
+import com.sofamaniac.crabir.domain.model.MediaInfo
+import com.sofamaniac.crabir.domain.model.ParsedMarkdown
+import com.sofamaniac.crabir.domain.model.Selftext
+import com.sofamaniac.crabir.domain.model.SubredditData
+import com.sofamaniac.crabir.domain.model.SubredditInfo
+import com.sofamaniac.crabir.domain.model.votable.Relationship
+import com.sofamaniac.crabir.domain.model.votable.Score
+import com.sofamaniac.crabir.domain.model.votable.VotableData
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.time.Instant
@@ -46,6 +58,7 @@ data class PostData(
     val locked: Boolean,
     val isCrosspostable: Boolean,
     val canModPost: Boolean,
+    val removalInfo: RemovalInfo = RemovalInfo(),
     //val status: Status
 ) : VotableData {
     val isCrosspost: Boolean =
@@ -54,6 +67,8 @@ data class PostData(
     val shortlink = "https://redd.it/$id"
 
     override val body: ParsedMarkdown = selftext.markdown
+
+    val canComment = !locked && !archived && removalInfo.kind == null
 
     override fun copy(relationship: Relationship?, score: Score?): PostData {
         return copy(relationship = relationship ?: this.relationship, score = score ?: this.score)
