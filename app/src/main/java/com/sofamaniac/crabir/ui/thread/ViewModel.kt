@@ -236,4 +236,28 @@ class ThreadViewModel(
             replyState.value = null
         }
     }
+
+
+    fun move(offset: Int) {
+        val index = listState.firstVisibleItemIndex
+        if (index + offset < 0 || index + offset >= comments.value.count()) return
+        listState.requestScrollToItem(index + offset)
+    }
+
+    fun nextTopLevel() {
+        val index = listState.firstVisibleItemIndex
+        val comments = comments.value.toList()
+        val nextIndex = comments.drop(index + 1).indexOfFirst { it.depth == 0 }
+        if (nextIndex == -1) return
+        listState.requestScrollToItem(index + 1 + nextIndex)
+    }
+
+    fun previousTopLevel() {
+        val index = listState.firstVisibleItemIndex
+        val comments = comments.value.toList()
+        val previousIndex = comments.take(index).indexOfLast { it.depth == 0 }
+        if (previousIndex == -1) return
+        listState.requestScrollToItem(previousIndex)
+    }
+
 }
