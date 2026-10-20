@@ -9,12 +9,10 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.map
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Qualifier
 import org.koin.core.annotation.Singleton
 
 interface LinksRepository : VotableRepository<PostData> {
-    override fun VotableEntity?.transform(): PostData? {
-        return this?.into()
-    }
 
     suspend fun markNSFW(name: Fullname): Result<Unit>
     suspend fun unmarkNSFW(name: Fullname): Result<Unit>
@@ -33,7 +31,7 @@ class PostNotFoundException(name: Fullname) : Exception("Post $name not found")
 @Singleton
 class LinksRepositoryImpl(
     override val api: RedditAPIService,
-    override val votableDao: VotableDao,
+    @Qualifier(PostData::class) override val cache: Cache<PostData>,
 ) : LinksRepository {
     private suspend inline fun updatePost(
         name: Fullname,
@@ -98,7 +96,7 @@ class LinksRepositoryImpl(
             get(name).first()
                 .map(default = { Result.failure<Unit>(PostNotFoundException(name)) }) { post ->
                     val relationship = post.relationship.copy(hidden = true)
-                    votableDao.update(name, post.copy(relationship = relationship).toEntity().data)
+                    cache.update(post.copy(relationship = relationship))
                     Result.success(Unit)
                 }
         }
@@ -109,11 +107,20 @@ class LinksRepositoryImpl(
             get(name).first()
                 .map(default = { Result.failure<Unit>(PostNotFoundException(name)) }) { post ->
                     val relationship = post.relationship.copy(hidden = false)
-                    votableDao.update(name, post.copy(relationship = relationship).toEntity().data)
+                    cache.update(post.copy(relationship = relationship))
                     Result.success(Unit)
                 }
         }
     }
+}
+
+@Singleton(binds = [Cache::class])
+@Qualifier(PostData::class)
+class PostDataCache(override val cache: VotableDao) : VotableCache<PostData>() {
+    override fun VotableEntity?.transform(): PostData? {
+        return this?.into()
+    }
+
 }
 
 object DummyLinksRepository : LinksRepository {
@@ -162,6 +169,6 @@ object DummyLinksRepository : LinksRepository {
 
     override val api: RedditAPIService
         get() = throw NotImplementedError()
-    override val votableDao: VotableDao
+    override val cache: PostDataCache
         get() = throw NotImplementedError()
 }

@@ -24,10 +24,10 @@ fun CommentNode(
     val newComments by viewModel.newComments.collectAsState()
     val children = remember(comment.name) { viewModel.getNumberOfChildren(comment.name) }
     CommentView(
-        commentViewModel,
+        viewModel = commentViewModel,
         depth = depth,
         children = children,
-        opened == comment.name,
+        opened = opened == comment.name,
         highlight = newComments.contains(comment.name),
         toggleComment = { target ->
             viewModel.toggleComment(comment.name, target)

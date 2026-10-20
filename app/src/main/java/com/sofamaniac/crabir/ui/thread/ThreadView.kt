@@ -29,6 +29,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.zIndex
 import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalSnackBarHost
+import com.sofamaniac.crabir.domain.repository.CommentsCacheScope
 import com.sofamaniac.crabir.settings.history.HistoryManager
 import com.sofamaniac.crabir.settings.history.SaveToHistory
 import com.sofamaniac.crabir.ui.thread.topBar.TopBar
@@ -36,13 +37,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
+import org.koin.compose.scope.KoinScope
+import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.parameter.parametersOf
+
 
 /**
  * @param comment Focal point of the view
  * @param context If is not null, number of parents to show
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, KoinExperimentalAPI::class)
 @Composable
 fun ThreadView(
     permalink: String,
@@ -52,18 +56,19 @@ fun ThreadView(
     dismiss: () -> Unit = {},
 ) {
 
-    val commentsSettings = LocalCommentsSettings.current
-    val viewModel: ThreadViewModel = koinViewModel(key = permalink) {
-        parametersOf(permalink, comment, context, commentsSettings)
+    KoinScope<CommentsCacheScope>(scopeID = permalink) {
+        val commentsSettings = LocalCommentsSettings.current
+        val viewModel: ThreadViewModel = koinViewModel(key = permalink) {
+            parametersOf(permalink, comment, context, commentsSettings)
+        }
+        ThreadView(
+            viewModel = viewModel,
+            comment = comment,
+            context = context,
+            dismiss = dismiss,
+            modifier = modifier,
+        )
     }
-    ThreadView(
-        viewModel = viewModel,
-        comment = comment,
-        context = context,
-        dismiss = dismiss,
-        modifier = modifier,
-    )
-
 }
 
 /**

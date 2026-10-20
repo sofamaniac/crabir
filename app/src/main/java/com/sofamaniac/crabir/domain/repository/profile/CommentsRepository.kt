@@ -8,11 +8,14 @@ import androidx.paging.PagingSource
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
+import com.sofamaniac.crabir.domain.repository.CommentsCacheScope
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.domain.repository.feed.CommentFeedRepository
-import org.koin.core.annotation.ViewModelScope
+import org.koin.core.annotation.Scope
+import org.koin.core.annotation.Scoped
 
-@ViewModelScope
+@Scoped
+@Scope(CommentsCacheScope::class)
 class CommentsRepository(
     override val votableRepository: CommentsRepository,
     val api: RedditAPIService,

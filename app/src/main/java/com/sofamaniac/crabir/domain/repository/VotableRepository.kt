@@ -14,37 +14,35 @@ import kotlinx.coroutines.flow.map
 
 interface VotableRepository<T : VotableData> : Cache<T> {
     val api: RedditAPIService
-    val votableDao: VotableDao
-
-    fun VotableEntity?.transform(): T?
+    val cache: Cache<T>
 
     override suspend fun insert(things: List<T>) {
-        votableDao.insert(things.map { it.toEntity() })
+        cache.insert(things)
     }
 
     override suspend fun insert(thing: T) {
-        votableDao.insert(thing.toEntity())
+        cache.insert(thing)
     }
 
     override fun get(name: Fullname): Flow<T?> =
-        votableDao.get(name).map { it.transform() }.distinctUntilChanged()
+        cache.get(name)
 
     override suspend fun getAsync(name: Fullname): T? {
-        return votableDao.getValue(name)?.transform()
+        return cache.getAsync(name)
     }
 
     override suspend fun update(thing: T) {
-        votableDao.update(thing.name, thing.toEntity().data)
+        cache.update(thing)
     }
 
     override suspend fun clear() {
-        votableDao.clear()
+        cache.clear()
     }
 
     override suspend fun delete(name: Fullname) {
         val res = api.delete(name)
         if (res.isSuccess) {
-            votableDao.delete(name)
+            cache.delete(name)
         } else {
             Log.e("VotableRepository", "Failed to delete: ${res.exceptionOrNull()}")
         }
@@ -72,7 +70,7 @@ interface VotableRepository<T : VotableData> : Cache<T> {
     }
 
     suspend fun vote(name: Fullname, upvote: Boolean?): Result<Unit> {
-        val thing: VotableData? = get(name).first()
+        val thing: T? = get(name).first()
         if (thing == null) {
             Log.e("PostRepository", "Post not found in cache")
             return Result.failure(Exception("Post not found"))
@@ -88,10 +86,10 @@ interface VotableRepository<T : VotableData> : Cache<T> {
         val newPost = thing.copy(
             relationship = relationship,
         ).updateScore(oldLikes, newLikes)
-        votableDao.update(name, newPost.toEntity().data)
+        cache.update(newPost as T)
         val res = api.vote(thing.name, dir)
         if (res.isFailure) {
-            votableDao.update(name, thing.toEntity().data)
+            cache.update(thing)
             Log.e("PostRepository", "Error upvoting post: ${res.exceptionOrNull()}")
         }
         return res
@@ -107,17 +105,17 @@ interface VotableRepository<T : VotableData> : Cache<T> {
 
 
     suspend fun saveHelper(name: Fullname, target: Boolean): Result<Unit> {
-        val post: VotableData? = get(name).first()
+        val post: T? = get(name).first()
         if (post == null) return Result.failure(PostNotFoundException(name))
         val relationship = post.relationship.copy(saved = target)
         val newPost = post.copy(relationship = relationship)
-        votableDao.update(name, newPost.toEntity().data)
+        cache.update(newPost as T)
         val res = if (target) api.save(post.name) else api.unsave(post.name)
         return if (res.isSuccess) {
             Result.success(Unit)
         } else {
             // restore old value on failure
-            votableDao.update(name, post.toEntity().data)
+            cache.update(post)
             Log.e("PostRepository", "Error saving post: ${res.exceptionOrNull()}")
             Result.failure(Exception("Error saving post"))
         }
@@ -130,4 +128,37 @@ interface VotableRepository<T : VotableData> : Cache<T> {
     suspend fun unsave(name: Fullname): Result<Unit> {
         return saveHelper(name, false)
     }
+}
+
+abstract class VotableCache<T : VotableData> : Cache<T> {
+    protected abstract val cache: VotableDao
+    abstract fun VotableEntity?.transform(): T?
+
+    override suspend fun insert(things: List<T>) {
+        cache.insert(things.map { it.toEntity() })
+    }
+
+    override suspend fun insert(thing: T) {
+        cache.insert(thing.toEntity())
+    }
+
+    override fun get(name: Fullname): Flow<T?> =
+        cache.get(name).map { it.transform() }.distinctUntilChanged()
+
+    override suspend fun getAsync(name: Fullname): T? {
+        return cache.getValue(name)?.transform()
+    }
+
+    override suspend fun update(thing: T) {
+        cache.update(thing.name, thing.toEntity().data)
+    }
+
+    override suspend fun delete(name: Fullname) {
+        cache.delete(name)
+    }
+
+    override suspend fun clear() {
+        cache.clear()
+    }
+
 }

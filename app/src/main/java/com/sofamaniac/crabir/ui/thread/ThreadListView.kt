@@ -149,7 +149,7 @@ fun ThreadListView(
                 when (comment) {
                     is CommentType.Comment -> {
                         CommentNode(
-                            depth = depths[comment.name] ?: comment.depth,
+                            depth = comment.depth,
                             comment = comment,
                             viewModel = viewModel,
                             enableAnimation = !commentsSettings.buttonsAlwaysVisible,

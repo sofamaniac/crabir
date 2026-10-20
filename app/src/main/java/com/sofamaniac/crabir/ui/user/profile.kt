@@ -33,9 +33,11 @@ import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalSnackBarHost
 import com.sofamaniac.crabir.LocalTheme
+import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.votable.CommentType
 import com.sofamaniac.crabir.domain.model.votable.VotableData
 import com.sofamaniac.crabir.domain.model.votable.post.PostData
+import com.sofamaniac.crabir.domain.repository.CommentsCacheScope
 import com.sofamaniac.crabir.map
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.PostRoute
@@ -45,10 +47,11 @@ import com.sofamaniac.crabir.ui.postFeed.PostFeedViewer
 import com.sofamaniac.crabir.ui.postFeed.PostView
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.scope.KoinScope
+import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.parameter.parametersOf
 
-
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, KoinExperimentalAPI::class)
 @Composable
 fun ProfileView(
     user: String?,
@@ -58,9 +61,6 @@ fun ProfileView(
         parametersOf(user)
     },
 ) {
-    //    val isConnectedUser by remember { profileViewModel.currentUser.map { it == user } }.collectAsState(
-    //        true
-    //    )
     val currentUser = LocalRedditAccount.current
     val isConnectedUser =
         currentUser.info?.username.map(default = { true }, map = { it == user })
@@ -79,120 +79,123 @@ fun ProfileView(
     }
 
     CompositionLocalProvider(LocalSnackBarHost provides snackbarHostState) {
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-                DrawerContent(drawerState)
-            },
-        ) {
-            val user = userInfo?.username ?: user
-            if (user == null) return@ModalNavigationDrawer
-            val viewModels: Map<ProfileTabs, ProfileFeedViewModel<out VotableData>> = mapOf(
-                ProfileTabs.Overview to koinViewModel<OverviewViewModel>(key = user + "_overview") {
-                    parametersOf(
-                        user
-                    )
+        KoinScope<CommentsCacheScope>(scopeID = user ?: RedditAccount.ANONYMOUS) {
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    DrawerContent(drawerState)
                 },
-                ProfileTabs.Saved to koinViewModel<SavedViewModel>(key = user + "_saved") {
-                    parametersOf(
-                        user
-                    )
-                },
-                ProfileTabs.Comments to koinViewModel<CommentsViewModel>(key = user + "_comments") {
-                    parametersOf(
-                        user
-                    )
-                },
-                ProfileTabs.Upvoted to koinViewModel<UpvotedViewModel>(key = user + "_upvoted") {
-                    parametersOf(
-                        user
-                    )
-                },
-                ProfileTabs.Downvoted to koinViewModel<DownvotedViewModel>(key = user + "_downvoted") {
-                    parametersOf(
-                        user
-                    )
-                },
-                ProfileTabs.Hidden to koinViewModel<HiddenViewModel>(key = user + "_hidden") {
-                    parametersOf(
-                        user
-                    )
-                },
-                ProfileTabs.Posts to koinViewModel<SubmittedViewModel>(key = user + "_submitted") {
-                    parametersOf(
-                        user
-                    )
-                },
-            )
+            ) {
+                val user = userInfo?.username ?: user
+                if (user == null) return@ModalNavigationDrawer
+                val viewModels: Map<ProfileTabs, ProfileFeedViewModel<out VotableData>> = mapOf(
+                    ProfileTabs.Overview to koinViewModel<OverviewViewModel>(key = user + "_overview") {
+                        parametersOf(
+                            user
+                        )
+                    },
+                    ProfileTabs.Saved to koinViewModel<SavedViewModel>(key = user + "_saved") {
+                        parametersOf(
+                            user
+                        )
+                    },
+                    ProfileTabs.Comments to koinViewModel<CommentsViewModel>(key = user + "_comments") {
+                        parametersOf(
+                            user
+                        )
+                    },
+                    ProfileTabs.Upvoted to koinViewModel<UpvotedViewModel>(key = user + "_upvoted") {
+                        parametersOf(
+                            user
+                        )
+                    },
+                    ProfileTabs.Downvoted to koinViewModel<DownvotedViewModel>(key = user + "_downvoted") {
+                        parametersOf(
+                            user
+                        )
+                    },
+                    ProfileTabs.Hidden to koinViewModel<HiddenViewModel>(key = user + "_hidden") {
+                        parametersOf(
+                            user
+                        )
+                    },
+                    ProfileTabs.Posts to koinViewModel<SubmittedViewModel>(key = user + "_submitted") {
+                        parametersOf(
+                            user
+                        )
+                    },
+                )
 
 
-            val activeViewModel = tabs.getOrNull(currentTab.currentPage).let {
-                viewModels.getOrDefault(it, defaultValue = null)
-            }
-            Scaffold(
-                snackbarHost = {
-                    SnackbarHost(snackbarHostState)
-                },
-                modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                topBar = {
-                    TopBar(
-                        scrollBehavior,
-                        user ?: "",
-                        userInfo,
-                        viewModel = activeViewModel,
-                        openDrawer = { scope.launch { drawerState.open() } }
-                    )
-
-                },
-                bottomBar = {
-                    TabBar(selected = 4)
+                val activeViewModel = tabs.getOrNull(currentTab.currentPage).let {
+                    viewModels.getOrDefault(it, defaultValue = null)
                 }
-            ) { innerPadding ->
-                Column(
-                    verticalArrangement = Arrangement.Top, modifier = Modifier.padding(innerPadding)
-                ) {
-                    SecondaryScrollableTabRow(
-                        containerColor = LocalTheme.current.toolbarBackground,
-                        selectedTabIndex = currentTab.currentPage.coerceAtMost(tabs.size - 1),
-                        modifier = Modifier.fillMaxWidth(),
-                        edgePadding = 0.dp
-                    ) {
-                        tabs.forEachIndexed { index, tab ->
-                            Tab(selected = index == currentTab.currentPage, onClick = {
-                                scope.launch { currentTab.animateScrollToPage(index) }
-                            }, text = { Text(tab.stringResource()) })
-                        }
+                Scaffold(
+                    snackbarHost = {
+                        SnackbarHost(snackbarHostState)
+                    },
+                    modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                    topBar = {
+                        TopBar(
+                            scrollBehavior,
+                            user ?: "",
+                            userInfo,
+                            viewModel = activeViewModel,
+                            openDrawer = { scope.launch { drawerState.open() } }
+                        )
+
+                    },
+                    bottomBar = {
+                        TabBar(selected = 4)
                     }
-                    HorizontalPager(
-                        state = currentTab, modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
+                    Column(
+                        verticalArrangement = Arrangement.Top,
+                        modifier = Modifier.padding(innerPadding)
                     ) {
-                        val page = tabs[it]
-                        when (val viewModel = viewModels[page]) {
-                            null -> {
-                                AboutTab(
-                                    userInfo,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                )
+                        SecondaryScrollableTabRow(
+                            containerColor = LocalTheme.current.toolbarBackground,
+                            selectedTabIndex = currentTab.currentPage.coerceAtMost(tabs.size - 1),
+                            modifier = Modifier.fillMaxWidth(),
+                            edgePadding = 0.dp
+                        ) {
+                            tabs.forEachIndexed { index, tab ->
+                                Tab(selected = index == currentTab.currentPage, onClick = {
+                                    scope.launch { currentTab.animateScrollToPage(index) }
+                                }, text = { Text(tab.stringResource()) })
                             }
+                        }
+                        HorizontalPager(
+                            state = currentTab, modifier = Modifier.fillMaxSize()
+                        ) {
+                            val page = tabs[it]
+                            when (val viewModel = viewModels[page]) {
+                                null -> {
+                                    AboutTab(
+                                        userInfo,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                    )
+                                }
 
-                            is SavedViewModel -> {
-                                val filter by viewModel.filters.collectAsState()
-                                TabInner(
-                                    viewModel,
-                                    filter = filter,
-                                    showHidden = false,
-                                    onPostClick = onPostClick
-                                )
-                            }
+                                is SavedViewModel -> {
+                                    val filter by viewModel.filters.collectAsState()
+                                    TabInner(
+                                        viewModel,
+                                        filter = filter,
+                                        showHidden = false,
+                                        onPostClick = onPostClick
+                                    )
+                                }
 
-                            else -> {
-                                TabInner(
-                                    viewModel,
-                                    filter = { true },
-                                    showHidden = page == ProfileTabs.Hidden,
-                                    onPostClick = onPostClick
-                                )
+                                else -> {
+                                    TabInner(
+                                        viewModel,
+                                        filter = { true },
+                                        showHidden = page == ProfileTabs.Hidden,
+                                        onPostClick = onPostClick
+                                    )
+                                }
                             }
                         }
                     }

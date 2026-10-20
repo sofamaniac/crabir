@@ -11,6 +11,7 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.votable.CommentType
 import com.sofamaniac.crabir.domain.model.votable.post.PostData
+import com.sofamaniac.crabir.domain.repository.CommentsCacheScope
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,7 +21,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
-import org.koin.core.annotation.ViewModelScope
+import org.koin.core.annotation.Scope
+import org.koin.core.annotation.Scoped
 
 interface ThreadRepository {
 
@@ -65,7 +67,8 @@ interface ThreadRepository {
 
 }
 
-@ViewModelScope
+@Scoped
+@Scope(CommentsCacheScope::class)
 class ThreadRepositoryImpl(
     private val repository: CommentsRepository,
     private val postsRepository: LinksRepository,
