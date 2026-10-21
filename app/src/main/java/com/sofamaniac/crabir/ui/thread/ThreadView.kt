@@ -4,6 +4,7 @@
 
 package com.sofamaniac.crabir.ui.thread
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -29,9 +30,17 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.zIndex
 import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.LocalSnackBarHost
+import com.sofamaniac.crabir.data.remote.reddit.Kind
+import com.sofamaniac.crabir.data.remote.reddit.Rules
+import com.sofamaniac.crabir.domain.model.FullnameKind
+import com.sofamaniac.crabir.domain.model.votable.CommentType
 import com.sofamaniac.crabir.settings.history.HistoryManager
 import com.sofamaniac.crabir.settings.history.SaveToHistory
+import com.sofamaniac.crabir.ui.thread.dialog.CopyDialog
+import com.sofamaniac.crabir.ui.thread.dialog.ShareMenu
+import com.sofamaniac.crabir.ui.thread.dialog.UserMenu
 import com.sofamaniac.crabir.ui.thread.topBar.TopBar
+import com.sofamaniac.crabir.ui.votable.ReportMenu
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -82,7 +91,6 @@ fun ThreadView(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val commentsSettings = LocalCommentsSettings.current
-    val showReplySheet by viewModel.reply.collectAsState()
     val post by viewModel.post.collectAsState()
 
     SaveToHistory(viewModel.name, post?.over18 ?: true)
@@ -107,11 +115,13 @@ fun ThreadView(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.loadingState.collectAsState()
 
     LaunchedEffect(uiState) {
-        if (uiState is UiState.Error) {
-            snackbarHostState.showSnackbar((uiState as UiState.Error).e.message ?: "Unknown error")
+        if (uiState is LoadingState.Error) {
+            snackbarHostState.showSnackbar(
+                (uiState as LoadingState.Error).e.message ?: "Unknown error"
+            )
         }
     }
     val newComments by viewModel.newComments.collectAsState()
@@ -149,11 +159,61 @@ fun ThreadView(
                     comment = comment,
                     context = context,
                 )
+            }
+            Dialogs(viewModel)
+        }
+    }
+}
 
-                if (showReplySheet != null) {
-                    ReplyBottomSheet(viewModel)
+@Composable
+fun Dialogs(viewModel: ThreadViewModel) {
+    val dialog by viewModel.dialogState.collectAsState()
+    when (val dialog = dialog) {
+        is Dialog.Copy -> {
+            val comment by viewModel.get(dialog.name).collectAsState(null)
+            if (comment is CommentType.Comment) {
+                val comment = comment as CommentType.Comment
+                CopyDialog(comment.comment) {
+                    viewModel.dialogState.value = null
                 }
             }
+        }
+
+        is Dialog.Reply -> {
+            ReplyBottomSheet(viewModel)
+        }
+
+        is Dialog.Report -> {
+            val rules: Rules by viewModel.rules.collectAsState(Rules())
+            val kind = when (dialog.name.kind) {
+                FullnameKind.Comment -> Kind.Comment
+                FullnameKind.Post -> Kind.Link
+                else -> Kind.All
+            }
+            ReportMenu(dialog.name, rules, kind = kind, report = viewModel::report) {
+                viewModel.dialogState.value = null
+            }
+        }
+
+        is Dialog.Share -> {
+            val comment by viewModel.get(dialog.name).collectAsState(null)
+            if (comment is CommentType.Comment) {
+                val comment = comment as CommentType.Comment
+                ShareMenu(comment.comment) {
+                    viewModel.dialogState.value = null
+                }
+            }
+        }
+
+        is Dialog.User -> {
+            UserMenu(dialog.username) {
+                viewModel.dialogState.value = null
+            }
+        }
+
+        null -> {}
+        else -> {
+            Log.e("ThreadView", "Dialogs: Missing implementation for $dialog")
         }
     }
 }

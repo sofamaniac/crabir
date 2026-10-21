@@ -12,8 +12,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,26 +25,23 @@ import com.sofamaniac.crabir.ui.components.ThemedCard
 import com.sofamaniac.crabir.ui.components.cartouche
 import com.sofamaniac.crabir.ui.formatElapsedTimeLocalized
 import com.sofamaniac.crabir.ui.thread.depthIndent
+import com.sofamaniac.crabir.ui.votable.CommentEvent
 import com.sofamaniac.crabir.ui.votable.ScoreString
 
 @Composable
 fun CommentView(
-    viewModel: CommentViewModel,
+    comment: CommentData,
     depth: Int,
     children: Int,
     opened: Boolean,
     highlight: Boolean,
-    toggleComment: (Boolean) -> Unit,
-    startReply: () -> Unit,
+    onEvent: (CommentEvent) -> Unit,
     modifier: Modifier = Modifier,
     enableAnimation: Boolean = true,
 ) {
     val innerModifier = Modifier
         .padding(horizontal = 16.dp)
     val theme = LocalTheme.current
-    val commentOpt by viewModel.votable.collectAsState()
-    if (commentOpt == null) return
-    val comment = commentOpt!!.comment
 
     Column(modifier = modifier) {
         if (depth == 0) HorizontalDivider()
@@ -58,8 +53,8 @@ fun CommentView(
                 .background(theme.cardBackground)
                 .depthIndent(depth.coerceAtLeast(0))
                 .combinedClickable(
-                    onClick = { if (!comment.collapsed) toggleComment(!opened) },
-                    onLongClick = { viewModel.collapse(!comment.collapsed) },
+                    onClick = { if (!comment.collapsed) onEvent(CommentEvent.ShowBar(comment.name)) },
+                    onLongClick = { onEvent(CommentEvent.Collapse(comment.name)) },
                     onLongClickLabel = "Collapse comment"
                 ),
         ) {
@@ -71,12 +66,11 @@ fun CommentView(
                 )
             } else {
                 OpenedComment(
-                    viewModel,
+                    comment,
                     opened = opened,
-                    toggleComment = toggleComment,
                     modifier = innerModifier,
                     enableAnimation = enableAnimation,
-                    startReply = startReply
+                    onEvent = onEvent,
                 )
             }
         }

@@ -5,13 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.sofamaniac.crabir.LocalCommentsSettings
 import com.sofamaniac.crabir.domain.model.votable.CommentData
 import com.sofamaniac.crabir.ui.richtext.Richtext
+import com.sofamaniac.crabir.ui.votable.CommentEvent
 
 @Composable
 fun CommentContent(comment: CommentData, modifier: Modifier = Modifier) {
@@ -27,24 +26,21 @@ fun CommentContent(comment: CommentData, modifier: Modifier = Modifier) {
 
 @Composable
 fun OpenedComment(
-    viewModel: CommentViewModel,
+    comment: CommentData,
     opened: Boolean,
-    toggleComment: (Boolean) -> Unit,
-    startReply: () -> Unit,
+    onEvent: (CommentEvent) -> Unit,
     modifier: Modifier = Modifier,
     enableAnimation: Boolean = true,
 ) {
     val showBottomBar = opened || !enableAnimation
     val commentsSettings = LocalCommentsSettings.current
-    val commentOuter by viewModel.votable.collectAsState()
-    val comment = (commentOuter)?.comment ?: return
 
     Column {
         CommentContent(comment, modifier = modifier)
         AnimatedVisibility(showBottomBar) {
-            BottomRow(comment, viewModel, startReply = startReply) {
+            BottomRow(comment, onEvent = onEvent) {
                 if (commentsSettings.hideButtonsAfterVote) {
-                    toggleComment(false)
+                    onEvent(CommentEvent.ShowBar(null))
                 }
             }
         }

@@ -7,51 +7,56 @@ import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.votable.VotableData
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 interface VotableRepository<T : VotableData> : Cache<T> {
     val api: RedditAPIService
-    val cache: Cache<T>
+    val votableDao: VotableDao
 
-    override suspend fun insert(things: List<T>) {
-        cache.insert(things)
+    fun VotableEntity?.transform(): T?
+
+    override suspend fun insert(things: List<T>) = withContext(Dispatchers.IO) {
+        votableDao.insert(things.map { it.toEntity() })
     }
 
-    override suspend fun insert(thing: T) {
-        cache.insert(thing)
+    override suspend fun insert(thing: T) = withContext(Dispatchers.IO) {
+        votableDao.insert(thing.toEntity())
     }
 
     override fun get(name: Fullname): Flow<T?> =
-        cache.get(name)
+        votableDao.get(name).map { it.transform() }.distinctUntilChanged()
 
-    override suspend fun getAsync(name: Fullname): T? {
-        return cache.getAsync(name)
+    override suspend fun getAsync(name: Fullname): T? = withContext(Dispatchers.IO) {
+        votableDao.getValue(name)?.transform()
     }
 
-    override suspend fun update(thing: T) {
-        cache.update(thing)
+    override suspend fun update(thing: T) = withContext(Dispatchers.IO) {
+        votableDao.update(thing.name, thing.toEntity().data)
     }
 
-    override suspend fun clear() {
-        cache.clear()
+    override suspend fun clear() = withContext(Dispatchers.IO) {
+        votableDao.clear()
     }
 
-    override suspend fun delete(name: Fullname) {
+    override suspend fun delete(name: Fullname) = withContext(Dispatchers.IO) {
         val res = api.delete(name)
         if (res.isSuccess) {
-            cache.delete(name)
+            votableDao.delete(name)
         } else {
             Log.e("VotableRepository", "Failed to delete: ${res.exceptionOrNull()}")
         }
+        Unit
     }
 
-    suspend fun getRules(subreddit: String): Rules {
+    suspend fun getRules(subreddit: String): Rules = withContext(Dispatchers.IO) {
         val subreddit = if (subreddit.startsWith("r/")) subreddit else "r/$subreddit"
         val res = api.getRules(subreddit)
-        return if (res.isSuccess) {
+        if (res.isSuccess) {
             res.getOrNull()!!
         } else {
             Log.e("VotableRepository", "Failed to get rules: ${res.exceptionOrNull()}")
@@ -59,21 +64,21 @@ interface VotableRepository<T : VotableData> : Cache<T> {
         }
     }
 
-    suspend fun report(name: Fullname, reason: String): Result<Unit> {
+    suspend fun report(name: Fullname, reason: String): Result<Unit> = withContext(Dispatchers.IO) {
         val res = api.report(name, reason)
         if (res.isSuccess) {
-            return Result.success(Unit)
+            Result.success(Unit)
         } else {
             Log.e("PostRepository", "Error reporting post: ${res.exceptionOrNull()}")
-            return Result.failure(Exception("Error reporting post"))
+            Result.failure(Exception("Error reporting post"))
         }
     }
 
-    suspend fun vote(name: Fullname, upvote: Boolean?): Result<Unit> {
-        val thing: T? = get(name).first()
+    suspend fun vote(name: Fullname, upvote: Boolean?): Result<Unit> = withContext(Dispatchers.IO) {
+        val thing: VotableData? = get(name).first()
         if (thing == null) {
             Log.e("PostRepository", "Post not found in cache")
-            return Result.failure(Exception("Post not found"))
+            return@withContext Result.failure(Exception("Post not found"))
         }
         val newLikes = if (thing.relationship.liked == upvote) null else upvote
         val dir = when (newLikes) {
@@ -86,13 +91,13 @@ interface VotableRepository<T : VotableData> : Cache<T> {
         val newPost = thing.copy(
             relationship = relationship,
         ).updateScore(oldLikes, newLikes)
-        cache.update(newPost as T)
+        votableDao.update(name, newPost.toEntity().data)
         val res = api.vote(thing.name, dir)
         if (res.isFailure) {
-            cache.update(thing)
+            votableDao.update(name, thing.toEntity().data)
             Log.e("PostRepository", "Error upvoting post: ${res.exceptionOrNull()}")
         }
-        return res
+        res
     }
 
     suspend fun upvote(name: Fullname): Result<Unit> {
@@ -104,25 +109,35 @@ interface VotableRepository<T : VotableData> : Cache<T> {
     }
 
 
-    suspend fun saveHelper(name: Fullname, target: Boolean): Result<Unit> {
-        val post: T? = get(name).first()
-        if (post == null) return Result.failure(PostNotFoundException(name))
-        val relationship = post.relationship.copy(saved = target)
-        val newPost = post.copy(relationship = relationship)
-        cache.update(newPost as T)
-        val res = if (target) api.save(post.name) else api.unsave(post.name)
-        return if (res.isSuccess) {
-            Result.success(Unit)
-        } else {
-            // restore old value on failure
-            cache.update(post)
-            Log.e("PostRepository", "Error saving post: ${res.exceptionOrNull()}")
-            Result.failure(Exception("Error saving post"))
+    suspend fun saveHelper(name: Fullname, target: Boolean): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            val post: VotableData? = get(name).first()
+            if (post == null) {
+                return@withContext Result.failure(PostNotFoundException(name))
+            }
+            val relationship = post.relationship.copy(saved = target)
+            val newPost = post.copy(relationship = relationship)
+            votableDao.update(name, newPost.toEntity().data)
+            val res = if (target) api.save(post.name) else api.unsave(post.name)
+            if (res.isSuccess) {
+                Result.success(Unit)
+            } else {
+                // restore old value on failure
+                votableDao.update(name, post.toEntity().data)
+                Log.e("PostRepository", "Error saving post: ${res.exceptionOrNull()}")
+                Result.failure(Exception("Error saving post"))
+            }
         }
-    }
 
-    suspend fun save(name: Fullname): Result<Unit> {
-        return saveHelper(name, true)
+    suspend fun save(name: Fullname, upvote: Boolean): Result<Unit> {
+        return saveHelper(name, true).then {
+            val post: VotableData? = get(name).first()
+            if (post?.relationship?.liked != true && upvote) {
+                upvote(name)
+            } else {
+                Result.success(Unit)
+            }
+        }
     }
 
     suspend fun unsave(name: Fullname): Result<Unit> {
@@ -130,35 +145,9 @@ interface VotableRepository<T : VotableData> : Cache<T> {
     }
 }
 
-abstract class VotableCache<T : VotableData> : Cache<T> {
-    protected abstract val cache: VotableDao
-    abstract fun VotableEntity?.transform(): T?
-
-    override suspend fun insert(things: List<T>) {
-        cache.insert(things.map { it.toEntity() })
+inline fun <R, T> Result<T>.then(transform: (T) -> Result<R>): Result<R> {
+    return when {
+        isSuccess -> transform(getOrNull()!!)
+        else -> Result.failure(exceptionOrNull()!!)
     }
-
-    override suspend fun insert(thing: T) {
-        cache.insert(thing.toEntity())
-    }
-
-    override fun get(name: Fullname): Flow<T?> =
-        cache.get(name).map { it.transform() }.distinctUntilChanged()
-
-    override suspend fun getAsync(name: Fullname): T? {
-        return cache.getValue(name)?.transform()
-    }
-
-    override suspend fun update(thing: T) {
-        cache.update(thing.name, thing.toEntity().data)
-    }
-
-    override suspend fun delete(name: Fullname) {
-        cache.delete(name)
-    }
-
-    override suspend fun clear() {
-        cache.clear()
-    }
-
 }

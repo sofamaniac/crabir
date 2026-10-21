@@ -19,15 +19,16 @@ import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.domain.model.votable.CommentData
 import com.sofamaniac.crabir.ui.thread.ReplyButton
 import com.sofamaniac.crabir.ui.thread.dialog.MoreOptionButton
+import com.sofamaniac.crabir.ui.votable.CommentEvent
 import com.sofamaniac.crabir.ui.votable.DownButton
 import com.sofamaniac.crabir.ui.votable.SavedButton
 import com.sofamaniac.crabir.ui.votable.UpButton
+import com.sofamaniac.crabir.ui.votable.VotableEvent
 
 @Composable
 fun BottomRow(
     comment: CommentData,
-    viewModel: CommentViewModel,
-    startReply: () -> Unit,
+    onEvent: (CommentEvent) -> Unit,
     modifier: Modifier = Modifier,
     onAction: () -> Unit,
 ) {
@@ -41,22 +42,23 @@ fun BottomRow(
             horizontalArrangement = Arrangement.End
         ) {
             UpButton(likes, onClick = {
-                viewModel.upvote(comment.name)
+                onEvent(VotableEvent.Upvote(comment.name))
                 onAction()
             })
             DownButton(likes, onClick = {
-                viewModel.downvote(comment.name)
+                onEvent(VotableEvent.Downvote(comment.name))
                 onAction()
             })
             SavedButton(saved, onClick = {
-                viewModel.save(comment.name, !saved, false)
+                // TODO upvote on save
+                onEvent(VotableEvent.Save(comment.name, !saved, false))
                 onAction()
             })
             ReplyButton(
                 enabled = comment.canComment,
-                startReply = startReply
+                startReply = { onEvent(VotableEvent.Reply(comment.name)) }
             )
-            MoreOptionButton(comment, viewModel)
+            MoreOptionButton(comment, onEvent)
             if (BuildConfig.DEBUG) {
                 IconButton(onClick = {
                     Log.d("CommentNode", "$comment")

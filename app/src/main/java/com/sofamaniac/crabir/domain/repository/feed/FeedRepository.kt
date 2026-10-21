@@ -30,7 +30,8 @@ interface FeedRepository<Params, T : VotableData> {
     }
 
     suspend fun save(name: Fullname): Result<Unit> {
-        return votableRepository.save(name)
+        // TODO update
+        return votableRepository.save(name, false)
     }
 
     suspend fun unsave(name: Fullname): Result<Unit> {

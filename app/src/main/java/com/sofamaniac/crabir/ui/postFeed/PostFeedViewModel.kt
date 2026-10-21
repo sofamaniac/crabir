@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 interface FeedViewModelInterface<T : VotableData> {
     val filters: StateFlow<(T) -> Boolean>
@@ -137,15 +138,16 @@ abstract class PostFeedViewModel<T : CommunityData>(
             filters.map { filters -> pagingData.filter(filters) }
         }
 
-    open suspend fun createViewEntity(name: String): CommunityViewEntity {
-        val info = communityRepository.getBySlug(name)
-        if (info == null) {
-            Log.e("PostFeedViewModel", "Failed to find $name in community repository")
-            return CommunityViewEntity(name, displayName = "")
-        } else {
-            return CommunityViewEntity(name, displayName = info.displayNamePrefixed)
+    open suspend fun createViewEntity(name: String): CommunityViewEntity =
+        withContext(Dispatchers.IO) {
+            val info = communityRepository.getBySlug(name)
+            if (info == null) {
+                Log.e("PostFeedViewModel", "Failed to find $name in community repository")
+                CommunityViewEntity(name, displayName = "")
+            } else {
+                CommunityViewEntity(name, displayName = info.displayNamePrefixed)
+            }
         }
-    }
 
     fun updateData(data: T?) {
         Log.d("PostFeedViewModel", "updateData: $data")
