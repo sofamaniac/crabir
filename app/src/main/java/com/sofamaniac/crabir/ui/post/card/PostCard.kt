@@ -96,6 +96,7 @@ internal fun PostCardContent(
         modifier = modifier.fillMaxWidth(),
         onClick = onClick,
     ) {
+        val read by interactions.read.collectAsState()
         PostHeader(
             post,
             showSubredditIcon = viewSettings.cardSettings.showSubredditIcon,
@@ -103,13 +104,11 @@ internal fun PostCardContent(
             showPrefix = viewSettings.prefixCommunity
         )
         val enablePreview = post.kind == Kind.Link || post.kind == Kind.Unknown
-        val likes by interactions.likes.collectAsState()
-        val read by interactions.read.collectAsState()
         PostInfo(
             post,
             modifier = innerModifier,
             enableThumbnail = enablePreview && viewSettings.cardSettings.thumbnailForLinkPreview,
-            likes = likes,
+            likes = post.relationship.liked,
             read = read,
         )
         PostBody(

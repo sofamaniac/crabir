@@ -23,16 +23,17 @@ import androidx.compose.ui.res.stringResource
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
-import com.sofamaniac.crabir.data.remote.reddit.Kind
 import com.sofamaniac.crabir.domain.model.votable.CommentData
 import com.sofamaniac.crabir.navigation.LocalNavController
-import com.sofamaniac.crabir.navigation.routes.TextEditorRoute
 import com.sofamaniac.crabir.ui.components.ListItem
-import com.sofamaniac.crabir.ui.thread.comment.CommentViewModel
-import com.sofamaniac.crabir.ui.votable.ReportMenu
+import com.sofamaniac.crabir.ui.votable.CommentEvent
+import com.sofamaniac.crabir.ui.votable.VotableEvent
 
 @Composable
-fun MoreOptionButton(comment: CommentData, viewModel: CommentViewModel) {
+fun MoreOptionButton(
+    comment: CommentData,
+    onEvent: (CommentEvent) -> Unit,
+) {
     var showMenu by remember { mutableStateOf(false) }
 
     IconButton(onClick = { showMenu = !showMenu }) {
@@ -40,7 +41,7 @@ fun MoreOptionButton(comment: CommentData, viewModel: CommentViewModel) {
     }
 
     if (showMenu) {
-        MoreOptionMenu(comment, viewModel) {
+        MoreOptionMenu(comment, onEvent) {
             showMenu = false
         }
     }
@@ -50,7 +51,7 @@ fun MoreOptionButton(comment: CommentData, viewModel: CommentViewModel) {
 @Composable
 fun MoreOptionMenu(
     comment: CommentData,
-    viewModel: CommentViewModel,
+    onEvent: (CommentEvent) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val theme = LocalTheme.current
@@ -67,15 +68,13 @@ fun MoreOptionMenu(
 
         if (comment.author.authorFullname == currentAccount.info?.name) {
             ListItem(
-                onClick = {
-                    navController?.navigate(TextEditorRoute(comment.name, comment.body.markdown))
-                },
+                onClick = { onEvent(VotableEvent.ShowEdit(comment.name)) },
                 leadingContent = { Icon(Icons.Default.Edit, contentDescription = null) },
                 content = { Text(stringResource(R.string.edit)) }
             )
         }
         ListItem(
-            onClick = { showUserMenu = true },
+            onClick = { onEvent(VotableEvent.ShowUser(comment.author.username)) },
             leadingContent = { Icon(Icons.Default.Person, contentDescription = null) },
             content = { Text(stringResource(R.string.about_user, comment.author.username)) },
             trailingContent = {
@@ -87,7 +86,7 @@ fun MoreOptionMenu(
         )
 
         ListItem(
-            onClick = { viewModel.collapse(true) },
+            onClick = { onEvent(CommentEvent.Collapse(comment.name, true)) },
             leadingContent = {
                 Icon(
                     Icons.Default.KeyboardDoubleArrowUp,
@@ -99,8 +98,7 @@ fun MoreOptionMenu(
 
         ListItem(
             onClick = {
-                viewModel.fetchRules()
-                showReportMenu = true
+                onEvent(VotableEvent.ShowReport(comment.name))
             },
             leadingContent = { Icon(Icons.Default.Report, contentDescription = null) },
             content = { Text(stringResource(R.string.report)) },
@@ -114,7 +112,7 @@ fun MoreOptionMenu(
 
         ListItem(
             onClick = {
-                showShareMenu = true
+                onEvent(VotableEvent.ShowShare(comment.name))
             },
             leadingContent = { Icon(Icons.Default.Share, contentDescription = null) },
             content = { Text(stringResource(R.string.share)) },
@@ -128,7 +126,7 @@ fun MoreOptionMenu(
 
         ListItem(
             onClick = {
-                showCopyMenu = true
+                onEvent(CommentEvent.ShowCopy(comment.name))
             },
             leadingContent = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
             content = { Text(stringResource(R.string.copy)) },
@@ -142,9 +140,10 @@ fun MoreOptionMenu(
     }
 
     if (showReportMenu) {
-        ReportMenu(comment.name, viewModel, kind = Kind.Comment) {
-            showReportMenu = false
-        }
+        // TODO
+        //        ReportMenu(comment.name, kind = Kind.Comment) {
+        //            showReportMenu = false
+        //        }
     }
 
     if (showUserMenu) {

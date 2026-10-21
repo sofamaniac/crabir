@@ -9,8 +9,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -18,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.data.remote.reddit.Kind
+import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.ui.components.ListItem
 import com.sofamaniac.crabir.ui.components.ThemedDialog
@@ -26,12 +25,12 @@ import com.sofamaniac.crabir.ui.components.ThemedDialog
 @Composable
 fun ReportMenu(
     name: Fullname,
-    viewModel: VotableInteraction,
+    rules: Rules,
     kind: Kind = Kind.All,
+    report: (Fullname, String) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    val rulesFull by viewModel.rules.collectAsState()
-    val rules = rulesFull.filter(kind)
+    val rules = rules.filter(kind)
     val (selectedOption, setSelectedOption) = remember { mutableStateOf(rules.siteRules.firstOrNull()) }
     ThemedDialog(
         onDismissRequest,
@@ -44,8 +43,7 @@ fun ReportMenu(
             TextButton(
                 enabled = selectedOption != null,
                 onClick = {
-                    viewModel.report(name, selectedOption!!)
-                    onDismissRequest()
+                    report(name, selectedOption!!)
                 }) {
                 Text(stringResource(R.string.report))
             }
@@ -53,7 +51,6 @@ fun ReportMenu(
         }) {
         Column(
             modifier = Modifier
-                .weight(1f)
                 .verticalScroll(rememberScrollState())
         ) {
             for (rule in rules.rules) {

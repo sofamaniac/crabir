@@ -76,7 +76,7 @@ open class VotableViewModel<T : VotableData>(
     override fun save(name: Fullname, target: Boolean, upvote: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             if (target) {
-                repository.save(fullname)
+                repository.save(fullname, upvote)
                 if (upvote) {
                     repository.upvote(fullname)
                 }

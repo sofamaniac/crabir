@@ -45,6 +45,7 @@ import com.sofamaniac.crabir.LocalPostSettings
 import com.sofamaniac.crabir.LocalRedditAccount
 import com.sofamaniac.crabir.LocalTheme
 import com.sofamaniac.crabir.R
+import com.sofamaniac.crabir.data.remote.reddit.Kind
 import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.navigation.LocalNavController
 import com.sofamaniac.crabir.navigation.routes.PostRoute
@@ -94,10 +95,9 @@ fun BottomRow(
     buttonsSettings: ButtonsSettings = LocalPostSettings.current.buttonsSettings,
     action: (@Composable () -> Unit)? = null,
 ) {
-    val likes by interactions.likes.collectAsState(post.relationship.liked)
-    val saved by interactions.saved.collectAsState(post.relationship.saved)
-    val upvoteOnSave =
-        interactions.linksSettings.collectAsState(initial = null).value?.upvoteOnSave ?: false
+    val likes = post.relationship.liked
+    val saved = post.relationship.saved
+    val upvoteOnSave = LocalPostSettings.current.linksSettings.upvoteOnSave
     val navController = LocalNavController.current
     val theme = LocalTheme.current
     CompositionLocalProvider(LocalContentColor provides theme.secondaryText) {
@@ -272,7 +272,12 @@ private fun ReportButton(post: PostData, interaction: LinkInteraction) {
         }
     )
     if (showMenu) {
-        ReportMenu(post.name, interaction) {
+        val rules by interaction.rules.collectAsState()
+        ReportMenu(
+            post.name, rules,
+            kind = Kind.Link,
+            report = interaction::report,
+        ) {
             showMenu = false
         }
     }

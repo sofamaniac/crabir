@@ -30,7 +30,8 @@ import com.sofamaniac.crabir.ui.components.ThemedCard
 fun MoreViewer(
     more: CommentType.More,
     depth: Int,
-    viewModel: ThreadViewModel,
+    fetchMore: (CommentType.More) -> Unit,
+    permalink: String,
     modifier: Modifier = Modifier,
 ) {
     val theme = LocalTheme.current
@@ -53,12 +54,12 @@ fun MoreViewer(
             if (loading) return@ThemedCard
             if (more.data.count > 0) {
                 loading = true
-                viewModel.fetchMoreComments(more)
+                fetchMore(more)
             } else {
                 val parentId = more.parent.name.split('_').last()
                 navController.navigate(
                     PostRoute(
-                        postPermalink = viewModel.permalink,
+                        postPermalink = permalink,
                         comment = parentId,
                     )
                 )

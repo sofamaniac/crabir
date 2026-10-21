@@ -1,12 +1,12 @@
 package com.sofamaniac.crabir.ui.thread
 
-import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.data.remote.dto.Thing
 import com.sofamaniac.crabir.data.remote.dto.comment.CommentDataMapper
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
+import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.votable.CommentType
@@ -16,6 +16,8 @@ import com.sofamaniac.crabir.domain.repository.accounts.AccountsStorage
 import com.sofamaniac.crabir.domain.repository.thread.ThreadRepository
 import com.sofamaniac.crabir.settings.comments.CommentsSettings
 import com.sofamaniac.crabir.settings.history.HistoryManager
+import com.sofamaniac.crabir.ui.votable.CommentEvent
+import com.sofamaniac.crabir.ui.votable.VotableEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +27,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -32,11 +35,22 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
-sealed class UiState {
-    object Loading : UiState()
-    class Error(val e: Throwable) : UiState()
-    object Success : UiState()
+sealed interface LoadingState {
+    object Loading : LoadingState
+    class Error(val e: Throwable) : LoadingState
+    object Success : LoadingState
 }
+
+sealed interface Dialog {
+    class Reply(val to: Fullname) : Dialog
+    class Share(val name: Fullname) : Dialog
+    class Copy(val name: Fullname) : Dialog
+    class Report(val name: Fullname) : Dialog
+    class User(val username: String) : Dialog
+
+    class Edit(val name: Fullname) : Dialog
+}
+
 
 @KoinViewModel
 class ThreadViewModel(
@@ -56,13 +70,19 @@ class ThreadViewModel(
 
     val accounts: Flow<List<RedditAccount>> = accountsStorage.accounts
 
-    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
-    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+    private val _loadingState = MutableStateFlow<LoadingState>(LoadingState.Loading)
+    val loadingState: StateFlow<LoadingState> = _loadingState.asStateFlow()
+    val dialogState: MutableStateFlow<Dialog?> = MutableStateFlow(null)
 
     private val replyState = MutableStateFlow<Fullname?>(null)
     val reply: StateFlow<Fullname?> = replyState.asStateFlow()
 
     val listState = LazyListState()
+
+    val rules = flow {
+        val rules = repository.getRules().getOrNull() ?: Rules()
+        emit(rules)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, Rules())
 
 
     private var _newComments: MutableStateFlow<Set<Fullname>> = MutableStateFlow(emptySet())
@@ -130,7 +150,7 @@ class ThreadViewModel(
     }
 
     private suspend fun fetchAsync() {
-        _uiState.update { UiState.Loading }
+        _loadingState.update { LoadingState.Loading }
         repository.getComments(
             permalink,
             sort = _sort.value,
@@ -138,7 +158,7 @@ class ThreadViewModel(
             context = context
         )
         _sort.value = _sort.value ?: post.value?.suggestedSort
-        _uiState.update { UiState.Success }
+        _loadingState.update { LoadingState.Success }
     }
 
     suspend fun collapseAutomod() {
@@ -180,10 +200,6 @@ class ThreadViewModel(
         if (entity.comments == null) return
         val new = _comments.value.map { it.name }.toSet().toMutableSet()
         new -= entity.comments.toSet()
-        Log.d(
-            "ThreadViewModel",
-            "highlightNewComments: $new = ${_comments.value} - ${entity.comments}"
-        )
         _newComments.value = new
     }
 
@@ -258,6 +274,83 @@ class ThreadViewModel(
         val previousIndex = comments.take(index).indexOfLast { it.depth == 0 }
         if (previousIndex == -1) return
         listState.requestScrollToItem(previousIndex)
+    }
+
+    private fun upvote(name: Fullname) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.upvote(name)
+        }
+    }
+
+    private fun downvote(name: Fullname) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.downvote(name)
+        }
+    }
+
+    private fun save(name: Fullname, upvote: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.save(name, upvote)
+        }
+    }
+
+    private fun unsave(name: Fullname) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.unsave(name)
+        }
+    }
+
+    fun onEvent(event: CommentEvent) {
+        when (event) {
+            is VotableEvent.Upvote -> upvote(event.name)
+            is VotableEvent.Downvote -> downvote(event.name)
+            is VotableEvent.Save -> {
+                if (event.target) {
+                    save(event.name, event.upvote)
+                } else {
+                    unsave(event.name)
+                }
+            }
+
+            is CommentEvent.Collapse -> collapse(event.name, event.target)
+            is CommentEvent.ShowBar -> {
+                if (event.name != null) {
+                    toggleComment(event.name)
+                } else {
+                    _openComment.value = null
+                }
+            }
+
+            is VotableEvent.Reply -> {
+                replyTo(event.name)
+                dialogState.value = Dialog.Reply(event.name)
+            }
+
+            is VotableEvent.ShowEdit -> dialogState.value = Dialog.Edit(event.name)
+            is VotableEvent.ShowReport -> dialogState.value = Dialog.Report(event.name)
+            is VotableEvent.ShowShare -> dialogState.value = Dialog.Share(event.name)
+            is VotableEvent.ShowUser -> dialogState.value = Dialog.User(event.username)
+            is CommentEvent.ShowCopy -> dialogState.value = Dialog.Copy(event.name)
+        }
+    }
+
+    private fun collapse(
+        name: Fullname,
+        target: Boolean?,
+    ) {
+        viewModelScope.launch {
+            repository.collapseComment(name, target)
+        }
+    }
+
+    fun get(name: Fullname): Flow<CommentType?> {
+        return commentsRepository.get(name)
+    }
+
+    fun report(name: Fullname, reason: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.report(name, reason)
+        }
     }
 
 }
