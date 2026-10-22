@@ -2,7 +2,6 @@ package com.sofamaniac.crabir.ui.thread.comment
 
 import androidx.lifecycle.viewModelScope
 import com.sofamaniac.crabir.domain.model.votable.CommentType
-import com.sofamaniac.crabir.domain.repository.CommentsCacheScope
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.ui.votable.VotableViewModel
 import kotlinx.coroutines.Dispatchers
@@ -14,10 +13,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
-import org.koin.core.annotation.Scope
 
 @KoinViewModel
-@Scope(CommentsCacheScope::class)
 open class CommentViewModel(
     @InjectedParam comment: CommentType.Comment,
     repository: CommentsRepository,

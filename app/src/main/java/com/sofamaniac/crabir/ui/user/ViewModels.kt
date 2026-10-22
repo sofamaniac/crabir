@@ -24,7 +24,6 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.votable.CommentType
 import com.sofamaniac.crabir.domain.model.votable.VotableData
 import com.sofamaniac.crabir.domain.model.votable.post.PostData
-import com.sofamaniac.crabir.domain.repository.CommentsCacheScope
 import com.sofamaniac.crabir.domain.repository.feed.FeedRepositoryCommon
 import com.sofamaniac.crabir.domain.repository.feed.FeedSource
 import com.sofamaniac.crabir.domain.repository.profile.CommentsRepository
@@ -50,7 +49,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
-import org.koin.core.annotation.Scope
 
 @KoinViewModel
 class ProfileViewModel(
@@ -122,7 +120,6 @@ class OverviewViewModel(
 ) : ProfileFeedViewModel<VotableData>(username, repository, visitedPostsDao)
 
 @KoinViewModel
-@Scope(CommentsCacheScope::class)
 class CommentsViewModel(
     @InjectedParam username: String,
     repository: CommentsRepository,

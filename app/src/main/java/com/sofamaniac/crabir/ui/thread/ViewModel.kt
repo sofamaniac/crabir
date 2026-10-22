@@ -11,7 +11,6 @@ import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.votable.CommentType
 import com.sofamaniac.crabir.domain.model.votable.post.PostData
-import com.sofamaniac.crabir.domain.repository.CommentsCacheScope
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.domain.repository.accounts.AccountsStorage
 import com.sofamaniac.crabir.domain.repository.thread.ThreadRepository
@@ -32,7 +31,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
-import org.koin.core.annotation.Scope
 
 sealed class UiState {
     object Loading : UiState()
@@ -41,7 +39,6 @@ sealed class UiState {
 }
 
 @KoinViewModel
-@Scope(CommentsCacheScope::class)
 class ThreadViewModel(
     private val repository: ThreadRepository,
     private val commentsRepository: CommentsRepository,

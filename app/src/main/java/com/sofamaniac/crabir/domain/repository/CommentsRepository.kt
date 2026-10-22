@@ -12,14 +12,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Qualifier
-import org.koin.core.annotation.Scope
-import org.koin.core.annotation.Scoped
 import org.koin.core.annotation.Singleton
+import org.koin.core.annotation.ViewModelScope
 
-class CommentsCacheScope
 
-@Scoped
-@Scope(CommentsCacheScope::class)
+@ViewModelScope
 class CommentsRepository(
     override val api: RedditAPIService,
     override val cache: CommentsCache,
@@ -33,8 +30,7 @@ interface CommentsCache : Cache<CommentType> {
     fun getMany(names: Iterable<Fullname>): Flow<List<CommentType>>
 }
 
-@Scoped
-@Scope(CommentsCacheScope::class)
+@ViewModelScope
 class CommentsCacheImpl : CommentsCache {
     private val cache: MutableStateFlow<Map<Fullname, CommentType>> = MutableStateFlow(emptyMap())
     override suspend fun insert(thing: CommentType) {
