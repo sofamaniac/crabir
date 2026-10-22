@@ -6,27 +6,31 @@ import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
 import com.sofamaniac.crabir.data.remote.reddit.MoreResponseOuter
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
+import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.data.remote.reddit.commentSubmissionBody
 import com.sofamaniac.crabir.domain.model.Fullname
+import com.sofamaniac.crabir.domain.model.FullnameKind
 import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.votable.CommentType
 import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.domain.repository.LinksRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 import org.koin.core.annotation.ViewModelScope
 
 interface ThreadRepository {
 
     val comments: StateFlow<Iterable<CommentType>>
     val post: Flow<PostData?>
-    val depths: Flow<Map<Fullname, Int>>
     suspend fun getComments(
         permalink: String,
         sort: Sort? = null,
@@ -50,6 +54,7 @@ interface ThreadRepository {
     ): Result<MoreResponseOuter>
 
     suspend fun updateComment(name: Fullname, value: CommentType)
+    suspend fun collapseComment(name: Fullname, collapsed: Boolean?)
 
     /** Extract fullname from post permalink. */
     fun getPostId(permalink: String): Fullname
@@ -62,6 +67,14 @@ interface ThreadRepository {
      * @param comment The data of the comment
      */
     suspend fun insertReply(parent: Fullname, comment: CommentType)
+
+    suspend fun upvote(name: Fullname): Result<Unit>
+    suspend fun downvote(name: Fullname): Result<Unit>
+    suspend fun save(name: Fullname, upvote: Boolean): Result<Unit>
+    suspend fun unsave(name: Fullname): Result<Unit>
+
+    suspend fun getRules(): Result<Rules>
+    suspend fun report(name: Fullname, reason: String): Result<Unit>
 
 }
 
@@ -85,23 +98,18 @@ class ThreadRepositoryImpl(
             postsRepository.get(name)
         }
     }
-
     private val forest: MutableStateFlow<Forest> = MutableStateFlow(Forest.new(Fullname("")))
     override val comments: StateFlow<Iterable<CommentType>> = forest
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override val depths: Flow<Map<Fullname, Int>> = forest.flatMapLatest { flowOf(it.depth) }
-
 
     suspend fun fetchThread(
         permalink: String,
         sort: Sort? = null,
         comment: String? = null,
         context: Int? = null,
-    ) {
+    ) = withContext(Dispatchers.IO) {
         if (_post != null && forest.value.isNotEmpty()) {
             Log.d("ThreadRepository", "fetchThread: post already loaded")
-            return
+            return@withContext
         }
         _postNameFlow.value = getPostId(permalink)
         val response = api.getThread(permalink, sort = sort, comment = comment, context = context)
@@ -110,13 +118,13 @@ class ThreadRepositoryImpl(
             if (body != null) {
                 val data = body.post.data.children.first()
                 _post = PostDataMapper.map(data.data)
-                val forest = Forest.from(
+                val newForest = Forest.from(
                     body.comments.data.children,
                     _post!!.name
                 )
-                val list = forest.toList()
+                val list = newForest.toList()
                 repository.insert(list)
-                this.forest.value = forest
+                forest.value = newForest
                 postsRepository.insert(listOf(_post!!))
                 _postNameFlow.value = _post!!.name
             }
@@ -204,5 +212,63 @@ class ThreadRepositoryImpl(
         //comments = emptyList()
         forest.value = Forest.new(Fullname(""))
     }
+
+    override suspend fun upvote(name: Fullname): Result<Unit> {
+        return when (name.kind) {
+            FullnameKind.Post -> postsRepository.upvote(name)
+            FullnameKind.Comment -> repository.upvote(name)
+            else -> Result.failure(Exception("Invalid fullname kind"))
+        }
+    }
+
+    override suspend fun downvote(name: Fullname): Result<Unit> {
+        return when (name.kind) {
+            FullnameKind.Post -> postsRepository.downvote(name)
+            FullnameKind.Comment -> repository.downvote(name)
+            else -> Result.failure(Exception("Invalid fullname kind"))
+        }
+    }
+
+    override suspend fun save(name: Fullname, upvote: Boolean): Result<Unit> {
+        return when (name.kind) {
+            FullnameKind.Post -> postsRepository.save(name, upvote)
+            FullnameKind.Comment -> repository.save(name, upvote)
+            else -> Result.failure(Exception("Invalid fullname kind"))
+        }
+    }
+
+    override suspend fun unsave(name: Fullname): Result<Unit> {
+        return when (name.kind) {
+            FullnameKind.Post -> postsRepository.unsave(name)
+            FullnameKind.Comment -> repository.unsave(name)
+            else -> Result.failure(Exception("Invalid fullname kind"))
+        }
+    }
+
+    override suspend fun collapseComment(name: Fullname, collapsed: Boolean?) {
+        val commentOpt = repository.get(name).first() as? CommentType.Comment?
+        if (commentOpt == null) {
+            Log.e("ThreadRepository", "Comment not found")
+            return
+        }
+        val comment = commentOpt.comment
+        val newComment =
+            commentOpt.copy(comment = comment.copy(collapsed = collapsed ?: !comment.collapsed))
+        repository.update(newComment)
+    }
+
+    override suspend fun getRules(): Result<Rules> = withContext(Dispatchers.IO) {
+        if (_post == null) {
+            Result.failure(Exception("No subreddit"))
+        } else {
+            val subreddit = _post!!.subreddit
+            api.getRules(subreddit.subredditPrefixed)
+        }
+    }
+
+    override suspend fun report(name: Fullname, reason: String): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            api.report(name, reason)
+        }
 }
 

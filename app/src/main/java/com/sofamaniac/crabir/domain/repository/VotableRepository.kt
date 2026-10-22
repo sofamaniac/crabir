@@ -121,8 +121,20 @@ interface VotableRepository<T : VotableData> : Cache<T> {
         }
     }
 
-    suspend fun save(name: Fullname): Result<Unit> {
-        return saveHelper(name, true)
+    suspend fun save(name: Fullname, upvote: Boolean): Result<Unit> {
+        val post: T? = get(name).first()
+        return if (post == null) {
+            Log.e("PostRepository", "Post not found in cache")
+            Result.failure(PostNotFoundException(name))
+        } else {
+            val res = saveHelper(name, true)
+            if (res.isSuccess && post.relationship.liked != true) {
+                upvote(name)
+            } else {
+                res
+            }
+
+        }
     }
 
     suspend fun unsave(name: Fullname): Result<Unit> {

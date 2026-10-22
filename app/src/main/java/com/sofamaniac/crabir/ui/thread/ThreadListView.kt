@@ -1,11 +1,11 @@
 package com.sofamaniac.crabir.ui.thread
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,6 +22,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,18 +44,11 @@ fun ThreadListView(
     comment: String? = null,
     context: Int? = null,
 ) {
-    val listState = viewModel.listState
-    val uiState by viewModel.uiState.collectAsState()
-    val theme = LocalTheme.current
-    val navController = LocalNavController.current!!
+    val uiState by viewModel.loadingState.collectAsState()
     val refreshBoxState = rememberPullToRefreshState()
     val commentsSettings = LocalCommentsSettings.current
+    val isLoading = uiState == LoadingState.Loading
 
-    val isLoading = uiState == UiState.Loading
-
-    val comments by viewModel.comments.collectAsState()
-    val post by viewModel.post.collectAsState()
-    val depths by viewModel.depths.collectAsState()
     PullToRefreshBox(
         state = refreshBoxState,
         isRefreshing = isLoading,
@@ -66,6 +60,11 @@ fun ThreadListView(
             RefreshIndicator(isLoading, state = refreshBoxState)
         }
     ) {
+        val listState = viewModel.listState
+        val comments by viewModel.comments.collectAsState()
+        val openedComment by viewModel.openComment.collectAsState()
+        val newComments by viewModel.newComments.collectAsState()
+        val post by viewModel.post.collectAsState()
 
         if (post == null) return@PullToRefreshBox
         LazyColumn(
@@ -83,62 +82,26 @@ fun ThreadListView(
             }
             item {
                 if (!comment.isNullOrBlank()) {
-                    ThemedCard(
-                        //modifier = modifier,
-                        roundedCorners = false,
-                        onClick = {
-                            navController.navigate(PostRoute(postPermalink = viewModel.permalink))
-                        }
-                    ) {
-                        Text(
-                            stringResource(R.string.see_full_thread),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = theme.highlight,
-                            modifier = Modifier.padding(8.dp)
-                        )
-                    }
-                    HorizontalDivider()
+                    FullThreadCard(
+                        viewModel.permalink,
+                        R.string.see_full_thread,
+                        comment = null,
+                    )
                 }
             }
             item {
                 if (!comment.isNullOrBlank() && context == null) {
-                    ThemedCard(
-                        //modifier = modifier,
-                        roundedCorners = false,
-                        onClick = {
-                            navController.navigate(
-                                PostRoute(
-                                    postPermalink = viewModel.permalink,
-                                    comment = comment,
-                                    context = 8
-                                )
-                            )
-                        }
-                    ) {
-                        Text(
-                            stringResource(R.string.show_full_context),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = theme.highlight,
-                            modifier = Modifier.padding(8.dp)
-                        )
-                    }
-                    HorizontalDivider()
+                    FullThreadCard(
+                        viewModel.permalink,
+                        R.string.show_full_context,
+                        comment = viewModel.comment,
+                        context = 8
+                    )
                 }
             }
-            if (!comments.any() && !isLoading) {
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.Comment, contentDescription = null)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            stringResource(R.string.no_comments),
-                        )
-                    }
+            item {
+                if (!comments.any() && !isLoading) {
+                    NoComments()
                 }
             }
 
@@ -146,29 +109,84 @@ fun ThreadListView(
                 items = comments,
                 key = { it.name }
             ) { comment ->
-                when (comment) {
+                when (val c = comment) {
                     is CommentType.Comment -> {
+                        val children = remember(comment.name) {
+                            viewModel.getNumberOfChildren(comment.name)
+                        }
                         CommentNode(
                             depth = comment.depth,
-                            comment = comment,
-                            viewModel = viewModel,
+                            comment = c,
                             enableAnimation = !commentsSettings.buttonsAlwaysVisible,
+                            opened = openedComment == comment.name,
+                            isNew = newComments.contains(comment.name),
+                            onEvent = viewModel::onEvent,
+                            children = children
                         )
                     }
 
                     is CommentType.More -> {
                         MoreViewer(
-                            more = comment,
-                            depth = depths[comment.name] ?: comment.depth,
-                            viewModel = viewModel
+                            more = c,
+                            depth = comment.depth,
+                            fetchMore = viewModel::fetchMoreComments,
+                            permalink = viewModel.permalink,
                         )
                     }
                 }
             }
             item {
-                Spacer(modifier = Modifier.fillParentMaxHeight(0.1f))
+                Spacer(modifier = Modifier.fillParentMaxHeight(0.3f))
             }
         }
     }
 }
 
+@Composable
+private fun FullThreadCard(
+    permalink: String,
+    @StringRes text: Int,
+    comment: String?,
+    context: Int? = null,
+) {
+    val navController = LocalNavController.current
+    val theme = LocalTheme.current
+    ThemedCard(
+        //modifier = modifier,
+        roundedCorners = false,
+        onClick = {
+            navController?.navigate(
+                PostRoute(
+                    postPermalink = permalink,
+                    comment = comment,
+                    context = context
+                )
+            )
+        }
+    ) {
+        Text(
+            stringResource(text),
+            style = MaterialTheme.typography.titleSmall,
+            color = theme.highlight,
+            modifier = Modifier.padding(8.dp)
+        )
+    }
+    HorizontalDivider()
+}
+
+@Composable
+private fun NoComments() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Icon(Icons.AutoMirrored.Filled.Comment, contentDescription = null)
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            stringResource(R.string.no_comments),
+        )
+    }
+}

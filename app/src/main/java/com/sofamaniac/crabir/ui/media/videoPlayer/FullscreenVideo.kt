@@ -40,7 +40,7 @@ fun FullscreenVideo(
 ) {
     val post = viewModel.post.collectAsState(initial = null).value ?: return
     var showDecorations by remember { mutableStateOf(true) }
-    val video = getVideoUrl(post)!!
+    val video = remember { getVideoUrl(post)!! }
     val downloadUrl = post.getDownloadUrl()
     SaveToHistory(post.name, post.over18)
     VerticalSwipeToDismiss(
@@ -113,7 +113,6 @@ fun FullscreenVideo(
 
 fun PostData.getDownloadUrl(): Uri? {
     val default = getVideoUrl(this)?.url?.toUri()
-    val ext = default?.lastPathSegment?.split(".")?.last()
     if (default == null || !default.isVideoUrl()) {
         return this.preview?.redditVideoPreview?.fallbackUrl?.toUri()
     }

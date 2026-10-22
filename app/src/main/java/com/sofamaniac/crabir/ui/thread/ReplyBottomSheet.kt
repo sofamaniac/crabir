@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -65,13 +65,16 @@ fun ReplyBottomSheet(viewModel: ThreadViewModel) {
                     Text(stringResource(R.string.cancel))
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                TextButton(onClick = {
-                    viewModel.submitComment(
-                        parent.name,
-                        textFieldState.text.toString(),
-                        account = selectedAccount
-                    )
-                }) {
+                TextButton(
+                    enabled = textFieldState.text.isNotBlank(),
+                    onClick = {
+                        viewModel.submitComment(
+                            parent.name,
+                            textFieldState.text.toString(),
+                            account = selectedAccount
+                        )
+                    }
+                ) {
                     Text(stringResource(R.string.submit))
                 }
             }
@@ -81,7 +84,7 @@ fun ReplyBottomSheet(viewModel: ThreadViewModel) {
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.5f),
+                    .heightIn(min = 100.dp),
                 state = textFieldState,
                 label = {
                     Text(

@@ -82,6 +82,8 @@ interface SubredditAPI {
     ): Result<Unit>
 
     @GET("{subreddit}/about/rules.json")
+    /** Get the rules of a subreddit.
+     * @param subreddit The name of the subreddit with the `r/` prefix*/
     suspend fun getRules(@Path("subreddit", encoded = true) subreddit: String): Result<Rules>
 
     @FormUrlEncoded
