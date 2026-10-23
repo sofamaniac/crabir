@@ -69,14 +69,14 @@ class CrosspostCreatorViewModel(
         loading = true
         state = state.copy(
             title = titleState.text as String,
-            subreddit = community?.displayName ?: ""
+            subreddit = community.value?.displayName ?: ""
         )
         val submission = state.build()
         return if (submission.isFailure) {
             Log.e("PostCreatorViewModel", "submit: ${submission.exceptionOrNull()}")
-            error = submission.exceptionOrNull() as SubmissionBuilderError?
+            errorState.value = submission.exceptionOrNull() as SubmissionBuilderError?
             loading = false
-            Result.failure(error!!)
+            Result.failure(error.value!!)
         } else {
             val res = api.submitPost(submission.getOrThrow(), account = account)
             loading = false

@@ -30,6 +30,8 @@ import com.sofamaniac.crabir.domain.repository.DraftsRepository
 import com.sofamaniac.crabir.domain.repository.accounts.AccountsStorage
 import com.sofamaniac.crabir.flatten
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
@@ -37,30 +39,32 @@ import org.koin.core.annotation.KoinViewModel
 abstract class CreatorViewModel(
     protected val api: RedditAPIService,
 ) : ViewModel() {
-    var community: SubredditData? by mutableStateOf(null)
-        protected set
+    protected var communityState: MutableStateFlow<SubredditData?> = MutableStateFlow(null)
+    val community: StateFlow<SubredditData?> = communityState
 
-    var rules: Rules by mutableStateOf(Rules())
-        private set
-    var flairs: List<FlairInfo> by mutableStateOf(emptyList())
-        private set
+    private var _rules: MutableStateFlow<Rules> = MutableStateFlow(Rules())
+    val rules: StateFlow<Rules> = _rules
 
-    var error: SubmissionBuilderError? by mutableStateOf(null)
-        protected set
+    private var flairsState: MutableStateFlow<List<FlairInfo>> = MutableStateFlow(emptyList())
+    val flairs: StateFlow<List<FlairInfo>> = flairsState
+
+    protected var errorState: MutableStateFlow<SubmissionBuilderError?> = MutableStateFlow(null)
+    val error: StateFlow<SubmissionBuilderError?> = errorState
+
 
     val titleState = TextFieldState()
 
     suspend fun getRules() {
-        if (rules.siteRules.isNotEmpty()) return
-        val res = api.getRules(community!!.displayNamePrefixed)
+        if (rules.value.siteRules.isNotEmpty()) return
+        val res = api.getRules(community.value!!.displayNamePrefixed)
         if (res.isSuccess) {
-            rules = res.getOrNull()!!
+            _rules.value = res.getOrNull()!!
         }
     }
 
     fun setSubreddit(subreddit: SubredditData) {
         viewModelScope.launch {
-            community = subreddit
+            communityState.value = subreddit
             getRules()
             getFlairs()
         }
@@ -68,14 +72,14 @@ abstract class CreatorViewModel(
 
 
     fun resetSubreddit() {
-        community = null
+        communityState.value = null
     }
 
     suspend fun getFlairs() {
-        if (flairs.isNotEmpty() || community == null) return
-        val res = api.getPostFlair(community!!.displayNamePrefixed)
+        if (flairs.value.isNotEmpty() || community.value == null) return
+        val res = api.getPostFlair(community.value!!.displayNamePrefixed)
         if (res.isSuccess) {
-            flairs = res.getOrNull()!!
+            flairsState.value = res.getOrNull()!!
         }
     }
 }
@@ -148,7 +152,7 @@ class PostCreatorViewModel(
         viewModelScope.launch {
             val sub = communities.getBySlug(subreddit)
             if (sub == null) return@launch
-            community = sub
+            communityState.value = sub
             getRules()
             getFlairs()
         }
@@ -197,15 +201,15 @@ class PostCreatorViewModel(
             title = titleState.text as String,
             text = textState.text as String,
             url = urlState.text as String,
-            subreddit = community?.displayName ?: ""
+            subreddit = community.value?.displayName ?: ""
         )
         setKind(context)
         var submission = state.build()
         if (submission.isFailure) {
             Log.e("PostCreatorViewModel", "submit: ${submission.exceptionOrNull()}")
-            error = submission.exceptionOrNull() as SubmissionBuilderError?
+            errorState.value = submission.exceptionOrNull() as SubmissionBuilderError?
             loading = false
-            return Result.failure(error!!)
+            return Result.failure(error.value!!)
         } else {
             val mediaIds = uploadMedia(
                 context,
@@ -245,7 +249,7 @@ class PostCreatorViewModel(
             title = title,
             url = url,
             text = text,
-            subreddit = community,
+            subreddit = community.value,
             nsfw = state.nsfw,
             spoiler = state.spoiler,
             flairId = state.flairId,

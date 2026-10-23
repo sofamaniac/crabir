@@ -94,6 +94,8 @@ fun PostCreator(
     val initialAccount = LocalRedditAccount.current
     var selectedAccount by remember { mutableStateOf(initialAccount) }
     val accounts by viewModel.accounts.collectAsState(emptyList())
+    val error by viewModel.error.collectAsState()
+    val flairs by viewModel.flairs.collectAsState()
     fun submit() {
         scope.launch {
             val res = viewModel.submit(context, account = selectedAccount)
@@ -137,16 +139,16 @@ fun PostCreator(
                         label = { Text(stringResource(R.string.title_field)) },
                         inputTransformation = InputTransformation.maxLength(300),
                         modifier = Modifier.fillMaxWidth(),
-                        isError = viewModel.error is MissingTitle,
+                        isError = error is MissingTitle,
                         supportingText = {
-                            if (viewModel.error is MissingTitle)
+                            if (error is MissingTitle)
                                 Text(
                                     stringResource(R.string.missing_title_error),
                                     color = MaterialTheme.colorScheme.error
                                 )
                         },
                         trailingIcon = {
-                            if (viewModel.error is MissingTitle)
+                            if (error is MissingTitle)
                                 Icon(
                                     Icons.Filled.Error,
                                     contentDescription = null,
@@ -162,7 +164,7 @@ fun PostCreator(
             }
             if (viewModel.state.flairId != null) {
                 item {
-                    val flair = viewModel.flairs.find { it.id == viewModel.state.flairId }
+                    val flair = flairs.find { it.id == viewModel.state.flairId }
                     val text = viewModel.state.flairText ?: flair?.text ?: ""
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(text)
@@ -256,7 +258,7 @@ fun PostCreator(
                 viewModel.getFlairs()
             }
             FlairDialog(
-                viewModel.flairs,
+                flairs,
                 onSelect = { flair ->
                     viewModel.state = viewModel.state.copy(flairId = flair.id)
                 },
@@ -271,7 +273,7 @@ fun PostCreator(
             val initialText = viewModel.state.flairText
             FlairEditBox(
                 initialText,
-                viewModel.flairs.find { it.id == viewModel.state.flairId }!!,
+                flairs.find { it.id == viewModel.state.flairId }!!,
                 onConfirm = { flairText ->
                     viewModel.state = viewModel.state.copy(flairText = flairText)
                 },
@@ -426,7 +428,8 @@ fun FlairEditBox(
 
 @Composable
 internal fun UrlField(viewModel: PostCreatorViewModel) {
-    val isError = viewModel.error is InvalidUrl || viewModel.error is MissingUrl
+    val error by viewModel.error.collectAsState()
+    val isError = error is InvalidUrl || error is MissingUrl
     TextField(
         lineLimits = TextFieldLineLimits.SingleLine,
         state = viewModel.urlState,
