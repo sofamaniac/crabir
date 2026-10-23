@@ -95,6 +95,8 @@ fun CrosspostCreator(
     val initialAccount = LocalRedditAccount.current
     var selectedAccount by remember { mutableStateOf(initialAccount) }
     val accounts by viewModel.accounts.collectAsState(emptyList())
+    val error by viewModel.error.collectAsState()
+    val flairs by viewModel.flairs.collectAsState()
     Box {
         Scaffold(
             containerColor = theme.cardBackground,
@@ -137,16 +139,16 @@ fun CrosspostCreator(
                     label = { Text(stringResource(R.string.title_field)) },
                     inputTransformation = InputTransformation.maxLength(300),
                     modifier = Modifier.fillMaxWidth(),
-                    isError = viewModel.error is MissingTitle,
+                    isError = error is MissingTitle,
                     supportingText = {
-                        if (viewModel.error is MissingTitle)
+                        if (error is MissingTitle)
                             Text(
                                 stringResource(R.string.missing_title_error),
                                 color = MaterialTheme.colorScheme.error
                             )
                     },
                     trailingIcon = {
-                        if (viewModel.error is MissingTitle)
+                        if (error is MissingTitle)
                             Icon(
                                 Icons.Filled.Error,
                                 contentDescription = null,
@@ -158,8 +160,10 @@ fun CrosspostCreator(
                     "${viewModel.titleState.text.length}/300",
                     modifier = Modifier.align(Alignment.End)
                 )
-                if (viewModel.flairs.isNotEmpty()) {
-                    TextButton(onClick = {}) {
+                if (flairs.isNotEmpty()) {
+                    TextButton(onClick = {
+                        // TODO
+                    }) {
                         Text(stringResource(R.string.flair_field))
                     }
                 }
