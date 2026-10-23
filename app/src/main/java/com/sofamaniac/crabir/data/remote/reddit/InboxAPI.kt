@@ -62,7 +62,7 @@ interface InboxAPI {
         @Field("text") body: String,
         @Field("api_type") apiType: String = "json",
         @Tag account: RedditAccount? = null,
-    ): Result<PostResponse>
+    ): Result<RedditResponse<PostResponseData>>
 
     @FormUrlEncoded
     @POST("/api/comment")
@@ -72,7 +72,7 @@ interface InboxAPI {
         @Field("return_rtjson") returnRtjson: Boolean = true,
         @Field("api_type") apiType: String = "json",
         @Tag account: RedditAccount? = null,
-    ): Result<PostResponse>
+    ): Result<RedditResponse<PostResponseData>>
 
     @POST("/api/del_msg")
     suspend fun delete(@Query("id") id: String): Result<Unit>

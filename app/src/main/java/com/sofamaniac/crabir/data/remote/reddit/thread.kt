@@ -47,14 +47,7 @@ interface ThreadAPI {
     ): Result<CommentsResponse>
 
     /**
-     * Gets the post and comments for a post.
-     *
-     * @param subreddit The name of the subreddit where the post is located.
-     * @param id The ID of the post.
-     * @param comment focal point of the returned view
-     * @param context Number of parents to be shown when [comment] is set
-     * @param depth is the maximum depth of subtrees in the thread
-     * @param showMore whether to show [More] or not
+     * Gets the post and comments for a post from its permalink.
      */
     @GET("{permalink}.json")
     suspend fun getThread(
@@ -82,13 +75,13 @@ interface ThreadAPI {
         @Query("children") children: String,
         @Query("api_type") apiType: String = "json",
         @Query("sort") sort: Sort? = null,
-    ): Result<MoreResponseOuter>
+    ): Result<RedditResponse<MoreResponseData>>
 
     @POST("api/comment")
     suspend fun submitComment(
         @Body body: RequestBody,
         @Tag account: RedditAccount?,
-    ): Result<MoreResponseOuter>
+    ): Result<RedditResponse<MoreResponseData>>
 }
 
 fun commentSubmissionBody(parentId: Fullname, text: String): RequestBody {

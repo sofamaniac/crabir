@@ -28,6 +28,7 @@ import com.sofamaniac.crabir.domain.model.RedditAccount
 import com.sofamaniac.crabir.domain.model.SubredditData
 import com.sofamaniac.crabir.domain.repository.DraftsRepository
 import com.sofamaniac.crabir.domain.repository.accounts.AccountsStorage
+import com.sofamaniac.crabir.flatten
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
@@ -224,19 +225,14 @@ class PostCreatorViewModel(
                 api.submitGalleryPost(galleryFinal, account)
             } else {
                 api.submitPost(submission.getOrThrow(), account)
-            }
-            loading = false
-            return if (res.isSuccess) {
-                val response = res.getOrNull()
-                Log.d("PostCreatorViewModel", "submit: $response")
-                if (response?.json?.errors?.isNotEmpty() == true) {
-                    Result.failure(Exception(response.json.errors.toString()))
-                } else {
-                    Result.success(Unit)
+            }.map {
+                it.toResult().map { Unit }
+            }.flatten()
+                .onFailure {
+                    Log.e("PostCreatorViewModel", "submit: $it")
                 }
-            } else {
-                Result.failure(Exception("Failed to submit post: ${res.exceptionOrNull()}"))
-            }
+            loading = false
+            return res
         }
     }
 

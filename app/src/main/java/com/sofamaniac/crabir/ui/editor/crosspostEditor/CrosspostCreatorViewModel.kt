@@ -19,6 +19,7 @@ import com.sofamaniac.crabir.domain.repository.CrosspostCommunitiesRepository
 import com.sofamaniac.crabir.domain.repository.LinksRepository
 import com.sofamaniac.crabir.domain.repository.ListingSource
 import com.sofamaniac.crabir.domain.repository.accounts.AccountsStorage
+import com.sofamaniac.crabir.flatten
 import com.sofamaniac.crabir.ui.editor.postEditor.CreatorViewModel
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.annotation.InjectedParam
@@ -71,25 +72,21 @@ class CrosspostCreatorViewModel(
             subreddit = community?.displayName ?: ""
         )
         val submission = state.build()
-        if (submission.isFailure) {
+        return if (submission.isFailure) {
             Log.e("PostCreatorViewModel", "submit: ${submission.exceptionOrNull()}")
             error = submission.exceptionOrNull() as SubmissionBuilderError?
             loading = false
-            return Result.failure(error!!)
+            Result.failure(error!!)
         } else {
             val res = api.submitPost(submission.getOrThrow(), account = account)
             loading = false
-            return if (res.isSuccess) {
-                val response = res.getOrNull()
-                Log.d("PostCreatorViewModel", "submit: $response")
-                if (response?.json?.errors?.isNotEmpty() == true) {
-                    Result.failure(Exception(response.json.errors.toString()))
-                } else {
-                    Result.success(Unit)
-                }
-            } else {
-                Result.failure(Exception("Failed to submit post: ${res.exceptionOrNull()}"))
-            }
+            res.onFailure {
+                Log.e("PostCreatorViewModel", "submit: $it")
+            }.map {
+                it.toResult().onFailure { err ->
+                    Log.e("PostCreatorViewModel", "submit: $err")
+                }.map { Unit }
+            }.flatten()
         }
     }
 }

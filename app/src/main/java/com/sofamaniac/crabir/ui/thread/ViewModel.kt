@@ -233,12 +233,12 @@ class ThreadViewModel(
     fun submitComment(parent: Fullname, body: String, account: RedditAccount?) {
         viewModelScope.launch(Dispatchers.IO) {
             val response = repository.postComment(parent, body, account = account)
+            // TODO display error if any
             if (!response.isSuccess) {
                 return@launch
             }
-            val result = response.getOrNull()?.json ?: return@launch
-            // TODO display error if any
-            val comment = result.data?.things?.firstOrNull() ?: return@launch
+            val result = response.getOrNull() ?: return@launch
+            val comment = result.things.firstOrNull() ?: return@launch
             val commentDTO = comment as Thing.Comment
             var commentData = CommentDataMapper.map(commentDTO.data)
             commentData =
@@ -274,25 +274,25 @@ class ThreadViewModel(
     }
 
     private fun upvote(name: Fullname) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.upvote(name)
         }
     }
 
     private fun downvote(name: Fullname) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.downvote(name)
         }
     }
 
     private fun save(name: Fullname, upvote: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.save(name, upvote)
         }
     }
 
     private fun unsave(name: Fullname) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.unsave(name)
         }
     }
@@ -345,7 +345,7 @@ class ThreadViewModel(
     }
 
     fun report(name: Fullname, reason: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.report(name, reason)
         }
     }
