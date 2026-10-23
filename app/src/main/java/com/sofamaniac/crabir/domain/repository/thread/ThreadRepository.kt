@@ -4,7 +4,7 @@ import android.util.Log
 import com.sofamaniac.crabir.data.remote.dto.Timeframe
 import com.sofamaniac.crabir.data.remote.dto.comment.Sort
 import com.sofamaniac.crabir.data.remote.dto.post.PostDataMapper
-import com.sofamaniac.crabir.data.remote.reddit.MoreResponseOuter
+import com.sofamaniac.crabir.data.remote.reddit.MoreResponseData
 import com.sofamaniac.crabir.data.remote.reddit.RedditAPIService
 import com.sofamaniac.crabir.data.remote.reddit.Rules
 import com.sofamaniac.crabir.data.remote.reddit.commentSubmissionBody
@@ -15,6 +15,7 @@ import com.sofamaniac.crabir.domain.model.votable.CommentType
 import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.domain.repository.CommentsRepository
 import com.sofamaniac.crabir.domain.repository.LinksRepository
+import com.sofamaniac.crabir.flatten
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -52,7 +53,7 @@ interface ThreadRepository {
         parentId: Fullname,
         comment: String,
         account: RedditAccount?,
-    ): Result<MoreResponseOuter>
+    ): Result<MoreResponseData>
 
     suspend fun updateComment(name: Fullname, value: CommentType)
     suspend fun collapseComment(name: Fullname, collapsed: Boolean?)
@@ -194,9 +195,12 @@ class ThreadRepositoryImpl(
         parentId: Fullname,
         comment: String,
         account: RedditAccount?,
-    ): Result<MoreResponseOuter> {
+    ): Result<MoreResponseData> {
         val body = commentSubmissionBody(parentId, comment)
-        return api.submitComment(body, account)
+        val res = api.submitComment(body, account)
+        return res.map {
+            it.toResult()
+        }.flatten()
     }
 
     override suspend fun updateComment(

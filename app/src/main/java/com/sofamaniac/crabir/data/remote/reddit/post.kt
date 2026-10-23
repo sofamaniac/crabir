@@ -40,13 +40,13 @@ interface PostAPI {
     suspend fun submitPost(
         @FieldMap post: Map<String, String>,
         @Tag account: RedditAccount?,
-    ): Result<PostResponse>
+    ): Result<RedditResponse<PostResponseData>>
 
     @POST("api/submit_gallery_post.json")
     suspend fun submitGalleryPost(
         @Body body: GallerySubmission,
         @Tag account: RedditAccount?,
-    ): Result<PostResponse>
+    ): Result<RedditResponse<PostResponseData>>
 
     @FormUrlEncoded
     @POST("api/media/asset.json")
@@ -112,15 +112,9 @@ interface PostAPI {
     ): Result<List<FlairInfo>>
 }
 
-@Serializable
-data class PostResponse(
-    val json: PostResponseInner,
-)
 
 @Serializable
-data class PostResponseInner(
-    val errors: List<List<String>> = emptyList(),
-)
+data class PostResponseData(val url: String, val id: String, val name: Fullname)
 
 interface MediaUploadInterface {
     @POST

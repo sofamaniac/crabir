@@ -11,6 +11,10 @@ fun <T> Result<T>.toOption(): T? {
     }
 }
 
+fun <T> Result<Result<T>>.flatten(): Result<T> {
+    return this.fold(onSuccess = { it }, onFailure = { Result.failure(it) })
+}
+
 inline fun <T, F> T?.map(default: () -> F, map: (T) -> F): F {
     return if (this != null) {
         map(this)
