@@ -404,7 +404,9 @@ fun RenderMixed(nodes: List<Richtext>, context: Context, modifier: Modifier = Mo
         val text = nodes.fold(AnnotatedString("")) { acc, child ->
             acc + (child as Richtext.TextNode).toAnnotatedString(context)
         }
-        Text(text, modifier = modifier)
+        // remove double spaces
+        val textFinal = text.replace(Regex(" +"), " ")
+        Text(textFinal, modifier = modifier)
     } else {
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(0.dp, alignment = Alignment.Start),
@@ -414,8 +416,9 @@ fun RenderMixed(nodes: List<Richtext>, context: Context, modifier: Modifier = Mo
                 if (child is Richtext.TextNode) {
                     acc + child.toAnnotatedString(context)
                 } else {
-                    if (acc.isNotEmpty()) {
-                        Text(acc)
+                    val textFinal = acc.replace(Regex(" +"), " ")
+                    if (textFinal.isNotEmpty()) {
+                        Text(textFinal)
                     }
                     context.configuration.components.render(child, context)
                     AnnotatedString("")
