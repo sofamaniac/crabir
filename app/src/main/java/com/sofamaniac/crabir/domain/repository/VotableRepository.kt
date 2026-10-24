@@ -16,37 +16,35 @@ import kotlinx.coroutines.withContext
 
 interface VotableRepository<T : VotableData> : Cache<T> {
     val api: RedditAPIService
-    val votableDao: VotableDao
+    val cache: Cache<T>
 
-    fun VotableEntity?.transform(): T?
-
-    override suspend fun insert(things: List<T>) = withContext(Dispatchers.IO) {
-        votableDao.insert(things.map { it.toEntity() })
+    override suspend fun insert(things: List<T>) {
+        cache.insert(things)
     }
 
-    override suspend fun insert(thing: T) = withContext(Dispatchers.IO) {
-        votableDao.insert(thing.toEntity())
+    override suspend fun insert(thing: T) {
+        cache.insert(thing)
     }
 
     override fun get(name: Fullname): Flow<T?> =
-        votableDao.get(name).map { it.transform() }.distinctUntilChanged()
+        cache.get(name)
 
-    override suspend fun getAsync(name: Fullname): T? = withContext(Dispatchers.IO) {
-        votableDao.getValue(name)?.transform()
+    override suspend fun getAsync(name: Fullname): T? {
+        return cache.getAsync(name)
     }
 
-    override suspend fun update(thing: T) = withContext(Dispatchers.IO) {
-        votableDao.update(thing.name, thing.toEntity().data)
+    override suspend fun update(thing: T) {
+        cache.update(thing)
     }
 
-    override suspend fun clear() = withContext(Dispatchers.IO) {
-        votableDao.clear()
+    override suspend fun clear() {
+        cache.clear()
     }
 
     override suspend fun delete(name: Fullname) = withContext(Dispatchers.IO) {
         val res = api.delete(name)
         if (res.isSuccess) {
-            votableDao.delete(name)
+            cache.delete(name)
         } else {
             Log.e("VotableRepository", "Failed to delete: ${res.exceptionOrNull()}")
         }
@@ -75,7 +73,7 @@ interface VotableRepository<T : VotableData> : Cache<T> {
     }
 
     suspend fun vote(name: Fullname, upvote: Boolean?): Result<Unit> = withContext(Dispatchers.IO) {
-        val thing: VotableData? = get(name).first()
+        val thing: T? = get(name).first()
         if (thing == null) {
             Log.e("PostRepository", "Post not found in cache")
             return@withContext Result.failure(Exception("Post not found"))
@@ -91,13 +89,13 @@ interface VotableRepository<T : VotableData> : Cache<T> {
         val newPost = thing.copy(
             relationship = relationship,
         ).updateScore(oldLikes, newLikes)
-        votableDao.update(name, newPost.toEntity().data)
+        cache.update(newPost as T)
         val res = api.vote(thing.name, dir)
         if (res.isFailure) {
-            votableDao.update(name, thing.toEntity().data)
+            cache.update(thing)
             Log.e("PostRepository", "Error upvoting post: ${res.exceptionOrNull()}")
         }
-        res
+        return@withContext res
     }
 
     suspend fun upvote(name: Fullname): Result<Unit> {
@@ -108,22 +106,19 @@ interface VotableRepository<T : VotableData> : Cache<T> {
         return vote(name, false)
     }
 
-
     suspend fun saveHelper(name: Fullname, target: Boolean): Result<Unit> =
         withContext(Dispatchers.IO) {
-            val post: VotableData? = get(name).first()
-            if (post == null) {
-                return@withContext Result.failure(PostNotFoundException(name))
-            }
+            val post: T? = get(name).first()
+            if (post == null) return@withContext Result.failure(PostNotFoundException(name))
             val relationship = post.relationship.copy(saved = target)
             val newPost = post.copy(relationship = relationship)
-            votableDao.update(name, newPost.toEntity().data)
+            cache.update(newPost as T)
             val res = if (target) api.save(post.name) else api.unsave(post.name)
             if (res.isSuccess) {
                 Result.success(Unit)
             } else {
                 // restore old value on failure
-                votableDao.update(name, post.toEntity().data)
+                cache.update(post)
                 Log.e("PostRepository", "Error saving post: ${res.exceptionOrNull()}")
                 Result.failure(Exception("Error saving post"))
             }
@@ -143,6 +138,39 @@ interface VotableRepository<T : VotableData> : Cache<T> {
     suspend fun unsave(name: Fullname): Result<Unit> {
         return saveHelper(name, false)
     }
+}
+
+abstract class VotableCache<T : VotableData> : Cache<T> {
+    protected abstract val cache: VotableDao
+    abstract fun VotableEntity?.transform(): T?
+
+    override suspend fun insert(things: List<T>) = withContext(Dispatchers.IO) {
+        cache.insert(things.map { it.toEntity() })
+    }
+
+    override suspend fun insert(thing: T) = withContext(Dispatchers.IO) {
+        cache.insert(thing.toEntity())
+    }
+
+    override fun get(name: Fullname): Flow<T?> =
+        cache.get(name).map { it.transform() }.distinctUntilChanged()
+
+    override suspend fun getAsync(name: Fullname): T? = withContext(Dispatchers.IO) {
+        cache.getValue(name)?.transform()
+    }
+
+    override suspend fun update(thing: T) = withContext(Dispatchers.IO) {
+        cache.update(thing.name, thing.toEntity().data)
+    }
+
+    override suspend fun delete(name: Fullname) = withContext(Dispatchers.IO) {
+        cache.delete(name)
+    }
+
+    override suspend fun clear() = withContext(Dispatchers.IO) {
+        cache.clear()
+    }
+
 }
 
 inline fun <R, T> Result<T>.then(transform: (T) -> Result<R>): Result<R> {
