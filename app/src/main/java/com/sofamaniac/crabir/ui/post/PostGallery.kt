@@ -6,6 +6,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +17,6 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -220,14 +220,7 @@ fun EmbeddedGallery(
                                         )
                                     }
                                 },
-                                fullscreenButton = {
-                                    IconButton(onClick = goFullscreen) {
-                                        Icon(
-                                            Icons.Default.Fullscreen,
-                                            contentDescription = "Go Fullscreen"
-                                        )
-                                    }
-                                }
+                                goFullscreen = goFullscreen,
                             )
 
 
@@ -316,12 +309,14 @@ fun FullscreenGallery(
             FullscreenBottomBar(post, showDecorations) {
                 val title = gallery.images[state.currentPage].caption
                 if (showControls) {
-                    PlayerControls {
-                        IconButton(onClick = dismiss) {
-                            Icon(
-                                Icons.Default.FullscreenExit,
-                                contentDescription = "Exit Fullscreen"
-                            )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        PlayerControls {
+                            IconButton(onClick = dismiss) {
+                                Icon(
+                                    Icons.Default.FullscreenExit,
+                                    contentDescription = "Exit Fullscreen"
+                                )
+                            }
                         }
                     }
                 }

@@ -42,7 +42,6 @@ fun PlayerControls(
     fullscreenButton: @Composable (() -> Unit)? = null,
 ) {
     val player = VideoPlayerManager.getInstance()
-    var showQualityMenu by remember { mutableStateOf(false) }
     var currentTracks by remember { mutableStateOf(player.currentTracks) }
 
     DisposableEffect(player) {
@@ -57,7 +56,7 @@ fun PlayerControls(
         }
     }
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .background(color = Color.Black.copy(alpha = 0.3f))
@@ -65,66 +64,74 @@ fun PlayerControls(
         PlayPauseButton(player = player, tint = Color.White)
         PositionText(player = player, color = Color.White)
         SeekProgressBar(
-            player, Modifier
-                .weight(1f)
-                .fillMaxWidth(),
+            player,
+            Modifier
+                .fillMaxWidth()
+                .weight(1f),
             sliderColors = SliderDefaults.colors().copy(
                 thumbColor = Color.White,
                 activeTrackColor = Color.White,
                 inactiveTrackColor = Color.Gray
             )
         )
+        DurationText(player = player, color = Color.White)
         if (currentTracks.groups.any { it.type == C.TRACK_TYPE_VIDEO }) {
-            Box {
-                IconButton(onClick = { showQualityMenu = true }) {
-                    Icon(
-                        Icons.Default.Settings,
-                        contentDescription = stringResource(R.string.change_quality),
-                        tint = Color.White
-                    )
-                }
-                DropdownMenu(
-                    expanded = showQualityMenu,
-                    onDismissRequest = { showQualityMenu = false }
-                ) {
-                    val isAuto = VideoPlayerManager.isAuto()
+            QualityMenu(currentTracks)
+        }
+        fullscreenButton?.invoke()
+    }
+}
 
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(R.string.quality_auto)) },
-                        trailingIcon = {
-                            if (isAuto) {
-                                Icon(Icons.Default.Check, contentDescription = null)
+@Composable
+private fun QualityMenu(
+    currentTracks: Tracks,
+) {
+    var showQualityMenu by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { showQualityMenu = true }) {
+            Icon(
+                Icons.Default.Settings,
+                contentDescription = stringResource(R.string.change_quality),
+                tint = Color.White
+            )
+        }
+        DropdownMenu(
+            expanded = showQualityMenu,
+            onDismissRequest = { showQualityMenu = false }
+        ) {
+            val isAuto = VideoPlayerManager.isAuto()
+            DropdownMenuItem(
+                text = { Text(text = stringResource(R.string.quality_auto)) },
+                trailingIcon = {
+                    if (isAuto) {
+                        Icon(Icons.Default.Check, contentDescription = null)
+                    }
+                },
+                onClick = {
+                    VideoPlayerManager.setAutoTrack()
+                    showQualityMenu = false
+                }
+            )
+            for (group in currentTracks.groups.filter { it.type == C.TRACK_TYPE_VIDEO }) {
+                for (i in 0 until group.length) {
+                    val format = group.getTrackFormat(i)
+                    if (format.height > 0) {
+                        val isSelected = group.isTrackSelected(i)
+                        DropdownMenuItem(
+                            text = { Text(text = "${format.height}p") },
+                            trailingIcon = {
+                                if (isSelected && !isAuto) {
+                                    Icon(Icons.Default.Check, contentDescription = null)
+                                }
+                            },
+                            onClick = {
+                                VideoPlayerManager.setTrack(group, i)
+                                showQualityMenu = false
                             }
-                        },
-                        onClick = {
-                            VideoPlayerManager.setAutoTrack()
-                            showQualityMenu = false
-                        }
-                    )
-                    for (group in currentTracks.groups.filter { it.type == C.TRACK_TYPE_VIDEO }) {
-                        for (i in 0 until group.length) {
-                            val format = group.getTrackFormat(i)
-                            if (format.height > 0) {
-                                val isSelected = group.isTrackSelected(i)
-                                DropdownMenuItem(
-                                    text = { Text(text = "${format.height}p") },
-                                    trailingIcon = {
-                                        if (isSelected && !isAuto) {
-                                            Icon(Icons.Default.Check, contentDescription = null)
-                                        }
-                                    },
-                                    onClick = {
-                                        VideoPlayerManager.setTrack(group, i)
-                                        showQualityMenu = false
-                                    }
-                                )
-                            }
-                        }
+                        )
                     }
                 }
             }
         }
-        DurationText(player = player, color = Color.White)
-        fullscreenButton?.invoke()
     }
 }

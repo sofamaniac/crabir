@@ -11,15 +11,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Fullscreen
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -163,17 +158,7 @@ fun PostVideo(
             modifier = modifier,
             cartouche = cartouche,
             quality = videoQuality,
-            fullscreenButton = {
-                IconButton(onClick = {
-                    goFullscreen()
-                }) {
-                    Icon(
-                        Icons.Default.Fullscreen,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
-                }
-            }
+            goFullscreen = goFullscreen,
         )
     }
 }
