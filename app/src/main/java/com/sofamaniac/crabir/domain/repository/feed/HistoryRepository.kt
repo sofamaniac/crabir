@@ -1,5 +1,6 @@
 package com.sofamaniac.crabir.domain.repository.feed
 
+import android.util.Log
 import androidx.paging.PagingSource
 import com.sofamaniac.crabir.data.local.dao.VisitedPostsDao
 import com.sofamaniac.crabir.domain.model.Fullname
@@ -11,25 +12,22 @@ import org.koin.core.annotation.Singleton
 class HistoryRepository(
     private val visitedPostsDao: VisitedPostsDao,
     override val votableRepository: LinksRepository,
-) : PostFeedRepository<FeedParams>() {
+) : PostFeedRepository<HistoryParams>() {
 
     val json = Json { ignoreUnknownKeys = true }
 
     override suspend fun getThings(
         after: Fullname,
-        params: FeedParams,
+        params: HistoryParams,
     ): PagingSource.LoadResult<Fullname, Fullname> {
         val timestamp = runCatching {
-            if (after.name.isBlank()) {
-                System.currentTimeMillis()
-            } else {
-                after.name.toLong()
-            }
+            visitedPostsDao.getPost(after)?.visitedAt ?: System.currentTimeMillis()
         }.getOrElse { e ->
+            Log.e("HistoryRepository", "Failed to parse timestamp", e)
             return PagingSource.LoadResult.Error(e)
         }
         val entities =
-            visitedPostsDao.getHistory(before = timestamp)
+            visitedPostsDao.getHistory(before = timestamp, visitedBy = params.visitedBy)
         val nextPage = entities.lastOrNull()?.let {
             visitedPostsDao.getPost(it.id)
         }
@@ -40,3 +38,7 @@ class HistoryRepository(
         )
     }
 }
+
+data class HistoryParams(
+    val visitedBy: List<Fullname>,
+)

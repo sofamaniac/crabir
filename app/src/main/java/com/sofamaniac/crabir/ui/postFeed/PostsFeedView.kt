@@ -33,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -195,7 +196,8 @@ fun FeedError(error: Throwable = RuntimeException("Test"), retry: () -> Unit = {
     ThemedCard(modifier = Modifier.clickable { retry() }) {
         Column(
             modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 stringResource(R.string.feed_error, error.localizedMessage),

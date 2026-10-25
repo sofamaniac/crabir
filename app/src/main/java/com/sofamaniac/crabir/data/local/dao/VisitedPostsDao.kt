@@ -17,10 +17,10 @@ interface VisitedPostsDao {
     @Query("SELECT * FROM visitedPosts WHERE id = :id")
     suspend fun getPost(id: Fullname): VisitedPostEntity?
 
-    @Query("SELECT votableTable.* FROM votableTable INNER JOIN visitedPosts ON votableTable.id = visitedPosts.id  WHERE visitedPosts.visitedAt < :before AND visitedBy = :visitedBy ORDER BY visitedPosts.visitedAt DESC LIMIT 100")
+    @Query("SELECT votableTable.* FROM votableTable INNER JOIN visitedPosts ON votableTable.id = visitedPosts.id  WHERE visitedPosts.visitedAt < :before AND visitedBy IN (:visitedBy) ORDER BY visitedPosts.visitedAt DESC LIMIT 100")
     suspend fun getHistory(
         before: Long = System.currentTimeMillis(),
-        visitedBy: Int,
+        visitedBy: List<Fullname>,
     ): List<VotableEntity>
 
     @Query("SELECT EXISTS(SELECT 1 FROM visitedPosts WHERE id = :id)")
@@ -31,6 +31,12 @@ interface VisitedPostsDao {
 
     @Query("SELECT votableTable.id FROM votableTable INNER JOIN visitedPosts ON votableTable.id = visitedPosts.id  WHERE visitedAt < :before ORDER BY visitedAt DESC LIMIT 100")
     fun getHistoryFlow(before: Long = System.currentTimeMillis()): Flow<List<Fullname>>
+
+    @Query("SELECT votableTable.id FROM votableTable INNER JOIN visitedPosts ON votableTable.id = visitedPosts.id  WHERE visitedAt < :before AND visitedBy IN (:visitedBy) ORDER BY visitedAt DESC LIMIT 100")
+    fun getHistoryFlow(
+        before: Long = System.currentTimeMillis(),
+        visitedBy: List<Fullname>,
+    ): Flow<List<Fullname>>
 
     @Query("SELECT * from visitedPosts WHERE visitedAt < :before ORDER BY visitedAt DESC LIMIT 100")
     suspend fun getHistoryIds(before: Long = System.currentTimeMillis()): List<VisitedPostEntity>
