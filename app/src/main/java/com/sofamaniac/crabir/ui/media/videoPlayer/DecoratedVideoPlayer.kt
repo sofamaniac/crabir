@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -196,11 +197,13 @@ private fun BoxScope.FullPlayerControls(
     barPlacement: Alignment = Alignment.BottomCenter,
     goFullscreen: (() -> Unit)?,
 ) {
-    PlayerButtons(modifier = Modifier.align(buttonPlacement), buttonSize = buttonSize) {
-        IconButton(onClick = { goFullscreen?.invoke() }) {
-            Icon(Icons.Default.Fullscreen, contentDescription = "Open fullscreen")
-        }
-    }
+    PlayerButtons(
+        modifier = Modifier.align(buttonPlacement),
+        buttonSize = buttonSize,
+        goFullscreen = goFullscreen,
+        fullscreenButtonIcon = Icons.Default.Fullscreen,
+        fullscreenButtonContentDescription = stringResource(R.string.video_open_fullscreen)
+    )
     PlayerControls(
         fullscreenButton = null,
         modifier = Modifier
@@ -209,16 +212,19 @@ private fun BoxScope.FullPlayerControls(
     )
 }
 
+@OptIn(UnstableApi::class)
 @Composable
 fun PlayerButtons(
     modifier: Modifier = Modifier,
     buttonSize: Dp = 64.dp,
-    fullscreenButton: @Composable (() -> Unit)? = null,
+    goFullscreen: (() -> Unit)? = null,
+    fullscreenButtonIcon: ImageVector? = null,
+    fullscreenButtonContentDescription: String? = null,
 ) {
     val player = remember { VideoPlayerManager.getInstance() }
     val theme = LocalTheme.current
     val showMuteButton by VideoPlayerManager.hasAudio.collectAsState()
-    val frac = if (showMuteButton && fullscreenButton != null) 0.66f else 0.5f
+    val frac = if (showMuteButton && goFullscreen != null) 0.66f else 0.5f
     val textColor = contentColorFor(theme.highlight)
     val buttonModifier = Modifier
         .clip(CircleShape)
@@ -243,6 +249,8 @@ fun PlayerButtons(
             tint = textColor,
             modifier = buttonModifier
         )
-        fullscreenButton?.invoke()
+        IconButton(onClick = { goFullscreen?.invoke() }, modifier = buttonModifier) {
+            Icon(fullscreenButtonIcon!!, contentDescription = fullscreenButtonContentDescription)
+        }
     }
 }

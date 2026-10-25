@@ -2,22 +2,21 @@ package com.sofamaniac.crabir.ui.media.videoPlayer
 
 import android.net.Uri
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FullscreenExit
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
+import com.sofamaniac.crabir.R
 import com.sofamaniac.crabir.domain.model.Fullname
 import com.sofamaniac.crabir.domain.model.votable.post.PostData
 import com.sofamaniac.crabir.isVideoUrl
@@ -59,16 +58,7 @@ fun FullscreenVideo(
         },
         bottomBar = {
             FullscreenBottomBar(post, showDecorations) {
-                PlayerControls {
-                    IconButton(onClick = dismiss, modifier = Modifier.size(32.dp)) {
-                        Icon(
-                            Icons.Default.FullscreenExit,
-                            contentDescription = "Exit fullscreen",
-                            tint = Color.White,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                }
+                PlayerControls()
             }
         },
         onDismiss = dismiss,
@@ -78,14 +68,27 @@ fun FullscreenVideo(
                 showDecorations = !showDecorations
             },
     ) {
-        VideoPlayer(
-            video,
-            key = post.id,
-            startPlaying = true,
-            mute = false,
-            modifier = Modifier
-                .fillMaxSize()
-        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            VideoPlayer(
+                video,
+                key = post.id,
+                startPlaying = true,
+                mute = false,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center)
+            )
+            if (showDecorations) {
+                PlayerButtons(
+                    modifier = Modifier.align(Alignment.Center),
+                    goFullscreen = dismiss,
+                    fullscreenButtonIcon = Icons.Default.FullscreenExit,
+                    fullscreenButtonContentDescription = stringResource(
+                        R.string.video_exit_fullscreen
+                    )
+                )
+            }
+        }
     }
 }
 

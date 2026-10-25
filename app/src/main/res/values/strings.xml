@@ -445,6 +445,8 @@
     <string name="post_removed_by_moderation">This post was removed by the moderation team of %1$s.</string>
     <string name="post_removed_by_reddit">This post was removed by Reddit spam filters.</string>
     <string name="cannot_reply_to_message">You cannot replied to this</string>
+    <string name="video_open_fullscreen">Open in fullscreen</string>
+    <string name="video_exit_fullscreen">Exit fullscreen</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>
