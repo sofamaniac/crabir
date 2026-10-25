@@ -164,7 +164,8 @@ fun Video(video: Richtext.Video, context: Context) {
                 .background(Color.Gray.copy(alpha = 0.3f))
                 .clickable {
                     uriHandler.openUri("https://v.redd.it/link/${context.threadId}/asset/${video.id}/HLSPlaylist.m3u8")
-                }) {
+                }
+        ) {
             AsyncImage(
                 "https://preview.redd.it/${video.id}.jpg?vthumb=1",
                 contentDescription = video.caption
@@ -445,20 +446,32 @@ fun AnnotatedString.Builder.withContext(
 
 fun Richtext.Text.toAnnotatedString(context: Context): AnnotatedString {
     var currentStart = 0
+    fun AnnotatedString.Builder.appendAndClean(text: String) {
+        // collapse all consecutive whitespaces to a single space
+        // similar to Apache Commons StringUtils.normalizeSpace
+        val (text, _) = text.fold(Pair("", false)) { (acc, inDoubleSpace), c ->
+            if (inDoubleSpace && c.isWhitespace()) {
+                Pair(acc, true)
+            } else {
+                Pair(acc + c, c.isWhitespace())
+            }
+        }
+        append(text)
+    }
     return buildAnnotatedString {
         withContext(context) {
             for (modifier in modifiers) {
                 if (currentStart < modifier.start) {
-                    append(text.substring(currentStart, modifier.start))
+                    appendAndClean(text.substring(currentStart, modifier.start))
                 }
                 val style = modifier.toSpanStyle(context.configuration.styles)
                 withStyle(style) {
-                    append(text.substring(modifier.start, modifier.start + modifier.length))
+                    appendAndClean(text.substring(modifier.start, modifier.start + modifier.length))
                 }
                 currentStart = modifier.start + modifier.length
             }
             if (currentStart < text.length) {
-                append(text.substring(currentStart, text.length))
+                appendAndClean(text.substring(currentStart, text.length))
             }
         }
     }
