@@ -235,7 +235,6 @@ private fun AccountsSelector(
             ToggleableState.On
         } else if (accounts.any { it.name !in ignoredAccounts }) {
             ToggleableState.Indeterminate
-
         } else {
             ToggleableState.Off
         }
@@ -269,9 +268,8 @@ private fun AccountsSelector(
                     role = Role.Checkbox,
                     onClick = {
                         ignoredAccounts = when (tristate) {
-                            ToggleableState.On -> emptySet()
-                            ToggleableState.Off -> accounts.map { it.name }.toSet()
-                            ToggleableState.Indeterminate -> accounts.map { it.name }.toSet()
+                            ToggleableState.Off, ToggleableState.Indeterminate -> emptySet()
+                            ToggleableState.On -> accounts.map { it.name }.toSet()
                         }
                     }
                 ),
