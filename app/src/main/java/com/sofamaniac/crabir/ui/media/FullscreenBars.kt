@@ -50,12 +50,12 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ColumnScope.FullscreenTopBar(
-    enabled: Boolean,
+    visible: Boolean,
     actions: @Composable () -> Unit = {},
 ) {
     val navController = LocalNavController.current
     AnimatedVisibility(
-        visible = enabled,
+        visible = visible,
         modifier = Modifier
             .fillMaxWidth()
             .align(Alignment.CenterHorizontally)
