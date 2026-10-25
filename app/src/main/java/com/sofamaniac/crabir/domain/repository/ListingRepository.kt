@@ -83,8 +83,16 @@ class ListingSource<Params, Data : DataInterface>(
             return LoadResult.Page(prevKey = null, nextKey = null, data = emptyList())
         }
         return when (val page = getThings(params.key!!)) {
-            is LoadResult.Error -> LoadResult.Error(page.throwable)
-            !is LoadResult.Page -> LoadResult.Error(Exception("Invalid load result"))
+            is LoadResult.Error -> {
+                Log.e("ListingSource", "Error while loading", page.throwable)
+                LoadResult.Error(page.throwable)
+            }
+
+            !is LoadResult.Page -> {
+                Log.e("ListingSource", "Invalid load result")
+                LoadResult.Error(Exception("Invalid load result"))
+            }
+
             else -> {
                 val data = page.data.mapNotNull { id ->
                     repository.cache.getAsync(id)

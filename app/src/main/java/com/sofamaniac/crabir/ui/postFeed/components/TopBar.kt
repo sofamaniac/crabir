@@ -197,7 +197,7 @@ fun TopBar(
 }
 
 @Composable
-private fun OptionMenu(
+internal fun OptionMenu(
     onPostViewClick: () -> Unit,
     onSettingsClick: () -> Unit,
     refresh: () -> Unit,
@@ -231,7 +231,7 @@ private fun OptionMenu(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ViewEditDialog(
+internal fun ViewEditDialog(
     onDismiss: () -> Unit,
     selectedView: Views,
     updateView: (Views) -> Unit,

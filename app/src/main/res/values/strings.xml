@@ -447,6 +447,8 @@
     <string name="cannot_reply_to_message">You cannot replied to this</string>
     <string name="video_open_fullscreen">Open in fullscreen</string>
     <string name="video_exit_fullscreen">Exit fullscreen</string>
+    <string name="history_filter_desc">Filter by accounts</string>
+    <string name="history_accounts_dialog">Accounts to show</string>
     <plurals name="subreddit_subscribers_count">"
         <item quantity="one">%1$s subscriber</item>
         <item quantity="other">%1$s subscribers</item>
