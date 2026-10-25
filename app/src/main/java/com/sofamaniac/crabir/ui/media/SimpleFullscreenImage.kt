@@ -22,7 +22,7 @@ fun SimpleFullscreenImage(url: String) {
 
     VerticalSwipeToDismiss(
         topBar = {
-            FullscreenTopBar(enabled = showOverlay, actions = {
+            FullscreenTopBar(visible = showOverlay, actions = {
                 DownloadButton(url.toUri())
             })
         },

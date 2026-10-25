@@ -1,12 +1,22 @@
 package com.sofamaniac.crabir.ui.media.videoPlayer
 
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import com.sofamaniac.crabir.R
@@ -28,8 +39,10 @@ import com.sofamaniac.crabir.ui.media.image.DownloadButton
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
 import com.sofamaniac.crabir.ui.post.PostDataViewModel
 import com.sofamaniac.crabir.ui.post.getVideoUrl
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun FullscreenVideo(
@@ -38,14 +51,16 @@ fun FullscreenVideo(
     dismiss: () -> Unit,
 ) {
     val post = viewModel.post.collectAsState(initial = null).value ?: return
-    var showDecorations by remember { mutableStateOf(true) }
     val video = remember { getVideoUrl(post)!! }
     val downloadUrl = post.getDownloadUrl()
     SaveToHistory(post.name, post.over18)
-    VerticalSwipeToDismiss(
-        topBar = {
+    FullscreenVideo(
+        url = video.url,
+        key = post.id,
+        dismiss = dismiss,
+        topBar = { visible ->
             FullscreenTopBar(
-                showDecorations,
+                visible,
                 actions = {
                     if (downloadUrl != null) {
                         DownloadButton(
@@ -56,10 +71,74 @@ fun FullscreenVideo(
                 }
             )
         },
-        bottomBar = {
-            FullscreenBottomBar(post, showDecorations) {
+        bottomBar = { visible ->
+            FullscreenBottomBar(post, visible) {
                 PlayerControls()
             }
+        }
+    )
+}
+
+@Composable
+fun FullscreenVideo(
+    url: String,
+    dismiss: () -> Unit,
+) {
+    FullscreenVideo(
+        url = url,
+        key = url,
+        dismiss = dismiss,
+        topBar = { visible ->
+            FullscreenTopBar(visible) {
+                if (url.toUri().isVideoUrl()) {
+                    DownloadButton(
+                        url.toUri(),
+                    )
+                }
+            }
+        },
+        bottomBar = { visible ->
+            AnimatedVisibility(
+                visible = visible,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally)
+                    .background(color = Color.Black.copy(alpha = 0.6f))
+                    .navigationBarsPadding(),
+                label = "decoration animation"
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Bottom,
+                    modifier = Modifier.height(IntrinsicSize.Min)
+                ) {
+                    PlayerControls()
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun FullscreenVideo(
+    url: String,
+    key: String = url,
+    dismiss: () -> Unit,
+    topBar: @Composable ColumnScope.(visible: Boolean) -> Unit = {},
+    bottomBar: @Composable ColumnScope.(visible: Boolean) -> Unit = {},
+) {
+    var showDecorations by remember { mutableStateOf(true) }
+    LaunchedEffect(showDecorations) {
+        if (showDecorations) {
+            delay(5.seconds)
+            showDecorations = false
+        }
+    }
+    VerticalSwipeToDismiss(
+        topBar = {
+            topBar(showDecorations)
+        },
+        bottomBar = {
+            bottomBar(showDecorations)
         },
         onDismiss = dismiss,
         modifier = Modifier
@@ -70,8 +149,8 @@ fun FullscreenVideo(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             VideoPlayer(
-                video,
-                key = post.id,
+                url,
+                key = key,
                 startPlaying = true,
                 mute = false,
                 modifier = Modifier
@@ -89,28 +168,6 @@ fun FullscreenVideo(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun FullscreenVideo(
-    url: String,
-    dismiss: () -> Unit,
-) {
-
-    VerticalSwipeToDismiss(
-        onDismiss = dismiss,
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        VideoPlayer(
-            url,
-            key = url,
-            startPlaying = true,
-            mute = false,
-            modifier = Modifier
-                .fillMaxSize()
-        )
     }
 }
 

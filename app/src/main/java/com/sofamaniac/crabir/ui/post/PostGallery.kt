@@ -62,6 +62,7 @@ import com.sofamaniac.crabir.ui.media.image.DownloadButtonViewModel
 import com.sofamaniac.crabir.ui.media.image.ImageView
 import com.sofamaniac.crabir.ui.media.image.TransformableImage
 import com.sofamaniac.crabir.ui.media.videoPlayer.DecoratedVideoPlayer
+import com.sofamaniac.crabir.ui.media.videoPlayer.PlayerButtons
 import com.sofamaniac.crabir.ui.media.videoPlayer.VideoPlayer
 import com.sofamaniac.crabir.ui.media.videoPlayer.controls.PlayerControls
 import org.koin.androidx.compose.koinViewModel
@@ -355,19 +356,33 @@ fun FullscreenGallery(
                     )
 
                 is MediaMetadata.Gif ->
-                    VideoPlayer(
-                        media = metadata.toMediaResource(),
-                        key = metadata.id ?: page.toString(),
-                        modifier = Modifier.fillMaxSize(),
-                        startPlaying = state.currentPage == page,
-                        placeholder = {
-                            ImageView(
-                                metadata.preview.last().toMediaResource(),
-                                allowTransformation = false,
-                                modifier = Modifier.fillMaxSize(),
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        VideoPlayer(
+                            media = metadata.toMediaResource(),
+                            key = metadata.id ?: page.toString(),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .align(Alignment.Center),
+                            startPlaying = state.currentPage == page,
+                            placeholder = {
+                                ImageView(
+                                    metadata.preview.last().toMediaResource(),
+                                    allowTransformation = false,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            },
+                        )
+                        if (showControls) {
+                            PlayerButtons(
+                                goFullscreen = dismiss,
+                                modifier = Modifier.align(Alignment.Center),
+                                fullscreenButtonIcon = Icons.Default.FullscreenExit,
+                                fullscreenButtonContentDescription = stringResource(
+                                    R.string.video_exit_fullscreen
+                                )
                             )
-                        },
-                    )
+                        }
+                    }
 
 
                 else -> {

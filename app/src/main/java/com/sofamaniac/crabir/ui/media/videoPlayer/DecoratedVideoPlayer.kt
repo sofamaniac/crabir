@@ -250,7 +250,11 @@ fun PlayerButtons(
             modifier = buttonModifier
         )
         IconButton(onClick = { goFullscreen?.invoke() }, modifier = buttonModifier) {
-            Icon(fullscreenButtonIcon!!, contentDescription = fullscreenButtonContentDescription)
+            Icon(
+                fullscreenButtonIcon!!,
+                tint = textColor,
+                contentDescription = fullscreenButtonContentDescription
+            )
         }
     }
 }
